@@ -1,0 +1,21 @@
+{
+    "name": "GRPC.NET.Example",
+    "rootNamespace": "",
+    "references": [
+        "GUID:3789a7777fa35fd4abd0086a45d240ca",
+        "GUID:9069ac25d95ca17448a247f3bb1c769f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Grpc.Net.Client.dll",
+        "Grpc.Core.Api.dll",
+        "Google.Protobuf.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
