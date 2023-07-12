@@ -1,0 +1,15 @@
+{
+    "name": "com.mochineko.grpc-dotnet-unity.plugins",
+    "version": "0.1.0",
+    "displayName": "grpc-dotnet for Unity Plugins",
+    "description": "Plugins of grpc-dotnet for Unity",
+    "unity": "2022.3",
+    "author": {
+      "name": "Mochineko",
+      "email": "t.o.e.4315@gmail.com"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+ssh://git@github.com:mochi-neko/grpc-dotnet-unity.git"
+    }
+  }
