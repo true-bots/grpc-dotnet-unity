@@ -1,6 +1,6 @@
 {
   "name": "com.mochineko.grpc-dotnet-unity",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "displayName": "grpc-dotnet for Unity",
   "description": "A gRPC library for Unity using grpc-dotnet and BestHTTP/2.",
   "unity": "2022.3",
@@ -13,6 +13,6 @@
     "url": "git+ssh://git@github.com:mochi-neko/grpc-dotnet-unity.git"
   },
   "dependencies": {
-    "com.mochineko.grpc-dotnet-unity.plugins": "https://github.com/mochi-neko/grpc-dotnet-unity.git?path=/Assets/GRPC.NET/Plugins/GRPC#0.1.0"
+    "com.mochineko.grpc-dotnet-unity.plugins": "https://github.com/mochi-neko/grpc-dotnet-unity.git?path=/Assets/GRPC.NET/Plugins/GRPC#mochineko"
   }
 }

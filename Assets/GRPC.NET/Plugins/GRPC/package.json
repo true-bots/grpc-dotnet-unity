@@ -1,6 +1,6 @@
 {
     "name": "com.mochineko.grpc-dotnet-unity.plugins",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "displayName": "grpc-dotnet for Unity Plugins",
     "description": "Plugins of grpc-dotnet for Unity",
     "unity": "2022.3",
