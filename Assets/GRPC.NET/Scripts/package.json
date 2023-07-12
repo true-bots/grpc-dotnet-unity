@@ -11,8 +11,5 @@
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com:mochi-neko/grpc-dotnet-unity.git"
-  },
-  "dependencies": {
-    "com.mochineko.grpc-dotnet-unity.plugins": "https://github.com/mochi-neko/grpc-dotnet-unity.git?path=/Assets/GRPC.NET/Plugins/GRPC#1.2.0"
   }
 }
