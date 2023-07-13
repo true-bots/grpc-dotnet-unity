@@ -22,22 +22,6 @@ namespace Mochineko.gRPC.NET.Editor
             EditorGUILayout.LabelField("Generates C# source code from protocol buffer (.proto) file.");
 
             EditorGUILayout.Space();
-
-            if (GUILayout.Button("Select protoc.exe Path ..."))
-            {
-                protocPath = EditorUtility.OpenFilePanel("Select protoc", string.Empty, "exe");
-            }
-            protocPath = EditorGUILayout.TextField("protoc.exe Path", protocPath);
-
-            EditorGUILayout.Space();
-            
-            if (GUILayout.Button("Select grpc_csharp_plugin.exe ..."))
-            {
-                pluginPath = EditorUtility.OpenFilePanel("Select gRPC C# Plugin", string.Empty, "exe");
-            }
-            pluginPath = EditorGUILayout.TextField("grpc_csharp_plugin.exe Path", pluginPath);
-
-            EditorGUILayout.Space();
             
             if (GUILayout.Button("Select Output Relative Path ..."))
             {
@@ -59,12 +43,15 @@ namespace Mochineko.gRPC.NET.Editor
             EditorGUILayout.Space();
             EditorGUILayout.Space();
 
-            if (string.IsNullOrEmpty(protocPath)
-                || string.IsNullOrEmpty(outputRelativePath)
-                || string.IsNullOrEmpty(pluginPath)
+            if (string.IsNullOrEmpty(GRPCSettings.ProtocPath)
+                || string.IsNullOrEmpty(GRPCSettings.GrpcCsharpPluginPath))
+            {
+                EditorGUILayout.HelpBox("Please set all paths in Preferences/gRPC.NET.", MessageType.Warning);
+            }
+            else if (string.IsNullOrEmpty(outputRelativePath)
                 || string.IsNullOrEmpty(protoFileRelativePath))
             {
-                EditorGUILayout.HelpBox("Please select all paths.", MessageType.Warning);
+                EditorGUILayout.HelpBox("Please set all paths in this windows.", MessageType.Warning);
             }
             else if (GUILayout.Button("Generate source code from .proto file..."))
             {
@@ -77,10 +64,10 @@ namespace Mochineko.gRPC.NET.Editor
             using var process = new System.Diagnostics.Process();
             var startInfo = new System.Diagnostics.ProcessStartInfo
             {
-                FileName = protocPath,
+                FileName = GRPCSettings.ProtocPath,
                 Arguments = $"--csharp_out {outputRelativePath} " +
                             $"--grpc_out {outputRelativePath} " +
-                            $"--plugin=protoc-gen-grpc={pluginPath} " +
+                            $"--plugin=protoc-gen-grpc={GRPCSettings.GrpcCsharpPluginPath} " +
                             $"{protoFileRelativePath}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
