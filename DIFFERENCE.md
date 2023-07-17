@@ -9,7 +9,7 @@ Add following dependencies to your `/Packages/manifest.json`.
     "dependencies": {
         "com.mochineko.grpc-dotnet-unity": "https://github.com/mochi-neko/grpc-dotnet-unity.git?path=/Assets/GRPC.NET/Scripts#1.2.0",
         "com.mochineko.grpc-dotnet-unity.plugins": "https://github.com/mochi-neko/grpc-dotnet-unity.git?path=/Assets/GRPC.NET/Plugins/GRPC#1.2.0",
-        "com.mochineko.grpc-dotnet-unity.editor": "https://github.com/mochi-neko/grpc-dotnet-unity.git?path=/Assets/Moshineko/gRPC.NET.Editor#1.2.0",
+        "com.mochineko.grpc-dotnet-unity.editor": "https://github.com/mochi-neko/grpc-dotnet-unity.git?path=/Assets/Mochineko/gRPC.NET.Editor#1.2.0",
         ...
     }
 }
