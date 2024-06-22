@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
@@ -10,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class CertStatus
 		: Asn1Encodable
 	{
-        public static CertStatus GetInstance(object obj)
-        {
+		public static CertStatus GetInstance(object obj)
+		{
 			if (obj is CertStatus certStatus)
 				return certStatus;
 
@@ -19,14 +18,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new CertStatus(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly Asn1OctetString m_certHash;
+		private readonly Asn1OctetString m_certHash;
 		private readonly DerInteger m_certReqID;
 		private readonly PkiStatusInfo m_statusInfo;
-        private readonly AlgorithmIdentifier m_hashAlg;
+		private readonly AlgorithmIdentifier m_hashAlg;
 
-        private CertStatus(Asn1Sequence seq)
+		private CertStatus(Asn1Sequence seq)
 		{
 			m_certHash = Asn1OctetString.GetInstance(seq[0]);
 			m_certReqID = DerInteger.GetInstance(seq[1]);
@@ -40,6 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 					{
 						m_statusInfo = PkiStatusInfo.GetInstance(s);
 					}
+
 					if (p is Asn1TaggedObject dto)
 					{
 						if (dto.TagNo != 0)
@@ -59,20 +59,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 
 		public CertStatus(byte[] certHash, BigInteger certReqID, PkiStatusInfo statusInfo)
 		{
-            m_certHash = new DerOctetString(certHash);
-            m_certReqID = new DerInteger(certReqID);
-            m_statusInfo = statusInfo;
+			m_certHash = new DerOctetString(certHash);
+			m_certReqID = new DerInteger(certReqID);
+			m_statusInfo = statusInfo;
 		}
 
-        public CertStatus(byte[] certHash, BigInteger certReqID, PkiStatusInfo statusInfo, AlgorithmIdentifier hashAlg)
-        {
-            m_certHash = new DerOctetString(certHash);
-            m_certReqID = new DerInteger(certReqID);
-            m_statusInfo = statusInfo;
-            m_hashAlg = hashAlg;
-        }
+		public CertStatus(byte[] certHash, BigInteger certReqID, PkiStatusInfo statusInfo, AlgorithmIdentifier hashAlg)
+		{
+			m_certHash = new DerOctetString(certHash);
+			m_certReqID = new DerInteger(certReqID);
+			m_statusInfo = statusInfo;
+			m_hashAlg = hashAlg;
+		}
 
-        public virtual Asn1OctetString CertHash => m_certHash;
+		public virtual Asn1OctetString CertHash => m_certHash;
 
 		public virtual DerInteger CertReqID => m_certReqID;
 
@@ -80,21 +80,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 
 		public virtual AlgorithmIdentifier HashAlg => m_hashAlg;
 
-        /**
-         * <pre>
-         *
-         *  CertStatus ::= SEQUENCE {
-         *     certHash    OCTET STRING,
-         *     certReqId   INTEGER,
-         *     statusInfo  PKIStatusInfo OPTIONAL,
-         *     hashAlg [0] AlgorithmIdentifier{DIGEST-ALGORITHM, {...}} OPTIONAL
-         *   }
-         *
-         * </pre>
-         *
-         * @return a basic ASN.1 object representation.
-         */
-        public override Asn1Object ToAsn1Object()
+		/**
+		 * <pre>
+		 *
+		 *  CertStatus ::= SEQUENCE {
+		 *     certHash    OCTET STRING,
+		 *     certReqId   INTEGER,
+		 *     statusInfo  PKIStatusInfo OPTIONAL,
+		 *     hashAlg [0] AlgorithmIdentifier{DIGEST-ALGORITHM, {...}} OPTIONAL
+		 *   }
+		 *
+		 * </pre>
+		 *
+		 * @return a basic ASN.1 object representation.
+		 */
+		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(m_certHash, m_certReqID);
 			v.AddOptional(m_statusInfo);

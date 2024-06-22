@@ -13,10 +13,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		internal SymmetricEncIntegrityPacket(
 			BcpgInputStream bcpgIn)
 			: base(bcpgIn)
-        {
+		{
 			version = bcpgIn.ReadByte();
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

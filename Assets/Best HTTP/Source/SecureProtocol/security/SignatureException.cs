@@ -5,8 +5,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 {
-    [Serializable]
-    public class SignatureException
+	[Serializable]
+	public class SignatureException
 		: GeneralSecurityException
 	{
 		public SignatureException()

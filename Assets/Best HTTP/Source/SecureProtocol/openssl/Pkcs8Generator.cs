@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs;
@@ -27,11 +26,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		public static readonly string PbeSha1_RC2_128 = PkcsObjectIdentifiers.PbeWithShaAnd128BitRC2Cbc.Id;
 		public static readonly string PbeSha1_RC2_40 = PkcsObjectIdentifiers.PbewithShaAnd40BitRC2Cbc.Id;
 
-		private char[]					password;
-		private string					algorithm;
-		private int						iterationCount;
-		private AsymmetricKeyParameter	privKey;
-		private SecureRandom			random;
+		private char[] password;
+		private string algorithm;
+		private int iterationCount;
+		private AsymmetricKeyParameter privKey;
+		private SecureRandom random;
 
 		/**
 		* Constructor for an unencrypted private key PEM object.
@@ -92,7 +91,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			{
 				EncryptedPrivateKeyInfo epki = EncryptedPrivateKeyInfoFactory.CreateEncryptedPrivateKeyInfo(
 					algorithm, password, salt, iterationCount, privKey);
-	
+
 				return new PemObject("ENCRYPTED PRIVATE KEY", epki.GetEncoded());
 			}
 			catch (Exception e)

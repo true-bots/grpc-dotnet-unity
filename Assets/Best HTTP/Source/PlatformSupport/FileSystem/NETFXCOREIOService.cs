@@ -205,7 +205,8 @@ namespace BestHTTP.PlatformSupport.FileSystem
             string[] strArray = uri.Split(new char[1] { '/' });
             for (int index = 0; index < strArray.Length - 1; ++index)
             {
-                Task<IReadOnlyList<StorageFolder>> task = WindowsRuntimeSystemExtensions.AsTask<IReadOnlyList<StorageFolder>>(storageFolder1.CreateFolderQuery().GetFoldersAsync());
+                Task<IReadOnlyList<StorageFolder>> task =
+ WindowsRuntimeSystemExtensions.AsTask<IReadOnlyList<StorageFolder>>(storageFolder1.CreateFolderQuery().GetFoldersAsync());
                 task.Wait();
                 if (task.Status != TaskStatus.RanToCompletion)
                     throw new Exception("Failed to find folder: " + strArray[index]);
@@ -237,7 +238,8 @@ namespace BestHTTP.PlatformSupport.FileSystem
 
         internal static StorageFile GetFileForPathOrURI(string path)
         {
-            IAsyncOperation<StorageFile> source = !System.Uri.IsWellFormedUriString(path, UriKind.RelativeOrAbsolute) ? StorageFile.GetFileFromPathAsync(path) : StorageFile.GetFileFromApplicationUriAsync(new System.Uri(path));
+            IAsyncOperation<StorageFile> source =
+ !System.Uri.IsWellFormedUriString(path, UriKind.RelativeOrAbsolute) ? StorageFile.GetFileFromPathAsync(path) : StorageFile.GetFileFromApplicationUriAsync(new System.Uri(path));
             WindowsRuntimeSystemExtensions.AsTask<StorageFile>(source).Wait();
             return source.GetResults();
         }

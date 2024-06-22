@@ -1,27 +1,26 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 {
-    public class TbsRequest
-        : Asn1Encodable
-    {
+	public class TbsRequest
+		: Asn1Encodable
+	{
 		private static readonly DerInteger V1 = new DerInteger(0);
 
-		private readonly DerInteger      version;
-        private readonly GeneralName     requestorName;
-        private readonly Asn1Sequence    requestList;
-        private readonly X509Extensions  requestExtensions;
+		private readonly DerInteger version;
+		private readonly GeneralName requestorName;
+		private readonly Asn1Sequence requestList;
+		private readonly X509Extensions requestExtensions;
 
 		private bool versionSet;
 
 		public static TbsRequest GetInstance(
-			Asn1TaggedObject	obj,
-			bool				explicitly)
+			Asn1TaggedObject obj,
+			bool explicitly)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
 		}
@@ -39,58 +38,58 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new TbsRequest((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public TbsRequest(
-            GeneralName     requestorName,
-            Asn1Sequence    requestList,
-            X509Extensions  requestExtensions)
-        {
-            this.version = V1;
-            this.requestorName = requestorName;
-            this.requestList = requestList;
-            this.requestExtensions = requestExtensions;
-        }
+			GeneralName requestorName,
+			Asn1Sequence requestList,
+			X509Extensions requestExtensions)
+		{
+			this.version = V1;
+			this.requestorName = requestorName;
+			this.requestList = requestList;
+			this.requestExtensions = requestExtensions;
+		}
 
 		private TbsRequest(
-            Asn1Sequence seq)
-        {
-            int index = 0;
+			Asn1Sequence seq)
+		{
+			int index = 0;
 
 			Asn1Encodable enc = seq[0];
 			if (enc is Asn1TaggedObject)
-            {
-                Asn1TaggedObject o = (Asn1TaggedObject) enc;
+			{
+				Asn1TaggedObject o = (Asn1TaggedObject)enc;
 
 				if (o.TagNo == 0)
-                {
+				{
 					versionSet = true;
 					version = DerInteger.GetInstance(o, true);
-                    index++;
-                }
-                else
-                {
-                    version = V1;
-                }
-            }
-            else
-            {
-                version = V1;
-            }
+					index++;
+				}
+				else
+				{
+					version = V1;
+				}
+			}
+			else
+			{
+				version = V1;
+			}
 
 			if (seq[index] is Asn1TaggedObject)
-            {
-                requestorName = GeneralName.GetInstance((Asn1TaggedObject) seq[index++], true);
-            }
+			{
+				requestorName = GeneralName.GetInstance((Asn1TaggedObject)seq[index++], true);
+			}
 
-			requestList = (Asn1Sequence) seq[index++];
+			requestList = (Asn1Sequence)seq[index++];
 
 			if (seq.Count == (index + 1))
-            {
-                requestExtensions = X509Extensions.GetInstance((Asn1TaggedObject) seq[index], true);
-            }
-        }
+			{
+				requestExtensions = X509Extensions.GetInstance((Asn1TaggedObject)seq[index], true);
+			}
+		}
 
 		public DerInteger Version
 		{
@@ -122,25 +121,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
          *     requestExtensions   [2]     EXPLICIT Extensions OPTIONAL }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
 
-            //
-            // if default don't include - unless explicitly provided. Not strictly correct
-            // but required for some requests
-            //
-            if (!version.Equals(V1) || versionSet)
-            {
-                v.Add(new DerTaggedObject(true, 0, version));
-            }
+			//
+			// if default don't include - unless explicitly provided. Not strictly correct
+			// but required for some requests
+			//
+			if (!version.Equals(V1) || versionSet)
+			{
+				v.Add(new DerTaggedObject(true, 0, version));
+			}
 
-            v.AddOptionalTagged(true, 1, requestorName);
-            v.Add(requestList);
-            v.AddOptionalTagged(true, 2, requestExtensions);
-            return new DerSequence(v);
-        }
-    }
+			v.AddOptionalTagged(true, 1, requestorName);
+			v.Add(requestList);
+			v.AddOptionalTagged(true, 2, requestExtensions);
+			return new DerSequence(v);
+		}
+	}
 }
 #pragma warning restore
 #endif

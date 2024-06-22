@@ -1,33 +1,32 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 {
-    /**
-    * this does your basic RSA algorithm.
-    */
-    public class RsaEngine
+	/**
+	* this does your basic RSA algorithm.
+	*/
+	public class RsaEngine
 		: IAsymmetricBlockCipher
-    {
+	{
 		private readonly IRsa core;
 
-        public RsaEngine()
-            : this(new RsaCoreEngine())
-        {
-        }
+		public RsaEngine()
+			: this(new RsaCoreEngine())
+		{
+		}
 
-        public RsaEngine(IRsa rsa)
-        {
-            this.core = rsa;
-        }
+		public RsaEngine(IRsa rsa)
+		{
+			this.core = rsa;
+		}
 
-        public virtual string AlgorithmName
-        {
-            get { return "RSA"; }
-        }
+		public virtual string AlgorithmName
+		{
+			get { return "RSA"; }
+		}
 
 		/**
         * initialise the RSA engine.
@@ -35,10 +34,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         * @param forEncryption true if we are encrypting, false otherwise.
         * @param param the necessary RSA key parameters.
         */
-        public virtual void Init(
-            bool				forEncryption,
-            ICipherParameters	parameters)
-        {
+		public virtual void Init(
+			bool forEncryption,
+			ICipherParameters parameters)
+		{
 			core.Init(forEncryption, parameters);
 		}
 
@@ -49,10 +48,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         *
         * @return maximum size for an input block.
         */
-        public virtual int GetInputBlockSize()
-        {
+		public virtual int GetInputBlockSize()
+		{
 			return core.GetInputBlockSize();
-        }
+		}
 
 		/**
         * Return the maximum size for an output block to this engine.
@@ -61,10 +60,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         *
         * @return maximum size for an output block.
         */
-        public virtual int GetOutputBlockSize()
-        {
+		public virtual int GetOutputBlockSize()
+		{
 			return core.GetOutputBlockSize();
-        }
+		}
 
 		/**
         * Process a single block using the basic RSA algorithm.
@@ -75,16 +74,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         * @return the result of the RSA process.
         * @exception DataLengthException the input block is too large.
         */
-        public virtual byte[] ProcessBlock(
-            byte[]	inBuf,
-            int		inOff,
-            int		inLen)
-        {
-            BigInteger input = core.ConvertInput(inBuf, inOff, inLen);
-            BigInteger output = core.ProcessBlock(input);
+		public virtual byte[] ProcessBlock(
+			byte[] inBuf,
+			int inOff,
+			int inLen)
+		{
+			BigInteger input = core.ConvertInput(inBuf, inOff, inLen);
+			BigInteger output = core.ProcessBlock(input);
 			return core.ConvertOutput(output);
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

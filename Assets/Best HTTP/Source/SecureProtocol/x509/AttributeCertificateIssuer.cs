@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
@@ -47,30 +46,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				name = (GeneralNames)form;
 			}
 
-            GeneralName[] names = name.GetNames();
+			GeneralName[] names = name.GetNames();
 
-            int count = 0;
-            for (int i = 0; i != names.Length; i++)
-            {
-                if (names[i].TagNo == GeneralName.DirectoryName)
-                {
-                    ++count;
-                }
-            }
-
-            object[] result = new object[count];
-
-            int pos = 0;
-            for (int i = 0; i != names.Length; i++)
+			int count = 0;
+			for (int i = 0; i != names.Length; i++)
 			{
 				if (names[i].TagNo == GeneralName.DirectoryName)
 				{
-                    result[pos++] = X509Name.GetInstance(names[i].Name);
+					++count;
 				}
 			}
 
-            return result;
-        }
+			object[] result = new object[count];
+
+			int pos = 0;
+			for (int i = 0; i != names.Length; i++)
+			{
+				if (names[i].TagNo == GeneralName.DirectoryName)
+				{
+					result[pos++] = X509Name.GetInstance(names[i].Name);
+				}
+			}
+
+			return result;
+		}
 
 		/// <summary>Return any principal objects inside the attribute certificate issuer object.</summary>
 		/// <returns>An array of IPrincipal objects (usually X509Principal).</returns>
@@ -78,18 +77,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		{
 			object[] p = this.GetNames();
 
-            int count = 0;
-            for (int i = 0; i != p.Length; i++)
-            {
-                if (p[i] is X509Name)
-                {
-                    ++count;
-                }
-            }
+			int count = 0;
+			for (int i = 0; i != p.Length; i++)
+			{
+				if (p[i] is X509Name)
+				{
+					++count;
+				}
+			}
 
-            X509Name[] result = new X509Name[count];
+			X509Name[] result = new X509Name[count];
 
-            int pos = 0;
+			int pos = 0;
 			for (int i = 0; i != p.Length; i++)
 			{
 				if (p[i] is X509Name)
@@ -98,12 +97,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				}
 			}
 
-            return result;
+			return result;
 		}
 
 		private bool MatchesDN(
-			X509Name		subject,
-			GeneralNames	targets)
+			X509Name subject,
+			GeneralNames targets)
 		{
 			GeneralName[] names = targets.GetNames();
 
@@ -141,17 +140,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			if (form is V2Form)
 			{
-				V2Form issuer = (V2Form) form;
+				V2Form issuer = (V2Form)form;
 				if (issuer.BaseCertificateID != null)
 				{
 					return issuer.BaseCertificateID.Serial.HasValue(x509Cert.SerialNumber)
-						&& MatchesDN(x509Cert.IssuerDN, issuer.BaseCertificateID.Issuer);
+					       && MatchesDN(x509Cert.IssuerDN, issuer.BaseCertificateID.Issuer);
 				}
 
 				return MatchesDN(x509Cert.SubjectDN, issuer.IssuerName);
 			}
 
-			return MatchesDN(x509Cert.SubjectDN, (GeneralNames) form);
+			return MatchesDN(x509Cert.SubjectDN, (GeneralNames)form);
 		}
 
 		public override bool Equals(

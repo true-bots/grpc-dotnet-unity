@@ -2,40 +2,39 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-    /**
-    * containing class for an CMS Enveloped Data object
-    */
-    public class CmsEnvelopedData
-    {
-        internal RecipientInformationStore	recipientInfoStore;
-        internal ContentInfo				contentInfo;
+	/**
+	* containing class for an CMS Enveloped Data object
+	*/
+	public class CmsEnvelopedData
+	{
+		internal RecipientInformationStore recipientInfoStore;
+		internal ContentInfo contentInfo;
 
-		private AlgorithmIdentifier	encAlg;
-        private Asn1Set				unprotectedAttributes;
+		private AlgorithmIdentifier encAlg;
+		private Asn1Set unprotectedAttributes;
 
 		public CmsEnvelopedData(
-            byte[] envelopedData)
-            : this(CmsUtilities.ReadContentInfo(envelopedData))
-        {
-        }
+			byte[] envelopedData)
+			: this(CmsUtilities.ReadContentInfo(envelopedData))
+		{
+		}
 
-        public CmsEnvelopedData(
-            Stream envelopedData)
-            : this(CmsUtilities.ReadContentInfo(envelopedData))
-        {
-        }
+		public CmsEnvelopedData(
+			Stream envelopedData)
+			: this(CmsUtilities.ReadContentInfo(envelopedData))
+		{
+		}
 
-        public CmsEnvelopedData(
-            ContentInfo contentInfo)
-        {
-            this.contentInfo = contentInfo;
+		public CmsEnvelopedData(
+			ContentInfo contentInfo)
+		{
+			this.contentInfo = contentInfo;
 
 			EnvelopedData envData = EnvelopedData.GetInstance(contentInfo.Content);
 
@@ -60,7 +59,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				recipientInfos, secureReadable);
 
 			this.unprotectedAttributes = envData.UnprotectedAttrs;
-        }
+		}
 
 		public AlgorithmIdentifier EncryptionAlgorithmID
 		{
@@ -70,21 +69,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		/**
         * return the object identifier for the content encryption algorithm.
         */
-        public string EncryptionAlgOid
-        {
-            get { return encAlg.Algorithm.Id; }
-        }
+		public string EncryptionAlgOid
+		{
+			get { return encAlg.Algorithm.Id; }
+		}
 
 		/**
         * return a store of the intended recipients for this message
         */
-        public RecipientInformationStore GetRecipientInfos()
-        {
-            return recipientInfoStore;
-        }
+		public RecipientInformationStore GetRecipientInfos()
+		{
+			return recipientInfoStore;
+		}
 
 		/**
-		 * return the ContentInfo 
+		 * return the ContentInfo
 		 */
 		public ContentInfo ContentInfo
 		{
@@ -95,22 +94,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
         * return a table of the unprotected attributes indexed by
         * the OID of the attribute.
         */
-        public Asn1.Cms.AttributeTable GetUnprotectedAttributes()
-        {
-            if (unprotectedAttributes == null)
-                return null;
+		public Asn1.Cms.AttributeTable GetUnprotectedAttributes()
+		{
+			if (unprotectedAttributes == null)
+				return null;
 
 			return new Asn1.Cms.AttributeTable(unprotectedAttributes);
-        }
+		}
 
 		/**
         * return the ASN.1 encoded representation of this object.
         */
-        public byte[] GetEncoded()
-        {
+		public byte[] GetEncoded()
+		{
 			return contentInfo.GetEncoded();
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

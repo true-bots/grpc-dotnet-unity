@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -51,13 +50,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class CmsAuthenticatedDataParser
 		: CmsContentInfoParser
 	{
-		internal RecipientInformationStore	_recipientInfoStore;
-		internal AuthenticatedDataParser	authData;
+		internal RecipientInformationStore _recipientInfoStore;
+		internal AuthenticatedDataParser authData;
 
-		private AlgorithmIdentifier			macAlg;
-		private byte[]						mac;
-		private Asn1.Cms.AttributeTable		authAttrs;
-		private Asn1.Cms.AttributeTable		unauthAttrs;
+		private AlgorithmIdentifier macAlg;
+		private byte[] mac;
+		private Asn1.Cms.AttributeTable authAttrs;
+		private Asn1.Cms.AttributeTable unauthAttrs;
 
 		private bool authAttrNotRead;
 		private bool unauthAttrNotRead;
@@ -112,7 +111,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		*/
 		public string MacAlgOid
 		{
-            get { return macAlg.Algorithm.Id; }
+			get { return macAlg.Algorithm.Id; }
 		}
 
 
@@ -145,6 +144,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				GetAuthAttrs();
 				mac = authData.GetMac().GetOctets();
 			}
+
 			return Arrays.Clone(mac);
 		}
 

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -15,17 +14,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		: IBlockCipher
 	{
 		private const int
-			rounds		= 32,
-			block_size	= 8;
+			rounds = 32,
+			block_size = 8;
 //			key_size	= 16,
 
-		private const uint 
-			delta		= 0x9E3779B9,
-			d_sum		= 0xC6EF3720; // sum on decrypt
+		private const uint
+			delta = 0x9E3779B9,
+			d_sum = 0xC6EF3720; // sum on decrypt
 
 		/*
-		* the expanded key array of 4 subkeys
-		*/
+		 * the expanded key array of 4 subkeys
+		 */
 		private uint _a, _b, _c, _d;
 		private bool _initialised;
 		private bool _forEncryption;
@@ -39,12 +38,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			_initialised = false;
 		}
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return "TEA"; }
 		}
 
-        public virtual int GetBlockSize()
+		public virtual int GetBlockSize()
 		{
 			return block_size;
 		}
@@ -57,12 +56,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @exception ArgumentException if the params argument is
 		* inappropriate.
 		*/
-        public virtual void Init(bool forEncryption, ICipherParameters parameters)
+		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter keyParameter))
 			{
 				throw new ArgumentException("invalid parameter passed to TEA init - "
-					+ Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
 			}
 
 			_forEncryption = forEncryption;
@@ -71,13 +70,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			SetKey(keyParameter.GetKey());
 		}
 
-        public virtual int ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
+		public virtual int ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			if (!_initialised)
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
 
-            Check.DataLength(inBytes, inOff, block_size, "input buffer too short");
-            Check.OutputLength(outBytes, outOff, block_size, "output buffer too short");
+			Check.DataLength(inBytes, inOff, block_size, "input buffer too short");
+			Check.OutputLength(outBytes, outOff, block_size, "output buffer too short");
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			return _forEncryption
@@ -130,8 +129,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			for (int i = 0; i != rounds; i++)
 			{
 				sum += delta;
-				v0  += ((v1 << 4) + _a) ^ (v1 + sum) ^ ((v1 >> 5) + _b);
-				v1  += ((v0 << 4) + _c) ^ (v0 + sum) ^ ((v0 >> 5) + _d);
+				v0 += ((v1 << 4) + _a) ^ (v1 + sum) ^ ((v1 >> 5) + _b);
+				v1 += ((v0 << 4) + _c) ^ (v0 + sum) ^ ((v0 >> 5) + _d);
 			}
 
 			Pack.UInt32_To_BE(v0, output);
@@ -150,8 +149,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			for (int i = 0; i != rounds; i++)
 			{
-				v1  -= ((v0 << 4) + _c) ^ (v0 + sum) ^ ((v0 >> 5) + _d);
-				v0  -= ((v1 << 4) + _a) ^ (v1 + sum) ^ ((v1 >> 5) + _b);
+				v1 -= ((v0 << 4) + _c) ^ (v0 + sum) ^ ((v0 >> 5) + _d);
+				v0 -= ((v1 << 4) + _a) ^ (v1 + sum) ^ ((v1 >> 5) + _b);
 				sum -= delta;
 			}
 
@@ -172,8 +171,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			for (int i = 0; i != rounds; i++)
 			{
 				sum += delta;
-				v0  += ((v1 << 4) + _a) ^ (v1 + sum) ^ ((v1 >> 5) + _b);
-				v1  += ((v0 << 4) + _c) ^ (v0 + sum) ^ ((v0 >> 5) + _d);
+				v0 += ((v1 << 4) + _a) ^ (v1 + sum) ^ ((v1 >> 5) + _b);
+				v1 += ((v0 << 4) + _c) ^ (v0 + sum) ^ ((v0 >> 5) + _d);
 			}
 
 			Pack.UInt32_To_BE(v0, outBytes, outOff);
@@ -192,8 +191,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			for (int i = 0; i != rounds; i++)
 			{
-				v1  -= ((v0 << 4) + _c) ^ (v0 + sum) ^ ((v0 >> 5) + _d);
-				v0  -= ((v1 << 4) + _a) ^ (v1 + sum) ^ ((v1 >> 5) + _b);
+				v1 -= ((v0 << 4) + _c) ^ (v0 + sum) ^ ((v0 >> 5) + _d);
+				v0 -= ((v1 << 4) + _a) ^ (v1 + sum) ^ ((v1 >> 5) + _b);
 				sum -= delta;
 			}
 

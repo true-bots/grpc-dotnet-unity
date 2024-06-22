@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
@@ -35,7 +34,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 			if (s.TagNo == 0)
 			{
-				return null;            // good
+				return null; // good
 			}
 
 			if (s.TagNo == 1)

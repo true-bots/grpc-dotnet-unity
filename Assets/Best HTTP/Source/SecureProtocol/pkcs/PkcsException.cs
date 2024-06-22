@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 	/// <summary>Base exception for PKCS related issues.</summary>
 	[Serializable]
 	public class PkcsException
-        : Exception
-    {
+		: Exception
+	{
 		public PkcsException()
 			: base()
 		{

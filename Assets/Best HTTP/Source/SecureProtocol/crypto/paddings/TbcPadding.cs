@@ -1,56 +1,54 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 {
-
-    /// <summary> A padder that adds Trailing-Bit-Compliment padding to a block.
-    /// <p>
-    /// This padding pads the block out compliment of the last bit
-    /// of the plain text.
-    /// </p>
-    /// </summary>
-    public class TbcPadding
+	/// <summary> A padder that adds Trailing-Bit-Compliment padding to a block.
+	/// <p>
+	/// This padding pads the block out compliment of the last bit
+	/// of the plain text.
+	/// </p>
+	/// </summary>
+	public class TbcPadding
 		: IBlockCipherPadding
-    {
-        /// <summary> Return the name of the algorithm the cipher implements.</summary>
-        /// <returns> the name of the algorithm the cipher implements.
-        /// </returns>
-        public string PaddingName
-        {
-            get { return "TBC"; }
-        }
+	{
+		/// <summary> Return the name of the algorithm the cipher implements.</summary>
+		/// <returns> the name of the algorithm the cipher implements.
+		/// </returns>
+		public string PaddingName
+		{
+			get { return "TBC"; }
+		}
 
 		/// <summary> Initialise the padder.</summary>
-        /// <param name="random">- a SecureRandom if available.
-        /// </param>
-        public virtual void Init(SecureRandom random)
-        {
-            // nothing to do.
-        }
+		/// <param name="random">- a SecureRandom if available.
+		/// </param>
+		public virtual void Init(SecureRandom random)
+		{
+			// nothing to do.
+		}
 
-        /// <summary> add the pad bytes to the passed in block, returning the number of bytes added.</summary>
-        /// <remarks>
-        /// This assumes that the last block of plain text is always passed to it inside <paramref name="input"/>.
-        /// i.e. if <paramref name="inOff"/> is zero, indicating the padding will fill the entire block,the value of
-        /// <paramref name="input"/> should be the same as the last block of plain text.
-        /// </remarks>
-        public virtual int AddPadding(byte[] input, int inOff)
-        {
-            int count = input.Length - inOff;
-            byte lastByte = inOff > 0 ? input[inOff - 1] : input[input.Length - 1];
-            byte padValue = (byte)((lastByte & 1) - 1);
+		/// <summary> add the pad bytes to the passed in block, returning the number of bytes added.</summary>
+		/// <remarks>
+		/// This assumes that the last block of plain text is always passed to it inside <paramref name="input"/>.
+		/// i.e. if <paramref name="inOff"/> is zero, indicating the padding will fill the entire block,the value of
+		/// <paramref name="input"/> should be the same as the last block of plain text.
+		/// </remarks>
+		public virtual int AddPadding(byte[] input, int inOff)
+		{
+			int count = input.Length - inOff;
+			byte lastByte = inOff > 0 ? input[inOff - 1] : input[input.Length - 1];
+			byte padValue = (byte)((lastByte & 1) - 1);
 
-            while (inOff < input.Length)
-            {
-                input[inOff++] = padValue;
-            }
+			while (inOff < input.Length)
+			{
+				input[inOff++] = padValue;
+			}
 
-            return count;
-        }
+			return count;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         /// <summary> add the pad bytes to the passed in block, returning the number of bytes added.</summary>
@@ -70,19 +68,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
         }
 #endif
 
-        public virtual int PadCount(byte[] input)
-        {
-            int i = input.Length;
-            int code = input[--i], count = 1, countingMask = -1;
-            while (--i >= 0)
-            {
-                int next = input[i];
-                int matchMask = ((next ^ code) - 1) >> 31;
-                countingMask &= matchMask;
-                count -= countingMask;
-            }
-            return count;
-        }
+		public virtual int PadCount(byte[] input)
+		{
+			int i = input.Length;
+			int code = input[--i], count = 1, countingMask = -1;
+			while (--i >= 0)
+			{
+				int next = input[i];
+				int matchMask = ((next ^ code) - 1) >> 31;
+				countingMask &= matchMask;
+				count -= countingMask;
+			}
+
+			return count;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public virtual int PadCount(ReadOnlySpan<byte> block)
@@ -99,7 +98,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
             return count;
         }
 #endif
-    }
+	}
 }
 #pragma warning restore
 #endif

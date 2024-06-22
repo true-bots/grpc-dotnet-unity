@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
@@ -13,36 +12,36 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	{
 		private readonly Stream input;
 
-        private bool used = false;
+		private bool used = false;
 
-        public CmsProcessableInputStream(Stream input)
+		public CmsProcessableInputStream(Stream input)
 		{
 			this.input = input;
 		}
 
-        public virtual Stream GetInputStream()
+		public virtual Stream GetInputStream()
 		{
 			CheckSingleUsage();
 
-            return input;
+			return input;
 		}
 
-        public virtual void Write(Stream output)
+		public virtual void Write(Stream output)
 		{
 			CheckSingleUsage();
 
 			Streams.PipeAll(input, output);
-            input.Dispose();
+			input.Dispose();
 		}
 
-        protected virtual void CheckSingleUsage()
+		protected virtual void CheckSingleUsage()
 		{
 			lock (this)
 			{
 				if (used)
 					throw new InvalidOperationException("CmsProcessableInputStream can only be used once");
 
-                used = true;
+				used = true;
 			}
 		}
 	}

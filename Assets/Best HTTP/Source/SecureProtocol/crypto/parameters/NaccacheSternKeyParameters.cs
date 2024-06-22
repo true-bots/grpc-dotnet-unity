@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
@@ -31,17 +30,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		/**
 		 * @return Returns the g.
 		 */
-		public BigInteger G { get  { return g; } }
+		public BigInteger G
+		{
+			get { return g; }
+		}
 
 		/**
 		 * @return Returns the lowerSigmaBound.
 		 */
-		public int LowerSigmaBound { get { return lowerSigmaBound; } }
+		public int LowerSigmaBound
+		{
+			get { return lowerSigmaBound; }
+		}
 
 		/**
 		 * @return Returns the n.
 		 */
-		public BigInteger Modulus { get { return n; } }
+		public BigInteger Modulus
+		{
+			get { return n; }
+		}
 	}
 }
 #pragma warning restore

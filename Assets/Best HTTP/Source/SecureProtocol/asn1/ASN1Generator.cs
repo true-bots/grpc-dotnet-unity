@@ -4,15 +4,15 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-    public abstract class Asn1Generator
-    {
+	public abstract class Asn1Generator
+	{
 		private Stream _out;
 
 		protected Asn1Generator(
 			Stream outStream)
-        {
-            _out = outStream;
-        }
+		{
+			_out = outStream;
+		}
 
 		protected Stream Out
 		{
@@ -21,12 +21,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		public abstract void AddObject(Asn1Encodable obj);
 
-        public abstract void AddObject(Asn1Object obj);
+		public abstract void AddObject(Asn1Object obj);
 
-        public abstract Stream GetRawOutputStream();
+		public abstract Stream GetRawOutputStream();
 
 		public abstract void Close();
-    }
+	}
 }
 #pragma warning restore
 #endif

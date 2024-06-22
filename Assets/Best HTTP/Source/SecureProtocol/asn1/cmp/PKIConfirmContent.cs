@@ -1,15 +1,14 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 {
-    /**
-     *  PKIConfirmContent ::= NULL
-     */
-    public class PkiConfirmContent
+	/**
+	 *  PKIConfirmContent ::= NULL
+	 */
+	public class PkiConfirmContent
 		: Asn1Encodable
 	{
 		public static PkiConfirmContent GetInstance(object obj)
@@ -23,20 +22,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			if (obj is Asn1Null asn1Null)
 				return new PkiConfirmContent(asn1Null);
 
-            throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
 		}
 
-        private readonly Asn1Null m_val;
+		private readonly Asn1Null m_val;
 
-        public PkiConfirmContent()
-            : this(DerNull.Instance)
-        {
-        }
+		public PkiConfirmContent()
+			: this(DerNull.Instance)
+		{
+		}
 
-        private PkiConfirmContent(Asn1Null val)
-        {
-            m_val = val;
-        }
+		private PkiConfirmContent(Asn1Null val)
+		{
+			m_val = val;
+		}
 
 		/**
 		 * <pre>

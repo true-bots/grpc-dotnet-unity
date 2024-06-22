@@ -1,83 +1,84 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 {
-    /// <summary>A generic TLS MAC implementation, acting as an HMAC based on some underlying Digest.</summary>
-    public class TlsSuiteHmac
-        : TlsSuiteMac
-    {
-        protected static int GetMacSize(TlsCryptoParameters cryptoParams, TlsMac mac)
-        {
-            int macSize = mac.MacLength;
-            if (cryptoParams.SecurityParameters.IsTruncatedHmac)
-            {
-                macSize = System.Math.Min(macSize, 10);
-            }
-            return macSize;
-        }
+	/// <summary>A generic TLS MAC implementation, acting as an HMAC based on some underlying Digest.</summary>
+	public class TlsSuiteHmac
+		: TlsSuiteMac
+	{
+		protected static int GetMacSize(TlsCryptoParameters cryptoParams, TlsMac mac)
+		{
+			int macSize = mac.MacLength;
+			if (cryptoParams.SecurityParameters.IsTruncatedHmac)
+			{
+				macSize = System.Math.Min(macSize, 10);
+			}
 
-        protected readonly TlsCryptoParameters m_cryptoParams;
-        protected readonly TlsHmac m_mac;
-        protected readonly int m_digestBlockSize;
-        protected readonly int m_digestOverhead;
-        protected readonly int m_macSize;
+			return macSize;
+		}
 
-        /// <summary>Generate a new instance of a TlsMac.</summary>
-        /// <param name="cryptoParams">the TLS client context specific crypto parameters.</param>
-        /// <param name="mac">The MAC to use.</param>
-        public TlsSuiteHmac(TlsCryptoParameters cryptoParams, TlsHmac mac)
-        {
-            this.m_cryptoParams = cryptoParams;
-            this.m_mac = mac;
-            this.m_macSize = GetMacSize(cryptoParams, mac);
-            this.m_digestBlockSize = mac.InternalBlockSize;
+		protected readonly TlsCryptoParameters m_cryptoParams;
+		protected readonly TlsHmac m_mac;
+		protected readonly int m_digestBlockSize;
+		protected readonly int m_digestOverhead;
+		protected readonly int m_macSize;
 
-            // TODO This should check the actual algorithm, not assume based on the digest size
-            if (TlsImplUtilities.IsSsl(cryptoParams) && mac.MacLength == 20)
-            {
-                /*
-                 * NOTE: For the SSL 3.0 MAC with SHA-1, the secret + input pad is not block-aligned.
-                 */
-                this.m_digestOverhead = 4;
-            }
-            else
-            {
-                this.m_digestOverhead = m_digestBlockSize / 8;
-            }
-        }
+		/// <summary>Generate a new instance of a TlsMac.</summary>
+		/// <param name="cryptoParams">the TLS client context specific crypto parameters.</param>
+		/// <param name="mac">The MAC to use.</param>
+		public TlsSuiteHmac(TlsCryptoParameters cryptoParams, TlsHmac mac)
+		{
+			this.m_cryptoParams = cryptoParams;
+			this.m_mac = mac;
+			this.m_macSize = GetMacSize(cryptoParams, mac);
+			this.m_digestBlockSize = mac.InternalBlockSize;
 
-        public virtual int Size
-        {
-            get { return m_macSize; }
-        }
+			// TODO This should check the actual algorithm, not assume based on the digest size
+			if (TlsImplUtilities.IsSsl(cryptoParams) && mac.MacLength == 20)
+			{
+				/*
+				 * NOTE: For the SSL 3.0 MAC with SHA-1, the secret + input pad is not block-aligned.
+				 */
+				this.m_digestOverhead = 4;
+			}
+			else
+			{
+				this.m_digestOverhead = m_digestBlockSize / 8;
+			}
+		}
 
-        public virtual byte[] CalculateMac(long seqNo, short type, byte[] msg, int msgOff, int msgLen)
-        {
+		public virtual int Size
+		{
+			get { return m_macSize; }
+		}
+
+		public virtual byte[] CalculateMac(long seqNo, short type, byte[] msg, int msgOff, int msgLen)
+		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return CalculateMac(seqNo, type, msg.AsSpan(msgOff, msgLen));
 #else
-            ProtocolVersion serverVersion = m_cryptoParams.ServerVersion;
-            bool isSsl = serverVersion.IsSsl;
+			ProtocolVersion serverVersion = m_cryptoParams.ServerVersion;
+			bool isSsl = serverVersion.IsSsl;
 
-            byte[] macHeader = new byte[isSsl ? 11 : 13];
-            TlsUtilities.WriteUint64(seqNo, macHeader, 0);
-            TlsUtilities.WriteUint8(type, macHeader, 8);
-            if (!isSsl)
-            {
-                TlsUtilities.WriteVersion(serverVersion, macHeader, 9);
-            }
-            TlsUtilities.WriteUint16(msgLen, macHeader, macHeader.Length - 2);
+			byte[] macHeader = new byte[isSsl ? 11 : 13];
+			TlsUtilities.WriteUint64(seqNo, macHeader, 0);
+			TlsUtilities.WriteUint8(type, macHeader, 8);
+			if (!isSsl)
+			{
+				TlsUtilities.WriteVersion(serverVersion, macHeader, 9);
+			}
 
-            m_mac.Update(macHeader, 0, macHeader.Length);
-            m_mac.Update(msg, msgOff, msgLen);
+			TlsUtilities.WriteUint16(msgLen, macHeader, macHeader.Length - 2);
 
-            return Truncate(m_mac.CalculateMac());
+			m_mac.Update(macHeader, 0, macHeader.Length);
+			m_mac.Update(msg, msgOff, msgLen);
+
+			return Truncate(m_mac.CalculateMac());
 #endif
-        }
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public virtual byte[] CalculateMac(long seqNo, short type, ReadOnlySpan<byte> message)
@@ -101,51 +102,51 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
         }
 #endif
 
-        public virtual byte[] CalculateMacConstantTime(long seqNo, short type, byte[] msg, int msgOff, int msgLen,
-            int fullLength, byte[] dummyData)
-        {
-            /*
-             * Actual MAC only calculated on 'length' bytes...
-             */
-            byte[] result = CalculateMac(seqNo, type, msg, msgOff, msgLen);
+		public virtual byte[] CalculateMacConstantTime(long seqNo, short type, byte[] msg, int msgOff, int msgLen,
+			int fullLength, byte[] dummyData)
+		{
+			/*
+			 * Actual MAC only calculated on 'length' bytes...
+			 */
+			byte[] result = CalculateMac(seqNo, type, msg, msgOff, msgLen);
 
-            /*
-             * ...but ensure a constant number of complete digest blocks are processed (as many as would
-             * be needed for 'fullLength' bytes of input).
-             */
-            int headerLength = TlsImplUtilities.IsSsl(m_cryptoParams) ? 11 : 13;
+			/*
+			 * ...but ensure a constant number of complete digest blocks are processed (as many as would
+			 * be needed for 'fullLength' bytes of input).
+			 */
+			int headerLength = TlsImplUtilities.IsSsl(m_cryptoParams) ? 11 : 13;
 
-            // How many extra full blocks do we need to calculate?
-            int extra = GetDigestBlockCount(headerLength + fullLength) - GetDigestBlockCount(headerLength + msgLen);
+			// How many extra full blocks do we need to calculate?
+			int extra = GetDigestBlockCount(headerLength + fullLength) - GetDigestBlockCount(headerLength + msgLen);
 
-            while (--extra >= 0)
-            {
-                m_mac.Update(dummyData, 0, m_digestBlockSize);
-            }
+			while (--extra >= 0)
+			{
+				m_mac.Update(dummyData, 0, m_digestBlockSize);
+			}
 
-            // One more byte in case the implementation is "lazy" about processing blocks
-            m_mac.Update(dummyData, 0, 1);
-            m_mac.Reset();
+			// One more byte in case the implementation is "lazy" about processing blocks
+			m_mac.Update(dummyData, 0, 1);
+			m_mac.Reset();
 
-            return result;
-        }
+			return result;
+		}
 
-        protected virtual int GetDigestBlockCount(int inputLength)
-        {
-            // NOTE: The input pad for HMAC is always a full digest block
+		protected virtual int GetDigestBlockCount(int inputLength)
+		{
+			// NOTE: The input pad for HMAC is always a full digest block
 
-            // NOTE: This calculation assumes a minimum of 1 pad byte
-            return (inputLength + m_digestOverhead) / m_digestBlockSize;
-        }
+			// NOTE: This calculation assumes a minimum of 1 pad byte
+			return (inputLength + m_digestOverhead) / m_digestBlockSize;
+		}
 
-        protected virtual byte[] Truncate(byte[] bs)
-        {
-            if (bs.Length <= m_macSize)
-                return bs;
+		protected virtual byte[] Truncate(byte[] bs)
+		{
+			if (bs.Length <= m_macSize)
+				return bs;
 
-            return Arrays.CopyOf(bs, m_macSize);
-        }
-    }
+			return Arrays.CopyOf(bs, m_macSize);
+		}
+	}
 }
 #pragma warning restore
 #endif

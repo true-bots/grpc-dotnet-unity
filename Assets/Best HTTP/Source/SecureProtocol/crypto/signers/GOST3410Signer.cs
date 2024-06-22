@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -18,12 +17,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		private Gost3410KeyParameters key;
 		private SecureRandom random;
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return "GOST3410"; }
 		}
 
-        public virtual void Init(bool forSigning, ICipherParameters parameters)
+		public virtual void Init(bool forSigning, ICipherParameters parameters)
 		{
 			if (forSigning)
 			{
@@ -40,21 +39,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				if (!(parameters is Gost3410PrivateKeyParameters))
 					throw new InvalidKeyException("GOST3410 private key required for signing");
 
-				this.key = (Gost3410PrivateKeyParameters) parameters;
+				this.key = (Gost3410PrivateKeyParameters)parameters;
 			}
 			else
 			{
 				if (!(parameters is Gost3410PublicKeyParameters))
 					throw new InvalidKeyException("GOST3410 public key required for signing");
 
-				this.key = (Gost3410PublicKeyParameters) parameters;
+				this.key = (Gost3410PublicKeyParameters)parameters;
 			}
 		}
 
-        public virtual BigInteger Order
-        {
-            get { return key.Parameters.Q; }
-        }
+		public virtual BigInteger Order
+		{
+			get { return key.Parameters.Q; }
+		}
 
 		/**
 		 * generate a signature for the given message using the key we were
@@ -63,10 +62,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		 *
 		 * @param message the message that will be verified later.
 		 */
-        public virtual BigInteger[] GenerateSignature(
+		public virtual BigInteger[] GenerateSignature(
 			byte[] message)
 		{
-            byte[] mRev = Arrays.Reverse(message); // conversion is little-endian
+			byte[] mRev = Arrays.Reverse(message); // conversion is little-endian
 			BigInteger m = new BigInteger(1, mRev);
 			Gost3410Parameters parameters = key.Parameters;
 			BigInteger k;
@@ -74,16 +73,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			do
 			{
 				k = new BigInteger(parameters.Q.BitLength, random);
-			}
-			while (k.CompareTo(parameters.Q) >= 0);
+			} while (k.CompareTo(parameters.Q) >= 0);
 
 			BigInteger r = parameters.A.ModPow(k, parameters.P).Mod(parameters.Q);
 
-			BigInteger s = k.Multiply(m).
-				Add(((Gost3410PrivateKeyParameters)key).X.Multiply(r)).
-				Mod(parameters.Q);
+			BigInteger s = k.Multiply(m).Add(((Gost3410PrivateKeyParameters)key).X.Multiply(r)).Mod(parameters.Q);
 
-			return new BigInteger[]{ r, s };
+			return new BigInteger[] { r, s };
 		}
 
 		/**
@@ -91,13 +87,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		 * the passed in message for standard Gost3410 the message should be a
 		 * Gost3411 hash of the real message to be verified.
 		 */
-        public virtual bool VerifySignature(
-			byte[]		message,
-			BigInteger	r,
-			BigInteger	s)
+		public virtual bool VerifySignature(
+			byte[] message,
+			BigInteger r,
+			BigInteger s)
 		{
-            byte[] mRev = Arrays.Reverse(message); // conversion is little-endian
-            BigInteger m = new BigInteger(1, mRev);
+			byte[] mRev = Arrays.Reverse(message); // conversion is little-endian
+			BigInteger m = new BigInteger(1, mRev);
 			Gost3410Parameters parameters = key.Parameters;
 
 			if (r.SignValue < 0 || parameters.Q.CompareTo(r) <= 0)

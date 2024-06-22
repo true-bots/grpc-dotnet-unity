@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
@@ -100,12 +99,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 			get { return this.validationParms; }
 		}
 
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector(p, g, q);
-            v.AddOptional(j, validationParms);
-            return new DerSequence(v);
-        }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector(p, g, q);
+			v.AddOptional(j, validationParms);
+			return new DerSequence(v);
+		}
 	}
 }
 #pragma warning restore

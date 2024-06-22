@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 
@@ -12,13 +11,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	*/
 	public class GOfbBlockCipher
 		: IBlockCipherMode
-    {
-		private byte[]	IV;
-		private byte[]	ofbV;
-		private byte[]	ofbOutV;
+	{
+		private byte[] IV;
+		private byte[] ofbV;
+		private byte[] ofbOutV;
 
-		private readonly int			blockSize;
-		private readonly IBlockCipher	cipher;
+		private readonly int blockSize;
+		private readonly IBlockCipher cipher;
 
 		bool firstStep = true;
 		int N3;
@@ -48,12 +47,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			this.ofbOutV = new byte[cipher.GetBlockSize()];
 		}
 
-        /**
+		/**
 		* return the underlying block cipher that we are wrapping.
 		*
 		* @return the underlying block cipher that we are wrapping.
 		*/
-        public IBlockCipher UnderlyingCipher => cipher;
+		public IBlockCipher UnderlyingCipher => cipher;
 
 		/**
 		* Initialise the cipher and, possibly, the initialisation vector (IV).
@@ -66,8 +65,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* @exception ArgumentException if the parameters argument is inappropriate.
 		*/
 		public void Init(
-			bool				forEncryption, //ignored by this CTR mode
-			ICipherParameters	parameters)
+			bool forEncryption, //ignored by this CTR mode
+			ICipherParameters parameters)
 		{
 			firstStep = true;
 			N3 = 0;
@@ -76,7 +75,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			if (parameters is ParametersWithIV)
 			{
 				ParametersWithIV ivParam = (ParametersWithIV)parameters;
-				byte[]      iv = ivParam.GetIV();
+				byte[] iv = ivParam.GetIV();
 
 				if (iv.Length < IV.Length)
 				{
@@ -97,11 +96,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 
 			Reset();
 
-            // if it's null, key is to be reused.
-            if (parameters != null)
-            {
-                cipher.Init(true, parameters);
-            }
+			// if it's null, key is to be reused.
+			if (parameters != null)
+			{
+				cipher.Init(true, parameters);
+			}
 		}
 
 		/**
@@ -130,7 +129,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			return blockSize;
 		}
 
-		public int ProcessBlock(byte[] input, int inOff, byte[]	output, int outOff)
+		public int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			Check.DataLength(input, inOff, blockSize, "input buffer too short");
 			Check.OutputLength(output, outOff, blockSize, "output buffer too short");
@@ -142,15 +141,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				N3 = (int)Pack.LE_To_UInt32(ofbOutV, 0);
 				N4 = (int)Pack.LE_To_UInt32(ofbOutV, 4);
 			}
+
 			N3 += C2;
 			N4 += C1;
-            if (N4 < C1)  // addition is mod (2**32 - 1)
-            {
-                if (N4 > 0)
-                {
-                    N4++;
-                }
-            }
+			if (N4 < C1) // addition is mod (2**32 - 1)
+			{
+				if (N4 > 0)
+				{
+					N4++;
+				}
+			}
+
 			Pack.UInt32_To_LE((uint)N3, ofbV, 0);
 			Pack.UInt32_To_LE((uint)N4, ofbV, 4);
 

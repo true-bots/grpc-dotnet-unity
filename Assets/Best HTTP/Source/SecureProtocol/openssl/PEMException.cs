@@ -6,8 +6,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 {
-    [Serializable]
-    public class PemException
+	[Serializable]
+	public class PemException
 		: IOException
 	{
 		public PemException()

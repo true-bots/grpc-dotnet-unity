@@ -8,33 +8,33 @@ using System.Runtime.Intrinsics.X86;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 {
-    internal abstract class Interleave
-    {
-        private const ulong M32 = 0x55555555UL;
-        private const ulong M64 = 0x5555555555555555UL;
-        private const ulong M64R = 0xAAAAAAAAAAAAAAAAUL;
+	internal abstract class Interleave
+	{
+		private const ulong M32 = 0x55555555UL;
+		private const ulong M64 = 0x5555555555555555UL;
+		private const ulong M64R = 0xAAAAAAAAAAAAAAAAUL;
 
-        internal static uint Expand8to16(uint x)
-        {
-            x &= 0xFFU;
-            x = (x | (x << 4)) & 0x0F0FU;
-            x = (x | (x << 2)) & 0x3333U;
-            x = (x | (x << 1)) & 0x5555U;
-            return x;
-        }
+		internal static uint Expand8to16(uint x)
+		{
+			x &= 0xFFU;
+			x = (x | (x << 4)) & 0x0F0FU;
+			x = (x | (x << 2)) & 0x3333U;
+			x = (x | (x << 1)) & 0x5555U;
+			return x;
+		}
 
-        internal static uint Expand16to32(uint x)
-        {
-            x &= 0xFFFFU;
-            x = (x | (x << 8)) & 0x00FF00FFU;
-            x = (x | (x << 4)) & 0x0F0F0F0FU;
-            x = (x | (x << 2)) & 0x33333333U;
-            x = (x | (x << 1)) & 0x55555555U;
-            return x;
-        }
+		internal static uint Expand16to32(uint x)
+		{
+			x &= 0xFFFFU;
+			x = (x | (x << 8)) & 0x00FF00FFU;
+			x = (x | (x << 4)) & 0x0F0F0F0FU;
+			x = (x | (x << 2)) & 0x33333333U;
+			x = (x | (x << 1)) & 0x55555555U;
+			return x;
+		}
 
-        internal static ulong Expand32to64(uint x)
-        {
+		internal static ulong Expand32to64(uint x)
+		{
 #if NETCOREAPP3_0_OR_GREATER
             if (Bmi2.IsSupported)
             {
@@ -43,17 +43,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
             }
 #endif
 
-            // "shuffle" low half to even bits and high half to odd bits
-            x = Bits.BitPermuteStep(x, 0x0000FF00U, 8);
-            x = Bits.BitPermuteStep(x, 0x00F000F0U, 4);
-            x = Bits.BitPermuteStep(x, 0x0C0C0C0CU, 2);
-            x = Bits.BitPermuteStep(x, 0x22222222U, 1);
+			// "shuffle" low half to even bits and high half to odd bits
+			x = Bits.BitPermuteStep(x, 0x0000FF00U, 8);
+			x = Bits.BitPermuteStep(x, 0x00F000F0U, 4);
+			x = Bits.BitPermuteStep(x, 0x0C0C0C0CU, 2);
+			x = Bits.BitPermuteStep(x, 0x22222222U, 1);
 
-            return ((x >> 1) & M32) << 32 | (x & M32);
-        }
+			return ((x >> 1) & M32) << 32 | (x & M32);
+		}
 
-        internal static void Expand64To128(ulong x, ulong[] z, int zOff)
-        {
+		internal static void Expand64To128(ulong x, ulong[] z, int zOff)
+		{
 #if NETCOREAPP3_0_OR_GREATER
             if (Bmi2.X64.IsSupported)
             {
@@ -63,16 +63,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
             }
 #endif
 
-            // "shuffle" low half to even bits and high half to odd bits
-            x = Bits.BitPermuteStep(x, 0x00000000FFFF0000UL, 16);
-            x = Bits.BitPermuteStep(x, 0x0000FF000000FF00UL, 8);
-            x = Bits.BitPermuteStep(x, 0x00F000F000F000F0UL, 4);
-            x = Bits.BitPermuteStep(x, 0x0C0C0C0C0C0C0C0CUL, 2);
-            x = Bits.BitPermuteStep(x, 0x2222222222222222UL, 1);
+			// "shuffle" low half to even bits and high half to odd bits
+			x = Bits.BitPermuteStep(x, 0x00000000FFFF0000UL, 16);
+			x = Bits.BitPermuteStep(x, 0x0000FF000000FF00UL, 8);
+			x = Bits.BitPermuteStep(x, 0x00F000F000F000F0UL, 4);
+			x = Bits.BitPermuteStep(x, 0x0C0C0C0C0C0C0C0CUL, 2);
+			x = Bits.BitPermuteStep(x, 0x2222222222222222UL, 1);
 
-            z[zOff    ] = (x     ) & M64;
-            z[zOff + 1] = (x >> 1) & M64;
-        }
+			z[zOff] = (x) & M64;
+			z[zOff + 1] = (x >> 1) & M64;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         internal static void Expand64To128(ulong x, Span<ulong> z)
@@ -98,15 +98,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
         }
 #endif
 
-        internal static void Expand64To128(ulong[] xs, int xsOff, int xsLen, ulong[] zs, int zsOff)
-        {
-            int xsPos = xsLen, zsPos = zsOff + (xsLen << 1);
-            while (--xsPos >= 0)
-            {
-                zsPos -= 2;
-                Expand64To128(xs[xsOff + xsPos], zs, zsPos);
-            }
-        }
+		internal static void Expand64To128(ulong[] xs, int xsOff, int xsLen, ulong[] zs, int zsOff)
+		{
+			int xsPos = xsLen, zsPos = zsOff + (xsLen << 1);
+			while (--xsPos >= 0)
+			{
+				zsPos -= 2;
+				Expand64To128(xs[xsOff + xsPos], zs, zsPos);
+			}
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         internal static void Expand64To128(ReadOnlySpan<ulong> xs, Span<ulong> zs)
@@ -121,70 +121,70 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
         }
 #endif
 
-        internal static ulong Expand64To128Rev(ulong x, out ulong low)
-        {
+		internal static ulong Expand64To128Rev(ulong x, out ulong low)
+		{
 #if NETCOREAPP3_0_OR_GREATER
             if (Bmi2.X64.IsSupported)
             {
-                low  = Bmi2.X64.ParallelBitDeposit(x >> 32, 0xAAAAAAAAAAAAAAAAUL);
+                low = Bmi2.X64.ParallelBitDeposit(x >> 32, 0xAAAAAAAAAAAAAAAAUL);
                 return Bmi2.X64.ParallelBitDeposit(x      , 0xAAAAAAAAAAAAAAAAUL);
             }
 #endif
 
-            // "shuffle" low half to even bits and high half to odd bits
-            x = Bits.BitPermuteStep(x, 0x00000000FFFF0000UL, 16);
-            x = Bits.BitPermuteStep(x, 0x0000FF000000FF00UL, 8);
-            x = Bits.BitPermuteStep(x, 0x00F000F000F000F0UL, 4);
-            x = Bits.BitPermuteStep(x, 0x0C0C0C0C0C0C0C0CUL, 2);
-            x = Bits.BitPermuteStep(x, 0x2222222222222222UL, 1);
+			// "shuffle" low half to even bits and high half to odd bits
+			x = Bits.BitPermuteStep(x, 0x00000000FFFF0000UL, 16);
+			x = Bits.BitPermuteStep(x, 0x0000FF000000FF00UL, 8);
+			x = Bits.BitPermuteStep(x, 0x00F000F000F000F0UL, 4);
+			x = Bits.BitPermuteStep(x, 0x0C0C0C0C0C0C0C0CUL, 2);
+			x = Bits.BitPermuteStep(x, 0x2222222222222222UL, 1);
 
-            low  = (x     ) & M64R;
-            return (x << 1) & M64R;
-        }
+			low = (x) & M64R;
+			return (x << 1) & M64R;
+		}
 
-        internal static uint Shuffle(uint x)
-        {
-            // "shuffle" low half to even bits and high half to odd bits
-            x = Bits.BitPermuteStep(x, 0x0000FF00U, 8);
-            x = Bits.BitPermuteStep(x, 0x00F000F0U, 4);
-            x = Bits.BitPermuteStep(x, 0x0C0C0C0CU, 2);
-            x = Bits.BitPermuteStep(x, 0x22222222U, 1);
-            return x;
-        }
+		internal static uint Shuffle(uint x)
+		{
+			// "shuffle" low half to even bits and high half to odd bits
+			x = Bits.BitPermuteStep(x, 0x0000FF00U, 8);
+			x = Bits.BitPermuteStep(x, 0x00F000F0U, 4);
+			x = Bits.BitPermuteStep(x, 0x0C0C0C0CU, 2);
+			x = Bits.BitPermuteStep(x, 0x22222222U, 1);
+			return x;
+		}
 
-        internal static ulong Shuffle(ulong x)
-        {
-            // "shuffle" low half to even bits and high half to odd bits
-            x = Bits.BitPermuteStep(x, 0x00000000FFFF0000UL, 16);
-            x = Bits.BitPermuteStep(x, 0x0000FF000000FF00UL, 8);
-            x = Bits.BitPermuteStep(x, 0x00F000F000F000F0UL, 4);
-            x = Bits.BitPermuteStep(x, 0x0C0C0C0C0C0C0C0CUL, 2);
-            x = Bits.BitPermuteStep(x, 0x2222222222222222UL, 1);
-            return x;
-        }
+		internal static ulong Shuffle(ulong x)
+		{
+			// "shuffle" low half to even bits and high half to odd bits
+			x = Bits.BitPermuteStep(x, 0x00000000FFFF0000UL, 16);
+			x = Bits.BitPermuteStep(x, 0x0000FF000000FF00UL, 8);
+			x = Bits.BitPermuteStep(x, 0x00F000F000F000F0UL, 4);
+			x = Bits.BitPermuteStep(x, 0x0C0C0C0C0C0C0C0CUL, 2);
+			x = Bits.BitPermuteStep(x, 0x2222222222222222UL, 1);
+			return x;
+		}
 
-        internal static uint Shuffle2(uint x)
-        {
-            // "shuffle" (twice) low half to even bits and high half to odd bits
-            x = Bits.BitPermuteStep(x, 0x00AA00AAU, 7);
-            x = Bits.BitPermuteStep(x, 0x0000CCCCU, 14);
-            x = Bits.BitPermuteStep(x, 0x00F000F0U, 4);
-            x = Bits.BitPermuteStep(x, 0x0000FF00U, 8);
-            return x;
-        }
+		internal static uint Shuffle2(uint x)
+		{
+			// "shuffle" (twice) low half to even bits and high half to odd bits
+			x = Bits.BitPermuteStep(x, 0x00AA00AAU, 7);
+			x = Bits.BitPermuteStep(x, 0x0000CCCCU, 14);
+			x = Bits.BitPermuteStep(x, 0x00F000F0U, 4);
+			x = Bits.BitPermuteStep(x, 0x0000FF00U, 8);
+			return x;
+		}
 
-        internal static uint Unshuffle(uint x)
-        {
-            // "unshuffle" even bits to low half and odd bits to high half
-            x = Bits.BitPermuteStep(x, 0x22222222U, 1);
-            x = Bits.BitPermuteStep(x, 0x0C0C0C0CU, 2);
-            x = Bits.BitPermuteStep(x, 0x00F000F0U, 4);
-            x = Bits.BitPermuteStep(x, 0x0000FF00U, 8);
-            return x;
-        }
+		internal static uint Unshuffle(uint x)
+		{
+			// "unshuffle" even bits to low half and odd bits to high half
+			x = Bits.BitPermuteStep(x, 0x22222222U, 1);
+			x = Bits.BitPermuteStep(x, 0x0C0C0C0CU, 2);
+			x = Bits.BitPermuteStep(x, 0x00F000F0U, 4);
+			x = Bits.BitPermuteStep(x, 0x0000FF00U, 8);
+			return x;
+		}
 
-        internal static ulong Unshuffle(ulong x)
-        {
+		internal static ulong Unshuffle(ulong x)
+		{
 #if NETCOREAPP3_0_OR_GREATER
             if (Bmi2.X64.IsSupported)
             {
@@ -193,17 +193,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
             }
 #endif
 
-            // "unshuffle" even bits to low half and odd bits to high half
-            x = Bits.BitPermuteStep(x, 0x2222222222222222UL, 1);
-            x = Bits.BitPermuteStep(x, 0x0C0C0C0C0C0C0C0CUL, 2);
-            x = Bits.BitPermuteStep(x, 0x00F000F000F000F0UL, 4);
-            x = Bits.BitPermuteStep(x, 0x0000FF000000FF00UL, 8);
-            x = Bits.BitPermuteStep(x, 0x00000000FFFF0000UL, 16);
-            return x;
-        }
+			// "unshuffle" even bits to low half and odd bits to high half
+			x = Bits.BitPermuteStep(x, 0x2222222222222222UL, 1);
+			x = Bits.BitPermuteStep(x, 0x0C0C0C0C0C0C0C0CUL, 2);
+			x = Bits.BitPermuteStep(x, 0x00F000F000F000F0UL, 4);
+			x = Bits.BitPermuteStep(x, 0x0000FF000000FF00UL, 8);
+			x = Bits.BitPermuteStep(x, 0x00000000FFFF0000UL, 16);
+			return x;
+		}
 
-        internal static ulong Unshuffle(ulong x, out ulong even)
-        {
+		internal static ulong Unshuffle(ulong x, out ulong even)
+		{
 #if NETCOREAPP3_0_OR_GREATER
             if (Bmi2.X64.IsSupported)
             {
@@ -212,13 +212,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
             }
 #endif
 
-            ulong u0 = Unshuffle(x);
-            even = u0 & 0x00000000FFFFFFFFUL;
-            return u0 >> 32;
-        }
+			ulong u0 = Unshuffle(x);
+			even = u0 & 0x00000000FFFFFFFFUL;
+			return u0 >> 32;
+		}
 
-        internal static ulong Unshuffle(ulong x0, ulong x1, out ulong even)
-        {
+		internal static ulong Unshuffle(ulong x0, ulong x1, out ulong even)
+		{
 #if NETCOREAPP3_0_OR_GREATER
             if (Bmi2.X64.IsSupported)
             {
@@ -229,22 +229,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
             }
 #endif
 
-            ulong u0 = Unshuffle(x0);
-            ulong u1 = Unshuffle(x1);
-            even = (u1 << 32) | (u0 & 0x00000000FFFFFFFFUL);
-            return (u0 >> 32) | (u1 & 0xFFFFFFFF00000000UL);
-        }
+			ulong u0 = Unshuffle(x0);
+			ulong u1 = Unshuffle(x1);
+			even = (u1 << 32) | (u0 & 0x00000000FFFFFFFFUL);
+			return (u0 >> 32) | (u1 & 0xFFFFFFFF00000000UL);
+		}
 
-        internal static uint Unshuffle2(uint x)
-        {
-            // "unshuffle" (twice) even bits to low half and odd bits to high half
-            x = Bits.BitPermuteStep(x, 0x0000FF00U, 8);
-            x = Bits.BitPermuteStep(x, 0x00F000F0U, 4);
-            x = Bits.BitPermuteStep(x, 0x0000CCCCU, 14);
-            x = Bits.BitPermuteStep(x, 0x00AA00AAU, 7);
-            return x;
-        }
-    }
+		internal static uint Unshuffle2(uint x)
+		{
+			// "unshuffle" (twice) even bits to low half and odd bits to high half
+			x = Bits.BitPermuteStep(x, 0x0000FF00U, 8);
+			x = Bits.BitPermuteStep(x, 0x00F000F0U, 4);
+			x = Bits.BitPermuteStep(x, 0x0000CCCCU, 14);
+			x = Bits.BitPermuteStep(x, 0x00AA00AAU, 7);
+			return x;
+		}
+	}
 }
 #pragma warning restore
 #endif

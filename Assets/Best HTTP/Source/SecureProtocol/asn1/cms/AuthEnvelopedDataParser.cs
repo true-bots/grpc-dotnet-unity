@@ -6,7 +6,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
 	/**
 	 * Produce an object suitable for an Asn1OutputStream.
-	 * 
+	 *
 	 * <pre>
 	 * AuthEnvelopedData ::= SEQUENCE {
 	 *   version CMSVersion,
@@ -20,14 +20,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	*/
 	public class AuthEnvelopedDataParser
 	{
-		private Asn1SequenceParser	seq;
-		private DerInteger			version;
-		private IAsn1Convertible	nextObject;
-		private bool				originatorInfoCalled;
-        private bool                isData;
+		private Asn1SequenceParser seq;
+		private DerInteger version;
+		private IAsn1Convertible nextObject;
+		private bool originatorInfoCalled;
+		private bool isData;
 
 		public AuthEnvelopedDataParser(
-			Asn1SequenceParser	seq)
+			Asn1SequenceParser seq)
 		{
 			this.seq = seq;
 
@@ -81,7 +81,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			return recipientInfos;
 		}
 
-		public EncryptedContentInfoParser GetAuthEncryptedContentInfo() 
+		public EncryptedContentInfoParser GetAuthEncryptedContentInfo()
 		{
 			if (nextObject == null)
 			{
@@ -90,16 +90,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 
 			if (nextObject != null)
 			{
-				Asn1SequenceParser o = (Asn1SequenceParser) nextObject;
+				Asn1SequenceParser o = (Asn1SequenceParser)nextObject;
 				nextObject = null;
-                EncryptedContentInfoParser encryptedContentInfoParser = new EncryptedContentInfoParser(o);
-                isData = CmsObjectIdentifiers.Data.Equals(encryptedContentInfoParser.ContentType);
-                return encryptedContentInfoParser;
+				EncryptedContentInfoParser encryptedContentInfoParser = new EncryptedContentInfoParser(o);
+				isData = CmsObjectIdentifiers.Data.Equals(encryptedContentInfoParser.ContentType);
+				return encryptedContentInfoParser;
 			}
 
 			return null;
 		}
-		
+
 		public Asn1SetParser GetAuthAttrs()
 		{
 			if (nextObject == null)
@@ -119,7 +119,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 
 			return null;
 		}
-		
+
 		public Asn1OctetString GetMac()
 		{
 			if (nextObject == null)
@@ -132,7 +132,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 
 			return Asn1OctetString.GetInstance(o.ToAsn1Object());
 		}
-		
+
 		public Asn1SetParser GetUnauthAttrs()
 		{
 			if (nextObject == null)

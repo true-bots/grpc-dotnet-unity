@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
@@ -25,17 +24,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			object obj)
 		{
 			if (obj == null || obj is SignaturePolicyIdentifier)
-				return (SignaturePolicyIdentifier) obj;
+				return (SignaturePolicyIdentifier)obj;
 
 			if (obj is SignaturePolicyId)
-				return new SignaturePolicyIdentifier((SignaturePolicyId) obj);
+				return new SignaturePolicyIdentifier((SignaturePolicyId)obj);
 
 			if (obj is Asn1Null)
 				return new SignaturePolicyIdentifier();
 
 			throw new ArgumentException(
 				"Unknown object in 'SignaturePolicyIdentifier' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -61,8 +60,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		public override Asn1Object ToAsn1Object()
 		{
 			return sigPolicy == null
-				?	DerNull.Instance
-				:	sigPolicy.ToAsn1Object();
+				? DerNull.Instance
+				: sigPolicy.ToAsn1Object();
 		}
 	}
 }

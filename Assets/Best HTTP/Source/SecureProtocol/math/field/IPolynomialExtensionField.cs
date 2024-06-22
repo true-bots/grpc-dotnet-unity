@@ -4,11 +4,11 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Field
 {
-    public interface IPolynomialExtensionField
-        : IExtensionField
-    {
-        IPolynomial MinimalPolynomial { get; }
-    }
+	public interface IPolynomialExtensionField
+		: IExtensionField
+	{
+		IPolynomial MinimalPolynomial { get; }
+	}
 }
 #pragma warning restore
 #endif

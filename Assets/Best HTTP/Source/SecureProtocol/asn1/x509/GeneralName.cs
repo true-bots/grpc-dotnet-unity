@@ -5,57 +5,56 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using NetUtils = BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 {
-    /**
-     * The GeneralName object.
-     * <pre>
-     * GeneralName ::= CHOICE {
-     *      otherName                       [0]     OtherName,
-     *      rfc822Name                      [1]     IA5String,
-     *      dNSName                         [2]     IA5String,
-     *      x400Address                     [3]     ORAddress,
-     *      directoryName                   [4]     Name,
-     *      ediPartyName                    [5]     EDIPartyName,
-     *      uniformResourceIdentifier       [6]     IA5String,
-     *      iPAddress                       [7]     OCTET STRING,
-     *      registeredID                    [8]     OBJECT IDENTIFIER}
-     *
-     * OtherName ::= Sequence {
-     *      type-id    OBJECT IDENTIFIER,
-     *      value      [0] EXPLICIT ANY DEFINED BY type-id }
-     *
-     * EDIPartyName ::= Sequence {
-     *      nameAssigner            [0]     DirectoryString OPTIONAL,
-     *      partyName               [1]     DirectoryString }
-     * </pre>
-     */
-    public class GeneralName
-        : Asn1Encodable, IAsn1Choice
-    {
-        public const int OtherName					= 0;
-        public const int Rfc822Name					= 1;
-        public const int DnsName					= 2;
-        public const int X400Address				= 3;
-        public const int DirectoryName				= 4;
-        public const int EdiPartyName				= 5;
-        public const int UniformResourceIdentifier	= 6;
-        public const int IPAddress					= 7;
-        public const int RegisteredID				= 8;
+	/**
+	 * The GeneralName object.
+	 * <pre>
+	 * GeneralName ::= CHOICE {
+	 *      otherName                       [0]     OtherName,
+	 *      rfc822Name                      [1]     IA5String,
+	 *      dNSName                         [2]     IA5String,
+	 *      x400Address                     [3]     ORAddress,
+	 *      directoryName                   [4]     Name,
+	 *      ediPartyName                    [5]     EDIPartyName,
+	 *      uniformResourceIdentifier       [6]     IA5String,
+	 *      iPAddress                       [7]     OCTET STRING,
+	 *      registeredID                    [8]     OBJECT IDENTIFIER}
+	 *
+	 * OtherName ::= Sequence {
+	 *      type-id    OBJECT IDENTIFIER,
+	 *      value      [0] EXPLICIT ANY DEFINED BY type-id }
+	 *
+	 * EDIPartyName ::= Sequence {
+	 *      nameAssigner            [0]     DirectoryString OPTIONAL,
+	 *      partyName               [1]     DirectoryString }
+	 * </pre>
+	 */
+	public class GeneralName
+		: Asn1Encodable, IAsn1Choice
+	{
+		public const int OtherName = 0;
+		public const int Rfc822Name = 1;
+		public const int DnsName = 2;
+		public const int X400Address = 3;
+		public const int DirectoryName = 4;
+		public const int EdiPartyName = 5;
+		public const int UniformResourceIdentifier = 6;
+		public const int IPAddress = 7;
+		public const int RegisteredID = 8;
 
-		internal readonly Asn1Encodable	obj;
-        internal readonly int			tag;
+		internal readonly Asn1Encodable obj;
+		internal readonly int tag;
 
 		public GeneralName(
-            X509Name directoryName)
-        {
-            this.obj = directoryName;
-            this.tag = 4;
-        }
+			X509Name directoryName)
+		{
+			this.obj = directoryName;
+			this.tag = 4;
+		}
 
 		/**
          * When the subjectAltName extension contains an Internet mail address,
@@ -84,21 +83,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
          * RFC 1883, the octet string MUST contain exactly sixteen octets [RFC
          * 1883].
          */
-        public GeneralName(
-            Asn1Object	name,
-			int			tag)
-        {
-            this.obj = name;
-            this.tag = tag;
-        }
+		public GeneralName(
+			Asn1Object name,
+			int tag)
+		{
+			this.obj = name;
+			this.tag = tag;
+		}
 
 		public GeneralName(
-            int				tag,
-            Asn1Encodable	name)
-        {
-            this.obj = name;
-            this.tag = tag;
-        }
+			int tag,
+			Asn1Encodable name)
+		{
+			this.obj = name;
+			this.tag = tag;
+		}
 
 		/**
 		 * Create a GeneralName for the given tag from the passed in string.
@@ -126,9 +125,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 *             not supported.
 		 */
 		public GeneralName(
-            int		tag,
-            string	name)
-        {
+			int tag,
+			string name)
+		{
 			this.tag = tag;
 
 			if (tag == Rfc822Name || tag == DnsName || tag == UniformResourceIdentifier)
@@ -158,29 +157,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public static GeneralName GetInstance(
-            object obj)
-        {
-            if (obj == null || obj is GeneralName)
-            {
-                return (GeneralName) obj;
-            }
+			object obj)
+		{
+			if (obj == null || obj is GeneralName)
+			{
+				return (GeneralName)obj;
+			}
 
-            if (obj is Asn1TaggedObject)
-            {
-                Asn1TaggedObject	tagObj = (Asn1TaggedObject) obj;
-                int					tag = tagObj.TagNo;
+			if (obj is Asn1TaggedObject)
+			{
+				Asn1TaggedObject tagObj = (Asn1TaggedObject)obj;
+				int tag = tagObj.TagNo;
 
 				switch (tag)
 				{
-                    case EdiPartyName:
-                    case OtherName:
-                    case X400Address:
-                        return new GeneralName(tag, Asn1Sequence.GetInstance(tagObj, false));
+					case EdiPartyName:
+					case OtherName:
+					case X400Address:
+						return new GeneralName(tag, Asn1Sequence.GetInstance(tagObj, false));
 
-                    case DnsName:
-                    case Rfc822Name:
-                    case UniformResourceIdentifier:
-                        return new GeneralName(tag, DerIA5String.GetInstance(tagObj, false));
+					case DnsName:
+					case Rfc822Name:
+					case UniformResourceIdentifier:
+						return new GeneralName(tag, DerIA5String.GetInstance(tagObj, false));
 
 					case DirectoryName:
 						return new GeneralName(tag, X509Name.GetInstance(tagObj, true));
@@ -189,32 +188,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 					case RegisteredID:
 						return new GeneralName(tag, DerObjectIdentifier.GetInstance(tagObj, false));
 
-                    default:
-                        throw new ArgumentException("unknown tag: " + tag);
+					default:
+						throw new ArgumentException("unknown tag: " + tag);
 				}
-	        }
+			}
 
-            if (obj is byte[])
-	        {
-	            try
-	            {
-	                return GetInstance(Asn1Object.FromByteArray((byte[])obj));
-	            }
-	            catch (IOException)
-	            {
-	                throw new ArgumentException("unable to parse encoded general name");
-	            }
-	        }
+			if (obj is byte[])
+			{
+				try
+				{
+					return GetInstance(Asn1Object.FromByteArray((byte[])obj));
+				}
+				catch (IOException)
+				{
+					throw new ArgumentException("unable to parse encoded general name");
+				}
+			}
 
 			throw new ArgumentException("unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public static GeneralName GetInstance(
-            Asn1TaggedObject	tagObj,
-            bool				explicitly)
-        {
-            return GetInstance(Asn1TaggedObject.GetInstance(tagObj, true));
-        }
+			Asn1TaggedObject tagObj,
+			bool explicitly)
+		{
+			return GetInstance(Asn1TaggedObject.GetInstance(tagObj, true));
+		}
 
 		public int TagNo
 		{
@@ -260,7 +259,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				if (slashIndex < 0)
 				{
 					byte[] addr = new byte[16];
-					int[]  parsedIp = parseIPv6(ip);
+					int[] parsedIp = parseIPv6(ip);
 					copyInts(parsedIp, addr, 0);
 
 					return addr;
@@ -268,7 +267,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				else
 				{
 					byte[] addr = new byte[32];
-					int[]  parsedIp = parseIPv6(ip.Substring(0, slashIndex));
+					int[] parsedIp = parseIPv6(ip.Substring(0, slashIndex));
 					copyInts(parsedIp, addr, 0);
 					string mask = ip.Substring(slashIndex + 1);
 					if (mask.IndexOf(':') > 0)
@@ -279,6 +278,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 					{
 						parsedIp = parseMask(mask);
 					}
+
 					copyInts(parsedIp, addr, 16);
 
 					return addr;
@@ -346,6 +346,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			{
 				res[i / 16] |= 1 << (i % 16);
 			}
+
 			return res;
 		}
 
@@ -415,13 +416,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public override Asn1Object ToAsn1Object()
-        {
-            // directoryName is explicitly tagged as it is a CHOICE
-            bool isExplicit = (tag == DirectoryName);
+		{
+			// directoryName is explicitly tagged as it is a CHOICE
+			bool isExplicit = (tag == DirectoryName);
 
-            return new DerTaggedObject(isExplicit, tag, obj);
-        }
-    }
+			return new DerTaggedObject(isExplicit, tag, obj);
+		}
+	}
 }
 #pragma warning restore
 #endif

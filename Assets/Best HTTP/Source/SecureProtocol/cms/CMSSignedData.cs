@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
@@ -38,10 +37,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	{
 		private static readonly CmsSignedHelper Helper = CmsSignedHelper.Instance;
 
-		private readonly CmsProcessable	signedContent;
-		private SignedData				signedData;
-		private ContentInfo				contentInfo;
-		private SignerInformationStore	signerInfoStore;
+		private readonly CmsProcessable signedContent;
+		private SignedData signedData;
+		private ContentInfo contentInfo;
+		private SignerInformationStore signerInfoStore;
 		private IDictionary<string, byte[]> m_hashes;
 
 		private CmsSignedData(CmsSignedData c)
@@ -132,11 +131,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			get { return signedData.Version.IntValueExact; }
 		}
 
-        /**
+		/**
 		* return the collection of signers that are associated with the
 		* signatures for the message.
 		*/
-        public SignerInformationStore GetSignerInfos()
+		public SignerInformationStore GetSignerInfos()
 		{
 			if (signerInfoStore == null)
 			{
@@ -157,9 +156,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 						signerInfos.Add(new SignerInformation(info, contentType, null, new BaseDigestCalculator(hash)));
 					}
 					else
-                    {
+					{
 						throw new InvalidOperationException();
-                    }
+					}
 				}
 
 				signerInfoStore = new SignerInformationStore(signerInfos);
@@ -206,7 +205,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return Helper.GetCrls(signedData.CRLs);
 		}
 
-        public IStore<Asn1Encodable> GetOtherRevInfos(DerObjectIdentifier otherRevInfoFormat)
+		public IStore<Asn1Encodable> GetOtherRevInfos(DerObjectIdentifier otherRevInfoFormat)
 		{
 			return Helper.GetOtherRevInfos(signedData.CRLs, otherRevInfoFormat);
 		}
@@ -241,15 +240,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return contentInfo.GetEncoded();
 		}
 
-        /**
-         * return the ASN.1 encoded representation of this object using the specified encoding.
-         *
-         * @param encoding the ASN.1 encoding format to use ("BER" or "DER").
-         */
-        public byte[] GetEncoded(string encoding)
-        {
-            return contentInfo.GetEncoded(encoding);
-        }
+		/**
+		 * return the ASN.1 encoded representation of this object using the specified encoding.
+		 *
+		 * @param encoding the ASN.1 encoding format to use ("BER" or "DER").
+		 */
+		public byte[] GetEncoded(string encoding)
+		{
+			return contentInfo.GetEncoded(encoding);
+		}
 
 		/**
 		* Replace the signerinformation store associated with this
@@ -262,8 +261,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @return a new signed data object.
 		*/
 		public static CmsSignedData ReplaceSigners(
-			CmsSignedData           signedData,
-			SignerInformationStore  signerInformationStore)
+			CmsSignedData signedData,
+			SignerInformationStore signerInformationStore)
 		{
 			//
 			// copy
@@ -315,7 +314,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return cms;
 		}
 
-        /**
+		/**
 		* Replace the certificate and CRL information associated with this
 		* CmsSignedData object with the new one passed in.
 		*
@@ -325,27 +324,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @return a new signed data object.
 		* @exception CmsException if there is an error processing the stores
 		*/
-        public static CmsSignedData ReplaceCertificatesAndCrls(CmsSignedData signedData,
-            IStore<X509Certificate> x509Certs, IStore<X509Crl> x509Crls)
+		public static CmsSignedData ReplaceCertificatesAndCrls(CmsSignedData signedData,
+			IStore<X509Certificate> x509Certs, IStore<X509Crl> x509Crls)
 		{
-            return ReplaceCertificatesAndRevocations(signedData, x509Certs, x509Crls, null, null);
+			return ReplaceCertificatesAndRevocations(signedData, x509Certs, x509Crls, null, null);
 		}
 
-        public static CmsSignedData ReplaceCertificatesAndCrls(CmsSignedData signedData,
+		public static CmsSignedData ReplaceCertificatesAndCrls(CmsSignedData signedData,
 			IStore<X509Certificate> x509Certs, IStore<X509Crl> x509Crls,
 			IStore<X509V2AttributeCertificate> x509AttrCerts)
 		{
-            return ReplaceCertificatesAndRevocations(signedData, x509Certs, x509Crls, x509AttrCerts, null);
-        }
+			return ReplaceCertificatesAndRevocations(signedData, x509Certs, x509Crls, x509AttrCerts, null);
+		}
 
-        public static CmsSignedData ReplaceCertificatesAndRevocations(CmsSignedData signedData,
-            IStore<X509Certificate> x509Certs, IStore<X509Crl> x509Crls,
-            IStore<X509V2AttributeCertificate> x509AttrCerts, IStore<OtherRevocationInfoFormat> otherRevocationInfos)
-        {
-            //
-            // copy
-            //
-            CmsSignedData cms = new CmsSignedData(signedData);
+		public static CmsSignedData ReplaceCertificatesAndRevocations(CmsSignedData signedData,
+			IStore<X509Certificate> x509Certs, IStore<X509Crl> x509Crls,
+			IStore<X509V2AttributeCertificate> x509AttrCerts, IStore<OtherRevocationInfoFormat> otherRevocationInfos)
+		{
+			//
+			// copy
+			//
+			CmsSignedData cms = new CmsSignedData(signedData);
 
 			//
 			// replace the certs and crls in the SignedData object
@@ -360,6 +359,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				{
 					certificates.AddRange(CmsUtilities.GetCertificatesFromStore(x509Certs));
 				}
+
 				if (x509AttrCerts != null)
 				{
 					certificates.AddRange(CmsUtilities.GetAttributeCertificatesFromStore(x509AttrCerts));
@@ -379,10 +379,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				{
 					revocations.AddRange(CmsUtilities.GetCrlsFromStore(x509Crls));
 				}
+
 				if (otherRevocationInfos != null)
 				{
-                    revocations.AddRange(CmsUtilities.GetOtherRevocationInfosFromStore(otherRevocationInfos));
-                }
+					revocations.AddRange(CmsUtilities.GetOtherRevocationInfosFromStore(otherRevocationInfos));
+				}
 
 				Asn1Set berSet = CmsUtilities.CreateBerSetFromList(revocations);
 				if (berSet.Count > 0)

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
@@ -15,31 +14,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	{
 		private const int DefaultBufSize = 32 * 1024;
 
-        private readonly FileInfo	_file;
-		private readonly int		_bufSize;
+		private readonly FileInfo _file;
+		private readonly int _bufSize;
 
-        public CmsProcessableFile(FileInfo file)
+		public CmsProcessableFile(FileInfo file)
 			: this(file, DefaultBufSize)
 		{
 		}
 
-        public CmsProcessableFile(FileInfo file, int bufSize)
+		public CmsProcessableFile(FileInfo file, int bufSize)
 		{
 			_file = file;
 			_bufSize = bufSize;
 		}
 
-        public virtual Stream GetInputStream()
+		public virtual Stream GetInputStream()
 		{
 			return new FileStream(_file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, _bufSize);
 		}
 
-        public virtual void Write(Stream zOut)
+		public virtual void Write(Stream zOut)
 		{
 			using (var inStr = _file.OpenRead())
 			{
-                Streams.PipeAll(inStr, zOut, _bufSize);
-            }
+				Streams.PipeAll(inStr, zOut, _bufSize);
+			}
 		}
 	}
 }

@@ -2,88 +2,87 @@
 #pragma warning disable
 using System;
 using System.Globalization;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
-    public class Time
-        : Asn1Encodable, IAsn1Choice
-    {
-        public static Time GetInstance(object obj)
-        {
-            if (obj == null)
-                return null;
-            if (obj is Time time)
-                return time;
-            if (obj is Asn1UtcTime utcTime)
-                return new Time(utcTime);
-            if (obj is Asn1GeneralizedTime generalizedTime)
-                return new Time(generalizedTime);
+	public class Time
+		: Asn1Encodable, IAsn1Choice
+	{
+		public static Time GetInstance(object obj)
+		{
+			if (obj == null)
+				return null;
+			if (obj is Time time)
+				return time;
+			if (obj is Asn1UtcTime utcTime)
+				return new Time(utcTime);
+			if (obj is Asn1GeneralizedTime generalizedTime)
+				return new Time(generalizedTime);
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
-        }
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+		}
 
-        public static Time GetInstance(Asn1TaggedObject	taggedObject, bool declaredExplicit)
-        {
-            return GetInstance(taggedObject.GetObject());
-        }
+		public static Time GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
+		{
+			return GetInstance(taggedObject.GetObject());
+		}
 
-        private readonly Asn1Object m_timeObject;
+		private readonly Asn1Object m_timeObject;
 
-        public Time(Asn1GeneralizedTime generalizedTime)
-        {
-            this.m_timeObject = generalizedTime ?? throw new ArgumentNullException(nameof(generalizedTime));
-        }
+		public Time(Asn1GeneralizedTime generalizedTime)
+		{
+			this.m_timeObject = generalizedTime ?? throw new ArgumentNullException(nameof(generalizedTime));
+		}
 
-        public Time(Asn1UtcTime utcTime)
-        {
-            if (utcTime == null)
-                throw new ArgumentNullException(nameof(utcTime));
+		public Time(Asn1UtcTime utcTime)
+		{
+			if (utcTime == null)
+				throw new ArgumentNullException(nameof(utcTime));
 
-            // Validate utcTime is in the appropriate year range
-            utcTime.ToDateTime(2049);
+			// Validate utcTime is in the appropriate year range
+			utcTime.ToDateTime(2049);
 
-            this.m_timeObject = utcTime;
-        }
+			this.m_timeObject = utcTime;
+		}
 
 		/**
          * creates a time object from a given date - if the date is between 1950
          * and 2049 a UTCTime object is Generated, otherwise a GeneralizedTime
          * is used.
          */
-        public Time(DateTime date)
-        {
-            DateTime utc = date.ToUniversalTime();
+		public Time(DateTime date)
+		{
+			DateTime utc = date.ToUniversalTime();
 
 			if (utc.Year < 1950 || utc.Year > 2049)
-            {
-                m_timeObject = new DerGeneralizedTime(utc);
-            }
-            else
-            {
-                m_timeObject = new DerUtcTime(utc, 2049);
-            }
-        }
+			{
+				m_timeObject = new DerGeneralizedTime(utc);
+			}
+			else
+			{
+				m_timeObject = new DerUtcTime(utc, 2049);
+			}
+		}
 
-        public DateTime ToDateTime()
-        {
-            try
-            {
-                if (m_timeObject is Asn1UtcTime utcTime)
-                    return utcTime.ToDateTime(2049);
+		public DateTime ToDateTime()
+		{
+			try
+			{
+				if (m_timeObject is Asn1UtcTime utcTime)
+					return utcTime.ToDateTime(2049);
 
-                return ((Asn1GeneralizedTime)m_timeObject).ToDateTime();
-            }
-            catch (FormatException e)
-            {
-                // this should never happen
-                throw new InvalidOperationException("invalid date string: " + e.Message);
-            }
-        }
+				return ((Asn1GeneralizedTime)m_timeObject).ToDateTime();
+			}
+			catch (FormatException e)
+			{
+				// this should never happen
+				throw new InvalidOperationException("invalid date string: " + e.Message);
+			}
+		}
 
 
-        public DateTime Date => ToDateTime();
+		public DateTime Date => ToDateTime();
 
 		/**
          * Produce an object suitable for an Asn1OutputStream.
@@ -93,22 +92,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          *             generalTime    GeneralizedTime }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            return m_timeObject;
-        }
+		public override Asn1Object ToAsn1Object()
+		{
+			return m_timeObject;
+		}
 
-        public override string ToString()
-        {
-            if (m_timeObject is Asn1UtcTime utcTime)
-                return utcTime.ToDateTime(2049).ToString(@"yyyyMMddHHmmssK", DateTimeFormatInfo.InvariantInfo);
+		public override string ToString()
+		{
+			if (m_timeObject is Asn1UtcTime utcTime)
+				return utcTime.ToDateTime(2049).ToString(@"yyyyMMddHHmmssK", DateTimeFormatInfo.InvariantInfo);
 
-            if (m_timeObject is Asn1GeneralizedTime generalizedTime)
-                return generalizedTime.ToDateTime().ToString(@"yyyyMMddHHmmss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo);
+			if (m_timeObject is Asn1GeneralizedTime generalizedTime)
+				return generalizedTime.ToDateTime().ToString(@"yyyyMMddHHmmss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo);
 
-            throw new InvalidOperationException();
-        }
-    }
+			throw new InvalidOperationException();
+		}
+	}
 }
 #pragma warning restore
 #endif

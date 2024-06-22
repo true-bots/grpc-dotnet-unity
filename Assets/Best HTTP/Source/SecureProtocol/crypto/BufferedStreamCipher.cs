@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
@@ -24,9 +23,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			get { return m_cipher.AlgorithmName; }
 		}
 
-        public override void Init(bool forEncryption, ICipherParameters parameters)
-        {
-            if (parameters is ParametersWithRandom withRandom)
+		public override void Init(bool forEncryption, ICipherParameters parameters)
+		{
+			if (parameters is ParametersWithRandom withRandom)
 			{
 				parameters = withRandom.Parameters;
 			}
@@ -51,12 +50,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 
 		public override byte[] ProcessByte(byte input)
 		{
-			return new byte[]{ m_cipher.ReturnByte(input) };
+			return new byte[] { m_cipher.ReturnByte(input) };
 		}
 
-        public override int ProcessByte(byte input, byte[] output, int outOff)
-        {
-            if (outOff >= output.Length)
+		public override int ProcessByte(byte input, byte[] output, int outOff)
+		{
+			if (outOff >= output.Length)
 				throw new DataLengthException("output buffer too short");
 
 			output[outOff] = m_cipher.ReturnByte(input);
@@ -71,9 +70,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        public override byte[] ProcessBytes(byte[] input, int inOff, int length)
-        {
-            if (length < 1)
+		public override byte[] ProcessBytes(byte[] input, int inOff, int length)
+		{
+			if (length < 1)
 				return null;
 
 			byte[] output = new byte[length];
@@ -81,9 +80,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			return output;
 		}
 
-        public override int ProcessBytes(byte[] input, int inOff, int length, byte[] output, int outOff)
-        {
-            if (length < 1)
+		public override int ProcessBytes(byte[] input, int inOff, int length, byte[] output, int outOff)
+		{
+			if (length < 1)
 				return 0;
 
 			m_cipher.ProcessBytes(input, inOff, length, output, outOff);
@@ -110,10 +109,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			if (length < 1)
 				return EmptyBuffer;
 
-            byte[] output = new byte[length];
-            m_cipher.ProcessBytes(input, inOff, length, output, 0);
-            m_cipher.Reset();
-            return output;
+			byte[] output = new byte[length];
+			m_cipher.ProcessBytes(input, inOff, length, output, 0);
+			m_cipher.Reset();
+			return output;
 		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
@@ -131,7 +130,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        public override void Reset()
+		public override void Reset()
 		{
 			m_cipher.Reset();
 		}

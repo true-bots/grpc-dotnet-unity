@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
@@ -39,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 		{
 			int count = input.Length - inOff;
 
-			input[inOff]= 0x80;
+			input[inOff] = 0x80;
 			while (++inOff < input.Length)
 			{
 				input[inOff] = 0x00;
@@ -58,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
         }
 #endif
 
-        public int PadCount(byte[] input)
+		public int PadCount(byte[] input)
 		{
 			int position = -1, still00Mask = -1;
 			int i = input.Length;
@@ -70,6 +69,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 				position ^= (i ^ position) & still00Mask & match80Mask;
 				still00Mask &= match00Mask;
 			}
+
 			if (position < 0)
 				throw new InvalidCipherTextException("pad block corrupted");
 
@@ -95,7 +95,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
             return block.Length - position;
         }
 #endif
-    }
+	}
 }
 #pragma warning restore
 #endif

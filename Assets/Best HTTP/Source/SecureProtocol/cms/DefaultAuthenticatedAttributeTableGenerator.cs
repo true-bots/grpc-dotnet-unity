@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 
@@ -55,26 +54,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		protected virtual IDictionary<DerObjectIdentifier, object> CreateStandardAttributeTable(
 			IDictionary<CmsAttributeTableParameter, object> parameters)
 		{
-            var std = new Dictionary<DerObjectIdentifier, object>(m_table);
+			var std = new Dictionary<DerObjectIdentifier, object>(m_table);
 
 			if (!std.ContainsKey(CmsAttributes.ContentType))
-            {
-                DerObjectIdentifier contentType = (DerObjectIdentifier)
-                    parameters[CmsAttributeTableParameter.ContentType];
-                Asn1.Cms.Attribute attr = new Asn1.Cms.Attribute(CmsAttributes.ContentType,
-                    new DerSet(contentType));
-                std[attr.AttrType] = attr;
-            }
+			{
+				DerObjectIdentifier contentType = (DerObjectIdentifier)
+					parameters[CmsAttributeTableParameter.ContentType];
+				Asn1.Cms.Attribute attr = new Asn1.Cms.Attribute(CmsAttributes.ContentType,
+					new DerSet(contentType));
+				std[attr.AttrType] = attr;
+			}
 
 			if (!std.ContainsKey(CmsAttributes.MessageDigest))
-            {
-                byte[] messageDigest = (byte[])parameters[CmsAttributeTableParameter.Digest];
-                Asn1.Cms.Attribute attr = new Asn1.Cms.Attribute(CmsAttributes.MessageDigest,
-                    new DerSet(new DerOctetString(messageDigest)));
-                std[attr.AttrType] = attr;
-            }
+			{
+				byte[] messageDigest = (byte[])parameters[CmsAttributeTableParameter.Digest];
+				Asn1.Cms.Attribute attr = new Asn1.Cms.Attribute(CmsAttributes.MessageDigest,
+					new DerSet(new DerOctetString(messageDigest)));
+				std[attr.AttrType] = attr;
+			}
 
-            return std;
+			return std;
 		}
 
 		/**
@@ -83,7 +82,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 */
 		public virtual AttributeTable GetAttributes(IDictionary<CmsAttributeTableParameter, object> parameters)
 		{
-            var table = CreateStandardAttributeTable(parameters);
+			var table = CreateStandardAttributeTable(parameters);
 			return new AttributeTable(table);
 		}
 	}

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store;
 
@@ -9,15 +8,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 {
 	/**
 	* CertPathValidatorSpi implementation for X.509 Attribute Certificates la RFC 3281.
-	* 
+	*
 	* @see org.bouncycastle.x509.ExtendedPkixParameters
 	*/
 	public class PkixAttrCertPathValidator
-	//    extends CertPathValidatorSpi
+		//    extends CertPathValidatorSpi
 	{
 		/**
 		* Validates an attribute certificate with the given certificate path.
-		* 
+		*
 		* <p>
 		* <code>params</code> must be an instance of
 		* <code>ExtendedPkixParameters</code>.
@@ -68,6 +67,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				throw new PkixCertPathValidatorException(
 					"Could not get validity date from attribute certificate.", e);
 			}
+
 			Rfc3281CertPathUtilities.CheckCrls(attrCert, pkixParams, issuerCert, date, certPath.Certificates);
 			return result;
 		}

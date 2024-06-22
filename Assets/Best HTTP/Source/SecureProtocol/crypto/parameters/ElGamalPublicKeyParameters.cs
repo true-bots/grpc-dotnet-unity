@@ -1,35 +1,34 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
-    public class ElGamalPublicKeyParameters
+	public class ElGamalPublicKeyParameters
 		: ElGamalKeyParameters
-    {
-        private readonly BigInteger y;
+	{
+		private readonly BigInteger y;
 
 		public ElGamalPublicKeyParameters(
-            BigInteger			y,
-            ElGamalParameters	parameters)
+			BigInteger y,
+			ElGamalParameters parameters)
 			: base(false, parameters)
-        {
+		{
 			if (y == null)
 				throw new ArgumentNullException("y");
 
 			this.y = y;
-        }
+		}
 
 		public BigInteger Y
-        {
-            get { return y; }
-        }
+		{
+			get { return y; }
+		}
 
 		public override bool Equals(
-            object obj)
-        {
+			object obj)
+		{
 			if (obj == this)
 				return true;
 
@@ -39,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 				return false;
 
 			return Equals(other);
-        }
+		}
 
 		protected bool Equals(
 			ElGamalPublicKeyParameters other)
@@ -48,10 +47,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		}
 
 		public override int GetHashCode()
-        {
+		{
 			return y.GetHashCode() ^ base.GetHashCode();
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
@@ -30,18 +29,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			if (cipherMode.GetBlockSize() != 1)
 				throw new ArgumentException("block cipher block size != 1.", nameof(cipherMode));
 
-            m_cipherMode = cipherMode;
+			m_cipherMode = cipherMode;
 		}
 
-        /**
+		/**
 		 * initialise the underlying cipher.
 		 *
 		 * @param forEncryption true if we are setting up for encryption, false otherwise.
 		 * @param param the necessary parameters for the underlying cipher to be initialised.
 		 */
-        public void Init(bool forEncryption, ICipherParameters parameters)
-        {
-            m_cipherMode.Init(forEncryption, parameters);
+		public void Init(bool forEncryption, ICipherParameters parameters)
+		{
+			m_cipherMode.Init(forEncryption, parameters);
 		}
 
 		/**
@@ -64,12 +63,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		{
 			oneByte[0] = input;
 
-            m_cipherMode.ProcessBlock(oneByte, 0, oneByte, 0);
+			m_cipherMode.ProcessBlock(oneByte, 0, oneByte, 0);
 
 			return oneByte[0];
 		}
 
-        /**
+		/**
 		* process a block of bytes from in putting the result into out.
 		*
 		* @param in the input byte array.
@@ -79,14 +78,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		* @param outOff the offset into the output byte array the processed data stars at.
 		* @exception DataLengthException if the output buffer is too small.
 		*/
-        public void ProcessBytes(byte[] input, int inOff, int length, byte[] output, int outOff)
-        {
-            Check.DataLength(input, inOff, length, "input buffer too short");
-            Check.OutputLength(output, outOff, length, "output buffer too short");
+		public void ProcessBytes(byte[] input, int inOff, int length, byte[] output, int outOff)
+		{
+			Check.DataLength(input, inOff, length, "input buffer too short");
+			Check.OutputLength(output, outOff, length, "output buffer too short");
 
 			for (int i = 0; i != length; i++)
 			{
-                m_cipherMode.ProcessBlock(input, inOff + i, output, outOff + i);
+				m_cipherMode.ProcessBlock(input, inOff + i, output, outOff + i);
 			}
 		}
 
@@ -102,13 +101,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        /**
+		/**
 		* reset the underlying cipher. This leaves it in the same state
 		* it was at after the last init (if there was one).
 		*/
-        public void Reset()
+		public void Reset()
 		{
-            m_cipherMode.Reset();
+			m_cipherMode.Reset();
 		}
 	}
 }

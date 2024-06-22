@@ -2,28 +2,29 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-    /**
-     * Der BMPString object.
-     */
-    public class DerBmpString
+	/**
+	 * Der BMPString object.
+	 */
+	public class DerBmpString
 		: DerStringBase
-    {
-        internal class Meta : Asn1UniversalType
-        {
-            internal static readonly Asn1UniversalType Instance = new Meta();
+	{
+		internal class Meta : Asn1UniversalType
+		{
+			internal static readonly Asn1UniversalType Instance = new Meta();
 
-            private Meta() : base(typeof(DerBmpString), Asn1Tags.BmpString) {}
+			private Meta() : base(typeof(DerBmpString), Asn1Tags.BmpString)
+			{
+			}
 
-            internal override Asn1Object FromImplicitPrimitive(DerOctetString octetString)
-            {
-                return CreatePrimitive(octetString.GetOctets());
-            }
-        }
+			internal override Asn1Object FromImplicitPrimitive(DerOctetString octetString)
+			{
+				return CreatePrimitive(octetString.GetOctets());
+			}
+		}
 
 		/**
          * return a BMP string from the given object.
@@ -31,140 +32,140 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
          * @param obj the object we want converted.
          * @exception ArgumentException if the object cannot be converted.
          */
-        public static DerBmpString GetInstance(object obj)
-        {
-            if (obj == null)
-                return null;
+		public static DerBmpString GetInstance(object obj)
+		{
+			if (obj == null)
+				return null;
 
-            if (obj is DerBmpString derBmpString)
-                return derBmpString;
+			if (obj is DerBmpString derBmpString)
+				return derBmpString;
 
-            if (obj is IAsn1Convertible asn1Convertible)
-            {
-                Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
-                if (asn1Object is DerBmpString converted)
-                    return converted;
-            }
-            else if (obj is byte[] bytes)
-            {
-                try
-                {
-                    return (DerBmpString)Meta.Instance.FromByteArray(bytes);
-                }
-                catch (IOException e)
-                {
-                    throw new ArgumentException("failed to construct BMP string from byte[]: " + e.Message);
-                }
-            }
+			if (obj is IAsn1Convertible asn1Convertible)
+			{
+				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
+				if (asn1Object is DerBmpString converted)
+					return converted;
+			}
+			else if (obj is byte[] bytes)
+			{
+				try
+				{
+					return (DerBmpString)Meta.Instance.FromByteArray(bytes);
+				}
+				catch (IOException e)
+				{
+					throw new ArgumentException("failed to construct BMP string from byte[]: " + e.Message);
+				}
+			}
 
-            throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
-        }
+			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+		}
 
-        /**
-         * return a BMP string from a tagged object.
-         *
-         * @param taggedObject the tagged object holding the object we want
-         * @param declaredExplicit true if the object is meant to be explicitly tagged false otherwise.
-         * @exception ArgumentException if the tagged object cannot be converted.
-         */
-        public static DerBmpString GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
-        {
-            return (DerBmpString)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
-        }
+		/**
+		 * return a BMP string from a tagged object.
+		 *
+		 * @param taggedObject the tagged object holding the object we want
+		 * @param declaredExplicit true if the object is meant to be explicitly tagged false otherwise.
+		 * @exception ArgumentException if the tagged object cannot be converted.
+		 */
+		public static DerBmpString GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
+		{
+			return (DerBmpString)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
+		}
 
-        private readonly string m_str;
+		private readonly string m_str;
 
-        internal DerBmpString(byte[] contents)
-        {
+		internal DerBmpString(byte[] contents)
+		{
 			if (null == contents)
 				throw new ArgumentNullException("contents");
 
-            int byteLen = contents.Length;
-            if (0 != (byteLen & 1))
-                throw new ArgumentException("malformed BMPString encoding encountered", "contents");
+			int byteLen = contents.Length;
+			if (0 != (byteLen & 1))
+				throw new ArgumentException("malformed BMPString encoding encountered", "contents");
 
-            int charLen = byteLen / 2;
-            char[] cs = new char[charLen];
+			int charLen = byteLen / 2;
+			char[] cs = new char[charLen];
 
-            for (int i = 0; i != charLen; i++)
-            {
-                cs[i] = (char)((contents[2 * i] << 8) | (contents[2 * i + 1] & 0xff));
-            }
+			for (int i = 0; i != charLen; i++)
+			{
+				cs[i] = (char)((contents[2 * i] << 8) | (contents[2 * i + 1] & 0xff));
+			}
 
-            m_str = new string(cs);
-        }
+			m_str = new string(cs);
+		}
 
-        internal DerBmpString(char[] str)
-        {
-            if (str == null)
-                throw new ArgumentNullException("str");
-
-            m_str = new string(str);
-        }
-
-        /**
-         * basic constructor
-         */
-        public DerBmpString(string str)
-        {
+		internal DerBmpString(char[] str)
+		{
 			if (str == null)
 				throw new ArgumentNullException("str");
 
-            m_str = str;
-        }
+			m_str = new string(str);
+		}
 
-        public override string GetString()
-        {
-            return m_str;
-        }
+		/**
+		 * basic constructor
+		 */
+		public DerBmpString(string str)
+		{
+			if (str == null)
+				throw new ArgumentNullException("str");
 
-        protected override bool Asn1Equals(Asn1Object asn1Object)
-        {
-            DerBmpString that = asn1Object as DerBmpString;
-            return null != that
-                && this.m_str.Equals(that.m_str);
-        }
+			m_str = str;
+		}
 
-        protected override int Asn1GetHashCode()
-        {
-            return m_str.GetHashCode();
-        }
+		public override string GetString()
+		{
+			return m_str;
+		}
 
-        internal override IAsn1Encoding GetEncoding(int encoding)
-        {
-            return new PrimitiveEncoding(Asn1Tags.Universal, Asn1Tags.BmpString, GetContents());
-        }
+		protected override bool Asn1Equals(Asn1Object asn1Object)
+		{
+			DerBmpString that = asn1Object as DerBmpString;
+			return null != that
+			       && this.m_str.Equals(that.m_str);
+		}
 
-        internal override IAsn1Encoding GetEncodingImplicit(int encoding, int tagClass, int tagNo)
-        {
-            return new PrimitiveEncoding(tagClass, tagNo, GetContents());
-        }
+		protected override int Asn1GetHashCode()
+		{
+			return m_str.GetHashCode();
+		}
 
-        private byte[] GetContents()
-        {
-            char[] c = m_str.ToCharArray();
-            byte[] b = new byte[c.Length * 2];
+		internal override IAsn1Encoding GetEncoding(int encoding)
+		{
+			return new PrimitiveEncoding(Asn1Tags.Universal, Asn1Tags.BmpString, GetContents());
+		}
 
-            for (int i = 0; i != c.Length; i++)
-            {
-                b[2 * i] = (byte)(c[i] >> 8);
-                b[2 * i + 1] = (byte)c[i];
-            }
+		internal override IAsn1Encoding GetEncodingImplicit(int encoding, int tagClass, int tagNo)
+		{
+			return new PrimitiveEncoding(tagClass, tagNo, GetContents());
+		}
 
-            return b;
-        }
+		private byte[] GetContents()
+		{
+			char[] c = m_str.ToCharArray();
+			byte[] b = new byte[c.Length * 2];
 
-        internal static DerBmpString CreatePrimitive(byte[] contents)
-        {
-            return new DerBmpString(contents);
-        }
+			for (int i = 0; i != c.Length; i++)
+			{
+				b[2 * i] = (byte)(c[i] >> 8);
+				b[2 * i + 1] = (byte)c[i];
+			}
 
-        internal static DerBmpString CreatePrimitive(char[] str)
-        {
-            // TODO[asn1] Asn1InputStream has a validator/converter that should be unified in this class somehow
-            return new DerBmpString(str);
-        }
-    }
+			return b;
+		}
+
+		internal static DerBmpString CreatePrimitive(byte[] contents)
+		{
+			return new DerBmpString(contents);
+		}
+
+		internal static DerBmpString CreatePrimitive(char[] str)
+		{
+			// TODO[asn1] Asn1InputStream has a validator/converter that should be unified in this class somehow
+			return new DerBmpString(str);
+		}
+	}
 }
 #pragma warning restore
 #endif

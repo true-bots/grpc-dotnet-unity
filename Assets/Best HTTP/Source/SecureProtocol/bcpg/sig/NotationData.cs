@@ -18,27 +18,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 		public const int HeaderValueLength = 2;
 
 		public NotationData(
-			bool	critical,
-            bool    isLongLength,
-            byte[]  data)
+			bool critical,
+			bool isLongLength,
+			byte[] data)
 			: base(SignatureSubpacketTag.NotationData, critical, isLongLength, data)
 		{
 		}
 
 		public NotationData(
-			bool	critical,
-			bool	humanReadable,
-			string	notationName,
-			string	notationValue)
+			bool critical,
+			bool humanReadable,
+			string notationName,
+			string notationValue)
 			: base(SignatureSubpacketTag.NotationData, critical, false,
 				CreateData(humanReadable, notationName, notationValue))
 		{
 		}
 
 		private static byte[] CreateData(
-			bool	humanReadable,
-			string	notationName,
-			string	notationValue)
+			bool humanReadable,
+			string notationName,
+			string notationValue)
 		{
 			MemoryStream os = new MemoryStream();
 

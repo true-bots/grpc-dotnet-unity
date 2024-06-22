@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
@@ -17,21 +16,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class CrlValidatedID
 		: Asn1Encodable
 	{
-		private readonly OtherHash		crlHash;
-		private readonly CrlIdentifier	crlIdentifier;
+		private readonly OtherHash crlHash;
+		private readonly CrlIdentifier crlIdentifier;
 
 		public static CrlValidatedID GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is CrlValidatedID)
-				return (CrlValidatedID) obj;
+				return (CrlValidatedID)obj;
 
 			if (obj is Asn1Sequence)
-				return new CrlValidatedID((Asn1Sequence) obj);
+				return new CrlValidatedID((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'CrlValidatedID' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -58,8 +57,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		}
 
 		public CrlValidatedID(
-			OtherHash		crlHash,
-			CrlIdentifier	crlIdentifier)
+			OtherHash crlHash,
+			CrlIdentifier crlIdentifier)
 		{
 			if (crlHash == null)
 				throw new ArgumentNullException("crlHash");

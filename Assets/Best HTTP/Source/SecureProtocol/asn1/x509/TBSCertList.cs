@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -10,10 +9,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class CrlEntry
 		: Asn1Encodable
 	{
-		internal Asn1Sequence	seq;
-		internal DerInteger		userCertificate;
-		internal Time			revocationDate;
-		internal X509Extensions	crlEntryExtensions;
+		internal Asn1Sequence seq;
+		internal DerInteger userCertificate;
+		internal Time revocationDate;
+		internal X509Extensions crlEntryExtensions;
 
 		public CrlEntry(Asn1Sequence seq)
 		{
@@ -76,9 +75,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
      *                                }
      * </pre>
      */
-    public class TbsCertificateList
-        : Asn1Encodable
-    {
+	public class TbsCertificateList
+		: Asn1Encodable
+	{
 		private class RevokedCertificatesEnumeration
 			: IEnumerable<CrlEntry>
 		{
@@ -90,9 +89,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			}
 
 			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
+			{
 				return GetEnumerator();
-            }
+			}
 
 			public IEnumerator<CrlEntry> GetEnumerator()
 			{
@@ -124,9 +123,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				}
 
 				object System.Collections.IEnumerator.Current
-                {
+				{
 					get { return Current; }
-                }
+				}
 
 				public CrlEntry Current
 				{
@@ -135,43 +134,43 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			}
 		}
 
-		internal Asn1Sequence			seq;
-		internal DerInteger				version;
-        internal AlgorithmIdentifier	signature;
-        internal X509Name				issuer;
-        internal Time					thisUpdate;
-        internal Time					nextUpdate;
-		internal Asn1Sequence			revokedCertificates;
-		internal X509Extensions			crlExtensions;
+		internal Asn1Sequence seq;
+		internal DerInteger version;
+		internal AlgorithmIdentifier signature;
+		internal X509Name issuer;
+		internal Time thisUpdate;
+		internal Time nextUpdate;
+		internal Asn1Sequence revokedCertificates;
+		internal X509Extensions crlExtensions;
 
 		public static TbsCertificateList GetInstance(
-            Asn1TaggedObject	obj,
-            bool				explicitly)
-        {
-            return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
-        }
+			Asn1TaggedObject obj,
+			bool explicitly)
+		{
+			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
+		}
 
 		public static TbsCertificateList GetInstance(
-            object obj)
-        {
-            TbsCertificateList list = obj as TbsCertificateList;
+			object obj)
+		{
+			TbsCertificateList list = obj as TbsCertificateList;
 
 			if (obj == null || list != null)
-            {
-                return list;
-            }
+			{
+				return list;
+			}
 
 			if (obj is Asn1Sequence)
-            {
-                return new TbsCertificateList((Asn1Sequence) obj);
-            }
+			{
+				return new TbsCertificateList((Asn1Sequence)obj);
+			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
-        }
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+		}
 
 		internal TbsCertificateList(
-            Asn1Sequence seq)
-        {
+			Asn1Sequence seq)
+		{
 			if (seq.Count < 3 || seq.Count > 7)
 			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
@@ -182,71 +181,71 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			this.seq = seq;
 
 			if (seq[seqPos] is DerInteger)
-            {
+			{
 				version = DerInteger.GetInstance(seq[seqPos++]);
 			}
-            else
-            {
-                version = new DerInteger(0);
-            }
+			else
+			{
+				version = new DerInteger(0);
+			}
 
 			signature = AlgorithmIdentifier.GetInstance(seq[seqPos++]);
-            issuer = X509Name.GetInstance(seq[seqPos++]);
-            thisUpdate = Time.GetInstance(seq[seqPos++]);
+			issuer = X509Name.GetInstance(seq[seqPos++]);
+			thisUpdate = Time.GetInstance(seq[seqPos++]);
 
 			if (seqPos < seq.Count
-                && (seq[seqPos] is Asn1UtcTime
-                   || seq[seqPos] is Asn1GeneralizedTime
-                   || seq[seqPos] is Time))
-            {
-                nextUpdate = Time.GetInstance(seq[seqPos++]);
-            }
+			    && (seq[seqPos] is Asn1UtcTime
+			        || seq[seqPos] is Asn1GeneralizedTime
+			        || seq[seqPos] is Time))
+			{
+				nextUpdate = Time.GetInstance(seq[seqPos++]);
+			}
 
 			if (seqPos < seq.Count
-                && !(seq[seqPos] is Asn1TaggedObject))
-            {
+			    && !(seq[seqPos] is Asn1TaggedObject))
+			{
 				revokedCertificates = Asn1Sequence.GetInstance(seq[seqPos++]);
 			}
 
 			if (seqPos < seq.Count
-                && seq[seqPos] is Asn1TaggedObject)
-            {
+			    && seq[seqPos] is Asn1TaggedObject)
+			{
 				crlExtensions = X509Extensions.GetInstance(seq[seqPos]);
 			}
-        }
+		}
 
 		public int Version
-        {
-            get { return version.IntValueExact + 1; }
-        }
+		{
+			get { return version.IntValueExact + 1; }
+		}
 
 		public DerInteger VersionNumber
-        {
-            get { return version; }
-        }
+		{
+			get { return version; }
+		}
 
 		public AlgorithmIdentifier Signature
-        {
-            get { return signature; }
-        }
+		{
+			get { return signature; }
+		}
 
 		public X509Name Issuer
-        {
-            get { return issuer; }
-        }
+		{
+			get { return issuer; }
+		}
 
 		public Time ThisUpdate
-        {
-            get { return thisUpdate; }
-        }
+		{
+			get { return thisUpdate; }
+		}
 
 		public Time NextUpdate
-        {
-            get { return nextUpdate; }
-        }
+		{
+			get { return nextUpdate; }
+		}
 
 		public CrlEntry[] GetRevokedCertificates()
-        {
+		{
 			if (revokedCertificates == null)
 			{
 				return new CrlEntry[0];
@@ -271,15 +270,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public X509Extensions Extensions
-        {
-            get { return crlExtensions; }
-        }
+		{
+			get { return crlExtensions; }
+		}
 
 		public override Asn1Object ToAsn1Object()
-        {
-            return seq;
-        }
-    }
+		{
+			return seq;
+		}
+	}
 }
 #pragma warning restore
 #endif

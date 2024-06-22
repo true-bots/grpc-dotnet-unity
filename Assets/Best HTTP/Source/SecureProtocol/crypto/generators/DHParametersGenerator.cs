@@ -1,37 +1,36 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 {
-    public class DHParametersGenerator
-    {
-        private int				size;
-        private int				certainty;
-        private SecureRandom	random;
+	public class DHParametersGenerator
+	{
+		private int size;
+		private int certainty;
+		private SecureRandom random;
 
-        public virtual void Init(
-            int				size,
-            int				certainty,
-            SecureRandom	random)
-        {
-            this.size = size;
-            this.certainty = certainty;
-            this.random = random;
-        }
+		public virtual void Init(
+			int size,
+			int certainty,
+			SecureRandom random)
+		{
+			this.size = size;
+			this.certainty = certainty;
+			this.random = random;
+		}
 
-        /**
-         * which Generates the p and g values from the given parameters,
-         * returning the DHParameters object.
-         * <p>
-         * Note: can take a while...</p>
-         */
-        public virtual DHParameters GenerateParameters()
-        {
+		/**
+		 * which Generates the p and g values from the given parameters,
+		 * returning the DHParameters object.
+		 * <p>
+		 * Note: can take a while...</p>
+		 */
+		public virtual DHParameters GenerateParameters()
+		{
 			//
 			// find a safe prime p where p = 2*q + 1, where p and q are prime.
 			//

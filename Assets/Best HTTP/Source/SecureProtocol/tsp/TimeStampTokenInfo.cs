@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
@@ -12,25 +11,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 	{
 		private static TstInfo ParseTstInfo(byte[] tstInfoEncoding)
 		{
-            try
-            {
-                return TstInfo.GetInstance(tstInfoEncoding);
-            }
-            catch (Exception e)
-            {
-                throw new TspException("unable to parse TstInfo encoding: " + e.Message);
-            }
-        }
+			try
+			{
+				return TstInfo.GetInstance(tstInfoEncoding);
+			}
+			catch (Exception e)
+			{
+				throw new TspException("unable to parse TstInfo encoding: " + e.Message);
+			}
+		}
 
-        private TstInfo		tstInfo;
-		private DateTime	genTime;
+		private TstInfo tstInfo;
+		private DateTime genTime;
 
-        public TimeStampTokenInfo(byte[] tstInfoEncoding)
+		public TimeStampTokenInfo(byte[] tstInfoEncoding)
 			: this(ParseTstInfo(tstInfoEncoding))
 		{
-        }
+		}
 
-        public TimeStampTokenInfo(
+		public TimeStampTokenInfo(
 			TstInfo tstInfo)
 		{
 			this.tstInfo = tstInfo;
@@ -65,8 +64,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			get
 			{
 				return this.Accuracy == null
-					?	null
-					:	new GenTimeAccuracy(this.Accuracy);
+					? null
+					: new GenTimeAccuracy(this.Accuracy);
 			}
 		}
 
@@ -93,8 +92,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			get
 			{
 				return tstInfo.Nonce == null
-					?	null
-					:	tstInfo.Nonce.Value;
+					? null
+					: tstInfo.Nonce.Value;
 			}
 		}
 
@@ -105,7 +104,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 		public string MessageImprintAlgOid
 		{
-            get { return tstInfo.MessageImprint.HashAlgorithm.Algorithm.Id; }
+			get { return tstInfo.MessageImprint.HashAlgorithm.Algorithm.Id; }
 		}
 
 		public byte[] GetMessageImprintDigest()

@@ -5,10 +5,10 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
-    [Serializable]
-    public class CryptoException
+	[Serializable]
+	public class CryptoException
 		: Exception
-    {
+	{
 		public CryptoException()
 			: base()
 		{

@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
@@ -15,9 +14,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 	{
 		private const int LineLength = 64;
 
-		private readonly TextWriter	writer;
-		private readonly int		nlLength;
-		private char[]				buf = new char[LineLength];
+		private readonly TextWriter writer;
+		private readonly int nlLength;
+		private char[] buf = new char[LineLength];
 
 		/**
 		 * Base constructor.
@@ -27,28 +26,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		public PemWriter(TextWriter writer)
 		{
 			this.writer = writer ?? throw new ArgumentNullException(nameof(writer));
-            this.nlLength = Environment.NewLine.Length;
+			this.nlLength = Environment.NewLine.Length;
 		}
 
-        #region IDisposable
+		#region IDisposable
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                writer.Dispose();
-            }
-        }
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				writer.Dispose();
+			}
+		}
 
-        #endregion
+		#endregion
 
-        public TextWriter Writer
+		public TextWriter Writer
 		{
 			get { return writer; }
 		}
@@ -120,6 +119,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 					buf[index] = (char)bytes[i + index];
 					index++;
 				}
+
 				writer.WriteLine(buf, 0, index);
 			}
 		}
@@ -133,7 +133,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		{
 			writer.WriteLine("-----END " + type + "-----");
 		}
-    }
+	}
 }
 #pragma warning restore
 #endif

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem;
 
@@ -17,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		{
 		}
 
-		public void WriteObject(object obj) 
+		public void WriteObject(object obj)
 		{
 			try
 			{
@@ -33,10 +32,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		}
 
 		public void WriteObject(
-			object			obj,
-			string			algorithm,
-			char[]			password,
-			SecureRandom	random)
+			object obj,
+			string algorithm,
+			char[] password,
+			SecureRandom random)
 		{
 			base.WriteObject(new MiscPemGenerator(obj, algorithm, password, random));
 		}

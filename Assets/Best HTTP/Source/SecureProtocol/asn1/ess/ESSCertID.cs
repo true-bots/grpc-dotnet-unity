@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -18,17 +17,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 		{
 			if (o == null || o is EssCertID)
 			{
-				return (EssCertID) o;
+				return (EssCertID)o;
 			}
 
 			if (o is Asn1Sequence)
 			{
-				return new EssCertID((Asn1Sequence) o);
+				return new EssCertID((Asn1Sequence)o);
 			}
 
 			throw new ArgumentException(
 				"unknown object in 'EssCertID' factory : "
-                + Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
 		}
 
 		/**
@@ -57,8 +56,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 		}
 
 		public EssCertID(
-			byte[]			hash,
-			IssuerSerial	issuerSerial)
+			byte[] hash,
+			IssuerSerial issuerSerial)
 		{
 			this.certHash = new DerOctetString(hash);
 			this.issuerSerial = issuerSerial;
@@ -84,7 +83,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(certHash);
-            v.AddOptional(issuerSerial);
+			v.AddOptional(issuerSerial);
 			return new DerSequence(v);
 		}
 	}

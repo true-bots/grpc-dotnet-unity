@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
@@ -9,18 +8,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class CAKeyUpdAnnContent
 		: Asn1Encodable
 	{
-        public static CAKeyUpdAnnContent GetInstance(object obj)
-        {
-            if (obj is CAKeyUpdAnnContent content)
-                return content;
+		public static CAKeyUpdAnnContent GetInstance(object obj)
+		{
+			if (obj is CAKeyUpdAnnContent content)
+				return content;
 
-            if (obj is Asn1Sequence seq)
-                return new CAKeyUpdAnnContent(seq);
+			if (obj is Asn1Sequence seq)
+				return new CAKeyUpdAnnContent(seq);
 
-            throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
-        }
+			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+		}
 
-        private readonly CmpCertificate m_oldWithNew;
+		private readonly CmpCertificate m_oldWithNew;
 		private readonly CmpCertificate m_newWithOld;
 		private readonly CmpCertificate m_newWithNew;
 

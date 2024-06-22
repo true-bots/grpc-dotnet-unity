@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -10,19 +9,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class PbeParameter
 		: Asn1Encodable
 	{
-		private readonly Asn1OctetString	salt;
-		private readonly DerInteger			iterationCount;
+		private readonly Asn1OctetString salt;
+		private readonly DerInteger iterationCount;
 
 		public static PbeParameter GetInstance(object obj)
 		{
 			if (obj is PbeParameter || obj == null)
 			{
-				return (PbeParameter) obj;
+				return (PbeParameter)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new PbeParameter((Asn1Sequence) obj);
+				return new PbeParameter((Asn1Sequence)obj);
 			}
 
 			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");

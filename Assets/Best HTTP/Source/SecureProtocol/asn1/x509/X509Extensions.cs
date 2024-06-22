@@ -2,15 +2,14 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 {
-    public class X509Extensions
-        : Asn1Encodable
-    {
+	public class X509Extensions
+		: Asn1Encodable
+	{
 		/**
 		 * Subject Directory Attributes
 		 */
@@ -19,102 +18,102 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		/**
          * Subject Key Identifier
          */
-        public static readonly DerObjectIdentifier SubjectKeyIdentifier = new DerObjectIdentifier("2.5.29.14");
+		public static readonly DerObjectIdentifier SubjectKeyIdentifier = new DerObjectIdentifier("2.5.29.14");
 
 		/**
          * Key Usage
          */
-        public static readonly DerObjectIdentifier KeyUsage = new DerObjectIdentifier("2.5.29.15");
+		public static readonly DerObjectIdentifier KeyUsage = new DerObjectIdentifier("2.5.29.15");
 
 		/**
          * Private Key Usage Period
          */
-        public static readonly DerObjectIdentifier PrivateKeyUsagePeriod = new DerObjectIdentifier("2.5.29.16");
+		public static readonly DerObjectIdentifier PrivateKeyUsagePeriod = new DerObjectIdentifier("2.5.29.16");
 
 		/**
          * Subject Alternative Name
          */
-        public static readonly DerObjectIdentifier SubjectAlternativeName = new DerObjectIdentifier("2.5.29.17");
+		public static readonly DerObjectIdentifier SubjectAlternativeName = new DerObjectIdentifier("2.5.29.17");
 
 		/**
          * Issuer Alternative Name
          */
-        public static readonly DerObjectIdentifier IssuerAlternativeName = new DerObjectIdentifier("2.5.29.18");
+		public static readonly DerObjectIdentifier IssuerAlternativeName = new DerObjectIdentifier("2.5.29.18");
 
 		/**
          * Basic Constraints
          */
-        public static readonly DerObjectIdentifier BasicConstraints = new DerObjectIdentifier("2.5.29.19");
+		public static readonly DerObjectIdentifier BasicConstraints = new DerObjectIdentifier("2.5.29.19");
 
 		/**
          * CRL Number
          */
-        public static readonly DerObjectIdentifier CrlNumber = new DerObjectIdentifier("2.5.29.20");
+		public static readonly DerObjectIdentifier CrlNumber = new DerObjectIdentifier("2.5.29.20");
 
 		/**
          * Reason code
          */
-        public static readonly DerObjectIdentifier ReasonCode = new DerObjectIdentifier("2.5.29.21");
+		public static readonly DerObjectIdentifier ReasonCode = new DerObjectIdentifier("2.5.29.21");
 
 		/**
          * Hold Instruction Code
          */
-        public static readonly DerObjectIdentifier InstructionCode = new DerObjectIdentifier("2.5.29.23");
+		public static readonly DerObjectIdentifier InstructionCode = new DerObjectIdentifier("2.5.29.23");
 
 		/**
          * Invalidity Date
          */
-        public static readonly DerObjectIdentifier InvalidityDate = new DerObjectIdentifier("2.5.29.24");
+		public static readonly DerObjectIdentifier InvalidityDate = new DerObjectIdentifier("2.5.29.24");
 
 		/**
          * Delta CRL indicator
          */
-        public static readonly DerObjectIdentifier DeltaCrlIndicator = new DerObjectIdentifier("2.5.29.27");
+		public static readonly DerObjectIdentifier DeltaCrlIndicator = new DerObjectIdentifier("2.5.29.27");
 
 		/**
          * Issuing Distribution Point
          */
-        public static readonly DerObjectIdentifier IssuingDistributionPoint = new DerObjectIdentifier("2.5.29.28");
+		public static readonly DerObjectIdentifier IssuingDistributionPoint = new DerObjectIdentifier("2.5.29.28");
 
 		/**
          * Certificate Issuer
          */
-        public static readonly DerObjectIdentifier CertificateIssuer = new DerObjectIdentifier("2.5.29.29");
+		public static readonly DerObjectIdentifier CertificateIssuer = new DerObjectIdentifier("2.5.29.29");
 
 		/**
          * Name Constraints
          */
-        public static readonly DerObjectIdentifier NameConstraints = new DerObjectIdentifier("2.5.29.30");
+		public static readonly DerObjectIdentifier NameConstraints = new DerObjectIdentifier("2.5.29.30");
 
 		/**
          * CRL Distribution Points
          */
-        public static readonly DerObjectIdentifier CrlDistributionPoints = new DerObjectIdentifier("2.5.29.31");
+		public static readonly DerObjectIdentifier CrlDistributionPoints = new DerObjectIdentifier("2.5.29.31");
 
 		/**
          * Certificate Policies
          */
-        public static readonly DerObjectIdentifier CertificatePolicies = new DerObjectIdentifier("2.5.29.32");
+		public static readonly DerObjectIdentifier CertificatePolicies = new DerObjectIdentifier("2.5.29.32");
 
 		/**
          * Policy Mappings
          */
-        public static readonly DerObjectIdentifier PolicyMappings = new DerObjectIdentifier("2.5.29.33");
+		public static readonly DerObjectIdentifier PolicyMappings = new DerObjectIdentifier("2.5.29.33");
 
 		/**
          * Authority Key Identifier
          */
-        public static readonly DerObjectIdentifier AuthorityKeyIdentifier = new DerObjectIdentifier("2.5.29.35");
+		public static readonly DerObjectIdentifier AuthorityKeyIdentifier = new DerObjectIdentifier("2.5.29.35");
 
 		/**
          * Policy Constraints
          */
-        public static readonly DerObjectIdentifier PolicyConstraints = new DerObjectIdentifier("2.5.29.36");
+		public static readonly DerObjectIdentifier PolicyConstraints = new DerObjectIdentifier("2.5.29.36");
 
 		/**
          * Extended Key Usage
          */
-        public static readonly DerObjectIdentifier ExtendedKeyUsage = new DerObjectIdentifier("2.5.29.37");
+		public static readonly DerObjectIdentifier ExtendedKeyUsage = new DerObjectIdentifier("2.5.29.37");
 
 		/**
 		 * Freshest CRL
@@ -124,7 +123,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		/**
          * Inhibit Any Policy
          */
-        public static readonly DerObjectIdentifier InhibitAnyPolicy = new DerObjectIdentifier("2.5.29.54");
+		public static readonly DerObjectIdentifier InhibitAnyPolicy = new DerObjectIdentifier("2.5.29.54");
 
 		/**
          * Authority Info Access
@@ -166,49 +165,50 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 */
 		public static readonly DerObjectIdentifier TargetInformation = new DerObjectIdentifier("2.5.29.55");
 
-        /**
-         * Expired Certificates on CRL extension
-         */
-        public static readonly DerObjectIdentifier ExpiredCertsOnCrl = new DerObjectIdentifier("2.5.29.60");
+		/**
+		 * Expired Certificates on CRL extension
+		 */
+		public static readonly DerObjectIdentifier ExpiredCertsOnCrl = new DerObjectIdentifier("2.5.29.60");
 
-        private readonly Dictionary<DerObjectIdentifier, X509Extension> m_extensions =
-            new Dictionary<DerObjectIdentifier, X509Extension>();
-        private readonly List<DerObjectIdentifier> m_ordering;
+		private readonly Dictionary<DerObjectIdentifier, X509Extension> m_extensions =
+			new Dictionary<DerObjectIdentifier, X509Extension>();
 
-        public static X509Extension GetExtension(X509Extensions extensions, DerObjectIdentifier oid)
-        {
-            return null == extensions ? null : extensions.GetExtension(oid);
-        }
+		private readonly List<DerObjectIdentifier> m_ordering;
 
-        public static Asn1Encodable GetExtensionParsedValue(X509Extensions extensions, DerObjectIdentifier oid)
-        {
-            return null == extensions ? null : extensions.GetExtensionParsedValue(oid);
-        }
+		public static X509Extension GetExtension(X509Extensions extensions, DerObjectIdentifier oid)
+		{
+			return null == extensions ? null : extensions.GetExtension(oid);
+		}
+
+		public static Asn1Encodable GetExtensionParsedValue(X509Extensions extensions, DerObjectIdentifier oid)
+		{
+			return null == extensions ? null : extensions.GetExtensionParsedValue(oid);
+		}
 
 		public static X509Extensions GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
-        {
-            return GetInstance(Asn1Sequence.GetInstance(taggedObject, declaredExplicit));
-        }
+		{
+			return GetInstance(Asn1Sequence.GetInstance(taggedObject, declaredExplicit));
+		}
 
 		public static X509Extensions GetInstance(
-            object obj)
-        {
-            if (obj == null || obj is X509Extensions)
-            {
-                return (X509Extensions) obj;
-            }
+			object obj)
+		{
+			if (obj == null || obj is X509Extensions)
+			{
+				return (X509Extensions)obj;
+			}
 
 			if (obj is Asn1Sequence)
-            {
-                return new X509Extensions((Asn1Sequence) obj);
-            }
+			{
+				return new X509Extensions((Asn1Sequence)obj);
+			}
 
 			if (obj is Asn1TaggedObject)
-            {
-                return GetInstance(((Asn1TaggedObject) obj).GetObject());
-            }
+			{
+				return GetInstance(((Asn1TaggedObject)obj).GetObject());
+			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -216,9 +216,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
          *
          * the extensions are a list of constructed sequences, either with (Oid, OctetString) or (Oid, Boolean, OctetString)
          */
-        private X509Extensions(Asn1Sequence seq)
-        {
-            m_ordering = new List<DerObjectIdentifier>();
+		private X509Extensions(Asn1Sequence seq)
+		{
+			m_ordering = new List<DerObjectIdentifier>();
 
 			foreach (Asn1Encodable ae in seq)
 			{
@@ -230,75 +230,75 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				DerObjectIdentifier oid = DerObjectIdentifier.GetInstance(s[0].ToAsn1Object());
 
 				bool isCritical = s.Count == 3
-					&& DerBoolean.GetInstance(s[1].ToAsn1Object()).IsTrue;
+				                  && DerBoolean.GetInstance(s[1].ToAsn1Object()).IsTrue;
 
 				Asn1OctetString octets = Asn1OctetString.GetInstance(s[s.Count - 1].ToAsn1Object());
 
-                if (m_extensions.ContainsKey(oid))
-                    throw new ArgumentException("repeated extension found: " + oid);
+				if (m_extensions.ContainsKey(oid))
+					throw new ArgumentException("repeated extension found: " + oid);
 
-                m_extensions.Add(oid, new X509Extension(isCritical, octets));
+				m_extensions.Add(oid, new X509Extension(isCritical, octets));
 				m_ordering.Add(oid);
 			}
-        }
+		}
 
-        /**
-         * constructor from a table of extensions.
-         * <p>
-         * it's is assumed the table contains Oid/string pairs.</p>
-         */
-        public X509Extensions(IDictionary<DerObjectIdentifier, X509Extension> extensions)
-            : this(null, extensions)
-        {
-        }
+		/**
+		 * constructor from a table of extensions.
+		 * <p>
+		 * it's is assumed the table contains Oid/string pairs.</p>
+		 */
+		public X509Extensions(IDictionary<DerObjectIdentifier, X509Extension> extensions)
+			: this(null, extensions)
+		{
+		}
 
-        /**
-         * Constructor from a table of extensions with ordering.
-         * <p>
-         * It's is assumed the table contains Oid/string pairs.</p>
-         */
-        public X509Extensions(IList<DerObjectIdentifier> ordering,
-            IDictionary<DerObjectIdentifier, X509Extension> extensions)
-        {
-            if (ordering == null)
-            {
-                m_ordering = new List<DerObjectIdentifier>(extensions.Keys);
-            }
-            else
-            {
-                m_ordering = new List<DerObjectIdentifier>(ordering);
-            }
+		/**
+		 * Constructor from a table of extensions with ordering.
+		 * <p>
+		 * It's is assumed the table contains Oid/string pairs.</p>
+		 */
+		public X509Extensions(IList<DerObjectIdentifier> ordering,
+			IDictionary<DerObjectIdentifier, X509Extension> extensions)
+		{
+			if (ordering == null)
+			{
+				m_ordering = new List<DerObjectIdentifier>(extensions.Keys);
+			}
+			else
+			{
+				m_ordering = new List<DerObjectIdentifier>(ordering);
+			}
 
-            foreach (DerObjectIdentifier oid in m_ordering)
-            {
-                m_extensions.Add(oid, extensions[oid]);
-            }
-        }
+			foreach (DerObjectIdentifier oid in m_ordering)
+			{
+				m_extensions.Add(oid, extensions[oid]);
+			}
+		}
 
-        /**
-         * Constructor from two vectors
-         *
-         * @param objectIDs an ArrayList of the object identifiers.
-         * @param values an ArrayList of the extension values.
-         */
-        public X509Extensions(IList<DerObjectIdentifier> oids, IList<X509Extension> values)
-        {
-            m_ordering = new List<DerObjectIdentifier>(oids);
+		/**
+		 * Constructor from two vectors
+		 *
+		 * @param objectIDs an ArrayList of the object identifiers.
+		 * @param values an ArrayList of the extension values.
+		 */
+		public X509Extensions(IList<DerObjectIdentifier> oids, IList<X509Extension> values)
+		{
+			m_ordering = new List<DerObjectIdentifier>(oids);
 
-            int count = 0;
-            foreach (DerObjectIdentifier oid in m_ordering)
-            {
-                m_extensions.Add(oid, values[count++]);
-            }
-        }
+			int count = 0;
+			foreach (DerObjectIdentifier oid in m_ordering)
+			{
+				m_extensions.Add(oid, values[count++]);
+			}
+		}
 
 		/**
 		 * return an Enumeration of the extension field's object ids.
 		 */
 		public IEnumerable<DerObjectIdentifier> ExtensionOids
-        {
+		{
 			get { return CollectionUtilities.Proxy(m_ordering); }
-        }
+		}
 
 		/**
          * return the extension represented by the object identifier
@@ -306,21 +306,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
          *
          * @return the extension if it's present, null otherwise.
          */
-        public X509Extension GetExtension(DerObjectIdentifier oid)
-        {
-            return CollectionUtilities.GetValueOrNull(m_extensions, oid);
-        }
+		public X509Extension GetExtension(DerObjectIdentifier oid)
+		{
+			return CollectionUtilities.GetValueOrNull(m_extensions, oid);
+		}
 
-        /**
-         * return the parsed value of the extension represented by the object identifier
-         * passed in.
-         *
-         * @return the parsed value of the extension if it's present, null otherwise.
-         */
-        public Asn1Encodable GetExtensionParsedValue(DerObjectIdentifier oid)
-        {
-            return GetExtension(oid)?.GetParsedValue();
-        }
+		/**
+		 * return the parsed value of the extension represented by the object identifier
+		 * passed in.
+		 *
+		 * @return the parsed value of the extension if it's present, null otherwise.
+		 */
+		public Asn1Encodable GetExtensionParsedValue(DerObjectIdentifier oid)
+		{
+			return GetExtension(oid)?.GetParsedValue();
+		}
 
 		/**
 		 * <pre>
@@ -333,42 +333,42 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * </pre>
 		 */
 		public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector	v = new Asn1EncodableVector(m_ordering.Count);
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector(m_ordering.Count);
 
 			foreach (DerObjectIdentifier oid in m_ordering)
 			{
-                X509Extension ext = m_extensions[oid];
-                if (ext.IsCritical)
-                {
-                    v.Add(new DerSequence(oid, DerBoolean.True, ext.Value));
-                }
-                else
-                {
-                    v.Add(new DerSequence(oid, ext.Value));
-                }
-            }
+				X509Extension ext = m_extensions[oid];
+				if (ext.IsCritical)
+				{
+					v.Add(new DerSequence(oid, DerBoolean.True, ext.Value));
+				}
+				else
+				{
+					v.Add(new DerSequence(oid, ext.Value));
+				}
+			}
 
 			return new DerSequence(v);
-        }
+		}
 
 		public bool Equivalent(X509Extensions other)
 		{
 			if (m_extensions.Count != other.m_extensions.Count)
 				return false;
 
-            foreach (var entry in m_extensions)
-            {
-                if (!entry.Value.Equals(other.GetExtension(entry.Key)))
-                    return false;
-            }
+			foreach (var entry in m_extensions)
+			{
+				if (!entry.Value.Equals(other.GetExtension(entry.Key)))
+					return false;
+			}
 
 			return true;
 		}
 
 		public DerObjectIdentifier[] GetExtensionOids()
 		{
-            return m_ordering.ToArray();
+			return m_ordering.ToArray();
 		}
 
 		public DerObjectIdentifier[] GetNonCriticalExtensionOids()
@@ -386,14 +386,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			var oids = new List<DerObjectIdentifier>();
 
 			foreach (DerObjectIdentifier oid in m_ordering)
-            {
+			{
 				if (m_extensions[oid].IsCritical == isCritical)
 				{
 					oids.Add(oid);
 				}
-            }
+			}
 
-            return oids.ToArray();
+			return oids.ToArray();
 		}
 	}
 }

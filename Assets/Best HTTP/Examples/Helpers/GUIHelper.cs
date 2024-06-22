@@ -6,55 +6,56 @@ using UnityEngine.UI;
 
 namespace BestHTTP.Examples
 {
-    public static class GUIHelper
-    {
-        // https://en.wikipedia.org/wiki/Binary_prefix
-        private static string[] prefixes = new string[] { " B", " KiB", " MiB", " GiB", " TiB" };
-        public static string GetBytesStr(double bytes, byte precision)
-        {
-            int prefixIdx = 0;
-            while (bytes >= 1024)
-            {
-                bytes = bytes / 1024;
-                prefixIdx++;
-            }
+	public static class GUIHelper
+	{
+		// https://en.wikipedia.org/wiki/Binary_prefix
+		private static string[] prefixes = new string[] { " B", " KiB", " MiB", " GiB", " TiB" };
 
-            return bytes.ToString("F" + precision) + prefixes[prefixIdx];
-        }
+		public static string GetBytesStr(double bytes, byte precision)
+		{
+			int prefixIdx = 0;
+			while (bytes >= 1024)
+			{
+				bytes = bytes / 1024;
+				prefixIdx++;
+			}
 
-        public static void RemoveChildren(RectTransform transform, int maxChildCount)
-        {
-            while (transform.childCount > maxChildCount)
-            {
-                var child = transform.GetChild(0);
-                child.SetParent(null);
+			return bytes.ToString("F" + precision) + prefixes[prefixIdx];
+		}
 
-                GameObject.Destroy(child.gameObject);
-            }
-        }
+		public static void RemoveChildren(RectTransform transform, int maxChildCount)
+		{
+			while (transform.childCount > maxChildCount)
+			{
+				var child = transform.GetChild(0);
+				child.SetParent(null);
 
-        public static TextListItem AddText(TextListItem prefab, RectTransform contentRoot, string text, int maxEntries, ScrollRect scrollRect)
-        {
-            if (contentRoot == null)
-                return null;
+				GameObject.Destroy(child.gameObject);
+			}
+		}
 
-            var listItem = GameObject.Instantiate<TextListItem>(prefab, contentRoot, false);
-            listItem.SetText(text);
+		public static TextListItem AddText(TextListItem prefab, RectTransform contentRoot, string text, int maxEntries, ScrollRect scrollRect)
+		{
+			if (contentRoot == null)
+				return null;
 
-            GUIHelper.RemoveChildren(contentRoot, maxEntries);
+			var listItem = GameObject.Instantiate<TextListItem>(prefab, contentRoot, false);
+			listItem.SetText(text);
 
-            if (scrollRect != null && scrollRect.isActiveAndEnabled)
-                scrollRect.StartCoroutine(ScrollToBottom(scrollRect));
+			GUIHelper.RemoveChildren(contentRoot, maxEntries);
 
-            return listItem;
-        }
+			if (scrollRect != null && scrollRect.isActiveAndEnabled)
+				scrollRect.StartCoroutine(ScrollToBottom(scrollRect));
 
-        public static IEnumerator ScrollToBottom(ScrollRect scrollRect)
-        {
-            yield return null;
+			return listItem;
+		}
 
-            if (scrollRect != null && scrollRect.isActiveAndEnabled)
-                scrollRect.normalizedPosition = new Vector2(0, 0);
-        }
-    }
+		public static IEnumerator ScrollToBottom(ScrollRect scrollRect)
+		{
+			yield return null;
+
+			if (scrollRect != null && scrollRect.isActiveAndEnabled)
+				scrollRect.normalizedPosition = new Vector2(0, 0);
+		}
+	}
 }

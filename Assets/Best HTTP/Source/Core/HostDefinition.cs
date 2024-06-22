@@ -1,147 +1,147 @@
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.Connections;
 using BestHTTP.PlatformSupport.Text;
 
 namespace BestHTTP.Core
 {
-    public sealed class HostDefinition
-    {
-        public string Host { get; private set; }
-        
-        // alt-svc support:
-        //  1. When a request receives an alt-svc header send a plugin msg to the manager with all the details to route to the proper hostDefinition.
-        //  2. HostDefinition parses the header value
-        //  3. If there's at least one supported protocol found, start open a connection to that said alternate
-        //  4. If the new connection is open, route new requests to that connection
-        public List<HostConnection> Alternates;
+	public sealed class HostDefinition
+	{
+		public string Host { get; private set; }
 
-        /// <summary>
-        /// Requests to the same host can require different connections: http, https, http + proxy, https + proxy, http2, http2 + proxy
-        /// </summary>
-        public Dictionary<string, HostConnection> hostConnectionVariant = new Dictionary<string, HostConnection>();
+		// alt-svc support:
+		//  1. When a request receives an alt-svc header send a plugin msg to the manager with all the details to route to the proper hostDefinition.
+		//  2. HostDefinition parses the header value
+		//  3. If there's at least one supported protocol found, start open a connection to that said alternate
+		//  4. If the new connection is open, route new requests to that connection
+		public List<HostConnection> Alternates;
 
-        public HostDefinition(string host)
-        {
-            this.Host = host;
-        }
+		/// <summary>
+		/// Requests to the same host can require different connections: http, https, http + proxy, https + proxy, http2, http2 + proxy
+		/// </summary>
+		public Dictionary<string, HostConnection> hostConnectionVariant = new Dictionary<string, HostConnection>();
 
-        public HostConnection HasBetterAlternate(HTTPRequest request)
-        {
-            return null;
-        }
+		public HostDefinition(string host)
+		{
+			this.Host = host;
+		}
 
-        public HostConnection GetHostDefinition(HTTPRequest request)
-        {
-            string key = GetKeyForRequest(request);
+		public HostConnection HasBetterAlternate(HTTPRequest request)
+		{
+			return null;
+		}
 
-            return GetHostDefinition(key);
-        }
+		public HostConnection GetHostDefinition(HTTPRequest request)
+		{
+			string key = GetKeyForRequest(request);
 
-        public HostConnection GetHostDefinition(string key)
-        {
-            HostConnection host = null;
+			return GetHostDefinition(key);
+		}
 
-            if (!this.hostConnectionVariant.TryGetValue(key, out host))
-                this.hostConnectionVariant.Add(key, host = new HostConnection(this, key));
+		public HostConnection GetHostDefinition(string key)
+		{
+			HostConnection host = null;
 
-            return host;
-        }
+			if (!this.hostConnectionVariant.TryGetValue(key, out host))
+				this.hostConnectionVariant.Add(key, host = new HostConnection(this, key));
 
-        public void Send(HTTPRequest request)
-        {
-            GetHostDefinition(request)
-                .Send(request);
-        }
+			return host;
+		}
 
-        public void TryToSendQueuedRequests()
-        {
-            foreach (var kvp in hostConnectionVariant)
-                kvp.Value.TryToSendQueuedRequests();
-        }
+		public void Send(HTTPRequest request)
+		{
+			GetHostDefinition(request)
+				.Send(request);
+		}
 
-        public void HandleAltSvcHeader(HTTPResponse response)
-        {
-            var headerValues = response.GetHeaderValues("alt-svc");
-            if (headerValues == null)
-                HTTPManager.Logger.Warning(typeof(HostDefinition).Name, "Received HandleAltSvcHeader message, but no Alt-Svc header found!", response.Context);
-        }
+		public void TryToSendQueuedRequests()
+		{
+			foreach (var kvp in hostConnectionVariant)
+				kvp.Value.TryToSendQueuedRequests();
+		}
 
-        public void HandleConnectProtocol(HTTP2ConnectProtocolInfo info)
-        {
-            HTTPManager.Logger.Information(typeof(HostDefinition).Name, string.Format("Received HandleConnectProtocol message. Connect protocol for host {0}. Enabled: {1}", info.Host, info.Enabled));
-        }
+		public void HandleAltSvcHeader(HTTPResponse response)
+		{
+			var headerValues = response.GetHeaderValues("alt-svc");
+			if (headerValues == null)
+				HTTPManager.Logger.Warning(typeof(HostDefinition).Name, "Received HandleAltSvcHeader message, but no Alt-Svc header found!", response.Context);
+		}
 
-        internal void Shutdown()
-        {
-            foreach (var kvp in this.hostConnectionVariant)
-            {
-                kvp.Value.Shutdown();
-            }
-        }
+		public void HandleConnectProtocol(HTTP2ConnectProtocolInfo info)
+		{
+			HTTPManager.Logger.Information(typeof(HostDefinition).Name,
+				string.Format("Received HandleConnectProtocol message. Connect protocol for host {0}. Enabled: {1}", info.Host, info.Enabled));
+		}
 
-        internal void SaveTo(System.IO.BinaryWriter bw)
-        {
-            bw.Write(this.hostConnectionVariant.Count);
+		internal void Shutdown()
+		{
+			foreach (var kvp in this.hostConnectionVariant)
+			{
+				kvp.Value.Shutdown();
+			}
+		}
 
-            foreach (var kvp in this.hostConnectionVariant)
-            {
-                bw.Write(kvp.Key.ToString());
+		internal void SaveTo(System.IO.BinaryWriter bw)
+		{
+			bw.Write(this.hostConnectionVariant.Count);
 
-                kvp.Value.SaveTo(bw);
-            }
-        }
+			foreach (var kvp in this.hostConnectionVariant)
+			{
+				bw.Write(kvp.Key.ToString());
 
-        internal void LoadFrom(int version, System.IO.BinaryReader br)
-        {
-            int count = br.ReadInt32();
-            for (int i = 0; i < count; ++i)
-            {
-                GetHostDefinition(br.ReadString())
-                    .LoadFrom(version, br);
-            }
-        }
+				kvp.Value.SaveTo(bw);
+			}
+		}
 
-        public static string GetKeyForRequest(HTTPRequest request)
-        {
-            return GetKeyFor(request.CurrentUri
+		internal void LoadFrom(int version, System.IO.BinaryReader br)
+		{
+			int count = br.ReadInt32();
+			for (int i = 0; i < count; ++i)
+			{
+				GetHostDefinition(br.ReadString())
+					.LoadFrom(version, br);
+			}
+		}
+
+		public static string GetKeyForRequest(HTTPRequest request)
+		{
+			return GetKeyFor(request.CurrentUri
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
-                , request.Proxy
+				, request.Proxy
 #endif
-                );
-        }
+			);
+		}
 
-        public static string GetKeyFor(Uri uri
+		public static string GetKeyFor(Uri uri
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
-            , Proxy proxy
+			, Proxy proxy
 #endif
-            )
-        {
-            if (uri.IsFile)
-                return uri.ToString();
+		)
+		{
+			if (uri.IsFile)
+				return uri.ToString();
 
-            var keyBuilder = StringBuilderPool.Get(11);
+			var keyBuilder = StringBuilderPool.Get(11);
 
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
-            if (proxy != null && proxy.UseProxyForAddress(uri))
-            {
-                keyBuilder.Append(proxy.Address.Scheme);
-                keyBuilder.Append("://");
-                keyBuilder.Append(proxy.Address.Host);
-                keyBuilder.Append(":");
-                keyBuilder.Append(proxy.Address.Port);
-                keyBuilder.Append(" @ ");
-            }
+			if (proxy != null && proxy.UseProxyForAddress(uri))
+			{
+				keyBuilder.Append(proxy.Address.Scheme);
+				keyBuilder.Append("://");
+				keyBuilder.Append(proxy.Address.Host);
+				keyBuilder.Append(":");
+				keyBuilder.Append(proxy.Address.Port);
+				keyBuilder.Append(" @ ");
+			}
 #endif
 
-            keyBuilder.Append(uri.Scheme);
-            keyBuilder.Append("://");
-            keyBuilder.Append(uri.Host);
-            keyBuilder.Append(":");
-            keyBuilder.Append(uri.Port);
+			keyBuilder.Append(uri.Scheme);
+			keyBuilder.Append("://");
+			keyBuilder.Append(uri.Host);
+			keyBuilder.Append(":");
+			keyBuilder.Append(uri.Port);
 
-            return StringBuilderPool.ReleaseAndGrab(keyBuilder);
-        }
-    }
+			return StringBuilderPool.ReleaseAndGrab(keyBuilder);
+		}
+	}
 }

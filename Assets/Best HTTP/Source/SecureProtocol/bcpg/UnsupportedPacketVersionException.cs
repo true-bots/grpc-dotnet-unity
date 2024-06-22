@@ -5,10 +5,10 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 {
-    [Serializable]
-    public class UnsupportedPacketVersionException
-        : Exception
-    {
+	[Serializable]
+	public class UnsupportedPacketVersionException
+		: Exception
+	{
 		public UnsupportedPacketVersionException()
 			: base()
 		{
@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			: base(info, context)
 		{
 		}
-    }
+	}
 }
 #pragma warning restore
 #endif

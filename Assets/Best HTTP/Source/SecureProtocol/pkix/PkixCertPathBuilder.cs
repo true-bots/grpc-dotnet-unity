@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security.Certificates;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
@@ -66,9 +65,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		private Exception certPathException;
 
 		protected virtual PkixCertPathBuilderResult Build(
-			X509Certificate			tbvCert,
-			PkixBuilderParameters	pkixParams,
-			IList<X509Certificate>	tbvPath)
+			X509Certificate tbvCert,
+			PkixBuilderParameters pkixParams,
+			IList<X509Certificate> tbvPath)
 		{
 			// If tbvCert is already present in tbvPath, it indicates having run into a cycle in the PKI graph.
 			if (tbvPath.Contains(tbvCert))

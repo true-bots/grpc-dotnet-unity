@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
@@ -27,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 
 			throw new ArgumentException("Invalid DHValidationParms: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
-		
+
 		public DHValidationParms(DerBitString seed, DerInteger pgenCounter)
 		{
 			if (seed == null)

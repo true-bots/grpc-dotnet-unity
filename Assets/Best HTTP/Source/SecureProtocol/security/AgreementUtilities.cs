@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.EdEC;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9;
@@ -22,17 +21,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		private static readonly IDictionary<string, string> Algorithms =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        static AgreementUtilities()
+		static AgreementUtilities()
 		{
-            Algorithms[X9ObjectIdentifiers.DHSinglePassCofactorDHSha1KdfScheme.Id] = "ECCDHWITHSHA1KDF";
+			Algorithms[X9ObjectIdentifiers.DHSinglePassCofactorDHSha1KdfScheme.Id] = "ECCDHWITHSHA1KDF";
 			Algorithms[X9ObjectIdentifiers.DHSinglePassStdDHSha1KdfScheme.Id] = "ECDHWITHSHA1KDF";
 			Algorithms[X9ObjectIdentifiers.MqvSinglePassSha1KdfScheme.Id] = "ECMQVWITHSHA1KDF";
 
-            Algorithms[EdECObjectIdentifiers.id_X25519.Id] = "X25519";
-            Algorithms[EdECObjectIdentifiers.id_X448.Id] = "X448";
-        }
+			Algorithms[EdECObjectIdentifiers.id_X25519.Id] = "X25519";
+			Algorithms[EdECObjectIdentifiers.id_X448.Id] = "X448";
+		}
 
-        public static IBasicAgreement GetBasicAgreement(
+		public static IBasicAgreement GetBasicAgreement(
 			DerObjectIdentifier oid)
 		{
 			return GetBasicAgreement(oid.Id);
@@ -41,16 +40,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public static IBasicAgreement GetBasicAgreement(
 			string algorithm)
 		{
-            string mechanism = GetMechanism(algorithm);
+			string mechanism = GetMechanism(algorithm);
 
-            if (mechanism == "DH" || mechanism == "DIFFIEHELLMAN")
+			if (mechanism == "DH" || mechanism == "DIFFIEHELLMAN")
 				return new DHBasicAgreement();
 
 			if (mechanism == "ECDH")
 				return new ECDHBasicAgreement();
 
-            if (mechanism == "ECDHC" || mechanism == "ECCDH")
-                    return new ECDHCBasicAgreement();
+			if (mechanism == "ECDHC" || mechanism == "ECCDH")
+				return new ECDHCBasicAgreement();
 
 			if (mechanism == "ECMQV")
 				return new ECMqvBasicAgreement();
@@ -60,7 +59,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 		public static IBasicAgreement GetBasicAgreementWithKdf(
 			DerObjectIdentifier oid,
-			string				wrapAlgorithm)
+			string wrapAlgorithm)
 		{
 			return GetBasicAgreementWithKdf(oid.Id, wrapAlgorithm);
 		}
@@ -69,9 +68,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			string agreeAlgorithm,
 			string wrapAlgorithm)
 		{
-            string mechanism = GetMechanism(agreeAlgorithm);
+			string mechanism = GetMechanism(agreeAlgorithm);
 
-            // 'DHWITHSHA1KDF' retained for backward compatibility
+			// 'DHWITHSHA1KDF' retained for backward compatibility
 			if (mechanism == "DHWITHSHA1KDF" || mechanism == "ECDHWITHSHA1KDF")
 				return new ECDHWithKdfBasicAgreement(
 					wrapAlgorithm,
@@ -87,24 +86,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			throw new SecurityUtilityException("Basic Agreement (with KDF) " + agreeAlgorithm + " not recognised.");
 		}
 
-        public static IRawAgreement GetRawAgreement(
-            DerObjectIdentifier oid)
-        {
-            return GetRawAgreement(oid.Id);
-        }
+		public static IRawAgreement GetRawAgreement(
+			DerObjectIdentifier oid)
+		{
+			return GetRawAgreement(oid.Id);
+		}
 
-        public static IRawAgreement GetRawAgreement(string algorithm)
-        {
-            string mechanism = GetMechanism(algorithm);
+		public static IRawAgreement GetRawAgreement(string algorithm)
+		{
+			string mechanism = GetMechanism(algorithm);
 
-            if (mechanism == "X25519")
-                return new X25519Agreement();
+			if (mechanism == "X25519")
+				return new X25519Agreement();
 
-            if (mechanism == "X448")
-                return new X448Agreement();
+			if (mechanism == "X448")
+				return new X448Agreement();
 
-            throw new SecurityUtilityException("Raw Agreement " + algorithm + " not recognised.");
-        }
+			throw new SecurityUtilityException("Raw Agreement " + algorithm + " not recognised.");
+		}
 
 		public static string GetAlgorithmName(DerObjectIdentifier oid)
 		{
@@ -112,11 +111,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		}
 
 		private static string GetMechanism(string algorithm)
-        {
+		{
 			var mechanism = CollectionUtilities.GetValueOrKey(Algorithms, algorithm);
 
 			return mechanism.ToUpperInvariant();
-        }
+		}
 	}
 }
 #pragma warning restore

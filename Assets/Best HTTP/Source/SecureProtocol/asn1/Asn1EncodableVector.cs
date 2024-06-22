@@ -5,244 +5,245 @@ using System.Collections.Generic;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-    /**
-     * Mutable class for building ASN.1 constructed objects such as SETs or SEQUENCEs.
-     */
-    public class Asn1EncodableVector
-        : IEnumerable<Asn1Encodable>
-    {
-        internal static readonly Asn1Encodable[] EmptyElements = new Asn1Encodable[0];
+	/**
+	 * Mutable class for building ASN.1 constructed objects such as SETs or SEQUENCEs.
+	 */
+	public class Asn1EncodableVector
+		: IEnumerable<Asn1Encodable>
+	{
+		internal static readonly Asn1Encodable[] EmptyElements = new Asn1Encodable[0];
 
-        private const int DefaultCapacity = 10;
+		private const int DefaultCapacity = 10;
 
-        private Asn1Encodable[] elements;
-        private int elementCount;
-        private bool copyOnWrite;
+		private Asn1Encodable[] elements;
+		private int elementCount;
+		private bool copyOnWrite;
 
-        public static Asn1EncodableVector FromEnumerable(IEnumerable<Asn1Encodable> e)
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
-            foreach (Asn1Encodable obj in e)
-            {
-                v.Add(obj);
-            }
-            return v;
-        }
+		public static Asn1EncodableVector FromEnumerable(IEnumerable<Asn1Encodable> e)
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
+			foreach (Asn1Encodable obj in e)
+			{
+				v.Add(obj);
+			}
 
-        public Asn1EncodableVector()
-            : this(DefaultCapacity)
-        {
-        }
+			return v;
+		}
 
-        public Asn1EncodableVector(int initialCapacity)
-        {
-            if (initialCapacity < 0)
-                throw new ArgumentException("must not be negative", "initialCapacity");
+		public Asn1EncodableVector()
+			: this(DefaultCapacity)
+		{
+		}
 
-            this.elements = (initialCapacity == 0) ? EmptyElements : new Asn1Encodable[initialCapacity];
-            this.elementCount = 0;
-            this.copyOnWrite = false;
-        }
+		public Asn1EncodableVector(int initialCapacity)
+		{
+			if (initialCapacity < 0)
+				throw new ArgumentException("must not be negative", "initialCapacity");
 
-        public Asn1EncodableVector(Asn1Encodable element)
-            : this()
-        {
-            Add(element);
-        }
+			this.elements = (initialCapacity == 0) ? EmptyElements : new Asn1Encodable[initialCapacity];
+			this.elementCount = 0;
+			this.copyOnWrite = false;
+		}
 
-        public Asn1EncodableVector(Asn1Encodable element1, Asn1Encodable element2)
-            : this()
-        {
-            Add(element1);
-            Add(element2);
-        }
+		public Asn1EncodableVector(Asn1Encodable element)
+			: this()
+		{
+			Add(element);
+		}
 
-        public Asn1EncodableVector(params Asn1Encodable[] v)
-            : this()
-        {
-            Add(v);
-        }
+		public Asn1EncodableVector(Asn1Encodable element1, Asn1Encodable element2)
+			: this()
+		{
+			Add(element1);
+			Add(element2);
+		}
 
-        public void Add(Asn1Encodable element)
-        {
-            if (null == element)
-                throw new ArgumentNullException("element");
+		public Asn1EncodableVector(params Asn1Encodable[] v)
+			: this()
+		{
+			Add(v);
+		}
 
-            int capacity = elements.Length;
-            int minCapacity = elementCount + 1;
-            if ((minCapacity > capacity) | copyOnWrite)
-            {
-                Reallocate(minCapacity);
-            }
+		public void Add(Asn1Encodable element)
+		{
+			if (null == element)
+				throw new ArgumentNullException("element");
 
-            this.elements[elementCount] = element;
-            this.elementCount = minCapacity;
-        }
+			int capacity = elements.Length;
+			int minCapacity = elementCount + 1;
+			if ((minCapacity > capacity) | copyOnWrite)
+			{
+				Reallocate(minCapacity);
+			}
 
-        public void Add(Asn1Encodable element1, Asn1Encodable element2)
-        {
-            Add(element1);
-            Add(element2);
-        }
+			this.elements[elementCount] = element;
+			this.elementCount = minCapacity;
+		}
 
-        public void Add(params Asn1Encodable[] objs)
-        {
-            foreach (Asn1Encodable obj in objs)
-            {
-                Add(obj);
-            }
-        }
+		public void Add(Asn1Encodable element1, Asn1Encodable element2)
+		{
+			Add(element1);
+			Add(element2);
+		}
 
-        public void AddOptional(Asn1Encodable element)
-        {
-            if (element != null)
-            {
-                Add(element);
-            }
-        }
+		public void Add(params Asn1Encodable[] objs)
+		{
+			foreach (Asn1Encodable obj in objs)
+			{
+				Add(obj);
+			}
+		}
 
-        public void AddOptional(Asn1Encodable element1, Asn1Encodable element2)
-        {
-            if (element1 != null)
-            {
-                Add(element1);
-            }
-            if (element2 != null)
-            {
-                Add(element2);
-            }
-        }
+		public void AddOptional(Asn1Encodable element)
+		{
+			if (element != null)
+			{
+				Add(element);
+			}
+		}
 
-        public void AddOptional(params Asn1Encodable[] elements)
-        {
-            if (elements != null)
-            {
-                foreach (var element in elements)
-                {
-                    if (element != null)
-                    {
-                        Add(element);
-                    }
-                }
-            }
-        }
+		public void AddOptional(Asn1Encodable element1, Asn1Encodable element2)
+		{
+			if (element1 != null)
+			{
+				Add(element1);
+			}
 
-        public void AddOptionalTagged(bool isExplicit, int tagNo, Asn1Encodable obj)
-        {
-            if (null != obj)
-            {
-                Add(new DerTaggedObject(isExplicit, tagNo, obj));
-            }
-        }
+			if (element2 != null)
+			{
+				Add(element2);
+			}
+		}
 
-        public void AddOptionalTagged(bool isExplicit, int tagClass, int tagNo, Asn1Encodable obj)
-        {
-            if (null != obj)
-            {
-                Add(new DerTaggedObject(isExplicit, tagClass, tagNo, obj));
-            }
-        }
+		public void AddOptional(params Asn1Encodable[] elements)
+		{
+			if (elements != null)
+			{
+				foreach (var element in elements)
+				{
+					if (element != null)
+					{
+						Add(element);
+					}
+				}
+			}
+		}
 
-        public void AddAll(Asn1EncodableVector other)
-        {
-            if (null == other)
-                throw new ArgumentNullException("other");
+		public void AddOptionalTagged(bool isExplicit, int tagNo, Asn1Encodable obj)
+		{
+			if (null != obj)
+			{
+				Add(new DerTaggedObject(isExplicit, tagNo, obj));
+			}
+		}
 
-            int otherElementCount = other.Count;
-            if (otherElementCount < 1)
-                return;
+		public void AddOptionalTagged(bool isExplicit, int tagClass, int tagNo, Asn1Encodable obj)
+		{
+			if (null != obj)
+			{
+				Add(new DerTaggedObject(isExplicit, tagClass, tagNo, obj));
+			}
+		}
 
-            int capacity = elements.Length;
-            int minCapacity = elementCount + otherElementCount;
-            if ((minCapacity > capacity) | copyOnWrite)
-            {
-                Reallocate(minCapacity);
-            }
+		public void AddAll(Asn1EncodableVector other)
+		{
+			if (null == other)
+				throw new ArgumentNullException("other");
 
-            int i = 0;
-            do
-            {
-                Asn1Encodable otherElement = other[i];
-                if (null == otherElement)
-                    throw new NullReferenceException("'other' elements cannot be null");
+			int otherElementCount = other.Count;
+			if (otherElementCount < 1)
+				return;
 
-                this.elements[elementCount + i] = otherElement;
-            }
-            while (++i < otherElementCount);
+			int capacity = elements.Length;
+			int minCapacity = elementCount + otherElementCount;
+			if ((minCapacity > capacity) | copyOnWrite)
+			{
+				Reallocate(minCapacity);
+			}
 
-            this.elementCount = minCapacity;
-        }
+			int i = 0;
+			do
+			{
+				Asn1Encodable otherElement = other[i];
+				if (null == otherElement)
+					throw new NullReferenceException("'other' elements cannot be null");
 
-        public Asn1Encodable this[int index]
-        {
-            get
-            {
-                if (index >= elementCount)
-                    throw new IndexOutOfRangeException(index + " >= " + elementCount);
+				this.elements[elementCount + i] = otherElement;
+			} while (++i < otherElementCount);
 
-                return elements[index];
-            }
-        }
+			this.elementCount = minCapacity;
+		}
 
-        public int Count
-        {
-            get { return elementCount; }
-        }
+		public Asn1Encodable this[int index]
+		{
+			get
+			{
+				if (index >= elementCount)
+					throw new IndexOutOfRangeException(index + " >= " + elementCount);
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+				return elements[index];
+			}
+		}
 
-        public IEnumerator<Asn1Encodable> GetEnumerator()
-        {
-            IEnumerable<Asn1Encodable> e = CopyElements();
-            return e.GetEnumerator();
-        }
+		public int Count
+		{
+			get { return elementCount; }
+		}
 
-        internal Asn1Encodable[] CopyElements()
-        {
-            if (0 == elementCount)
-                return EmptyElements;
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 
-            Asn1Encodable[] copy = new Asn1Encodable[elementCount];
-            Array.Copy(elements, 0, copy, 0, elementCount);
-            return copy;
-        }
+		public IEnumerator<Asn1Encodable> GetEnumerator()
+		{
+			IEnumerable<Asn1Encodable> e = CopyElements();
+			return e.GetEnumerator();
+		}
 
-        internal Asn1Encodable[] TakeElements()
-        {
-            if (0 == elementCount)
-                return EmptyElements;
+		internal Asn1Encodable[] CopyElements()
+		{
+			if (0 == elementCount)
+				return EmptyElements;
 
-            if (elements.Length == elementCount)
-            {
-                this.copyOnWrite = true;
-                return elements;
-            }
+			Asn1Encodable[] copy = new Asn1Encodable[elementCount];
+			Array.Copy(elements, 0, copy, 0, elementCount);
+			return copy;
+		}
 
-            Asn1Encodable[] copy = new Asn1Encodable[elementCount];
-            Array.Copy(elements, 0, copy, 0, elementCount);
-            return copy;
-        }
+		internal Asn1Encodable[] TakeElements()
+		{
+			if (0 == elementCount)
+				return EmptyElements;
 
-        private void Reallocate(int minCapacity)
-        {
-            int oldCapacity = elements.Length;
-            int newCapacity = System.Math.Max(oldCapacity, minCapacity + (minCapacity >> 1));
+			if (elements.Length == elementCount)
+			{
+				this.copyOnWrite = true;
+				return elements;
+			}
 
-            Asn1Encodable[] copy = new Asn1Encodable[newCapacity];
-            Array.Copy(elements, 0, copy, 0, elementCount);
+			Asn1Encodable[] copy = new Asn1Encodable[elementCount];
+			Array.Copy(elements, 0, copy, 0, elementCount);
+			return copy;
+		}
 
-            this.elements = copy;
-            this.copyOnWrite = false;
-        }
+		private void Reallocate(int minCapacity)
+		{
+			int oldCapacity = elements.Length;
+			int newCapacity = System.Math.Max(oldCapacity, minCapacity + (minCapacity >> 1));
 
-        internal static Asn1Encodable[] CloneElements(Asn1Encodable[] elements)
-        {
-            return elements.Length < 1 ? EmptyElements : (Asn1Encodable[])elements.Clone();
-        }
-    }
+			Asn1Encodable[] copy = new Asn1Encodable[newCapacity];
+			Array.Copy(elements, 0, copy, 0, elementCount);
+
+			this.elements = copy;
+			this.copyOnWrite = false;
+		}
+
+		internal static Asn1Encodable[] CloneElements(Asn1Encodable[] elements)
+		{
+			return elements.Length < 1 ? EmptyElements : (Asn1Encodable[])elements.Clone();
+		}
+	}
 }
 #pragma warning restore
 #endif

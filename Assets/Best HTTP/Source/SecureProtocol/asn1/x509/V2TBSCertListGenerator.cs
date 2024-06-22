@@ -3,90 +3,89 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 {
-    /**
-     * Generator for Version 2 TbsCertList structures.
-     * <pre>
-     *  TbsCertList  ::=  Sequence  {
-     *       version                 Version OPTIONAL,
-     *                                    -- if present, shall be v2
-     *       signature               AlgorithmIdentifier,
-     *       issuer                  Name,
-     *       thisUpdate              Time,
-     *       nextUpdate              Time OPTIONAL,
-     *       revokedCertificates     Sequence OF Sequence  {
-     *            userCertificate         CertificateSerialNumber,
-     *            revocationDate          Time,
-     *            crlEntryExtensions      Extensions OPTIONAL
-     *                                          -- if present, shall be v2
-     *                                 }  OPTIONAL,
-     *       crlExtensions           [0]  EXPLICIT Extensions OPTIONAL
-     *                                          -- if present, shall be v2
-     *                                 }
-     * </pre>
-     *
-     * <b>Note: This class may be subject to change</b>
-     */
-    public class V2TbsCertListGenerator
-    {
-        private DerInteger			version = new DerInteger(1);
-        private AlgorithmIdentifier	signature;
-        private X509Name			issuer;
-        private Time				thisUpdate, nextUpdate;
-        private X509Extensions		extensions;
-        private List<Asn1Sequence>  crlEntries;
+	/**
+	 * Generator for Version 2 TbsCertList structures.
+	 * <pre>
+	 *  TbsCertList  ::=  Sequence  {
+	 *       version                 Version OPTIONAL,
+	 *                                    -- if present, shall be v2
+	 *       signature               AlgorithmIdentifier,
+	 *       issuer                  Name,
+	 *       thisUpdate              Time,
+	 *       nextUpdate              Time OPTIONAL,
+	 *       revokedCertificates     Sequence OF Sequence  {
+	 *            userCertificate         CertificateSerialNumber,
+	 *            revocationDate          Time,
+	 *            crlEntryExtensions      Extensions OPTIONAL
+	 *                                          -- if present, shall be v2
+	 *                                 }  OPTIONAL,
+	 *       crlExtensions           [0]  EXPLICIT Extensions OPTIONAL
+	 *                                          -- if present, shall be v2
+	 *                                 }
+	 * </pre>
+	 *
+	 * <b>Note: This class may be subject to change</b>
+	 */
+	public class V2TbsCertListGenerator
+	{
+		private DerInteger version = new DerInteger(1);
+		private AlgorithmIdentifier signature;
+		private X509Name issuer;
+		private Time thisUpdate, nextUpdate;
+		private X509Extensions extensions;
+		private List<Asn1Sequence> crlEntries;
 
 		public V2TbsCertListGenerator()
-        {
-        }
+		{
+		}
 
 		public void SetSignature(
-            AlgorithmIdentifier signature)
-        {
-            this.signature = signature;
-        }
+			AlgorithmIdentifier signature)
+		{
+			this.signature = signature;
+		}
 
 		public void SetIssuer(
-            X509Name issuer)
-        {
-            this.issuer = issuer;
-        }
+			X509Name issuer)
+		{
+			this.issuer = issuer;
+		}
 
 		public void SetThisUpdate(
-            Asn1UtcTime thisUpdate)
-        {
-            this.thisUpdate = new Time(thisUpdate);
-        }
+			Asn1UtcTime thisUpdate)
+		{
+			this.thisUpdate = new Time(thisUpdate);
+		}
 
 		public void SetNextUpdate(
-            Asn1UtcTime nextUpdate)
-        {
-            this.nextUpdate = (nextUpdate != null)
-				?	new Time(nextUpdate)
-				:	null;
-        }
+			Asn1UtcTime nextUpdate)
+		{
+			this.nextUpdate = (nextUpdate != null)
+				? new Time(nextUpdate)
+				: null;
+		}
 
 		public void SetThisUpdate(
-            Time thisUpdate)
-        {
-            this.thisUpdate = thisUpdate;
-        }
+			Time thisUpdate)
+		{
+			this.thisUpdate = thisUpdate;
+		}
 
 		public void SetNextUpdate(
-            Time nextUpdate)
-        {
-            this.nextUpdate = nextUpdate;
-        }
+			Time nextUpdate)
+		{
+			this.nextUpdate = nextUpdate;
+		}
 
 		public void AddCrlEntry(Asn1Sequence crlEntry)
 		{
 			if (crlEntries == null)
 			{
-                crlEntries = new List<Asn1Sequence>();
+				crlEntries = new List<Asn1Sequence>();
 			}
 
 			crlEntries.Add(crlEntry);
@@ -103,10 +102,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public void AddCrlEntry(DerInteger userCertificate, Time revocationDate, int reason,
-            Asn1GeneralizedTime invalidityDate)
+			Asn1GeneralizedTime invalidityDate)
 		{
-            var extOids = new List<DerObjectIdentifier>();
-            var extValues = new List<X509Extension>();
+			var extOids = new List<DerObjectIdentifier>();
+			var extValues = new List<X509Extension>();
 
 			if (reason != 0)
 			{
@@ -159,40 +158,40 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public void SetExtensions(
-            X509Extensions extensions)
-        {
-            this.extensions = extensions;
-        }
+			X509Extensions extensions)
+		{
+			this.extensions = extensions;
+		}
 
 		public TbsCertificateList GenerateTbsCertList()
-        {
-            if ((signature == null) || (issuer == null) || (thisUpdate == null))
-            {
-                throw new InvalidOperationException("Not all mandatory fields set in V2 TbsCertList generator.");
-            }
+		{
+			if ((signature == null) || (issuer == null) || (thisUpdate == null))
+			{
+				throw new InvalidOperationException("Not all mandatory fields set in V2 TbsCertList generator.");
+			}
 
 			Asn1EncodableVector v = new Asn1EncodableVector(
 				version, signature, issuer, thisUpdate);
 
 			if (nextUpdate != null)
-            {
-                v.Add(nextUpdate);
-            }
+			{
+				v.Add(nextUpdate);
+			}
 
 			// Add CRLEntries if they exist
-            if (crlEntries != null)
-            {
+			if (crlEntries != null)
+			{
 				v.Add(new DerSequence(crlEntries.ToArray()));
-            }
+			}
 
 			if (extensions != null)
-            {
-                v.Add(new DerTaggedObject(0, extensions));
-            }
+			{
+				v.Add(new DerTaggedObject(0, extensions));
+			}
 
 			return new TbsCertificateList(new DerSequence(v));
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

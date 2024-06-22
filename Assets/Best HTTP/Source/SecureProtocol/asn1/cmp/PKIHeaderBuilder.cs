@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
@@ -13,26 +12,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		private GeneralName recipient;
 		private Asn1GeneralizedTime messageTime;
 		private AlgorithmIdentifier protectionAlg;
-		private Asn1OctetString senderKID;       // KeyIdentifier
-		private Asn1OctetString recipKID;        // KeyIdentifier
+		private Asn1OctetString senderKID; // KeyIdentifier
+		private Asn1OctetString recipKID; // KeyIdentifier
 		private Asn1OctetString transactionID;
 		private Asn1OctetString senderNonce;
 		private Asn1OctetString recipNonce;
-		private PkiFreeText     freeText;
-		private Asn1Sequence    generalInfo;
+		private PkiFreeText freeText;
+		private Asn1Sequence generalInfo;
 
 		public PkiHeaderBuilder(
-			int			pvno,
-			GeneralName	sender,
-			GeneralName	recipient)
+			int pvno,
+			GeneralName sender,
+			GeneralName recipient)
 			: this(new DerInteger(pvno), sender, recipient)
 		{
 		}
 
 		private PkiHeaderBuilder(
-			DerInteger	pvno,
-			GeneralName	sender,
-			GeneralName	recipient)
+			DerInteger pvno,
+			GeneralName sender,
+			GeneralName recipient)
 		{
 			this.pvno = pvno;
 			this.sender = sender;
@@ -53,7 +52,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 
 		public virtual PkiHeaderBuilder SetSenderKID(byte[] kid)
 		{
-            return SetSenderKID(kid == null ? null : new DerOctetString(kid));
+			return SetSenderKID(kid == null ? null : new DerOctetString(kid));
 		}
 
 		public virtual PkiHeaderBuilder SetSenderKID(Asn1OctetString kid)
@@ -64,7 +63,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 
 		public virtual PkiHeaderBuilder SetRecipKID(byte[] kid)
 		{
-            return SetRecipKID(kid == null ? null : new DerOctetString(kid));
+			return SetRecipKID(kid == null ? null : new DerOctetString(kid));
 		}
 
 		public virtual PkiHeaderBuilder SetRecipKID(Asn1OctetString kid)
@@ -83,10 +82,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			transactionID = tid;
 			return this;
 		}
-		
+
 		public virtual PkiHeaderBuilder SetSenderNonce(byte[] nonce)
 		{
-            return SetSenderNonce(nonce == null ? null : new DerOctetString(nonce));
+			return SetSenderNonce(nonce == null ? null : new DerOctetString(nonce));
 		}
 
 		public virtual PkiHeaderBuilder SetSenderNonce(Asn1OctetString nonce)
@@ -97,7 +96,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 
 		public virtual PkiHeaderBuilder SetRecipNonce(byte[] nonce)
 		{
-            return SetRecipNonce(nonce == null ? null : new DerOctetString(nonce));
+			return SetRecipNonce(nonce == null ? null : new DerOctetString(nonce));
 		}
 
 		public virtual PkiHeaderBuilder SetRecipNonce(Asn1OctetString nonce)
@@ -111,17 +110,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			freeText = text;
 			return this;
 		}
-		
+
 		public virtual PkiHeaderBuilder SetGeneralInfo(InfoTypeAndValue genInfo)
 		{
 			return SetGeneralInfo(MakeGeneralInfoSeq(genInfo));
 		}
-		
+
 		public virtual PkiHeaderBuilder SetGeneralInfo(InfoTypeAndValue[] genInfos)
 		{
 			return SetGeneralInfo(MakeGeneralInfoSeq(genInfos));
 		}
-		
+
 		public virtual PkiHeaderBuilder SetGeneralInfo(Asn1Sequence seqOfInfoTypeAndValue)
 		{
 			generalInfo = seqOfInfoTypeAndValue;
@@ -133,7 +132,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		{
 			return new DerSequence(generalInfo);
 		}
-		
+
 		private static Asn1Sequence MakeGeneralInfoSeq(
 			InfoTypeAndValue[] generalInfos)
 		{
@@ -145,8 +144,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				{
 					v.Add(generalInfos[i]);
 				}
+
 				genInfoSeq = new DerSequence(v);
 			}
+
 			return genInfoSeq;
 		}
 

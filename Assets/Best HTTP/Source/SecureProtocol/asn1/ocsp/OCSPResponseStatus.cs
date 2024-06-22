@@ -1,20 +1,19 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 {
-    public class OcspResponseStatus
-        : DerEnumerated
-    {
-        public const int Successful = 0;
-        public const int MalformedRequest = 1;
-        public const int InternalError = 2;
-        public const int TryLater = 3;
-        public const int SignatureRequired = 5;
-        public const int Unauthorized = 6;
+	public class OcspResponseStatus
+		: DerEnumerated
+	{
+		public const int Successful = 0;
+		public const int MalformedRequest = 1;
+		public const int InternalError = 2;
+		public const int TryLater = 3;
+		public const int SignatureRequired = 5;
+		public const int Unauthorized = 6;
 
 		/**
          * The OcspResponseStatus enumeration.
@@ -30,16 +29,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
          * }
          * </pre>
          */
-        public OcspResponseStatus(int value)
+		public OcspResponseStatus(int value)
 			: base(value)
-        {
-        }
+		{
+		}
 
 		public OcspResponseStatus(DerEnumerated value)
-            : base(value.IntValueExact)
-        {
-        }
-    }
+			: base(value.IntValueExact)
+		{
+		}
+	}
 }
 #pragma warning restore
 #endif

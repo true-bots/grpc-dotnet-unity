@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -23,14 +22,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			object obj)
 		{
 			if (obj == null || obj is CertificateValues)
-				return (CertificateValues) obj;
+				return (CertificateValues)obj;
 
 			if (obj is Asn1Sequence)
-				return new CertificateValues((Asn1Sequence) obj);
+				return new CertificateValues((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'CertificateValues' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -74,6 +73,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			{
 				result[i] = X509CertificateStructure.GetInstance(certificates[i]);
 			}
+
 			return result;
 		}
 
@@ -81,7 +81,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		{
 			return certificates;
 		}
- 	}
+	}
 }
 #pragma warning restore
 #endif

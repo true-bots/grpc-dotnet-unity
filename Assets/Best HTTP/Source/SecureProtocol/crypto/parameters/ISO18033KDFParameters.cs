@@ -11,10 +11,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class Iso18033KdfParameters
 		: IDerivationParameters
 	{
-		byte[]  seed;
+		byte[] seed;
 
 		public Iso18033KdfParameters(
-			byte[]  seed)
+			byte[] seed)
 		{
 			this.seed = seed;
 		}

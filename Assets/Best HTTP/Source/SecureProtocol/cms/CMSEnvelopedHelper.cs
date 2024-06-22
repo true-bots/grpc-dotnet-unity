@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -29,10 +28,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			KeySizes.Add(CmsEnvelopedGenerator.Aes192Cbc, 192);
 			KeySizes.Add(CmsEnvelopedGenerator.Aes256Cbc, 256);
 
-			BaseCipherNames.Add(CmsEnvelopedGenerator.DesEde3Cbc,  "DESEDE");
-			BaseCipherNames.Add(CmsEnvelopedGenerator.Aes128Cbc,  "AES");
-			BaseCipherNames.Add(CmsEnvelopedGenerator.Aes192Cbc,  "AES");
-			BaseCipherNames.Add(CmsEnvelopedGenerator.Aes256Cbc,  "AES");
+			BaseCipherNames.Add(CmsEnvelopedGenerator.DesEde3Cbc, "DESEDE");
+			BaseCipherNames.Add(CmsEnvelopedGenerator.Aes128Cbc, "AES");
+			BaseCipherNames.Add(CmsEnvelopedGenerator.Aes192Cbc, "AES");
+			BaseCipherNames.Add(CmsEnvelopedGenerator.Aes256Cbc, "AES");
 		}
 
 		private string GetAsymmetricEncryptionAlgName(
@@ -61,6 +60,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					// Ignore
 				}
 			}
+
 			return CipherUtilities.GetCipher(encryptionOid);
 		}
 
@@ -109,6 +109,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 				ReadRecipientInfo(infos, info, secureReadable);
 			}
+
 			return new RecipientInformationStore(infos);
 		}
 
@@ -158,7 +159,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 			public CmsReadable GetReadable(KeyParameter sKey)
 			{
-                string macAlg = this.algorithm.Algorithm.Id;
+				string macAlg = this.algorithm.Algorithm.Id;
 //				Asn1Object sParams = this.algorithm.Parameters.ToAsn1Object();
 
 				try
@@ -256,7 +257,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			{
 				try
 				{
-                    this.cipher = CipherUtilities.GetCipher(this.algorithm.Algorithm);
+					this.cipher = CipherUtilities.GetCipher(this.algorithm.Algorithm);
 
 					Asn1Encodable asn1Enc = this.algorithm.Parameters;
 					Asn1Object asn1Params = asn1Enc == null ? null : asn1Enc.ToAsn1Object();
@@ -266,14 +267,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					if (asn1Params != null && !(asn1Params is Asn1Null))
 					{
 						cipherParameters = ParameterUtilities.GetCipherParameters(
-                            this.algorithm.Algorithm, cipherParameters, asn1Params);
+							this.algorithm.Algorithm, cipherParameters, asn1Params);
 					}
 					else
 					{
-                        string alg = this.algorithm.Algorithm.Id;
+						string alg = this.algorithm.Algorithm.Id;
 						if (alg.Equals(CmsEnvelopedDataGenerator.DesEde3Cbc)
-							|| alg.Equals(CmsEnvelopedDataGenerator.IdeaCbc)
-							|| alg.Equals(CmsEnvelopedDataGenerator.Cast5Cbc))
+						    || alg.Equals(CmsEnvelopedDataGenerator.IdeaCbc)
+						    || alg.Equals(CmsEnvelopedDataGenerator.Cast5Cbc))
 						{
 							cipherParameters = new ParametersWithIV(cipherParameters, new byte[8]);
 						}

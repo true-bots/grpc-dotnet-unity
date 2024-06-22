@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
@@ -17,12 +16,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 //		: IPolicyNode
 	{
 		protected IList<PkixPolicyNode> mChildren;
-		protected int				mDepth;
-		protected ISet<string>		mExpectedPolicies;
-		protected PkixPolicyNode	mParent;
+		protected int mDepth;
+		protected ISet<string> mExpectedPolicies;
+		protected PkixPolicyNode mParent;
 		protected ISet<PolicyQualifierInfo> mPolicyQualifiers;
-		protected string			mValidPolicy;
-		protected bool				mCritical;
+		protected string mValidPolicy;
+		protected bool mCritical;
 
 		public virtual int Depth
 		{
@@ -70,23 +69,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// Constructors
 		public PkixPolicyNode(
 			IEnumerable<PkixPolicyNode> children,
-			int				depth,
-			ISet<string>	expectedPolicies,
-			PkixPolicyNode	parent,
+			int depth,
+			ISet<string> expectedPolicies,
+			PkixPolicyNode parent,
 			ISet<PolicyQualifierInfo> policyQualifiers,
-			string			validPolicy,
-			bool			critical)
+			string validPolicy,
+			bool critical)
 		{
-            if (children == null)
-            {
+			if (children == null)
+			{
 				this.mChildren = new List<PkixPolicyNode>();
-            }
-            else
-            {
+			}
+			else
+			{
 				this.mChildren = new List<PkixPolicyNode>(children);
-            }
+			}
 
-            this.mDepth = depth;
+			this.mDepth = depth;
 			this.mExpectedPolicies = expectedPolicies;
 			this.mParent = parent;
 			this.mPolicyQualifiers = policyQualifiers;

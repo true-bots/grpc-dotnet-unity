@@ -1,16 +1,15 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 {
-    public class AttCertIssuer
-        : Asn1Encodable, IAsn1Choice
-    {
-        internal readonly Asn1Encodable	obj;
-        internal readonly Asn1Object	choiceObj;
+	public class AttCertIssuer
+		: Asn1Encodable, IAsn1Choice
+	{
+		internal readonly Asn1Encodable obj;
+		internal readonly Asn1Object choiceObj;
 
 		public static AttCertIssuer GetInstance(
 			object obj)
@@ -36,12 +35,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new AttCertIssuer(GeneralNames.GetInstance(obj));
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public static AttCertIssuer GetInstance(
-			Asn1TaggedObject	obj,
-			bool				isExplicit)
+			Asn1TaggedObject obj,
+			bool isExplicit)
 		{
 			return GetInstance(obj.GetObject()); // must be explictly tagged
 		}
@@ -59,11 +58,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public AttCertIssuer(
-            V2Form v2Form)
-        {
-            obj = v2Form;
-            choiceObj = new DerTaggedObject(false, 0, obj);
-        }
+			V2Form v2Form)
+		{
+			obj = v2Form;
+			choiceObj = new DerTaggedObject(false, 0, obj);
+		}
 
 		public Asn1Encodable Issuer
 		{
@@ -80,11 +79,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
          *  }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            return choiceObj;
-        }
-    }
+		public override Asn1Object ToAsn1Object()
+		{
+			return choiceObj;
+		}
+	}
 }
 #pragma warning restore
 #endif

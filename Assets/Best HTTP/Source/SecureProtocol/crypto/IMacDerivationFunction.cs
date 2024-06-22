@@ -2,11 +2,11 @@
 #pragma warning disable
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
-    public interface IMacDerivationFunction
-        : IDerivationFunction
-    {
-        IMac Mac { get; }
-    }
+	public interface IMacDerivationFunction
+		: IDerivationFunction
+	{
+		IMac Mac { get; }
+	}
 }
 #pragma warning restore
 #endif

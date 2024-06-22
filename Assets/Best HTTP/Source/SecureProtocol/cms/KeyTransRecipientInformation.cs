@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using Asn1Pkcs = BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
@@ -16,61 +15,62 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-    /**
-    * the KeyTransRecipientInformation class for a recipient who has been sent a secret
-    * key encrypted using their public key that needs to be used to
-    * extract the message.
-    */
-    public class KeyTransRecipientInformation
-        : RecipientInformation
-    {
-        private KeyTransRecipientInfo info;
+	/**
+	* the KeyTransRecipientInformation class for a recipient who has been sent a secret
+	* key encrypted using their public key that needs to be used to
+	* extract the message.
+	*/
+	public class KeyTransRecipientInformation
+		: RecipientInformation
+	{
+		private KeyTransRecipientInfo info;
 
 		internal KeyTransRecipientInformation(
-			KeyTransRecipientInfo	info,
-			CmsSecureReadable		secureReadable)
+			KeyTransRecipientInfo info,
+			CmsSecureReadable secureReadable)
 			: base(info.KeyEncryptionAlgorithm, secureReadable)
 		{
-            this.info = info;
-            this.rid = new RecipientID();
+			this.info = info;
+			this.rid = new RecipientID();
 
 			RecipientIdentifier r = info.RecipientIdentifier;
 
 			try
-            {
-                if (r.IsTagged)
-                {
-                    Asn1OctetString octs = Asn1OctetString.GetInstance(r.ID);
+			{
+				if (r.IsTagged)
+				{
+					Asn1OctetString octs = Asn1OctetString.GetInstance(r.ID);
 
 					rid.SubjectKeyIdentifier = octs.GetOctets();
-                }
-                else
-                {
-                    Asn1.Cms.IssuerAndSerialNumber iAnds = Asn1.Cms.IssuerAndSerialNumber.GetInstance(r.ID);
+				}
+				else
+				{
+					Asn1.Cms.IssuerAndSerialNumber iAnds = Asn1.Cms.IssuerAndSerialNumber.GetInstance(r.ID);
 
 					rid.Issuer = iAnds.Name;
-                    rid.SerialNumber = iAnds.SerialNumber.Value;
-                }
-            }
-            catch (IOException)
-            {
-                throw new ArgumentException("invalid rid in KeyTransRecipientInformation");
-            }
-        }
+					rid.SerialNumber = iAnds.SerialNumber.Value;
+				}
+			}
+			catch (IOException)
+			{
+				throw new ArgumentException("invalid rid in KeyTransRecipientInformation");
+			}
+		}
 
 		private string GetExchangeEncryptionAlgorithmName(
 			AlgorithmIdentifier algo)
 		{
-		    DerObjectIdentifier oid = algo.Algorithm;
+			DerObjectIdentifier oid = algo.Algorithm;
 
-            if (Asn1Pkcs.PkcsObjectIdentifiers.RsaEncryption.Equals(oid))
+			if (Asn1Pkcs.PkcsObjectIdentifiers.RsaEncryption.Equals(oid))
 			{
 				return "RSA//PKCS1Padding";
-			} else if (Asn1Pkcs.PkcsObjectIdentifiers.IdRsaesOaep.Equals(oid))
-            {
-                 Asn1Pkcs.RsaesOaepParameters rsaParams = Asn1Pkcs.RsaesOaepParameters.GetInstance(algo.Parameters);                       
-                return "RSA//OAEPWITH"+DigestUtilities.GetAlgorithmName(rsaParams.HashAlgorithm.Algorithm)+"ANDMGF1Padding";
-            }
+			}
+			else if (Asn1Pkcs.PkcsObjectIdentifiers.IdRsaesOaep.Equals(oid))
+			{
+				Asn1Pkcs.RsaesOaepParameters rsaParams = Asn1Pkcs.RsaesOaepParameters.GetInstance(algo.Parameters);
+				return "RSA//OAEPWITH" + DigestUtilities.GetAlgorithmName(rsaParams.HashAlgorithm.Algorithm) + "ANDMGF1Padding";
+			}
 
 			return oid.Id;
 		}
@@ -78,7 +78,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal KeyParameter UnwrapKey(ICipherParameters key)
 		{
 			byte[] encryptedKey = info.EncryptedKey.GetOctets();
-            
+
 
 			try
 			{
@@ -87,7 +87,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					IKeyUnwrapper keyWrapper = new Asn1KeyUnwrapper(keyEncAlg.Algorithm, keyEncAlg.Parameters, key);
 
 					return ParameterUtilities.CreateKeyParameter(
-							GetContentAlgorithmName(), keyWrapper.Unwrap(encryptedKey, 0, encryptedKey.Length).Collect());
+						GetContentAlgorithmName(), keyWrapper.Unwrap(encryptedKey, 0, encryptedKey.Length).Collect());
 				}
 				else
 				{
@@ -119,18 +119,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				throw new CmsException("bad padding in message.", e);
 			}
 		}
-		
+
 		/**
         * decrypt the content and return it as a byte array.
         */
-        public override CmsTypedStream GetContentStream(
-            ICipherParameters key)
-        {
+		public override CmsTypedStream GetContentStream(
+			ICipherParameters key)
+		{
 			KeyParameter sKey = UnwrapKey(key);
 
 			return GetContentFromSessionKey(sKey);
 		}
-    }
+	}
 }
 #pragma warning restore
 #endif

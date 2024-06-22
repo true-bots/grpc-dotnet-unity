@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -9,13 +8,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 {
 	public enum PkiStatus
 	{
-		Granted					= 0,
-		GrantedWithMods			= 1,
-		Rejection				= 2,
-		Waiting					= 3,
-		RevocationWarning		= 4,
-		RevocationNotification	= 5,
-    	KeyUpdateWarning		= 6,
+		Granted = 0,
+		GrantedWithMods = 1,
+		Rejection = 2,
+		Waiting = 3,
+		RevocationWarning = 4,
+		RevocationNotification = 5,
+		KeyUpdateWarning = 6,
 	}
 
 	public class PkiStatusEncodable
@@ -49,7 +48,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			if (obj is DerInteger)
 				return new PkiStatusEncodable((DerInteger)obj);
 
-            throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public virtual BigInteger Value

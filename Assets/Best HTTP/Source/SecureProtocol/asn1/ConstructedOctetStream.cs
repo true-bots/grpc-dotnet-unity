@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
@@ -29,16 +28,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return Read(buffer.AsSpan(offset, count));
 #else
 			if (count < 1)
-                return 0;
+				return 0;
 
 			if (m_currentStream == null)
 			{
 				if (!m_first)
 					return 0;
 
-                Asn1OctetStringParser next = GetNextParser();
-                if (next == null)
-                    return 0;
+				Asn1OctetStringParser next = GetNextParser();
+				if (next == null)
+					return 0;
 
 				m_first = false;
 				m_currentStream = next.GetOctetStream();
@@ -59,8 +58,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 				else
 				{
-                    Asn1OctetStringParser next = GetNextParser();
-                    if (next == null)
+					Asn1OctetStringParser next = GetNextParser();
+					if (next == null)
 					{
 						m_currentStream = null;
 						return totalRead;
@@ -126,8 +125,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				if (!m_first)
 					return -1;
 
-                Asn1OctetStringParser next = GetNextParser();
-                if (next == null)
+				Asn1OctetStringParser next = GetNextParser();
+				if (next == null)
 					return -1;
 
 				m_first = false;
@@ -141,8 +140,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				if (b >= 0)
 					return b;
 
-                Asn1OctetStringParser next = GetNextParser();
-                if (next == null)
+				Asn1OctetStringParser next = GetNextParser();
+				if (next == null)
 				{
 					m_currentStream = null;
 					return -1;
@@ -152,17 +151,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-        private Asn1OctetStringParser GetNextParser()
-        {
-            IAsn1Convertible asn1Obj = m_parser.ReadObject();
-            if (asn1Obj == null)
-                return null;
+		private Asn1OctetStringParser GetNextParser()
+		{
+			IAsn1Convertible asn1Obj = m_parser.ReadObject();
+			if (asn1Obj == null)
+				return null;
 
-            if (asn1Obj is Asn1OctetStringParser)
-                return (Asn1OctetStringParser)asn1Obj;
+			if (asn1Obj is Asn1OctetStringParser)
+				return (Asn1OctetStringParser)asn1Obj;
 
-            throw new IOException("unknown object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(asn1Obj));
-        }
+			throw new IOException("unknown object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(asn1Obj));
+		}
 	}
 }
 #pragma warning restore

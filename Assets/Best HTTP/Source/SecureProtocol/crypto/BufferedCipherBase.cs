@@ -21,9 +21,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public abstract byte[] ProcessByte(byte input);
 
 		public virtual int ProcessByte(
-			byte	input,
-			byte[]	output,
-			int		outOff)
+			byte input,
+			byte[] output,
+			int outOff)
 		{
 			byte[] outBytes = ProcessByte(input);
 			if (outBytes == null)
@@ -38,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public abstract int ProcessByte(byte input, Span<byte> output);
 #endif
 
-        public virtual byte[] ProcessBytes(
+		public virtual byte[] ProcessBytes(
 			byte[] input)
 		{
 			return ProcessBytes(input, 0, input.Length);
@@ -47,19 +47,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public abstract byte[] ProcessBytes(byte[] input, int inOff, int length);
 
 		public virtual int ProcessBytes(
-			byte[]	input,
-			byte[]	output,
-			int		outOff)
+			byte[] input,
+			byte[] output,
+			int outOff)
 		{
 			return ProcessBytes(input, 0, input.Length, output, outOff);
 		}
 
 		public virtual int ProcessBytes(
-			byte[]	input,
-			int		inOff,
-			int		length,
-			byte[]	output,
-			int		outOff)
+			byte[] input,
+			int inOff,
+			int length,
+			byte[] output,
+			int outOff)
 		{
 			byte[] outBytes = ProcessBytes(input, inOff, length);
 			if (outBytes == null)
@@ -83,13 +83,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		}
 
 		public abstract byte[] DoFinal(
-			byte[]	input,
-			int		inOff,
-			int		length);
+			byte[] input,
+			int inOff,
+			int length);
 
 		public virtual int DoFinal(
-			byte[]	output,
-			int		outOff)
+			byte[] output,
+			int outOff)
 		{
 			byte[] outBytes = DoFinal();
 			if (outOff + outBytes.Length > output.Length)
@@ -99,19 +99,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		}
 
 		public virtual int DoFinal(
-			byte[]	input,
-			byte[]	output,
-			int		outOff)
+			byte[] input,
+			byte[] output,
+			int outOff)
 		{
 			return DoFinal(input, 0, input.Length, output, outOff);
 		}
 
 		public virtual int DoFinal(
-			byte[]	input,
-			int		inOff,
-			int		length,
-			byte[]	output,
-			int		outOff)
+			byte[] input,
+			int inOff,
+			int length,
+			byte[] output,
+			int outOff)
 		{
 			int len = ProcessBytes(input, inOff, length, output, outOff);
 			len += DoFinal(output, outOff + len);

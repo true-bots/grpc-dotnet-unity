@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -27,10 +26,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/// 256 bit block size - Skein-256
 		/// </summary>
 		public const int SKEIN_256 = SkeinEngine.SKEIN_256;
+
 		/// <summary>
 		/// 512 bit block size - Skein-512
 		/// </summary>
 		public const int SKEIN_512 = SkeinEngine.SKEIN_512;
+
 		/// <summary>
 		/// 1024 bit block size - Skein-1024
 		/// </summary>
@@ -123,7 +124,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
             return engine.DoFinal(output);
         }
 #endif
-    }
+	}
 }
 #pragma warning restore
 #endif

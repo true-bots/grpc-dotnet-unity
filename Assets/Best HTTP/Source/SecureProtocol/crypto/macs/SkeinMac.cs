@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
@@ -9,7 +8,6 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 {
-
 	/// <summary>
 	/// Implementation of the Skein parameterised MAC function in 256, 512 and 1024 bit block sizes,
 	/// based on the <see cref="BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines.ThreefishEngine">Threefish</see> tweakable block cipher.
@@ -30,10 +28,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		/// 256 bit block size - Skein-256
 		/// </summary>
 		public const int SKEIN_256 = SkeinEngine.SKEIN_256;
+
 		/// <summary>
 		/// 512 bit block size - Skein-512
 		/// </summary>
 		public const int SKEIN_512 = SkeinEngine.SKEIN_512;
+
 		/// <summary>
 		/// 1024 bit block size - Skein-1024
 		/// </summary>
@@ -82,12 +82,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			else
 			{
 				throw new ArgumentException("Invalid parameter passed to Skein MAC init - "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
 			}
+
 			if (skeinParameters.GetKey() == null)
 			{
 				throw new ArgumentException("Skein MAC requires a key parameter.");
 			}
+
 			engine.Init(skeinParameters);
 		}
 

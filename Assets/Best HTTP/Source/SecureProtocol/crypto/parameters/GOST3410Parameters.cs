@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
@@ -14,18 +13,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		private readonly Gost3410ValidationParameters validation;
 
 		public Gost3410Parameters(
-			BigInteger	p,
-			BigInteger	q,
-			BigInteger	a)
+			BigInteger p,
+			BigInteger q,
+			BigInteger a)
 			: this(p, q, a, null)
 		{
 		}
 
 		public Gost3410Parameters(
-			BigInteger						p,
-			BigInteger						q,
-			BigInteger						a,
-			Gost3410ValidationParameters	validation)
+			BigInteger p,
+			BigInteger q,
+			BigInteger a,
+			Gost3410ValidationParameters validation)
 		{
 			if (p == null)
 				throw new ArgumentNullException("p");

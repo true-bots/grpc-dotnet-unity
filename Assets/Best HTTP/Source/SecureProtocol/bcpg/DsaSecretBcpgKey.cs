@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
@@ -9,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	/// <remarks>Base class for a DSA secret key.</remarks>
 	public class DsaSecretBcpgKey
 		: BcpgObject, IBcpgKey
-    {
+	{
 		internal MPInteger x;
 
 		/**

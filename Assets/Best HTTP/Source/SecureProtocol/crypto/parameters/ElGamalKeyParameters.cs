@@ -1,33 +1,32 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
-    public class ElGamalKeyParameters
+	public class ElGamalKeyParameters
 		: AsymmetricKeyParameter
-    {
-        private readonly ElGamalParameters parameters;
+	{
+		private readonly ElGamalParameters parameters;
 
 		protected ElGamalKeyParameters(
-            bool				isPrivate,
-            ElGamalParameters	parameters)
+			bool isPrivate,
+			ElGamalParameters parameters)
 			: base(isPrivate)
-        {
+		{
 			// TODO Should we allow 'parameters' to be null?
-            this.parameters = parameters;
-        }
+			this.parameters = parameters;
+		}
 
 		public ElGamalParameters Parameters
-        {
-            get { return parameters; }
-        }
+		{
+			get { return parameters; }
+		}
 
 		public override bool Equals(
-            object obj)
-        {
+			object obj)
+		{
 			if (obj == this)
 				return true;
 
@@ -37,17 +36,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 				return false;
 
 			return Equals(other);
-        }
+		}
 
 		protected bool Equals(
 			ElGamalKeyParameters other)
 		{
 			return Org.BouncyCastle.Utilities.Platform.Equals(parameters, other.parameters)
-				&& base.Equals(other);
+			       && base.Equals(other);
 		}
 
 		public override int GetHashCode()
-        {
+		{
 			int hc = base.GetHashCode();
 
 			if (parameters != null)
@@ -56,8 +55,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			}
 
 			return hc;
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

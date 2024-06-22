@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -9,131 +8,132 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 {
-    internal class DHParametersHelper
-    {
-        private static readonly BigInteger Six = BigInteger.ValueOf(6);
+	internal class DHParametersHelper
+	{
+		private static readonly BigInteger Six = BigInteger.ValueOf(6);
 
-        private static readonly int[][] primeLists = BigInteger.primeLists;
-        private static readonly int[] primeProducts = BigInteger.primeProducts;
-        private static readonly BigInteger[] BigPrimeProducts = ConstructBigPrimeProducts(primeProducts);
+		private static readonly int[][] primeLists = BigInteger.primeLists;
+		private static readonly int[] primeProducts = BigInteger.primeProducts;
+		private static readonly BigInteger[] BigPrimeProducts = ConstructBigPrimeProducts(primeProducts);
 
-        private static BigInteger[] ConstructBigPrimeProducts(int[] primeProducts)
-        {
-            BigInteger[] bpp = new BigInteger[primeProducts.Length];
-            for (int i = 0; i < bpp.Length; ++i)
-            {
-                bpp[i] = BigInteger.ValueOf(primeProducts[i]);
-            }
-            return bpp;
-        }
+		private static BigInteger[] ConstructBigPrimeProducts(int[] primeProducts)
+		{
+			BigInteger[] bpp = new BigInteger[primeProducts.Length];
+			for (int i = 0; i < bpp.Length; ++i)
+			{
+				bpp[i] = BigInteger.ValueOf(primeProducts[i]);
+			}
 
-        /*
-         * Finds a pair of prime BigInteger's {p, q: p = 2q + 1}
-         * 
-         * (see: Handbook of Applied Cryptography 4.86)
-         */
-        internal static BigInteger[] GenerateSafePrimes(int size, int certainty, SecureRandom random)
-        {
-            BigInteger p, q;
-            int qLength = size - 1;
-            int minWeight = size >> 2;
+			return bpp;
+		}
 
-            if (size <= 32)
-            {
-                for (;;)
-                {
-                    q = new BigInteger(qLength, 2, random);
+		/*
+		 * Finds a pair of prime BigInteger's {p, q: p = 2q + 1}
+		 *
+		 * (see: Handbook of Applied Cryptography 4.86)
+		 */
+		internal static BigInteger[] GenerateSafePrimes(int size, int certainty, SecureRandom random)
+		{
+			BigInteger p, q;
+			int qLength = size - 1;
+			int minWeight = size >> 2;
 
-                    p = q.ShiftLeft(1).Add(BigInteger.One);
+			if (size <= 32)
+			{
+				for (;;)
+				{
+					q = new BigInteger(qLength, 2, random);
 
-                    if (!p.IsProbablePrime(certainty, true))
-                        continue;
+					p = q.ShiftLeft(1).Add(BigInteger.One);
 
-                    if (certainty > 2 && !q.IsProbablePrime(certainty, true))
-                        continue;
+					if (!p.IsProbablePrime(certainty, true))
+						continue;
 
-                    break;
-                }
-            }
-            else
-            {
-                // Note: Modified from Java version for speed
-                for (;;)
-                {
-                    q = new BigInteger(qLength, 0, random);
+					if (certainty > 2 && !q.IsProbablePrime(certainty, true))
+						continue;
 
-                retry:
-                    for (int i = 0; i < primeLists.Length; ++i)
-                    {
-                        int test = q.Remainder(BigPrimeProducts[i]).IntValue;
+					break;
+				}
+			}
+			else
+			{
+				// Note: Modified from Java version for speed
+				for (;;)
+				{
+					q = new BigInteger(qLength, 0, random);
 
-                        if (i == 0)
-                        {
-                            int rem3 = test % 3;
-                            if (rem3 != 2)
-                            {
-                                int diff = 2 * rem3 + 2;
-                                q = q.Add(BigInteger.ValueOf(diff));
-                                test = (test + diff) % primeProducts[i];
-                            }
-                        }
+					retry:
+					for (int i = 0; i < primeLists.Length; ++i)
+					{
+						int test = q.Remainder(BigPrimeProducts[i]).IntValue;
 
-                        int[] primeList = primeLists[i];
-                        for (int j = 0; j < primeList.Length; ++j)
-                        {
-                            int prime = primeList[j];
-                            int qRem = test % prime;
-                            if (qRem == 0 || qRem == (prime >> 1))
-                            {
-                                q = q.Add(Six);
-                                goto retry;
-                            }
-                        }
-                    }
+						if (i == 0)
+						{
+							int rem3 = test % 3;
+							if (rem3 != 2)
+							{
+								int diff = 2 * rem3 + 2;
+								q = q.Add(BigInteger.ValueOf(diff));
+								test = (test + diff) % primeProducts[i];
+							}
+						}
 
-                    if (q.BitLength != qLength)
-                        continue;
+						int[] primeList = primeLists[i];
+						for (int j = 0; j < primeList.Length; ++j)
+						{
+							int prime = primeList[j];
+							int qRem = test % prime;
+							if (qRem == 0 || qRem == (prime >> 1))
+							{
+								q = q.Add(Six);
+								goto retry;
+							}
+						}
+					}
 
-                    if (!q.RabinMillerTest(2, random, true))
-                        continue;
+					if (q.BitLength != qLength)
+						continue;
 
-                    p = q.ShiftLeft(1).Add(BigInteger.One);
+					if (!q.RabinMillerTest(2, random, true))
+						continue;
 
-                    if (!p.RabinMillerTest(certainty, random, true))
-                        continue;
+					p = q.ShiftLeft(1).Add(BigInteger.One);
 
-                    if (certainty > 2 && !q.RabinMillerTest(certainty - 2, random, true))
-                        continue;
+					if (!p.RabinMillerTest(certainty, random, true))
+						continue;
 
-                    /*
-                     * Require a minimum weight of the NAF representation, since low-weight primes may be
-                     * weak against a version of the number-field-sieve for the discrete-logarithm-problem.
-                     * 
-                     * See "The number field sieve for integers of low weight", Oliver Schirokauer.
-                     */
-                    if (WNafUtilities.GetNafWeight(p) < minWeight)
-                        continue;
+					if (certainty > 2 && !q.RabinMillerTest(certainty - 2, random, true))
+						continue;
 
-                    break;
-                }
-            }
+					/*
+					 * Require a minimum weight of the NAF representation, since low-weight primes may be
+					 * weak against a version of the number-field-sieve for the discrete-logarithm-problem.
+					 *
+					 * See "The number field sieve for integers of low weight", Oliver Schirokauer.
+					 */
+					if (WNafUtilities.GetNafWeight(p) < minWeight)
+						continue;
 
-            return new BigInteger[] { p, q };
-        }
+					break;
+				}
+			}
 
-        /*
-         * Select a high order element of the multiplicative group Zp*
-         * 
-         * p and q must be s.t. p = 2*q + 1, where p and q are prime (see generateSafePrimes)
-         */
-        internal static BigInteger SelectGenerator(BigInteger p, BigInteger q, SecureRandom random)
-        {
-            BigInteger pMinusTwo = p.Subtract(BigInteger.Two);
-            BigInteger g;
+			return new BigInteger[] { p, q };
+		}
 
-            /*
-             * (see: Handbook of Applied Cryptography 4.80)
-             */
+		/*
+		 * Select a high order element of the multiplicative group Zp*
+		 *
+		 * p and q must be s.t. p = 2*q + 1, where p and q are prime (see generateSafePrimes)
+		 */
+		internal static BigInteger SelectGenerator(BigInteger p, BigInteger q, SecureRandom random)
+		{
+			BigInteger pMinusTwo = p.Subtract(BigInteger.Two);
+			BigInteger g;
+
+			/*
+			 * (see: Handbook of Applied Cryptography 4.80)
+			 */
 //			do
 //			{
 //				g = BigIntegers.CreateRandomInRange(BigInteger.Two, pMinusTwo, random);
@@ -141,20 +141,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 //			while (g.ModPow(BigInteger.Two, p).Equals(BigInteger.One)
 //				|| g.ModPow(q, p).Equals(BigInteger.One));
 
-            /*
-             * RFC 2631 2.2.1.2 (and see: Handbook of Applied Cryptography 4.81)
-             */
-            do
-            {
-                BigInteger h = BigIntegers.CreateRandomInRange(BigInteger.Two, pMinusTwo, random);
+			/*
+			 * RFC 2631 2.2.1.2 (and see: Handbook of Applied Cryptography 4.81)
+			 */
+			do
+			{
+				BigInteger h = BigIntegers.CreateRandomInRange(BigInteger.Two, pMinusTwo, random);
 
-                g = h.ModPow(BigInteger.Two, p);
-            }
-            while (g.Equals(BigInteger.One));
+				g = h.ModPow(BigInteger.Two, p);
+			} while (g.Equals(BigInteger.One));
 
-            return g;
-        }
-    }
+			return g;
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -12,22 +11,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	{
 		private static readonly DerInteger V1 = new DerInteger(0);
 
-		private readonly bool                versionPresent;
-		private readonly DerInteger          version;
-		private readonly ResponderID         responderID;
+		private readonly bool versionPresent;
+		private readonly DerInteger version;
+		private readonly ResponderID responderID;
 		private readonly Asn1GeneralizedTime producedAt;
-		private readonly Asn1Sequence        responses;
-		private readonly X509Extensions      responseExtensions;
+		private readonly Asn1Sequence responses;
+		private readonly X509Extensions responseExtensions;
 
 		public static ResponseData GetInstance(
-			Asn1TaggedObject	obj,
-			bool				explicitly)
+			Asn1TaggedObject obj,
+			bool explicitly)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
 		}
 
 		public static ResponseData GetInstance(
-			object  obj)
+			object obj)
 		{
 			if (obj == null || obj is ResponseData)
 			{
@@ -39,15 +38,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new ResponseData((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public ResponseData(
-			DerInteger          version,
-			ResponderID         responderID,
-            Asn1GeneralizedTime producedAt,
-			Asn1Sequence        responses,
-			X509Extensions      responseExtensions)
+			DerInteger version,
+			ResponderID responderID,
+			Asn1GeneralizedTime producedAt,
+			Asn1Sequence responses,
+			X509Extensions responseExtensions)
 		{
 			this.version = version;
 			this.responderID = responderID;
@@ -57,10 +56,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 		}
 
 		public ResponseData(
-			ResponderID         responderID,
-            Asn1GeneralizedTime producedAt,
-			Asn1Sequence        responses,
-			X509Extensions      responseExtensions)
+			ResponderID responderID,
+			Asn1GeneralizedTime producedAt,
+			Asn1Sequence responses,
+			X509Extensions responseExtensions)
 			: this(V1, responderID, producedAt, responses, responseExtensions)
 		{
 		}
@@ -138,20 +137,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
          *     responseExtensions   [1] EXPLICIT Extensions OPTIONAL }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
 
-            if (versionPresent || !version.Equals(V1))
-            {
-                v.Add(new DerTaggedObject(true, 0, version));
-            }
+			if (versionPresent || !version.Equals(V1))
+			{
+				v.Add(new DerTaggedObject(true, 0, version));
+			}
 
-            v.Add(responderID, producedAt, responses);
-            v.AddOptionalTagged(true, 1, responseExtensions);
-            return new DerSequence(v);
-        }
-    }
+			v.Add(responderID, producedAt, responses);
+			v.AddOptionalTagged(true, 1, responseExtensions);
+			return new DerSequence(v);
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
@@ -22,14 +21,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			object obj)
 		{
 			if (obj == null || obj is CompleteCertificateRefs)
-				return (CompleteCertificateRefs) obj;
+				return (CompleteCertificateRefs)obj;
 
 			if (obj is Asn1Sequence)
-				return new CompleteCertificateRefs((Asn1Sequence) obj);
+				return new CompleteCertificateRefs((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'CompleteCertificateRefs' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -73,6 +72,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			{
 				result[i] = OtherCertID.GetInstance(otherCertIDs[i].ToAsn1Object());
 			}
+
 			return result;
 		}
 

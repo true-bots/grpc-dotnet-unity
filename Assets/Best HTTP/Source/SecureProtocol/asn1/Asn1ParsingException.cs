@@ -5,8 +5,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-    [Serializable]
-    public class Asn1ParsingException
+	[Serializable]
+	public class Asn1ParsingException
 		: InvalidOperationException
 	{
 		public Asn1ParsingException()

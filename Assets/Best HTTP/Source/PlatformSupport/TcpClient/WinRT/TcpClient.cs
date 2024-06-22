@@ -1,5 +1,4 @@
 ﻿#if NETFX_CORE && !UNITY_EDITOR && !ENABLE_IL2CPP
-
 using System;
 using Windows.Networking;
 using Windows.Networking.Sockets;

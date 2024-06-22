@@ -1,45 +1,44 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
-    /**
-     * RFC 3274 - CMS Compressed Data.
-     * <pre>
-     * CompressedData ::= Sequence {
-     *  version CMSVersion,
-     *  compressionAlgorithm CompressionAlgorithmIdentifier,
-     *  encapContentInfo EncapsulatedContentInfo
-     * }
-     * </pre>
-     */
-    public class CompressedData
-        : Asn1Encodable
-    {
-        private DerInteger			version;
-        private AlgorithmIdentifier	compressionAlgorithm;
-        private ContentInfo			encapContentInfo;
+	/**
+	 * RFC 3274 - CMS Compressed Data.
+	 * <pre>
+	 * CompressedData ::= Sequence {
+	 *  version CMSVersion,
+	 *  compressionAlgorithm CompressionAlgorithmIdentifier,
+	 *  encapContentInfo EncapsulatedContentInfo
+	 * }
+	 * </pre>
+	 */
+	public class CompressedData
+		: Asn1Encodable
+	{
+		private DerInteger version;
+		private AlgorithmIdentifier compressionAlgorithm;
+		private ContentInfo encapContentInfo;
 
 		public CompressedData(
-            AlgorithmIdentifier	compressionAlgorithm,
-            ContentInfo			encapContentInfo)
-        {
-            this.version = new DerInteger(0);
-            this.compressionAlgorithm = compressionAlgorithm;
-            this.encapContentInfo = encapContentInfo;
-        }
+			AlgorithmIdentifier compressionAlgorithm,
+			ContentInfo encapContentInfo)
+		{
+			this.version = new DerInteger(0);
+			this.compressionAlgorithm = compressionAlgorithm;
+			this.encapContentInfo = encapContentInfo;
+		}
 
 		public CompressedData(
-            Asn1Sequence seq)
-        {
-            this.version = (DerInteger) seq[0];
-            this.compressionAlgorithm = AlgorithmIdentifier.GetInstance(seq[1]);
-            this.encapContentInfo = ContentInfo.GetInstance(seq[2]);
-        }
+			Asn1Sequence seq)
+		{
+			this.version = (DerInteger)seq[0];
+			this.compressionAlgorithm = AlgorithmIdentifier.GetInstance(seq[1]);
+			this.encapContentInfo = ContentInfo.GetInstance(seq[2]);
+		}
 
 		/**
          * return a CompressedData object from a tagged object.
@@ -50,30 +49,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * @exception ArgumentException if the object held by the
          *          tagged object cannot be converted.
          */
-        public static CompressedData GetInstance(
-            Asn1TaggedObject ato,
-            bool explicitly)
-        {
-            return GetInstance(Asn1Sequence.GetInstance(ato, explicitly));
-        }
+		public static CompressedData GetInstance(
+			Asn1TaggedObject ato,
+			bool explicitly)
+		{
+			return GetInstance(Asn1Sequence.GetInstance(ato, explicitly));
+		}
 
-        /**
-         * return a CompressedData object from the given object.
-         *
-         * @param _obj the object we want converted.
-         * @exception ArgumentException if the object cannot be converted.
-         */
-        public static CompressedData GetInstance(
-            object obj)
-        {
-            if (obj == null || obj is CompressedData)
-                return (CompressedData)obj;
+		/**
+		 * return a CompressedData object from the given object.
+		 *
+		 * @param _obj the object we want converted.
+		 * @exception ArgumentException if the object cannot be converted.
+		 */
+		public static CompressedData GetInstance(
+			object obj)
+		{
+			if (obj == null || obj is CompressedData)
+				return (CompressedData)obj;
 
 			if (obj is Asn1Sequence)
-                return new CompressedData((Asn1Sequence) obj);
+				return new CompressedData((Asn1Sequence)obj);
 
-            throw new ArgumentException("Invalid CompressedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
-        }
+			throw new ArgumentException("Invalid CompressedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+		}
 
 		public DerInteger Version
 		{
@@ -91,10 +90,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		}
 
 		public override Asn1Object ToAsn1Object()
-        {
+		{
 			return new BerSequence(version, compressionAlgorithm, encapContentInfo);
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

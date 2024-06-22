@@ -4,13 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
-
 	/// <summary>
 	/// Parameters for the Skein hash function - a series of byte[] strings identified by integer tags.
 	/// </summary>
@@ -181,16 +179,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 				{
 					throw new ArgumentException("Parameter value must not be null.");
 				}
+
 				if ((type != PARAM_TYPE_KEY)
 				    && (type <= PARAM_TYPE_CONFIG || type >= PARAM_TYPE_OUTPUT || type == PARAM_TYPE_MESSAGE))
 				{
 					throw new ArgumentException("Parameter types must be in the range 0,5..47,49..62.");
 				}
+
 				if (type == PARAM_TYPE_CONFIG)
 				{
 					throw new ArgumentException("Parameter type " + PARAM_TYPE_CONFIG
-					                            + " is reserved for internal use.");
+					                                              + " is reserved for internal use.");
 				}
+
 				m_parameters.Add(type, value);
 				return this;
 			}
@@ -229,13 +230,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 					MemoryStream bout = new MemoryStream();
 					using (var outBytes = new StreamWriter(bout, System.Text.Encoding.UTF8))
 					{
-                        outBytes.Write(date.ToString("YYYYMMDD", CultureInfo.InvariantCulture));
-                        outBytes.Write(" ");
-                        outBytes.Write(emailAddress);
-                        outBytes.Write(" ");
-                        outBytes.Write(distinguisher);
-                    }
-                    return Set(PARAM_TYPE_PERSONALISATION, bout.ToArray());
+						outBytes.Write(date.ToString("YYYYMMDD", CultureInfo.InvariantCulture));
+						outBytes.Write(" ");
+						outBytes.Write(emailAddress);
+						outBytes.Write(" ");
+						outBytes.Write(distinguisher);
+					}
+
+					return Set(PARAM_TYPE_PERSONALISATION, bout.ToArray());
 				}
 				catch (IOException e)
 				{

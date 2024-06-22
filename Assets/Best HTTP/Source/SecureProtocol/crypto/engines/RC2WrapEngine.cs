@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
@@ -36,9 +35,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/** Field IV2           */
 		private static readonly byte[] IV2 =
 		{
-			(byte) 0x4a, (byte) 0xdd, (byte) 0xa2,
-			(byte) 0x2c, (byte) 0x79, (byte) 0xe8,
-			(byte) 0x21, (byte) 0x05
+			(byte)0x4a, (byte)0xdd, (byte)0xa2,
+			(byte)0x2c, (byte)0x79, (byte)0xe8,
+			(byte)0x21, (byte)0x05
 		};
 
 		//
@@ -53,7 +52,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			* @param forWrapping
 			* @param param
 			*/
-        public virtual void Init(bool forWrapping, ICipherParameters parameters)
+		public virtual void Init(bool forWrapping, ICipherParameters parameters)
 		{
 			this.forWrapping = forWrapping;
 			this.engine = new CbcBlockCipher(new RC2Engine());
@@ -100,7 +99,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @return
 		*/
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return "RC2"; }
 		}
@@ -113,10 +112,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @param inLen
 		* @return
 		*/
-        public virtual byte[] Wrap(
-			byte[]	input,
-			int		inOff,
-			int		length)
+		public virtual byte[] Wrap(
+			byte[] input,
+			int inOff,
+			int length)
 		{
 			if (!forWrapping)
 			{
@@ -129,7 +128,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				len += 8 - (len % 8);
 			}
 
-			byte [] keyToBeWrapped = new byte[len];
+			byte[] keyToBeWrapped = new byte[len];
 
 			keyToBeWrapped[0] = (byte)length;
 			Array.Copy(input, inOff, keyToBeWrapped, 1, length);
@@ -153,7 +152,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			// Encrypt WKCKS in CBC mode using KEK as the key and IV as the
 			// initialization vector. Call the results TEMP1.
-			byte [] TEMP1 = new byte[WKCKS.Length];
+			byte[] TEMP1 = new byte[WKCKS.Length];
 
 			Array.Copy(WKCKS, 0, TEMP1, 0, WKCKS.Length);
 
@@ -214,10 +213,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @return
 		* @throws InvalidCipherTextException
 		*/
-        public virtual byte[] Unwrap(
-			byte[]	input,
-			int		inOff,
-			int		length)
+		public virtual byte[] Unwrap(
+			byte[] input,
+			int inOff,
+			int length)
 		{
 			if (forWrapping)
 			{
@@ -232,7 +231,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (length % engine.GetBlockSize() != 0)
 			{
 				throw new InvalidCipherTextException("Ciphertext not multiple of "
-					+ engine.GetBlockSize());
+				                                     + engine.GetBlockSize());
 			}
 
 			/*
@@ -257,7 +256,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			this.engine.Init(false, param2);
 
-			byte [] TEMP3 = new byte[length];
+			byte[] TEMP3 = new byte[length];
 
 			Array.Copy(input, inOff, TEMP3, 0, length);
 
@@ -360,8 +359,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @see http://www.w3.org/TR/xmlenc-core/#sec-CMSKeyChecksum
 		*/
 		private bool CheckCmsKeyChecksum(
-			byte[]	key,
-			byte[]	checksum)
+			byte[] key,
+			byte[] checksum)
 		{
 			return Arrays.ConstantTimeAreEqual(CalculateCmsKeyChecksum(key), checksum);
 		}

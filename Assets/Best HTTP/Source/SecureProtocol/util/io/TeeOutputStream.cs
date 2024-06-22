@@ -6,7 +6,7 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 {
-    public class TeeOutputStream
+	public class TeeOutputStream
 		: BaseOutputStream
 	{
 		private readonly Stream output, tee;
@@ -20,17 +20,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 			this.tee = tee;
 		}
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                output.Dispose();
-                tee.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				output.Dispose();
+				tee.Dispose();
+			}
 
-        public override void Write(byte[] buffer, int offset, int count)
+			base.Dispose(disposing);
+		}
+
+		public override void Write(byte[] buffer, int offset, int count)
 		{
 			output.Write(buffer, offset, count);
 			tee.Write(buffer, offset, count);
@@ -44,7 +45,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
         }
 #endif
 
-        public override void WriteByte(byte value)
+		public override void WriteByte(byte value)
 		{
 			output.WriteByte(value);
 			tee.WriteByte(value);

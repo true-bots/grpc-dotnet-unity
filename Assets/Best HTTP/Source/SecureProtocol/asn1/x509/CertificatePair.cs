@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -49,15 +48,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 			if (obj == null || obj is CertificatePair)
 			{
-				return (CertificatePair) obj;
+				return (CertificatePair)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new CertificatePair((Asn1Sequence) obj);
+				return new CertificatePair((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -107,8 +106,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		* @param reverse Certificates issued by this CA to other CAs.
 		*/
 		public CertificatePair(
-			X509CertificateStructure	forward,
-			X509CertificateStructure	reverse)
+			X509CertificateStructure forward,
+			X509CertificateStructure reverse)
 		{
 			this.forward = forward;
 			this.reverse = reverse;
@@ -128,13 +127,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		*
 		* @return a DERObject
 		*/
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptionalTagged(true, 0, forward);
-            v.AddOptionalTagged(true, 1, reverse);
-            return new DerSequence(v);
-        }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
+			v.AddOptionalTagged(true, 0, forward);
+			v.AddOptionalTagged(true, 1, reverse);
+			return new DerSequence(v);
+		}
 
 		/**
 		* @return Returns the forward.

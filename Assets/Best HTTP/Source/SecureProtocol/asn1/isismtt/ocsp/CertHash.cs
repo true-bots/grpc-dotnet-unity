@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -30,23 +29,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 	public class CertHash
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier	hashAlgorithm;
-		private readonly byte[]					certificateHash;
+		private readonly AlgorithmIdentifier hashAlgorithm;
+		private readonly byte[] certificateHash;
 
 		public static CertHash GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is CertHash)
 			{
-				return (CertHash) obj;
+				return (CertHash)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new CertHash((Asn1Sequence) obj);
+				return new CertHash((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -80,8 +79,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 		* @param certificateHash The hash of the whole DER encoding of the certificate.
 		*/
 		public CertHash(
-			AlgorithmIdentifier	hashAlgorithm,
-			byte[]				certificateHash)
+			AlgorithmIdentifier hashAlgorithm,
+			byte[] certificateHash)
 		{
 			if (hashAlgorithm == null)
 				throw new ArgumentNullException("hashAlgorithm");
@@ -89,7 +88,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 				throw new ArgumentNullException("certificateHash");
 
 			this.hashAlgorithm = hashAlgorithm;
-			this.certificateHash = (byte[]) certificateHash.Clone();
+			this.certificateHash = (byte[])certificateHash.Clone();
 		}
 
 		public AlgorithmIdentifier HashAlgorithm
@@ -99,7 +98,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 
 		public byte[] CertificateHash
 		{
-			get { return (byte[]) certificateHash.Clone(); }
+			get { return (byte[])certificateHash.Clone(); }
 		}
 
 		/**

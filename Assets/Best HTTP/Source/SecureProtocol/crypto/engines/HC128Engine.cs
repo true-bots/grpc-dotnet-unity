@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -48,7 +47,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return (RotateLeft(x, 10) ^ RotateLeft(z, 23)) + RotateLeft(y, 8);
 		}
 
-		private static uint RotateLeft(uint	x, int bits)
+		private static uint RotateLeft(uint x, int bits)
 		{
 			return (x << bits) | (x >> -bits);
 		}
@@ -97,6 +96,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				q[j] += G2(q[Dim(j, 3)], q[Dim(j, 10)], q[Dim(j, 511)]);
 				ret = H2(q[Dim(j, 12)]) ^ q[j];
 			}
+
 			cnt = Mod1024(cnt + 1);
 			return ret;
 		}
@@ -109,8 +109,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (key.Length != 16)
 				throw new ArgumentException("The key must be 128 bits long");
 
-            idx = 0;
-            cnt = 0;
+			idx = 0;
+			cnt = 0;
 
 			uint[] w = new uint[1280];
 
@@ -118,12 +118,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				w[i >> 2] |= ((uint)key[i] << (8 * (i & 0x3)));
 			}
+
 			Array.Copy(w, 0, w, 4, 4);
 
 			for (int i = 0; i < iv.Length && i < 16; i++)
 			{
 				w[(i >> 2) + 8] |= ((uint)iv[i] << (8 * (i & 0x3)));
 			}
+
 			Array.Copy(w, 8, w, 12, 4);
 
 			for (uint i = 16; i < 1280; i++)
@@ -138,6 +140,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				p[i] = Step();
 			}
+
 			for (int i = 0; i < 512; i++)
 			{
 				q[i] = Step();
@@ -146,7 +149,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			cnt = 0;
 		}
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return "HC-128"; }
 		}
@@ -160,9 +163,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @throws ArgumentException if the params argument is
 		*                                  inappropriate (ie. the key is not 128 bit long).
 		*/
-        public virtual void Init(
-			bool				forEncryption,
-			ICipherParameters	parameters)
+		public virtual void Init(
+			bool forEncryption,
+			ICipherParameters parameters)
 		{
 			ICipherParameters keyParam = parameters;
 
@@ -198,27 +201,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		{
 			if (idx == 0)
 			{
-				Pack.UInt32_To_LE(Step(), buf);				
+				Pack.UInt32_To_LE(Step(), buf);
 			}
+
 			byte ret = buf[idx];
 			idx = idx + 1 & 0x3;
 			return ret;
 		}
 
-        public virtual void ProcessBytes(
-			byte[]	input,
-			int		inOff,
-			int		len,
-			byte[]	output,
-			int		outOff)
+		public virtual void ProcessBytes(
+			byte[] input,
+			int inOff,
+			int len,
+			byte[] output,
+			int outOff)
 		{
 			if (!initialised)
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
 
-            Check.DataLength(input, inOff, len, "input buffer too short");
-            Check.OutputLength(output, outOff, len, "output buffer too short");
+			Check.DataLength(input, inOff, len, "input buffer too short");
+			Check.OutputLength(output, outOff, len, "output buffer too short");
 
-            for (int i = 0; i < len; i++)
+			for (int i = 0; i < len; i++)
 			{
 				output[outOff + i] = (byte)(input[inOff + i] ^ GetByte());
 			}
@@ -239,12 +243,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         }
 #endif
 
-        public virtual void Reset()
+		public virtual void Reset()
 		{
 			Init();
 		}
 
-        public virtual byte ReturnByte(byte input)
+		public virtual byte ReturnByte(byte input)
 		{
 			return (byte)(input ^ GetByte());
 		}

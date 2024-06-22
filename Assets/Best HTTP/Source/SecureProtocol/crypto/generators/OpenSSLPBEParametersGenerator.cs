@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -39,9 +38,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		}
 
 		public override void Init(
-			byte[]	password,
-			byte[]	salt,
-			int		iterationCount)
+			byte[] password,
+			byte[] salt,
+			int iterationCount)
 		{
 			// Ignore the provided iterationCount
 			base.Init(password, salt, 1);
@@ -49,7 +48,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 		/**
 		 * Initialise - note the iteration count for this algorithm is fixed at 1.
-		 * 
+		 *
 		 * @param password password to use.
 		 * @param salt salt to use.
 		 */
@@ -69,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			byte[] buf = new byte[digest.GetDigestSize()];
 			byte[] key = new byte[bytesNeeded];
 			int offset = 0;
-        
+
 			for (;;)
 			{
 				digest.BlockUpdate(mPassword, 0, mPassword.Length);
@@ -97,8 +96,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		}
 
 		public override ICipherParameters GenerateDerivedParameters(
-			string	algorithm,
-			int		keySize)
+			string algorithm,
+			int keySize)
 		{
 			keySize /= 8;
 
@@ -108,9 +107,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		}
 
 		public override ICipherParameters GenerateDerivedParameters(
-			string	algorithm,
-			int		keySize,
-			int     ivSize)
+			string algorithm,
+			int keySize,
+			int ivSize)
 		{
 			keySize /= 8;
 			ivSize /= 8;

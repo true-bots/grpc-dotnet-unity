@@ -2,14 +2,14 @@
 #pragma warning disable
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 {
-    /**
-     * <pre>GenMsgContent ::= SEQUENCE OF InfoTypeAndValue</pre>
-     */
-    public class GenMsgContent
+	/**
+	 * <pre>GenMsgContent ::= SEQUENCE OF InfoTypeAndValue</pre>
+	 */
+	public class GenMsgContent
 		: Asn1Encodable
 	{
-        public static GenMsgContent GetInstance(object obj)
-        {
+		public static GenMsgContent GetInstance(object obj)
+		{
 			if (obj is GenMsgContent genMsgContent)
 				return genMsgContent;
 
@@ -17,21 +17,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new GenMsgContent(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly Asn1Sequence m_content;
+		private readonly Asn1Sequence m_content;
 
 		private GenMsgContent(Asn1Sequence seq)
 		{
 			m_content = seq;
 		}
 
-        public GenMsgContent(InfoTypeAndValue itv)
-        {
-            m_content = new DerSequence(itv);
-        }
+		public GenMsgContent(InfoTypeAndValue itv)
+		{
+			m_content = new DerSequence(itv);
+		}
 
-        public GenMsgContent(params InfoTypeAndValue[] itvs)
+		public GenMsgContent(params InfoTypeAndValue[] itvs)
 		{
 			m_content = new DerSequence(itvs);
 		}

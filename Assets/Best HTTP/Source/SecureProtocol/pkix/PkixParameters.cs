@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
@@ -42,7 +41,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		private DateTime? date;
 		private List<PkixCertPathChecker> m_checkers;
 		private bool revocationEnabled = true;
+
 		private HashSet<string> initialPolicies;
+
 		//private bool checkOnlyEECertificateCrl = false;
 		private bool explicitPolicyRequired = false;
 		private bool anyPolicyInhibited = false;
@@ -412,9 +413,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		{
 			var result = new List<PkixCertPathChecker>(m_checkers.Count);
 			foreach (var checker in m_checkers)
-            {
+			{
 				result.Add((PkixCertPathChecker)checker.Clone());
 			}
+
 			return result;
 		}
 

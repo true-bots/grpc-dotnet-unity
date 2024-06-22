@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Oiw;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
@@ -20,17 +19,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class OtherHash
 		: Asn1Encodable, IAsn1Choice
 	{
-		private readonly Asn1OctetString		sha1Hash;
-		private readonly OtherHashAlgAndValue	otherHash;
+		private readonly Asn1OctetString sha1Hash;
+		private readonly OtherHashAlgAndValue otherHash;
 
 		public static OtherHash GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is OtherHash)
-				return (OtherHash) obj;
+				return (OtherHash)obj;
 
 			if (obj is Asn1OctetString)
-				return new OtherHash((Asn1OctetString) obj);
+				return new OtherHash((Asn1OctetString)obj);
 
 			return new OtherHash(
 				OtherHashAlgAndValue.GetInstance(obj));
@@ -68,23 +67,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			get
 			{
 				return otherHash == null
-					?	new AlgorithmIdentifier(OiwObjectIdentifiers.IdSha1)
-					:	otherHash.HashAlgorithm;
+					? new AlgorithmIdentifier(OiwObjectIdentifiers.IdSha1)
+					: otherHash.HashAlgorithm;
 			}
 		}
 
 		public byte[] GetHashValue()
 		{
 			return otherHash == null
-				?	sha1Hash.GetOctets()
-				:	otherHash.GetHashValue();
+				? sha1Hash.GetOctets()
+				: otherHash.GetHashValue();
 		}
 
 		public override Asn1Object ToAsn1Object()
 		{
 			return otherHash == null
-				?	sha1Hash
-				:	otherHash.ToAsn1Object();
+				? sha1Hash
+				: otherHash.ToAsn1Object();
 		}
 	}
 }

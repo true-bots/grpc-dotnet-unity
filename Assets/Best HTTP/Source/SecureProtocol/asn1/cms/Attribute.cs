@@ -1,16 +1,15 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
-    public class Attribute
-        : Asn1Encodable
-    {
-        private DerObjectIdentifier	attrType;
-        private Asn1Set				attrValues;
+	public class Attribute
+		: Asn1Encodable
+	{
+		private DerObjectIdentifier attrType;
+		private Asn1Set attrValues;
 
 		/**
         * return an Attribute object from the given object.
@@ -18,34 +17,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
         * @param o the object we want converted.
         * @exception ArgumentException if the object cannot be converted.
         */
-        public static Attribute GetInstance(
-            object obj)
-        {
-            if (obj == null || obj is Attribute)
-				return (Attribute) obj;
+		public static Attribute GetInstance(
+			object obj)
+		{
+			if (obj == null || obj is Attribute)
+				return (Attribute)obj;
 
 			if (obj is Asn1Sequence)
-                return new Attribute((Asn1Sequence) obj);
+				return new Attribute((Asn1Sequence)obj);
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
-        }
-
-		public Attribute(
-            Asn1Sequence seq)
-        {
-            attrType = (DerObjectIdentifier)seq[0];
-            attrValues = (Asn1Set)seq[1];
-        }
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+		}
 
 		public Attribute(
-            DerObjectIdentifier attrType,
-            Asn1Set             attrValues)
-        {
-            this.attrType = attrType;
-            this.attrValues = attrValues;
-        }
+			Asn1Sequence seq)
+		{
+			attrType = (DerObjectIdentifier)seq[0];
+			attrValues = (Asn1Set)seq[1];
+		}
 
-        public DerObjectIdentifier AttrType
+		public Attribute(
+			DerObjectIdentifier attrType,
+			Asn1Set attrValues)
+		{
+			this.attrType = attrType;
+			this.attrValues = attrValues;
+		}
+
+		public DerObjectIdentifier AttrType
 		{
 			get { return attrType; }
 		}
@@ -64,11 +63,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
         * }
         * </pre>
         */
-        public override Asn1Object ToAsn1Object()
-        {
+		public override Asn1Object ToAsn1Object()
+		{
 			return new DerSequence(attrType, attrValues);
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

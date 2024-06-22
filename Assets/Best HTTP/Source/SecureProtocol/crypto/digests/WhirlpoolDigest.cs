@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -49,13 +48,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		private static readonly ulong[] C7 = new ulong[256];
 
 		/*
-		* increment() can be implemented in this way using 2 arrays or
-		* by having some temporary variables that are used to set the
-		* value provided by EIGHT[i] and carry within the loop.
-		*
-		* not having done any timing, this seems likely to be faster
-		* at the slight expense of 32*(sizeof short) bytes
-		*/
+		 * increment() can be implemented in this way using 2 arrays or
+		 * by having some temporary variables that are used to set the
+		 * value provided by EIGHT[i] and carry within the loop.
+		 *
+		 * not having done any timing, this seems likely to be faster
+		 * at the slight expense of 32*(sizeof short) bytes
+		 */
 		private static readonly short[] EIGHT = new short[BITCOUNT_ARRAY_SIZE];
 
 		static WhirlpoolDigest()
@@ -91,13 +90,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		private static ulong PackIntoUInt64(int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0)
 		{
 			return ((ulong)b7 << 56) ^
-				   ((ulong)b6 << 48) ^
-				   ((ulong)b5 << 40) ^
-				   ((ulong)b4 << 32) ^
-				   ((ulong)b3 << 24) ^
-				   ((ulong)b2 << 16) ^
-				   ((ulong)b1 << 8) ^
-				    (ulong)b0;
+			       ((ulong)b6 << 48) ^
+			       ((ulong)b5 << 40) ^
+			       ((ulong)b4 << 32) ^
+			       ((ulong)b3 << 24) ^
+			       ((ulong)b2 << 16) ^
+			       ((ulong)b1 << 8) ^
+			       (ulong)b0;
 		}
 
 		private readonly ulong[] _rc = new ulong[ROUNDS + 1];
@@ -109,7 +108,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			{
 				int i = 8 * (r - 1);
 				_rc[r] =
-					(C0[i    ] & 0xff00000000000000UL) ^
+					(C0[i] & 0xff00000000000000UL) ^
 					(C1[i + 1] & 0x00ff000000000000UL) ^
 					(C2[i + 2] & 0x0000ff0000000000UL) ^
 					(C3[i + 3] & 0x000000ff00000000UL) ^
@@ -123,12 +122,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		// --------------------------------------------------------------------------------------//
 
 		// -- buffer information --
-		private byte[]  _buffer    = new byte[64];
-		private int     _bufferPos;
-		private short[] _bitCount  = new short[BITCOUNT_ARRAY_SIZE];
+		private byte[] _buffer = new byte[64];
+		private int _bufferPos;
+		private short[] _bitCount = new short[BITCOUNT_ARRAY_SIZE];
 
 		// -- internal hash state --
-		private ulong[] _hash  = new ulong[8];
+		private ulong[] _hash = new ulong[8];
 		private ulong[] _K = new ulong[8]; // the round key
 		private ulong[] _L = new ulong[8];
 		private ulong[] _block = new ulong[8]; // mu (buffer)
@@ -219,13 +218,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			{
 				for (int i = 0; i < 8; i++)
 				{
-					_L[i]  = C0[(int)(_K[(i - 0) & 7] >> 56) & 0xff];
+					_L[i] = C0[(int)(_K[(i - 0) & 7] >> 56) & 0xff];
 					_L[i] ^= C1[(int)(_K[(i - 1) & 7] >> 48) & 0xff];
 					_L[i] ^= C2[(int)(_K[(i - 2) & 7] >> 40) & 0xff];
 					_L[i] ^= C3[(int)(_K[(i - 3) & 7] >> 32) & 0xff];
 					_L[i] ^= C4[(int)(_K[(i - 4) & 7] >> 24) & 0xff];
 					_L[i] ^= C5[(int)(_K[(i - 5) & 7] >> 16) & 0xff];
-					_L[i] ^= C6[(int)(_K[(i - 6) & 7] >>  8) & 0xff];
+					_L[i] ^= C6[(int)(_K[(i - 6) & 7] >> 8) & 0xff];
 					_L[i] ^= C7[(int)(_K[(i - 7) & 7]) & 0xff];
 				}
 
@@ -305,10 +304,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		private void Finish()
 		{
 			/*
-			* this makes a copy of the current bit length. at the expense of an
-			* object creation of 32 bytes rather than providing a _stopCounting
-			* boolean which was the alternative I could think of.
-			*/
+			 * this makes a copy of the current bit length. at the expense of an
+			 * object creation of 32 bytes rather than providing a _stopCounting
+			 * boolean which was the alternative I could think of.
+			 */
 			byte[] bitLength = CopyBitLength();
 
 			_buffer[_bufferPos] |= 0x80;
@@ -318,11 +317,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 
 			/*
-			* Final block contains
-			* [ ... data .... ][0][0][0][ length ]
-			*
-			* if [ length ] cannot fit.  Need to create a new block.
-			*/
+			 * Final block contains
+			 * [ ... data .... ][0][0][0][ length ]
+			 *
+			 * if [ length ] cannot fit.  Need to create a new block.
+			 */
 			if (_bufferPos > 32)
 			{
 				while (_bufferPos != 0)
@@ -349,6 +348,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			{
 				rv[i] = (byte)(_bitCount[i] & 0xff);
 			}
+
 			return rv;
 		}
 

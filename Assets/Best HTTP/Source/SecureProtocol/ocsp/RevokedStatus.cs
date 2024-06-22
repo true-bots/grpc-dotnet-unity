@@ -1,15 +1,14 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 {
-    /// <summary>Wrapper for the RevokedInfo object</summary>
-    public class RevokedStatus
+	/// <summary>Wrapper for the RevokedInfo object</summary>
+	public class RevokedStatus
 		: CertificateStatus
 	{
 		private readonly RevokedInfo m_revokedInfo;
@@ -24,7 +23,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			m_revokedInfo = new RevokedInfo(new Asn1GeneralizedTime(revocationDate));
 		}
 
-        public RevokedStatus(DateTime revocationDate, int reason)
+		public RevokedStatus(DateTime revocationDate, int reason)
 		{
 			m_revokedInfo = new RevokedInfo(new Asn1GeneralizedTime(revocationDate), new CrlReason(reason));
 		}
@@ -39,18 +38,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			get { return m_revokedInfo.RevocationReason != null; }
 		}
 
-        /// <summary>Return the revocation reason, if there is one.</summary>
+		/// <summary>Return the revocation reason, if there is one.</summary>
 		/// <remarks>This field is optional; test for it with <see cref="HasRevocationReason"/> first.</remarks>
 		/// <returns>The revocation reason, if available.</returns>
 		/// <exception cref="InvalidOperationException">If no revocation reason is available.</exception>
-        public int RevocationReason
+		public int RevocationReason
 		{
 			get
 			{
 				if (m_revokedInfo.RevocationReason == null)
 					throw new InvalidOperationException("attempt to get a reason where none is available");
 
-                return m_revokedInfo.RevocationReason.IntValueExact;
+				return m_revokedInfo.RevocationReason.IntValueExact;
 			}
 		}
 	}

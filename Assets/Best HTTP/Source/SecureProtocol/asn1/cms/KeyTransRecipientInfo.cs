@@ -1,47 +1,46 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
-    public class KeyTransRecipientInfo
-        : Asn1Encodable
-    {
-        private DerInteger          version;
-        private RecipientIdentifier rid;
-        private AlgorithmIdentifier keyEncryptionAlgorithm;
-        private Asn1OctetString     encryptedKey;
+	public class KeyTransRecipientInfo
+		: Asn1Encodable
+	{
+		private DerInteger version;
+		private RecipientIdentifier rid;
+		private AlgorithmIdentifier keyEncryptionAlgorithm;
+		private Asn1OctetString encryptedKey;
 
 		public KeyTransRecipientInfo(
-            RecipientIdentifier rid,
-            AlgorithmIdentifier keyEncryptionAlgorithm,
-            Asn1OctetString     encryptedKey)
-        {
-            if (rid.ToAsn1Object() is Asn1TaggedObject)
-            {
-                this.version = new DerInteger(2);
-            }
-            else
-            {
-                this.version = new DerInteger(0);
-            }
+			RecipientIdentifier rid,
+			AlgorithmIdentifier keyEncryptionAlgorithm,
+			Asn1OctetString encryptedKey)
+		{
+			if (rid.ToAsn1Object() is Asn1TaggedObject)
+			{
+				this.version = new DerInteger(2);
+			}
+			else
+			{
+				this.version = new DerInteger(0);
+			}
 
 			this.rid = rid;
-            this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
-            this.encryptedKey = encryptedKey;
-        }
+			this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
+			this.encryptedKey = encryptedKey;
+		}
 
 		public KeyTransRecipientInfo(
-            Asn1Sequence seq)
-        {
-            this.version = (DerInteger) seq[0];
-            this.rid = RecipientIdentifier.GetInstance(seq[1]);
-            this.keyEncryptionAlgorithm = AlgorithmIdentifier.GetInstance(seq[2]);
-            this.encryptedKey = (Asn1OctetString) seq[3];
-        }
+			Asn1Sequence seq)
+		{
+			this.version = (DerInteger)seq[0];
+			this.rid = RecipientIdentifier.GetInstance(seq[1]);
+			this.keyEncryptionAlgorithm = AlgorithmIdentifier.GetInstance(seq[2]);
+			this.encryptedKey = (Asn1OctetString)seq[3];
+		}
 
 		/**
          * return a KeyTransRecipientInfo object from the given object.
@@ -49,18 +48,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * @param obj the object we want converted.
          * @exception ArgumentException if the object cannot be converted.
          */
-        public static KeyTransRecipientInfo GetInstance(
-            object obj)
-        {
-            if (obj == null || obj is KeyTransRecipientInfo)
-                return (KeyTransRecipientInfo) obj;
+		public static KeyTransRecipientInfo GetInstance(
+			object obj)
+		{
+			if (obj == null || obj is KeyTransRecipientInfo)
+				return (KeyTransRecipientInfo)obj;
 
-			if(obj is Asn1Sequence)
-                return new KeyTransRecipientInfo((Asn1Sequence) obj);
+			if (obj is Asn1Sequence)
+				return new KeyTransRecipientInfo((Asn1Sequence)obj);
 
 			throw new ArgumentException(
-                "Illegal object in KeyTransRecipientInfo: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
-        }
+				"Illegal object in KeyTransRecipientInfo: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+		}
 
 		public DerInteger Version
 		{
@@ -93,11 +92,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
+		public override Asn1Object ToAsn1Object()
+		{
 			return new DerSequence(version, rid, keyEncryptionAlgorithm, encryptedKey);
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -57,20 +57,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		protected override void SetKey(byte[] keyBytes, byte[] ivBytes)
 		{
-            if (keyBytes != null)
-            {
-                if ((keyBytes.Length != 16) && (keyBytes.Length != 32))
-                    throw new ArgumentException(AlgorithmName + " requires 128 bit or 256 bit key");
+			if (keyBytes != null)
+			{
+				if ((keyBytes.Length != 16) && (keyBytes.Length != 32))
+					throw new ArgumentException(AlgorithmName + " requires 128 bit or 256 bit key");
 
-                PackTauOrSigma(keyBytes.Length, engineState, 0);
+				PackTauOrSigma(keyBytes.Length, engineState, 0);
 
-                // Key
-                Pack.LE_To_UInt32(keyBytes, 0, engineState, 4, 4);
-                Pack.LE_To_UInt32(keyBytes, keyBytes.Length - 16, engineState, 8, 4);
-            }
+				// Key
+				Pack.LE_To_UInt32(keyBytes, 0, engineState, 4, 4);
+				Pack.LE_To_UInt32(keyBytes, keyBytes.Length - 16, engineState, 8, 4);
+			}
 
-            // IV
-            Pack.LE_To_UInt32(ivBytes, 0, engineState, 14, 2);
+			// IV
+			Pack.LE_To_UInt32(ivBytes, 0, engineState, 14, 2);
 		}
 
 		protected override void GenerateKeyStream(byte[] output)
@@ -147,65 +147,97 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 #endif
 
-            {
-				uint x00 = input[ 0], x01 = input[ 1], x02 = input[ 2], x03 = input[ 3];
-				uint x04 = input[ 4], x05 = input[ 5], x06 = input[ 6], x07 = input[ 7];
-				uint x08 = input[ 8], x09 = input[ 9], x10 = input[10], x11 = input[11];
+			{
+				uint x00 = input[0], x01 = input[1], x02 = input[2], x03 = input[3];
+				uint x04 = input[4], x05 = input[5], x06 = input[6], x07 = input[7];
+				uint x08 = input[8], x09 = input[9], x10 = input[10], x11 = input[11];
 				uint x12 = input[12], x13 = input[13], x14 = input[14], x15 = input[15];
 
 				for (int i = rounds; i > 0; i -= 2)
 				{
-					x00 += x04; x12 = Integers.RotateLeft(x12 ^ x00, 16);
-					x01 += x05; x13 = Integers.RotateLeft(x13 ^ x01, 16);
-					x02 += x06; x14 = Integers.RotateLeft(x14 ^ x02, 16);
-					x03 += x07; x15 = Integers.RotateLeft(x15 ^ x03, 16);
+					x00 += x04;
+					x12 = Integers.RotateLeft(x12 ^ x00, 16);
+					x01 += x05;
+					x13 = Integers.RotateLeft(x13 ^ x01, 16);
+					x02 += x06;
+					x14 = Integers.RotateLeft(x14 ^ x02, 16);
+					x03 += x07;
+					x15 = Integers.RotateLeft(x15 ^ x03, 16);
 
-					x08 += x12; x04 = Integers.RotateLeft(x04 ^ x08, 12);
-					x09 += x13; x05 = Integers.RotateLeft(x05 ^ x09, 12);
-					x10 += x14; x06 = Integers.RotateLeft(x06 ^ x10, 12);
-					x11 += x15; x07 = Integers.RotateLeft(x07 ^ x11, 12);
+					x08 += x12;
+					x04 = Integers.RotateLeft(x04 ^ x08, 12);
+					x09 += x13;
+					x05 = Integers.RotateLeft(x05 ^ x09, 12);
+					x10 += x14;
+					x06 = Integers.RotateLeft(x06 ^ x10, 12);
+					x11 += x15;
+					x07 = Integers.RotateLeft(x07 ^ x11, 12);
 
-					x00 += x04; x12 = Integers.RotateLeft(x12 ^ x00, 8);
-					x01 += x05; x13 = Integers.RotateLeft(x13 ^ x01, 8);
-					x02 += x06; x14 = Integers.RotateLeft(x14 ^ x02, 8);
-					x03 += x07; x15 = Integers.RotateLeft(x15 ^ x03, 8);
+					x00 += x04;
+					x12 = Integers.RotateLeft(x12 ^ x00, 8);
+					x01 += x05;
+					x13 = Integers.RotateLeft(x13 ^ x01, 8);
+					x02 += x06;
+					x14 = Integers.RotateLeft(x14 ^ x02, 8);
+					x03 += x07;
+					x15 = Integers.RotateLeft(x15 ^ x03, 8);
 
-					x08 += x12; x04 = Integers.RotateLeft(x04 ^ x08, 7);
-					x09 += x13; x05 = Integers.RotateLeft(x05 ^ x09, 7);
-					x10 += x14; x06 = Integers.RotateLeft(x06 ^ x10, 7);
-					x11 += x15; x07 = Integers.RotateLeft(x07 ^ x11, 7);
+					x08 += x12;
+					x04 = Integers.RotateLeft(x04 ^ x08, 7);
+					x09 += x13;
+					x05 = Integers.RotateLeft(x05 ^ x09, 7);
+					x10 += x14;
+					x06 = Integers.RotateLeft(x06 ^ x10, 7);
+					x11 += x15;
+					x07 = Integers.RotateLeft(x07 ^ x11, 7);
 
-					x00 += x05; x15 = Integers.RotateLeft(x15 ^ x00, 16);
-					x01 += x06; x12 = Integers.RotateLeft(x12 ^ x01, 16);
-					x02 += x07; x13 = Integers.RotateLeft(x13 ^ x02, 16);
-					x03 += x04; x14 = Integers.RotateLeft(x14 ^ x03, 16);
+					x00 += x05;
+					x15 = Integers.RotateLeft(x15 ^ x00, 16);
+					x01 += x06;
+					x12 = Integers.RotateLeft(x12 ^ x01, 16);
+					x02 += x07;
+					x13 = Integers.RotateLeft(x13 ^ x02, 16);
+					x03 += x04;
+					x14 = Integers.RotateLeft(x14 ^ x03, 16);
 
-					x10 += x15; x05 = Integers.RotateLeft(x05 ^ x10, 12);
-					x11 += x12; x06 = Integers.RotateLeft(x06 ^ x11, 12);
-					x08 += x13; x07 = Integers.RotateLeft(x07 ^ x08, 12);
-					x09 += x14; x04 = Integers.RotateLeft(x04 ^ x09, 12);
+					x10 += x15;
+					x05 = Integers.RotateLeft(x05 ^ x10, 12);
+					x11 += x12;
+					x06 = Integers.RotateLeft(x06 ^ x11, 12);
+					x08 += x13;
+					x07 = Integers.RotateLeft(x07 ^ x08, 12);
+					x09 += x14;
+					x04 = Integers.RotateLeft(x04 ^ x09, 12);
 
-					x00 += x05; x15 = Integers.RotateLeft(x15 ^ x00, 8);
-					x01 += x06; x12 = Integers.RotateLeft(x12 ^ x01, 8);
-					x02 += x07; x13 = Integers.RotateLeft(x13 ^ x02, 8);
-					x03 += x04; x14 = Integers.RotateLeft(x14 ^ x03, 8);
+					x00 += x05;
+					x15 = Integers.RotateLeft(x15 ^ x00, 8);
+					x01 += x06;
+					x12 = Integers.RotateLeft(x12 ^ x01, 8);
+					x02 += x07;
+					x13 = Integers.RotateLeft(x13 ^ x02, 8);
+					x03 += x04;
+					x14 = Integers.RotateLeft(x14 ^ x03, 8);
 
-					x10 += x15; x05 = Integers.RotateLeft(x05 ^ x10, 7);
-					x11 += x12; x06 = Integers.RotateLeft(x06 ^ x11, 7);
-					x08 += x13; x07 = Integers.RotateLeft(x07 ^ x08, 7);
-					x09 += x14; x04 = Integers.RotateLeft(x04 ^ x09, 7);
+					x10 += x15;
+					x05 = Integers.RotateLeft(x05 ^ x10, 7);
+					x11 += x12;
+					x06 = Integers.RotateLeft(x06 ^ x11, 7);
+					x08 += x13;
+					x07 = Integers.RotateLeft(x07 ^ x08, 7);
+					x09 += x14;
+					x04 = Integers.RotateLeft(x04 ^ x09, 7);
 				}
 
-				Pack.UInt32_To_LE(x00 + input[ 0], output,  0);
-				Pack.UInt32_To_LE(x01 + input[ 1], output,  4);
-				Pack.UInt32_To_LE(x02 + input[ 2], output,  8);
-				Pack.UInt32_To_LE(x03 + input[ 3], output, 12);
-				Pack.UInt32_To_LE(x04 + input[ 4], output, 16);
-				Pack.UInt32_To_LE(x05 + input[ 5], output, 20);
-				Pack.UInt32_To_LE(x06 + input[ 6], output, 24);
-				Pack.UInt32_To_LE(x07 + input[ 7], output, 28);
-				Pack.UInt32_To_LE(x08 + input[ 8], output, 32);
-				Pack.UInt32_To_LE(x09 + input[ 9], output, 36);
+				Pack.UInt32_To_LE(x00 + input[0], output, 0);
+				Pack.UInt32_To_LE(x01 + input[1], output, 4);
+				Pack.UInt32_To_LE(x02 + input[2], output, 8);
+				Pack.UInt32_To_LE(x03 + input[3], output, 12);
+				Pack.UInt32_To_LE(x04 + input[4], output, 16);
+				Pack.UInt32_To_LE(x05 + input[5], output, 20);
+				Pack.UInt32_To_LE(x06 + input[6], output, 24);
+				Pack.UInt32_To_LE(x07 + input[7], output, 28);
+				Pack.UInt32_To_LE(x08 + input[8], output, 32);
+				Pack.UInt32_To_LE(x09 + input[9], output, 36);
 				Pack.UInt32_To_LE(x10 + input[10], output, 40);
 				Pack.UInt32_To_LE(x11 + input[11], output, 44);
 				Pack.UInt32_To_LE(x12 + input[12], output, 48);

@@ -4,17 +4,17 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-    /// <summary>Processor interface for a PSK identity.</summary>
-    public interface TlsPskIdentity
-    {
-        void SkipIdentityHint();
+	/// <summary>Processor interface for a PSK identity.</summary>
+	public interface TlsPskIdentity
+	{
+		void SkipIdentityHint();
 
-        void NotifyIdentityHint(byte[] psk_identity_hint);
+		void NotifyIdentityHint(byte[] psk_identity_hint);
 
-        byte[] GetPskIdentity();
+		byte[] GetPskIdentity();
 
-        byte[] GetPsk();
-    }
+		byte[] GetPsk();
+	}
 }
 #pragma warning restore
 #endif

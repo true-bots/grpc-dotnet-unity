@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -9,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	/**
 	 * Target structure used in target information extension for attribute
 	 * certificates from RFC 3281.
-	 * 
+	 *
 	 * <pre>
 	 *     Target  ::= CHOICE {
 	 *       targetName          [0] GeneralName,
@@ -17,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	 *       targetCert          [2] TargetCert
 	 *     }
 	 * </pre>
-	 * 
+	 *
 	 * <p>
 	 * The targetCert field is currently not supported and must not be used
 	 * according to RFC 3281.</p>
@@ -38,7 +37,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		* Creates an instance of a Target from the given object.
 		* <p>
 		* <code>obj</code> can be a Target or a {@link Asn1TaggedObject}</p>
-		* 
+		*
 		* @param obj The object.
 		* @return A Target instance.
 		* @throws ArgumentException if the given object cannot be
@@ -49,29 +48,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 			if (obj is Target)
 			{
-				return (Target) obj;
+				return (Target)obj;
 			}
 
 			if (obj is Asn1TaggedObject)
 			{
-				return new Target((Asn1TaggedObject) obj);
+				return new Target((Asn1TaggedObject)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
 		 * Constructor from Asn1TaggedObject.
-		 * 
+		 *
 		 * @param tagObj The tagged object.
 		 * @throws ArgumentException if the encoding is wrong.
 		 */
 		private Target(
 			Asn1TaggedObject tagObj)
 		{
-			switch ((Choice) tagObj.TagNo)
+			switch ((Choice)tagObj.TagNo)
 			{
-				case Choice.Name:	// GeneralName is already a choice so explicit
+				case Choice.Name: // GeneralName is already a choice so explicit
 					targetName = GeneralName.GetInstance(tagObj, true);
 					break;
 				case Choice.Group:
@@ -92,9 +91,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * @throws ArgumentException if type is invalid.
 		 */
 		public Target(
-			Choice		type,
-			GeneralName	name)
-			: this(new DerTaggedObject((int) type, name))
+			Choice type,
+			GeneralName name)
+			: this(new DerTaggedObject((int)type, name))
 		{
 		}
 
@@ -116,9 +115,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		/**
 		 * Produce an object suitable for an Asn1OutputStream.
-		 * 
+		 *
 		 * Returns:
-		 * 
+		 *
 		 * <pre>
 		 *     Target  ::= CHOICE {
 		 *       targetName          [0] GeneralName,
@@ -126,7 +125,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 *       targetCert          [2] TargetCert
 		 *     }
 		 * </pre>
-		 * 
+		 *
 		 * @return an Asn1Object
 		 */
 		public override Asn1Object ToAsn1Object()

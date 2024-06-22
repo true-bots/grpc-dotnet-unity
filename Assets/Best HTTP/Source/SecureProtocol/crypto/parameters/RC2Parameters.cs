@@ -16,26 +16,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		}
 
 		public RC2Parameters(
-			byte[]	key,
-			int		keyOff,
-			int		keyLen)
+			byte[] key,
+			int keyOff,
+			int keyLen)
 			: this(key, keyOff, keyLen, (keyLen > 128) ? 1024 : (keyLen * 8))
 		{
 		}
 
 		public RC2Parameters(
-			byte[]	key,
-			int		bits)
+			byte[] key,
+			int bits)
 			: base(key)
 		{
 			this.bits = bits;
 		}
 
 		public RC2Parameters(
-			byte[]	key,
-			int		keyOff,
-			int		keyLen,
-			int		bits)
+			byte[] key,
+			int keyOff,
+			int keyLen,
+			int bits)
 			: base(key, keyOff, keyLen)
 		{
 			this.bits = bits;

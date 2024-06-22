@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
@@ -36,16 +35,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 				x3 = P[(x3 + x2 + r) & 0xff];
 				x2 = P[(x2 + x1 + r) & 0xff];
 				x1 = P[(x1 + s + r) & 0xff];
-				T[g & 0x1f] = (byte) (T[g & 0x1f] ^ x1);
-				T[(g + 1) & 0x1f] = (byte) (T[(g + 1) & 0x1f] ^ x2);
-				T[(g + 2) & 0x1f] = (byte) (T[(g + 2) & 0x1f] ^ x3);
-				T[(g + 3) & 0x1f] = (byte) (T[(g + 3) & 0x1f] ^ x4);
-				g = (byte) ((g + 4) & 0x1f);
+				T[g & 0x1f] = (byte)(T[g & 0x1f] ^ x1);
+				T[(g + 1) & 0x1f] = (byte)(T[(g + 1) & 0x1f] ^ x2);
+				T[(g + 2) & 0x1f] = (byte)(T[(g + 2) & 0x1f] ^ x3);
+				T[(g + 3) & 0x1f] = (byte)(T[(g + 3) & 0x1f] ^ x4);
+				g = (byte)((g + 4) & 0x1f);
 
 				byte temp = P[n & 0xff];
 				P[n & 0xff] = P[s & 0xff];
 				P[s & 0xff] = temp;
-				n = (byte) ((n + 1) & 0xff);
+				n = (byte)((n + 1) & 0xff);
 			}
 
 			// Input T to the IV-phase of the VMPC KSA
@@ -143,8 +142,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			if (!(parameters is ParametersWithIV))
 				throw new ArgumentException("VMPC-MAC Init parameters must include an IV", "parameters");
 
-			ParametersWithIV ivParams = (ParametersWithIV) parameters;
-			KeyParameter key = (KeyParameter) ivParams.Parameters;
+			ParametersWithIV ivParams = (ParametersWithIV)parameters;
+			KeyParameter key = (KeyParameter)ivParams.Parameters;
 
 			if (!(ivParams.Parameters is KeyParameter))
 				throw new ArgumentException("VMPC-MAC Init parameters must include a key", "parameters");
@@ -157,7 +156,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			this.workingKey = key.GetKey();
 
 			Reset();
-
 		}
 
 		private void initKey(byte[] keyBytes, byte[] ivBytes)
@@ -166,8 +164,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			P = new byte[256];
 			for (int i = 0; i < 256; i++)
 			{
-				P[i] = (byte) i;
+				P[i] = (byte)i;
 			}
+
 			for (int m = 0; m < 768; m++)
 			{
 				s = P[(s + P[m & 0xff] + keyBytes[m % keyBytes.Length]) & 0xff];
@@ -175,6 +174,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 				P[m & 0xff] = P[s & 0xff];
 				P[s & 0xff] = temp;
 			}
+
 			for (int m = 0; m < 768; m++)
 			{
 				s = P[(s + P[m & 0xff] + ivBytes[m % ivBytes.Length]) & 0xff];
@@ -182,6 +182,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 				P[m & 0xff] = P[s & 0xff];
 				P[s & 0xff] = temp;
 			}
+
 			n = 0;
 		}
 
@@ -199,22 +200,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public virtual void Update(byte input)
 		{
 			s = P[(s + P[n & 0xff]) & 0xff];
-			byte c = (byte) (input ^ P[(P[(P[s & 0xff]) & 0xff] + 1) & 0xff]);
+			byte c = (byte)(input ^ P[(P[(P[s & 0xff]) & 0xff] + 1) & 0xff]);
 
 			x4 = P[(x4 + x3) & 0xff];
 			x3 = P[(x3 + x2) & 0xff];
 			x2 = P[(x2 + x1) & 0xff];
 			x1 = P[(x1 + s + c) & 0xff];
-			T[g & 0x1f] = (byte) (T[g & 0x1f] ^ x1);
-			T[(g + 1) & 0x1f] = (byte) (T[(g + 1) & 0x1f] ^ x2);
-			T[(g + 2) & 0x1f] = (byte) (T[(g + 2) & 0x1f] ^ x3);
-			T[(g + 3) & 0x1f] = (byte) (T[(g + 3) & 0x1f] ^ x4);
-			g = (byte) ((g + 4) & 0x1f);
+			T[g & 0x1f] = (byte)(T[g & 0x1f] ^ x1);
+			T[(g + 1) & 0x1f] = (byte)(T[(g + 1) & 0x1f] ^ x2);
+			T[(g + 2) & 0x1f] = (byte)(T[(g + 2) & 0x1f] ^ x3);
+			T[(g + 3) & 0x1f] = (byte)(T[(g + 3) & 0x1f] ^ x4);
+			g = (byte)((g + 4) & 0x1f);
 
 			byte temp = P[n & 0xff];
 			P[n & 0xff] = P[s & 0xff];
 			P[s & 0xff] = temp;
-			n = (byte) ((n + 1) & 0xff);
+			n = (byte)((n + 1) & 0xff);
 		}
 
 		public virtual void BlockUpdate(byte[] input, int inOff, int inLen)

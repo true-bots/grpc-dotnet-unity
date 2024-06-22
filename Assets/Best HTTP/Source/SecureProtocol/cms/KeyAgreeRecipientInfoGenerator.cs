@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms.Ecc;
@@ -21,10 +20,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	{
 		private static readonly CmsEnvelopedHelper Helper = CmsEnvelopedHelper.Instance;
 
-		private DerObjectIdentifier			keyAgreementOID;
-		private DerObjectIdentifier			keyEncryptionOID;
-		private IList<X509Certificate>      recipientCerts;
-		private AsymmetricCipherKeyPair		senderKeyPair;
+		private DerObjectIdentifier keyAgreementOID;
+		private DerObjectIdentifier keyEncryptionOID;
+		private IList<X509Certificate> recipientCerts;
+		private AsymmetricCipherKeyPair senderKeyPair;
 
 		internal KeyAgreeRecipientInfoGenerator()
 		{
@@ -151,7 +150,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				keyWrapper.Init(true, new ParametersWithRandom(keyEncryptionKey, random));
 				byte[] encryptedKeyBytes = keyWrapper.Wrap(keyBytes, 0, keyBytes.Length);
 
-	        	Asn1OctetString encryptedKey = new DerOctetString(encryptedKeyBytes);
+				Asn1OctetString encryptedKey = new DerOctetString(encryptedKeyBytes);
 
 				recipientEncryptedKeys.Add(new RecipientEncryptedKey(karid, encryptedKey));
 			}
@@ -165,7 +164,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		{
 			SubjectPublicKeyInfo spki = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(publicKey);
 			return new OriginatorPublicKey(
-                new AlgorithmIdentifier(spki.AlgorithmID.Algorithm, DerNull.Instance),
+				new AlgorithmIdentifier(spki.AlgorithmID.Algorithm, DerNull.Instance),
 				spki.PublicKeyData.GetBytes());
 		}
 	}

@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO;
@@ -10,67 +9,67 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 {
-    public class Asn1DigestFactory
-        : IDigestFactory
-    {
-        public static Asn1DigestFactory Get(DerObjectIdentifier oid)
-        {
-            return new Asn1DigestFactory(DigestUtilities.GetDigest(oid), oid);          
-        }
+	public class Asn1DigestFactory
+		: IDigestFactory
+	{
+		public static Asn1DigestFactory Get(DerObjectIdentifier oid)
+		{
+			return new Asn1DigestFactory(DigestUtilities.GetDigest(oid), oid);
+		}
 
-        public static Asn1DigestFactory Get(string mechanism)
-        {
-            DerObjectIdentifier oid = DigestUtilities.GetObjectIdentifier(mechanism);
-            return new Asn1DigestFactory(DigestUtilities.GetDigest(oid), oid);
-        }
+		public static Asn1DigestFactory Get(string mechanism)
+		{
+			DerObjectIdentifier oid = DigestUtilities.GetObjectIdentifier(mechanism);
+			return new Asn1DigestFactory(DigestUtilities.GetDigest(oid), oid);
+		}
 
-        private readonly IDigest mDigest;
-        private readonly DerObjectIdentifier mOid;
+		private readonly IDigest mDigest;
+		private readonly DerObjectIdentifier mOid;
 
-        public Asn1DigestFactory(IDigest digest, DerObjectIdentifier oid)
-        {
-            this.mDigest = digest;
-            this.mOid = oid;
-        }    
+		public Asn1DigestFactory(IDigest digest, DerObjectIdentifier oid)
+		{
+			this.mDigest = digest;
+			this.mOid = oid;
+		}
 
-        public virtual object AlgorithmDetails
-        {
-            get { return new AlgorithmIdentifier(mOid); }
-        }
+		public virtual object AlgorithmDetails
+		{
+			get { return new AlgorithmIdentifier(mOid); }
+		}
 
-        public virtual int DigestLength
-        {
-            get { return mDigest.GetDigestSize(); }
-        }
+		public virtual int DigestLength
+		{
+			get { return mDigest.GetDigestSize(); }
+		}
 
-        public virtual IStreamCalculator<IBlockResult> CreateCalculator()
-        {
-            return new DfDigestStream(mDigest);
-        }
-    }
+		public virtual IStreamCalculator<IBlockResult> CreateCalculator()
+		{
+			return new DfDigestStream(mDigest);
+		}
+	}
 
-    internal class DfDigestStream
-        : IStreamCalculator<SimpleBlockResult>
-    {
-        private readonly DigestSink mStream;
+	internal class DfDigestStream
+		: IStreamCalculator<SimpleBlockResult>
+	{
+		private readonly DigestSink mStream;
 
-        public DfDigestStream(IDigest digest)
-        {          
-            this.mStream = new DigestSink(digest);
-        }
+		public DfDigestStream(IDigest digest)
+		{
+			this.mStream = new DigestSink(digest);
+		}
 
-        public Stream Stream
-        {
-            get { return mStream; }
-        }
+		public Stream Stream
+		{
+			get { return mStream; }
+		}
 
-        public SimpleBlockResult GetResult()
-        {
-            byte[] result = new byte[mStream.Digest.GetDigestSize()];
-            mStream.Digest.DoFinal(result, 0);
-            return new SimpleBlockResult(result);
-        }
-    }
+		public SimpleBlockResult GetResult()
+		{
+			byte[] result = new byte[mStream.Digest.GetDigestSize()];
+			mStream.Digest.DoFinal(result, 0);
+			return new SimpleBlockResult(result);
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -22,16 +22,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 	{
 		//	private static final long serialVersionUID = 1L;
 
-		private readonly BigInteger	bigInt;
-		private readonly int		scale;
+		private readonly BigInteger bigInt;
+		private readonly int scale;
 
 		/**
 		* Returns a <code>SimpleBigDecimal</code> representing the same numerical
 		* value as <code>value</code>.
 		* @param value The value of the <code>SimpleBigDecimal</code> to be
-		* created. 
+		* created.
 		* @param scale The scale of the <code>SimpleBigDecimal</code> to be
-		* created. 
+		* created.
 		* @return The such created <code>SimpleBigDecimal</code>.
 		*/
 		public static SimpleBigDecimal GetInstance(BigInteger val, int scale)
@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 
 		/**
 		* Constructor for <code>SimpleBigDecimal</code>. The value of the
-		* constructed <code>SimpleBigDecimal</code> Equals <code>bigInt / 
+		* constructed <code>SimpleBigDecimal</code> Equals <code>bigInt /
 		* 2<sup>scale</sup></code>.
 		* @param bigInt The <code>bigInt</code> value parameter.
 		* @param scale The scale of the constructed <code>SimpleBigDecimal</code>.
@@ -185,7 +185,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 				return bigInt.ToString();
 
 			BigInteger floorBigInt = Floor();
-	        
+
 			BigInteger fract = bigInt.Subtract(floorBigInt.ShiftLeft(scale));
 			if (bigInt.SignValue < 0)
 			{
@@ -196,20 +196,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 			{
 				floorBigInt = floorBigInt.Add(BigInteger.One);
 			}
+
 			string leftOfPoint = floorBigInt.ToString();
 
 			char[] fractCharArr = new char[scale];
-				string fractStr = fract.ToString(2);
+			string fractStr = fract.ToString(2);
 			int fractLen = fractStr.Length;
 			int zeroes = scale - fractLen;
 			for (int i = 0; i < zeroes; i++)
 			{
 				fractCharArr[i] = '0';
 			}
+
 			for (int j = 0; j < fractLen; j++)
 			{
 				fractCharArr[zeroes + j] = fractStr[j];
 			}
+
 			string rightOfPoint = new string(fractCharArr);
 
 			StringBuilder sb = new StringBuilder(leftOfPoint);
@@ -231,14 +234,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 				return false;
 
 			return bigInt.Equals(other.bigInt)
-				&& scale == other.scale;
+			       && scale == other.scale;
 		}
 
 		public override int GetHashCode()
 		{
 			return bigInt.GetHashCode() ^ scale;
 		}
-
 	}
 }
 #pragma warning restore

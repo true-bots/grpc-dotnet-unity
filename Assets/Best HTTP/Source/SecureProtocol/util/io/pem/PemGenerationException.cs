@@ -5,8 +5,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 {
-    [Serializable]
-    public class PemGenerationException
+	[Serializable]
+	public class PemGenerationException
 		: Exception
 	{
 		public PemGenerationException()

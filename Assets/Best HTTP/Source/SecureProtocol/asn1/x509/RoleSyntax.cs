@@ -18,8 +18,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class RoleSyntax
 		: Asn1Encodable
 	{
-		private readonly GeneralNames	roleAuthority;
-		private readonly GeneralName	roleName;
+		private readonly GeneralNames roleAuthority;
+		private readonly GeneralName roleName;
 
 		/**
 		 * RoleSyntax factory method.
@@ -50,15 +50,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		* @param roleName    the role name of this RoleSyntax.
 		*/
 		public RoleSyntax(
-			GeneralNames	roleAuthority,
-			GeneralName		roleName)
+			GeneralNames roleAuthority,
+			GeneralName roleName)
 		{
 			if (roleName == null
-				|| roleName.TagNo != GeneralName.UniformResourceIdentifier
-				|| ((IAsn1String) roleName.Name).GetString().Equals(""))
+			    || roleName.TagNo != GeneralName.UniformResourceIdentifier
+			    || ((IAsn1String)roleName.Name).GetString().Equals(""))
 			{
 				throw new ArgumentException("the role name MUST be non empty and MUST " +
-					"use the URI option of GeneralName");
+				                            "use the URI option of GeneralName");
 			}
 
 			this.roleAuthority = roleAuthority;
@@ -85,7 +85,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public RoleSyntax(
 			string roleName)
 			: this(new GeneralName(GeneralName.UniformResourceIdentifier,
-				(roleName == null)? "": roleName))
+				(roleName == null) ? "" : roleName))
 		{
 		}
 
@@ -148,7 +148,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		*/
 		public string GetRoleNameAsString()
 		{
-			return ((IAsn1String) this.roleName.Name).GetString();
+			return ((IAsn1String)this.roleName.Name).GetString();
 		}
 
 		/**
@@ -165,12 +165,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 			GeneralName[] names = roleAuthority.GetNames();
 			string[] namesString = new string[names.Length];
-			for(int i = 0; i < names.Length; i++)
+			for (int i = 0; i < names.Length; i++)
 			{
 				Asn1Encodable asn1Value = names[i].Name;
 				if (asn1Value is IAsn1String)
 				{
-					namesString[i] = ((IAsn1String) asn1Value).GetString();
+					namesString[i] = ((IAsn1String)asn1Value).GetString();
 				}
 				else
 				{
@@ -192,18 +192,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		*           }
 		* </pre>
 		*/
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptionalTagged(false, 0, roleAuthority);
-            v.Add(new DerTaggedObject(true, 1, roleName));
-            return new DerSequence(v);
-        }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
+			v.AddOptionalTagged(false, 0, roleAuthority);
+			v.Add(new DerTaggedObject(true, 1, roleName));
+			return new DerSequence(v);
+		}
 
 		public override string ToString()
 		{
 			StringBuilder buff = new StringBuilder("Name: " + this.GetRoleNameAsString() +
-				" - Auth: ");
+			                                       " - Auth: ");
 
 			if (this.roleAuthority == null || roleAuthority.GetNames().Length == 0)
 			{
@@ -213,10 +213,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			{
 				string[] names = this.GetRoleAuthorityAsString();
 				buff.Append('[').Append(names[0]);
-				for(int i = 1; i < names.Length; i++)
+				for (int i = 1; i < names.Length; i++)
 				{
 					buff.Append(", ").Append(names[i]);
 				}
+
 				buff.Append(']');
 			}
 

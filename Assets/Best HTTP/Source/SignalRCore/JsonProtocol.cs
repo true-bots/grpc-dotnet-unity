@@ -11,212 +11,222 @@ using System.Reflection;
 
 namespace BestHTTP.SignalRCore
 {
-    public interface IProtocol
-    {
-        string Name { get; }
+	public interface IProtocol
+	{
+		string Name { get; }
 
-        TransferModes Type { get; }
+		TransferModes Type { get; }
 
-        IEncoder Encoder { get; }
+		IEncoder Encoder { get; }
 
-        HubConnection Connection { get; set; }
+		HubConnection Connection { get; set; }
 
-        /// <summary>
-        /// This function must parse binary representation of the messages into the list of Messages.
-        /// </summary>
-        void ParseMessages(BufferSegment segment, ref List<Message> messages);
+		/// <summary>
+		/// This function must parse binary representation of the messages into the list of Messages.
+		/// </summary>
+		void ParseMessages(BufferSegment segment, ref List<Message> messages);
 
-        /// <summary>
-        /// This function must return the encoded representation of the given message.
-        /// </summary>
-        BufferSegment EncodeMessage(Message message);
+		/// <summary>
+		/// This function must return the encoded representation of the given message.
+		/// </summary>
+		BufferSegment EncodeMessage(Message message);
 
-        /// <summary>
-        /// This function must convert all element in the arguments array to the corresponding type from the argTypes array.
-        /// </summary>
-        object[] GetRealArguments(Type[] argTypes, object[] arguments);
+		/// <summary>
+		/// This function must convert all element in the arguments array to the corresponding type from the argTypes array.
+		/// </summary>
+		object[] GetRealArguments(Type[] argTypes, object[] arguments);
 
-        /// <summary>
-        /// Convert a value to the given type.
-        /// </summary>
-        object ConvertTo(Type toType, object obj);
-    }
+		/// <summary>
+		/// Convert a value to the given type.
+		/// </summary>
+		object ConvertTo(Type toType, object obj);
+	}
 
-    public sealed class JsonProtocol : IProtocol
-    {
-        public const char Separator = (char)0x1E;
+	public sealed class JsonProtocol : IProtocol
+	{
+		public const char Separator = (char)0x1E;
 
-        public string Name { get { return "json"; } }
+		public string Name
+		{
+			get { return "json"; }
+		}
 
-        public TransferModes Type { get { return TransferModes.Binary; } }
+		public TransferModes Type
+		{
+			get { return TransferModes.Binary; }
+		}
 
-        public IEncoder Encoder { get; private set; }
+		public IEncoder Encoder { get; private set; }
 
-        public HubConnection Connection { get; set; }
+		public HubConnection Connection { get; set; }
 
-        public JsonProtocol(IEncoder encoder)
-        {
-            if (encoder == null)
-                throw new ArgumentNullException("encoder");
+		public JsonProtocol(IEncoder encoder)
+		{
+			if (encoder == null)
+				throw new ArgumentNullException("encoder");
 
-            this.Encoder = encoder;
-        }
+			this.Encoder = encoder;
+		}
 
-        public void ParseMessages(BufferSegment segment, ref List<Message> messages) {
-            if (segment.Data == null || segment.Count == 0)
-                return;
+		public void ParseMessages(BufferSegment segment, ref List<Message> messages)
+		{
+			if (segment.Data == null || segment.Count == 0)
+				return;
 
-            int from = segment.Offset;
-            int separatorIdx = Array.IndexOf<byte>(segment.Data, (byte)JsonProtocol.Separator, from);
-            if (separatorIdx == -1)
-                throw new Exception("Missing separator in data! Segment: " + segment.ToString());
+			int from = segment.Offset;
+			int separatorIdx = Array.IndexOf<byte>(segment.Data, (byte)JsonProtocol.Separator, from);
+			if (separatorIdx == -1)
+				throw new Exception("Missing separator in data! Segment: " + segment.ToString());
 
-            while (separatorIdx != -1)
-            {
-                if (HTTPManager.Logger.Level == Logger.Loglevels.All)
-                    HTTPManager.Logger.Verbose("JsonProtocol", "ParseMessages - " + System.Text.Encoding.UTF8.GetString(segment.Data, from, separatorIdx - from));
-                var message = this.Encoder.DecodeAs<Message>(new BufferSegment(segment.Data, from, separatorIdx - from));
+			while (separatorIdx != -1)
+			{
+				if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+					HTTPManager.Logger.Verbose("JsonProtocol", "ParseMessages - " + System.Text.Encoding.UTF8.GetString(segment.Data, from, separatorIdx - from));
+				var message = this.Encoder.DecodeAs<Message>(new BufferSegment(segment.Data, from, separatorIdx - from));
 
-                messages.Add(message);
+				messages.Add(message);
 
-                from = separatorIdx + 1;
-                separatorIdx = Array.IndexOf<byte>(segment.Data, (byte)JsonProtocol.Separator, from);
-            }
-        }
-        
-        public BufferSegment EncodeMessage(Message message)
-        {
-            BufferSegment result = BufferSegment.Empty;
+				from = separatorIdx + 1;
+				separatorIdx = Array.IndexOf<byte>(segment.Data, (byte)JsonProtocol.Separator, from);
+			}
+		}
 
-            // While message contains all informations already, the spec states that no additional field are allowed in messages
-            //  So we are creating 'specialized' messages here to send to the server.
-            switch (message.type)
-            {
-                case MessageTypes.StreamItem:
-                    result = this.Encoder.Encode<StreamItemMessage>(new StreamItemMessage()
-                    {
-                        type = message.type,
-                        invocationId = message.invocationId,
-                        item = message.item
-                    });
-                    break;
+		public BufferSegment EncodeMessage(Message message)
+		{
+			BufferSegment result = BufferSegment.Empty;
 
-                case MessageTypes.Completion:
-                    if (!string.IsNullOrEmpty(message.error))
-                    {
-                        result = this.Encoder.Encode<CompletionWithError>(new CompletionWithError()
-                        {
-                            type = MessageTypes.Completion,
-                            invocationId = message.invocationId,
-                            error = message.error
-                        });
-                    }
-                    else if (message.result != null)
-                    {
-                        result = this.Encoder.Encode<CompletionWithResult>(new CompletionWithResult()
-                        {
-                            type = MessageTypes.Completion,
-                            invocationId = message.invocationId,
-                            result = message.result
-                        });
-                    }
-                    else
-                        result = this.Encoder.Encode<Completion>(new Completion()
-                        {
-                            type = MessageTypes.Completion,
-                            invocationId = message.invocationId
-                        });
-                    break;
+			// While message contains all informations already, the spec states that no additional field are allowed in messages
+			//  So we are creating 'specialized' messages here to send to the server.
+			switch (message.type)
+			{
+				case MessageTypes.StreamItem:
+					result = this.Encoder.Encode<StreamItemMessage>(new StreamItemMessage()
+					{
+						type = message.type,
+						invocationId = message.invocationId,
+						item = message.item
+					});
+					break;
 
-                case MessageTypes.Invocation:
-                case MessageTypes.StreamInvocation:
-                    if (message.streamIds != null)
-                    {
-                        result = this.Encoder.Encode<UploadInvocationMessage>(new UploadInvocationMessage()
-                        {
-                            type = message.type,
-                            invocationId = message.invocationId,
-                            nonblocking = message.nonblocking,
-                            target = message.target,
-                            arguments = message.arguments,
-                            streamIds = message.streamIds
-                        });
-                    }
-                    else
-                    {
-                        result = this.Encoder.Encode<InvocationMessage>(new InvocationMessage()
-                        {
-                            type = message.type,
-                            invocationId = message.invocationId,
-                            nonblocking = message.nonblocking,
-                            target = message.target,
-                            arguments = message.arguments
-                        });
-                    }
-                    break;
+				case MessageTypes.Completion:
+					if (!string.IsNullOrEmpty(message.error))
+					{
+						result = this.Encoder.Encode<CompletionWithError>(new CompletionWithError()
+						{
+							type = MessageTypes.Completion,
+							invocationId = message.invocationId,
+							error = message.error
+						});
+					}
+					else if (message.result != null)
+					{
+						result = this.Encoder.Encode<CompletionWithResult>(new CompletionWithResult()
+						{
+							type = MessageTypes.Completion,
+							invocationId = message.invocationId,
+							result = message.result
+						});
+					}
+					else
+						result = this.Encoder.Encode<Completion>(new Completion()
+						{
+							type = MessageTypes.Completion,
+							invocationId = message.invocationId
+						});
 
-                case MessageTypes.CancelInvocation:
-                    result = this.Encoder.Encode<CancelInvocationMessage>(new CancelInvocationMessage()
-                    {
-                        invocationId = message.invocationId
-                    });
-                    break;
+					break;
 
-                case MessageTypes.Ping:
-                    //result = this.Encoder.Encode<PingMessage>(new PingMessage());
-                    // fast path to encode a well-known json string
-                    result = EncodeKnown("{\"type\":6}");
-                    break;
+				case MessageTypes.Invocation:
+				case MessageTypes.StreamInvocation:
+					if (message.streamIds != null)
+					{
+						result = this.Encoder.Encode<UploadInvocationMessage>(new UploadInvocationMessage()
+						{
+							type = message.type,
+							invocationId = message.invocationId,
+							nonblocking = message.nonblocking,
+							target = message.target,
+							arguments = message.arguments,
+							streamIds = message.streamIds
+						});
+					}
+					else
+					{
+						result = this.Encoder.Encode<InvocationMessage>(new InvocationMessage()
+						{
+							type = message.type,
+							invocationId = message.invocationId,
+							nonblocking = message.nonblocking,
+							target = message.target,
+							arguments = message.arguments
+						});
+					}
 
-                case MessageTypes.Close:
-                    if (!string.IsNullOrEmpty(message.error))
-                    {
-                        result = this.Encoder.Encode<CloseWithErrorMessage>(new CloseWithErrorMessage() { error = message.error });
-                    }
-                    else
-                    {
-                        //result = this.Encoder.Encode<CloseMessage>(new CloseMessage());
-                        // fast path to encode a well-known json string
-                        result = EncodeKnown("{\"type\":7}");
-                    }
-                    break;
-            }
+					break;
 
-            if (HTTPManager.Logger.Level == Logger.Loglevels.All)
-                HTTPManager.Logger.Verbose("JsonProtocol", "EncodeMessage - json: " + System.Text.Encoding.UTF8.GetString(result.Data, 0, result.Count - 1));
+				case MessageTypes.CancelInvocation:
+					result = this.Encoder.Encode<CancelInvocationMessage>(new CancelInvocationMessage()
+					{
+						invocationId = message.invocationId
+					});
+					break;
 
-            return result;
-        }
+				case MessageTypes.Ping:
+					//result = this.Encoder.Encode<PingMessage>(new PingMessage());
+					// fast path to encode a well-known json string
+					result = EncodeKnown("{\"type\":6}");
+					break;
 
-        private BufferSegment EncodeKnown(string json)
-        {
-            int len = System.Text.Encoding.UTF8.GetByteCount(json);
-            byte[] buffer = BufferPool.Get(len + 1, true);
-            System.Text.Encoding.UTF8.GetBytes(json, 0, json.Length, buffer, 0);
-            buffer[len] = (byte)JsonProtocol.Separator;
-            return new BufferSegment(buffer, 0, len + 1);
-        }
+				case MessageTypes.Close:
+					if (!string.IsNullOrEmpty(message.error))
+					{
+						result = this.Encoder.Encode<CloseWithErrorMessage>(new CloseWithErrorMessage() { error = message.error });
+					}
+					else
+					{
+						//result = this.Encoder.Encode<CloseMessage>(new CloseMessage());
+						// fast path to encode a well-known json string
+						result = EncodeKnown("{\"type\":7}");
+					}
 
-        public object[] GetRealArguments(Type[] argTypes, object[] arguments)
-        {
-            if (arguments == null || arguments.Length == 0)
-                return null;
+					break;
+			}
 
-            if (argTypes.Length > arguments.Length)
-                throw new Exception(string.Format("argType.Length({0}) < arguments.length({1})", argTypes.Length, arguments.Length));
+			if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+				HTTPManager.Logger.Verbose("JsonProtocol", "EncodeMessage - json: " + System.Text.Encoding.UTF8.GetString(result.Data, 0, result.Count - 1));
 
-            object[] realArgs = new object[arguments.Length];
+			return result;
+		}
 
-            for (int i = 0; i < arguments.Length; ++i)
-                realArgs[i] = ConvertTo(argTypes[i], arguments[i]);
+		private BufferSegment EncodeKnown(string json)
+		{
+			int len = System.Text.Encoding.UTF8.GetByteCount(json);
+			byte[] buffer = BufferPool.Get(len + 1, true);
+			System.Text.Encoding.UTF8.GetBytes(json, 0, json.Length, buffer, 0);
+			buffer[len] = (byte)JsonProtocol.Separator;
+			return new BufferSegment(buffer, 0, len + 1);
+		}
 
-            return realArgs;
-        }
+		public object[] GetRealArguments(Type[] argTypes, object[] arguments)
+		{
+			if (arguments == null || arguments.Length == 0)
+				return null;
 
-        public object ConvertTo(Type toType, object obj)
-        {
-            if (obj == null)
-                return null;
+			if (argTypes.Length > arguments.Length)
+				throw new Exception(string.Format("argType.Length({0}) < arguments.length({1})", argTypes.Length, arguments.Length));
+
+			object[] realArgs = new object[arguments.Length];
+
+			for (int i = 0; i < arguments.Length; ++i)
+				realArgs[i] = ConvertTo(argTypes[i], arguments[i]);
+
+			return realArgs;
+		}
+
+		public object ConvertTo(Type toType, object obj)
+		{
+			if (obj == null)
+				return null;
 
 #if NETFX_CORE
             TypeInfo typeInfo = toType.GetTypeInfo();
@@ -225,46 +235,46 @@ namespace BestHTTP.SignalRCore
 #if NETFX_CORE
             if (typeInfo.IsEnum)
 #else
-            if (toType.IsEnum)
+			if (toType.IsEnum)
 #endif
-                return Enum.Parse(toType, obj.ToString(), true);
+				return Enum.Parse(toType, obj.ToString(), true);
 
 #if NETFX_CORE
             if (typeInfo.IsPrimitive)
 #else
-            if (toType.IsPrimitive)
+			if (toType.IsPrimitive)
 #endif
-                return Convert.ChangeType(obj, toType);
+				return Convert.ChangeType(obj, toType);
 
-            if (toType == typeof(string))
-                return obj.ToString();
+			if (toType == typeof(string))
+				return obj.ToString();
 
 #if NETFX_CORE
             if (typeInfo.IsGenericType && toType.Name == "Nullable`1")
                 return Convert.ChangeType(obj, toType.GenericTypeArguments[0]);
 #else
-            if (toType.IsGenericType && toType.Name == "Nullable`1")
-                return Convert.ChangeType(obj, toType.GetGenericArguments()[0]);
+			if (toType.IsGenericType && toType.Name == "Nullable`1")
+				return Convert.ChangeType(obj, toType.GetGenericArguments()[0]);
 #endif
 
-            return this.Encoder.ConvertTo(toType, obj);
-        }
+			return this.Encoder.ConvertTo(toType, obj);
+		}
 
-        /// <summary>
-        /// Returns the given string parameter's bytes with the added separator(0x1E).
-        /// </summary>
-        public static BufferSegment WithSeparator(string str)
-        {
-            int len = System.Text.Encoding.UTF8.GetByteCount(str);
+		/// <summary>
+		/// Returns the given string parameter's bytes with the added separator(0x1E).
+		/// </summary>
+		public static BufferSegment WithSeparator(string str)
+		{
+			int len = System.Text.Encoding.UTF8.GetByteCount(str);
 
-            byte[] buffer = BufferPool.Get(len + 1, true);
+			byte[] buffer = BufferPool.Get(len + 1, true);
 
-            System.Text.Encoding.UTF8.GetBytes(str, 0, str.Length, buffer, 0);
+			System.Text.Encoding.UTF8.GetBytes(str, 0, str.Length, buffer, 0);
 
-            buffer[len] = 0x1e;
+			buffer[len] = 0x1e;
 
-            return new BufferSegment(buffer, 0, len + 1);
-        }
-    }
+			return new BufferSegment(buffer, 0, len + 1);
+		}
+	}
 }
 #endif

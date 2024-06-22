@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -18,12 +17,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal RecipientInformationStore recipientInfoStore;
 		internal ContentInfo contentInfo;
 
-		private OriginatorInfo      originator;
+		private OriginatorInfo originator;
 		private AlgorithmIdentifier authEncAlg;
-		private Asn1Set             authAttrs;
-		private byte[]              mac;
-		private Asn1Set             unauthAttrs;
-	
+		private Asn1Set authAttrs;
+		private byte[] mac;
+		private Asn1Set unauthAttrs;
+
 		public CmsAuthEnvelopedData(
 			byte[] authEnvData)
 			: this(CmsUtilities.ReadContentInfo(authEnvData))
@@ -46,9 +45,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			this.originator = authEnvData.OriginatorInfo;
 
 			//
-	        // read the recipients
-	        //
-	        Asn1Set recipientInfos = authEnvData.RecipientInfos;
+			// read the recipients
+			//
+			Asn1Set recipientInfos = authEnvData.RecipientInfos;
 
 			//
 			// read the auth-encrypted content info
@@ -107,7 +106,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 //				  aes-ICVlen       AES-GCM-ICVlen DEFAULT 12 }
 //				
 //				AES-GCM-ICVlen ::= INTEGER (12 | 13 | 14 | 15 | 16)
-			}            
+			}
 		}
 	}
 }

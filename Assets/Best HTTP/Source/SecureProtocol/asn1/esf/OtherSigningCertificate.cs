@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -19,21 +18,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class OtherSigningCertificate
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence	certs;
-		private readonly Asn1Sequence	policies;
+		private readonly Asn1Sequence certs;
+		private readonly Asn1Sequence policies;
 
 		public static OtherSigningCertificate GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is OtherSigningCertificate)
-				return (OtherSigningCertificate) obj;
+				return (OtherSigningCertificate)obj;
 
 			if (obj is Asn1Sequence)
-				return new OtherSigningCertificate((Asn1Sequence) obj);
+				return new OtherSigningCertificate((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'OtherSigningCertificate' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -60,8 +59,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		}
 
 		public OtherSigningCertificate(
-			OtherCertID[]				certs,
-			params PolicyInformation[]	policies)
+			OtherCertID[] certs,
+			params PolicyInformation[] policies)
 		{
 			if (certs == null)
 				throw new ArgumentNullException("certs");
@@ -104,6 +103,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			{
 				cs[i] = OtherCertID.GetInstance(certs[i].ToAsn1Object());
 			}
+
 			return cs;
 		}
 
@@ -117,13 +117,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			{
 				ps[i] = PolicyInformation.GetInstance(policies[i].ToAsn1Object());
 			}
+
 			return ps;
 		}
 
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(certs);
-            v.AddOptional(policies);
+			v.AddOptional(policies);
 			return new DerSequence(v);
 		}
 	}

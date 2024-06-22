@@ -1,51 +1,50 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 {
-    /**
-    * A padder that adds Pkcs7/Pkcs5 padding to a block.
-    */
-    public class Pkcs7Padding
-        : IBlockCipherPadding
-    {
-        /**
-        * Initialise the padder.
-        *
-        * @param random - a SecureRandom if available.
-        */
-        public void Init(
-            SecureRandom random)
-        {
-            // nothing to do.
-        }
+	/**
+	* A padder that adds Pkcs7/Pkcs5 padding to a block.
+	*/
+	public class Pkcs7Padding
+		: IBlockCipherPadding
+	{
+		/**
+		* Initialise the padder.
+		*
+		* @param random - a SecureRandom if available.
+		*/
+		public void Init(
+			SecureRandom random)
+		{
+			// nothing to do.
+		}
 
-        /**
-        * Return the name of the algorithm the cipher implements.
-        *
-        * @return the name of the algorithm the cipher implements.
-        */
-        public string PaddingName
-        {
-            get { return "PKCS7"; }
-        }
+		/**
+		* Return the name of the algorithm the cipher implements.
+		*
+		* @return the name of the algorithm the cipher implements.
+		*/
+		public string PaddingName
+		{
+			get { return "PKCS7"; }
+		}
 
-        public int AddPadding(byte[] input, int inOff)
-        {
-            int count = input.Length - inOff;
-            byte padValue = (byte)count;
+		public int AddPadding(byte[] input, int inOff)
+		{
+			int count = input.Length - inOff;
+			byte padValue = (byte)count;
 
-            while (inOff < input.Length)
-            {
-                input[inOff++] = padValue;
-            }
+			while (inOff < input.Length)
+			{
+				input[inOff++] = padValue;
+			}
 
-            return count;
-        }
+			return count;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public int AddPadding(Span<byte> block, int position)
@@ -57,22 +56,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
         }
 #endif
 
-        public int PadCount(byte[] input)
-        {
-            byte padValue = input[input.Length - 1];
-            int count = padValue;
-            int position = input.Length - count;
+		public int PadCount(byte[] input)
+		{
+			byte padValue = input[input.Length - 1];
+			int count = padValue;
+			int position = input.Length - count;
 
-            int failed = (position | (count - 1)) >> 31;
-            for (int i = 0; i < input.Length; ++i)
-            {
-                failed |= (input[i] ^ padValue) & ~((i - position) >> 31);
-            }
-            if (failed != 0)
-                throw new InvalidCipherTextException("pad block corrupted");
+			int failed = (position | (count - 1)) >> 31;
+			for (int i = 0; i < input.Length; ++i)
+			{
+				failed |= (input[i] ^ padValue) & ~((i - position) >> 31);
+			}
 
-            return count;
-        }
+			if (failed != 0)
+				throw new InvalidCipherTextException("pad block corrupted");
+
+			return count;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public int PadCount(ReadOnlySpan<byte> block)
@@ -92,7 +92,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
             return count;
         }
 #endif
-    }
+	}
 }
 #pragma warning restore
 #endif

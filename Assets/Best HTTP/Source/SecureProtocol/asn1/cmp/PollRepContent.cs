@@ -2,17 +2,17 @@
 #pragma warning disable
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 {
-    /**
-     * PollRepContent ::= SEQUENCE OF SEQUENCE {
-     * certReqId    INTEGER,
-     * checkAfter   INTEGER,  -- time in seconds
-     * reason       PKIFreeText OPTIONAL }
-     */
-    public class PollRepContent
+	/**
+	 * PollRepContent ::= SEQUENCE OF SEQUENCE {
+	 * certReqId    INTEGER,
+	 * checkAfter   INTEGER,  -- time in seconds
+	 * reason       PKIFreeText OPTIONAL }
+	 */
+	public class PollRepContent
 		: Asn1Encodable
 	{
-        public static PollRepContent GetInstance(object obj)
-        {
+		public static PollRepContent GetInstance(object obj)
+		{
 			if (obj is PollRepContent pollRepContent)
 				return pollRepContent;
 
@@ -20,9 +20,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new PollRepContent(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly DerInteger[] m_certReqID;
+		private readonly DerInteger[] m_certReqID;
 		private readonly DerInteger[] m_checkAfter;
 		private readonly PkiFreeText[] m_reason;
 
@@ -47,21 +47,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			}
 		}
 
-	    public PollRepContent(DerInteger certReqID, DerInteger checkAfter)
+		public PollRepContent(DerInteger certReqID, DerInteger checkAfter)
 			: this(certReqID, checkAfter, null)
-	    {
-	    }
+		{
+		}
 
-        public PollRepContent(DerInteger certReqID, DerInteger checkAfter, PkiFreeText reason)
-	    {
-            m_certReqID = new DerInteger[1]{ certReqID };
-            m_checkAfter = new DerInteger[1]{ checkAfter };
-            m_reason = new PkiFreeText[1]{ reason };
-        }
+		public PollRepContent(DerInteger certReqID, DerInteger checkAfter, PkiFreeText reason)
+		{
+			m_certReqID = new DerInteger[1] { certReqID };
+			m_checkAfter = new DerInteger[1] { checkAfter };
+			m_reason = new PkiFreeText[1] { reason };
+		}
 
-        public virtual int Count => m_certReqID.Length;
+		public virtual int Count => m_certReqID.Length;
 
-        public virtual DerInteger GetCertReqID(int index) => m_certReqID[index];
+		public virtual DerInteger GetCertReqID(int index) => m_certReqID[index];
 
 		public virtual DerInteger GetCheckAfter(int index) => m_checkAfter[index];
 

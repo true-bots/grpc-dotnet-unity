@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
@@ -14,8 +13,8 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-    internal class CmsUtilities
-    {
+	internal class CmsUtilities
+	{
 		// TODO Is there a .NET equivalent to this?
 //		private static readonly Runtime RUNTIME = Runtime.getRuntime();
 
@@ -24,7 +23,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			get
 			{
 				// TODO Is there a .NET equivalent to this?
-				long maxMem = int.MaxValue;//RUNTIME.maxMemory();
+				long maxMem = int.MaxValue; //RUNTIME.maxMemory();
 
 				if (maxMem > int.MaxValue)
 				{
@@ -71,26 +70,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		internal static byte[] StreamToByteArray(Stream inStream)
-        {
+		{
 			return Streams.ReadAll(inStream);
-        }
+		}
 
 		internal static byte[] StreamToByteArray(Stream inStream, int limit)
-        {
+		{
 			return Streams.ReadAllLimited(inStream, limit);
-        }
+		}
 
 		internal static List<Asn1TaggedObject> GetAttributeCertificatesFromStore(
 			IStore<X509V2AttributeCertificate> attrCertStore)
 		{
 			var result = new List<Asn1TaggedObject>();
 			if (attrCertStore != null)
-            {
+			{
 				foreach (var attrCert in attrCertStore.EnumerateMatches(null))
 				{
 					result.Add(new DerTaggedObject(false, 2, attrCert.AttributeCertificate));
 				}
-            }
+			}
+
 			return result;
 		}
 
@@ -98,12 +98,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		{
 			var result = new List<X509CertificateStructure>();
 			if (certStore != null)
-            {
-                foreach (var cert in certStore.EnumerateMatches(null))
-                {
-                    result.Add(cert.CertificateStructure);
-                }
+			{
+				foreach (var cert in certStore.EnumerateMatches(null))
+				{
+					result.Add(cert.CertificateStructure);
+				}
 			}
+
 			return result;
 		}
 
@@ -112,49 +113,52 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			var result = new List<CertificateList>();
 			if (crlStore != null)
 			{
-                foreach (var crl in crlStore.EnumerateMatches(null))
-                {
-                    result.Add(crl.CertificateList);
+				foreach (var crl in crlStore.EnumerateMatches(null))
+				{
+					result.Add(crl.CertificateList);
 				}
 			}
+
 			return result;
 		}
 
-        internal static List<Asn1TaggedObject> GetOtherRevocationInfosFromStore(
+		internal static List<Asn1TaggedObject> GetOtherRevocationInfosFromStore(
 			IStore<OtherRevocationInfoFormat> otherRevocationInfoStore)
-        {
-            var result = new List<Asn1TaggedObject>();
-            if (otherRevocationInfoStore != null)
-            {
-                foreach (var otherRevocationInfo in otherRevocationInfoStore.EnumerateMatches(null))
-                {
-                    ValidateOtherRevocationInfo(otherRevocationInfo);
+		{
+			var result = new List<Asn1TaggedObject>();
+			if (otherRevocationInfoStore != null)
+			{
+				foreach (var otherRevocationInfo in otherRevocationInfoStore.EnumerateMatches(null))
+				{
+					ValidateOtherRevocationInfo(otherRevocationInfo);
 
-                    result.Add(new DerTaggedObject(false, 1, otherRevocationInfo));
-                }
-            }
-            return result;
-        }
+					result.Add(new DerTaggedObject(false, 1, otherRevocationInfo));
+				}
+			}
 
-        internal static List<DerTaggedObject> GetOtherRevocationInfosFromStore(IStore<Asn1Encodable> otherRevInfoStore,
-            DerObjectIdentifier otherRevInfoFormat)
-        {
+			return result;
+		}
+
+		internal static List<DerTaggedObject> GetOtherRevocationInfosFromStore(IStore<Asn1Encodable> otherRevInfoStore,
+			DerObjectIdentifier otherRevInfoFormat)
+		{
 			var result = new List<DerTaggedObject>();
 			if (otherRevInfoStore != null && otherRevInfoFormat != null)
 			{
 				foreach (var otherRevInfo in otherRevInfoStore.EnumerateMatches(null))
 				{
-                    var otherRevocationInfo = new OtherRevocationInfoFormat(otherRevInfoFormat, otherRevInfo);
+					var otherRevocationInfo = new OtherRevocationInfoFormat(otherRevInfoFormat, otherRevInfo);
 
-                    ValidateOtherRevocationInfo(otherRevocationInfo);
+					ValidateOtherRevocationInfo(otherRevocationInfo);
 
-                    result.Add(new DerTaggedObject(false, 1, otherRevocationInfo));
+					result.Add(new DerTaggedObject(false, 1, otherRevocationInfo));
 				}
 			}
-			return result;
-        }
 
-        internal static Asn1Set CreateBerSetFromList(IEnumerable<Asn1Encodable> elements)
+			return result;
+		}
+
+		internal static Asn1Set CreateBerSetFromList(IEnumerable<Asn1Encodable> elements)
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector();
 
@@ -195,17 +199,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return new IssuerAndSerialNumber(tbsCert.Issuer, tbsCert.SerialNumber.Value);
 		}
 
-        internal static void ValidateOtherRevocationInfo(OtherRevocationInfoFormat otherRevocationInfo)
-        {
-            if (CmsObjectIdentifiers.id_ri_ocsp_response.Equals(otherRevocationInfo.InfoFormat))
+		internal static void ValidateOtherRevocationInfo(OtherRevocationInfoFormat otherRevocationInfo)
+		{
+			if (CmsObjectIdentifiers.id_ri_ocsp_response.Equals(otherRevocationInfo.InfoFormat))
 			{
 				OcspResponse ocspResponse = OcspResponse.GetInstance(otherRevocationInfo.Info);
 
-                if (OcspResponseStatus.Successful != ocspResponse.ResponseStatus.IntValueExact)
-                    throw new ArgumentException("cannot add unsuccessful OCSP response to CMS SignedData");
-            }
-        }
-    }
+				if (OcspResponseStatus.Successful != ocspResponse.ResponseStatus.IntValueExact)
+					throw new ArgumentException("cannot add unsuccessful OCSP response to CMS SignedData");
+			}
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -2,38 +2,38 @@
 #pragma warning disable
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 {
-    /**
-     * NestedMessageContent ::= PKIMessages
-     */
-    public class NestedMessageContent
-        : PkiMessages
-    {
-        public static new NestedMessageContent GetInstance(object obj)
-        {
-            if (obj is NestedMessageContent nestedMessageContent)
-                return nestedMessageContent;
+	/**
+	 * NestedMessageContent ::= PKIMessages
+	 */
+	public class NestedMessageContent
+		: PkiMessages
+	{
+		public static new NestedMessageContent GetInstance(object obj)
+		{
+			if (obj is NestedMessageContent nestedMessageContent)
+				return nestedMessageContent;
 
-            if (obj != null)
-                return new NestedMessageContent(Asn1Sequence.GetInstance(obj));
+			if (obj != null)
+				return new NestedMessageContent(Asn1Sequence.GetInstance(obj));
 
-            return null;
-        }
+			return null;
+		}
 
-        public NestedMessageContent(PkiMessage msg)
-            : base(msg)
-        {
-        }
+		public NestedMessageContent(PkiMessage msg)
+			: base(msg)
+		{
+		}
 
-        public NestedMessageContent(PkiMessage[] msgs)
-            : base(msgs)
-        {
-        }
+		public NestedMessageContent(PkiMessage[] msgs)
+			: base(msgs)
+		{
+		}
 
-        public NestedMessageContent(Asn1Sequence seq)
-            : base(seq)
-        {
-        }
-    }
+		public NestedMessageContent(Asn1Sequence seq)
+			: base(seq)
+		{
+		}
+	}
 }
 #pragma warning restore
 #endif

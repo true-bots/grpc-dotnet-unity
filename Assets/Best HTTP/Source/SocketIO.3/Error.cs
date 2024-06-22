@@ -2,22 +2,24 @@
 
 namespace BestHTTP.SocketIO3
 {
-    public class Error
-    {
-        public string message;
+	public class Error
+	{
+		public string message;
 
-        public Error() { }
+		public Error()
+		{
+		}
 
-        public Error(string msg)
-        {
-            this.message = msg;
-        }
+		public Error(string msg)
+		{
+			this.message = msg;
+		}
 
-        public override string ToString()
-        {
-            return this.message;
-        }
-    }
+		public override string ToString()
+		{
+			return this.message;
+		}
+	}
 }
 
 #endif

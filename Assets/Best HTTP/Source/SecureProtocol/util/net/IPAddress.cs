@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Globalization;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
@@ -37,7 +36,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 
 		/**
 		 * Validate the given IPv4 address.
-		 * 
+		 *
 		 * @param address the IP address as a string.
 		 *
 		 * @return true if a valid IPv4 address, false otherwise
@@ -49,8 +48,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			{
 				return unsafeIsValidIPv4(address);
 			}
-			catch (FormatException) {}
-			catch (OverflowException) {}
+			catch (FormatException)
+			{
+			}
+			catch (OverflowException)
+			{
+			}
+
 			return false;
 		}
 
@@ -66,7 +70,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			int pos;
 			int start = 0;
 			while (start < temp.Length
-				&& (pos = temp.IndexOf('.', start)) > start)
+			       && (pos = temp.IndexOf('.', start)) > start)
 			{
 				if (octets == 4)
 					return false;
@@ -91,7 +95,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			string mask = address.Substring(index + 1);
 
 			return (index > 0) && IsValidIPv4(address.Substring(0, index))
-				&& (IsValidIPv4(mask) || IsMaskValue(mask, 32));
+			                   && (IsValidIPv4(mask) || IsMaskValue(mask, 32));
 		}
 
 		public static bool IsValidIPv6WithNetmask(
@@ -101,20 +105,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			string mask = address.Substring(index + 1);
 
 			return (index > 0) && (IsValidIPv6(address.Substring(0, index))
-				&& (IsValidIPv6(mask) || IsMaskValue(mask, 128)));
+			                       && (IsValidIPv6(mask) || IsMaskValue(mask, 128)));
 		}
 
 		private static bool IsMaskValue(
-			string	component,
-			int		size)
+			string component,
+			int size)
 		{
 			int val = int.Parse(component);
 			try
 			{
 				return val >= 0 && val <= size;
 			}
-			catch (FormatException) {}
-			catch (OverflowException) {}
+			catch (FormatException)
+			{
+			}
+			catch (OverflowException)
+			{
+			}
+
 			return false;
 		}
 
@@ -132,8 +141,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			{
 				return unsafeIsValidIPv6(address);
 			}
-			catch (FormatException) {}
-			catch (OverflowException) {}
+			catch (FormatException)
+			{
+			}
+			catch (OverflowException)
+			{
+			}
+
 			return false;
 		}
 
@@ -152,7 +166,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			int pos;
 			int start = 0;
 			while (start < temp.Length
-				&& (pos = temp.IndexOf(':', start)) >= start)
+			       && (pos = temp.IndexOf(':', start)) >= start)
 			{
 				if (octets == 8)
 				{
@@ -187,8 +201,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 					{
 						return false;
 					}
+
 					doubleColonFound = true;
 				}
+
 				start = pos + 1;
 				octets++;
 			}

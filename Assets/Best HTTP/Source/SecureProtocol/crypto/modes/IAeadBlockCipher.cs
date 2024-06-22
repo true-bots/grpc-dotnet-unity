@@ -6,12 +6,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 {
 	/// <summary>An IAeadCipher based on an IBlockCipher.</summary>
 	public interface IAeadBlockCipher
-        : IAeadCipher
+		: IAeadCipher
 	{
-        /// <returns>The block size for this cipher, in bytes.</returns>
-        int GetBlockSize();
+		/// <returns>The block size for this cipher, in bytes.</returns>
+		int GetBlockSize();
 
-        /// <summary>The block cipher underlying this algorithm.</summary>
+		/// <summary>The block cipher underlying this algorithm.</summary>
 		IBlockCipher UnderlyingCipher { get; }
 	}
 }

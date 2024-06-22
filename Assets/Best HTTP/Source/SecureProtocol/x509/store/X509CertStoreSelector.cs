@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
@@ -22,7 +21,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		private X509Certificate certificate;
 		private DateTime? certificateValid;
 		private ISet<DerObjectIdentifier> extendedKeyUsage;
-        private bool ignoreX509NameOrdering;
+		private bool ignoreX509NameOrdering;
 		private X509Name issuer;
 		private bool[] keyUsage;
 		private ISet<DerObjectIdentifier> policy;
@@ -45,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 			this.certificate = o.Certificate;
 			this.certificateValid = o.CertificateValid;
 			this.extendedKeyUsage = o.ExtendedKeyUsage;
-            this.ignoreX509NameOrdering = o.IgnoreX509NameOrdering;
+			this.ignoreX509NameOrdering = o.IgnoreX509NameOrdering;
 			this.issuer = o.Issuer;
 			this.keyUsage = o.KeyUsage;
 			this.policy = o.Policy;
@@ -98,11 +97,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 			set { extendedKeyUsage = CopySet(value); }
 		}
 
-        public bool IgnoreX509NameOrdering
-        {
-            get { return ignoreX509NameOrdering; }
-            set { this.ignoreX509NameOrdering = value; }
-        }
+		public bool IgnoreX509NameOrdering
+		{
+			get { return ignoreX509NameOrdering; }
+			set { this.ignoreX509NameOrdering = value; }
+		}
 
 		public X509Name Issuer
 		{
@@ -272,7 +271,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 			if (serialNumber != null && !serialNumber.Equals(c.SerialNumber))
 				return false;
 
-            if (subject != null && !subject.Equivalent(c.SubjectDN, !ignoreX509NameOrdering))
+			if (subject != null && !subject.Equivalent(c.SubjectDN, !ignoreX509NameOrdering))
 				return false;
 
 			if (!MatchExtension(subjectKeyIdentifier, c, X509Extensions.SubjectKeyIdentifier))
@@ -282,15 +281,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 				return false;
 
 			if (subjectPublicKeyAlgID != null
-				&& !subjectPublicKeyAlgID.Equals(GetSubjectPublicKey(c).AlgorithmID))
+			    && !subjectPublicKeyAlgID.Equals(GetSubjectPublicKey(c).AlgorithmID))
 				return false;
 
 			return true;
 		}
 
 		internal static bool IssuersMatch(
-			X509Name	a,
-			X509Name	b)
+			X509Name a,
+			X509Name b)
 		{
 			return a == null ? b == null : a.Equivalent(b, true);
 		}
@@ -298,7 +297,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		private static bool[] CopyBoolArray(
 			bool[] b)
 		{
-			return b == null ? null : (bool[]) b.Clone();
+			return b == null ? null : (bool[])b.Clone();
 		}
 
 		private static ISet<T> CopySet<T>(ISet<T> s)
@@ -313,9 +312,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		}
 
 		private static bool MatchExtension(
-			byte[]				b,
-			X509Certificate		c,
-			DerObjectIdentifier	oid)
+			byte[] b,
+			X509Certificate c,
+			DerObjectIdentifier oid)
 		{
 			if (b == null)
 				return true;

@@ -5,8 +5,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 {
-    [Serializable]
-    public class TspException
+	[Serializable]
+	public class TspException
 		: Exception
 	{
 		public TspException()

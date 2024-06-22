@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
@@ -21,11 +20,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	*/
 	public class SignedDataParser
 	{
-		private Asn1SequenceParser	_seq;
-		private DerInteger			_version;
-		private object				_nextObject;
-		private bool				_certsCalled;
-		private bool				_crlsCalled;
+		private Asn1SequenceParser _seq;
+		private DerInteger _version;
+		private object _nextObject;
+		private bool _certsCalled;
+		private bool _crlsCalled;
 
 		public static SignedDataParser GetInstance(
 			object o)
@@ -36,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			if (o is Asn1SequenceParser)
 				return new SignedDataParser((Asn1SequenceParser)o);
 
-            throw new IOException("unknown object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+			throw new IOException("unknown object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
 		}
 
 		public SignedDataParser(
@@ -101,8 +100,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 				}
 			}
 
-            return null;
-        }
+			return null;
+		}
 
 		public Asn1SetParser GetSignerInfos()
 		{

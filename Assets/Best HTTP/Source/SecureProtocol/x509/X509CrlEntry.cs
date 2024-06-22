@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -22,13 +21,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	public class X509CrlEntry
 		: X509ExtensionBase
 	{
-		private CrlEntry	c;
-		private bool		isIndirect;
-		private X509Name	previousCertificateIssuer;
-		private X509Name	certificateIssuer;
+		private CrlEntry c;
+		private bool isIndirect;
+		private X509Name previousCertificateIssuer;
+		private X509Name certificateIssuer;
 
-        private volatile bool hashValueSet;
-        private volatile int hashValue;
+		private volatile bool hashValueSet;
+		private volatile int hashValue;
 
 		public X509CrlEntry(
 			CrlEntry c)
@@ -55,9 +54,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		*            Certificate issuer of the previous CrlEntry.
 		*/
 		public X509CrlEntry(
-			CrlEntry		c,
-			bool			isIndirect,
-			X509Name		previousCertificateIssuer)
+			CrlEntry c,
+			bool isIndirect,
+			X509Name previousCertificateIssuer)
 		{
 			this.c = c;
 			this.isIndirect = isIndirect;
@@ -135,34 +134,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			get { return c.Extensions != null; }
 		}
 
-        public override bool Equals(object other)
-        {
-            if (this == other)
-                return true;
+		public override bool Equals(object other)
+		{
+			if (this == other)
+				return true;
 
-            X509CrlEntry that = other as X509CrlEntry;
-            if (null == that)
-                return false;
+			X509CrlEntry that = other as X509CrlEntry;
+			if (null == that)
+				return false;
 
-            if (this.hashValueSet && that.hashValueSet)
-            {
-                if (this.hashValue != that.hashValue)
-                    return false;
-            }
+			if (this.hashValueSet && that.hashValueSet)
+			{
+				if (this.hashValue != that.hashValue)
+					return false;
+			}
 
-            return this.c.Equals(that.c);
-        }
+			return this.c.Equals(that.c);
+		}
 
-        public override int GetHashCode()
-        {
-            if (!hashValueSet)
-            {
-                hashValue = this.c.GetHashCode();
-                hashValueSet = true;
-            }
+		public override int GetHashCode()
+		{
+			if (!hashValueSet)
+			{
+				hashValue = this.c.GetHashCode();
+				hashValueSet = true;
+			}
 
-            return hashValue;
-        }
+			return hashValue;
+		}
 
 		public override string ToString()
 		{
@@ -188,7 +187,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 						if (ext.Value != null)
 						{
-                            Asn1Object obj = X509ExtensionUtilities.FromExtensionValue(ext.Value);
+							Asn1Object obj = X509ExtensionUtilities.FromExtensionValue(ext.Value);
 
 							buf.Append("                       critical(")
 								.Append(ext.IsCritical)
@@ -204,11 +203,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 									buf.Append("Certificate issuer: ").Append(
 										GeneralNames.GetInstance((Asn1Sequence)obj));
 								}
-								else 
+								else
 								{
 									buf.Append(oid.Id);
 									buf.Append(" value = ").Append(Asn1Dump.DumpAsString(obj));
 								}
+
 								buf.AppendLine();
 							}
 							catch (Exception)
@@ -221,8 +221,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 						{
 							buf.AppendLine();
 						}
-					}
-					while (e.MoveNext());
+					} while (e.MoveNext());
 				}
 			}
 

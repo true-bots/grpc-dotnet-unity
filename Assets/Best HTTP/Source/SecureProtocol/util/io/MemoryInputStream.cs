@@ -5,19 +5,19 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 {
-    public class MemoryInputStream
-        : MemoryStream
-    {
-        public MemoryInputStream(byte[] buffer)
-            : base(buffer, false)
-        {
-        }
+	public class MemoryInputStream
+		: MemoryStream
+	{
+		public MemoryInputStream(byte[] buffer)
+			: base(buffer, false)
+		{
+		}
 
-        public sealed override bool CanWrite
-        {
-            get { return false; }
-        }
-    }
+		public sealed override bool CanWrite
+		{
+			get { return false; }
+		}
+	}
 }
 #pragma warning restore
 #endif

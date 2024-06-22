@@ -4,13 +4,13 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
-    /**
-     * a holding class for public/private parameter pairs.
-     */
-    public class AsymmetricCipherKeyPair
-    {
-        private readonly AsymmetricKeyParameter publicParameter;
-        private readonly AsymmetricKeyParameter privateParameter;
+	/**
+	 * a holding class for public/private parameter pairs.
+	 */
+	public class AsymmetricCipherKeyPair
+	{
+		private readonly AsymmetricKeyParameter publicParameter;
+		private readonly AsymmetricKeyParameter privateParameter;
 
 		/**
          * basic constructor.
@@ -18,39 +18,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
          * @param publicParam a public key parameters object.
          * @param privateParam the corresponding private key parameters.
          */
-        public AsymmetricCipherKeyPair(
-            AsymmetricKeyParameter    publicParameter,
-            AsymmetricKeyParameter    privateParameter)
-        {
+		public AsymmetricCipherKeyPair(
+			AsymmetricKeyParameter publicParameter,
+			AsymmetricKeyParameter privateParameter)
+		{
 			if (publicParameter.IsPrivate)
 				throw new ArgumentException("Expected a public key", "publicParameter");
 			if (!privateParameter.IsPrivate)
 				throw new ArgumentException("Expected a private key", "privateParameter");
 
 			this.publicParameter = publicParameter;
-            this.privateParameter = privateParameter;
-        }
+			this.privateParameter = privateParameter;
+		}
 
 		/**
          * return the public key parameters.
          *
          * @return the public key parameters.
          */
-        public AsymmetricKeyParameter Public
-        {
-            get { return publicParameter; }
-        }
+		public AsymmetricKeyParameter Public
+		{
+			get { return publicParameter; }
+		}
 
 		/**
          * return the private key parameters.
          *
          * @return the private key parameters.
          */
-        public AsymmetricKeyParameter Private
-        {
-            get { return privateParameter; }
-        }
-    }
+		public AsymmetricKeyParameter Private
+		{
+			get { return privateParameter; }
+		}
+	}
 }
 #pragma warning restore
 #endif

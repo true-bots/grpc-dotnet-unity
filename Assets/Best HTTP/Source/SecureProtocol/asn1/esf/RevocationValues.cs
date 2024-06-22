@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
@@ -21,15 +20,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class RevocationValues
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence	crlVals;
-		private readonly Asn1Sequence	ocspVals;
-		private readonly OtherRevVals	otherRevVals;
+		private readonly Asn1Sequence crlVals;
+		private readonly Asn1Sequence ocspVals;
+		private readonly OtherRevVals otherRevVals;
 
 		public static RevocationValues GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is RevocationValues)
-				return (RevocationValues) obj;
+				return (RevocationValues)obj;
 
 			return new RevocationValues(Asn1Sequence.GetInstance(obj));
 		}
@@ -48,19 +47,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 				switch (taggedObj.TagNo)
 				{
 					case 0:
-						Asn1Sequence crlValsSeq = (Asn1Sequence) asn1Obj;
+						Asn1Sequence crlValsSeq = (Asn1Sequence)asn1Obj;
 						foreach (Asn1Encodable ae in crlValsSeq)
 						{
 							CertificateList.GetInstance(ae.ToAsn1Object());
 						}
+
 						this.crlVals = crlValsSeq;
 						break;
 					case 1:
-						Asn1Sequence ocspValsSeq = (Asn1Sequence) asn1Obj;
+						Asn1Sequence ocspValsSeq = (Asn1Sequence)asn1Obj;
 						foreach (Asn1Encodable ae in ocspValsSeq)
 						{
 							BasicOcspResponse.GetInstance(ae.ToAsn1Object());
 						}
+
 						this.ocspVals = ocspValsSeq;
 						break;
 					case 2:
@@ -73,9 +74,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		}
 
 		public RevocationValues(
-			CertificateList[]	crlVals,
-			BasicOcspResponse[]	ocspVals,
-			OtherRevVals		otherRevVals)
+			CertificateList[] crlVals,
+			BasicOcspResponse[] ocspVals,
+			OtherRevVals otherRevVals)
 		{
 			if (crlVals != null)
 			{
@@ -117,6 +118,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			{
 				result[i] = CertificateList.GetInstance(crlVals[i].ToAsn1Object());
 			}
+
 			return result;
 		}
 
@@ -127,6 +129,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			{
 				result[i] = BasicOcspResponse.GetInstance(ocspVals[i].ToAsn1Object());
 			}
+
 			return result;
 		}
 
@@ -138,15 +141,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptionalTagged(true, 0, crlVals);
-            v.AddOptionalTagged(true, 1, ocspVals);
+			v.AddOptionalTagged(true, 0, crlVals);
+			v.AddOptionalTagged(true, 1, ocspVals);
 
-            if (otherRevVals != null)
+			if (otherRevVals != null)
 			{
 				v.Add(new DerTaggedObject(true, 2, otherRevVals.ToAsn1Object()));
 			}
 
-            return new DerSequence(v);
+			return new DerSequence(v);
 		}
 	}
 }

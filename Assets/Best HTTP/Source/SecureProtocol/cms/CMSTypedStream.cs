@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
@@ -13,8 +12,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	{
 		private const int BufferSize = 32 * 1024;
 
-		private readonly string	_oid;
-		private readonly Stream	_in;
+		private readonly string _oid;
+		private readonly Stream _in;
 
 		public CmsTypedStream(
 			Stream inStream)
@@ -30,9 +29,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		public CmsTypedStream(
-			string	oid,
-			Stream	inStream,
-			int		bufSize)
+			string oid,
+			Stream inStream,
+			int bufSize)
 		{
 			_oid = oid;
 			_in = new FullReaderStream(new BufferedStream(inStream, bufSize));
@@ -51,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		public void Drain()
 		{
 			Streams.Drain(_in);
-            _in.Dispose();
+			_in.Dispose();
 		}
 
 		private class FullReaderStream : FilterStream
@@ -61,7 +60,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			{
 			}
 
-            public override int Read(byte[]	buf, int off, int len)
+			public override int Read(byte[] buf, int off, int len)
 			{
 				return Streams.ReadFully(s, buf, off, len);
 			}
@@ -72,8 +71,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
                 return Streams.ReadFully(s, buffer);
             }
 #endif
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -12,404 +12,405 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 {
-    public sealed class Blake3Digest
-        : IDigest, IMemoable, IXof
-    {
-        /**
-         * Already outputting error.
-         */
-        private const string ERR_OUTPUTTING = "Already outputting";
+	public sealed class Blake3Digest
+		: IDigest, IMemoable, IXof
+	{
+		/**
+		 * Already outputting error.
+		 */
+		private const string ERR_OUTPUTTING = "Already outputting";
 
-        /**
-         * Number of Words.
-         */
-        private const int NUMWORDS = 8;
+		/**
+		 * Number of Words.
+		 */
+		private const int NUMWORDS = 8;
 
-        /**
-         * Number of Rounds.
-         */
-        private const int ROUNDS = 7;
+		/**
+		 * Number of Rounds.
+		 */
+		private const int ROUNDS = 7;
 
-        /**
-         * Buffer length.
-         */
-        private const int BLOCKLEN = NUMWORDS * Integers.NumBytes * 2;
+		/**
+		 * Buffer length.
+		 */
+		private const int BLOCKLEN = NUMWORDS * Integers.NumBytes * 2;
 
-        /**
-         * Chunk length.
-         */
-        private const int CHUNKLEN = 1024;
+		/**
+		 * Chunk length.
+		 */
+		private const int CHUNKLEN = 1024;
 
-        /**
-         * ChunkStart Flag.
-         */
-        private const int CHUNKSTART = 1;
+		/**
+		 * ChunkStart Flag.
+		 */
+		private const int CHUNKSTART = 1;
 
-        /**
-         * ChunkEnd Flag.
-         */
-        private const int CHUNKEND = 2;
+		/**
+		 * ChunkEnd Flag.
+		 */
+		private const int CHUNKEND = 2;
 
-        /**
-         * Parent Flag.
-         */
-        private const int PARENT = 4;
+		/**
+		 * Parent Flag.
+		 */
+		private const int PARENT = 4;
 
-        /**
-         * Root Flag.
-         */
-        private const int ROOT = 8;
+		/**
+		 * Root Flag.
+		 */
+		private const int ROOT = 8;
 
-        /**
-         * KeyedHash Flag.
-         */
-        private const int KEYEDHASH = 16;
+		/**
+		 * KeyedHash Flag.
+		 */
+		private const int KEYEDHASH = 16;
 
-        /**
-         * DeriveContext Flag.
-         */
-        private const int DERIVECONTEXT = 32;
+		/**
+		 * DeriveContext Flag.
+		 */
+		private const int DERIVECONTEXT = 32;
 
-        /**
-         * DeriveKey Flag.
-         */
-        private const int DERIVEKEY = 64;
+		/**
+		 * DeriveKey Flag.
+		 */
+		private const int DERIVEKEY = 64;
 
-        /**
-         * Chaining0 State Locations.
-         */
-        private const int CHAINING0 = 0;
+		/**
+		 * Chaining0 State Locations.
+		 */
+		private const int CHAINING0 = 0;
 
-        /**
-         * Chaining1 State Location.
-         */
-        private const int CHAINING1 = 1;
+		/**
+		 * Chaining1 State Location.
+		 */
+		private const int CHAINING1 = 1;
 
-        /**
-         * Chaining2 State Location.
-         */
-        private const int CHAINING2 = 2;
+		/**
+		 * Chaining2 State Location.
+		 */
+		private const int CHAINING2 = 2;
 
-        /**
-         * Chaining3 State Location.
-         */
-        private const int CHAINING3 = 3;
+		/**
+		 * Chaining3 State Location.
+		 */
+		private const int CHAINING3 = 3;
 
-        /**
-         * Chaining4 State Location.
-         */
-        private const int CHAINING4 = 4;
+		/**
+		 * Chaining4 State Location.
+		 */
+		private const int CHAINING4 = 4;
 
-        /**
-         * Chaining5 State Location.
-         */
-        private const int CHAINING5 = 5;
+		/**
+		 * Chaining5 State Location.
+		 */
+		private const int CHAINING5 = 5;
 
-        /**
-         * Chaining6 State Location.
-         */
-        private const int CHAINING6 = 6;
+		/**
+		 * Chaining6 State Location.
+		 */
+		private const int CHAINING6 = 6;
 
-        /**
-         * Chaining7 State Location.
-         */
-        private const int CHAINING7 = 7;
+		/**
+		 * Chaining7 State Location.
+		 */
+		private const int CHAINING7 = 7;
 
-        /**
-         * IV0 State Locations.
-         */
-        private const int IV0 = 8;
+		/**
+		 * IV0 State Locations.
+		 */
+		private const int IV0 = 8;
 
-        /**
-         * IV1 State Location.
-         */
-        private const int IV1 = 9;
+		/**
+		 * IV1 State Location.
+		 */
+		private const int IV1 = 9;
 
-        /**
-         * IV2 State Location.
-         */
-        private const int IV2 = 10;
+		/**
+		 * IV2 State Location.
+		 */
+		private const int IV2 = 10;
 
-        /**
-         * IV3 State Location.
-         */
-        private const int IV3 = 11;
+		/**
+		 * IV3 State Location.
+		 */
+		private const int IV3 = 11;
 
-        /**
-         * Count0 State Location.
-         */
-        private const int COUNT0 = 12;
+		/**
+		 * Count0 State Location.
+		 */
+		private const int COUNT0 = 12;
 
-        /**
-         * Count1 State Location.
-         */
-        private const int COUNT1 = 13;
+		/**
+		 * Count1 State Location.
+		 */
+		private const int COUNT1 = 13;
 
-        /**
-         * DataLen State Location.
-         */
-        private const int DATALEN = 14;
+		/**
+		 * DataLen State Location.
+		 */
+		private const int DATALEN = 14;
 
-        /**
-         * Flags State Location.
-         */
-        private const int FLAGS = 15;
+		/**
+		 * Flags State Location.
+		 */
+		private const int FLAGS = 15;
 
-        /**
-         * Message word permutations.
-         */
-        private static readonly byte[] SIGMA = { 2, 6, 3, 10, 7, 0, 4, 13, 1, 11, 12, 5, 9, 14, 15, 8 };
+		/**
+		 * Message word permutations.
+		 */
+		private static readonly byte[] SIGMA = { 2, 6, 3, 10, 7, 0, 4, 13, 1, 11, 12, 5, 9, 14, 15, 8 };
 
-        /**
-         * Blake3 Initialization Vector.
-         */
-        private static readonly uint[] IV = {
-            0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
-        };
+		/**
+		 * Blake3 Initialization Vector.
+		 */
+		private static readonly uint[] IV =
+		{
+			0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+		};
 
-        /**
-         * The byte input/output buffer.
-         */
-        private readonly byte[] m_theBuffer = new byte[BLOCKLEN];
+		/**
+		 * The byte input/output buffer.
+		 */
+		private readonly byte[] m_theBuffer = new byte[BLOCKLEN];
 
-        /**
-         * The key.
-         */
-        private readonly uint[] m_theK = new uint[NUMWORDS];
+		/**
+		 * The key.
+		 */
+		private readonly uint[] m_theK = new uint[NUMWORDS];
 
-        /**
-         * The chaining value.
-         */
-        private readonly uint[] m_theChaining = new uint[NUMWORDS];
+		/**
+		 * The chaining value.
+		 */
+		private readonly uint[] m_theChaining = new uint[NUMWORDS];
 
-        /**
-         * The state.
-         */
-        private readonly uint[] m_theV = new uint[NUMWORDS << 1];
+		/**
+		 * The state.
+		 */
+		private readonly uint[] m_theV = new uint[NUMWORDS << 1];
 
-        /**
-         * The message Buffer.
-         */
-        private readonly uint[] m_theM = new uint[NUMWORDS << 1];
+		/**
+		 * The message Buffer.
+		 */
+		private readonly uint[] m_theM = new uint[NUMWORDS << 1];
 
-        /**
-         * The indices.
-         */
-        private readonly byte[] m_theIndices = new byte[NUMWORDS << 1];
+		/**
+		 * The indices.
+		 */
+		private readonly byte[] m_theIndices = new byte[NUMWORDS << 1];
 
-        /**
-         * The chainingStack.
-         */
-        private readonly List<uint[]> m_theStack = new List<uint[]>();
+		/**
+		 * The chainingStack.
+		 */
+		private readonly List<uint[]> m_theStack = new List<uint[]>();
 
-        /**
-         * The default digestLength.
-         */
-        private readonly int m_theDigestLen;
+		/**
+		 * The default digestLength.
+		 */
+		private readonly int m_theDigestLen;
 
-        /**
-         * Are we outputting?
-         */
-        private bool m_outputting;
+		/**
+		 * Are we outputting?
+		 */
+		private bool m_outputting;
 
-        /**
-         * How many more bytes can we output?
-         */
-        private long m_outputAvailable;
+		/**
+		 * How many more bytes can we output?
+		 */
+		private long m_outputAvailable;
 
-        /**
-         * The current mode.
-         */
-        private int m_theMode;
+		/**
+		 * The current mode.
+		 */
+		private int m_theMode;
 
-        /**
-         * The output mode.
-         */
-        private int m_theOutputMode;
+		/**
+		 * The output mode.
+		 */
+		private int m_theOutputMode;
 
-        /**
-         * The output dataLen.
-         */
-        private int m_theOutputDataLen;
+		/**
+		 * The output dataLen.
+		 */
+		private int m_theOutputDataLen;
 
-        /**
-         * The block counter.
-         */
-        private long m_theCounter;
+		/**
+		 * The block counter.
+		 */
+		private long m_theCounter;
 
-        /**
-         * The # of bytes in the current block.
-         */
-        private int m_theCurrBytes;
+		/**
+		 * The # of bytes in the current block.
+		 */
+		private int m_theCurrBytes;
 
-        /**
-         * The position of the next byte in the buffer.
-         */
-        private int m_thePos;
+		/**
+		 * The position of the next byte in the buffer.
+		 */
+		private int m_thePos;
 
-        public Blake3Digest()
-            : this((BLOCKLEN >> 1) * 8)
-        {
-        }
+		public Blake3Digest()
+			: this((BLOCKLEN >> 1) * 8)
+		{
+		}
 
-        /// <param name="pDigestSize">the default digest size (in bits)</param>
-        public Blake3Digest(int pDigestSize)
-        {
-            m_theDigestLen = pDigestSize / 8;
+		/// <param name="pDigestSize">the default digest size (in bits)</param>
+		public Blake3Digest(int pDigestSize)
+		{
+			m_theDigestLen = pDigestSize / 8;
 
-            Init(null);
-        }
+			Init(null);
+		}
 
-        /**
-         * Constructor.
-         *
-         * @param pSource the source digest.
-         */
-        public Blake3Digest(Blake3Digest pSource)
-        {
-            /* Copy default digest length */
-            m_theDigestLen = pSource.m_theDigestLen;
+		/**
+		 * Constructor.
+		 *
+		 * @param pSource the source digest.
+		 */
+		public Blake3Digest(Blake3Digest pSource)
+		{
+			/* Copy default digest length */
+			m_theDigestLen = pSource.m_theDigestLen;
 
-            /* Initialise from source */
-            Reset(pSource);
-        }
+			/* Initialise from source */
+			Reset(pSource);
+		}
 
-        public int GetByteLength() => BLOCKLEN;
+		public int GetByteLength() => BLOCKLEN;
 
-        public string AlgorithmName => "BLAKE3";
+		public string AlgorithmName => "BLAKE3";
 
-        public int GetDigestSize() => m_theDigestLen;
+		public int GetDigestSize() => m_theDigestLen;
 
-        /**
-         * Initialise.
-         *
-         * @param pParams the parameters.
-         */
-        public void Init(Blake3Parameters pParams)
-        {
-            /* Access key/context */
-            byte[] myKey = pParams?.GetKey();
-            byte[] myContext = pParams?.GetContext();
+		/**
+		 * Initialise.
+		 *
+		 * @param pParams the parameters.
+		 */
+		public void Init(Blake3Parameters pParams)
+		{
+			/* Access key/context */
+			byte[] myKey = pParams?.GetKey();
+			byte[] myContext = pParams?.GetContext();
 
-            /* Reset the digest */
-            Reset();
+			/* Reset the digest */
+			Reset();
 
-            /* If we have a key  */
-            if (myKey != null)
-            {
-                /* Initialise with the key */
-                InitKey(myKey);
-                Arrays.Fill(myKey, 0);
+			/* If we have a key  */
+			if (myKey != null)
+			{
+				/* Initialise with the key */
+				InitKey(myKey);
+				Arrays.Fill(myKey, 0);
 
-                /* else if we have a context */
-            }
-            else if (myContext != null)
-            {
-                /* Initialise for deriving context */
-                InitNullKey();
-                m_theMode = DERIVECONTEXT;
+				/* else if we have a context */
+			}
+			else if (myContext != null)
+			{
+				/* Initialise for deriving context */
+				InitNullKey();
+				m_theMode = DERIVECONTEXT;
 
-                /* Derive key from context */
-                BlockUpdate(myContext, 0, myContext.Length);
-                DoFinal(m_theBuffer, 0);
-                InitKeyFromContext();
-                Reset();
+				/* Derive key from context */
+				BlockUpdate(myContext, 0, myContext.Length);
+				DoFinal(m_theBuffer, 0);
+				InitKeyFromContext();
+				Reset();
 
-                /* Else init null key and reset mode */
-            }
-            else
-            {
-                InitNullKey();
-                m_theMode = 0;
-            }
-        }
+				/* Else init null key and reset mode */
+			}
+			else
+			{
+				InitNullKey();
+				m_theMode = 0;
+			}
+		}
 
-        public void Update(byte b)
-        {
-            /* Check that we are not outputting */
-            if (m_outputting)
-                throw new InvalidOperationException(ERR_OUTPUTTING);
+		public void Update(byte b)
+		{
+			/* Check that we are not outputting */
+			if (m_outputting)
+				throw new InvalidOperationException(ERR_OUTPUTTING);
 
-            /* If the buffer is full */
-            int blockLen = m_theBuffer.Length;
-            int remainingLength = blockLen - m_thePos;
-            if (remainingLength == 0)
-            {
-                /* Process the buffer */
+			/* If the buffer is full */
+			int blockLen = m_theBuffer.Length;
+			int remainingLength = blockLen - m_thePos;
+			if (remainingLength == 0)
+			{
+				/* Process the buffer */
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
                 CompressBlock(m_theBuffer);
 #else
-                CompressBlock(m_theBuffer, 0);
+				CompressBlock(m_theBuffer, 0);
 #endif
 
-                /* Reset the buffer */
-                Arrays.Fill(m_theBuffer, 0);
-                m_thePos = 0;
-            }
+				/* Reset the buffer */
+				Arrays.Fill(m_theBuffer, 0);
+				m_thePos = 0;
+			}
 
-            /* Store the byte */
-            m_theBuffer[m_thePos] = b;
-            m_thePos++;
-        }
+			/* Store the byte */
+			m_theBuffer[m_thePos] = b;
+			m_thePos++;
+		}
 
-        public void BlockUpdate(byte[] pMessage, int pOffset, int pLen)
-        {
-            /* Ignore null operation */
-            if (pMessage == null)
-                return;
+		public void BlockUpdate(byte[] pMessage, int pOffset, int pLen)
+		{
+			/* Ignore null operation */
+			if (pMessage == null)
+				return;
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             BlockUpdate(pMessage.AsSpan(pOffset, pLen));
 #else
-            if (pLen == 0)
-                return;
+			if (pLen == 0)
+				return;
 
-            /* Check that we are not outputting */
-            if (m_outputting)
-                throw new InvalidOperationException(ERR_OUTPUTTING);
+			/* Check that we are not outputting */
+			if (m_outputting)
+				throw new InvalidOperationException(ERR_OUTPUTTING);
 
-            /* Process any bytes currently in the buffer */
-            int remainingLen = 0; // left bytes of buffer
-            if (m_thePos != 0)
-            {
-                /* Calculate space remaining in the buffer */
-                remainingLen = BLOCKLEN - m_thePos;
+			/* Process any bytes currently in the buffer */
+			int remainingLen = 0; // left bytes of buffer
+			if (m_thePos != 0)
+			{
+				/* Calculate space remaining in the buffer */
+				remainingLen = BLOCKLEN - m_thePos;
 
-                /* If there is sufficient space in the buffer */
-                if (remainingLen >= pLen)
-                {
-                    /* Copy data into buffer and return */
-                    Array.Copy(pMessage, pOffset, m_theBuffer, m_thePos, pLen);
-                    m_thePos += pLen;
-                    return;
-                }
+				/* If there is sufficient space in the buffer */
+				if (remainingLen >= pLen)
+				{
+					/* Copy data into buffer and return */
+					Array.Copy(pMessage, pOffset, m_theBuffer, m_thePos, pLen);
+					m_thePos += pLen;
+					return;
+				}
 
-                /* Fill the buffer */
-                Array.Copy(pMessage, pOffset, m_theBuffer, m_thePos, remainingLen);
+				/* Fill the buffer */
+				Array.Copy(pMessage, pOffset, m_theBuffer, m_thePos, remainingLen);
 
-                /* Process the buffer */
-                CompressBlock(m_theBuffer, 0);
+				/* Process the buffer */
+				CompressBlock(m_theBuffer, 0);
 
-                /* Reset the buffer */
-                m_thePos = 0;
-                Arrays.Fill(m_theBuffer, 0);
-            }
+				/* Reset the buffer */
+				m_thePos = 0;
+				Arrays.Fill(m_theBuffer, 0);
+			}
 
-            /* process all blocks except the last one */
-            int messagePos;
-            int blockWiseLastPos = pOffset + pLen - BLOCKLEN;
-            for (messagePos = pOffset + remainingLen; messagePos < blockWiseLastPos; messagePos += BLOCKLEN)
-            {
-                /* Process the buffer */
-                CompressBlock(pMessage, messagePos);
-            }
+			/* process all blocks except the last one */
+			int messagePos;
+			int blockWiseLastPos = pOffset + pLen - BLOCKLEN;
+			for (messagePos = pOffset + remainingLen; messagePos < blockWiseLastPos; messagePos += BLOCKLEN)
+			{
+				/* Process the buffer */
+				CompressBlock(pMessage, messagePos);
+			}
 
-            /* Fill the buffer with the remaining bytes of the message */
-            int len = pLen - messagePos;
-            Array.Copy(pMessage, messagePos, m_theBuffer, 0, pOffset + len);
-            m_thePos += pOffset + len;
+			/* Fill the buffer with the remaining bytes of the message */
+			int len = pLen - messagePos;
+			Array.Copy(pMessage, messagePos, m_theBuffer, 0, pOffset + len);
+			m_thePos += pOffset + len;
 #endif
-        }
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public void BlockUpdate(ReadOnlySpan<byte> input)
@@ -465,87 +466,87 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        public int DoFinal(byte[] pOutput, int pOutOffset)
-        {
+		public int DoFinal(byte[] pOutput, int pOutOffset)
+		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return OutputFinal(pOutput.AsSpan(pOutOffset, GetDigestSize()));
 #else
-            return OutputFinal(pOutput, pOutOffset, GetDigestSize());
+			return OutputFinal(pOutput, pOutOffset, GetDigestSize());
 #endif
-        }
+		}
 
-        public int OutputFinal(byte[] pOut, int pOutOffset, int pOutLen)
-        {
+		public int OutputFinal(byte[] pOut, int pOutOffset, int pOutLen)
+		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return OutputFinal(pOut.AsSpan(pOutOffset, pOutLen));
 #else
-            /* Reject if we are already outputting */
-            if (m_outputting)
-                throw new InvalidOperationException(ERR_OUTPUTTING);
+			/* Reject if we are already outputting */
+			if (m_outputting)
+				throw new InvalidOperationException(ERR_OUTPUTTING);
 
-            /* Build the required output */
-            int length = Output(pOut, pOutOffset, pOutLen);
+			/* Build the required output */
+			int length = Output(pOut, pOutOffset, pOutLen);
 
-            /* reset the underlying digest and return the length */
-            Reset();
-            return length;
+			/* reset the underlying digest and return the length */
+			Reset();
+			return length;
 #endif
-        }
+		}
 
-        public int Output(byte[] pOut, int pOutOffset, int pOutLen)
-        {
+		public int Output(byte[] pOut, int pOutOffset, int pOutLen)
+		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return Output(pOut.AsSpan(pOutOffset, pOutLen));
 #else
-            /* If we have not started outputting yet */
-            if (!m_outputting)
-            {
-                /* Process the buffer */
-                CompressFinalBlock(m_thePos);
-            }
+			/* If we have not started outputting yet */
+			if (!m_outputting)
+			{
+				/* Process the buffer */
+				CompressFinalBlock(m_thePos);
+			}
 
-            /* Reject if there is insufficient Xof remaining */
-            if (pOutLen < 0 || (m_outputAvailable >= 0 && pOutLen > m_outputAvailable))
-                throw new ArgumentException("Insufficient bytes remaining");
+			/* Reject if there is insufficient Xof remaining */
+			if (pOutLen < 0 || (m_outputAvailable >= 0 && pOutLen > m_outputAvailable))
+				throw new ArgumentException("Insufficient bytes remaining");
 
-            /* If we have some remaining data in the current buffer */
-            int dataLeft = pOutLen;
-            int outPos = pOutOffset;
-            if (m_thePos < BLOCKLEN)
-            {
-                /* Copy data from current hash */
-                int dataToCopy = System.Math.Min(dataLeft, BLOCKLEN - m_thePos);
-                Array.Copy(m_theBuffer, m_thePos, pOut, outPos, dataToCopy);
+			/* If we have some remaining data in the current buffer */
+			int dataLeft = pOutLen;
+			int outPos = pOutOffset;
+			if (m_thePos < BLOCKLEN)
+			{
+				/* Copy data from current hash */
+				int dataToCopy = System.Math.Min(dataLeft, BLOCKLEN - m_thePos);
+				Array.Copy(m_theBuffer, m_thePos, pOut, outPos, dataToCopy);
 
-                /* Adjust counters */
-                m_thePos += dataToCopy;
-                outPos += dataToCopy;
-                dataLeft -= dataToCopy;
-            }
+				/* Adjust counters */
+				m_thePos += dataToCopy;
+				outPos += dataToCopy;
+				dataLeft -= dataToCopy;
+			}
 
-            /* Loop until we have completed the request */
-            while (dataLeft > 0)
-            {
-                /* Calculate the next block */
-                NextOutputBlock();
+			/* Loop until we have completed the request */
+			while (dataLeft > 0)
+			{
+				/* Calculate the next block */
+				NextOutputBlock();
 
-                /* Copy data from current hash */
-                int dataToCopy = System.Math.Min(dataLeft, BLOCKLEN);
-                Array.Copy(m_theBuffer, 0, pOut, outPos, dataToCopy);
+				/* Copy data from current hash */
+				int dataToCopy = System.Math.Min(dataLeft, BLOCKLEN);
+				Array.Copy(m_theBuffer, 0, pOut, outPos, dataToCopy);
 
-                /* Adjust counters */
-                m_thePos += dataToCopy;
-                outPos += dataToCopy;
-                dataLeft -= dataToCopy;
-            }
+				/* Adjust counters */
+				m_thePos += dataToCopy;
+				outPos += dataToCopy;
+				dataLeft -= dataToCopy;
+			}
 
-            /* Adjust outputAvailable */
-            m_outputAvailable -= pOutLen;
+			/* Adjust outputAvailable */
+			m_outputAvailable -= pOutLen;
 
-            /* Return the number of bytes transferred */
-            return pOutLen;
+			/* Return the number of bytes transferred */
+			return pOutLen;
 #endif
-        }
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public int DoFinal(Span<byte> output)
@@ -620,51 +621,51 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        public void Reset()
-        {
-            ResetBlockCount();
-            m_thePos = 0;
-            m_outputting = false;
-            Arrays.Fill(m_theBuffer, 0);
-        }
+		public void Reset()
+		{
+			ResetBlockCount();
+			m_thePos = 0;
+			m_outputting = false;
+			Arrays.Fill(m_theBuffer, 0);
+		}
 
-        public void Reset(IMemoable pSource)
-        {
-            /* Access source */
-            Blake3Digest mySource = (Blake3Digest)pSource;
+		public void Reset(IMemoable pSource)
+		{
+			/* Access source */
+			Blake3Digest mySource = (Blake3Digest)pSource;
 
-            /*  Reset counter */
-            m_theCounter = mySource.m_theCounter;
-            m_theCurrBytes = mySource.m_theCurrBytes;
-            m_theMode = mySource.m_theMode;
+			/*  Reset counter */
+			m_theCounter = mySource.m_theCounter;
+			m_theCurrBytes = mySource.m_theCurrBytes;
+			m_theMode = mySource.m_theMode;
 
-            /* Reset output state */
-            m_outputting = mySource.m_outputting;
-            m_outputAvailable = mySource.m_outputAvailable;
-            m_theOutputMode = mySource.m_theOutputMode;
-            m_theOutputDataLen = mySource.m_theOutputDataLen;
+			/* Reset output state */
+			m_outputting = mySource.m_outputting;
+			m_outputAvailable = mySource.m_outputAvailable;
+			m_theOutputMode = mySource.m_theOutputMode;
+			m_theOutputDataLen = mySource.m_theOutputDataLen;
 
-            /* Copy state */
-            Array.Copy(mySource.m_theChaining, 0, m_theChaining, 0, m_theChaining.Length);
-            Array.Copy(mySource.m_theK, 0, m_theK, 0, m_theK.Length);
-            Array.Copy(mySource.m_theM, 0, m_theM, 0, m_theM.Length);
+			/* Copy state */
+			Array.Copy(mySource.m_theChaining, 0, m_theChaining, 0, m_theChaining.Length);
+			Array.Copy(mySource.m_theK, 0, m_theK, 0, m_theK.Length);
+			Array.Copy(mySource.m_theM, 0, m_theM, 0, m_theM.Length);
 
-            /* Copy stack */
-            m_theStack.Clear();
-            foreach (var element in mySource.m_theStack)
-            {
-                m_theStack.Add(Arrays.Clone(element));
-            }
+			/* Copy stack */
+			m_theStack.Clear();
+			foreach (var element in mySource.m_theStack)
+			{
+				m_theStack.Add(Arrays.Clone(element));
+			}
 
-            /* Copy buffer */
-            Array.Copy(mySource.m_theBuffer, 0, m_theBuffer, 0, m_theBuffer.Length);
-            m_thePos = mySource.m_thePos;
-        }
+			/* Copy buffer */
+			Array.Copy(mySource.m_theBuffer, 0, m_theBuffer, 0, m_theBuffer.Length);
+			m_thePos = mySource.m_thePos;
+		}
 
-        public IMemoable Copy()
-        {
-            return new Blake3Digest(this);
-        }
+		public IMemoable Copy()
+		{
+			return new Blake3Digest(this);
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private void CompressBlock(ReadOnlySpan<byte> block)
@@ -687,365 +688,367 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
             Pack.LE_To_UInt32(block, m_theM);
         }
 #else
-        /**
-         * Compress next block of the message.
-         *
-         * @param pMessage the message buffer
-         * @param pMsgPos  the position within the message buffer
-         */
-        private void CompressBlock(byte[] pMessage, int pMsgPos)
-        {
-            /* Initialise state and compress message */
-            InitChunkBlock(BLOCKLEN, false);
-            InitM(pMessage, pMsgPos);
-            Compress();
+		/**
+		 * Compress next block of the message.
+		 *
+		 * @param pMessage the message buffer
+		 * @param pMsgPos  the position within the message buffer
+		 */
+		private void CompressBlock(byte[] pMessage, int pMsgPos)
+		{
+			/* Initialise state and compress message */
+			InitChunkBlock(BLOCKLEN, false);
+			InitM(pMessage, pMsgPos);
+			Compress();
 
-            /* Adjust stack if we have completed a block */
-            if (m_theCurrBytes == 0)
-            {
-                AdjustStack();
-            }
-        }
+			/* Adjust stack if we have completed a block */
+			if (m_theCurrBytes == 0)
+			{
+				AdjustStack();
+			}
+		}
 
-        /**
-         * Initialise M from message.
-         *
-         * @param pMessage the source message
-         * @param pMsgPos  the message position
-         */
-        private void InitM(byte[] pMessage, int pMsgPos)
-        {
-            /* Copy message bytes into word array */
-            Pack.LE_To_UInt32(pMessage, pMsgPos, m_theM);
-        }
+		/**
+		 * Initialise M from message.
+		 *
+		 * @param pMessage the source message
+		 * @param pMsgPos  the message position
+		 */
+		private void InitM(byte[] pMessage, int pMsgPos)
+		{
+			/* Copy message bytes into word array */
+			Pack.LE_To_UInt32(pMessage, pMsgPos, m_theM);
+		}
 #endif
 
-        /**
-         * Adjust the stack.
-         */
-        private void AdjustStack()
-        {
-            /* Loop to combine blocks */
-            long myCount = m_theCounter;
-            while (myCount > 0)
-            {
-                /* Break loop if we are not combining */
-                if ((myCount & 1) == 1)
-                    break;
+		/**
+		 * Adjust the stack.
+		 */
+		private void AdjustStack()
+		{
+			/* Loop to combine blocks */
+			long myCount = m_theCounter;
+			while (myCount > 0)
+			{
+				/* Break loop if we are not combining */
+				if ((myCount & 1) == 1)
+					break;
 
-                /* Build the message to be hashed */
-                uint[] myLeft = m_theStack[m_theStack.Count - 1];
-                m_theStack.RemoveAt(m_theStack.Count - 1);
+				/* Build the message to be hashed */
+				uint[] myLeft = m_theStack[m_theStack.Count - 1];
+				m_theStack.RemoveAt(m_theStack.Count - 1);
 
-                Array.Copy(myLeft, 0, m_theM, 0, NUMWORDS);
-                Array.Copy(m_theChaining, 0, m_theM, NUMWORDS, NUMWORDS);
+				Array.Copy(myLeft, 0, m_theM, 0, NUMWORDS);
+				Array.Copy(m_theChaining, 0, m_theM, NUMWORDS, NUMWORDS);
 
-                /* Create parent block */
-                InitParentBlock();
-                Compress();
+				/* Create parent block */
+				InitParentBlock();
+				Compress();
 
-                /* Next block */
-                myCount >>= 1;
-            }
+				/* Next block */
+				myCount >>= 1;
+			}
 
-            /* Add back to the stack */
-            m_theStack.Add(Arrays.CopyOf(m_theChaining, NUMWORDS));
-        }
+			/* Add back to the stack */
+			m_theStack.Add(Arrays.CopyOf(m_theChaining, NUMWORDS));
+		}
 
-        /**
-         * Compress final block.
-         *
-         * @param pDataLen the data length
-         */
-        private void CompressFinalBlock(int pDataLen)
-        {
-            /* Initialise state and compress message */
-            InitChunkBlock(pDataLen, true);
+		/**
+		 * Compress final block.
+		 *
+		 * @param pDataLen the data length
+		 */
+		private void CompressFinalBlock(int pDataLen)
+		{
+			/* Initialise state and compress message */
+			InitChunkBlock(pDataLen, true);
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             InitM(m_theBuffer);
 #else
-            InitM(m_theBuffer, 0);
+			InitM(m_theBuffer, 0);
 #endif
-            Compress();
+			Compress();
 
-            /* Finalise stack */
-            ProcessStack();
-        }
+			/* Finalise stack */
+			ProcessStack();
+		}
 
-        /**
-         * Process the stack.
-         */
-        private void ProcessStack()
-        {
-            /* Finalise stack */
-            while (m_theStack.Count > 0)
-            {
-                /* Build the message to be hashed */
-                uint[] myLeft = m_theStack[m_theStack.Count - 1];
-                m_theStack.RemoveAt(m_theStack.Count - 1);
+		/**
+		 * Process the stack.
+		 */
+		private void ProcessStack()
+		{
+			/* Finalise stack */
+			while (m_theStack.Count > 0)
+			{
+				/* Build the message to be hashed */
+				uint[] myLeft = m_theStack[m_theStack.Count - 1];
+				m_theStack.RemoveAt(m_theStack.Count - 1);
 
-                Array.Copy(myLeft, 0, m_theM, 0, NUMWORDS);
-                Array.Copy(m_theChaining, 0, m_theM, NUMWORDS, NUMWORDS);
+				Array.Copy(myLeft, 0, m_theM, 0, NUMWORDS);
+				Array.Copy(m_theChaining, 0, m_theM, NUMWORDS, NUMWORDS);
 
-                /* Create parent block */
-                InitParentBlock();
-                if (m_theStack.Count < 1)
-                {
-                    SetRoot();
-                }
-                Compress();
-            }
-        }
+				/* Create parent block */
+				InitParentBlock();
+				if (m_theStack.Count < 1)
+				{
+					SetRoot();
+				}
 
-        /**
-         * Perform compression.
-         */
-        private void Compress()
-        {
-            /* Initialise the buffers */
-            InitIndices();
+				Compress();
+			}
+		}
 
-            /* Loop through the rounds */
-            for (int round = 0; round < ROUNDS - 1; round++)
-            {
-                /* Perform the round and permuteM */
-                PerformRound();
-                PermuteIndices();
-            }
-            PerformRound();
-            AdjustChaining();
-        }
+		/**
+		 * Perform compression.
+		 */
+		private void Compress()
+		{
+			/* Initialise the buffers */
+			InitIndices();
 
-        /**
-         * Perform a round.
-         */
+			/* Loop through the rounds */
+			for (int round = 0; round < ROUNDS - 1; round++)
+			{
+				/* Perform the round and permuteM */
+				PerformRound();
+				PermuteIndices();
+			}
+
+			PerformRound();
+			AdjustChaining();
+		}
+
+		/**
+		 * Perform a round.
+		 */
 #if NETSTANDARD1_0_OR_GREATER || NETCOREAPP1_0_OR_GREATER || UNITY_2021_2_OR_NEWER
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private void PerformRound()
-        {
-            /* Apply to columns of V */
-            MixG(0, CHAINING0, CHAINING4, IV0, COUNT0);
-            MixG(1, CHAINING1, CHAINING5, IV1, COUNT1);
-            MixG(2, CHAINING2, CHAINING6, IV2, DATALEN);
-            MixG(3, CHAINING3, CHAINING7, IV3, FLAGS);
+		private void PerformRound()
+		{
+			/* Apply to columns of V */
+			MixG(0, CHAINING0, CHAINING4, IV0, COUNT0);
+			MixG(1, CHAINING1, CHAINING5, IV1, COUNT1);
+			MixG(2, CHAINING2, CHAINING6, IV2, DATALEN);
+			MixG(3, CHAINING3, CHAINING7, IV3, FLAGS);
 
-            /* Apply to diagonals of V */
-            MixG(4, CHAINING0, CHAINING5, IV2, FLAGS);
-            MixG(5, CHAINING1, CHAINING6, IV3, COUNT0);
-            MixG(6, CHAINING2, CHAINING7, IV0, COUNT1);
-            MixG(7, CHAINING3, CHAINING4, IV1, DATALEN);
-        }
+			/* Apply to diagonals of V */
+			MixG(4, CHAINING0, CHAINING5, IV2, FLAGS);
+			MixG(5, CHAINING1, CHAINING6, IV3, COUNT0);
+			MixG(6, CHAINING2, CHAINING7, IV0, COUNT1);
+			MixG(7, CHAINING3, CHAINING4, IV1, DATALEN);
+		}
 
-        /**
-         * Adjust Chaining after compression.
-         */
-        private void AdjustChaining()
-        {
-            /* If we are outputting */
-            if (m_outputting)
-            {
-                /* Adjust full state */
-                for (int i = 0; i < NUMWORDS; i++)
-                {
-                    m_theV[i] ^= m_theV[i + NUMWORDS];
-                    m_theV[i + NUMWORDS] ^= m_theChaining[i];
-                }
+		/**
+		 * Adjust Chaining after compression.
+		 */
+		private void AdjustChaining()
+		{
+			/* If we are outputting */
+			if (m_outputting)
+			{
+				/* Adjust full state */
+				for (int i = 0; i < NUMWORDS; i++)
+				{
+					m_theV[i] ^= m_theV[i + NUMWORDS];
+					m_theV[i + NUMWORDS] ^= m_theChaining[i];
+				}
 
-                /* Output state to buffer */
-                Pack.UInt32_To_LE(m_theV, m_theBuffer, 0);
-                m_thePos = 0;
+				/* Output state to buffer */
+				Pack.UInt32_To_LE(m_theV, m_theBuffer, 0);
+				m_thePos = 0;
 
-                /* Else just build chain value */
-            }
-            else
-            {
-                /* Combine V into Chaining */
-                for (int i = 0; i < NUMWORDS; i++)
-                {
-                    m_theChaining[i] = m_theV[i] ^ m_theV[i + NUMWORDS];
-                }
-            }
-        }
+				/* Else just build chain value */
+			}
+			else
+			{
+				/* Combine V into Chaining */
+				for (int i = 0; i < NUMWORDS; i++)
+				{
+					m_theChaining[i] = m_theV[i] ^ m_theV[i + NUMWORDS];
+				}
+			}
+		}
 
-        /**
-         * Mix function G.
-         *
-         * @param msgIdx the message index
-         * @param posA   position A in V
-         * @param posB   position B in V
-         * @param posC   position C in V
-         * @param posD   poistion D in V
-         */
+		/**
+		 * Mix function G.
+		 *
+		 * @param msgIdx the message index
+		 * @param posA   position A in V
+		 * @param posB   position B in V
+		 * @param posC   position C in V
+		 * @param posD   poistion D in V
+		 */
 #if NETSTANDARD1_0_OR_GREATER || NETCOREAPP1_0_OR_GREATER || UNITY_2021_2_OR_NEWER
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private void MixG(int msgIdx, int posA, int posB, int posC, int posD)
-        {
-            /* Determine indices */
-            int msg = msgIdx << 1;
+		private void MixG(int msgIdx, int posA, int posB, int posC, int posD)
+		{
+			/* Determine indices */
+			int msg = msgIdx << 1;
 
-            /* Perform the Round */
-            m_theV[posA] += m_theV[posB] + m_theM[m_theIndices[msg++]];
-            m_theV[posD] = Integers.RotateRight(m_theV[posD] ^ m_theV[posA], 16);
-            m_theV[posC] += m_theV[posD];
-            m_theV[posB] = Integers.RotateRight(m_theV[posB] ^ m_theV[posC], 12);
-            m_theV[posA] += m_theV[posB] + m_theM[m_theIndices[msg]];
-            m_theV[posD] = Integers.RotateRight(m_theV[posD] ^ m_theV[posA], 8);
-            m_theV[posC] += m_theV[posD];
-            m_theV[posB] = Integers.RotateRight(m_theV[posB] ^ m_theV[posC], 7);
-        }
+			/* Perform the Round */
+			m_theV[posA] += m_theV[posB] + m_theM[m_theIndices[msg++]];
+			m_theV[posD] = Integers.RotateRight(m_theV[posD] ^ m_theV[posA], 16);
+			m_theV[posC] += m_theV[posD];
+			m_theV[posB] = Integers.RotateRight(m_theV[posB] ^ m_theV[posC], 12);
+			m_theV[posA] += m_theV[posB] + m_theM[m_theIndices[msg]];
+			m_theV[posD] = Integers.RotateRight(m_theV[posD] ^ m_theV[posA], 8);
+			m_theV[posC] += m_theV[posD];
+			m_theV[posB] = Integers.RotateRight(m_theV[posB] ^ m_theV[posC], 7);
+		}
 
-        /**
-         * initialise the indices.
-         */
-        private void InitIndices()
-        {
-            for (byte i = 0; i < m_theIndices.Length; i++)
-            {
-                m_theIndices[i] = i;
-            }
-        }
+		/**
+		 * initialise the indices.
+		 */
+		private void InitIndices()
+		{
+			for (byte i = 0; i < m_theIndices.Length; i++)
+			{
+				m_theIndices[i] = i;
+			}
+		}
 
-        /**
-         * PermuteIndices.
-         */
-        private void PermuteIndices()
-        {
-            for (byte i = 0; i < m_theIndices.Length; i++)
-            {
-                m_theIndices[i] = SIGMA[m_theIndices[i]];
-            }
-        }
+		/**
+		 * PermuteIndices.
+		 */
+		private void PermuteIndices()
+		{
+			for (byte i = 0; i < m_theIndices.Length; i++)
+			{
+				m_theIndices[i] = SIGMA[m_theIndices[i]];
+			}
+		}
 
-        /**
-         * Initialise null key.
-         */
-        private void InitNullKey()
-        {
-            Array.Copy(IV, 0, m_theK, 0, NUMWORDS);
-        }
+		/**
+		 * Initialise null key.
+		 */
+		private void InitNullKey()
+		{
+			Array.Copy(IV, 0, m_theK, 0, NUMWORDS);
+		}
 
-        /**
-         * Initialise key.
-         *
-         * @param pKey the keyBytes
-         */
-        private void InitKey(byte[] pKey)
-        {
-            /* Copy message bytes into word array */
-            Pack.LE_To_UInt32(pKey, 0, m_theK);
-            m_theMode = KEYEDHASH;
-        }
+		/**
+		 * Initialise key.
+		 *
+		 * @param pKey the keyBytes
+		 */
+		private void InitKey(byte[] pKey)
+		{
+			/* Copy message bytes into word array */
+			Pack.LE_To_UInt32(pKey, 0, m_theK);
+			m_theMode = KEYEDHASH;
+		}
 
-        /**
-         * Initialise key from context.
-         */
-        private void InitKeyFromContext()
-        {
-            Array.Copy(m_theV, 0, m_theK, 0, NUMWORDS);
-            m_theMode = DERIVEKEY;
-        }
+		/**
+		 * Initialise key from context.
+		 */
+		private void InitKeyFromContext()
+		{
+			Array.Copy(m_theV, 0, m_theK, 0, NUMWORDS);
+			m_theMode = DERIVEKEY;
+		}
 
-        /**
-         * Initialise chunk block.
-         *
-         * @param pDataLen the dataLength
-         * @param pFinal   is this the final chunk?
-         */
-        private void InitChunkBlock(int pDataLen, bool pFinal)
-        {
-            /* Initialise the block */
-            Array.Copy(m_theCurrBytes == 0 ? m_theK : m_theChaining, 0, m_theV, 0, NUMWORDS);
-            Array.Copy(IV, 0, m_theV, NUMWORDS, NUMWORDS >> 1);
-            m_theV[COUNT0] = (uint)m_theCounter;
-            m_theV[COUNT1] = (uint)(m_theCounter >> Integers.NumBits);
-            m_theV[DATALEN] = (uint)pDataLen;
-            m_theV[FLAGS] = (uint)(m_theMode
-                + (m_theCurrBytes == 0 ? CHUNKSTART : 0)
-                + (pFinal ? CHUNKEND : 0));
+		/**
+		 * Initialise chunk block.
+		 *
+		 * @param pDataLen the dataLength
+		 * @param pFinal   is this the final chunk?
+		 */
+		private void InitChunkBlock(int pDataLen, bool pFinal)
+		{
+			/* Initialise the block */
+			Array.Copy(m_theCurrBytes == 0 ? m_theK : m_theChaining, 0, m_theV, 0, NUMWORDS);
+			Array.Copy(IV, 0, m_theV, NUMWORDS, NUMWORDS >> 1);
+			m_theV[COUNT0] = (uint)m_theCounter;
+			m_theV[COUNT1] = (uint)(m_theCounter >> Integers.NumBits);
+			m_theV[DATALEN] = (uint)pDataLen;
+			m_theV[FLAGS] = (uint)(m_theMode
+			                       + (m_theCurrBytes == 0 ? CHUNKSTART : 0)
+			                       + (pFinal ? CHUNKEND : 0));
 
-            /* * Adjust block count */
-            m_theCurrBytes += pDataLen;
-            if (m_theCurrBytes >= CHUNKLEN)
-            {
-                IncrementBlockCount();
-                m_theV[FLAGS] |= CHUNKEND;
-            }
+			/* * Adjust block count */
+			m_theCurrBytes += pDataLen;
+			if (m_theCurrBytes >= CHUNKLEN)
+			{
+				IncrementBlockCount();
+				m_theV[FLAGS] |= CHUNKEND;
+			}
 
-            /* If we are single chunk */
-            if (pFinal && m_theStack.Count < 1)
-            {
-                SetRoot();
-            }
-        }
+			/* If we are single chunk */
+			if (pFinal && m_theStack.Count < 1)
+			{
+				SetRoot();
+			}
+		}
 
-        /**
-         * Initialise parent block.
-         */
-        private void InitParentBlock()
-        {
-            /* Initialise the block */
-            Array.Copy(m_theK, 0, m_theV, 0, NUMWORDS);
-            Array.Copy(IV, 0, m_theV, NUMWORDS, NUMWORDS >> 1);
-            m_theV[COUNT0] = 0;
-            m_theV[COUNT1] = 0;
-            m_theV[DATALEN] = BLOCKLEN;
-            m_theV[FLAGS] = (uint)(m_theMode | PARENT);
-        }
+		/**
+		 * Initialise parent block.
+		 */
+		private void InitParentBlock()
+		{
+			/* Initialise the block */
+			Array.Copy(m_theK, 0, m_theV, 0, NUMWORDS);
+			Array.Copy(IV, 0, m_theV, NUMWORDS, NUMWORDS >> 1);
+			m_theV[COUNT0] = 0;
+			m_theV[COUNT1] = 0;
+			m_theV[DATALEN] = BLOCKLEN;
+			m_theV[FLAGS] = (uint)(m_theMode | PARENT);
+		}
 
-        /**
-         * Initialise output block.
-         */
-        private void NextOutputBlock()
-        {
-            /* Increment the counter */
-            m_theCounter++;
+		/**
+		 * Initialise output block.
+		 */
+		private void NextOutputBlock()
+		{
+			/* Increment the counter */
+			m_theCounter++;
 
-            /* Initialise the block */
-            Array.Copy(m_theChaining, 0, m_theV, 0, NUMWORDS);
-            Array.Copy(IV, 0, m_theV, NUMWORDS, NUMWORDS >> 1);
-            m_theV[COUNT0] = (uint)m_theCounter;
-            m_theV[COUNT1] = (uint)(m_theCounter >> Integers.NumBits);
-            m_theV[DATALEN] = (uint)m_theOutputDataLen;
-            m_theV[FLAGS] = (uint)m_theOutputMode;
+			/* Initialise the block */
+			Array.Copy(m_theChaining, 0, m_theV, 0, NUMWORDS);
+			Array.Copy(IV, 0, m_theV, NUMWORDS, NUMWORDS >> 1);
+			m_theV[COUNT0] = (uint)m_theCounter;
+			m_theV[COUNT1] = (uint)(m_theCounter >> Integers.NumBits);
+			m_theV[DATALEN] = (uint)m_theOutputDataLen;
+			m_theV[FLAGS] = (uint)m_theOutputMode;
 
-            /* Generate output */
-            Compress();
-        }
+			/* Generate output */
+			Compress();
+		}
 
-        /**
-         * IncrementBlockCount.
-         */
-        private void IncrementBlockCount()
-        {
-            m_theCounter++;
-            m_theCurrBytes = 0;
-        }
+		/**
+		 * IncrementBlockCount.
+		 */
+		private void IncrementBlockCount()
+		{
+			m_theCounter++;
+			m_theCurrBytes = 0;
+		}
 
-        /**
-         * ResetBlockCount.
-         */
-        private void ResetBlockCount()
-        {
-            m_theCounter = 0;
-            m_theCurrBytes = 0;
-        }
+		/**
+		 * ResetBlockCount.
+		 */
+		private void ResetBlockCount()
+		{
+			m_theCounter = 0;
+			m_theCurrBytes = 0;
+		}
 
-        /**
-         * Set root indication.
-         */
-        private void SetRoot()
-        {
-            m_theV[FLAGS] |= ROOT;
-            m_theOutputMode = (int)m_theV[FLAGS];
-            m_theOutputDataLen = (int)m_theV[DATALEN];
-            m_theCounter = 0;
-            m_outputting = true;
-            m_outputAvailable = -1;
-            Array.Copy(m_theV, 0, m_theChaining, 0, NUMWORDS);
-        }
-    }
+		/**
+		 * Set root indication.
+		 */
+		private void SetRoot()
+		{
+			m_theV[FLAGS] |= ROOT;
+			m_theOutputMode = (int)m_theV[FLAGS];
+			m_theOutputDataLen = (int)m_theV[DATALEN];
+			m_theCounter = 0;
+			m_outputting = true;
+			m_outputAvailable = -1;
+			Array.Copy(m_theV, 0, m_theChaining, 0, NUMWORDS);
+		}
+	}
 }
 #pragma warning restore
 #endif

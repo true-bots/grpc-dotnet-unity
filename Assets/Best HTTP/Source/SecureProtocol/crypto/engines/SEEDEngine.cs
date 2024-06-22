@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 
@@ -89,7 +88,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		private static readonly uint[] SS2 =
 		{
-
 			0xa1a82989, 0x81840585, 0xd2d416c6, 0xd3d013c3, 0x50541444, 0x111c1d0d, 0xa0ac2c8c, 0x21242505,
 			0x515c1d4d, 0x43400343, 0x10181808, 0x121c1e0e, 0x51501141, 0xf0fc3ccc, 0xc2c80aca, 0x63602343,
 			0x20282808, 0x40440444, 0x20202000, 0x919c1d8d, 0xe0e020c0, 0xe2e022c2, 0xc0c808c8, 0x13141707,
@@ -126,7 +124,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		private static readonly uint[] SS3 =
 		{
-
 			0x08303838, 0xc8e0e828, 0x0d212c2d, 0x86a2a426, 0xcfc3cc0f, 0xced2dc1e, 0x83b3b033, 0x88b0b838,
 			0x8fa3ac2f, 0x40606020, 0x45515415, 0xc7c3c407, 0x44404404, 0x4f636c2f, 0x4b63682b, 0x4b53581b,
 			0xc3c3c003, 0x42626022, 0x03333033, 0x85b1b435, 0x09212829, 0x80a0a020, 0xc2e2e022, 0x87a3a427,
@@ -172,31 +169,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		private int[] wKey;
 		private bool forEncryption;
 
-        public virtual void Init(bool forEncryption, ICipherParameters parameters)
+		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			this.forEncryption = forEncryption;
 			wKey = CreateWorkingKey(((KeyParameter)parameters).GetKey());
 		}
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return "SEED"; }
 		}
 
-        public virtual int GetBlockSize()
+		public virtual int GetBlockSize()
 		{
 			return BlockSize;
 		}
 
-        public virtual int ProcessBlock(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
+		public virtual int ProcessBlock(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
 		{
 			if (wKey == null)
 				throw new InvalidOperationException("SEED engine not initialised");
 
-            Check.DataLength(inBuf, inOff, BlockSize, "input buffer too short");
-            Check.OutputLength(outBuf, outOff, BlockSize, "output buffer too short");
+			Check.DataLength(inBuf, inOff, BlockSize, "input buffer too short");
+			Check.OutputLength(outBuf, outOff, BlockSize, "output buffer too short");
 
-            long l = (long)Pack.BE_To_UInt64(inBuf, inOff + 0);
+			long l = (long)Pack.BE_To_UInt64(inBuf, inOff + 0);
 			long r = (long)Pack.BE_To_UInt64(inBuf, inOff + 8);
 
 			if (forEncryption)
@@ -317,13 +314,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		private long rotateLeft8(
 			long x)
 		{
-			return (x << 8) | ((long)((ulong) x >> 56));
+			return (x << 8) | ((long)((ulong)x >> 56));
 		}
 
 		private long rotateRight8(
 			long x)
 		{
-			return ((long)((ulong) x >> 8)) | (x << 56);
+			return ((long)((ulong)x >> 8)) | (x << 56);
 		}
 
 		private int G(
@@ -333,9 +330,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 
 		private long F(
-			int		ki0,
-			int		ki1,
-			long	r)
+			int ki0,
+			int ki1,
+			long r)
 		{
 			int r0 = (int)(r >> 32);
 			int r1 = (int)r;
@@ -346,19 +343,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 
 		private int phaseCalc1(
-			int	r0,
-			int	ki0,
-			int	r1,
-			int	ki1)
+			int r0,
+			int ki0,
+			int r1,
+			int ki1)
 		{
 			return G(G((r0 ^ ki0) ^ (r1 ^ ki1)) + (r0 ^ ki0));
 		}
 
 		private int phaseCalc2(
-			int	r0,
-			int	ki0,
-			int	r1,
-			int	ki1)
+			int r0,
+			int ki0,
+			int r1,
+			int ki1)
 		{
 			return G(phaseCalc1(r0, ki0, r1, ki1) + G((r0 ^ ki0) ^ (r1 ^ ki1)));
 		}

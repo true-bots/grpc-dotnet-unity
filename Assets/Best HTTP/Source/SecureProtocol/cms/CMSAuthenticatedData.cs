@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -84,7 +83,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		*/
 		public string MacAlgOid
 		{
-            get { return macAlg.Algorithm.Id; }
+			get { return macAlg.Algorithm.Id; }
 		}
 
 		/**
@@ -96,7 +95,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		/**
-		 * return the ContentInfo 
+		 * return the ContentInfo
 		 */
 		public ContentInfo ContentInfo
 		{

@@ -27,16 +27,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/** Constants */
 		private const int StateSize = 16; // 16, 32 bit ints = 64 bytes
 
-        private readonly static uint[] TAU_SIGMA = Pack.LE_To_UInt32(Strings.ToAsciiByteArray("expand 16-byte k" + "expand 32-byte k"), 0, 8);
+		private readonly static uint[] TAU_SIGMA = Pack.LE_To_UInt32(Strings.ToAsciiByteArray("expand 16-byte k" + "expand 32-byte k"), 0, 8);
 
-        internal void PackTauOrSigma(int keyLength, uint[] state, int stateOffset)
-        {
-            int tsOff = (keyLength - 16) / 4;
-            state[stateOffset] = TAU_SIGMA[tsOff];
-            state[stateOffset + 1] = TAU_SIGMA[tsOff + 1];
-            state[stateOffset + 2] = TAU_SIGMA[tsOff + 2];
-            state[stateOffset + 3] = TAU_SIGMA[tsOff + 3];
-        }
+		internal void PackTauOrSigma(int keyLength, uint[] state, int stateOffset)
+		{
+			int tsOff = (keyLength - 16) / 4;
+			state[stateOffset] = TAU_SIGMA[tsOff];
+			state[stateOffset + 1] = TAU_SIGMA[tsOff + 1];
+			state[stateOffset + 2] = TAU_SIGMA[tsOff + 2];
+			state[stateOffset + 3] = TAU_SIGMA[tsOff + 3];
+		}
 
 		protected int rounds;
 
@@ -77,13 +77,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			this.rounds = rounds;
 		}
 
-        public virtual void Init(
-			bool				forEncryption, 
-			ICipherParameters	parameters)
+		public virtual void Init(
+			bool forEncryption,
+			ICipherParameters parameters)
 		{
-			/* 
+			/*
 			 * Salsa20 encryption and decryption is completely
-			 * symmetrical, so the 'forEncryption' is 
+			 * symmetrical, so the 'forEncryption' is
 			 * irrelevant. (Like 90% of stream ciphers)
 			 */
 
@@ -95,24 +95,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (iv == null || iv.Length != NonceSize)
 				throw new ArgumentException(AlgorithmName + " requires exactly " + NonceSize + " bytes of IV");
 
-            ICipherParameters keyParam = ivParams.Parameters;
-            if (keyParam == null)
-            {
-                if (!initialised)
-                    throw new InvalidOperationException(AlgorithmName + " KeyParameter can not be null for first initialisation");
+			ICipherParameters keyParam = ivParams.Parameters;
+			if (keyParam == null)
+			{
+				if (!initialised)
+					throw new InvalidOperationException(AlgorithmName + " KeyParameter can not be null for first initialisation");
 
-                SetKey(null, iv);
-            }
-            else if (keyParam is KeyParameter)
-            {
-                SetKey(((KeyParameter)keyParam).GetKey(), iv);
-            }
-            else
-            {
-                throw new ArgumentException(AlgorithmName + " Init parameters must contain a KeyParameter (or null for re-init)");
-            }
+				SetKey(null, iv);
+			}
+			else if (keyParam is KeyParameter)
+			{
+				SetKey(((KeyParameter)keyParam).GetKey(), iv);
+			}
+			else
+			{
+				throw new ArgumentException(AlgorithmName + " Init parameters must contain a KeyParameter (or null for re-init)");
+			}
 
-            Reset();
+			Reset();
 			initialised = true;
 		}
 
@@ -124,17 +124,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual string AlgorithmName
 		{
 			get
-            { 
+			{
 				string name = "Salsa20";
 				if (rounds != DEFAULT_ROUNDS)
 				{
 					name += "/" + rounds;
 				}
+
 				return name;
 			}
 		}
 
-        public virtual byte ReturnByte(
+		public virtual byte ReturnByte(
 			byte input)
 		{
 			if (LimitExceeded())
@@ -162,30 +163,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-        public virtual void ProcessBytes(
-			byte[]	inBytes, 
-			int		inOff, 
-			int		len, 
-			byte[]	outBytes, 
-			int		outOff)
+		public virtual void ProcessBytes(
+			byte[] inBytes,
+			int inOff,
+			int len,
+			byte[] outBytes,
+			int outOff)
 		{
 			if (!initialised)
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
 
-            Check.DataLength(inBytes, inOff, len, "input buffer too short");
-            Check.OutputLength(outBytes, outOff, len, "output buffer too short");
+			Check.DataLength(inBytes, inOff, len, "input buffer too short");
+			Check.OutputLength(outBytes, outOff, len, "output buffer too short");
 
-            if (LimitExceeded((uint)len))
+			if (LimitExceeded((uint)len))
 				throw new MaxBytesExceededException("2^70 byte limit per IV would be exceeded; Change IV");
 
-            for (int i = 0; i < len; i++)
+			for (int i = 0; i < len; i++)
 			{
 				if (index == 0)
 				{
 					GenerateKeyStream(keyStream);
 					AdvanceCounter();
 				}
-				outBytes[i+outOff] = (byte)(keyStream[index]^inBytes[i+inOff]);
+
+				outBytes[i + outOff] = (byte)(keyStream[index] ^ inBytes[i + inOff]);
 				index = (index + 1) & 63;
 			}
 		}
@@ -214,7 +216,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         }
 #endif
 
-        public virtual void Reset()
+		public virtual void Reset()
 		{
 			index = 0;
 			ResetLimitCounter();
@@ -228,27 +230,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		protected virtual void SetKey(byte[] keyBytes, byte[] ivBytes)
 		{
-            if (keyBytes != null)
-            {
-                if ((keyBytes.Length != 16) && (keyBytes.Length != 32))
-                    throw new ArgumentException(AlgorithmName + " requires 128 bit or 256 bit key");
+			if (keyBytes != null)
+			{
+				if ((keyBytes.Length != 16) && (keyBytes.Length != 32))
+					throw new ArgumentException(AlgorithmName + " requires 128 bit or 256 bit key");
 
-                int tsOff = (keyBytes.Length - 16) / 4;
-                engineState[0] = TAU_SIGMA[tsOff];
-                engineState[5] = TAU_SIGMA[tsOff + 1];
-                engineState[10] = TAU_SIGMA[tsOff + 2];
-                engineState[15] = TAU_SIGMA[tsOff + 3];
+				int tsOff = (keyBytes.Length - 16) / 4;
+				engineState[0] = TAU_SIGMA[tsOff];
+				engineState[5] = TAU_SIGMA[tsOff + 1];
+				engineState[10] = TAU_SIGMA[tsOff + 2];
+				engineState[15] = TAU_SIGMA[tsOff + 3];
 
-                // Key
-                Pack.LE_To_UInt32(keyBytes, 0, engineState, 1, 4);
-                Pack.LE_To_UInt32(keyBytes, keyBytes.Length - 16, engineState, 11, 4);
-            }
+				// Key
+				Pack.LE_To_UInt32(keyBytes, 0, engineState, 1, 4);
+				Pack.LE_To_UInt32(keyBytes, keyBytes.Length - 16, engineState, 11, 4);
+			}
 
-            // IV
-            Pack.LE_To_UInt32(ivBytes, 0, engineState, 6, 2);
-        }
+			// IV
+			Pack.LE_To_UInt32(ivBytes, 0, engineState, 6, 2);
+		}
 
-        protected virtual void GenerateKeyStream(byte[] output)
+		protected virtual void GenerateKeyStream(byte[] output)
 		{
 			SalsaCore(rounds, engineState, x);
 			Pack.UInt32_To_LE(x, output, 0);
@@ -385,16 +387,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (rounds % 2 != 0)
 				throw new ArgumentException("Number of rounds must be even");
 
-			uint x00 = input[ 0];
-			uint x01 = input[ 1];
-			uint x02 = input[ 2];
-			uint x03 = input[ 3];
-			uint x04 = input[ 4];
-			uint x05 = input[ 5];
-			uint x06 = input[ 6];
-			uint x07 = input[ 7];
-			uint x08 = input[ 8];
-			uint x09 = input[ 9];
+			uint x00 = input[0];
+			uint x01 = input[1];
+			uint x02 = input[2];
+			uint x03 = input[3];
+			uint x04 = input[4];
+			uint x05 = input[5];
+			uint x06 = input[6];
+			uint x07 = input[7];
+			uint x08 = input[8];
+			uint x09 = input[9];
 			uint x10 = input[10];
 			uint x11 = input[11];
 			uint x12 = input[12];
@@ -405,26 +407,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			for (int i = rounds; i > 0; i -= 2)
 			{
 				QuarterRound(ref x00, ref x04, ref x08, ref x12);
-                QuarterRound(ref x05, ref x09, ref x13, ref x01);
-                QuarterRound(ref x10, ref x14, ref x02, ref x06);
-                QuarterRound(ref x15, ref x03, ref x07, ref x11);
+				QuarterRound(ref x05, ref x09, ref x13, ref x01);
+				QuarterRound(ref x10, ref x14, ref x02, ref x06);
+				QuarterRound(ref x15, ref x03, ref x07, ref x11);
 
-                QuarterRound(ref x00, ref x01, ref x02, ref x03);
-                QuarterRound(ref x05, ref x06, ref x07, ref x04);
-                QuarterRound(ref x10, ref x11, ref x08, ref x09);
-                QuarterRound(ref x15, ref x12, ref x13, ref x14);
+				QuarterRound(ref x00, ref x01, ref x02, ref x03);
+				QuarterRound(ref x05, ref x06, ref x07, ref x04);
+				QuarterRound(ref x10, ref x11, ref x08, ref x09);
+				QuarterRound(ref x15, ref x12, ref x13, ref x14);
 			}
 
-			output[ 0] = x00 + input[ 0];
-			output[ 1] = x01 + input[ 1];
-			output[ 2] = x02 + input[ 2];
-			output[ 3] = x03 + input[ 3];
-			output[ 4] = x04 + input[ 4];
-			output[ 5] = x05 + input[ 5];
-			output[ 6] = x06 + input[ 6];
-			output[ 7] = x07 + input[ 7];
-			output[ 8] = x08 + input[ 8];
-			output[ 9] = x09 + input[ 9];
+			output[0] = x00 + input[0];
+			output[1] = x01 + input[1];
+			output[2] = x02 + input[2];
+			output[3] = x03 + input[3];
+			output[4] = x04 + input[4];
+			output[5] = x05 + input[5];
+			output[6] = x06 + input[6];
+			output[7] = x07 + input[7];
+			output[8] = x08 + input[8];
+			output[9] = x09 + input[9];
 			output[10] = x10 + input[10];
 			output[11] = x11 + input[11];
 			output[12] = x12 + input[12];
@@ -447,7 +449,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				if (++cW1 == 0)
 				{
-					return (++cW2 & 0x20) != 0;          // 2^(32 + 32 + 6)
+					return (++cW2 & 0x20) != 0; // 2^(32 + 32 + 6)
 				}
 			}
 
@@ -466,7 +468,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				if (++cW1 == 0)
 				{
-					return (++cW2 & 0x20) != 0;          // 2^(32 + 32 + 6)
+					return (++cW2 & 0x20) != 0; // 2^(32 + 32 + 6)
 				}
 			}
 
@@ -474,15 +476,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 
 #if NETSTANDARD1_0_OR_GREATER || NETCOREAPP1_0_OR_GREATER || UNITY_2021_2_OR_NEWER
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private static void QuarterRound(ref uint a, ref uint b, ref uint c, ref uint d)
+		private static void QuarterRound(ref uint a, ref uint b, ref uint c, ref uint d)
 		{
-            b ^= Integers.RotateLeft(a + d,  7);
-            c ^= Integers.RotateLeft(b + a,  9);
-            d ^= Integers.RotateLeft(c + b, 13);
-            a ^= Integers.RotateLeft(d + c, 18);
-        }
+			b ^= Integers.RotateLeft(a + d, 7);
+			c ^= Integers.RotateLeft(b + a, 9);
+			d ^= Integers.RotateLeft(c + b, 13);
+			a ^= Integers.RotateLeft(d + c, 18);
+		}
 
 #if NETCOREAPP3_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -506,7 +508,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             return Sse2.Xor(Sse2.ShiftLeftLogical(x, sl), Sse2.ShiftRightLogical(x, sr));
         }
 #endif
-    }
+	}
 }
 #pragma warning restore
 #endif

@@ -7,8 +7,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 {
 	[Serializable]
 	public class CrmfException
-        : Exception
-    {
+		: Exception
+	{
 		public CrmfException()
 			: base()
 		{

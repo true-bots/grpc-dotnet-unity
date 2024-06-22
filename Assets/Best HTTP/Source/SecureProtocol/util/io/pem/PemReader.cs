@@ -3,14 +3,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 {
 	public class PemReader
 		: IDisposable
-	{		
+	{
 		private readonly TextReader reader;
 		private readonly MemoryStream buffer;
 		private readonly StreamWriter textBuffer;
@@ -20,29 +19,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		public PemReader(TextReader reader)
 		{
 			this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
-            this.buffer = new MemoryStream();
-            this.textBuffer = new StreamWriter(buffer);
+			this.buffer = new MemoryStream();
+			this.textBuffer = new StreamWriter(buffer);
 		}
 
-        #region IDisposable
+		#region IDisposable
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                reader.Dispose();
-            }
-        }
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				reader.Dispose();
+			}
+		}
 
-        #endregion
+		#endregion
 
-        public TextReader Reader
+		public TextReader Reader
 		{
 			get { return reader; }
 		}
@@ -53,20 +52,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		/// </returns>
 		/// <exception cref="IOException"></exception>	
 		public PemObject ReadPemObject()
-        {
-
+		{
 			//
 			// Look for BEGIN
 			//
 
 			for (;;)
 			{
-
 				// Seek a leading dash, ignore anything up to that point.
 				if (!seekDash())
 				{
 					// There are no pem objects here.
-					return null; 
+					return null;
 				}
 
 
@@ -86,7 +83,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 				}
 
 				break;
-
 			}
 
 
@@ -96,8 +92,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			// Consume type, accepting whitespace
 			//
 
-			if (!bufferUntilStopChar('-',false) )
-            {
+			if (!bufferUntilStopChar('-', false))
+			{
 				throw new IOException("ran out of data before consuming type");
 			}
 
@@ -107,7 +103,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			// Consume dashes after type.
 
 			if (!consumeDash())
-            {
+			{
 				throw new IOException("ran out of data consuming header");
 			}
 
@@ -122,10 +118,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			var headers = new List<PemHeader>();
 
 			while (seekColon(64))
-            {
-
-				if (!bufferUntilStopChar(':',false))
-                {
+			{
+				if (!bufferUntilStopChar(':', false))
+				{
 					throw new IOException("ran out of data reading header key value");
 				}
 
@@ -134,25 +129,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 
 				c = Read();
 				if (c != ':')
-                {
+				{
 					throw new IOException("expected colon");
-                }
-				
+				}
+
 
 				//
 				// We are going to look for well formed headers, if they do not end with a "LF" we cannot
 				// discern where they end.
 				//
-			
+
 				if (!bufferUntilStopChar('\n', false)) // Now read to the end of the line.
-                {
+				{
 					throw new IOException("ran out of data before consuming header value");
 				}
 
 				skipWhiteSpace();
 
 				string value = bufferedString().Trim();
-				headers.Add(new PemHeader(key,value));
+				headers.Add(new PemHeader(key, value));
 			}
 
 
@@ -162,13 +157,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 
 			skipWhiteSpace();
 
-			if (!bufferUntilStopChar('-',true))
+			if (!bufferUntilStopChar('-', true))
 			{
 				throw new IOException("ran out of data before consuming payload");
 			}
 
 			string payload = bufferedString();
-		
+
 			// Seek the start of the end.
 			if (!seekDash())
 			{
@@ -180,11 +175,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 				throw new IOException("no data after consuming trailing dashes");
 			}
 
-			if (!expect("END "+type))
+			if (!expect("END " + type))
 			{
-				throw new IOException("END "+type+" was not found.");
+				throw new IOException("END " + type + " was not found.");
 			}
-
 
 
 			if (!seekDash())
@@ -195,39 +189,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 
 			// consume trailing dashes.
 			consumeDash();
-			
+
 
 			return new PemObject(type, headers, Base64.Decode(payload));
-
 		}
 
 
-	
 		private string bufferedString()
-        {
+		{
 			textBuffer.Flush();
 			string value = Strings.FromUtf8ByteArray(buffer.ToArray());
 			buffer.Position = 0;
 			buffer.SetLength(0);
 			return value;
-        }
+		}
 
 
 		private bool seekDash()
-        {
+		{
 			c = 0;
-			while((c = Read()) >=0)
-            {
+			while ((c = Read()) >= 0)
+			{
 				if (c == '-')
-                {
+				{
 					break;
-                }
-            }
+				}
+			}
 
 			PushBack(c);
 
 			return c == '-';
-        }
+		}
 
 
 		/// <summary>
@@ -241,26 +233,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			bool colonFound = false;
 			var read = new List<int>();
 
-			for (; upTo>=0 && c >=0; upTo--)
-            {
+			for (; upTo >= 0 && c >= 0; upTo--)
+			{
 				c = Read();
 				read.Add(c);
 				if (c == ':')
-                {
+				{
 					colonFound = true;
 					break;
-                }
-            }
+				}
+			}
 
-			while(read.Count>0)
-            {
-				PushBack((int)read[read.Count-1]);
-				read.RemoveAt(read.Count-1);
-            }
+			while (read.Count > 0)
+			{
+				PushBack((int)read[read.Count - 1]);
+				read.RemoveAt(read.Count - 1);
+			}
 
 			return colonFound;
 		}
-
 
 
 		/// <summary>
@@ -268,7 +259,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		/// </summary>
 		/// <returns></returns>
 		private bool consumeDash()
-        {
+		{
 			c = 0;
 			while ((c = Read()) >= 0)
 			{
@@ -287,7 +278,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		/// Skip white space leave char in stream.
 		/// </summary>
 		private void skipWhiteSpace()
-        {
+		{
 			while ((c = Read()) >= 0)
 			{
 				if (c > ' ')
@@ -295,6 +286,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 					break;
 				}
 			}
+
 			PushBack(c);
 		}
 
@@ -303,74 +295,75 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		/// </summary>
 		/// <param name="value">expected string</param>
 		/// <returns>false if not consumed</returns>
-
 		private bool expect(string value)
-        {
-			for (int t=0; t<value.Length; t++)
-            {
+		{
+			for (int t = 0; t < value.Length; t++)
+			{
 				c = Read();
 				if (c == value[t])
-                {
+				{
 					continue;
-                } else
-                {
+				}
+				else
+				{
 					return false;
-                }
-            }
+				}
+			}
 
 			return true;
-        }
+		}
 
 		/// <summary>
 		/// Consume until dash.
 		/// </summary>
 		/// <returns>true if stream end not met</returns>
-		private bool bufferUntilStopChar(char stopChar,   bool skipWhiteSpace)
-        {
+		private bool bufferUntilStopChar(char stopChar, bool skipWhiteSpace)
+		{
 			while ((c = Read()) >= 0)
-			{	
-				if (skipWhiteSpace && c <=' ')
-                {
+			{
+				if (skipWhiteSpace && c <= ' ')
+				{
 					continue;
-                }
+				}
 
 				if (c != stopChar)
 				{
 					textBuffer.Write((char)c);
 					textBuffer.Flush();
-					
-				} else
-                {
-					  PushBack(c);
+				}
+				else
+				{
+					PushBack(c);
 					break;
-                }
+				}
 			}
-			
+
 			return c > -1;
 		}
 
 		private void PushBack(int value)
-        {
+		{
 			if (pushback.Count == 0)
-            {
+			{
 				pushback.Add(value);
-            } else
-            {
+			}
+			else
+			{
 				pushback.Insert(0, value);
-            }
-        }
+			}
+		}
 
 		private int Read()
-        {
+		{
 			if (pushback.Count > 0)
-            {
+			{
 				int i = pushback[0];
 				pushback.RemoveAt(0);
 				return i;
-            }
+			}
 
 			return reader.Read();
-        }
+		}
 	}
 }
 #pragma warning restore

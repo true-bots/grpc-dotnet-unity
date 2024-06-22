@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
@@ -18,21 +17,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class OcspResponsesID
 		: Asn1Encodable
 	{
-		private readonly OcspIdentifier	ocspIdentifier;
-		private readonly OtherHash		ocspRepHash;
+		private readonly OcspIdentifier ocspIdentifier;
+		private readonly OtherHash ocspRepHash;
 
 		public static OcspResponsesID GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is OcspResponsesID)
-				return (OcspResponsesID) obj;
+				return (OcspResponsesID)obj;
 
 			if (obj is Asn1Sequence)
-				return new OcspResponsesID((Asn1Sequence) obj);
+				return new OcspResponsesID((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'OcspResponsesID' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -59,8 +58,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		}
 
 		public OcspResponsesID(
-			OcspIdentifier	ocspIdentifier,
-			OtherHash		ocspRepHash)
+			OcspIdentifier ocspIdentifier,
+			OtherHash ocspRepHash)
 		{
 			if (ocspIdentifier == null)
 				throw new ArgumentNullException("ocspIdentifier");
@@ -91,7 +90,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 
 			return new DerSequence(v);
 		}
-
 	}
 }
 #pragma warning restore

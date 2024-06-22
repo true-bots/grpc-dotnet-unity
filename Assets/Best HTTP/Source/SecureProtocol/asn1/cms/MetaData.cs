@@ -9,14 +9,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	{
 		private DerBoolean hashProtected;
 		private DerUtf8String fileName;
-		private DerIA5String  mediaType;
+		private DerIA5String mediaType;
 		private Attributes otherMetaData;
 
 		public MetaData(
-			DerBoolean		hashProtected,
-			DerUtf8String	fileName,
-			DerIA5String	mediaType,
-			Attributes		otherMetaData)
+			DerBoolean hashProtected,
+			DerUtf8String fileName,
+			DerIA5String mediaType,
+			Attributes otherMetaData)
 		{
 			this.hashProtected = hashProtected;
 			this.fileName = fileName;
@@ -34,10 +34,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			{
 				this.fileName = DerUtf8String.GetInstance(seq[index++]);
 			}
+
 			if (index < seq.Count && seq[index] is DerIA5String)
 			{
 				this.mediaType = DerIA5String.GetInstance(seq[index++]);
 			}
+
 			if (index < seq.Count)
 			{
 				this.otherMetaData = Attributes.GetInstance(seq[index++]);

@@ -20,7 +20,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		public PemObject(string type, IList<PemHeader> headers, byte[] content)
 		{
 			this.type = type;
-            this.headers = new List<PemHeader>(headers);
+			this.headers = new List<PemHeader>(headers);
 			this.content = content;
 		}
 

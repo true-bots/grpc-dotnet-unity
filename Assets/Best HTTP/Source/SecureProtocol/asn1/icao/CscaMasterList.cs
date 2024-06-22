@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
@@ -14,12 +13,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 	 * CscaMasterList ::= SEQUENCE {
 	 *   version                CscaMasterListVersion,
 	 *   certList               SET OF Certificate }
-	 *   
+	 *
 	 * CscaMasterListVersion :: INTEGER {v0(0)}
 	 * </pre>
 	 */
-	public class CscaMasterList 
-		: Asn1Encodable 
+	public class CscaMasterList
+		: Asn1Encodable
 	{
 		private DerInteger version = new DerInteger(0);
 		private X509CertificateStructure[] certList;
@@ -31,7 +30,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 				return (CscaMasterList)obj;
 
 			if (obj != null)
-				return new CscaMasterList(Asn1Sequence.GetInstance(obj));            
+				return new CscaMasterList(Asn1Sequence.GetInstance(obj));
 
 			return null;
 		}
@@ -64,7 +63,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 
 		public virtual int Version
 		{
-            get { return version.IntValueExact; }
+			get { return version.IntValueExact; }
 		}
 
 		public X509CertificateStructure[] GetCertStructs()
@@ -77,7 +76,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 			return (X509CertificateStructure[])orig.Clone();
 		}
 
-		public override Asn1Object ToAsn1Object() 
+		public override Asn1Object ToAsn1Object()
 		{
 			return new DerSequence(version, new DerSet(certList));
 		}

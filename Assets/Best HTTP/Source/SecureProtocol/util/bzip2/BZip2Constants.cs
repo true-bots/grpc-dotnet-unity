@@ -26,26 +26,26 @@
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 {
-    /**
-    * Base class for both the compress and decompress classes.
-    * Holds common arrays, and static data.
-    *
-    * @author <a href="mailto:keiron@aftexsw.com">Keiron Liddle</a>
-    */
-    public class BZip2Constants
-    {
-        public const int baseBlockSize = 100000;
-        public const int MAX_ALPHA_SIZE = 258;
-        public const int MAX_CODE_LEN = 20;
-        public const int MAX_CODE_LEN_GEN = 17;
-        public const int RUNA = 0;
-        public const int RUNB = 1;
-        public const int N_GROUPS = 6;
-        public const int G_SIZE = 50;
-        public const int N_ITERS = 4;
-        public const int MAX_SELECTORS = 2 + (900000 / G_SIZE);
-        public const int NUM_OVERSHOOT_BYTES = 20;
-    }
+	/**
+	* Base class for both the compress and decompress classes.
+	* Holds common arrays, and static data.
+	*
+	* @author <a href="mailto:keiron@aftexsw.com">Keiron Liddle</a>
+	*/
+	public class BZip2Constants
+	{
+		public const int baseBlockSize = 100000;
+		public const int MAX_ALPHA_SIZE = 258;
+		public const int MAX_CODE_LEN = 20;
+		public const int MAX_CODE_LEN_GEN = 17;
+		public const int RUNA = 0;
+		public const int RUNB = 1;
+		public const int N_GROUPS = 6;
+		public const int G_SIZE = 50;
+		public const int N_ITERS = 4;
+		public const int MAX_SELECTORS = 2 + (900000 / G_SIZE);
+		public const int NUM_OVERSHOOT_BYTES = 20;
+	}
 }
 #pragma warning restore
 #endif

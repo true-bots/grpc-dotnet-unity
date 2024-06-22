@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.GM;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Nist;
@@ -32,10 +31,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		public static readonly string RipeMD256 = TeleTrusTObjectIdentifiers.RipeMD256.Id;
 
 		public static readonly string Gost3411 = CryptoProObjectIdentifiers.GostR3411.Id;
-        public static readonly string Gost3411_2012_256 = RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256.Id;
-        public static readonly string Gost3411_2012_512 = RosstandartObjectIdentifiers.id_tc26_gost_3411_12_512.Id;
+		public static readonly string Gost3411_2012_256 = RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256.Id;
+		public static readonly string Gost3411_2012_512 = RosstandartObjectIdentifiers.id_tc26_gost_3411_12_512.Id;
 
-        public static readonly string SM3 = GMObjectIdentifiers.sm3.Id;
+		public static readonly string SM3 = GMObjectIdentifiers.sm3.Id;
 
 		public static readonly IList<string> Allowed;
 

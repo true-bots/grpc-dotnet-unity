@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	/// <summary>This exception is thrown whenever a cipher requires a change of key, IV or similar after x amount of
 	/// bytes enciphered.
 	/// </summary>
-    [Serializable]
-    public class MaxBytesExceededException
+	[Serializable]
+	public class MaxBytesExceededException
 		: CryptoException
 	{
 		public MaxBytesExceededException()

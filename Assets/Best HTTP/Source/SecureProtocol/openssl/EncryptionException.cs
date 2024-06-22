@@ -6,8 +6,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 {
-    [Serializable]
-    public class EncryptionException
+	[Serializable]
+	public class EncryptionException
 		: IOException
 	{
 		public EncryptionException()

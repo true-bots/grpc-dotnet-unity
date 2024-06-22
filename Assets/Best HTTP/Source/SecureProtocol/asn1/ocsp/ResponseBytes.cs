@@ -1,20 +1,19 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 {
-    public class ResponseBytes
-        : Asn1Encodable
-    {
-        private readonly DerObjectIdentifier responseType;
-        private readonly Asn1OctetString response;
+	public class ResponseBytes
+		: Asn1Encodable
+	{
+		private readonly DerObjectIdentifier responseType;
+		private readonly Asn1OctetString response;
 
 		public static ResponseBytes GetInstance(
-			Asn1TaggedObject	obj,
-			bool				explicitly)
+			Asn1TaggedObject obj,
+			bool explicitly)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
 		}
@@ -32,31 +31,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new ResponseBytes((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public ResponseBytes(
-            DerObjectIdentifier	responseType,
-            Asn1OctetString		response)
-        {
+			DerObjectIdentifier responseType,
+			Asn1OctetString response)
+		{
 			if (responseType == null)
 				throw new ArgumentNullException("responseType");
 			if (response == null)
 				throw new ArgumentNullException("response");
 
 			this.responseType = responseType;
-            this.response = response;
-        }
+			this.response = response;
+		}
 
 		private ResponseBytes(
-            Asn1Sequence seq)
-        {
+			Asn1Sequence seq)
+		{
 			if (seq.Count != 2)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
 			this.responseType = DerObjectIdentifier.GetInstance(seq[0]);
-            this.response = Asn1OctetString.GetInstance(seq[1]);
-        }
+			this.response = Asn1OctetString.GetInstance(seq[1]);
+		}
 
 		public DerObjectIdentifier ResponseType
 		{
@@ -76,11 +75,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
          *     response       OCTET STRING }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
+		public override Asn1Object ToAsn1Object()
+		{
 			return new DerSequence(responseType, response);
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

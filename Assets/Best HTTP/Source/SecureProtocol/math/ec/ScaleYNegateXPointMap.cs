@@ -4,21 +4,21 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 {
-    public class ScaleYNegateXPointMap
-        : ECPointMap
-    {
-        protected readonly ECFieldElement scale;
+	public class ScaleYNegateXPointMap
+		: ECPointMap
+	{
+		protected readonly ECFieldElement scale;
 
-        public ScaleYNegateXPointMap(ECFieldElement scale)
-        {
-            this.scale = scale;
-        }
+		public ScaleYNegateXPointMap(ECFieldElement scale)
+		{
+			this.scale = scale;
+		}
 
-        public virtual ECPoint Map(ECPoint p)
-        {
-            return p.ScaleYNegateX(scale);
-        }
-    }
+		public virtual ECPoint Map(ECPoint p)
+		{
+			return p.ScaleYNegateX(scale);
+		}
+	}
 }
 #pragma warning restore
 #endif

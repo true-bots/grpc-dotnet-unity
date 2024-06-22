@@ -18,10 +18,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	*/
 	public class EnvelopedDataParser
 	{
-		private Asn1SequenceParser	_seq;
-		private DerInteger			_version;
-		private IAsn1Convertible	_nextObject;
-		private bool				_originatorInfoCalled;
+		private Asn1SequenceParser _seq;
+		private DerInteger _version;
+		private IAsn1Convertible _nextObject;
+		private bool _originatorInfoCalled;
 
 		public EnvelopedDataParser(
 			Asn1SequenceParser seq)
@@ -35,9 +35,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			get { return _version; }
 		}
 
-		public OriginatorInfo GetOriginatorInfo() 
+		public OriginatorInfo GetOriginatorInfo()
 		{
-			_originatorInfoCalled = true; 
+			_originatorInfoCalled = true;
 
 			if (_nextObject == null)
 			{
@@ -83,7 +83,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 
 			if (_nextObject != null)
 			{
-				Asn1SequenceParser o = (Asn1SequenceParser) _nextObject;
+				Asn1SequenceParser o = (Asn1SequenceParser)_nextObject;
 				_nextObject = null;
 				return new EncryptedContentInfoParser(o);
 			}

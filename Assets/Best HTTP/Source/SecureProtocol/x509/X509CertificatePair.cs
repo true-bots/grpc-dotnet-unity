@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security.Certificates;
@@ -24,8 +23,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		/// <param name="forward">Certificate from the other CA to this CA.</param>
 		/// <param name="reverse">Certificate from this CA to the other CA.</param>
 		public X509CertificatePair(
-			X509Certificate	forward,
-			X509Certificate	reverse)
+			X509Certificate forward,
+			X509Certificate reverse)
 		{
 			this.forward = forward;
 			this.reverse = reverse;
@@ -40,6 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			{
 				this.forward = new X509Certificate(pair.Forward);
 			}
+
 			if (pair.Reverse != null)
 			{
 				this.reverse = new X509Certificate(pair.Reverse);
@@ -104,7 +104,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				return false;
 
 			return Org.BouncyCastle.Utilities.Platform.Equals(this.forward, other.forward)
-				&& Org.BouncyCastle.Utilities.Platform.Equals(this.reverse, other.reverse);
+			       && Org.BouncyCastle.Utilities.Platform.Equals(this.reverse, other.reverse);
 		}
 
 		public override int GetHashCode()
@@ -114,11 +114,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			{
 				hash ^= forward.GetHashCode();
 			}
+
 			if (reverse != null)
 			{
 				hash *= 17;
 				hash ^= reverse.GetHashCode();
 			}
+
 			return hash;
 		}
 	}

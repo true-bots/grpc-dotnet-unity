@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -22,12 +21,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		public static Restriction GetInstance(object obj)
 		{
 			if (obj is Restriction)
-				return (Restriction) obj;
+				return (Restriction)obj;
 
 			if (obj is IAsn1String)
 				return new Restriction(DirectoryString.GetInstance(obj));
 
-            throw new ArgumentException("Unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**

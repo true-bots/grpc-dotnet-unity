@@ -13,14 +13,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 
 		protected override void InitKey(
-			byte[]	keyBytes,
-			byte[]	ivBytes)
+			byte[] keyBytes,
+			byte[] ivBytes)
 		{
 			s = 0;
 			P = new byte[256];
 			for (int i = 0; i < 256; i++)
 			{
-				P[i] = (byte) i;
+				P[i] = (byte)i;
 			}
 
 			for (int m = 0; m < 768; m++)

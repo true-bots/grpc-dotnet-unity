@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
@@ -32,8 +31,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		 * @param value value object to go into the atribute's value set.
 		 */
 		public X509Attribute(
-			string			oid,
-			Asn1Encodable	value)
+			string oid,
+			Asn1Encodable value)
 		{
 			this.attr = new AttributeX509(new DerObjectIdentifier(oid), new DerSet(value));
 		}
@@ -46,7 +45,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		 * @param value vector of values to go in the attribute's value set.
 		 */
 		public X509Attribute(
-			string              oid,
+			string oid,
 			Asn1EncodableVector value)
 		{
 			this.attr = new AttributeX509(new DerObjectIdentifier(oid), new DerSet(value));

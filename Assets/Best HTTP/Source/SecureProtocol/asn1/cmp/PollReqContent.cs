@@ -7,8 +7,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class PollReqContent
 		: Asn1Encodable
 	{
-        public static PollReqContent GetInstance(object obj)
-        {
+		public static PollReqContent GetInstance(object obj)
+		{
 			if (obj is PollReqContent pollReqContent)
 				return pollReqContent;
 
@@ -16,9 +16,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new PollReqContent(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly Asn1Sequence m_content;
+		private readonly Asn1Sequence m_content;
 
 		private PollReqContent(Asn1Sequence seq)
 		{
@@ -72,22 +72,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			{
 				result[i] = SequenceToDerIntegerArray((Asn1Sequence)m_content[i]);
 			}
+
 			return result;
 		}
 
-        public virtual BigInteger[] GetCertReqIDValues()
-        {
-            BigInteger[] result = new BigInteger[m_content.Count];
+		public virtual BigInteger[] GetCertReqIDValues()
+		{
+			BigInteger[] result = new BigInteger[m_content.Count];
 
-            for (int i = 0; i != result.Length; i++)
-            {
-                result[i] = DerInteger.GetInstance(Asn1Sequence.GetInstance(m_content[i])[0]).Value;
-            }
+			for (int i = 0; i != result.Length; i++)
+			{
+				result[i] = DerInteger.GetInstance(Asn1Sequence.GetInstance(m_content[i])[0]).Value;
+			}
 
-            return result;
-        }
+			return result;
+		}
 
-        /**
+		/**
 		 * <pre>
 		 * PollReqContent ::= SEQUENCE OF SEQUENCE {
 		 *                        certReqId              INTEGER
@@ -95,7 +96,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		 * </pre>
 		 * @return a basic ASN.1 object representation.
 		 */
-        public override Asn1Object ToAsn1Object()
+		public override Asn1Object ToAsn1Object()
 		{
 			return m_content;
 		}

@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 
@@ -45,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 		public int Status
 		{
-            get { return this.resp.ResponseStatus.IntValueExact; }
+			get { return this.resp.ResponseStatus.IntValueExact; }
 		}
 
 		public object GetResponseObject()

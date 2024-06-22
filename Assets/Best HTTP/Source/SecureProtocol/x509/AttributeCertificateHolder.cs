@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -16,16 +15,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	/// <remarks>
 	/// The Holder object.
 	/// <pre>
- 	/// Holder ::= SEQUENCE {
- 	///		baseCertificateID   [0] IssuerSerial OPTIONAL,
- 	///			-- the issuer and serial number of
- 	///			-- the holder's Public Key Certificate
- 	///		entityName          [1] GeneralNames OPTIONAL,
- 	///			-- the name of the claimant or role
- 	///		objectDigestInfo    [2] ObjectDigestInfo OPTIONAL
- 	///			-- used to directly authenticate the holder,
- 	///			-- for example, an executable
- 	/// }
+	/// Holder ::= SEQUENCE {
+	///		baseCertificateID   [0] IssuerSerial OPTIONAL,
+	///			-- the issuer and serial number of
+	///			-- the holder's Public Key Certificate
+	///		entityName          [1] GeneralNames OPTIONAL,
+	///			-- the name of the claimant or role
+	///		objectDigestInfo    [2] ObjectDigestInfo OPTIONAL
+	///			-- used to directly authenticate the holder,
+	///			-- for example, an executable
+	/// }
 	/// </pre>
 	/// </remarks>
 	public class AttributeCertificateHolder
@@ -41,8 +40,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		}
 
 		public AttributeCertificateHolder(
-			X509Name	issuerName,
-			BigInteger	serialNumber)
+			X509Name issuerName,
+			BigInteger serialNumber)
 		{
 			holder = new Holder(
 				new IssuerSerial(
@@ -51,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		}
 
 		public AttributeCertificateHolder(
-			X509Certificate	cert)
+			X509Certificate cert)
 		{
 			X509Name name;
 			try
@@ -96,10 +95,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		 * @param objectDigest The hash value.
 		 */
 		public AttributeCertificateHolder(
-			int		digestedObjectType,
-			string	digestAlgorithm,
-			string	otherObjectTypeID,
-			byte[]	objectDigest)
+			int digestedObjectType,
+			string digestAlgorithm,
+			string otherObjectTypeID,
+			byte[] objectDigest)
 		{
 			// TODO Allow 'objectDigest' to be null?
 
@@ -129,8 +128,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				ObjectDigestInfo odi = holder.ObjectDigestInfo;
 
 				return odi == null
-					?   -1
-                    :   odi.DigestedObjectType.IntValueExact;
+					? -1
+					: odi.DigestedObjectType.IntValueExact;
 			}
 		}
 
@@ -147,8 +146,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				ObjectDigestInfo odi = holder.ObjectDigestInfo;
 
 				return odi == null
-					?	null
-					:	odi.DigestAlgorithm.Algorithm.Id;
+					? null
+					: odi.DigestAlgorithm.Algorithm.Id;
 			}
 		}
 
@@ -162,8 +161,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			ObjectDigestInfo odi = holder.ObjectDigestInfo;
 
 			return odi == null
-				?	null
-				:	odi.ObjectDigest.GetBytes();
+				? null
+				: odi.ObjectDigest.GetBytes();
 		}
 
 		/**
@@ -179,8 +178,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				ObjectDigestInfo odi = holder.ObjectDigestInfo;
 
 				return odi == null
-					?	null
-					:	odi.OtherObjectTypeID.Id;
+					? null
+					: odi.OtherObjectTypeID.Id;
 			}
 		}
 
@@ -192,8 +191,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		}
 
 		private bool MatchesDN(
-			X509Name		subject,
-			GeneralNames	targets)
+			X509Name subject,
+			GeneralNames targets)
 		{
 			GeneralName[] names = targets.GetNames();
 
@@ -222,57 +221,57 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		private object[] GetNames(
 			GeneralName[] names)
 		{
-            int count = 0;
-            for (int i = 0; i != names.Length; i++)
-            {
-                if (names[i].TagNo == GeneralName.DirectoryName)
-                {
-                    ++count;
-                }
-            }
+			int count = 0;
+			for (int i = 0; i != names.Length; i++)
+			{
+				if (names[i].TagNo == GeneralName.DirectoryName)
+				{
+					++count;
+				}
+			}
 
-            object[] result = new object[count];
+			object[] result = new object[count];
 
-            int pos = 0;
-            for (int i = 0; i != names.Length; i++)
-            {
-                if (names[i].TagNo == GeneralName.DirectoryName)
-                {
-                    result[pos++] = X509Name.GetInstance(names[i].Name);
-                }
-            }
+			int pos = 0;
+			for (int i = 0; i != names.Length; i++)
+			{
+				if (names[i].TagNo == GeneralName.DirectoryName)
+				{
+					result[pos++] = X509Name.GetInstance(names[i].Name);
+				}
+			}
 
-            return result;
-        }
+			return result;
+		}
 
 		private X509Name[] GetPrincipals(
 			GeneralNames names)
 		{
 			object[] p = this.GetNames(names.GetNames());
 
-            int count = 0;
+			int count = 0;
 
-            for (int i = 0; i != p.Length; i++)
+			for (int i = 0; i != p.Length; i++)
 			{
 				if (p[i] is X509Name)
 				{
-                    ++count;
+					++count;
 				}
 			}
 
-            X509Name[] result = new X509Name[count];
+			X509Name[] result = new X509Name[count];
 
-            int pos = 0;
-            for (int i = 0; i != p.Length; i++)
-            {
-                if (p[i] is X509Name)
-                {
-                    result[pos++] = (X509Name)p[i];
-                }
-            }
+			int pos = 0;
+			for (int i = 0; i != p.Length; i++)
+			{
+				if (p[i] is X509Name)
+				{
+					result[pos++] = (X509Name)p[i];
+				}
+			}
 
-            return result;
-        }
+			return result;
+		}
 
 		/**
 		 * Return any principal objects inside the attribute certificate holder entity names field.
@@ -337,7 +336,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				if (holder.BaseCertificateID != null)
 				{
 					return holder.BaseCertificateID.Serial.HasValue(x509Cert.SerialNumber)
-						&& MatchesDN(PrincipalUtilities.GetIssuerX509Principal(x509Cert), holder.BaseCertificateID.Issuer);
+					       && MatchesDN(PrincipalUtilities.GetIssuerX509Principal(x509Cert), holder.BaseCertificateID.Issuer);
 				}
 
 				if (holder.EntityName != null)

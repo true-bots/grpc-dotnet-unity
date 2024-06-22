@@ -11,8 +11,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class ShortenedDigest
 		: IDigest
 	{
-		private IDigest	baseDigest;
-		private int		length;
+		private IDigest baseDigest;
+		private int length;
 
 		/**
 		* Base constructor.
@@ -22,8 +22,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		* @exception ArgumentException if baseDigest is null, or length is greater than baseDigest.GetDigestSize().
 		*/
 		public ShortenedDigest(
-			IDigest	baseDigest,
-			int		length)
+			IDigest baseDigest,
+			int length)
 		{
 			if (baseDigest == null)
 			{
@@ -66,13 +66,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        public int DoFinal(byte[] output, int outOff)
+		public int DoFinal(byte[] output, int outOff)
 		{
 			byte[] tmp = new byte[baseDigest.GetDigestSize()];
 
 			baseDigest.DoFinal(tmp, 0);
 
-	        Array.Copy(tmp, 0, output, outOff, length);
+			Array.Copy(tmp, 0, output, outOff, length);
 
 			return length;
 		}
@@ -93,7 +93,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        public void Reset()
+		public void Reset()
 		{
 			baseDigest.Reset();
 		}

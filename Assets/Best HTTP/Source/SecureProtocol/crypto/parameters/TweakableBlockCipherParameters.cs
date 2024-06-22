@@ -5,7 +5,6 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
-
 	/// <summary>
 	/// Parameters for tweakable block ciphers.
 	/// </summary>

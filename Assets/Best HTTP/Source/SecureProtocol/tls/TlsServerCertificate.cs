@@ -4,13 +4,13 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-    /// <summary>Server certificate carrier interface.</summary>
-    public interface TlsServerCertificate
-    {
-        Certificate Certificate { get; }
+	/// <summary>Server certificate carrier interface.</summary>
+	public interface TlsServerCertificate
+	{
+		Certificate Certificate { get; }
 
-        CertificateStatus CertificateStatus { get; }
-    }
+		CertificateStatus CertificateStatus { get; }
+	}
 }
 #pragma warning restore
 #endif

@@ -1,21 +1,20 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 {
-    public class ServiceLocator
-        : Asn1Encodable
-    {
-        private readonly X509Name issuer;
-        private readonly Asn1Object locator;
+	public class ServiceLocator
+		: Asn1Encodable
+	{
+		private readonly X509Name issuer;
+		private readonly Asn1Object locator;
 
 		public static ServiceLocator GetInstance(
-			Asn1TaggedObject	obj,
-			bool				explicitly)
+			Asn1TaggedObject obj,
+			bool explicitly)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
 		}
@@ -25,26 +24,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 		{
 			if (obj == null || obj is ServiceLocator)
 			{
-				return (ServiceLocator) obj;
+				return (ServiceLocator)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new ServiceLocator((Asn1Sequence) obj);
+				return new ServiceLocator((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public ServiceLocator(
-			X509Name	issuer)
+			X509Name issuer)
 			: this(issuer, null)
 		{
 		}
 
 		public ServiceLocator(
-			X509Name	issuer,
-			Asn1Object	locator)
+			X509Name issuer,
+			Asn1Object locator)
 		{
 			if (issuer == null)
 				throw new ArgumentNullException("issuer");
@@ -82,13 +81,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
          *     locator   AuthorityInfoAccessSyntax OPTIONAL }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector(issuer);
-            v.AddOptional(locator);
-            return new DerSequence(v);
-        }
-    }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector(issuer);
+			v.AddOptional(locator);
+			return new DerSequence(v);
+		}
+	}
 }
 #pragma warning restore
 #endif

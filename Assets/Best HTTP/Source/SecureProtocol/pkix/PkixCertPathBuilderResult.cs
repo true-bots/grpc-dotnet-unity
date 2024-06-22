@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix;
 
@@ -12,17 +11,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 	/// Summary description for PkixCertPathBuilderResult.
 	/// </summary>
 	public class PkixCertPathBuilderResult
-		: PkixCertPathValidatorResult//, ICertPathBuilderResult
+		: PkixCertPathValidatorResult //, ICertPathBuilderResult
 	{
 		private PkixCertPath certPath;
-		
+
 		public PkixCertPathBuilderResult(
-			PkixCertPath			certPath,
-			TrustAnchor				trustAnchor,
-			PkixPolicyNode			policyTree,
-			AsymmetricKeyParameter	subjectPublicKey)
+			PkixCertPath certPath,
+			TrustAnchor trustAnchor,
+			PkixPolicyNode policyTree,
+			AsymmetricKeyParameter subjectPublicKey)
 			: base(trustAnchor, policyTree, subjectPublicKey)
-		{			
+		{
 			if (certPath == null)
 				throw new ArgumentNullException("certPath");
 
@@ -31,7 +30,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		public PkixCertPath CertPath
 		{
-            get { return certPath; }
+			get { return certPath; }
 		}
 
 		public override string ToString()

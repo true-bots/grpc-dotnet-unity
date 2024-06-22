@@ -14,8 +14,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		}
 
 		public KeyDerivationFunc(
-			DerObjectIdentifier	id,
-			Asn1Encodable		parameters)
+			DerObjectIdentifier id,
+			Asn1Encodable parameters)
 			: base(id, parameters)
 		{
 		}

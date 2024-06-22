@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Oiw;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -38,14 +37,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		 * The default version
 		 */
 		public RsaesOaepParameters()
-		    : this(DefaultHashAlgorithm, DefaultMaskGenFunction, DefaultPSourceAlgorithm)
-		{ 
+			: this(DefaultHashAlgorithm, DefaultMaskGenFunction, DefaultPSourceAlgorithm)
+		{
 		}
 
 		public RsaesOaepParameters(
 			AlgorithmIdentifier hashAlgorithm,
 			AlgorithmIdentifier maskGenAlgorithm)
-		    : this(hashAlgorithm, maskGenAlgorithm, DefaultPSourceAlgorithm)
+			: this(hashAlgorithm, maskGenAlgorithm, DefaultPSourceAlgorithm)
 		{
 		}
 

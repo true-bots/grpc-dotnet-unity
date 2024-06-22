@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -24,7 +23,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public static byte[] ConvertToDefiniteLength(
 			byte[] berPkcs12File)
 		{
-            Pfx pfx = Pfx.GetInstance(berPkcs12File);
+			Pfx pfx = Pfx.GetInstance(berPkcs12File);
 
 			return pfx.GetEncoded(Asn1Encodable.Der);
 		}
@@ -39,10 +38,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		* @throws IOException on parsing, encoding errors.
 		*/
 		public static byte[] ConvertToDefiniteLength(
-			byte[]	berPkcs12File,
-			char[]	passwd)
+			byte[] berPkcs12File,
+			char[] passwd)
 		{
-            Pfx pfx = Pfx.GetInstance(berPkcs12File);
+			Pfx pfx = Pfx.GetInstance(berPkcs12File);
 
 			ContentInfo info = pfx.AuthSafe;
 
@@ -58,10 +57,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				int itCount = mData.IterationCount.IntValue;
 				byte[] data = Asn1OctetString.GetInstance(info.Content).GetOctets();
 				byte[] res = Pkcs12Store.CalculatePbeMac(
-                    mData.Mac.AlgorithmID.Algorithm, mData.GetSalt(), itCount, passwd, false, data);
+					mData.Mac.AlgorithmID.Algorithm, mData.GetSalt(), itCount, passwd, false, data);
 
 				AlgorithmIdentifier algId = new AlgorithmIdentifier(
-                    mData.Mac.AlgorithmID.Algorithm, DerNull.Instance);
+					mData.Mac.AlgorithmID.Algorithm, DerNull.Instance);
 				DigestInfo dInfo = new DigestInfo(algId, res);
 
 				mData = new MacData(dInfo, mData.GetSalt(), itCount);

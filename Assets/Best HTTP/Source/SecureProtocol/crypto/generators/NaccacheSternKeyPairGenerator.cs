@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -62,6 +61,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			{
 				u = u.Multiply((BigInteger)smallPrimes[i]);
 			}
+
 			for (int i = smallPrimes.Count / 2; i < smallPrimes.Count; i++)
 			{
 				v = v.Multiply((BigInteger)smallPrimes[i]);
@@ -115,7 +115,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 				if (!sigma.Gcd(_p.Multiply(_q)).Equals(BigInteger.One))
 				{
-                    //Console.WriteLine("sigma.gcd(_p.mult(_q)) != 1!\n _p: " + _p +"\n _q: "+ _q );
+					//Console.WriteLine("sigma.gcd(_p.mult(_q)) != 1!\n _p: " + _p +"\n _q: "+ _q );
 					continue;
 				}
 
@@ -123,6 +123,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				{
 					continue;
 				}
+
 				break;
 			}
 
@@ -153,11 +154,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 						}
 					}
 				}
+
 				g = BigInteger.One;
 				for (int i = 0; i < smallPrimes.Count; i++)
 				{
-					BigInteger gPart = (BigInteger) gParts[i];
-					BigInteger smallPrime = (BigInteger) smallPrimes[i];
+					BigInteger gPart = (BigInteger)gParts[i];
+					BigInteger smallPrime = (BigInteger)smallPrimes[i];
 					g = g.Multiply(gPart.ModPow(sigma.Divide(smallPrime), n)).Mod(n);
 				}
 
@@ -189,18 +191,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				{
 					continue;
 				}
+
 				if (g.ModPow(phi_n.Divide(_q), n).Equals(BigInteger.One))
 				{
 					continue;
 				}
+
 				if (g.ModPow(phi_n.Divide(a), n).Equals(BigInteger.One))
 				{
 					continue;
 				}
+
 				if (g.ModPow(phi_n.Divide(b), n).Equals(BigInteger.One))
 				{
 					continue;
 				}
+
 				break;
 			}
 
@@ -225,9 +231,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 */
 		private static IList<T> PermuteList<T>(IList<T> arr, SecureRandom rand)
 		{
-            // TODO Create a utility method for generating permutation of first 'n' integers
+			// TODO Create a utility method for generating permutation of first 'n' integers
 
-            var retval = new List<T>(arr.Count);
+			var retval = new List<T>(arr.Count);
 
 			foreach (var element in arr)
 			{
@@ -256,7 +262,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 			return primes;
 		}
-
 	}
 }
 #pragma warning restore

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
@@ -19,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	public class BufferedBlockCipher
 		: BufferedCipherBase
 	{
-        internal byte[] buf;
+		internal byte[] buf;
 		internal int bufOff;
 		internal bool forEncryption;
 		internal IBlockCipherMode m_cipherMode;
@@ -31,23 +30,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		{
 		}
 
-        public BufferedBlockCipher(IBlockCipher cipher)
+		public BufferedBlockCipher(IBlockCipher cipher)
 			: this(EcbBlockCipher.GetBlockCipherMode(cipher))
-        {
-        }
+		{
+		}
 
-        /**
+		/**
 		* Create a buffered block cipher without padding.
 		*
 		* @param cipher the underlying block cipher this buffering object wraps.
 		* false otherwise.
 		*/
-        public BufferedBlockCipher(IBlockCipherMode cipherMode)
+		public BufferedBlockCipher(IBlockCipherMode cipherMode)
 		{
 			if (cipherMode == null)
 				throw new ArgumentNullException(nameof(cipherMode));
 
-            m_cipherMode = cipherMode;
+			m_cipherMode = cipherMode;
 			buf = new byte[cipherMode.GetBlockSize()];
 			bufOff = 0;
 		}
@@ -76,7 +75,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 				parameters = withRandom.Parameters;
 			}
 
-            Reset();
+			Reset();
 
 			m_cipherMode.Init(forEncryption, parameters);
 		}
@@ -181,9 +180,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        public override byte[] ProcessBytes(byte[] input, int inOff, int length)
-        {
-            if (input == null)
+		public override byte[] ProcessBytes(byte[] input, int inOff, int length)
+		{
+			if (input == null)
 				throw new ArgumentNullException(nameof(input));
 			if (length < 1)
 				return null;
@@ -204,7 +203,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			return outBytes;
 		}
 
-        /**
+		/**
 		* process an array of bytes, producing output if necessary.
 		*
 		* @param in the input byte array.
@@ -216,9 +215,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		* @exception DataLengthException if there isn't enough space in out.
 		* @exception InvalidOperationException if the cipher isn't initialised.
 		*/
-        public override int ProcessBytes(byte[] input, int inOff, int length, byte[] output, int outOff)
-        {
-            if (length < 1)
+		public override int ProcessBytes(byte[] input, int inOff, int length, byte[] output, int outOff)
+		{
+			if (length < 1)
 			{
 				if (length < 0)
 					throw new ArgumentException("Can't have a negative input length!");
@@ -231,10 +230,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 
 			if (outLength > 0)
 			{
-                Check.OutputLength(output, outOff, outLength, "output buffer too short");
+				Check.OutputLength(output, outOff, outLength, "output buffer too short");
 			}
 
-            int resultLen = 0;
+			int resultLen = 0;
 			int gapLen = buf.Length - bufOff;
 			if (length >= gapLen)
 			{
@@ -250,6 +249,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 					inOff += blockSize;
 				}
 			}
+
 			Array.Copy(input, inOff, buf, bufOff, length);
 			bufOff += length;
 			return resultLen;
@@ -289,7 +289,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        public override byte[] DoFinal()
+		public override byte[] DoFinal()
 		{
 			byte[] outBytes = EmptyBuffer;
 
@@ -314,9 +314,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			return outBytes;
 		}
 
-        public override byte[] DoFinal(byte[] input, int inOff, int inLen)
-        {
-            if (input == null)
+		public override byte[] DoFinal(byte[] input, int inOff, int inLen)
+		{
+			if (input == null)
 				throw new ArgumentNullException(nameof(input));
 
 			int length = GetOutputSize(inLen);
@@ -328,8 +328,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 				outBytes = new byte[length];
 
 				int pos = (inLen > 0)
-					?	ProcessBytes(input, inOff, inLen, outBytes, 0)
-					:	0;
+					? ProcessBytes(input, inOff, inLen, outBytes, 0)
+					: 0;
 
 				pos += DoFinal(outBytes, pos);
 
@@ -348,7 +348,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			return outBytes;
 		}
 
-        /**
+		/**
 		* Process the last block in the buffer.
 		*
 		* @param out the array the block currently being held is copied into.
@@ -362,17 +362,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		* @exception DataLengthException if the input is not block size
 		* aligned.
 		*/
-        public override int DoFinal(byte[] output, int outOff)
-        {
-            try
+		public override int DoFinal(byte[] output, int outOff)
+		{
+			try
 			{
 				if (bufOff != 0)
 				{
-                    Check.DataLength(!m_cipherMode.IsPartialBlockOkay, "data not block size aligned");
-                    Check.OutputLength(output, outOff, bufOff, "output buffer too short for DoFinal()");
+					Check.DataLength(!m_cipherMode.IsPartialBlockOkay, "data not block size aligned");
+					Check.OutputLength(output, outOff, bufOff, "output buffer too short for DoFinal()");
 
-                    // NB: Can't copy directly, or we may write too much output
-                    m_cipherMode.ProcessBlock(buf, 0, buf, 0);
+					// NB: Can't copy directly, or we may write too much output
+					m_cipherMode.ProcessBlock(buf, 0, buf, 0);
 					Array.Copy(buf, 0, output, outOff, bufOff);
 				}
 
@@ -408,7 +408,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        /**
+		/**
 		* Reset the buffer and cipher. After resetting the object is in the same
 		* state as it was after the last init (if there was one).
 		*/
@@ -417,7 +417,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			Array.Clear(buf, 0, buf.Length);
 			bufOff = 0;
 
-            m_cipherMode.Reset();
+			m_cipherMode.Reset();
 		}
 	}
 }

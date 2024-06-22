@@ -2,58 +2,57 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 {
 	/// <remarks>Basic output stream.</remarks>
-    public class BcpgOutputStream
-        : BaseOutputStream
-    {
+	public class BcpgOutputStream
+		: BaseOutputStream
+	{
 		internal static BcpgOutputStream Wrap(
 			Stream outStr)
 		{
 			if (outStr is BcpgOutputStream)
 			{
-				return (BcpgOutputStream) outStr;
+				return (BcpgOutputStream)outStr;
 			}
 
 			return new BcpgOutputStream(outStr);
 		}
 
 		private Stream outStr;
-        private byte[] partialBuffer;
-        private int partialBufferLength;
-        private int partialPower;
-        private int partialOffset;
-        private const int BufferSizePower = 16; // 2^16 size buffer on long files
+		private byte[] partialBuffer;
+		private int partialBufferLength;
+		private int partialPower;
+		private int partialOffset;
+		private const int BufferSizePower = 16; // 2^16 size buffer on long files
 
 		/// <summary>Create a stream representing a general packet.</summary>
 		/// <param name="outStr">Output stream to write to.</param>
 		public BcpgOutputStream(
-            Stream outStr)
-        {
+			Stream outStr)
+		{
 			if (outStr == null)
 				throw new ArgumentNullException("outStr");
 
 			this.outStr = outStr;
-        }
+		}
 
 		/// <summary>Create a stream representing an old style partial object.</summary>
 		/// <param name="outStr">Output stream to write to.</param>
 		/// <param name="tag">The packet tag for the object.</param>
-        public BcpgOutputStream(
-            Stream		outStr,
-            PacketTag	tag)
-        {
+		public BcpgOutputStream(
+			Stream outStr,
+			PacketTag tag)
+		{
 			if (outStr == null)
 				throw new ArgumentNullException("outStr");
 
 			this.outStr = outStr;
-            this.WriteHeader(tag, true, true, 0);
-        }
+			this.WriteHeader(tag, true, true, 0);
+		}
 
 		/// <summary>Create a stream representing a general packet.</summary>
 		/// <param name="outStr">Output stream to write to.</param>
@@ -61,168 +60,169 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		/// <param name="length">Size of chunks making up the packet.</param>
 		/// <param name="oldFormat">If true, the header is written out in old format.</param>
 		public BcpgOutputStream(
-            Stream		outStr,
-            PacketTag	tag,
-            long		length,
-            bool		oldFormat)
-        {
+			Stream outStr,
+			PacketTag tag,
+			long length,
+			bool oldFormat)
+		{
 			if (outStr == null)
 				throw new ArgumentNullException("outStr");
 
 			this.outStr = outStr;
 
-            if (length > 0xFFFFFFFFL)
-            {
-                this.WriteHeader(tag, false, true, 0);
-                this.partialBufferLength = 1 << BufferSizePower;
-                this.partialBuffer = new byte[partialBufferLength];
+			if (length > 0xFFFFFFFFL)
+			{
+				this.WriteHeader(tag, false, true, 0);
+				this.partialBufferLength = 1 << BufferSizePower;
+				this.partialBuffer = new byte[partialBufferLength];
 				this.partialPower = BufferSizePower;
 				this.partialOffset = 0;
-            }
-            else
-            {
-                this.WriteHeader(tag, oldFormat, false, length);
-            }
-        }
+			}
+			else
+			{
+				this.WriteHeader(tag, oldFormat, false, length);
+			}
+		}
 
 		/// <summary>Create a new style partial input stream buffered into chunks.</summary>
 		/// <param name="outStr">Output stream to write to.</param>
 		/// <param name="tag">Packet tag.</param>
 		/// <param name="length">Size of chunks making up the packet.</param>
 		public BcpgOutputStream(
-            Stream		outStr,
-            PacketTag	tag,
-            long		length)
-        {
+			Stream outStr,
+			PacketTag tag,
+			long length)
+		{
 			if (outStr == null)
 				throw new ArgumentNullException("outStr");
 
-            this.outStr = outStr;
-            this.WriteHeader(tag, false, false, length);
-        }
+			this.outStr = outStr;
+			this.WriteHeader(tag, false, false, length);
+		}
 
 		/// <summary>Create a new style partial input stream buffered into chunks.</summary>
 		/// <param name="outStr">Output stream to write to.</param>
 		/// <param name="tag">Packet tag.</param>
 		/// <param name="buffer">Buffer to use for collecting chunks.</param>
-        public BcpgOutputStream(
-            Stream		outStr,
-            PacketTag	tag,
-            byte[]		buffer)
-        {
+		public BcpgOutputStream(
+			Stream outStr,
+			PacketTag tag,
+			byte[] buffer)
+		{
 			if (outStr == null)
 				throw new ArgumentNullException("outStr");
 
-            this.outStr = outStr;
-            this.WriteHeader(tag, false, true, 0);
+			this.outStr = outStr;
+			this.WriteHeader(tag, false, true, 0);
 
 			this.partialBuffer = buffer;
 
-			uint length = (uint) partialBuffer.Length;
-            for (partialPower = 0; length != 1; partialPower++)
-            {
-                length >>= 1;
-            }
+			uint length = (uint)partialBuffer.Length;
+			for (partialPower = 0; length != 1; partialPower++)
+			{
+				length >>= 1;
+			}
 
 			if (partialPower > 30)
-            {
-                throw new IOException("Buffer cannot be greater than 2^30 in length.");
-            }
-            this.partialBufferLength = 1 << partialPower;
-            this.partialOffset = 0;
-        }
+			{
+				throw new IOException("Buffer cannot be greater than 2^30 in length.");
+			}
+
+			this.partialBufferLength = 1 << partialPower;
+			this.partialOffset = 0;
+		}
 
 		private void WriteNewPacketLength(
-            long bodyLen)
-        {
-            if (bodyLen < 192)
-            {
-                outStr.WriteByte((byte)bodyLen);
-            }
-            else if (bodyLen <= 8383)
-            {
-                bodyLen -= 192;
+			long bodyLen)
+		{
+			if (bodyLen < 192)
+			{
+				outStr.WriteByte((byte)bodyLen);
+			}
+			else if (bodyLen <= 8383)
+			{
+				bodyLen -= 192;
 
-                outStr.WriteByte((byte)(((bodyLen >> 8) & 0xff) + 192));
-                outStr.WriteByte((byte)bodyLen);
-            }
-            else
-            {
-                outStr.WriteByte(0xff);
-                outStr.WriteByte((byte)(bodyLen >> 24));
-                outStr.WriteByte((byte)(bodyLen >> 16));
-                outStr.WriteByte((byte)(bodyLen >> 8));
-                outStr.WriteByte((byte)bodyLen);
-            }
-        }
+				outStr.WriteByte((byte)(((bodyLen >> 8) & 0xff) + 192));
+				outStr.WriteByte((byte)bodyLen);
+			}
+			else
+			{
+				outStr.WriteByte(0xff);
+				outStr.WriteByte((byte)(bodyLen >> 24));
+				outStr.WriteByte((byte)(bodyLen >> 16));
+				outStr.WriteByte((byte)(bodyLen >> 8));
+				outStr.WriteByte((byte)bodyLen);
+			}
+		}
 
-        private void WriteHeader(
-            PacketTag	tag,
-            bool		oldPackets,
-            bool		partial,
-            long		bodyLen)
-        {
-            int hdr = 0x80;
+		private void WriteHeader(
+			PacketTag tag,
+			bool oldPackets,
+			bool partial,
+			long bodyLen)
+		{
+			int hdr = 0x80;
 
-            if (partialBuffer != null)
-            {
-                PartialFlushLast();
-                partialBuffer = null;
-            }
+			if (partialBuffer != null)
+			{
+				PartialFlushLast();
+				partialBuffer = null;
+			}
 
-            if (oldPackets)
-            {
-                hdr |= ((int) tag) << 2;
+			if (oldPackets)
+			{
+				hdr |= ((int)tag) << 2;
 
-                if (partial)
-                {
-                    this.WriteByte((byte)(hdr | 0x03));
-                }
-                else
-                {
-                    if (bodyLen <= 0xff)
-                    {
-                        this.WriteByte((byte) hdr);
-                        this.WriteByte((byte)bodyLen);
-                    }
-                    else if (bodyLen <= 0xffff)
-                    {
-                        this.WriteByte((byte)(hdr | 0x01));
-                        this.WriteByte((byte)(bodyLen >> 8));
-                        this.WriteByte((byte)(bodyLen));
-                    }
-                    else
-                    {
-                        this.WriteByte((byte)(hdr | 0x02));
-                        this.WriteByte((byte)(bodyLen >> 24));
-                        this.WriteByte((byte)(bodyLen >> 16));
-                        this.WriteByte((byte)(bodyLen >> 8));
-                        this.WriteByte((byte)bodyLen);
-                    }
-                }
-            }
-            else
-            {
-                hdr |= 0x40 | (int) tag;
-                this.WriteByte((byte) hdr);
+				if (partial)
+				{
+					this.WriteByte((byte)(hdr | 0x03));
+				}
+				else
+				{
+					if (bodyLen <= 0xff)
+					{
+						this.WriteByte((byte)hdr);
+						this.WriteByte((byte)bodyLen);
+					}
+					else if (bodyLen <= 0xffff)
+					{
+						this.WriteByte((byte)(hdr | 0x01));
+						this.WriteByte((byte)(bodyLen >> 8));
+						this.WriteByte((byte)(bodyLen));
+					}
+					else
+					{
+						this.WriteByte((byte)(hdr | 0x02));
+						this.WriteByte((byte)(bodyLen >> 24));
+						this.WriteByte((byte)(bodyLen >> 16));
+						this.WriteByte((byte)(bodyLen >> 8));
+						this.WriteByte((byte)bodyLen);
+					}
+				}
+			}
+			else
+			{
+				hdr |= 0x40 | (int)tag;
+				this.WriteByte((byte)hdr);
 
-                if (partial)
-                {
-                    partialOffset = 0;
-                }
-                else
-                {
-                    this.WriteNewPacketLength(bodyLen);
-                }
-            }
-        }
+				if (partial)
+				{
+					partialOffset = 0;
+				}
+				else
+				{
+					this.WriteNewPacketLength(bodyLen);
+				}
+			}
+		}
 
-        private void PartialFlush()
-        {
-            outStr.WriteByte((byte)(0xE0 | partialPower));
-            outStr.Write(partialBuffer, 0, partialBufferLength);
-            partialOffset = 0;
-        }
+		private void PartialFlush()
+		{
+			outStr.WriteByte((byte)(0xE0 | partialPower));
+			outStr.Write(partialBuffer, 0, partialBufferLength);
+			partialOffset = 0;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private void PartialFlush(ref ReadOnlySpan<byte> buffer)
@@ -233,48 +233,49 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
         }
 #endif
 
-        private void PartialFlushLast()
-        {
-            WriteNewPacketLength(partialOffset);
-            outStr.Write(partialBuffer, 0, partialOffset);
-            partialOffset = 0;
-        }
+		private void PartialFlushLast()
+		{
+			WriteNewPacketLength(partialOffset);
+			outStr.Write(partialBuffer, 0, partialOffset);
+			partialOffset = 0;
+		}
 
-        private void PartialWrite(byte[] buffer, int offset, int count)
-        {
-            Streams.ValidateBufferArguments(buffer, offset, count);
+		private void PartialWrite(byte[] buffer, int offset, int count)
+		{
+			Streams.ValidateBufferArguments(buffer, offset, count);
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             PartialWrite(buffer.AsSpan(offset, count));
 #else
-            if (partialOffset == partialBufferLength)
-            {
-                PartialFlush();
-            }
+			if (partialOffset == partialBufferLength)
+			{
+				PartialFlush();
+			}
 
-            if (count <= (partialBufferLength - partialOffset))
-            {
-                Array.Copy(buffer, offset, partialBuffer, partialOffset, count);
-                partialOffset += count;
-                return;
-            }
+			if (count <= (partialBufferLength - partialOffset))
+			{
+				Array.Copy(buffer, offset, partialBuffer, partialOffset, count);
+				partialOffset += count;
+				return;
+			}
 
-            int diff = partialBufferLength - partialOffset;
-            Array.Copy(buffer, offset, partialBuffer, partialOffset, diff);
-            offset += diff;
-            count -= diff;
-            PartialFlush();
-            while (count > partialBufferLength)
-            {
-                Array.Copy(buffer, offset, partialBuffer, 0, partialBufferLength);
-                offset += partialBufferLength;
-                count -= partialBufferLength;
-                PartialFlush();
-            }
-            Array.Copy(buffer, offset, partialBuffer, 0, count);
-            partialOffset = count;
+			int diff = partialBufferLength - partialOffset;
+			Array.Copy(buffer, offset, partialBuffer, partialOffset, diff);
+			offset += diff;
+			count -= diff;
+			PartialFlush();
+			while (count > partialBufferLength)
+			{
+				Array.Copy(buffer, offset, partialBuffer, 0, partialBufferLength);
+				offset += partialBufferLength;
+				count -= partialBufferLength;
+				PartialFlush();
+			}
+
+			Array.Copy(buffer, offset, partialBuffer, 0, count);
+			partialOffset = count;
 #endif
-        }
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private void PartialWrite(ReadOnlySpan<byte> buffer)
@@ -304,27 +305,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
         }
 #endif
 
-        private void PartialWriteByte(byte value)
-        {
-            if (partialOffset == partialBufferLength)
-            {
-                PartialFlush();
-            }
+		private void PartialWriteByte(byte value)
+		{
+			if (partialOffset == partialBufferLength)
+			{
+				PartialFlush();
+			}
 
-            partialBuffer[partialOffset++] = value;
-        }
+			partialBuffer[partialOffset++] = value;
+		}
 
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            if (partialBuffer != null)
-            {
-                PartialWrite(buffer, offset, count);
-            }
-            else
-            {
-                outStr.Write(buffer, offset, count);
-            }
-        }
+		public override void Write(byte[] buffer, int offset, int count)
+		{
+			if (partialBuffer != null)
+			{
+				PartialWrite(buffer, offset, count);
+			}
+			else
+			{
+				outStr.Write(buffer, offset, count);
+			}
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public override void Write(ReadOnlySpan<byte> buffer)
@@ -340,26 +341,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
         }
 #endif
 
-        public override void WriteByte(byte value)
-        {
-            if (partialBuffer != null)
-            {
-                PartialWriteByte(value);
-            }
-            else
-            {
-                outStr.WriteByte(value);
-            }
-        }
+		public override void WriteByte(byte value)
+		{
+			if (partialBuffer != null)
+			{
+				PartialWriteByte(value);
+			}
+			else
+			{
+				outStr.WriteByte(value);
+			}
+		}
 
-        // Additional helper methods to write primitive types
-        internal virtual void WriteShort(
+		// Additional helper methods to write primitive types
+		internal virtual void WriteShort(
 			short n)
 		{
 			this.Write(
 				(byte)(n >> 8),
 				(byte)n);
 		}
+
 		internal virtual void WriteInt(
 			int n)
 		{
@@ -369,6 +371,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				(byte)(n >> 8),
 				(byte)n);
 		}
+
 		internal virtual void WriteLong(
 			long n)
 		{
@@ -384,25 +387,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		}
 
 		public void WritePacket(
-            ContainedPacket p)
-        {
-            p.Encode(this);
-        }
+			ContainedPacket p)
+		{
+			p.Encode(this);
+		}
 
-        internal void WritePacket(
-            PacketTag	tag,
-            byte[]		body,
-            bool		oldFormat)
-        {
-            this.WriteHeader(tag, oldFormat, false, body.Length);
-            this.Write(body);
-        }
+		internal void WritePacket(
+			PacketTag tag,
+			byte[] body,
+			bool oldFormat)
+		{
+			this.WriteHeader(tag, oldFormat, false, body.Length);
+			this.Write(body);
+		}
 
 		public void WriteObject(
-            BcpgObject bcpgObject)
-        {
-            bcpgObject.Encode(this);
-        }
+			BcpgObject bcpgObject)
+		{
+			bcpgObject.Encode(this);
+		}
 
 		public void WriteObjects(
 			params BcpgObject[] v)
@@ -414,33 +417,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		}
 
 		/// <summary>Flush the underlying stream.</summary>
-        public override void Flush()
-        {
-            outStr.Flush();
-        }
+		public override void Flush()
+		{
+			outStr.Flush();
+		}
 
 		/// <summary>Finish writing out the current packet without closing the underlying stream.</summary>
-        public void Finish()
-        {
-            if (partialBuffer != null)
-            {
-                PartialFlushLast();
-                Array.Clear(partialBuffer, 0, partialBuffer.Length);
-                partialBuffer = null;
-            }
-        }
+		public void Finish()
+		{
+			if (partialBuffer != null)
+			{
+				PartialFlushLast();
+				Array.Clear(partialBuffer, 0, partialBuffer.Length);
+				partialBuffer = null;
+			}
+		}
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-			    this.Finish();
-			    outStr.Flush();
-                outStr.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-    }
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				this.Finish();
+				outStr.Flush();
+				outStr.Dispose();
+			}
+
+			base.Dispose(disposing);
+		}
+	}
 }
 #pragma warning restore
 #endif

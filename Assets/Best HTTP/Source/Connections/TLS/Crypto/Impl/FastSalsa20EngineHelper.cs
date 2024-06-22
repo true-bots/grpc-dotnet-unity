@@ -6,8 +6,8 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 #if BESTHTTP_WITH_BURST
     [Unity.Burst.BurstCompile]
 #endif
-    internal static class FastSalsa20EngineHelper
-    {
+	internal static class FastSalsa20EngineHelper
+	{
 #if BESTHTTP_WITH_BURST
         [Unity.Burst.BurstCompile]
         public unsafe static void ProcessBytes([Unity.Burst.NoAlias] byte* outBytes, int outOff, [Unity.Burst.NoAlias] byte* inBytes, int inOff, [Unity.Burst.NoAlias] byte* keyStream)
@@ -25,7 +25,6 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
             pulOut[3] = pulKeyStream[3] ^ pulIn[3];
         }
 #endif
-
-    }
+	}
 }
 #endif

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
@@ -9,71 +8,71 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 {
-    /**
-     * The AuthorityKeyIdentifier object.
-     * <pre>
-     * id-ce-authorityKeyIdentifier OBJECT IDENTIFIER ::=  { id-ce 35 }
-     *
-     *   AuthorityKeyIdentifier ::= Sequence {
-     *      keyIdentifier             [0] IMPLICIT KeyIdentifier           OPTIONAL,
-     *      authorityCertIssuer       [1] IMPLICIT GeneralNames            OPTIONAL,
-     *      authorityCertSerialNumber [2] IMPLICIT CertificateSerialNumber OPTIONAL  }
-     *
-     *   KeyIdentifier ::= OCTET STRING
-     * </pre>
-     *
-     */
-    public class AuthorityKeyIdentifier
-        : Asn1Encodable
-    {
-        public static AuthorityKeyIdentifier GetInstance(Asn1TaggedObject obj, bool explicitly)
-        {
-            return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
-        }
-
-		public static AuthorityKeyIdentifier GetInstance(object obj)
-        {
-            if (obj is AuthorityKeyIdentifier)
-                return (AuthorityKeyIdentifier)obj;
-            if (obj is X509Extension)
-                return GetInstance(X509Extension.ConvertValueToObject((X509Extension)obj));
-            if (obj == null)
-                return null;
-            return new AuthorityKeyIdentifier(Asn1Sequence.GetInstance(obj));
+	/**
+	 * The AuthorityKeyIdentifier object.
+	 * <pre>
+	 * id-ce-authorityKeyIdentifier OBJECT IDENTIFIER ::=  { id-ce 35 }
+	 *
+	 *   AuthorityKeyIdentifier ::= Sequence {
+	 *      keyIdentifier             [0] IMPLICIT KeyIdentifier           OPTIONAL,
+	 *      authorityCertIssuer       [1] IMPLICIT GeneralNames            OPTIONAL,
+	 *      authorityCertSerialNumber [2] IMPLICIT CertificateSerialNumber OPTIONAL  }
+	 *
+	 *   KeyIdentifier ::= OCTET STRING
+	 * </pre>
+	 *
+	 */
+	public class AuthorityKeyIdentifier
+		: Asn1Encodable
+	{
+		public static AuthorityKeyIdentifier GetInstance(Asn1TaggedObject obj, bool explicitly)
+		{
+			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
 		}
 
-        public static AuthorityKeyIdentifier FromExtensions(X509Extensions extensions)
-        {
-            return GetInstance(X509Extensions.GetExtensionParsedValue(extensions, X509Extensions.AuthorityKeyIdentifier));
-        }
+		public static AuthorityKeyIdentifier GetInstance(object obj)
+		{
+			if (obj is AuthorityKeyIdentifier)
+				return (AuthorityKeyIdentifier)obj;
+			if (obj is X509Extension)
+				return GetInstance(X509Extension.ConvertValueToObject((X509Extension)obj));
+			if (obj == null)
+				return null;
+			return new AuthorityKeyIdentifier(Asn1Sequence.GetInstance(obj));
+		}
 
-        private readonly Asn1OctetString keyidentifier;
-        private readonly GeneralNames certissuer;
-        private readonly DerInteger certserno;
+		public static AuthorityKeyIdentifier FromExtensions(X509Extensions extensions)
+		{
+			return GetInstance(X509Extensions.GetExtensionParsedValue(extensions, X509Extensions.AuthorityKeyIdentifier));
+		}
 
-        protected internal AuthorityKeyIdentifier(
-            Asn1Sequence seq)
-        {
-            foreach (Asn1Encodable element in seq)
+		private readonly Asn1OctetString keyidentifier;
+		private readonly GeneralNames certissuer;
+		private readonly DerInteger certserno;
+
+		protected internal AuthorityKeyIdentifier(
+			Asn1Sequence seq)
+		{
+			foreach (Asn1Encodable element in seq)
 			{
-                Asn1TaggedObject obj = Asn1TaggedObject.GetInstance(element);
+				Asn1TaggedObject obj = Asn1TaggedObject.GetInstance(element);
 
 				switch (obj.TagNo)
-                {
-				case 0:
-					this.keyidentifier = Asn1OctetString.GetInstance(obj, false);
-					break;
-				case 1:
-					this.certissuer = GeneralNames.GetInstance(obj, false);
-					break;
-				case 2:
-					this.certserno = DerInteger.GetInstance(obj, false);
-					break;
-				default:
-					throw new ArgumentException("illegal tag");
-                }
-            }
-        }
+				{
+					case 0:
+						this.keyidentifier = Asn1OctetString.GetInstance(obj, false);
+						break;
+					case 1:
+						this.certissuer = GeneralNames.GetInstance(obj, false);
+						break;
+					case 2:
+						this.certserno = DerInteger.GetInstance(obj, false);
+						break;
+					default:
+						throw new ArgumentException("illegal tag");
+				}
+			}
+		}
 
 		/**
          *
@@ -88,40 +87,40 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
          * </pre>
          *
          **/
-        public AuthorityKeyIdentifier(
-            SubjectPublicKeyInfo spki)
-            : this(spki, null, null)
-        {
-        }
+		public AuthorityKeyIdentifier(
+			SubjectPublicKeyInfo spki)
+			: this(spki, null, null)
+		{
+		}
 
-        /**
-         * create an AuthorityKeyIdentifier with the GeneralNames tag and
-         * the serial number provided as well.
-         */
-        public AuthorityKeyIdentifier(
-            SubjectPublicKeyInfo	spki,
-            GeneralNames			name,
-            BigInteger				serialNumber)
-        {
-            IDigest digest = new Sha1Digest();
-            byte[] resBuf = new byte[digest.GetDigestSize()];
+		/**
+		 * create an AuthorityKeyIdentifier with the GeneralNames tag and
+		 * the serial number provided as well.
+		 */
+		public AuthorityKeyIdentifier(
+			SubjectPublicKeyInfo spki,
+			GeneralNames name,
+			BigInteger serialNumber)
+		{
+			IDigest digest = new Sha1Digest();
+			byte[] resBuf = new byte[digest.GetDigestSize()];
 			byte[] bytes = spki.PublicKeyData.GetBytes();
-            digest.BlockUpdate(bytes, 0, bytes.Length);
-            digest.DoFinal(resBuf, 0);
+			digest.BlockUpdate(bytes, 0, bytes.Length);
+			digest.DoFinal(resBuf, 0);
 
 			this.keyidentifier = new DerOctetString(resBuf);
-            this.certissuer = name;
-            this.certserno = serialNumber == null ? null : new DerInteger(serialNumber);
-        }
+			this.certissuer = name;
+			this.certserno = serialNumber == null ? null : new DerInteger(serialNumber);
+		}
 
-        /**
+		/**
 		 * create an AuthorityKeyIdentifier with the GeneralNames tag and
 		 * the serial number provided.
 		 */
 		public AuthorityKeyIdentifier(
-			GeneralNames	name,
-			BigInteger		serialNumber)
-            : this((byte[])null, name, serialNumber)
+			GeneralNames name,
+			BigInteger serialNumber)
+			: this((byte[])null, name, serialNumber)
 		{
 		}
 
@@ -130,18 +129,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 */
 		public AuthorityKeyIdentifier(
 			byte[] keyIdentifier)
-            : this(keyIdentifier, null, null)
+			: this(keyIdentifier, null, null)
 		{
 		}
 
-        /**
+		/**
 		 * create an AuthorityKeyIdentifier with a precomupted key identifier
 		 * and the GeneralNames tag and the serial number provided as well.
 		 */
 		public AuthorityKeyIdentifier(
-			byte[]			keyIdentifier,
-			GeneralNames	name,
-			BigInteger		serialNumber)
+			byte[] keyIdentifier,
+			GeneralNames name,
+			BigInteger serialNumber)
 		{
 			this.keyidentifier = keyIdentifier == null ? null : new DerOctetString(keyIdentifier);
 			this.certissuer = name;
@@ -149,9 +148,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public byte[] GetKeyIdentifier()
-        {
+		{
 			return keyidentifier == null ? null : keyidentifier.GetOctets();
-        }
+		}
 
 		public GeneralNames AuthorityCertIssuer
 		{
@@ -159,29 +158,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public BigInteger AuthorityCertSerialNumber
-        {
-            get { return certserno == null ? null : certserno.Value; }
-        }
+		{
+			get { return certserno == null ? null : certserno.Value; }
+		}
 
-        /**
-         * Produce an object suitable for an Asn1OutputStream.
-         */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptionalTagged(false, 0, keyidentifier);
-            v.AddOptionalTagged(false, 1, certissuer);
-            v.AddOptionalTagged(false, 2, certserno);
-            return new DerSequence(v);
-        }
+		/**
+		 * Produce an object suitable for an Asn1OutputStream.
+		 */
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
+			v.AddOptionalTagged(false, 0, keyidentifier);
+			v.AddOptionalTagged(false, 1, certissuer);
+			v.AddOptionalTagged(false, 2, certserno);
+			return new DerSequence(v);
+		}
 
 		public override string ToString()
-        {
-            string keyID = (keyidentifier != null) ? Hex.ToHexString(keyidentifier.GetOctets()) : "null";
+		{
+			string keyID = (keyidentifier != null) ? Hex.ToHexString(keyidentifier.GetOctets()) : "null";
 
-            return "AuthorityKeyIdentifier: KeyID(" + keyID + ")";
-        }
-    }
+			return "AuthorityKeyIdentifier: KeyID(" + keyID + ")";
+		}
+	}
 }
 #pragma warning restore
 #endif

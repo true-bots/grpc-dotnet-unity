@@ -4,11 +4,11 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Endo
 {
-    public interface GlvEndomorphism
-        :   ECEndomorphism
-    {
-        BigInteger[] DecomposeScalar(BigInteger k);
-    }
+	public interface GlvEndomorphism
+		: ECEndomorphism
+	{
+		BigInteger[] DecomposeScalar(BigInteger k);
+	}
 }
 #pragma warning restore
 #endif

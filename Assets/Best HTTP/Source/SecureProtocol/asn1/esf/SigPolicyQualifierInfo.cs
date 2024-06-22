@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
@@ -9,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	/// <remarks>
 	/// <code>
 	/// SigPolicyQualifierInfo ::= SEQUENCE {
-    ///		sigPolicyQualifierId  SigPolicyQualifierId,
+	///		sigPolicyQualifierId  SigPolicyQualifierId,
 	///		sigQualifier          ANY DEFINED BY sigPolicyQualifierId
 	/// }
 	/// 
@@ -19,21 +18,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class SigPolicyQualifierInfo
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier	sigPolicyQualifierId;
-		private readonly Asn1Object				sigQualifier;
+		private readonly DerObjectIdentifier sigPolicyQualifierId;
+		private readonly Asn1Object sigQualifier;
 
 		public static SigPolicyQualifierInfo GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is SigPolicyQualifierInfo)
-				return (SigPolicyQualifierInfo) obj;
+				return (SigPolicyQualifierInfo)obj;
 
 			if (obj is Asn1Sequence)
-				return new SigPolicyQualifierInfo((Asn1Sequence) obj);
+				return new SigPolicyQualifierInfo((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'SigPolicyQualifierInfo' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -45,13 +44,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			if (seq.Count != 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.sigPolicyQualifierId = (DerObjectIdentifier) seq[0].ToAsn1Object();
+			this.sigPolicyQualifierId = (DerObjectIdentifier)seq[0].ToAsn1Object();
 			this.sigQualifier = seq[1].ToAsn1Object();
 		}
 
 		public SigPolicyQualifierInfo(
-			DerObjectIdentifier	sigPolicyQualifierId,
-			Asn1Encodable		sigQualifier)
+			DerObjectIdentifier sigPolicyQualifierId,
+			Asn1Encodable sigQualifier)
 		{
 			this.sigPolicyQualifierId = sigPolicyQualifierId;
 			this.sigQualifier = sigQualifier.ToAsn1Object();

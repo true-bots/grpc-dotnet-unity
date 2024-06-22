@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -19,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		private bool forEncryption;
 		private int bitSize;
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return "ElGamal"; }
 		}
@@ -30,7 +29,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @param forEncryption true if we are encrypting, false otherwise.
 		* @param param the necessary ElGamal key parameters.
 		*/
-        public virtual void Init(bool forEncryption, ICipherParameters parameters)
+		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			if (parameters is ParametersWithRandom withRandom)
 			{
@@ -41,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				this.key = (ElGamalKeyParameters)parameters;
 				this.random = CryptoServicesRegistrar.GetSecureRandom();
-            }
+			}
 
 			this.forEncryption = forEncryption;
 			this.bitSize = key.Parameters.P.BitLength;
@@ -65,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @return maximum size for an input block.
 		*/
-        public virtual int GetInputBlockSize()
+		public virtual int GetInputBlockSize()
 		{
 			if (forEncryption)
 			{
@@ -82,7 +81,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @return maximum size for an output block.
 		*/
-        public virtual int GetOutputBlockSize()
+		public virtual int GetOutputBlockSize()
 		{
 			if (forEncryption)
 			{
@@ -101,17 +100,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @return the result of the ElGamal process.
 		* @exception DataLengthException the input block is too large.
 		*/
-        public virtual byte[] ProcessBlock(
-			byte[]	input,
-			int		inOff,
-			int		length)
+		public virtual byte[] ProcessBlock(
+			byte[] input,
+			int inOff,
+			int length)
 		{
 			if (key == null)
 				throw new InvalidOperationException("ElGamal engine not initialised");
 
 			int maxLength = forEncryption
-				?	(bitSize - 1 + 7) / 8
-				:	GetInputBlockSize();
+				? (bitSize - 1 + 7) / 8
+				: GetInputBlockSize();
 
 			if (length > maxLength)
 				throw new DataLengthException("input too large for ElGamal cipher.\n");
@@ -125,7 +124,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				BigInteger gamma = new BigInteger(1, input, inOff, halfLength);
 				BigInteger phi = new BigInteger(1, input, inOff + halfLength, halfLength);
 
-				ElGamalPrivateKeyParameters priv = (ElGamalPrivateKeyParameters) key;
+				ElGamalPrivateKeyParameters priv = (ElGamalPrivateKeyParameters)key;
 
 				// a shortcut, which generally relies on p being prime amongst other things.
 				// if a problem with this shows up, check the p and g values!
@@ -141,7 +140,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					throw new DataLengthException("input too large for ElGamal cipher.\n");
 
 
-				ElGamalPublicKeyParameters pub = (ElGamalPublicKeyParameters) key;
+				ElGamalPublicKeyParameters pub = (ElGamalPublicKeyParameters)key;
 
 				BigInteger pSub2 = p.Subtract(BigInteger.Two);
 
@@ -150,8 +149,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				do
 				{
 					k = new BigInteger(p.BitLength, random);
-				}
-				while (k.SignValue == 0 || k.CompareTo(pSub2) > 0);
+				} while (k.SignValue == 0 || k.CompareTo(pSub2) > 0);
 
 				BigInteger g = key.Parameters.G;
 				BigInteger gamma = g.ModPow(k, p);

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -33,9 +32,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		 * @exception OcspException if any problems occur creating the id fields.
 		 */
 		public CertificateID(
-			string			hashAlgorithm,
-			X509Certificate	issuerCert,
-			BigInteger		serialNumber)
+			string hashAlgorithm,
+			X509Certificate issuerCert,
+			BigInteger serialNumber)
 		{
 			AlgorithmIdentifier hashAlg = new AlgorithmIdentifier(
 				new DerObjectIdentifier(hashAlgorithm), DerNull.Instance);
@@ -45,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 		public string HashAlgOid
 		{
-            get { return id.HashAlgorithm.Algorithm.Id; }
+			get { return id.HashAlgorithm.Algorithm.Id; }
 		}
 
 		public byte[] GetIssuerNameHash()
@@ -68,7 +67,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		}
 
 		public bool MatchesIssuer(
-			X509Certificate	issuerCert)
+			X509Certificate issuerCert)
 		{
 			return CreateCertID(id.HashAlgorithm, issuerCert, id.SerialNumber).Equals(id);
 		}
@@ -113,14 +112,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 				original.id.IssuerKeyHash, new DerInteger(newSerialNumber)));
 		}
 
-        private static CertID CreateCertID(
-			AlgorithmIdentifier	hashAlg,
-			X509Certificate		issuerCert,
-			DerInteger			serialNumber)
+		private static CertID CreateCertID(
+			AlgorithmIdentifier hashAlg,
+			X509Certificate issuerCert,
+			DerInteger serialNumber)
 		{
 			try
 			{
-                string hashAlgorithm = hashAlg.Algorithm.Id;
+				string hashAlgorithm = hashAlg.Algorithm.Id;
 
 				X509Name issuerName = PrincipalUtilities.GetSubjectX509Principal(issuerCert);
 				byte[] issuerNameHash = DigestUtilities.CalculateDigest(

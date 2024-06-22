@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
@@ -111,6 +110,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 								}
 							}
 						}
+
 						if (!found)
 						{
 							return false;
@@ -238,7 +238,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		* The collection consists of either GeneralName objects or byte[] arrays representing
 		* DER encoded GeneralName structures.
 		* </p>
-		* 
+		*
 		* @param names A collection of target names.
 		* @throws IOException if a parsing error occurs.
 		* @see #AddTargetName(byte[])
@@ -254,7 +254,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		* made up of an <code>Integer</code> in the first entry and a DER encoded
 		* byte array or a <code>String</code> in the second entry.
 		* <p>The returned collection is immutable.</p>
-		* 
+		*
 		* @return The collection of target names
 		* @see #setTargetNames(Collection)
 		*/
@@ -349,9 +349,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 						result.Add(GeneralName.GetInstance(Asn1Object.FromByteArray(bs)));
 					}
 					else
-                    {
+					{
 						throw new InvalidOperationException();
-                    }
+					}
 				}
 			}
 

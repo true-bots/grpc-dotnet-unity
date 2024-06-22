@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
@@ -19,9 +18,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	*/
 	public class CompressedDataParser
 	{
-		private DerInteger			_version;
-		private AlgorithmIdentifier	_compressionAlgorithm;
-		private ContentInfoParser	_encapContentInfo;
+		private DerInteger _version;
+		private AlgorithmIdentifier _compressionAlgorithm;
+		private ContentInfoParser _encapContentInfo;
 
 		public CompressedDataParser(
 			Asn1SequenceParser seq)

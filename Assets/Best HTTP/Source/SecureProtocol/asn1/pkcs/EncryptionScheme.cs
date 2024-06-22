@@ -1,24 +1,23 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 {
-    public class EncryptionScheme
-        : AlgorithmIdentifier
-    {
-        public EncryptionScheme(
-            DerObjectIdentifier	objectID)
-            : base(objectID)
-        {
-        }
+	public class EncryptionScheme
+		: AlgorithmIdentifier
+	{
+		public EncryptionScheme(
+			DerObjectIdentifier objectID)
+			: base(objectID)
+		{
+		}
 
-        public EncryptionScheme(
-            DerObjectIdentifier	objectID,
-            Asn1Encodable		parameters)
+		public EncryptionScheme(
+			DerObjectIdentifier objectID,
+			Asn1Encodable parameters)
 			: base(objectID, parameters)
 		{
 		}
@@ -26,8 +25,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		internal EncryptionScheme(
 			Asn1Sequence seq)
 			: this((DerObjectIdentifier)seq[0], seq[1])
-        {
-        }
+		{
+		}
 
 		public new static EncryptionScheme GetInstance(object obj)
 		{
@@ -50,10 +49,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		}
 
 		public override Asn1Object ToAsn1Object()
-        {
-            return new DerSequence(Algorithm, Parameters);
-        }
-    }
+		{
+			return new DerSequence(Algorithm, Parameters);
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
@@ -18,7 +17,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		private static X509CertStoreSelector CloneSelector(
 			X509CertStoreSelector s)
 		{
-			return s == null ? null : (X509CertStoreSelector) s.Clone();
+			return s == null ? null : (X509CertStoreSelector)s.Clone();
 		}
 
 		private X509CertificatePair certPair;

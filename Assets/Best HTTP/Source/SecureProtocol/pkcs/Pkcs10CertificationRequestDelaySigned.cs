@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -47,30 +46,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			: base()
 		{
 		}
+
 		public Pkcs10CertificationRequestDelaySigned(
 			byte[] encoded)
 			: base(encoded)
 		{
 		}
+
 		public Pkcs10CertificationRequestDelaySigned(
 			Asn1Sequence seq)
 			: base(seq)
 		{
 		}
+
 		public Pkcs10CertificationRequestDelaySigned(
 			Stream input)
 			: base(input)
 		{
 		}
+
 		public Pkcs10CertificationRequestDelaySigned(
-			string					signatureAlgorithm,
-			X509Name				subject,
-			AsymmetricKeyParameter	publicKey,
-			Asn1Set					attributes,
-			AsymmetricKeyParameter	signingKey)
+			string signatureAlgorithm,
+			X509Name subject,
+			AsymmetricKeyParameter publicKey,
+			Asn1Set attributes,
+			AsymmetricKeyParameter signingKey)
 			: base(signatureAlgorithm, subject, publicKey, attributes, signingKey)
 		{
 		}
+
 		/// <summary>
 		/// Instantiate a Pkcs10CertificationRequest object with the necessary credentials.
 		/// </summary>
@@ -79,14 +83,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		/// <param name="publicKey">Public Key to be included in cert reqest.</param>
 		/// <param name="attributes">ASN1Set of Attributes.</param>
 		/// <remarks>
-        /// After the object is constructed use the <see cref="GetDataToSign"/> and finally the
-        /// SignRequest methods to finalize the request.
+		/// After the object is constructed use the <see cref="GetDataToSign"/> and finally the
+		/// SignRequest methods to finalize the request.
 		/// </remarks>
 		public Pkcs10CertificationRequestDelaySigned(
-			string					signatureAlgorithm,
-			X509Name				subject,
-			AsymmetricKeyParameter	publicKey,
-			Asn1Set					attributes)
+			string signatureAlgorithm,
+			X509Name subject,
+			AsymmetricKeyParameter publicKey,
+			Asn1Set attributes)
 		{
 			if (signatureAlgorithm == null)
 				throw new ArgumentNullException("signatureAlgorithm");
@@ -109,6 +113,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 					throw new ArgumentException("Unknown signature type requested", e);
 				}
 			}
+
 			if (m_noParams.Contains(sigOid))
 			{
 				this.sigAlgId = new AlgorithmIdentifier(sigOid);
@@ -121,6 +126,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			{
 				this.sigAlgId = new AlgorithmIdentifier(sigOid, DerNull.Instance);
 			}
+
 			SubjectPublicKeyInfo pubInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(publicKey);
 			this.reqInfo = new CertificationRequestInfo(subject, pubInfo, attributes);
 		}
@@ -129,11 +135,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		{
 			return reqInfo.GetDerEncoded();
 		}
+
 		public void SignRequest(byte[] signedData)
 		{
 			//build the signature from the signed data
 			sigBits = new DerBitString(signedData);
 		}
+
 		public void SignRequest(DerBitString signedData)
 		{
 			//build the signature from the signed data

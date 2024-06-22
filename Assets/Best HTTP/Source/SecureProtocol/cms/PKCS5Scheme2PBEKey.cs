@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -17,15 +16,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		: CmsPbeKey
 	{
 		public Pkcs5Scheme2PbeKey(
-			char[]	password,
-			byte[]	salt,
-			int		iterationCount)
+			char[] password,
+			byte[] salt,
+			int iterationCount)
 			: base(password, salt, iterationCount)
 		{
 		}
 
 		public Pkcs5Scheme2PbeKey(
-			char[]				password,
+			char[] password,
 			AlgorithmIdentifier keyDerivationAlgorithm)
 			: base(password, keyDerivationAlgorithm)
 		{
@@ -41,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				salt,
 				iterationCount);
 
-			return (KeyParameter) gen.GenerateDerivedParameters(
+			return (KeyParameter)gen.GenerateDerivedParameters(
 				algorithmOid,
 				CmsEnvelopedHelper.Instance.GetKeySize(algorithmOid));
 		}

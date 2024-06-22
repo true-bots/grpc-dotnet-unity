@@ -31,7 +31,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			this.seq = seq;
 		}
 
-        /**
+		/**
 		 * Creates a new <code>PolicyMappings</code> instance.
 		 *
 		 * @param mappings a <code>HashMap</code> value that maps

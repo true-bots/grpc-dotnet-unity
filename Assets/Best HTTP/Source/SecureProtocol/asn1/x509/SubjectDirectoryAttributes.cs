@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 
@@ -37,15 +36,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 			if (obj == null || obj is SubjectDirectoryAttributes)
 			{
-				return (SubjectDirectoryAttributes) obj;
+				return (SubjectDirectoryAttributes)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new SubjectDirectoryAttributes((Asn1Sequence) obj);
+				return new SubjectDirectoryAttributes((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -72,16 +71,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		private SubjectDirectoryAttributes(
 			Asn1Sequence seq)
 		{
-            m_attributes = new List<AttributeX509>();
+			m_attributes = new List<AttributeX509>();
 
-            foreach (object o in seq)
+			foreach (object o in seq)
 			{
 				Asn1Sequence s = Asn1Sequence.GetInstance(o);
 				m_attributes.Add(AttributeX509.GetInstance(s));
 			}
 		}
 
-        /**
+		/**
 		 * Constructor from an ArrayList of attributes.
 		 *
 		 * The ArrayList consists of attributes of type {@link Attribute Attribute}
@@ -116,15 +115,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-            AttributeX509[] v = new AttributeX509[m_attributes.Count];
-            for (int i = 0; i < m_attributes.Count; ++i)
-            {
-                v[i] = m_attributes[i];
-            }
-            return new DerSequence(v);
+			AttributeX509[] v = new AttributeX509[m_attributes.Count];
+			for (int i = 0; i < m_attributes.Count; ++i)
+			{
+				v[i] = m_attributes[i];
+			}
+
+			return new DerSequence(v);
 		}
 
-        /**
+		/**
 		 * @return Returns the attributes.
 		 */
 		public IEnumerable<AttributeX509> Attributes

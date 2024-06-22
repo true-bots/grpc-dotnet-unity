@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
@@ -40,12 +39,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		* inappropriate.
 		*/
 		public override void Init(
-			bool				forEncryption,
-			ICipherParameters	parameters)
+			bool forEncryption,
+			ICipherParameters parameters)
 		{
 			if (parameters is ParametersWithRandom)
 			{
-				parameters = ((ParametersWithRandom) parameters).Parameters;
+				parameters = ((ParametersWithRandom)parameters).Parameters;
 			}
 
 			cipher.Init(forEncryption, parameters);
@@ -99,9 +98,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		* @exception DataLengthException if there isn't enough space in out.
 		* @exception InvalidOperationException if the cipher isn't initialised.
 		*/
-        public override int ProcessByte(byte input, byte[] output, int outOff)
-        {
-            return cipher.ProcessByte(input, output, outOff);
+		public override int ProcessByte(byte input, byte[] output, int outOff)
+		{
+			return cipher.ProcessByte(input, output, outOff);
 		}
 
 		public override byte[] ProcessByte(
@@ -130,10 +129,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        public override byte[] ProcessBytes(
-			byte[]	input,
-			int		inOff,
-			int		length)
+		public override byte[] ProcessBytes(
+			byte[] input,
+			int inOff,
+			int length)
 		{
 			if (input == null)
 				throw new ArgumentNullException("input");
@@ -169,11 +168,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		* @exception InvalidOperationException if the cipher isn't initialised.
 		*/
 		public override int ProcessBytes(
-			byte[]	input,
-			int		inOff,
-			int		length,
-			byte[]	output,
-			int		outOff)
+			byte[] input,
+			int inOff,
+			int length,
+			byte[] output,
+			int outOff)
 		{
 			return cipher.ProcessBytes(input, inOff, length, output, outOff);
 		}
@@ -185,46 +184,46 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        public override byte[] DoFinal()
+		public override byte[] DoFinal()
 		{
-            byte[] outBytes = new byte[GetOutputSize(0)];
+			byte[] outBytes = new byte[GetOutputSize(0)];
 
-            int pos = DoFinal(outBytes, 0);
+			int pos = DoFinal(outBytes, 0);
 
-            if (pos < outBytes.Length)
+			if (pos < outBytes.Length)
 			{
 				byte[] tmp = new byte[pos];
 				Array.Copy(outBytes, 0, tmp, 0, pos);
 				outBytes = tmp;
 			}
 
-            return outBytes;
+			return outBytes;
 		}
 
 		public override byte[] DoFinal(
-			byte[]	input,
-			int		inOff,
-			int		inLen)
+			byte[] input,
+			int inOff,
+			int inLen)
 		{
 			if (input == null)
 				throw new ArgumentNullException("input");
 
-            byte[] outBytes = new byte[GetOutputSize(inLen)];
+			byte[] outBytes = new byte[GetOutputSize(inLen)];
 
-            int pos = (inLen > 0)
-				?	ProcessBytes(input, inOff, inLen, outBytes, 0)
-				:	0;
+			int pos = (inLen > 0)
+				? ProcessBytes(input, inOff, inLen, outBytes, 0)
+				: 0;
 
 			pos += DoFinal(outBytes, pos);
 
-            if (pos < outBytes.Length)
+			if (pos < outBytes.Length)
 			{
 				byte[] tmp = new byte[pos];
 				Array.Copy(outBytes, 0, tmp, 0, pos);
 				outBytes = tmp;
 			}
 
-            return outBytes;
+			return outBytes;
 		}
 
 		/**
@@ -242,8 +241,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		* aligned.
 		*/
 		public override int DoFinal(
-			byte[]	output,
-			int		outOff)
+			byte[] output,
+			int outOff)
 		{
 			return cipher.DoFinal(output, outOff);
 		}
@@ -262,11 +261,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        /**
+		/**
 		* Reset the buffer and cipher. After resetting the object is in the same
 		* state as it was after the last init (if there was one).
 		*/
-        public override void Reset()
+		public override void Reset()
 		{
 			cipher.Reset();
 		}

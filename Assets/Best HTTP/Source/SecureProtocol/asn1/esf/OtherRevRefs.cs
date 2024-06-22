@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
@@ -21,21 +20,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class OtherRevRefs
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier	otherRevRefType;
-		private readonly Asn1Object				otherRevRefs;
+		private readonly DerObjectIdentifier otherRevRefType;
+		private readonly Asn1Object otherRevRefs;
 
 		public static OtherRevRefs GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is OtherRevRefs)
-				return (OtherRevRefs) obj;
+				return (OtherRevRefs)obj;
 
 			if (obj is Asn1Sequence)
-				return new OtherRevRefs((Asn1Sequence) obj);
+				return new OtherRevRefs((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'OtherRevRefs' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -47,13 +46,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			if (seq.Count != 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.otherRevRefType = (DerObjectIdentifier) seq[0].ToAsn1Object();
+			this.otherRevRefType = (DerObjectIdentifier)seq[0].ToAsn1Object();
 			this.otherRevRefs = seq[1].ToAsn1Object();
 		}
 
 		public OtherRevRefs(
-			DerObjectIdentifier	otherRevRefType,
-			Asn1Encodable		otherRevRefs)
+			DerObjectIdentifier otherRevRefType,
+			Asn1Encodable otherRevRefs)
 		{
 			if (otherRevRefType == null)
 				throw new ArgumentNullException("otherRevRefType");

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Cms;
@@ -13,34 +12,34 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 {
-    public class CertificateStatus
-    {
-        private static readonly DefaultSignatureAlgorithmIdentifierFinder sigAlgFinder = new DefaultSignatureAlgorithmIdentifierFinder();
+	public class CertificateStatus
+	{
+		private static readonly DefaultSignatureAlgorithmIdentifierFinder sigAlgFinder = new DefaultSignatureAlgorithmIdentifierFinder();
 
-        private readonly DefaultDigestAlgorithmIdentifierFinder digestAlgFinder;
-        private readonly CertStatus certStatus;
+		private readonly DefaultDigestAlgorithmIdentifierFinder digestAlgFinder;
+		private readonly CertStatus certStatus;
 
-        public CertificateStatus(DefaultDigestAlgorithmIdentifierFinder digestAlgFinder, CertStatus certStatus)
-        {
-            this.digestAlgFinder = digestAlgFinder;
-            this.certStatus = certStatus;
-        }
+		public CertificateStatus(DefaultDigestAlgorithmIdentifierFinder digestAlgFinder, CertStatus certStatus)
+		{
+			this.digestAlgFinder = digestAlgFinder;
+			this.certStatus = certStatus;
+		}
 
-        public virtual PkiStatusInfo StatusInfo => certStatus.StatusInfo;
+		public virtual PkiStatusInfo StatusInfo => certStatus.StatusInfo;
 
-        public virtual BigInteger CertRequestID => certStatus.CertReqID.Value;
+		public virtual BigInteger CertRequestID => certStatus.CertReqID.Value;
 
-        public virtual bool IsVerified(X509Certificate cert)
-        {
-            AlgorithmIdentifier digAlg = digestAlgFinder.Find(sigAlgFinder.Find(cert.SigAlgName));
-            if (null == digAlg)
-                throw new CmpException("cannot find algorithm for digest from signature " + cert.SigAlgName);
+		public virtual bool IsVerified(X509Certificate cert)
+		{
+			AlgorithmIdentifier digAlg = digestAlgFinder.Find(sigAlgFinder.Find(cert.SigAlgName));
+			if (null == digAlg)
+				throw new CmpException("cannot find algorithm for digest from signature " + cert.SigAlgName);
 
-            byte[] digest = DigestUtilities.CalculateDigest(digAlg.Algorithm, cert.GetEncoded());
+			byte[] digest = DigestUtilities.CalculateDigest(digAlg.Algorithm, cert.GetEncoded());
 
-            return Arrays.ConstantTimeAreEqual(certStatus.CertHash.GetOctets(), digest);
-        }
-    }
+			return Arrays.ConstantTimeAreEqual(certStatus.CertHash.GetOctets(), digest);
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -4,13 +4,13 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
-    /// <summary>
-    /// Base interface for operator factories that create stream-based digest calculators.
-    /// </summary>   
-    public interface IDigestFactory
+	/// <summary>
+	/// Base interface for operator factories that create stream-based digest calculators.
+	/// </summary>   
+	public interface IDigestFactory
 	{
 		/// <summary>The algorithm details object for calculators made by this factory.</summary>
-		object AlgorithmDetails { get ; }
+		object AlgorithmDetails { get; }
 
 		/// <summary>Return the size of the digest associated with this factory.</summary>
 		/// <returns>The length of the digest produced by this calculators from this factory in bytes.</returns>

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -15,10 +14,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class Rfc3211WrapEngine
 		: IWrapper
 	{
-		private CbcBlockCipher		engine;
-		private ParametersWithIV	param;
-		private bool				forWrapping;
-		private SecureRandom		rand;
+		private CbcBlockCipher engine;
+		private ParametersWithIV param;
+		private bool forWrapping;
+		private SecureRandom rand;
 
 		public Rfc3211WrapEngine(
 			IBlockCipher engine)
@@ -26,14 +25,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			this.engine = new CbcBlockCipher(engine);
 		}
 
-        public virtual void Init(bool forWrapping, ICipherParameters param)
+		public virtual void Init(bool forWrapping, ICipherParameters param)
 		{
 			this.forWrapping = forWrapping;
 
 			if (param is ParametersWithRandom withRandom)
 			{
-                this.rand = withRandom.Random;
-                this.param = withRandom.Parameters as ParametersWithIV;
+				this.rand = withRandom.Random;
+				this.param = withRandom.Parameters as ParametersWithIV;
 			}
 			else
 			{
@@ -42,29 +41,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					rand = CryptoServicesRegistrar.GetSecureRandom();
 				}
 
-                this.param = param as ParametersWithIV;
-            }
+				this.param = param as ParametersWithIV;
+			}
 
-            if (null == this.param)
-                throw new ArgumentException("RFC3211Wrap requires an IV", "param");
-        }
+			if (null == this.param)
+				throw new ArgumentException("RFC3211Wrap requires an IV", "param");
+		}
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return engine.UnderlyingCipher.AlgorithmName + "/RFC3211Wrap"; }
 		}
 
-        public virtual byte[] Wrap(
-			byte[]	inBytes,
-			int		inOff,
-			int		inLen)
+		public virtual byte[] Wrap(
+			byte[] inBytes,
+			int inOff,
+			int inLen)
 		{
 			if (!forWrapping)
 				throw new InvalidOperationException("not set for wrapping");
-            if (inLen > 255 || inLen < 0)
-                throw new ArgumentException("input must be from 0 to 255 bytes", "inLen");
+			if (inLen > 255 || inLen < 0)
+				throw new ArgumentException("input must be from 0 to 255 bytes", "inLen");
 
-            engine.Init(true, param);
+			engine.Init(true, param);
 
 			int blockSize = engine.GetBlockSize();
 			byte[] cekBlock;
@@ -84,11 +83,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			rand.NextBytes(cekBlock, inLen + 4, cekBlock.Length - inLen - 4);
 
-            cekBlock[1] = (byte)~cekBlock[4];
-            cekBlock[2] = (byte)~cekBlock[4 + 1];
-            cekBlock[3] = (byte)~cekBlock[4 + 2];
+			cekBlock[1] = (byte)~cekBlock[4];
+			cekBlock[2] = (byte)~cekBlock[4 + 1];
+			cekBlock[3] = (byte)~cekBlock[4 + 2];
 
-            for (int i = 0; i < cekBlock.Length; i += blockSize)
+			for (int i = 0; i < cekBlock.Length; i += blockSize)
 			{
 				engine.ProcessBlock(cekBlock, i, cekBlock, i);
 			}
@@ -101,10 +100,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return cekBlock;
 		}
 
-        public virtual byte[] Unwrap(
-			byte[]	inBytes,
-			int		inOff,
-			int		inLen)
+		public virtual byte[] Unwrap(
+			byte[] inBytes,
+			int inOff,
+			int inLen)
 		{
 			if (forWrapping)
 			{
@@ -128,7 +127,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			for (int i = blockSize; i < cekBlock.Length; i += blockSize)
 			{
-				engine.ProcessBlock(cekBlock, i, cekBlock, i);    
+				engine.ProcessBlock(cekBlock, i, cekBlock, i);
 			}
 
 			Array.Copy(cekBlock, cekBlock.Length - iv.Length, iv, 0, iv.Length);
@@ -144,34 +143,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				engine.ProcessBlock(cekBlock, i, cekBlock, i);
 			}
 
-            bool invalidLength = (int)cekBlock[0] > (cekBlock.Length - 4);
+			bool invalidLength = (int)cekBlock[0] > (cekBlock.Length - 4);
 
-            byte[] key;
-            if (invalidLength)
-            {
-                key = new byte[cekBlock.Length - 4];
-            }
-            else
-            {
-                key = new byte[cekBlock[0]];
-            }
+			byte[] key;
+			if (invalidLength)
+			{
+				key = new byte[cekBlock.Length - 4];
+			}
+			else
+			{
+				key = new byte[cekBlock[0]];
+			}
 
-            Array.Copy(cekBlock, 4, key, 0, key.Length);
+			Array.Copy(cekBlock, 4, key, 0, key.Length);
 
 			// Note: Using constant time comparison
 			int nonEqual = 0;
 			for (int i = 0; i != 3; i++)
 			{
 				byte check = (byte)~cekBlock[1 + i];
-                nonEqual |= (check ^ cekBlock[4 + i]);
-            }
+				nonEqual |= (check ^ cekBlock[4 + i]);
+			}
 
-            Array.Clear(cekBlock, 0, cekBlock.Length);
+			Array.Clear(cekBlock, 0, cekBlock.Length);
 
-            if (nonEqual != 0 | invalidLength)
-                throw new InvalidCipherTextException("wrapped key corrupted");
+			if (nonEqual != 0 | invalidLength)
+				throw new InvalidCipherTextException("wrapped key corrupted");
 
-            return key;
+			return key;
 		}
 	}
 }

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC;
@@ -9,167 +8,168 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
-    public class ECDomainParameters
-    {
-        private readonly ECCurve     curve;
-        private readonly byte[] seed;
-        private readonly ECPoint g;
-        private readonly BigInteger n;
-        private readonly BigInteger h;
+	public class ECDomainParameters
+	{
+		private readonly ECCurve curve;
+		private readonly byte[] seed;
+		private readonly ECPoint g;
+		private readonly BigInteger n;
+		private readonly BigInteger h;
 
-        private BigInteger hInv;
+		private BigInteger hInv;
 
-        public ECDomainParameters(X9ECParameters x9)
-            : this(x9.Curve, x9.G, x9.N, x9.H, x9.GetSeed())
-        {
-        }
+		public ECDomainParameters(X9ECParameters x9)
+			: this(x9.Curve, x9.G, x9.N, x9.H, x9.GetSeed())
+		{
+		}
 
-        public ECDomainParameters(
-            ECCurve     curve,
-            ECPoint     g,
-            BigInteger  n)
-            : this(curve, g, n, BigInteger.One, null)
-        {
-        }
+		public ECDomainParameters(
+			ECCurve curve,
+			ECPoint g,
+			BigInteger n)
+			: this(curve, g, n, BigInteger.One, null)
+		{
+		}
 
-        public ECDomainParameters(
-            ECCurve     curve,
-            ECPoint     g,
-            BigInteger  n,
-            BigInteger  h)
-            : this(curve, g, n, h, null)
-        {
-        }
+		public ECDomainParameters(
+			ECCurve curve,
+			ECPoint g,
+			BigInteger n,
+			BigInteger h)
+			: this(curve, g, n, h, null)
+		{
+		}
 
-        public ECDomainParameters(
-            ECCurve     curve,
-            ECPoint     g,
-            BigInteger  n,
-            BigInteger  h,
-            byte[]      seed)
-        {
-            if (curve == null)
-                throw new ArgumentNullException("curve");
-            if (g == null)
-                throw new ArgumentNullException("g");
-            if (n == null)
-                throw new ArgumentNullException("n");
-            // we can't check for h == null here as h is optional in X9.62 as it is not required for ECDSA
+		public ECDomainParameters(
+			ECCurve curve,
+			ECPoint g,
+			BigInteger n,
+			BigInteger h,
+			byte[] seed)
+		{
+			if (curve == null)
+				throw new ArgumentNullException("curve");
+			if (g == null)
+				throw new ArgumentNullException("g");
+			if (n == null)
+				throw new ArgumentNullException("n");
+			// we can't check for h == null here as h is optional in X9.62 as it is not required for ECDSA
 
-            this.curve = curve;
-            this.g = ValidatePublicPoint(curve, g);
-            this.n = n;
-            this.h = h;
-            this.seed = Arrays.Clone(seed);
-        }
+			this.curve = curve;
+			this.g = ValidatePublicPoint(curve, g);
+			this.n = n;
+			this.h = h;
+			this.seed = Arrays.Clone(seed);
+		}
 
-        public ECCurve Curve
-        {
-            get { return curve; }
-        }
+		public ECCurve Curve
+		{
+			get { return curve; }
+		}
 
-        public ECPoint G
-        {
-            get { return g; }
-        }
+		public ECPoint G
+		{
+			get { return g; }
+		}
 
-        public BigInteger N
-        {
-            get { return n; }
-        }
+		public BigInteger N
+		{
+			get { return n; }
+		}
 
-        public BigInteger H
-        {
-            get { return h; }
-        }
+		public BigInteger H
+		{
+			get { return h; }
+		}
 
-        public BigInteger HInv
-        {
-            get
-            {
-                lock (this)
-                {
-                    if (hInv == null)
-                    {
-                        hInv = BigIntegers.ModOddInverseVar(n, h);
-                    }
-                    return hInv;
-                }
-            }
-        }
+		public BigInteger HInv
+		{
+			get
+			{
+				lock (this)
+				{
+					if (hInv == null)
+					{
+						hInv = BigIntegers.ModOddInverseVar(n, h);
+					}
 
-        public byte[] GetSeed()
-        {
-            return Arrays.Clone(seed);
-        }
+					return hInv;
+				}
+			}
+		}
 
-        public override bool Equals(
-            object obj)
-        {
-            if (obj == this)
-                return true;
+		public byte[] GetSeed()
+		{
+			return Arrays.Clone(seed);
+		}
 
-            ECDomainParameters other = obj as ECDomainParameters;
+		public override bool Equals(
+			object obj)
+		{
+			if (obj == this)
+				return true;
 
-            if (other == null)
-                return false;
+			ECDomainParameters other = obj as ECDomainParameters;
 
-            return Equals(other);
-        }
+			if (other == null)
+				return false;
 
-        protected virtual bool Equals(
-            ECDomainParameters other)
-        {
-            return curve.Equals(other.curve)
-                &&	g.Equals(other.g)
-                &&	n.Equals(other.n);
-        }
+			return Equals(other);
+		}
 
-        public override int GetHashCode()
-        {
-            //return Arrays.GetHashCode(new object[]{ curve, g, n });
-            int hc = 4;
-            hc *= 257;
-            hc ^= curve.GetHashCode();
-            hc *= 257;
-            hc ^= g.GetHashCode();
-            hc *= 257;
-            hc ^= n.GetHashCode();
-            return hc;
-        }
+		protected virtual bool Equals(
+			ECDomainParameters other)
+		{
+			return curve.Equals(other.curve)
+			       && g.Equals(other.g)
+			       && n.Equals(other.n);
+		}
 
-        public BigInteger ValidatePrivateScalar(BigInteger d)
-        {
-            if (null == d)
-                throw new ArgumentNullException("d", "Scalar cannot be null");
+		public override int GetHashCode()
+		{
+			//return Arrays.GetHashCode(new object[]{ curve, g, n });
+			int hc = 4;
+			hc *= 257;
+			hc ^= curve.GetHashCode();
+			hc *= 257;
+			hc ^= g.GetHashCode();
+			hc *= 257;
+			hc ^= n.GetHashCode();
+			return hc;
+		}
 
-            if (d.CompareTo(BigInteger.One) < 0 || (d.CompareTo(N) >= 0))
-                throw new ArgumentException("Scalar is not in the interval [1, n - 1]", "d");
+		public BigInteger ValidatePrivateScalar(BigInteger d)
+		{
+			if (null == d)
+				throw new ArgumentNullException("d", "Scalar cannot be null");
 
-            return d;
-        }
+			if (d.CompareTo(BigInteger.One) < 0 || (d.CompareTo(N) >= 0))
+				throw new ArgumentException("Scalar is not in the interval [1, n - 1]", "d");
 
-        public ECPoint ValidatePublicPoint(ECPoint q)
-        {
-            return ValidatePublicPoint(Curve, q);
-        }
+			return d;
+		}
 
-        internal static ECPoint ValidatePublicPoint(ECCurve c, ECPoint q)
-        {
-            if (null == q)
-                throw new ArgumentNullException("q", "Point cannot be null");
+		public ECPoint ValidatePublicPoint(ECPoint q)
+		{
+			return ValidatePublicPoint(Curve, q);
+		}
 
-            q = ECAlgorithms.ImportPoint(c, q).Normalize();
+		internal static ECPoint ValidatePublicPoint(ECCurve c, ECPoint q)
+		{
+			if (null == q)
+				throw new ArgumentNullException("q", "Point cannot be null");
 
-            if (q.IsInfinity)
-                throw new ArgumentException("Point at infinity", "q");
+			q = ECAlgorithms.ImportPoint(c, q).Normalize();
 
-            if (!q.IsValid())
-                throw new ArgumentException("Point not on curve", "q");
+			if (q.IsInfinity)
+				throw new ArgumentException("Point at infinity", "q");
 
-            return q;
-        }
-    }
+			if (!q.IsValid())
+				throw new ArgumentException("Point not on curve", "q");
+
+			return q;
+		}
+	}
 }
 #pragma warning restore
 #endif

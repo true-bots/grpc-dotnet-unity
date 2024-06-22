@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	[Serializable]
 	public class TlsException
-        : IOException
-    {
+		: IOException
+	{
 		public TlsException()
 			: base()
 		{

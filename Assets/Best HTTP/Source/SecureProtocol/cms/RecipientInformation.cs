@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Nist;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
@@ -16,17 +15,17 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-    public abstract class RecipientInformation
-    {
-		internal RecipientID			rid = new RecipientID();
-		internal AlgorithmIdentifier	keyEncAlg;
-		internal CmsSecureReadable		secureReadable;
-		
+	public abstract class RecipientInformation
+	{
+		internal RecipientID rid = new RecipientID();
+		internal AlgorithmIdentifier keyEncAlg;
+		internal CmsSecureReadable secureReadable;
+
 		private byte[] resultMac;
 
 		internal RecipientInformation(
-			AlgorithmIdentifier	keyEncAlg,
-			CmsSecureReadable	secureReadable)
+			AlgorithmIdentifier keyEncAlg,
+			CmsSecureReadable secureReadable)
 		{
 			this.keyEncAlg = keyEncAlg;
 			this.secureReadable = secureReadable;
@@ -40,9 +39,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		public RecipientID RecipientID
-        {
+		{
 			get { return rid; }
-        }
+		}
 
 		public AlgorithmIdentifier KeyEncryptionAlgorithmID
 		{
@@ -51,18 +50,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		/**
         * return the object identifier for the key encryption algorithm.
-        * 
+        *
 		* @return OID for key encryption algorithm.
         */
-        public string KeyEncryptionAlgOid
-        {
-            get { return keyEncAlg.Algorithm.Id; }
-        }
+		public string KeyEncryptionAlgOid
+		{
+			get { return keyEncAlg.Algorithm.Id; }
+		}
 
 		/**
         * return the ASN.1 encoded key encryption algorithm parameters, or null if
         * there aren't any.
-        * 
+        *
 		* @return ASN.1 encoding of key encryption algorithm parameters.
         */
 		public Asn1Object KeyEncryptionAlgParams
@@ -78,7 +77,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal CmsTypedStream GetContentFromSessionKey(
 			KeyParameter sKey)
 		{
-			CmsReadable readable = secureReadable.GetReadable(sKey); 
+			CmsReadable readable = secureReadable.GetReadable(sKey);
 
 			try
 			{
@@ -91,17 +90,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		public byte[] GetContent(
-            ICipherParameters key)
-        {
-            try
-            {
+			ICipherParameters key)
+		{
+			try
+			{
 				return CmsUtilities.StreamToByteArray(GetContentStream(key).ContentStream);
-            }
-            catch (IOException e)
-            {
-                throw new Exception("unable to parse internal stream: " + e);
-            }
-        }
+			}
+			catch (IOException e)
+			{
+				throw new Exception("unable to parse internal stream: " + e);
+			}
+		}
 
 		/**
 		* Return the MAC calculated for the content stream. Note: this call is only meaningful once all

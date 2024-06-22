@@ -16,19 +16,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 		}
 
 #if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER || (UNITY_2021_2_OR_NEWER && (NET_STANDARD_2_0 || NET_STANDARD_2_1))
-        public override void CopyTo(Stream destination, int bufferSize)
-        {
+		public override void CopyTo(Stream destination, int bufferSize)
+		{
 			if (m_buf != -1)
 			{
 				destination.WriteByte((byte)m_buf);
-                m_buf = -1;
-            }
+				m_buf = -1;
+			}
 
-            s.CopyTo(destination, bufferSize);
-        }
+			s.CopyTo(destination, bufferSize);
+		}
 #endif
 
-        public override int Read(byte[] buffer, int offset, int count)
+		public override int Read(byte[] buffer, int offset, int count)
 		{
 			Streams.ValidateBufferArguments(buffer, offset, count);
 
@@ -62,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
         }
 #endif
 
-        public override int ReadByte()
+		public override int ReadByte()
 		{
 			if (m_buf != -1)
 			{

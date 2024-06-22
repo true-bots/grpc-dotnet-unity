@@ -3,44 +3,45 @@ using System.Threading;
 
 namespace BestHTTP.PlatformSupport.Threading
 {
-    public struct ReadLock : IDisposable
-    {
-        private ReaderWriterLockSlim rwLock;
-        private bool locked;
-        public ReadLock(ReaderWriterLockSlim rwLock)
-        {
-            this.rwLock = rwLock;
+	public struct ReadLock : IDisposable
+	{
+		private ReaderWriterLockSlim rwLock;
+		private bool locked;
 
-            this.locked = this.rwLock.IsReadLockHeld;
-            if (!this.locked)
-                this.rwLock.EnterReadLock();
-        }
+		public ReadLock(ReaderWriterLockSlim rwLock)
+		{
+			this.rwLock = rwLock;
 
-        public void Dispose()
-        {
-            if (!this.locked)
-                this.rwLock.ExitReadLock();
-        }
-    }
+			this.locked = this.rwLock.IsReadLockHeld;
+			if (!this.locked)
+				this.rwLock.EnterReadLock();
+		}
 
-    public struct WriteLock : IDisposable
-    {
-        private ReaderWriterLockSlim rwLock;
-        private bool locked;
+		public void Dispose()
+		{
+			if (!this.locked)
+				this.rwLock.ExitReadLock();
+		}
+	}
 
-        public WriteLock(ReaderWriterLockSlim rwLock)
-        {
-            this.rwLock = rwLock;
-            this.locked = rwLock.IsWriteLockHeld;
+	public struct WriteLock : IDisposable
+	{
+		private ReaderWriterLockSlim rwLock;
+		private bool locked;
 
-            if (!locked)
-                this.rwLock.EnterWriteLock();
-        }
+		public WriteLock(ReaderWriterLockSlim rwLock)
+		{
+			this.rwLock = rwLock;
+			this.locked = rwLock.IsWriteLockHeld;
 
-        public void Dispose()
-        {
-            if (!locked)
-                this.rwLock.ExitWriteLock();
-        }
-    }
+			if (!locked)
+				this.rwLock.EnterWriteLock();
+		}
+
+		public void Dispose()
+		{
+			if (!locked)
+				this.rwLock.ExitWriteLock();
+		}
+	}
 }

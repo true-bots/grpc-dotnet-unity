@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
@@ -12,20 +11,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 {
 	internal sealed class PemUtilities
 	{
-		private enum PemBaseAlg { AES_128, AES_192, AES_256, BF, DES, DES_EDE, DES_EDE3, RC2, RC2_40, RC2_64 };
-		private enum PemMode { CBC, CFB, ECB, OFB };
+		private enum PemBaseAlg
+		{
+			AES_128,
+			AES_192,
+			AES_256,
+			BF,
+			DES,
+			DES_EDE,
+			DES_EDE3,
+			RC2,
+			RC2_40,
+			RC2_64
+		};
+
+		private enum PemMode
+		{
+			CBC,
+			CFB,
+			ECB,
+			OFB
+		};
 
 		static PemUtilities()
 		{
 			// Signal to obfuscation tools not to change enum constants
 			Enums.GetArbitraryValue<PemBaseAlg>().ToString();
-            Enums.GetArbitraryValue<PemMode>().ToString();
+			Enums.GetArbitraryValue<PemMode>().ToString();
 		}
 
 		private static void ParseDekAlgName(
-			string			dekAlgName,
-			out PemBaseAlg	baseAlg,
-			out PemMode		mode)
+			string dekAlgName,
+			out PemBaseAlg baseAlg,
+			out PemMode mode)
 		{
 			try
 			{
@@ -41,8 +59,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 				if (pos >= 0)
 				{
 					baseAlg = Enums.GetEnumValue<PemBaseAlg>(dekAlgName.Substring(0, pos));
-                    mode = Enums.GetEnumValue<PemMode>(dekAlgName.Substring(pos + 1));
-                    return;
+					mode = Enums.GetEnumValue<PemMode>(dekAlgName.Substring(pos + 1));
+					return;
 				}
 			}
 			catch (ArgumentException)
@@ -53,11 +71,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		}
 
 		internal static byte[] Crypt(
-			bool	encrypt,
-			byte[]	bytes,
-			char[]	password,
-			string	dekAlgName,
-			byte[]	iv)
+			bool encrypt,
+			byte[] bytes,
+			char[] password,
+			string dekAlgName,
+			byte[] iv)
 		{
 			PemBaseAlg baseAlg;
 			PemMode mode;
@@ -92,6 +110,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 						salt = new byte[8];
 						Array.Copy(iv, 0, salt, 0, salt.Length);
 					}
+
 					break;
 				case PemBaseAlg.BF:
 					algorithm = "BLOWFISH";
@@ -128,24 +147,54 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		}
 
 		private static ICipherParameters GetCipherParameters(
-			char[]		password,
-			PemBaseAlg	baseAlg,
-			byte[]		salt)
+			char[] password,
+			PemBaseAlg baseAlg,
+			byte[] salt)
 		{
 			string algorithm;
 			int keyBits;
 			switch (baseAlg)
 			{
-				case PemBaseAlg.AES_128:		keyBits = 128;	algorithm = "AES128";	break;
-				case PemBaseAlg.AES_192:		keyBits = 192;	algorithm = "AES192";	break;
-				case PemBaseAlg.AES_256:		keyBits = 256;	algorithm = "AES256";	break;
-				case PemBaseAlg.BF:				keyBits = 128;	algorithm = "BLOWFISH";	break;
-				case PemBaseAlg.DES:			keyBits = 64;	algorithm = "DES";		break;
-				case PemBaseAlg.DES_EDE:		keyBits = 128;	algorithm = "DESEDE";	break;
-				case PemBaseAlg.DES_EDE3:		keyBits = 192;	algorithm = "DESEDE3";	break;
-				case PemBaseAlg.RC2:			keyBits = 128;	algorithm = "RC2";		break;
-				case PemBaseAlg.RC2_40:			keyBits = 40;	algorithm = "RC2";		break;
-				case PemBaseAlg.RC2_64:			keyBits = 64;	algorithm = "RC2";		break;
+				case PemBaseAlg.AES_128:
+					keyBits = 128;
+					algorithm = "AES128";
+					break;
+				case PemBaseAlg.AES_192:
+					keyBits = 192;
+					algorithm = "AES192";
+					break;
+				case PemBaseAlg.AES_256:
+					keyBits = 256;
+					algorithm = "AES256";
+					break;
+				case PemBaseAlg.BF:
+					keyBits = 128;
+					algorithm = "BLOWFISH";
+					break;
+				case PemBaseAlg.DES:
+					keyBits = 64;
+					algorithm = "DES";
+					break;
+				case PemBaseAlg.DES_EDE:
+					keyBits = 128;
+					algorithm = "DESEDE";
+					break;
+				case PemBaseAlg.DES_EDE3:
+					keyBits = 192;
+					algorithm = "DESEDE3";
+					break;
+				case PemBaseAlg.RC2:
+					keyBits = 128;
+					algorithm = "RC2";
+					break;
+				case PemBaseAlg.RC2_40:
+					keyBits = 40;
+					algorithm = "RC2";
+					break;
+				case PemBaseAlg.RC2_64:
+					keyBits = 64;
+					algorithm = "RC2";
+					break;
 				default:
 					return null;
 			}

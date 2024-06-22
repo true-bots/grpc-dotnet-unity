@@ -4,13 +4,13 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-    /// <summary>Base interface for an object that can process a PSK identity.</summary>
-    public interface TlsPskIdentityManager
-    {
-        byte[] GetHint();
+	/// <summary>Base interface for an object that can process a PSK identity.</summary>
+	public interface TlsPskIdentityManager
+	{
+		byte[] GetHint();
 
-        byte[] GetPsk(byte[] identity);
-    }
+		byte[] GetPsk(byte[] identity);
+	}
 }
 #pragma warning restore
 #endif

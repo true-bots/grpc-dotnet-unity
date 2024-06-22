@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -27,8 +26,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 	public class BasicOcspResp
 		: X509ExtensionBase
 	{
-		private readonly BasicOcspResponse	resp;
-		private readonly ResponseData		data;
+		private readonly BasicOcspResponse resp;
+		private readonly ResponseData data;
 //		private readonly X509Certificate[]	chain;
 
 		public BasicOcspResp(
@@ -54,7 +53,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 		public int Version
 		{
-            get { return data.Version.IntValueExact + 1; }
+			get { return data.Version.IntValueExact + 1; }
 		}
 
 		public RespID ResponderId
@@ -95,12 +94,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 		public string SignatureAlgName
 		{
-            get { return OcspUtilities.GetAlgorithmName(resp.SignatureAlgorithm.Algorithm); }
+			get { return OcspUtilities.GetAlgorithmName(resp.SignatureAlgorithm.Algorithm); }
 		}
 
 		public string SignatureAlgOid
 		{
-            get { return resp.SignatureAlgorithm.Algorithm.Id; }
+			get { return resp.SignatureAlgorithm.Algorithm.Id; }
 		}
 
 		public byte[] GetSignature()

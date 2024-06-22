@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
@@ -24,14 +23,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			object obj)
 		{
 			if (obj == null || obj is OcspListID)
-				return (OcspListID) obj;
+				return (OcspListID)obj;
 
 			if (obj is Asn1Sequence)
-				return new OcspListID((Asn1Sequence) obj);
+				return new OcspListID((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'OcspListID' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -43,7 +42,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			if (seq.Count != 1)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.ocspResponses = (Asn1Sequence) seq[0].ToAsn1Object();
+			this.ocspResponses = (Asn1Sequence)seq[0].ToAsn1Object();
 
 			foreach (Asn1Encodable ae in this.ocspResponses)
 			{
@@ -77,6 +76,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			{
 				result[i] = OcspResponsesID.GetInstance(ocspResponses[i].ToAsn1Object());
 			}
+
 			return result;
 		}
 

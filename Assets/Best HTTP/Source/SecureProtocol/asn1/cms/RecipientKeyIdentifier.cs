@@ -1,28 +1,27 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
-    public class RecipientKeyIdentifier
-        : Asn1Encodable
-    {
-        private Asn1OctetString      subjectKeyIdentifier;
-        private Asn1GeneralizedTime  date;
-        private OtherKeyAttribute    other;
+	public class RecipientKeyIdentifier
+		: Asn1Encodable
+	{
+		private Asn1OctetString subjectKeyIdentifier;
+		private Asn1GeneralizedTime date;
+		private OtherKeyAttribute other;
 
 		public RecipientKeyIdentifier(
-            Asn1OctetString         subjectKeyIdentifier,
-            Asn1GeneralizedTime     date,
-            OtherKeyAttribute       other)
-        {
-            this.subjectKeyIdentifier = subjectKeyIdentifier;
-            this.date = date;
-            this.other = other;
-        }
-		
+			Asn1OctetString subjectKeyIdentifier,
+			Asn1GeneralizedTime date,
+			OtherKeyAttribute other)
+		{
+			this.subjectKeyIdentifier = subjectKeyIdentifier;
+			this.date = date;
+			this.other = other;
+		}
+
 		public RecipientKeyIdentifier(
 			byte[] subjectKeyIdentifier)
 			: this(subjectKeyIdentifier, null, null)
@@ -30,9 +29,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		}
 
 		public RecipientKeyIdentifier(
-			byte[]				subjectKeyIdentifier,
-            Asn1GeneralizedTime date,
-			OtherKeyAttribute	other)
+			byte[] subjectKeyIdentifier,
+			Asn1GeneralizedTime date,
+			OtherKeyAttribute other)
 		{
 			this.subjectKeyIdentifier = new DerOctetString(subjectKeyIdentifier);
 			this.date = date;
@@ -40,13 +39,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		}
 
 		public RecipientKeyIdentifier(
-            Asn1Sequence seq)
-        {
-            subjectKeyIdentifier = Asn1OctetString.GetInstance(
+			Asn1Sequence seq)
+		{
+			subjectKeyIdentifier = Asn1OctetString.GetInstance(
 				seq[0]);
 
-			switch(seq.Count)
-            {
+			switch (seq.Count)
+			{
 				case 1:
 					break;
 				case 2:
@@ -58,15 +57,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 					{
 						other = OtherKeyAttribute.GetInstance(seq[2]);
 					}
+
 					break;
 				case 3:
-					date  = (Asn1GeneralizedTime)seq[1];
+					date = (Asn1GeneralizedTime)seq[1];
 					other = OtherKeyAttribute.GetInstance(seq[2]);
 					break;
 				default:
 					throw new ArgumentException("Invalid RecipientKeyIdentifier");
-            }
-        }
+			}
+		}
 
 		/**
          * return a RecipientKeyIdentifier object from a tagged object.
@@ -77,12 +77,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * @exception ArgumentException if the object held by the
          *          tagged object cannot be converted.
          */
-        public static RecipientKeyIdentifier GetInstance(
-			Asn1TaggedObject	ato,
-			bool				explicitly)
+		public static RecipientKeyIdentifier GetInstance(
+			Asn1TaggedObject ato,
+			bool explicitly)
 		{
-            return GetInstance(Asn1Sequence.GetInstance(ato, explicitly));
-        }
+			return GetInstance(Asn1Sequence.GetInstance(ato, explicitly));
+		}
 
 		/**
          * return a RecipientKeyIdentifier object from the given object.
@@ -90,17 +90,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * @param _obj the object we want converted.
          * @exception ArgumentException if the object cannot be converted.
          */
-        public static RecipientKeyIdentifier GetInstance(
+		public static RecipientKeyIdentifier GetInstance(
 			object obj)
 		{
-            if (obj == null || obj is RecipientKeyIdentifier)
-                return (RecipientKeyIdentifier) obj;
+			if (obj == null || obj is RecipientKeyIdentifier)
+				return (RecipientKeyIdentifier)obj;
 
 			if (obj is Asn1Sequence)
-				return new RecipientKeyIdentifier((Asn1Sequence) obj);
+				return new RecipientKeyIdentifier((Asn1Sequence)obj);
 
-            throw new ArgumentException("Invalid RecipientKeyIdentifier: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
-        }
+			throw new ArgumentException("Invalid RecipientKeyIdentifier: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+		}
 
 		public Asn1OctetString SubjectKeyIdentifier
 		{
@@ -129,13 +129,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * SubjectKeyIdentifier ::= OCTET STRING
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector(subjectKeyIdentifier);
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector(subjectKeyIdentifier);
 			v.AddOptional(date, other);
 			return new DerSequence(v);
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

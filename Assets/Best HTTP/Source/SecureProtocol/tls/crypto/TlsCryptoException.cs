@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 	/// <summary>Basic exception class for crypto services to pass back a cause.</summary>
 	[Serializable]
 	public class TlsCryptoException
-        : TlsException
-    {
+		: TlsException
+	{
 		public TlsCryptoException()
 			: base()
 		{

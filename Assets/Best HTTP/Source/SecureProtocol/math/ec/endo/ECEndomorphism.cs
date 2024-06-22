@@ -4,12 +4,12 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Endo
 {
-    public interface ECEndomorphism
-    {
-        ECPointMap PointMap { get; }
+	public interface ECEndomorphism
+	{
+		ECPointMap PointMap { get; }
 
-        bool HasEfficientPointMap { get; }
-    }
+		bool HasEfficientPointMap { get; }
+	}
 }
 #pragma warning restore
 #endif

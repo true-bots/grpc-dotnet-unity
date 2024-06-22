@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
@@ -12,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	/// <remarks>
 	/// XSalsa20 requires a 256 bit key, and a 192 bit nonce.
 	/// </remarks>
-	public class XSalsa20Engine 
+	public class XSalsa20Engine
 		: Salsa20Engine
 	{
 		public override string AlgorithmName
@@ -32,17 +31,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/// </summary>
 		protected override void SetKey(byte[] keyBytes, byte[] ivBytes)
 		{
-            if (keyBytes == null)
-                throw new ArgumentException(AlgorithmName + " doesn't support re-init with null key");
+			if (keyBytes == null)
+				throw new ArgumentException(AlgorithmName + " doesn't support re-init with null key");
 
-            if (keyBytes.Length != 32)
+			if (keyBytes.Length != 32)
 				throw new ArgumentException(AlgorithmName + " requires a 256 bit key");
 
-            // Set key for HSalsa20
+			// Set key for HSalsa20
 			base.SetKey(keyBytes, ivBytes);
 
 			// Pack next 64 bits of IV into engine state instead of counter
-            Pack.LE_To_UInt32(ivBytes, 8, engineState, 8, 2);
+			Pack.LE_To_UInt32(ivBytes, 8, engineState, 8, 2);
 
 			// Process engine state to generate Salsa20 key
 			uint[] hsalsa20Out = new uint[engineState.Length];
@@ -60,7 +59,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			engineState[14] = hsalsa20Out[9] - engineState[9];
 
 			// Last 64 bits of input IV
-            Pack.LE_To_UInt32(ivBytes, 16, engineState, 6, 2);
+			Pack.LE_To_UInt32(ivBytes, 16, engineState, 6, 2);
 		}
 	}
 }

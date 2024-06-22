@@ -6,40 +6,40 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
 	public abstract class Asn1Encodable
 		: IAsn1Convertible
-    {
+	{
 		public const string Der = "DER";
 		public const string Ber = "BER";
 
-        public virtual void EncodeTo(Stream output)
-        {
-            ToAsn1Object().EncodeTo(output);
-        }
+		public virtual void EncodeTo(Stream output)
+		{
+			ToAsn1Object().EncodeTo(output);
+		}
 
-        public virtual void EncodeTo(Stream output, string encoding)
-        {
-            ToAsn1Object().EncodeTo(output, encoding);
-        }
+		public virtual void EncodeTo(Stream output, string encoding)
+		{
+			ToAsn1Object().EncodeTo(output, encoding);
+		}
 
 		public byte[] GetEncoded()
-        {
-            MemoryStream bOut = new MemoryStream();
-            ToAsn1Object().EncodeTo(bOut);
-            return bOut.ToArray();
-        }
+		{
+			MemoryStream bOut = new MemoryStream();
+			ToAsn1Object().EncodeTo(bOut);
+			return bOut.ToArray();
+		}
 
-        public byte[] GetEncoded(string encoding)
-        {
-            MemoryStream bOut = new MemoryStream();
-            ToAsn1Object().EncodeTo(bOut, encoding);
-            return bOut.ToArray();
-        }
+		public byte[] GetEncoded(string encoding)
+		{
+			MemoryStream bOut = new MemoryStream();
+			ToAsn1Object().EncodeTo(bOut, encoding);
+			return bOut.ToArray();
+		}
 
-        /**
+		/**
 		* Return the DER encoding of the object, null if the DER encoding can not be made.
 		*
 		* @return a DER byte array, null otherwise.
 		*/
-        public byte[] GetDerEncoded()
+		public byte[] GetDerEncoded()
 		{
 			try
 			{
@@ -74,7 +74,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		}
 
 		public abstract Asn1Object ToAsn1Object();
-    }
+	}
 }
 #pragma warning restore
 #endif

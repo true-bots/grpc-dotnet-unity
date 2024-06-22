@@ -1,15 +1,14 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
-    public class DHParameters
+	public class DHParameters
 		: ICipherParameters
-    {
+	{
 		private const int DefaultMinimumLength = 160;
 
 		private readonly BigInteger p, g, q, j;
@@ -26,57 +25,57 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		}
 
 		public DHParameters(
-			BigInteger	p,
-			BigInteger	g)
+			BigInteger p,
+			BigInteger g)
 			: this(p, g, null, 0)
 		{
 		}
 
 		public DHParameters(
-			BigInteger	p,
-			BigInteger	g,
-			BigInteger	q)
+			BigInteger p,
+			BigInteger g,
+			BigInteger q)
 			: this(p, g, q, 0)
 		{
 		}
 
 		public DHParameters(
-			BigInteger	p,
-			BigInteger	g,
-			BigInteger	q,
-			int			l)
+			BigInteger p,
+			BigInteger g,
+			BigInteger q,
+			int l)
 			: this(p, g, q, GetDefaultMParam(l), l, null, null)
 		{
 		}
 
 		public DHParameters(
-			BigInteger  p,
-			BigInteger  g,
-			BigInteger  q,
-			int         m,
-			int         l)
+			BigInteger p,
+			BigInteger g,
+			BigInteger q,
+			int m,
+			int l)
 			: this(p, g, q, m, l, null, null)
 		{
 		}
 
 		public DHParameters(
-			BigInteger				p,
-			BigInteger				g,
-			BigInteger				q,
-			BigInteger				j,
-			DHValidationParameters	validation)
-			: this(p, g, q,  DefaultMinimumLength, 0, j, validation)
+			BigInteger p,
+			BigInteger g,
+			BigInteger q,
+			BigInteger j,
+			DHValidationParameters validation)
+			: this(p, g, q, DefaultMinimumLength, 0, j, validation)
 		{
 		}
 
 		public DHParameters(
-			BigInteger				p,
-			BigInteger				g,
-			BigInteger				q,
-			int						m,
-			int						l,
-			BigInteger				j,
-			DHValidationParameters	validation)
+			BigInteger p,
+			BigInteger g,
+			BigInteger q,
+			int m,
+			int l,
+			BigInteger j,
+			DHValidationParameters validation)
 		{
 			if (p == null)
 				throw new ArgumentNullException("p");
@@ -85,20 +84,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			if (!p.TestBit(0))
 				throw new ArgumentException("field must be an odd prime", "p");
 			if (g.CompareTo(BigInteger.Two) < 0
-				|| g.CompareTo(p.Subtract(BigInteger.Two)) > 0)
+			    || g.CompareTo(p.Subtract(BigInteger.Two)) > 0)
 				throw new ArgumentException("generator must in the range [2, p - 2]", "g");
 			if (q != null && q.BitLength >= p.BitLength)
 				throw new ArgumentException("q too big to be a factor of (p-1)", "q");
 			if (m >= p.BitLength)
 				throw new ArgumentException("m value must be < bitlength of p", "m");
 			if (l != 0)
-			{ 
-                // TODO Check this against the Java version, which has 'l > p.BitLength' here
-	            if (l >= p.BitLength)
-                	throw new ArgumentException("when l value specified, it must be less than bitlength(p)", "l");
+			{
+				// TODO Check this against the Java version, which has 'l > p.BitLength' here
+				if (l >= p.BitLength)
+					throw new ArgumentException("when l value specified, it must be less than bitlength(p)", "l");
 				if (l < m)
 					throw new ArgumentException("when l value specified, it may not be less than m value", "l");
 			}
+
 			if (j != null && j.CompareTo(BigInteger.Two) < 0)
 				throw new ArgumentException("subgroup factor must be >= 2", "j");
 
@@ -111,27 +111,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			this.l = l;
 			this.j = j;
 			this.validation = validation;
-        }
+		}
 
 		public BigInteger P
-        {
-            get { return p; }
-        }
+		{
+			get { return p; }
+		}
 
 		public BigInteger G
-        {
-            get { return g; }
-        }
+		{
+			get { return g; }
+		}
 
 		public BigInteger Q
-        {
-            get { return q; }
-        }
+		{
+			get { return q; }
+		}
 
 		public BigInteger J
-        {
-            get { return j; }
-        }
+		{
+			get { return j; }
+		}
 
 		/// <summary>The minimum bitlength of the private value.</summary>
 		public int M
@@ -146,13 +146,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		}
 
 		public DHValidationParameters ValidationParameters
-        {
+		{
 			get { return validation; }
-        }
+		}
 
 		public override bool Equals(
 			object obj)
-        {
+		{
 			if (obj == this)
 				return true;
 
@@ -168,12 +168,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			DHParameters other)
 		{
 			return p.Equals(other.p)
-				&& g.Equals(other.g)
-				&& Org.BouncyCastle.Utilities.Platform.Equals(q, other.q);
+			       && g.Equals(other.g)
+			       && Org.BouncyCastle.Utilities.Platform.Equals(q, other.q);
 		}
 
 		public override int GetHashCode()
-        {
+		{
 			int hc = p.GetHashCode() ^ g.GetHashCode();
 
 			if (q != null)
@@ -182,8 +182,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			}
 
 			return hc;
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

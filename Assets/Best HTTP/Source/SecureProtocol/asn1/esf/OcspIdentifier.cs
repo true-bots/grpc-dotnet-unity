@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -21,21 +20,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class OcspIdentifier
 		: Asn1Encodable
 	{
-		private readonly ResponderID		ocspResponderID;
+		private readonly ResponderID ocspResponderID;
 		private readonly Asn1GeneralizedTime producedAt;
 
 		public static OcspIdentifier GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is OcspIdentifier)
-				return (OcspIdentifier) obj;
+				return (OcspIdentifier)obj;
 
 			if (obj is Asn1Sequence)
-				return new OcspIdentifier((Asn1Sequence) obj);
+				return new OcspIdentifier((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'OcspIdentifier' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -60,18 +59,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			this.producedAt = new Asn1GeneralizedTime(producedAt);
 		}
 
-        public OcspIdentifier(ResponderID ocspResponderID, Asn1GeneralizedTime producedAt)
-        {
-            if (ocspResponderID == null)
-                throw new ArgumentNullException(nameof(ocspResponderID));
-            if (producedAt == null)
-                throw new ArgumentNullException(nameof(producedAt));
+		public OcspIdentifier(ResponderID ocspResponderID, Asn1GeneralizedTime producedAt)
+		{
+			if (ocspResponderID == null)
+				throw new ArgumentNullException(nameof(ocspResponderID));
+			if (producedAt == null)
+				throw new ArgumentNullException(nameof(producedAt));
 
-            this.ocspResponderID = ocspResponderID;
-            this.producedAt = producedAt;
-        }
+			this.ocspResponderID = ocspResponderID;
+			this.producedAt = producedAt;
+		}
 
-        public ResponderID OcspResponderID
+		public ResponderID OcspResponderID
 		{
 			get { return ocspResponderID; }
 		}

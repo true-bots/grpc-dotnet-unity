@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -17,45 +16,49 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-    /**
-    * General class for generating a pkcs7-signature message stream.
-    * <p>
-    * A simple example of usage.
-    * </p>
-    * <pre>
-    *      IX509Store                   certs...
-    *      CmsSignedDataStreamGenerator gen = new CmsSignedDataStreamGenerator();
-    *
-    *      gen.AddSigner(privateKey, cert, CmsSignedDataStreamGenerator.DIGEST_SHA1);
-    *
-    *      gen.AddCertificates(certs);
-    *
-    *      Stream sigOut = gen.Open(bOut);
-    *
-    *      sigOut.Write(Encoding.UTF8.GetBytes("Hello World!"));
-    *
-    *      sigOut.Close();
-    * </pre>
-    */
-    public class CmsSignedDataStreamGenerator
-        : CmsSignedGenerator
-    {
+	/**
+	* General class for generating a pkcs7-signature message stream.
+	* <p>
+	* A simple example of usage.
+	* </p>
+	* <pre>
+	*      IX509Store                   certs...
+	*      CmsSignedDataStreamGenerator gen = new CmsSignedDataStreamGenerator();
+	*
+	*      gen.AddSigner(privateKey, cert, CmsSignedDataStreamGenerator.DIGEST_SHA1);
+	*
+	*      gen.AddCertificates(certs);
+	*
+	*      Stream sigOut = gen.Open(bOut);
+	*
+	*      sigOut.Write(Encoding.UTF8.GetBytes("Hello World!"));
+	*
+	*      sigOut.Close();
+	* </pre>
+	*/
+	public class CmsSignedDataStreamGenerator
+		: CmsSignedGenerator
+	{
 		private static readonly CmsSignedHelper Helper = CmsSignedHelper.Instance;
 
 		private readonly IList<DigestAndSignerInfoGeneratorHolder> _signerInfs =
 			new List<DigestAndSignerInfoGeneratorHolder>();
+
 		private readonly HashSet<string> _messageDigestOids = new HashSet<string>();
+
 		private readonly IDictionary<string, IDigest> m_messageDigests =
 			new Dictionary<string, IDigest>(StringComparer.OrdinalIgnoreCase);
+
 		private readonly IDictionary<string, byte[]> m_messageHashes =
 			new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+
 		private bool _messageDigestsLocked;
-        private int _bufferSize;
+		private int _bufferSize;
 
 		private class DigestAndSignerInfoGeneratorHolder
 		{
-			internal readonly ISignerInfoGenerator	signerInf;
-			internal readonly string				digestOID;
+			internal readonly ISignerInfoGenerator signerInf;
+			internal readonly string digestOID;
 
 			internal DigestAndSignerInfoGeneratorHolder(ISignerInfoGenerator signerInf, string digestOID)
 			{
@@ -70,25 +73,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		private class SignerInfoGeneratorImpl : ISignerInfoGenerator
-        {
+		{
 			private readonly CmsSignedDataStreamGenerator outer;
 
-			private readonly SignerIdentifier			_signerIdentifier;
-			private readonly string						_digestOID;
-			private readonly string						_encOID;
-			private readonly CmsAttributeTableGenerator	_sAttr;
-			private readonly CmsAttributeTableGenerator	_unsAttr;
-			private readonly string						_encName;
-			private readonly ISigner					_sig;
+			private readonly SignerIdentifier _signerIdentifier;
+			private readonly string _digestOID;
+			private readonly string _encOID;
+			private readonly CmsAttributeTableGenerator _sAttr;
+			private readonly CmsAttributeTableGenerator _unsAttr;
+			private readonly string _encName;
+			private readonly ISigner _sig;
 
 			internal SignerInfoGeneratorImpl(
-				CmsSignedDataStreamGenerator	outer,
-				AsymmetricKeyParameter			key,
-				SignerIdentifier				signerIdentifier,
-				string							digestOID,
-				string							encOID,
-				CmsAttributeTableGenerator		sAttr,
-				CmsAttributeTableGenerator		unsAttr)
+				CmsSignedDataStreamGenerator outer,
+				AsymmetricKeyParameter key,
+				SignerIdentifier signerIdentifier,
+				string digestOID,
+				string encOID,
+				CmsAttributeTableGenerator sAttr,
+				CmsAttributeTableGenerator unsAttr)
 			{
 				this.outer = outer;
 
@@ -104,7 +107,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 				if (_sAttr != null)
 				{
-            		_sig = Helper.GetSignatureInstance(signatureName);
+					_sig = Helper.GetSignatureInstance(signatureName);
 				}
 				else
 				{
@@ -143,7 +146,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			}
 
 			public SignerInfo Generate(DerObjectIdentifier contentType, AlgorithmIdentifier digestAlgorithm,
-        		byte[] calculatedDigest)
+				byte[] calculatedDigest)
 			{
 				try
 				{
@@ -174,17 +177,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 //						Asn1.Cms.AttributeTable signed = _sAttr.GetAttributes(Collections.unmodifiableMap(parameters));
 						Asn1.Cms.AttributeTable signed = _sAttr.GetAttributes(parameters);
 
-                        if (contentType == null) //counter signature
-                        {
-                            if (signed != null && signed[CmsAttributes.ContentType] != null)
-                            {
+						if (contentType == null) //counter signature
+						{
+							if (signed != null && signed[CmsAttributes.ContentType] != null)
+							{
 								signed = signed.Remove(CmsAttributes.ContentType);
-                            }
-                        }
+							}
+						}
 
-                        signedAttr = outer.GetAttributeSet(signed);
+						signedAttr = outer.GetAttributeSet(signed);
 
-                		// sig must be composed from the DER encoding.
+						// sig must be composed from the DER encoding.
 						bytesToSign = signedAttr.GetEncoded(Asn1Encodable.Der);
 					}
 					else
@@ -220,20 +223,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					return new SignerInfo(_signerIdentifier, digestAlgorithm,
 						signedAttr, digestEncryptionAlgorithm, new DerOctetString(sigBytes), unsignedAttr);
 				}
-	            catch (IOException e)
-	            {
-	                throw new CmsStreamException("encoding error.", e);
-	            }
-	            catch (SignatureException e)
-	            {
-	                throw new CmsStreamException("error creating signature.", e);
-	            }
-            }
-        }
+				catch (IOException e)
+				{
+					throw new CmsStreamException("encoding error.", e);
+				}
+				catch (SignatureException e)
+				{
+					throw new CmsStreamException("error creating signature.", e);
+				}
+			}
+		}
 
 		public CmsSignedDataStreamGenerator()
-        {
-        }
+		{
+		}
 
 		/// <summary>Constructor allowing specific source of randomness</summary>
 		/// <param name="random">Instance of <c>SecureRandom</c> to use.</param>
@@ -247,10 +250,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
         *
         * @param bufferSize length of octet strings to buffer the data.
         */
-        public void SetBufferSize(int bufferSize)
-        {
-            _bufferSize = bufferSize;
-        }
+		public void SetBufferSize(int bufferSize)
+		{
+			_bufferSize = bufferSize;
+		}
 
 		public void AddDigests(params string[] digestOids)
 		{
@@ -274,11 +277,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
         * @throws NoSuchAlgorithmException
         * @throws InvalidKeyException
         */
-        public void AddSigner(
-            AsymmetricKeyParameter	privateKey,
-            X509Certificate			cert,
-            string					digestOid)
-        {
+		public void AddSigner(
+			AsymmetricKeyParameter privateKey,
+			X509Certificate cert,
+			string digestOid)
+		{
 			AddSigner(privateKey, cert, digestOid,
 				new DefaultSignedAttributeTableGenerator(), null);
 		}
@@ -291,28 +294,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 * @throws InvalidKeyException
 		 */
 		public void AddSigner(
-			AsymmetricKeyParameter	privateKey,
-			X509Certificate			cert,
-			string					encryptionOid,
-			string					digestOid)
+			AsymmetricKeyParameter privateKey,
+			X509Certificate cert,
+			string encryptionOid,
+			string digestOid)
 		{
 			AddSigner(privateKey, cert, encryptionOid, digestOid,
 				new DefaultSignedAttributeTableGenerator(),
 				(CmsAttributeTableGenerator)null);
 		}
 
-        /**
-        * add a signer with extra signed/unsigned attributes.
-        * @throws NoSuchAlgorithmException
-        * @throws InvalidKeyException
-        */
-        public void AddSigner(
-            AsymmetricKeyParameter	privateKey,
-            X509Certificate			cert,
-            string					digestOid,
-            Asn1.Cms.AttributeTable	signedAttr,
-            Asn1.Cms.AttributeTable	unsignedAttr)
-        {
+		/**
+		* add a signer with extra signed/unsigned attributes.
+		* @throws NoSuchAlgorithmException
+		* @throws InvalidKeyException
+		*/
+		public void AddSigner(
+			AsymmetricKeyParameter privateKey,
+			X509Certificate cert,
+			string digestOid,
+			Asn1.Cms.AttributeTable signedAttr,
+			Asn1.Cms.AttributeTable unsignedAttr)
+		{
 			AddSigner(privateKey, cert, digestOid,
 				new DefaultSignedAttributeTableGenerator(signedAttr),
 				new SimpleAttributeTableGenerator(unsignedAttr));
@@ -326,12 +329,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 * @throws InvalidKeyException
 		 */
 		public void AddSigner(
-			AsymmetricKeyParameter	privateKey,
-			X509Certificate			cert,
-			string					encryptionOid,
-			string					digestOid,
-			Asn1.Cms.AttributeTable	signedAttr,
-			Asn1.Cms.AttributeTable	unsignedAttr)
+			AsymmetricKeyParameter privateKey,
+			X509Certificate cert,
+			string encryptionOid,
+			string digestOid,
+			Asn1.Cms.AttributeTable signedAttr,
+			Asn1.Cms.AttributeTable unsignedAttr)
 		{
 			AddSigner(privateKey, cert, encryptionOid, digestOid,
 				new DefaultSignedAttributeTableGenerator(signedAttr),
@@ -339,23 +342,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		public void AddSigner(
-			AsymmetricKeyParameter		privateKey,
-			X509Certificate				cert,
-			string						digestOid,
-			CmsAttributeTableGenerator  signedAttrGenerator,
-			CmsAttributeTableGenerator  unsignedAttrGenerator)
+			AsymmetricKeyParameter privateKey,
+			X509Certificate cert,
+			string digestOid,
+			CmsAttributeTableGenerator signedAttrGenerator,
+			CmsAttributeTableGenerator unsignedAttrGenerator)
 		{
 			AddSigner(privateKey, cert, Helper.GetEncOid(privateKey, digestOid), digestOid,
 				signedAttrGenerator, unsignedAttrGenerator);
-        }
+		}
 
 		public void AddSigner(
-			AsymmetricKeyParameter		privateKey,
-			X509Certificate				cert,
-			string						encryptionOid,
-			string						digestOid,
-			CmsAttributeTableGenerator  signedAttrGenerator,
-			CmsAttributeTableGenerator  unsignedAttrGenerator)
+			AsymmetricKeyParameter privateKey,
+			X509Certificate cert,
+			string encryptionOid,
+			string digestOid,
+			CmsAttributeTableGenerator signedAttrGenerator,
+			CmsAttributeTableGenerator unsignedAttrGenerator)
 		{
 			DoAddSigner(privateKey, GetSignerIdentifier(cert), encryptionOid, digestOid,
 				signedAttrGenerator, unsignedAttrGenerator);
@@ -368,9 +371,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @throws InvalidKeyException
 		*/
 		public void AddSigner(
-			AsymmetricKeyParameter	privateKey,
-			byte[]					subjectKeyID,
-			string					digestOid)
+			AsymmetricKeyParameter privateKey,
+			byte[] subjectKeyID,
+			string digestOid)
 		{
 			AddSigner(privateKey, subjectKeyID, digestOid, new DefaultSignedAttributeTableGenerator(),
 				(CmsAttributeTableGenerator)null);
@@ -384,10 +387,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 * @throws InvalidKeyException
 		 */
 		public void AddSigner(
-			AsymmetricKeyParameter	privateKey,
-			byte[]					subjectKeyID,
-			string					encryptionOid,
-			string					digestOid)
+			AsymmetricKeyParameter privateKey,
+			byte[] subjectKeyID,
+			string encryptionOid,
+			string digestOid)
 		{
 			AddSigner(privateKey, subjectKeyID, encryptionOid, digestOid,
 				new DefaultSignedAttributeTableGenerator(),
@@ -400,47 +403,47 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @throws InvalidKeyException
 		*/
 		public void AddSigner(
-			AsymmetricKeyParameter	privateKey,
-			byte[]					subjectKeyID,
-			string					digestOid,
-			Asn1.Cms.AttributeTable	signedAttr,
-			Asn1.Cms.AttributeTable	unsignedAttr)
-	    {
-	        AddSigner(privateKey, subjectKeyID, digestOid,
+			AsymmetricKeyParameter privateKey,
+			byte[] subjectKeyID,
+			string digestOid,
+			Asn1.Cms.AttributeTable signedAttr,
+			Asn1.Cms.AttributeTable unsignedAttr)
+		{
+			AddSigner(privateKey, subjectKeyID, digestOid,
 				new DefaultSignedAttributeTableGenerator(signedAttr),
 				new SimpleAttributeTableGenerator(unsignedAttr));
 		}
 
 		public void AddSigner(
-			AsymmetricKeyParameter		privateKey,
-			byte[]						subjectKeyID,
-			string						digestOid,
-			CmsAttributeTableGenerator	signedAttrGenerator,
-			CmsAttributeTableGenerator	unsignedAttrGenerator)
+			AsymmetricKeyParameter privateKey,
+			byte[] subjectKeyID,
+			string digestOid,
+			CmsAttributeTableGenerator signedAttrGenerator,
+			CmsAttributeTableGenerator unsignedAttrGenerator)
 		{
 			AddSigner(privateKey, subjectKeyID, Helper.GetEncOid(privateKey, digestOid),
 				digestOid, signedAttrGenerator, unsignedAttrGenerator);
 		}
 
 		public void AddSigner(
-			AsymmetricKeyParameter		privateKey,
-			byte[]						subjectKeyID,
-			string						encryptionOid,
-			string						digestOid,
-			CmsAttributeTableGenerator	signedAttrGenerator,
-			CmsAttributeTableGenerator	unsignedAttrGenerator)
+			AsymmetricKeyParameter privateKey,
+			byte[] subjectKeyID,
+			string encryptionOid,
+			string digestOid,
+			CmsAttributeTableGenerator signedAttrGenerator,
+			CmsAttributeTableGenerator unsignedAttrGenerator)
 		{
 			DoAddSigner(privateKey, GetSignerIdentifier(subjectKeyID), encryptionOid, digestOid,
 				signedAttrGenerator, unsignedAttrGenerator);
 		}
 
 		private void DoAddSigner(
-			AsymmetricKeyParameter		privateKey,
-			SignerIdentifier			signerIdentifier,
-			string						encryptionOid,
-			string						digestOid,
-			CmsAttributeTableGenerator	signedAttrGenerator,
-			CmsAttributeTableGenerator	unsignedAttrGenerator)
+			AsymmetricKeyParameter privateKey,
+			SignerIdentifier signerIdentifier,
+			string encryptionOid,
+			string digestOid,
+			CmsAttributeTableGenerator signedAttrGenerator,
+			CmsAttributeTableGenerator unsignedAttrGenerator)
 		{
 			ConfigureDigest(digestOid);
 
@@ -457,30 +460,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			// NB: Would need to call FixAlgID on the DigestAlgorithmID
 
 			// For precalculated signers, just need to register the algorithm, not configure a digest
-            RegisterDigestOid(si.DigestAlgorithmID.Algorithm.Id);
+			RegisterDigestOid(si.DigestAlgorithmID.Algorithm.Id);
 		}
 
 		/**
         * generate a signed object that for a CMS Signed Data object
         */
-        public Stream Open(
-            Stream outStream)
-        {
-            return Open(outStream, false);
-        }
+		public Stream Open(
+			Stream outStream)
+		{
+			return Open(outStream, false);
+		}
 
-        /**
-        * generate a signed object that for a CMS Signed Data
-        * object - if encapsulate is true a copy
-        * of the message will be included in the signature with the
-        * default content type "data".
-        */
-        public Stream Open(
-            Stream	outStream,
-            bool	encapsulate)
-        {
-            return Open(outStream, Data, encapsulate);
-        }
+		/**
+		* generate a signed object that for a CMS Signed Data
+		* object - if encapsulate is true a copy
+		* of the message will be included in the signature with the
+		* default content type "data".
+		*/
+		public Stream Open(
+			Stream outStream,
+			bool encapsulate)
+		{
+			return Open(outStream, Data, encapsulate);
+		}
 
 		/**
 		 * generate a signed object that for a CMS Signed Data
@@ -493,9 +496,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 * @param dataOutputStream output stream to copy the data being signed to.
 		 */
 		public Stream Open(
-			Stream	outStream,
-			bool	encapsulate,
-			Stream	dataOutputStream)
+			Stream outStream,
+			bool encapsulate,
+			Stream dataOutputStream)
 		{
 			return Open(outStream, Data, encapsulate, dataOutputStream);
 		}
@@ -506,11 +509,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
         * of the message will be included in the signature. The content type
         * is set according to the OID represented by the string signedContentType.
         */
-        public Stream Open(
-            Stream	outStream,
-            string	signedContentType,
-            bool	encapsulate)
-        {
+		public Stream Open(
+			Stream outStream,
+			string signedContentType,
+			bool encapsulate)
+		{
 			return Open(outStream, signedContentType, encapsulate, null);
 		}
 
@@ -525,10 +528,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @param dataOutputStream output stream to copy the data being signed to.
 		*/
 		public Stream Open(
-			Stream	outStream,
-			string	signedContentType,
-			bool	encapsulate,
-			Stream	dataOutputStream)
+			Stream outStream,
+			string signedContentType,
+			bool encapsulate,
+			Stream dataOutputStream)
 		{
 			if (outStream == null)
 				throw new ArgumentNullException("outStream");
@@ -540,96 +543,96 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			_messageDigestsLocked = true;
 
 			//
-            // ContentInfo
-            //
-            BerSequenceGenerator sGen = new BerSequenceGenerator(outStream);
+			// ContentInfo
+			//
+			BerSequenceGenerator sGen = new BerSequenceGenerator(outStream);
 
 			sGen.AddObject(CmsObjectIdentifiers.SignedData);
 
 			//
-            // Signed Data
-            //
-            BerSequenceGenerator sigGen = new BerSequenceGenerator(
+			// Signed Data
+			//
+			BerSequenceGenerator sigGen = new BerSequenceGenerator(
 				sGen.GetRawOutputStream(), 0, true);
 
-            bool isCounterSignature = (signedContentType == null);
+			bool isCounterSignature = (signedContentType == null);
 
-            DerObjectIdentifier contentTypeOid = isCounterSignature
-                ? null
-                : new DerObjectIdentifier(signedContentType);
+			DerObjectIdentifier contentTypeOid = isCounterSignature
+				? null
+				: new DerObjectIdentifier(signedContentType);
 
-            sigGen.AddObject(CalculateVersion(contentTypeOid));
+			sigGen.AddObject(CalculateVersion(contentTypeOid));
 
 			Asn1EncodableVector digestAlgs = new Asn1EncodableVector();
 
 			foreach (string digestOid in _messageDigestOids)
-            {
+			{
 				digestAlgs.Add(new AlgorithmIdentifier(new DerObjectIdentifier(digestOid), DerNull.Instance));
-            }
+			}
 
-            new DerSet(digestAlgs).EncodeTo(sigGen.GetRawOutputStream());
+			new DerSet(digestAlgs).EncodeTo(sigGen.GetRawOutputStream());
 
 			BerSequenceGenerator eiGen = new BerSequenceGenerator(sigGen.GetRawOutputStream());
-            eiGen.AddObject(contentTypeOid);
+			eiGen.AddObject(contentTypeOid);
 
-        	// If encapsulating, add the data as an octet string in the sequence
+			// If encapsulating, add the data as an octet string in the sequence
 			Stream encapStream = encapsulate
-				?	CmsUtilities.CreateBerOctetOutputStream(eiGen.GetRawOutputStream(), 0, true, _bufferSize)
-				:	null;
+				? CmsUtilities.CreateBerOctetOutputStream(eiGen.GetRawOutputStream(), 0, true, _bufferSize)
+				: null;
 
-        	// Also send the data to 'dataOutputStream' if necessary
+			// Also send the data to 'dataOutputStream' if necessary
 			Stream teeStream = GetSafeTeeOutputStream(dataOutputStream, encapStream);
 
-        	// Let all the digests see the data as it is written
+			// Let all the digests see the data as it is written
 			Stream digStream = AttachDigestsToOutputStream(m_messageDigests.Values, teeStream);
 
 			return new CmsSignedDataOutputStream(this, digStream, signedContentType, sGen, sigGen, eiGen);
-        }
+		}
 
 		private void RegisterDigestOid(
 			string digestOid)
 		{
-       		if (_messageDigestsLocked)
-       		{
-       			if (!_messageDigestOids.Contains(digestOid))
+			if (_messageDigestsLocked)
+			{
+				if (!_messageDigestOids.Contains(digestOid))
 					throw new InvalidOperationException("Cannot register new digest OIDs after the data stream is opened");
-       		}
-       		else
-       		{
+			}
+			else
+			{
 				_messageDigestOids.Add(digestOid);
-       		}
+			}
 		}
 
 		private void ConfigureDigest(string digestOid)
 		{
-       		RegisterDigestOid(digestOid);
+			RegisterDigestOid(digestOid);
 
-       		string digestName = Helper.GetDigestAlgName(digestOid);
+			string digestName = Helper.GetDigestAlgName(digestOid);
 
 			if (!m_messageDigests.ContainsKey(digestName))
 			{
 				if (_messageDigestsLocked)
 					throw new InvalidOperationException("Cannot configure new digests after the data stream is opened");
 
-            	m_messageDigests[digestName] = Helper.GetDigestInstance(digestName);
-            }
+				m_messageDigests[digestName] = Helper.GetDigestInstance(digestName);
+			}
 		}
 
 		// TODO Make public?
 		internal void Generate(
-			Stream			outStream,
-			string			eContentType,
-			bool			encapsulate,
-			Stream			dataOutputStream,
-			CmsProcessable	content)
+			Stream outStream,
+			string eContentType,
+			bool encapsulate,
+			Stream dataOutputStream,
+			CmsProcessable content)
 		{
 			using (var signedOut = Open(outStream, eContentType, encapsulate, dataOutputStream))
 			{
-                if (content != null)
-                {
-                    content.Write(signedOut);
-                }
-            }
+				if (content != null)
+				{
+					content.Write(signedOut);
+				}
+			}
 		}
 
 		// RFC3852, section 5.1:
@@ -708,13 +711,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				return new DerInteger(4);
 			}
 
-            if (attrCertV1Found || !CmsObjectIdentifiers.Data.Equals(contentOid) || CheckForVersion3(_signers))
-            {
-                return new DerInteger(3);
-            }
+			if (attrCertV1Found || !CmsObjectIdentifiers.Data.Equals(contentOid) || CheckForVersion3(_signers))
+			{
+				return new DerInteger(3);
+			}
 
-            return new DerInteger(1);
-        }
+			return new DerInteger(1);
+		}
 
 		private bool CheckForVersion3(IList<SignerInformation> signerInfos)
 		{
@@ -736,6 +739,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			{
 				result = GetSafeTeeOutputStream(result, new DigestSink(digest));
 			}
+
 			return result;
 		}
 
@@ -754,32 +758,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		private class CmsSignedDataOutputStream
-            : BaseOutputStream
-        {
+			: BaseOutputStream
+		{
 			private readonly CmsSignedDataStreamGenerator outer;
 
-			private Stream					_out;
-            private DerObjectIdentifier		_contentOID;
-            private BerSequenceGenerator	_sGen;
-            private BerSequenceGenerator	_sigGen;
-            private BerSequenceGenerator	_eiGen;
+			private Stream _out;
+			private DerObjectIdentifier _contentOID;
+			private BerSequenceGenerator _sGen;
+			private BerSequenceGenerator _sigGen;
+			private BerSequenceGenerator _eiGen;
 
 			public CmsSignedDataOutputStream(
-				CmsSignedDataStreamGenerator	outer,
-				Stream							outStream,
-                string							contentOID,
-                BerSequenceGenerator			sGen,
-                BerSequenceGenerator			sigGen,
-                BerSequenceGenerator			eiGen)
-            {
+				CmsSignedDataStreamGenerator outer,
+				Stream outStream,
+				string contentOID,
+				BerSequenceGenerator sGen,
+				BerSequenceGenerator sigGen,
+				BerSequenceGenerator eiGen)
+			{
 				this.outer = outer;
 
 				_out = outStream;
-                _contentOID = new DerObjectIdentifier(contentOID);
-                _sGen = sGen;
-                _sigGen = sigGen;
-                _eiGen = eiGen;
-            }
+				_contentOID = new DerObjectIdentifier(contentOID);
+				_sGen = sGen;
+				_sigGen = sigGen;
+				_eiGen = eiGen;
+			}
 
 			public override void Write(byte[] buffer, int offset, int count)
 			{
@@ -793,87 +797,88 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
             }
 #endif
 
-            public override void WriteByte(byte value)
+			public override void WriteByte(byte value)
 			{
 				_out.WriteByte(value);
 			}
 
-            protected override void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    DoClose();
-                }
-                base.Dispose(disposing);
-            }
+			protected override void Dispose(bool disposing)
+			{
+				if (disposing)
+				{
+					DoClose();
+				}
 
-            private void DoClose()
-            {
-                _out.Dispose();
+				base.Dispose(disposing);
+			}
 
-                // TODO Parent context(s) should really be be closed explicitly
+			private void DoClose()
+			{
+				_out.Dispose();
 
-                _eiGen.Close();
+				// TODO Parent context(s) should really be be closed explicitly
 
-                outer.m_digests.Clear();    // clear the current preserved digest state
+				_eiGen.Close();
+
+				outer.m_digests.Clear(); // clear the current preserved digest state
 
 				if (outer._certs.Count > 0)
 				{
 					Asn1Set certs = outer.UseDerForCerts
-                        ?   CmsUtilities.CreateDerSetFromList(outer._certs)
-                        :   CmsUtilities.CreateBerSetFromList(outer._certs);
+						? CmsUtilities.CreateDerSetFromList(outer._certs)
+						: CmsUtilities.CreateBerSetFromList(outer._certs);
 
-                    WriteToGenerator(_sigGen, new BerTaggedObject(false, 0, certs));
-                }
+					WriteToGenerator(_sigGen, new BerTaggedObject(false, 0, certs));
+				}
 
 				if (outer._crls.Count > 0)
 				{
-                    Asn1Set crls = outer.UseDerForCrls
-                        ?   CmsUtilities.CreateDerSetFromList(outer._crls)
-                        :   CmsUtilities.CreateBerSetFromList(outer._crls);
+					Asn1Set crls = outer.UseDerForCrls
+						? CmsUtilities.CreateDerSetFromList(outer._crls)
+						: CmsUtilities.CreateBerSetFromList(outer._crls);
 
-                    WriteToGenerator(_sigGen, new BerTaggedObject(false, 1, crls));
-                }
+					WriteToGenerator(_sigGen, new BerTaggedObject(false, 1, crls));
+				}
 
-                //
-                // Calculate the digest hashes
-                //
-                foreach (var de in outer.m_messageDigests)
-                {
-                    outer.m_messageHashes.Add(de.Key, DigestUtilities.DoFinal(de.Value));
-                }
+				//
+				// Calculate the digest hashes
+				//
+				foreach (var de in outer.m_messageDigests)
+				{
+					outer.m_messageHashes.Add(de.Key, DigestUtilities.DoFinal(de.Value));
+				}
 
-                // TODO If the digest OIDs for precalculated signers weren't mixed in with
-                // the others, we could fill in outer._digests here, instead of SignerInfoGenerator.Generate
+				// TODO If the digest OIDs for precalculated signers weren't mixed in with
+				// the others, we could fill in outer._digests here, instead of SignerInfoGenerator.Generate
 
-                //
-                // collect all the SignerInfo objects
-                //
-                Asn1EncodableVector signerInfos = new Asn1EncodableVector();
+				//
+				// collect all the SignerInfo objects
+				//
+				Asn1EncodableVector signerInfos = new Asn1EncodableVector();
 
-                //
-                // add the generated SignerInfo objects
-                //
-                {
-                    foreach (DigestAndSignerInfoGeneratorHolder holder in outer._signerInfs)
-                    {
-                        AlgorithmIdentifier digestAlgorithm = holder.DigestAlgorithm;
+				//
+				// add the generated SignerInfo objects
+				//
+				{
+					foreach (DigestAndSignerInfoGeneratorHolder holder in outer._signerInfs)
+					{
+						AlgorithmIdentifier digestAlgorithm = holder.DigestAlgorithm;
 
-                        byte[] calculatedDigest = outer.m_messageHashes[
-                            Helper.GetDigestAlgName(holder.digestOID)];
-                        outer.m_digests[holder.digestOID] = (byte[])calculatedDigest.Clone();
+						byte[] calculatedDigest = outer.m_messageHashes[
+							Helper.GetDigestAlgName(holder.digestOID)];
+						outer.m_digests[holder.digestOID] = (byte[])calculatedDigest.Clone();
 
-                        signerInfos.Add(holder.signerInf.Generate(_contentOID, digestAlgorithm, calculatedDigest));
-                    }
-                }
+						signerInfos.Add(holder.signerInf.Generate(_contentOID, digestAlgorithm, calculatedDigest));
+					}
+				}
 
-                //
-                // add the precalculated SignerInfo objects.
-                //
-                {
-                    foreach (SignerInformation signer in outer._signers)
-                    {
-                        // TODO Verify the content type and calculated digest match the precalculated SignerInfo
+				//
+				// add the precalculated SignerInfo objects.
+				//
+				{
+					foreach (SignerInformation signer in outer._signers)
+					{
+						// TODO Verify the content type and calculated digest match the precalculated SignerInfo
 //						if (!signer.ContentType.Equals(_contentOID))
 //						{
 //							// TODO The precalculated content type did not match - error?
@@ -892,22 +897,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 //							}
 //						}
 
-                        signerInfos.Add(signer.ToSignerInfo());
-                    }
-                }
+						signerInfos.Add(signer.ToSignerInfo());
+					}
+				}
 
-                WriteToGenerator(_sigGen, new DerSet(signerInfos));
+				WriteToGenerator(_sigGen, new DerSet(signerInfos));
 
 				_sigGen.Close();
-                _sGen.Close();
-            }
+				_sGen.Close();
+			}
 
 			private static void WriteToGenerator(Asn1Generator ag, Asn1Encodable ae)
 			{
 				ae.EncodeTo(ag.GetRawOutputStream());
 			}
 		}
-    }
+	}
 }
 #pragma warning restore
 #endif

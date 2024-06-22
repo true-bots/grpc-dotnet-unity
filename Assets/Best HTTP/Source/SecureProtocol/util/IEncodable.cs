@@ -4,13 +4,13 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 {
-    public interface IEncodable
-    {
-        /// <summary>Return a byte array representing the implementing object.</summary>
-        /// <returns>An encoding of this object as a byte array.</returns>
-        /// <exception cref="IOException"/>
-        byte[] GetEncoded();
-    }
+	public interface IEncodable
+	{
+		/// <summary>Return a byte array representing the implementing object.</summary>
+		/// <returns>An encoding of this object as a byte array.</returns>
+		/// <exception cref="IOException"/>
+		byte[] GetEncoded();
+	}
 }
 #pragma warning restore
 #endif

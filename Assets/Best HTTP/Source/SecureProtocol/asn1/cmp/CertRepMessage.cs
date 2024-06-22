@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
@@ -9,20 +8,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class CertRepMessage
 		: Asn1Encodable
 	{
-        public static CertRepMessage GetInstance(object obj)
-        {
-            if (obj is CertRepMessage certRepMessage)
-                return certRepMessage;
+		public static CertRepMessage GetInstance(object obj)
+		{
+			if (obj is CertRepMessage certRepMessage)
+				return certRepMessage;
 
-            if (obj != null)
+			if (obj != null)
 				return new CertRepMessage(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly Asn1Sequence m_caPubs;
+		private readonly Asn1Sequence m_caPubs;
 		private readonly Asn1Sequence m_response;
-		
+
 		private CertRepMessage(Asn1Sequence seq)
 		{
 			int index = 0;
@@ -55,7 +54,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 
 		public virtual CertResponse[] GetResponse()
 		{
-            return m_response.MapElements(CertResponse.GetInstance);
+			return m_response.MapElements(CertResponse.GetInstance);
 		}
 
 		/**
@@ -71,7 +70,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(2);
-            v.AddOptionalTagged(true, 1, m_caPubs);
+			v.AddOptionalTagged(true, 1, m_caPubs);
 			v.Add(m_response);
 			return new DerSequence(v);
 		}

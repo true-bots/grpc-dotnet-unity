@@ -1,21 +1,20 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 {
-    public class RevokedInfo
-        : Asn1Encodable
-    {
-        private readonly Asn1GeneralizedTime revocationTime;
-        private readonly CrlReason revocationReason;
+	public class RevokedInfo
+		: Asn1Encodable
+	{
+		private readonly Asn1GeneralizedTime revocationTime;
+		private readonly CrlReason revocationReason;
 
 		public static RevokedInfo GetInstance(
-			Asn1TaggedObject	obj,
-			bool				explicitly)
+			Asn1TaggedObject obj,
+			bool explicitly)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
 		}
@@ -25,45 +24,45 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 		{
 			if (obj == null || obj is RevokedInfo)
 			{
-				return (RevokedInfo) obj;
+				return (RevokedInfo)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new RevokedInfo((Asn1Sequence) obj);
+				return new RevokedInfo((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public RevokedInfo(
-            Asn1GeneralizedTime revocationTime)
+			Asn1GeneralizedTime revocationTime)
 			: this(revocationTime, null)
 		{
 		}
 
 		public RevokedInfo(
-            Asn1GeneralizedTime revocationTime,
-            CrlReason           revocationReason)
-        {
+			Asn1GeneralizedTime revocationTime,
+			CrlReason revocationReason)
+		{
 			if (revocationTime == null)
 				throw new ArgumentNullException("revocationTime");
 
 			this.revocationTime = revocationTime;
-            this.revocationReason = revocationReason;
-        }
+			this.revocationReason = revocationReason;
+		}
 
 		private RevokedInfo(
-            Asn1Sequence seq)
-        {
-            this.revocationTime = (Asn1GeneralizedTime)seq[0];
+			Asn1Sequence seq)
+		{
+			this.revocationTime = (Asn1GeneralizedTime)seq[0];
 
 			if (seq.Count > 1)
-            {
-                this.revocationReason = new CrlReason(
-					DerEnumerated.GetInstance((Asn1TaggedObject) seq[1], true));
-            }
-        }
+			{
+				this.revocationReason = new CrlReason(
+					DerEnumerated.GetInstance((Asn1TaggedObject)seq[1], true));
+			}
+		}
 
 		public Asn1GeneralizedTime RevocationTime
 		{
@@ -83,13 +82,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
          *      revocationReason    [0]     EXPLICIT CRLReason OPTIONAL }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector(revocationTime);
-            v.AddOptionalTagged(true, 0, revocationReason);
-            return new DerSequence(v);
-        }
-    }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector(revocationTime);
+			v.AddOptionalTagged(true, 0, revocationReason);
+			return new DerSequence(v);
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -4,13 +4,13 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-    /// <summary>Processor interface for an SRP identity.</summary>
-    public interface TlsSrpIdentity
-    {
-        byte[] GetSrpIdentity();
+	/// <summary>Processor interface for an SRP identity.</summary>
+	public interface TlsSrpIdentity
+	{
+		byte[] GetSrpIdentity();
 
-        byte[] GetSrpPassword();
-    }
+		byte[] GetSrpPassword();
+	}
 }
 #pragma warning restore
 #endif

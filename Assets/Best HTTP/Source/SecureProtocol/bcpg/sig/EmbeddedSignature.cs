@@ -11,9 +11,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 		: SignatureSubpacket
 	{
 		public EmbeddedSignature(
-			bool	critical,
-            bool    isLongLength,
-			byte[]	data)
+			bool critical,
+			bool isLongLength,
+			byte[] data)
 			: base(SignatureSubpacketTag.EmbeddedSignature, critical, isLongLength, data)
 		{
 		}

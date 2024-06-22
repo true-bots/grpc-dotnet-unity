@@ -1,25 +1,24 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 {
-    public class X962Parameters
-        : Asn1Encodable, IAsn1Choice
-    {
-        private readonly Asn1Object _params;
+	public class X962Parameters
+		: Asn1Encodable, IAsn1Choice
+	{
+		private readonly Asn1Object _params;
 
 		public static X962Parameters GetInstance(
 			object obj)
 		{
-			if (obj == null || obj is X962Parameters) 
+			if (obj == null || obj is X962Parameters)
 			{
 				return (X962Parameters)obj;
 			}
 
-			if (obj is Asn1Object) 
+			if (obj is Asn1Object)
 			{
 				return new X962Parameters((Asn1Object)obj);
 			}
@@ -40,42 +39,42 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		}
 
 		public X962Parameters(
-            X9ECParameters ecParameters)
-        {
-            this._params = ecParameters.ToAsn1Object();
-        }
+			X9ECParameters ecParameters)
+		{
+			this._params = ecParameters.ToAsn1Object();
+		}
 
 		public X962Parameters(
-            DerObjectIdentifier namedCurve)
-        {
-            this._params = namedCurve;
-        }
+			DerObjectIdentifier namedCurve)
+		{
+			this._params = namedCurve;
+		}
 
-        public X962Parameters(
-            Asn1Null obj)
-        {
-            this._params = obj;
-        }
+		public X962Parameters(
+			Asn1Null obj)
+		{
+			this._params = obj;
+		}
 
-        private X962Parameters(Asn1Object obj)
-        {
-            this._params = obj;
-        }
+		private X962Parameters(Asn1Object obj)
+		{
+			this._params = obj;
+		}
 
 		public bool IsNamedCurve
-        {
+		{
 			get { return (_params is DerObjectIdentifier); }
-        }
+		}
 
 		public bool IsImplicitlyCA
-        {
+		{
 			get { return (_params is Asn1Null); }
-        }
+		}
 
 		public Asn1Object Parameters
-        {
-            get { return _params; }
-        }
+		{
+			get { return _params; }
+		}
 
 		/**
          * Produce an object suitable for an Asn1OutputStream.
@@ -87,11 +86,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
          * }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            return _params;
-        }
-    }
+		public override Asn1Object ToAsn1Object()
+		{
+			return _params;
+		}
+	}
 }
 #pragma warning restore
 #endif

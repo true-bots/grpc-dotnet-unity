@@ -5,24 +5,24 @@ using System.IO;
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 {
 	/// <remarks>Generic compressed data object.</remarks>
-    public class CompressedDataPacket
-        : InputStreamPacket
-    {
-        private readonly CompressionAlgorithmTag algorithm;
+	public class CompressedDataPacket
+		: InputStreamPacket
+	{
+		private readonly CompressionAlgorithmTag algorithm;
 
 		internal CompressedDataPacket(
-            BcpgInputStream bcpgIn)
+			BcpgInputStream bcpgIn)
 			: base(bcpgIn)
-        {
-            this.algorithm = (CompressionAlgorithmTag) bcpgIn.ReadByte();
-        }
+		{
+			this.algorithm = (CompressionAlgorithmTag)bcpgIn.ReadByte();
+		}
 
 		/// <summary>The algorithm tag value.</summary>
-        public CompressionAlgorithmTag Algorithm
+		public CompressionAlgorithmTag Algorithm
 		{
 			get { return algorithm; }
 		}
-    }
+	}
 }
 #pragma warning restore
 #endif

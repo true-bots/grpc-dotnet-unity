@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
@@ -36,10 +35,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// A mask with all revocation reasons.
 		/// </summary>
 		internal static readonly ReasonsMask AllReasons = new ReasonsMask(
-				ReasonFlags.AACompromise | ReasonFlags.AffiliationChanged | ReasonFlags.CACompromise
-			|	ReasonFlags.CertificateHold | ReasonFlags.CessationOfOperation
-			|	ReasonFlags.KeyCompromise | ReasonFlags.PrivilegeWithdrawn | ReasonFlags.Unused
-			|	ReasonFlags.Superseded);
+			ReasonFlags.AACompromise | ReasonFlags.AffiliationChanged | ReasonFlags.CACompromise
+			| ReasonFlags.CertificateHold | ReasonFlags.CessationOfOperation
+			| ReasonFlags.KeyCompromise | ReasonFlags.PrivilegeWithdrawn | ReasonFlags.Unused
+			| ReasonFlags.Superseded);
 
 		/**
 		 * Adds all reasons from the reasons mask to this mask.

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -9,22 +8,27 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 {
 	/**
-	* A Two-Pass Authenticated-Encryption Scheme Optimized for Simplicity and 
+	* A Two-Pass Authenticated-Encryption Scheme Optimized for Simplicity and
 	* Efficiency - by M. Bellare, P. Rogaway, D. Wagner.
-	* 
+	*
 	* http://www.cs.ucdavis.edu/~rogaway/papers/eax.pdf
-	* 
-	* EAX is an AEAD scheme based on CTR and OMAC1/CMAC, that uses a single block 
-	* cipher to encrypt and authenticate data. It's on-line (the length of a 
+	*
+	* EAX is an AEAD scheme based on CTR and OMAC1/CMAC, that uses a single block
+	* cipher to encrypt and authenticate data. It's on-line (the length of a
 	* message isn't needed to begin processing it), has good performances, it's
 	* simple and provably secure (provided the underlying block cipher is secure).
-	* 
+	*
 	* Of course, this implementations is NOT thread-safe.
 	*/
 	public class EaxBlockCipher
 		: IAeadBlockCipher
 	{
-		private enum Tag : byte { N, H, C };
+		private enum Tag : byte
+		{
+			N,
+			H,
+			C
+		};
 
 		private SicBlockCipher cipher;
 
@@ -42,8 +46,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		private byte[] bufBlock;
 		private int bufOff;
 
-        private bool cipherInitialized;
-        private byte[] initialAssociatedText;
+		private bool cipherInitialized;
+		private byte[] initialAssociatedText;
 
 		/**
 		* Constructor that accepts an instance of a block cipher engine.
@@ -80,14 +84,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			if (parameters is AeadParameters aeadParameters)
 			{
 				nonce = aeadParameters.GetNonce();
-                initialAssociatedText = aeadParameters.GetAssociatedText();
+				initialAssociatedText = aeadParameters.GetAssociatedText();
 				macSize = aeadParameters.MacSize / 8;
 				keyParam = aeadParameters.Key;
 			}
 			else if (parameters is ParametersWithIV parametersWithIV)
 			{
 				nonce = parametersWithIV.GetIV();
-                initialAssociatedText = null;
+				initialAssociatedText = null;
 				macSize = mac.GetMacSize() / 2;
 				keyParam = parametersWithIV.Parameters;
 			}
@@ -96,41 +100,41 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				throw new ArgumentException("invalid parameters passed to EAX");
 			}
 
-            bufBlock = new byte[forEncryption ? blockSize : (blockSize + macSize)];
+			bufBlock = new byte[forEncryption ? blockSize : (blockSize + macSize)];
 
-            byte[] tag = new byte[blockSize];
+			byte[] tag = new byte[blockSize];
 
-            // Key reuse implemented in CBC mode of underlying CMac
-            mac.Init(keyParam);
+			// Key reuse implemented in CBC mode of underlying CMac
+			mac.Init(keyParam);
 
-            tag[blockSize - 1] = (byte)Tag.N;
-            mac.BlockUpdate(tag, 0, blockSize);
-            mac.BlockUpdate(nonce, 0, nonce.Length);
-            mac.DoFinal(nonceMac, 0);
+			tag[blockSize - 1] = (byte)Tag.N;
+			mac.BlockUpdate(tag, 0, blockSize);
+			mac.BlockUpdate(nonce, 0, nonce.Length);
+			mac.DoFinal(nonceMac, 0);
 
-            // Same BlockCipher underlies this and the mac, so reuse last key on cipher
-            cipher.Init(true, new ParametersWithIV(null, nonceMac));
+			// Same BlockCipher underlies this and the mac, so reuse last key on cipher
+			cipher.Init(true, new ParametersWithIV(null, nonceMac));
 
-            Reset();
+			Reset();
 		}
 
-        private void InitCipher()
-        {
-            if (cipherInitialized)
-            {
-                return;
-            }
+		private void InitCipher()
+		{
+			if (cipherInitialized)
+			{
+				return;
+			}
 
-            cipherInitialized = true;
+			cipherInitialized = true;
 
-            mac.DoFinal(associatedTextMac, 0);
+			mac.DoFinal(associatedTextMac, 0);
 
-            byte[] tag = new byte[blockSize];
-            tag[blockSize - 1] = (byte)Tag.C;
-            mac.BlockUpdate(tag, 0, blockSize);
-        }
+			byte[] tag = new byte[blockSize];
+			tag[blockSize - 1] = (byte)Tag.C;
+			mac.BlockUpdate(tag, 0, blockSize);
+		}
 
-        private void CalculateMac()
+		private void CalculateMac()
 		{
 			byte[] outC = new byte[blockSize];
 			mac.DoFinal(outC, 0);
@@ -149,7 +153,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		private void Reset(
 			bool clearMac)
 		{
-            cipher.Reset(); // TODO Redundant since the mac will reset it?
+			cipher.Reset(); // TODO Redundant since the mac will reset it?
 			mac.Reset();
 
 			bufOff = 0;
@@ -160,34 +164,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				Array.Clear(macBlock, 0, macBlock.Length);
 			}
 
-            byte[] tag = new byte[blockSize];
-            tag[blockSize - 1] = (byte)Tag.H;
-            mac.BlockUpdate(tag, 0, blockSize);
+			byte[] tag = new byte[blockSize];
+			tag[blockSize - 1] = (byte)Tag.H;
+			mac.BlockUpdate(tag, 0, blockSize);
 
-            cipherInitialized = false;
+			cipherInitialized = false;
 
-            if (initialAssociatedText != null)
-            {
-                ProcessAadBytes(initialAssociatedText, 0, initialAssociatedText.Length);
-            }
-        }
-        
-        public virtual void ProcessAadByte(byte input)
-        {
-            if (cipherInitialized)
-            {
-                throw new InvalidOperationException("AAD data cannot be added after encryption/decryption processing has begun.");
-            }
-            mac.Update(input);
-        }
+			if (initialAssociatedText != null)
+			{
+				ProcessAadBytes(initialAssociatedText, 0, initialAssociatedText.Length);
+			}
+		}
 
-        public virtual void ProcessAadBytes(byte[] inBytes, int inOff, int len)
-        {
-            if (cipherInitialized)
-                throw new InvalidOperationException("AAD data cannot be added after encryption/decryption processing has begun.");
+		public virtual void ProcessAadByte(byte input)
+		{
+			if (cipherInitialized)
+			{
+				throw new InvalidOperationException("AAD data cannot be added after encryption/decryption processing has begun.");
+			}
 
-            mac.BlockUpdate(inBytes, inOff, len);
-        }
+			mac.Update(input);
+		}
+
+		public virtual void ProcessAadBytes(byte[] inBytes, int inOff, int len)
+		{
+			if (cipherInitialized)
+				throw new InvalidOperationException("AAD data cannot be added after encryption/decryption processing has begun.");
+
+			mac.BlockUpdate(inBytes, inOff, len);
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 		public virtual void ProcessAadBytes(ReadOnlySpan<byte> input)
@@ -199,9 +204,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		}
 #endif
 
-        public virtual int ProcessByte(byte input, byte[] outBytes, int outOff)
+		public virtual int ProcessByte(byte input, byte[] outBytes, int outOff)
 		{
-            InitCipher();
+			InitCipher();
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			return Process(input, Spans.FromNullable(outBytes, outOff));
@@ -219,21 +224,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         }
 #endif
 
-        public virtual int ProcessBytes(byte[] inBytes, int inOff, int len, byte[] outBytes, int outOff)
-        {
-            InitCipher();
+		public virtual int ProcessBytes(byte[] inBytes, int inOff, int len, byte[] outBytes, int outOff)
+		{
+			InitCipher();
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			return ProcessBytes(inBytes.AsSpan(inOff, len), Spans.FromNullable(outBytes, outOff));
 #else
-            int resultLen = 0;
+			int resultLen = 0;
 
 			for (int i = 0; i != len; i++)
 			{
 				resultLen += Process(inBytes[inOff + i], outBytes, outOff + resultLen);
 			}
 
-            return resultLen;
+			return resultLen;
 #endif
 		}
 
@@ -254,25 +259,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         }
 #endif
 
-        public virtual int DoFinal(byte[] outBytes, int outOff)
+		public virtual int DoFinal(byte[] outBytes, int outOff)
 		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			return DoFinal(outBytes.AsSpan(outOff));
 #else
 			InitCipher();
 
-            int extra = bufOff;
+			int extra = bufOff;
 			byte[] tmp = new byte[bufBlock.Length];
 
-            bufOff = 0;
+			bufOff = 0;
 
 			if (forEncryption)
 			{
-                Check.OutputLength(outBytes, outOff, extra + macSize, "output buffer too short");
+				Check.OutputLength(outBytes, outOff, extra + macSize, "output buffer too short");
 
-                cipher.ProcessBlock(bufBlock, 0, tmp, 0);
+				cipher.ProcessBlock(bufBlock, 0, tmp, 0);
 
-                Array.Copy(tmp, 0, outBytes, outOff, extra);
+				Array.Copy(tmp, 0, outBytes, outOff, extra);
 
 				mac.BlockUpdate(tmp, 0, extra);
 
@@ -286,18 +291,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			}
 			else
 			{
-                if (extra < macSize)
-                    throw new InvalidCipherTextException("data too short");
+				if (extra < macSize)
+					throw new InvalidCipherTextException("data too short");
 
-                Check.OutputLength(outBytes, outOff, extra - macSize, "output buffer too short");
+				Check.OutputLength(outBytes, outOff, extra - macSize, "output buffer too short");
 
-                if (extra > macSize)
+				if (extra > macSize)
 				{
 					mac.BlockUpdate(bufBlock, 0, extra - macSize);
 
 					cipher.ProcessBlock(bufBlock, 0, tmp, 0);
 
-                    Array.Copy(tmp, 0, outBytes, outOff, extra - macSize);
+					Array.Copy(tmp, 0, outBytes, outOff, extra - macSize);
 				}
 
 				CalculateMac();
@@ -372,7 +377,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		}
 #endif
 
-        public virtual byte[] GetMac()
+		public virtual byte[] GetMac()
 		{
 			byte[] mac = new byte[macSize];
 
@@ -381,33 +386,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			return mac;
 		}
 
-        public virtual int GetUpdateOutputSize(
+		public virtual int GetUpdateOutputSize(
 			int len)
 		{
-            int totalData = len + bufOff;
-            if (!forEncryption)
-            {
-                if (totalData < macSize)
-                {
-                    return 0;
-                }
-                totalData -= macSize;
-            }
-            return totalData - totalData % blockSize;
-        }
+			int totalData = len + bufOff;
+			if (!forEncryption)
+			{
+				if (totalData < macSize)
+				{
+					return 0;
+				}
+
+				totalData -= macSize;
+			}
+
+			return totalData - totalData % blockSize;
+		}
 
 		public virtual int GetOutputSize(
 			int len)
 		{
-            int totalData = len + bufOff;
+			int totalData = len + bufOff;
 
-            if (forEncryption)
-            {
-                return totalData + macSize;
-            }
+			if (forEncryption)
+			{
+				return totalData + macSize;
+			}
 
-            return totalData < macSize ? 0 : totalData - macSize;
-        }
+			return totalData < macSize ? 0 : totalData - macSize;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private int Process(byte b, Span<byte> output)
@@ -449,15 +456,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
             return 0;
         }
 #else
-        private int Process(byte b, byte[] outBytes, int outOff)
-        {
-            bufBlock[bufOff++] = b;
+		private int Process(byte b, byte[] outBytes, int outOff)
+		{
+			bufBlock[bufOff++] = b;
 
 			if (bufOff == bufBlock.Length)
 			{
-                Check.OutputLength(outBytes, outOff, blockSize, "Output buffer is too short");
+				Check.OutputLength(outBytes, outOff, blockSize, "Output buffer is too short");
 
-                // TODO Could move the ProcessByte(s) calls to here
+				// TODO Could move the ProcessByte(s) calls to here
 //                InitCipher();
 
 				int size;
@@ -475,30 +482,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 					size = cipher.ProcessBlock(bufBlock, 0, outBytes, outOff);
 				}
 
-                bufOff = 0;
-                if (!forEncryption)
-                {
-                    Array.Copy(bufBlock, blockSize, bufBlock, 0, macSize);
-                    bufOff = macSize;
-                }
+				bufOff = 0;
+				if (!forEncryption)
+				{
+					Array.Copy(bufBlock, blockSize, bufBlock, 0, macSize);
+					bufOff = macSize;
+				}
 
-                return size;
+				return size;
 			}
 
 			return 0;
 		}
 #endif
 
-        private bool VerifyMac(byte[] mac, int off)
+		private bool VerifyMac(byte[] mac, int off)
 		{
-            int nonEqual = 0;
+			int nonEqual = 0;
 
-            for (int i = 0; i < macSize; i++)
-            {
-                nonEqual |= (macBlock[i] ^ mac[off + i]);
-            }
+			for (int i = 0; i < macSize; i++)
+			{
+				nonEqual |= (macBlock[i] ^ mac[off + i]);
+			}
 
-            return nonEqual == 0;
+			return nonEqual == 0;
 		}
 	}
 }

@@ -5,10 +5,10 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 {
-    [Serializable]
-    public class PkixNameConstraintValidatorException
-        : Exception
-    {
+	[Serializable]
+	public class PkixNameConstraintValidatorException
+		: Exception
+	{
 		public PkixNameConstraintValidatorException()
 			: base()
 		{
@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			: base(info, context)
 		{
 		}
-    }
+	}
 }
 #pragma warning restore
 #endif

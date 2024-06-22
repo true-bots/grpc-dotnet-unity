@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -38,10 +37,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class CmsEnvelopedDataStreamGenerator
 		: CmsEnvelopedGenerator
 	{
-		private object	_originatorInfo = null;
-		private object	_unprotectedAttributes = null;
-		private int		_bufferSize;
-		private bool	_berEncodeRecipientSet;
+		private object _originatorInfo = null;
+		private object _unprotectedAttributes = null;
+		private int _bufferSize;
+		private bool _berEncodeRecipientSet;
 
 		public CmsEnvelopedDataStreamGenerator()
 		{
@@ -74,8 +73,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			get
 			{
 				int version = (_originatorInfo != null || _unprotectedAttributes != null)
-					?	2
-					:	0;
+					? 2
+					: 0;
 
 				return new DerInteger(version);
 			}
@@ -86,9 +85,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		/// object using the passed in key generator.
 		/// </summary>
 		private Stream Open(
-			Stream				outStream,
-			string				encryptionOid,
-			CipherKeyGenerator	keyGen)
+			Stream outStream,
+			string encryptionOid,
+			CipherKeyGenerator keyGen)
 		{
 			byte[] encKeyBytes = keyGen.GenerateKey();
 			KeyParameter encKey = ParameterUtilities.CreateKeyParameter(encryptionOid, encKeyBytes);
@@ -121,10 +120,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		private Stream Open(
-			Stream				outStream,
-			AlgorithmIdentifier	encAlgID,
-			ICipherParameters	cipherParameters,
-			Asn1EncodableVector	recipientInfos)
+			Stream outStream,
+			AlgorithmIdentifier encAlgID,
+			ICipherParameters cipherParameters,
+			Asn1EncodableVector recipientInfos)
 		{
 			try
 			{
@@ -145,8 +144,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 				Stream envRaw = envGen.GetRawOutputStream();
 				Asn1Generator recipGen = _berEncodeRecipientSet
-					?	(Asn1Generator) new BerSetGenerator(envRaw)
-					:	new DerSetGenerator(envRaw);
+					? (Asn1Generator)new BerSetGenerator(envRaw)
+					: new DerSetGenerator(envRaw);
 
 				foreach (Asn1Encodable ae in recipientInfos)
 				{
@@ -162,7 +161,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				Stream octetOutputStream = CmsUtilities.CreateBerOctetOutputStream(
 					eiGen.GetRawOutputStream(), 0, false, _bufferSize);
 
-                IBufferedCipher cipher = CipherUtilities.GetCipher(encAlgID.Algorithm);
+				IBufferedCipher cipher = CipherUtilities.GetCipher(encAlgID.Algorithm);
 				cipher.Init(true, new ParametersWithRandom(cipherParameters, m_random));
 				CipherStream cOut = new CipherStream(octetOutputStream, null, cipher);
 
@@ -187,8 +186,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @throws IOException
 		*/
 		public Stream Open(
-			Stream	outStream,
-			string	encryptionOid)
+			Stream outStream,
+			string encryptionOid)
 		{
 			CipherKeyGenerator keyGen = GeneratorUtilities.GetKeyGenerator(encryptionOid);
 
@@ -202,9 +201,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @throws IOException
 		*/
 		public Stream Open(
-			Stream	outStream,
-			string	encryptionOid,
-			int		keySize)
+			Stream outStream,
+			string encryptionOid,
+			int keySize)
 		{
 			CipherKeyGenerator keyGen = GeneratorUtilities.GetKeyGenerator(encryptionOid);
 
@@ -216,19 +215,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		private class CmsEnvelopedDataOutputStream
 			: BaseOutputStream
 		{
-            private readonly CmsEnvelopedGenerator _outer;
+			private readonly CmsEnvelopedGenerator _outer;
 
-			private readonly CipherStream			_out;
-			private readonly BerSequenceGenerator	_cGen;
-			private readonly BerSequenceGenerator	_envGen;
-			private readonly BerSequenceGenerator	_eiGen;
+			private readonly CipherStream _out;
+			private readonly BerSequenceGenerator _cGen;
+			private readonly BerSequenceGenerator _envGen;
+			private readonly BerSequenceGenerator _eiGen;
 
 			public CmsEnvelopedDataOutputStream(
-				CmsEnvelopedGenerator	outer,
-				CipherStream			outStream,
-				BerSequenceGenerator	cGen,
-				BerSequenceGenerator	envGen,
-				BerSequenceGenerator	eiGen)
+				CmsEnvelopedGenerator outer,
+				CipherStream outStream,
+				BerSequenceGenerator cGen,
+				BerSequenceGenerator envGen,
+				BerSequenceGenerator eiGen)
 			{
 				_outer = outer;
 				_out = outStream;
@@ -249,36 +248,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
             }
 #endif
 
-            public override void WriteByte(byte value)
+			public override void WriteByte(byte value)
 			{
 				_out.WriteByte(value);
 			}
 
-            protected override void Dispose(bool disposing)
-            {
-                if (disposing)
- 				{
-                    _out.Dispose();
+			protected override void Dispose(bool disposing)
+			{
+				if (disposing)
+				{
+					_out.Dispose();
 
-                    // TODO Parent context(s) should really be closed explicitly
+					// TODO Parent context(s) should really be closed explicitly
 
-                    _eiGen.Close();
+					_eiGen.Close();
 
-                    if (_outer.unprotectedAttributeGenerator != null)
-                    {
-                        Asn1.Cms.AttributeTable attrTable = _outer.unprotectedAttributeGenerator.GetAttributes(
-                            new Dictionary<CmsAttributeTableParameter, object>());
+					if (_outer.unprotectedAttributeGenerator != null)
+					{
+						Asn1.Cms.AttributeTable attrTable = _outer.unprotectedAttributeGenerator.GetAttributes(
+							new Dictionary<CmsAttributeTableParameter, object>());
 
-                        Asn1Set unprotectedAttrs = new BerSet(attrTable.ToAsn1EncodableVector());
+						Asn1Set unprotectedAttrs = new BerSet(attrTable.ToAsn1EncodableVector());
 
-                        _envGen.AddObject(new DerTaggedObject(false, 1, unprotectedAttrs));
-                    }
+						_envGen.AddObject(new DerTaggedObject(false, 1, unprotectedAttrs));
+					}
 
-                    _envGen.Close();
-                    _cGen.Close();
-                }
-                base.Dispose(disposing);
-            }
+					_envGen.Close();
+					_cGen.Close();
+				}
+
+				base.Dispose(disposing);
+			}
 		}
 	}
 }

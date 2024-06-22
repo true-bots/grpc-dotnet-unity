@@ -4,14 +4,14 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-    public interface TlsHeartbeat
-    {
-        byte[] GeneratePayload();
+	public interface TlsHeartbeat
+	{
+		byte[] GeneratePayload();
 
-        int IdleMillis { get; }
+		int IdleMillis { get; }
 
-        int TimeoutMillis { get; }
-    }
+		int TimeoutMillis { get; }
+	}
 }
 #pragma warning restore
 #endif

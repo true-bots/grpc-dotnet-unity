@@ -5,8 +5,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-    [Serializable]
-    public class CmsException
+	[Serializable]
+	public class CmsException
 		: Exception
 	{
 		public CmsException()

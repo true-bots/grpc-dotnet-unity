@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -31,10 +30,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/// 256 bit block size - Threefish-256
 		/// </summary>
 		public const int BLOCKSIZE_256 = 256;
+
 		/// <summary>
 		/// 512 bit block size - Threefish-512
 		/// </summary>
 		public const int BLOCKSIZE_512 = 512;
+
 		/// <summary>
 		/// 1024 bit block size - Threefish-1024
 		/// </summary>
@@ -44,16 +45,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	     * Size of the tweak in bytes (always 128 bit/16 bytes)
 	     */
 		private const int TWEAK_SIZE_BYTES = 16;
+
 		private const int TWEAK_SIZE_WORDS = TWEAK_SIZE_BYTES / 8;
 
 		/**
 	     * Rounds in Threefish-256
 	     */
 		private const int ROUNDS_256 = 72;
+
 		/**
 	     * Rounds in Threefish-512
 	     */
 		private const int ROUNDS_512 = 72;
+
 		/**
 	     * Rounds in Threefish-1024
 	     */
@@ -130,24 +134,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			this.currentBlock = new ulong[blocksizeWords];
 
 			/*
-	         * Provide room for original key words, extended key word and repeat of key words for modulo
-	         * free lookup of key schedule words.
-	         */
+			 * Provide room for original key words, extended key word and repeat of key words for modulo
+			 * free lookup of key schedule words.
+			 */
 			this.kw = new ulong[2 * blocksizeWords + 1];
 
 			switch (blocksizeBits)
 			{
-			case BLOCKSIZE_256:
-				cipher = new Threefish256Cipher(kw, t);
-				break;
-			case BLOCKSIZE_512:
-				cipher = new Threefish512Cipher(kw, t);
-				break;
-			case BLOCKSIZE_1024:
-				cipher = new Threefish1024Cipher(kw, t);
-				break;
-			default:
-				throw new ArgumentException("Invalid blocksize - Threefish is defined with block size of 256, 512, or 1024 bits");
+				case BLOCKSIZE_256:
+					cipher = new Threefish256Cipher(kw, t);
+					break;
+				case BLOCKSIZE_512:
+					cipher = new Threefish512Cipher(kw, t);
+					break;
+				case BLOCKSIZE_1024:
+					cipher = new Threefish1024Cipher(kw, t);
+					break;
+				default:
+					throw new ArgumentException("Invalid blocksize - Threefish is defined with block size of 256, 512, or 1024 bits");
 			}
 		}
 
@@ -157,7 +161,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/// <param name="forEncryption">Initialise for encryption if true, for decryption if false.</param>
 		/// <param name="parameters">an instance of <see cref="TweakableBlockCipherParameters"/> or <see cref="KeyParameter"/> (to
 		///               use a 0 tweak)</param>
-        public virtual void Init(bool forEncryption, ICipherParameters parameters)
+		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			byte[] keyBytes;
 			byte[] tweakBytes;
@@ -176,7 +180,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			else
 			{
 				throw new ArgumentException("Invalid parameter passed to Threefish init - "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
 			}
 
 			ulong[] keyWords = null;
@@ -187,20 +191,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				if (keyBytes.Length != this.blocksizeBytes)
 				{
 					throw new ArgumentException("Threefish key must be same size as block (" + blocksizeBytes
-					                            + " bytes)");
+					                                                                         + " bytes)");
 				}
+
 				keyWords = new ulong[blocksizeWords];
 				Pack.LE_To_UInt64(keyBytes, 0, keyWords);
 			}
+
 			if (tweakBytes != null)
 			{
 				if (tweakBytes.Length != TWEAK_SIZE_BYTES)
 				{
 					throw new ArgumentException("Threefish tweak must be " + TWEAK_SIZE_BYTES + " bytes");
 				}
+
 				tweakWords = new ulong[2];
 				Pack.LE_To_UInt64(tweakBytes, 0, tweakWords);
 			}
+
 			Init(forEncryption, keyWords, tweakWords);
 		}
 
@@ -217,6 +225,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				SetKey(key);
 			}
+
 			if (tweak != null)
 			{
 				SetTweak(tweak);
@@ -228,16 +237,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (key.Length != this.blocksizeWords)
 			{
 				throw new ArgumentException("Threefish key must be same size as block (" + blocksizeWords
-				                            + " words)");
+				                                                                         + " words)");
 			}
 
 			/*
-	         * Full subkey schedule is deferred to execution to avoid per cipher overhead (10k for 512,
-	         * 20k for 1024).
-	         * 
-	         * Key and tweak word sequences are repeated, and static MOD17/MOD9/MOD5/MOD3 calculations
-	         * used, to avoid expensive mod computations during cipher operation.
-	         */
+			 * Full subkey schedule is deferred to execution to avoid per cipher overhead (10k for 512,
+			 * 20k for 1024).
+			 *
+			 * Key and tweak word sequences are repeated, and static MOD17/MOD9/MOD5/MOD3 calculations
+			 * used, to avoid expensive mod computations during cipher operation.
+			 */
 
 			ulong knw = C_240;
 			for (int i = 0; i < blocksizeWords; i++)
@@ -245,6 +254,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				kw[i] = key[i];
 				knw = knw ^ kw[i];
 			}
+
 			kw[blocksizeWords] = knw;
 			Array.Copy(kw, 0, kw, blocksizeWords + 1, blocksizeWords);
 		}
@@ -257,8 +267,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			/*
-	         * Tweak schedule partially repeated to avoid mod computations during cipher operation
-	         */
+			 * Tweak schedule partially repeated to avoid mod computations during cipher operation
+			 */
 			t[0] = tweak[0];
 			t[1] = tweak[1];
 			t[2] = t[0] ^ t[1];
@@ -266,17 +276,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			t[4] = t[1];
 		}
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return "Threefish-" + (blocksizeBytes * 8); }
 		}
 
-        public virtual int GetBlockSize()
+		public virtual int GetBlockSize()
 		{
 			return blocksizeBytes;
 		}
 
-        public virtual int ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
+		public virtual int ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			Check.DataLength(inBytes, inOff, blocksizeBytes, "input buffer too short");
 			Check.OutputLength(outBytes, outOff, blocksizeBytes, "output buffer too short");
@@ -355,6 +365,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	         * The extended + repeated tweak words
 	         */
 			protected readonly ulong[] t;
+
 			/**
 	         * The extended + repeated key words
 	         */
@@ -369,7 +380,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			internal abstract void EncryptBlock(ulong[] block, ulong[] outWords);
 
 			internal abstract void DecryptBlock(ulong[] block, ulong[] outWords);
-
 		}
 
 		private sealed class Threefish256Cipher
@@ -379,6 +389,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	         * Mix rotation constants defined in Skein 1.3 specification
 	         */
 			private const int ROTATION_0_0 = 14, ROTATION_0_1 = 16;
+
 			private const int ROTATION_1_0 = 52, ROTATION_1_1 = 57;
 			private const int ROTATION_2_0 = 23, ROTATION_2_1 = 40;
 			private const int ROTATION_3_0 = 5, ROTATION_3_1 = 37;
@@ -405,37 +416,38 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					throw new ArgumentException();
 				}
+
 				if (t.Length != 5)
 				{
 					throw new ArgumentException();
 				}
 
 				/*
-	             * Read 4 words of plaintext data, not using arrays for cipher state
-	             */
+				 * Read 4 words of plaintext data, not using arrays for cipher state
+				 */
 				ulong b0 = block[0];
 				ulong b1 = block[1];
 				ulong b2 = block[2];
 				ulong b3 = block[3];
 
 				/*
-	             * First subkey injection.
-	             */
+				 * First subkey injection.
+				 */
 				b0 += kw[0];
 				b1 += kw[1] + t[0];
 				b2 += kw[2] + t[1];
 				b3 += kw[3];
 
 				/*
-	             * Rounds loop, unrolled to 8 rounds per iteration.
-	             * 
-	             * Unrolling to multiples of 4 avoids the mod 4 check for key injection, and allows
-	             * inlining of the permutations, which cycle every of 2 rounds (avoiding array
-	             * index/lookup).
-	             * 
-	             * Unrolling to multiples of 8 avoids the mod 8 rotation constant lookup, and allows
-	             * inlining constant rotation values (avoiding array index/lookup).
-	             */
+				 * Rounds loop, unrolled to 8 rounds per iteration.
+				 *
+				 * Unrolling to multiples of 4 avoids the mod 4 check for key injection, and allows
+				 * inlining of the permutations, which cycle every of 2 rounds (avoiding array
+				 * index/lookup).
+				 *
+				 * Unrolling to multiples of 8 avoids the mod 8 rotation constant lookup, and allows
+				 * inlining constant rotation values (avoiding array index/lookup).
+				 */
 
 				for (int d = 1; d < (ROUNDS_256 / 4); d += 2)
 				{
@@ -443,11 +455,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					int dm3 = mod3[d];
 
 					/*
-	                 * 4 rounds of mix and permute.
-	                 * 
-	                 * Permute schedule has a 2 round cycle, so permutes are inlined in the mix
-	                 * operations in each 4 round block.
-	                 */
+					 * 4 rounds of mix and permute.
+					 *
+					 * Permute schedule has a 2 round cycle, so permutes are inlined in the mix
+					 * operations in each 4 round block.
+					 */
 					b1 = RotlXor(b1, ROTATION_0_0, b0 += b1);
 					b3 = RotlXor(b3, ROTATION_0_1, b2 += b3);
 
@@ -461,16 +473,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					b1 = RotlXor(b1, ROTATION_3_1, b2 += b1);
 
 					/*
-	                 * Subkey injection for first 4 rounds.
-	                 */
+					 * Subkey injection for first 4 rounds.
+					 */
 					b0 += kw[dm5];
 					b1 += kw[dm5 + 1] + t[dm3];
 					b2 += kw[dm5 + 2] + t[dm3 + 1];
 					b3 += kw[dm5 + 3] + (uint)d;
 
 					/*
-	                 * 4 more rounds of mix/permute
-	                 */
+					 * 4 more rounds of mix/permute
+					 */
 					b1 = RotlXor(b1, ROTATION_4_0, b0 += b1);
 					b3 = RotlXor(b3, ROTATION_4_1, b2 += b3);
 
@@ -484,8 +496,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					b1 = RotlXor(b1, ROTATION_7_1, b2 += b1);
 
 					/*
-	                 * Subkey injection for next 4 rounds.
-	                 */
+					 * Subkey injection for next 4 rounds.
+					 */
 					b0 += kw[dm5 + 1];
 					b1 += kw[dm5 + 2] + t[dm3 + 1];
 					b2 += kw[dm5 + 3] + t[dm3 + 2];
@@ -493,8 +505,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				}
 
 				/*
-	             * Output cipher state.
-	             */
+				 * Output cipher state.
+				 */
 				outWords[0] = b0;
 				outWords[1] = b1;
 				outWords[2] = b2;
@@ -513,6 +525,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					throw new ArgumentException();
 				}
+
 				if (t.Length != 5)
 				{
 					throw new ArgumentException();
@@ -585,22 +598,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				}
 
 				/*
-	             * First subkey uninjection.
-	             */
+				 * First subkey uninjection.
+				 */
 				b0 -= kw[0];
 				b1 -= kw[1] + t[0];
 				b2 -= kw[2] + t[1];
 				b3 -= kw[3];
 
 				/*
-	             * Output cipher state.
-	             */
+				 * Output cipher state.
+				 */
 				state[0] = b0;
 				state[1] = b1;
 				state[2] = b2;
 				state[3] = b3;
 			}
-
 		}
 
 		private sealed class Threefish512Cipher
@@ -610,6 +622,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	         * Mix rotation constants defined in Skein 1.3 specification
 	         */
 			private const int ROTATION_0_0 = 46, ROTATION_0_1 = 36, ROTATION_0_2 = 19, ROTATION_0_3 = 37;
+
 			private const int ROTATION_1_0 = 33, ROTATION_1_1 = 27, ROTATION_1_2 = 14, ROTATION_1_3 = 42;
 			private const int ROTATION_2_0 = 17, ROTATION_2_1 = 49, ROTATION_2_2 = 36, ROTATION_2_3 = 39;
 			private const int ROTATION_3_0 = 44, ROTATION_3_1 = 9, ROTATION_3_2 = 54, ROTATION_3_3 = 56;
@@ -636,14 +649,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					throw new ArgumentException();
 				}
+
 				if (t.Length != 5)
 				{
 					throw new ArgumentException();
 				}
 
 				/*
-	             * Read 8 words of plaintext data, not using arrays for cipher state
-	             */
+				 * Read 8 words of plaintext data, not using arrays for cipher state
+				 */
 				ulong b0 = block[0];
 				ulong b1 = block[1];
 				ulong b2 = block[2];
@@ -654,8 +668,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				ulong b7 = block[7];
 
 				/*
-	             * First subkey injection.
-	             */
+				 * First subkey injection.
+				 */
 				b0 += kw[0];
 				b1 += kw[1];
 				b2 += kw[2];
@@ -666,15 +680,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				b7 += kw[7];
 
 				/*
-	             * Rounds loop, unrolled to 8 rounds per iteration.
-	             * 
-	             * Unrolling to multiples of 4 avoids the mod 4 check for key injection, and allows
-	             * inlining of the permutations, which cycle every of 4 rounds (avoiding array
-	             * index/lookup).
-	             * 
-	             * Unrolling to multiples of 8 avoids the mod 8 rotation constant lookup, and allows
-	             * inlining constant rotation values (avoiding array index/lookup).
-	             */
+				 * Rounds loop, unrolled to 8 rounds per iteration.
+				 *
+				 * Unrolling to multiples of 4 avoids the mod 4 check for key injection, and allows
+				 * inlining of the permutations, which cycle every of 4 rounds (avoiding array
+				 * index/lookup).
+				 *
+				 * Unrolling to multiples of 8 avoids the mod 8 rotation constant lookup, and allows
+				 * inlining constant rotation values (avoiding array index/lookup).
+				 */
 
 				for (int d = 1; d < (ROUNDS_512 / 4); d += 2)
 				{
@@ -682,11 +696,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					int dm3 = mod3[d];
 
 					/*
-	                 * 4 rounds of mix and permute.
-	                 * 
-	                 * Permute schedule has a 4 round cycle, so permutes are inlined in the mix
-	                 * operations in each 4 round block.
-	                 */
+					 * 4 rounds of mix and permute.
+					 *
+					 * Permute schedule has a 4 round cycle, so permutes are inlined in the mix
+					 * operations in each 4 round block.
+					 */
 					b1 = RotlXor(b1, ROTATION_0_0, b0 += b1);
 					b3 = RotlXor(b3, ROTATION_0_1, b2 += b3);
 					b5 = RotlXor(b5, ROTATION_0_2, b4 += b5);
@@ -708,8 +722,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					b3 = RotlXor(b3, ROTATION_3_3, b4 += b3);
 
 					/*
-	                 * Subkey injection for first 4 rounds.
-	                 */
+					 * Subkey injection for first 4 rounds.
+					 */
 					b0 += kw[dm9];
 					b1 += kw[dm9 + 1];
 					b2 += kw[dm9 + 2];
@@ -720,8 +734,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					b7 += kw[dm9 + 7] + (uint)d;
 
 					/*
-	                 * 4 more rounds of mix/permute
-	                 */
+					 * 4 more rounds of mix/permute
+					 */
 					b1 = RotlXor(b1, ROTATION_4_0, b0 += b1);
 					b3 = RotlXor(b3, ROTATION_4_1, b2 += b3);
 					b5 = RotlXor(b5, ROTATION_4_2, b4 += b5);
@@ -743,8 +757,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					b3 = RotlXor(b3, ROTATION_7_3, b4 += b3);
 
 					/*
-	                 * Subkey injection for next 4 rounds.
-	                 */
+					 * Subkey injection for next 4 rounds.
+					 */
 					b0 += kw[dm9 + 1];
 					b1 += kw[dm9 + 2];
 					b2 += kw[dm9 + 3];
@@ -756,8 +770,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				}
 
 				/*
-	             * Output cipher state.
-	             */
+				 * Output cipher state.
+				 */
 				outWords[0] = b0;
 				outWords[1] = b1;
 				outWords[2] = b2;
@@ -780,6 +794,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					throw new ArgumentException();
 				}
+
 				if (t.Length != 5)
 				{
 					throw new ArgumentException();
@@ -896,8 +911,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				}
 
 				/*
-	             * First subkey uninjection.
-	             */
+				 * First subkey uninjection.
+				 */
 				b0 -= kw[0];
 				b1 -= kw[1];
 				b2 -= kw[2];
@@ -908,8 +923,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				b7 -= kw[7];
 
 				/*
-	             * Output cipher state.
-	             */
+				 * Output cipher state.
+				 */
 				state[0] = b0;
 				state[1] = b1;
 				state[2] = b2;
@@ -928,6 +943,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	         * Mix rotation constants defined in Skein 1.3 specification
 	         */
 			private const int ROTATION_0_0 = 24, ROTATION_0_1 = 13, ROTATION_0_2 = 8, ROTATION_0_3 = 47;
+
 			private const int ROTATION_0_4 = 8, ROTATION_0_5 = 17, ROTATION_0_6 = 22, ROTATION_0_7 = 37;
 			private const int ROTATION_1_0 = 38, ROTATION_1_1 = 19, ROTATION_1_2 = 10, ROTATION_1_3 = 55;
 			private const int ROTATION_1_4 = 49, ROTATION_1_5 = 18, ROTATION_1_6 = 23, ROTATION_1_7 = 52;
@@ -962,14 +978,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					throw new ArgumentException();
 				}
+
 				if (t.Length != 5)
 				{
 					throw new ArgumentException();
 				}
 
 				/*
-	             * Read 16 words of plaintext data, not using arrays for cipher state
-	             */
+				 * Read 16 words of plaintext data, not using arrays for cipher state
+				 */
 				ulong b0 = block[0];
 				ulong b1 = block[1];
 				ulong b2 = block[2];
@@ -988,8 +1005,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				ulong b15 = block[15];
 
 				/*
-	             * First subkey injection.
-	             */
+				 * First subkey injection.
+				 */
 				b0 += kw[0];
 				b1 += kw[1];
 				b2 += kw[2];
@@ -1008,15 +1025,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				b15 += kw[15];
 
 				/*
-	             * Rounds loop, unrolled to 8 rounds per iteration.
-	             * 
-	             * Unrolling to multiples of 4 avoids the mod 4 check for key injection, and allows
-	             * inlining of the permutations, which cycle every of 4 rounds (avoiding array
-	             * index/lookup).
-	             * 
-	             * Unrolling to multiples of 8 avoids the mod 8 rotation constant lookup, and allows
-	             * inlining constant rotation values (avoiding array index/lookup).
-	             */
+				 * Rounds loop, unrolled to 8 rounds per iteration.
+				 *
+				 * Unrolling to multiples of 4 avoids the mod 4 check for key injection, and allows
+				 * inlining of the permutations, which cycle every of 4 rounds (avoiding array
+				 * index/lookup).
+				 *
+				 * Unrolling to multiples of 8 avoids the mod 8 rotation constant lookup, and allows
+				 * inlining constant rotation values (avoiding array index/lookup).
+				 */
 
 				for (int d = 1; d < (ROUNDS_1024 / 4); d += 2)
 				{
@@ -1024,11 +1041,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					int dm3 = mod3[d];
 
 					/*
-	                 * 4 rounds of mix and permute.
-	                 * 
-	                 * Permute schedule has a 4 round cycle, so permutes are inlined in the mix
-	                 * operations in each 4 round block.
-	                 */
+					 * 4 rounds of mix and permute.
+					 *
+					 * Permute schedule has a 4 round cycle, so permutes are inlined in the mix
+					 * operations in each 4 round block.
+					 */
 					b1 = RotlXor(b1, ROTATION_0_0, b0 += b1);
 					b3 = RotlXor(b3, ROTATION_0_1, b2 += b3);
 					b5 = RotlXor(b5, ROTATION_0_2, b4 += b5);
@@ -1066,8 +1083,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					b7 = RotlXor(b7, ROTATION_3_7, b12 += b7);
 
 					/*
-	                 * Subkey injection for first 4 rounds.
-	                 */
+					 * Subkey injection for first 4 rounds.
+					 */
 					b0 += kw[dm17];
 					b1 += kw[dm17 + 1];
 					b2 += kw[dm17 + 2];
@@ -1086,8 +1103,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					b15 += kw[dm17 + 15] + (uint)d;
 
 					/*
-	                 * 4 more rounds of mix/permute
-	                 */
+					 * 4 more rounds of mix/permute
+					 */
 					b1 = RotlXor(b1, ROTATION_4_0, b0 += b1);
 					b3 = RotlXor(b3, ROTATION_4_1, b2 += b3);
 					b5 = RotlXor(b5, ROTATION_4_2, b4 += b5);
@@ -1125,8 +1142,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					b7 = RotlXor(b7, ROTATION_7_7, b12 += b7);
 
 					/*
-	                 * Subkey injection for next 4 rounds.
-	                 */
+					 * Subkey injection for next 4 rounds.
+					 */
 					b0 += kw[dm17 + 1];
 					b1 += kw[dm17 + 2];
 					b2 += kw[dm17 + 3];
@@ -1143,12 +1160,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					b13 += kw[dm17 + 14] + t[dm3 + 1];
 					b14 += kw[dm17 + 15] + t[dm3 + 2];
 					b15 += kw[dm17 + 16] + (uint)d + 1;
-
 				}
 
 				/*
-	             * Output cipher state.
-	             */
+				 * Output cipher state.
+				 */
 				outWords[0] = b0;
 				outWords[1] = b1;
 				outWords[2] = b2;
@@ -1179,6 +1195,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					throw new ArgumentException();
 				}
+
 				if (t.Length != 5)
 				{
 					throw new ArgumentException();
@@ -1382,8 +1399,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				}
 
 				/*
-	             * First subkey uninjection.
-	             */
+				 * First subkey uninjection.
+				 */
 				b0 -= kw[0];
 				b1 -= kw[1];
 				b2 -= kw[2];
@@ -1402,8 +1419,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				b15 -= kw[15];
 
 				/*
-	             * Output cipher state.
-	             */
+				 * Output cipher state.
+				 */
 				state[0] = b0;
 				state[1] = b1;
 				state[2] = b2;
@@ -1421,9 +1438,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				state[14] = b14;
 				state[15] = b15;
 			}
-
 		}
-
 	}
 }
 #pragma warning restore

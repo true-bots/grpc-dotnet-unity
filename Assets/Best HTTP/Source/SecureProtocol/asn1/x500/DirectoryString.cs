@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
@@ -14,26 +13,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 		public static DirectoryString GetInstance(object obj)
 		{
 			if (obj == null || obj is DirectoryString)
-				return (DirectoryString) obj;
+				return (DirectoryString)obj;
 
-            if (obj is DerStringBase)
+			if (obj is DerStringBase)
 			{
 				if (obj is DerT61String
-					|| obj is DerPrintableString
-					|| obj is DerUniversalString
-					|| obj is DerUtf8String
-					|| obj is DerBmpString)
+				    || obj is DerPrintableString
+				    || obj is DerUniversalString
+				    || obj is DerUtf8String
+				    || obj is DerBmpString)
 				{
-					return new DirectoryString((DerStringBase) obj);
+					return new DirectoryString((DerStringBase)obj);
 				}
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public static DirectoryString GetInstance(
-			Asn1TaggedObject	obj,
-			bool				isExplicit)
+			Asn1TaggedObject obj,
+			bool isExplicit)
 		{
 			if (!isExplicit)
 				throw new ArgumentException("choice item must be explicitly tagged");

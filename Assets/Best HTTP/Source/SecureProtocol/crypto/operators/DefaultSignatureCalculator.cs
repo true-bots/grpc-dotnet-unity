@@ -2,31 +2,30 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 {
-    public class DefaultSignatureCalculator
-        : IStreamCalculator<IBlockResult>
-    {
-        private readonly SignerSink mSignerSink;
+	public class DefaultSignatureCalculator
+		: IStreamCalculator<IBlockResult>
+	{
+		private readonly SignerSink mSignerSink;
 
-        public DefaultSignatureCalculator(ISigner signer)
-        {
-            this.mSignerSink = new SignerSink(signer);
-        }
+		public DefaultSignatureCalculator(ISigner signer)
+		{
+			this.mSignerSink = new SignerSink(signer);
+		}
 
-        public Stream Stream
-        {
-            get { return mSignerSink; }
-        }
+		public Stream Stream
+		{
+			get { return mSignerSink; }
+		}
 
-        public IBlockResult GetResult()
-        {
-            return new DefaultSignatureResult(mSignerSink.Signer);
-        }
-    }
+		public IBlockResult GetResult()
+		{
+			return new DefaultSignatureResult(mSignerSink.Signer);
+		}
+	}
 }
 #pragma warning restore
 #endif

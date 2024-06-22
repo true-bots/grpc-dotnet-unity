@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
@@ -30,8 +29,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		}
 
 		public override void Init(
-			bool				forEncryption,
-			ICipherParameters	parameters)
+			bool forEncryption,
+			ICipherParameters parameters)
 		{
 			this.forEncryption = forEncryption;
 
@@ -52,8 +51,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 
 			int baseLen = inputLen + Convert.ToInt32(buffer.Length);
 			return forEncryption
-				?	baseLen + 20
-				:	baseLen - 20;
+				? baseLen + 20
+				: baseLen - 20;
 		}
 
 		public override int GetUpdateOutputSize(
@@ -68,11 +67,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			return null;
 		}
 
-        public override int ProcessByte(byte input, byte[] output, int outOff)
-        {
-            buffer.WriteByte(input);
-            return 0;
-        }
+		public override int ProcessByte(byte input, byte[] output, int outOff)
+		{
+			buffer.WriteByte(input);
+			return 0;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public override int ProcessByte(byte input, Span<byte> output)
@@ -82,10 +81,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        public override byte[] ProcessBytes(
-			byte[]	input,
-			int		inOff,
-			int		length)
+		public override byte[] ProcessBytes(
+			byte[] input,
+			int inOff,
+			int length)
 		{
 			if (input == null)
 				throw new ArgumentNullException("input");
@@ -108,7 +107,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		}
 #endif
 
-        public override byte[] DoFinal()
+		public override byte[] DoFinal()
 		{
 			byte[] buf = buffer.ToArray();
 
@@ -118,9 +117,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		}
 
 		public override byte[] DoFinal(
-			byte[]	input,
-			int		inOff,
-			int		length)
+			byte[] input,
+			int inOff,
+			int length)
 		{
 			ProcessBytes(input, inOff, length);
 			return DoFinal();
@@ -139,7 +138,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        public override void Reset()
+		public override void Reset()
 		{
 			buffer.SetLength(0);
 		}

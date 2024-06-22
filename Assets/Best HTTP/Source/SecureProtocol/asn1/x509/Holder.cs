@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -10,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	 * The Holder object.
 	 * <p>
 	 * For an v2 attribute certificate this is:
-	 * 
+	 *
 	 * <pre>
 	 *            Holder ::= SEQUENCE {
 	 *                  baseCertificateID   [0] IssuerSerial OPTIONAL,
@@ -26,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	 * </p>
 	 * <p>
 	 * For an v1 attribute certificate this is:
-	 * 
+	 *
 	 * <pre>
 	 *         subject CHOICE {
 	 *          baseCertificateID [0] EXPLICIT IssuerSerial,
@@ -37,37 +36,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	 * </p>
 	 */
 	public class Holder
-        : Asn1Encodable
-    {
-		internal readonly IssuerSerial		baseCertificateID;
-        internal readonly GeneralNames		entityName;
-        internal readonly ObjectDigestInfo	objectDigestInfo;
+		: Asn1Encodable
+	{
+		internal readonly IssuerSerial baseCertificateID;
+		internal readonly GeneralNames entityName;
+		internal readonly ObjectDigestInfo objectDigestInfo;
 		private readonly int version;
 
 		public static Holder GetInstance(
-            object obj)
-        {
-            if (obj is Holder)
-            {
-                return (Holder) obj;
-            }
+			object obj)
+		{
+			if (obj is Holder)
+			{
+				return (Holder)obj;
+			}
 
 			if (obj is Asn1Sequence)
-            {
-                return new Holder((Asn1Sequence) obj);
-            }
+			{
+				return new Holder((Asn1Sequence)obj);
+			}
 
 			if (obj is Asn1TaggedObject)
 			{
-				return new Holder((Asn1TaggedObject) obj);
+				return new Holder((Asn1TaggedObject)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
 		 * Constructor for a holder for an v1 attribute certificate.
-		 * 
+		 *
 		 * @param tagObj The ASN.1 tagged holder object.
 		 */
 		public Holder(
@@ -90,34 +89,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		/**
 		 * Constructor for a holder for an v2 attribute certificate. *
-		 * 
+		 *
 		 * @param seq The ASN.1 sequence.
 		 */
 		private Holder(
-            Asn1Sequence seq)
-        {
+			Asn1Sequence seq)
+		{
 			if (seq.Count > 3)
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
 
 			for (int i = 0; i != seq.Count; i++)
-            {
+			{
 				Asn1TaggedObject tObj = Asn1TaggedObject.GetInstance(seq[i]);
 
 				switch (tObj.TagNo)
-                {
-                    case 0:
-                        baseCertificateID = IssuerSerial.GetInstance(tObj, false);
-                        break;
-                    case 1:
-                        entityName = GeneralNames.GetInstance(tObj, false);
-                        break;
-                    case 2:
-                        objectDigestInfo = ObjectDigestInfo.GetInstance(tObj, false);
-                        break;
-                    default:
-                        throw new ArgumentException("unknown tag in Holder");
-                }
-            }
+				{
+					case 0:
+						baseCertificateID = IssuerSerial.GetInstance(tObj, false);
+						break;
+					case 1:
+						entityName = GeneralNames.GetInstance(tObj, false);
+						break;
+					case 2:
+						objectDigestInfo = ObjectDigestInfo.GetInstance(tObj, false);
+						break;
+					default:
+						throw new ArgumentException("unknown tag in Holder");
+				}
+			}
 
 			this.version = 1;
 		}
@@ -131,11 +130,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		/**
 		 * Constructs a holder from a IssuerSerial.
 		 * @param baseCertificateID The IssuerSerial.
-		 * @param version The version of the attribute certificate. 
+		 * @param version The version of the attribute certificate.
 		 */
 		public Holder(
-			IssuerSerial	baseCertificateID,
-			int				version)
+			IssuerSerial baseCertificateID,
+			int version)
 		{
 			this.baseCertificateID = baseCertificateID;
 			this.version = version;
@@ -143,7 +142,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		/**
 		 * Returns 1 for v2 attribute certificates or 0 for v1 attribute
-		 * certificates. 
+		 * certificates.
 		 * @return The version of the attribute certificate.
 		 */
 		public int Version
@@ -154,7 +153,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		/**
 		 * Constructs a holder with an entityName for v2 attribute certificates or
 		 * with a subjectName for v1 attribute certificates.
-		 * 
+		 *
 		 * @param entityName The entity or subject name.
 		 */
 		public Holder(
@@ -166,13 +165,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		/**
 		 * Constructs a holder with an entityName for v2 attribute certificates or
 		 * with a subjectName for v1 attribute certificates.
-		 * 
+		 *
 		 * @param entityName The entity or subject name.
-		 * @param version The version of the attribute certificate. 
+		 * @param version The version of the attribute certificate.
 		 */
 		public Holder(
-			GeneralNames	entityName,
-			int				version)
+			GeneralNames entityName,
+			int version)
 		{
 			this.entityName = entityName;
 			this.version = version;
@@ -180,7 +179,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		/**
 		 * Constructs a holder from an object digest info.
-		 * 
+		 *
 		 * @param objectDigestInfo The object digest info object.
 		 */
 		public Holder(
@@ -198,7 +197,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		/**
 		 * Returns the entityName for an v2 attribute certificate or the subjectName
 		 * for an v1 attribute certificate.
-		 * 
+		 *
 		 * @return The entityname or subjectname.
 		 */
 		public GeneralNames EntityName
@@ -226,24 +225,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
          *  }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            if (version == 1)
-            {
-                Asn1EncodableVector v = new Asn1EncodableVector(3);
-                v.AddOptionalTagged(false, 0, baseCertificateID);
-                v.AddOptionalTagged(false, 1, entityName);
-                v.AddOptionalTagged(false, 2, objectDigestInfo);
-                return new DerSequence(v);
-            }
+		public override Asn1Object ToAsn1Object()
+		{
+			if (version == 1)
+			{
+				Asn1EncodableVector v = new Asn1EncodableVector(3);
+				v.AddOptionalTagged(false, 0, baseCertificateID);
+				v.AddOptionalTagged(false, 1, entityName);
+				v.AddOptionalTagged(false, 2, objectDigestInfo);
+				return new DerSequence(v);
+			}
 
-            if (entityName != null)
-            {
-                return new DerTaggedObject(true, 1, entityName);
-            }
+			if (entityName != null)
+			{
+				return new DerTaggedObject(true, 1, entityName);
+			}
 
-            return new DerTaggedObject(true, 0, baseCertificateID);
-        }
+			return new DerTaggedObject(true, 0, baseCertificateID);
+		}
 	}
 }
 #pragma warning restore

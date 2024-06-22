@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -15,17 +14,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		: IBlockCipher
 	{
 		private const int
-			rounds		= 32,
-			block_size	= 8,
+			rounds = 32,
+			block_size = 8,
 //			key_size	= 16,
-			delta		= unchecked((int) 0x9E3779B9);
+			delta = unchecked((int)0x9E3779B9);
 
 		/*
-		* the expanded key array of 4 subkeys
-		*/
+		 * the expanded key array of 4 subkeys
+		 */
 		private uint[] _S = new uint[4],
 			_sum0 = new uint[32],
 			_sum1 = new uint[32];
+
 		private bool _initialised, _forEncryption;
 
 		/**
@@ -42,7 +42,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			get { return "XTEA"; }
 		}
 
-        public virtual int GetBlockSize()
+		public virtual int GetBlockSize()
 		{
 			return block_size;
 		}
@@ -55,31 +55,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @exception ArgumentException if the params argument is
 		* inappropriate.
 		*/
-        public virtual void Init(
-			bool				forEncryption,
-			ICipherParameters	parameters)
+		public virtual void Init(
+			bool forEncryption,
+			ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
 			{
 				throw new ArgumentException("invalid parameter passed to TEA init - "
-					+ Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
 			}
 
 			_forEncryption = forEncryption;
 			_initialised = true;
 
-			KeyParameter p = (KeyParameter) parameters;
+			KeyParameter p = (KeyParameter)parameters;
 
 			setKey(p.GetKey());
 		}
 
-        public virtual int ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
+		public virtual int ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			if (!_initialised)
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
 
-            Check.DataLength(inBytes, inOff, block_size, "input buffer too short");
-            Check.OutputLength(outBytes, outOff, block_size, "output buffer too short");
+			Check.DataLength(inBytes, inOff, block_size, "input buffer too short");
+			Check.OutputLength(outBytes, outOff, block_size, "output buffer too short");
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			return _forEncryption
@@ -116,7 +116,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			byte[] key)
 		{
 			int i, j;
-			for (i = j = 0; i < 4; i++,j+=4)
+			for (i = j = 0; i < 4; i++, j += 4)
 			{
 				_S[i] = Pack.BE_To_UInt32(key, j);
 			}
@@ -189,10 +189,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			uint v0 = Pack.BE_To_UInt32(inBytes, inOff);
 			uint v1 = Pack.BE_To_UInt32(inBytes, inOff + 4);
 
-			for (int i = rounds-1; i >= 0; i--)
+			for (int i = rounds - 1; i >= 0; i--)
 			{
-				v1  -= ((v0 << 4 ^ v0 >> 5) + v0) ^ _sum1[i];
-				v0  -= ((v1 << 4 ^ v1 >> 5) + v1) ^ _sum0[i];
+				v1 -= ((v0 << 4 ^ v0 >> 5) + v0) ^ _sum1[i];
+				v0 -= ((v1 << 4 ^ v1 >> 5) + v1) ^ _sum0[i];
 			}
 
 			Pack.UInt32_To_BE(v0, outBytes, outOff);

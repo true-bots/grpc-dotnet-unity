@@ -21,14 +21,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		public override Asn1Object ToAsn1Object()
 		{
-            return Parse(m_parser);
+			return Parse(m_parser);
 		}
 
-        internal static DerExternal Parse(Asn1StreamParser sp)
-        {
-            return new DerExternal(sp.ReadVector());
-        }
-    }
+		internal static DerExternal Parse(Asn1StreamParser sp)
+		{
+			return new DerExternal(sp.ReadVector());
+		}
+	}
 }
 #pragma warning restore
 #endif

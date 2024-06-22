@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
@@ -9,20 +8,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class EncryptedData
 		: Asn1Encodable
 	{
-		private readonly DerInteger				version;
-		private readonly EncryptedContentInfo	encryptedContentInfo;
-		private readonly Asn1Set				unprotectedAttrs;
+		private readonly DerInteger version;
+		private readonly EncryptedContentInfo encryptedContentInfo;
+		private readonly Asn1Set unprotectedAttrs;
 
 		public static EncryptedData GetInstance(
 			object obj)
 		{
 			if (obj is EncryptedData)
-				return (EncryptedData) obj;
+				return (EncryptedData)obj;
 
 			if (obj is Asn1Sequence)
-				return new EncryptedData((Asn1Sequence) obj);
+				return new EncryptedData((Asn1Sequence)obj);
 
-            throw new ArgumentException("Invalid EncryptedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid EncryptedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
 		}
 
 		public EncryptedData(
@@ -32,8 +31,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		}
 
 		public EncryptedData(
-			EncryptedContentInfo	encInfo,
-			Asn1Set					unprotectedAttrs)
+			EncryptedContentInfo encInfo,
+			Asn1Set unprotectedAttrs)
 		{
 			if (encInfo == null)
 				throw new ArgumentNullException("encInfo");
@@ -56,8 +55,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 
 			if (seq.Count > 2)
 			{
-                this.unprotectedAttrs = Asn1Set.GetInstance((Asn1TaggedObject)seq[2], false);
-            }
+				this.unprotectedAttrs = Asn1Set.GetInstance((Asn1TaggedObject)seq[2], false);
+			}
 		}
 
 		public virtual DerInteger Version

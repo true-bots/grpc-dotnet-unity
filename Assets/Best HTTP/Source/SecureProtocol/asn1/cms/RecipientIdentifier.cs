@@ -1,33 +1,32 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
-    public class RecipientIdentifier
-        : Asn1Encodable, IAsn1Choice
-    {
-        private Asn1Encodable id;
+	public class RecipientIdentifier
+		: Asn1Encodable, IAsn1Choice
+	{
+		private Asn1Encodable id;
 
 		public RecipientIdentifier(
-            IssuerAndSerialNumber id)
-        {
-            this.id = id;
-        }
+			IssuerAndSerialNumber id)
+		{
+			this.id = id;
+		}
 
 		public RecipientIdentifier(
-            Asn1OctetString id)
-        {
-            this.id = new DerTaggedObject(false, 0, id);
-        }
+			Asn1OctetString id)
+		{
+			this.id = new DerTaggedObject(false, 0, id);
+		}
 
 		public RecipientIdentifier(
-            Asn1Object id)
-        {
-            this.id = id;
-        }
+			Asn1Object id)
+		{
+			this.id = id;
+		}
 
 		/**
          * return a RecipientIdentifier object from the given object.
@@ -35,24 +34,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * @param o the object we want converted.
          * @exception ArgumentException if the object cannot be converted.
          */
-        public static RecipientIdentifier GetInstance(
-            object o)
-        {
-            if (o == null || o is RecipientIdentifier)
-                return (RecipientIdentifier)o;
+		public static RecipientIdentifier GetInstance(
+			object o)
+		{
+			if (o == null || o is RecipientIdentifier)
+				return (RecipientIdentifier)o;
 
 			if (o is IssuerAndSerialNumber)
-                return new RecipientIdentifier((IssuerAndSerialNumber) o);
+				return new RecipientIdentifier((IssuerAndSerialNumber)o);
 
 			if (o is Asn1OctetString)
-                return new RecipientIdentifier((Asn1OctetString) o);
+				return new RecipientIdentifier((Asn1OctetString)o);
 
 			if (o is Asn1Object)
-                return new RecipientIdentifier((Asn1Object) o);
+				return new RecipientIdentifier((Asn1Object)o);
 
 			throw new ArgumentException(
-              "Illegal object in RecipientIdentifier: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
-        }
+				"Illegal object in RecipientIdentifier: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+		}
 
 		public bool IsTagged
 		{
@@ -60,17 +59,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		}
 
 		public Asn1Encodable ID
-        {
-            get
-            {
-                if (id is Asn1TaggedObject)
-                {
-                    return Asn1OctetString.GetInstance((Asn1TaggedObject) id, false);
-                }
+		{
+			get
+			{
+				if (id is Asn1TaggedObject)
+				{
+					return Asn1OctetString.GetInstance((Asn1TaggedObject)id, false);
+				}
 
 				return IssuerAndSerialNumber.GetInstance(id);
-            }
-        }
+			}
+		}
 
 		/**
          * Produce an object suitable for an Asn1OutputStream.
@@ -83,11 +82,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * SubjectKeyIdentifier ::= OCTET STRING
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            return id.ToAsn1Object();
-        }
-    }
+		public override Asn1Object ToAsn1Object()
+		{
+			return id.ToAsn1Object();
+		}
+	}
 }
 #pragma warning restore
 #endif

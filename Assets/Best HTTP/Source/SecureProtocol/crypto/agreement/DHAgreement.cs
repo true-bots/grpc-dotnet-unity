@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Diagnostics;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
@@ -23,10 +22,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 	 */
 	public class DHAgreement
 	{
-		private DHPrivateKeyParameters  key;
-		private DHParameters			dhParams;
-		private BigInteger				privateValue;
-		private SecureRandom			random;
+		private DHPrivateKeyParameters key;
+		private DHParameters dhParams;
+		private BigInteger privateValue;
+		private SecureRandom random;
 
 		public void Init(ICipherParameters parameters)
 		{
@@ -69,8 +68,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 		 * this will represent the shared secret.
 		 */
 		public BigInteger CalculateAgreement(
-			DHPublicKeyParameters	pub,
-			BigInteger				message)
+			DHPublicKeyParameters pub,
+			BigInteger message)
 		{
 			if (pub == null)
 				throw new ArgumentNullException("pub");
@@ -80,19 +79,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 			if (!pub.Parameters.Equals(dhParams))
 				throw new ArgumentException("Diffie-Hellman public key has wrong parameters.");
 
-            BigInteger p = dhParams.P;
+			BigInteger p = dhParams.P;
 
-            BigInteger peerY = pub.Y;
-            if (peerY == null || peerY.CompareTo(BigInteger.One) <= 0 || peerY.CompareTo(p.Subtract(BigInteger.One)) >= 0)
-                throw new ArgumentException("Diffie-Hellman public key is weak");
+			BigInteger peerY = pub.Y;
+			if (peerY == null || peerY.CompareTo(BigInteger.One) <= 0 || peerY.CompareTo(p.Subtract(BigInteger.One)) >= 0)
+				throw new ArgumentException("Diffie-Hellman public key is weak");
 
-            BigInteger result = peerY.ModPow(privateValue, p);
-            if (result.Equals(BigInteger.One))
-                throw new InvalidOperationException("Shared key can't be 1");
+			BigInteger result = peerY.ModPow(privateValue, p);
+			if (result.Equals(BigInteger.One))
+				throw new InvalidOperationException("Shared key can't be 1");
 
-            return message.ModPow(key.X, p).Multiply(result).Mod(p);
-        }
-    }
+			return message.ModPow(key.X, p).Multiply(result).Mod(p);
+		}
+	}
 }
 #pragma warning restore
 #endif

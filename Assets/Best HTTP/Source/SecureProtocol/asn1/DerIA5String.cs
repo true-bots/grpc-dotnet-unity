@@ -2,76 +2,77 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-    /**
-     * IA5String object - this is an Ascii string.
-     */
-    public class DerIA5String
-        : DerStringBase
-    {
-        internal class Meta : Asn1UniversalType
-        {
-            internal static readonly Asn1UniversalType Instance = new Meta();
+	/**
+	 * IA5String object - this is an Ascii string.
+	 */
+	public class DerIA5String
+		: DerStringBase
+	{
+		internal class Meta : Asn1UniversalType
+		{
+			internal static readonly Asn1UniversalType Instance = new Meta();
 
-            private Meta() : base(typeof(DerIA5String), Asn1Tags.IA5String) {}
+			private Meta() : base(typeof(DerIA5String), Asn1Tags.IA5String)
+			{
+			}
 
-            internal override Asn1Object FromImplicitPrimitive(DerOctetString octetString)
-            {
-                return CreatePrimitive(octetString.GetOctets());
-            }
-        }
+			internal override Asn1Object FromImplicitPrimitive(DerOctetString octetString)
+			{
+				return CreatePrimitive(octetString.GetOctets());
+			}
+		}
 
-        /**
-         * return an IA5 string from the passed in object
-         *
-         * @exception ArgumentException if the object cannot be converted.
-         */
-        public static DerIA5String GetInstance(object obj)
-        {
-            if (obj == null)
-                return null;
+		/**
+		 * return an IA5 string from the passed in object
+		 *
+		 * @exception ArgumentException if the object cannot be converted.
+		 */
+		public static DerIA5String GetInstance(object obj)
+		{
+			if (obj == null)
+				return null;
 
-            if (obj is DerIA5String derIA5String)
-                return derIA5String;
+			if (obj is DerIA5String derIA5String)
+				return derIA5String;
 
-            if (obj is IAsn1Convertible asn1Convertible)
-            {
-                Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
-                if (asn1Object is DerIA5String converted)
-                    return converted;
-            }
-            else if (obj is byte[] bytes)
-            {
-                try
-                {
-                    return (DerIA5String)Meta.Instance.FromByteArray(bytes);
-                }
-                catch (IOException e)
-                {
-                    throw new ArgumentException("failed to construct IA5 string from byte[]: " + e.Message);
-                }
-            }
+			if (obj is IAsn1Convertible asn1Convertible)
+			{
+				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
+				if (asn1Object is DerIA5String converted)
+					return converted;
+			}
+			else if (obj is byte[] bytes)
+			{
+				try
+				{
+					return (DerIA5String)Meta.Instance.FromByteArray(bytes);
+				}
+				catch (IOException e)
+				{
+					throw new ArgumentException("failed to construct IA5 string from byte[]: " + e.Message);
+				}
+			}
 
-            throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
-        }
+			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+		}
 
-        /**
-         * return an IA5 string from a tagged object.
-         *
-         * @param taggedObject the tagged object holding the object we want
-         * @param declaredExplicit true if the object is meant to be explicitly tagged false otherwise.
-         * @exception ArgumentException if the tagged object cannot be converted.
-         */
-        public static DerIA5String GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
-        {
-            return (DerIA5String)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
-        }
+		/**
+		 * return an IA5 string from a tagged object.
+		 *
+		 * @param taggedObject the tagged object holding the object we want
+		 * @param declaredExplicit true if the object is meant to be explicitly tagged false otherwise.
+		 * @exception ArgumentException if the tagged object cannot be converted.
+		 */
+		public static DerIA5String GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
+		{
+			return (DerIA5String)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
+		}
 
-        private readonly byte[] m_contents;
+		private readonly byte[] m_contents;
 
 		public DerIA5String(string str)
 			: this(str, false)
@@ -96,58 +97,58 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			m_contents = Strings.ToAsciiByteArray(str);
 		}
 
-        public DerIA5String(byte[] contents)
-            : this(contents, true)
-        {
-        }
+		public DerIA5String(byte[] contents)
+			: this(contents, true)
+		{
+		}
 
-        internal DerIA5String(byte[] contents, bool clone)
-        {
-            if (null == contents)
-                throw new ArgumentNullException("contents");
+		internal DerIA5String(byte[] contents, bool clone)
+		{
+			if (null == contents)
+				throw new ArgumentNullException("contents");
 
-            m_contents = clone ? Arrays.Clone(contents) : contents;
-        }
+			m_contents = clone ? Arrays.Clone(contents) : contents;
+		}
 
-        public override string GetString()
-        {
-            return Strings.FromAsciiByteArray(m_contents);
-        }
+		public override string GetString()
+		{
+			return Strings.FromAsciiByteArray(m_contents);
+		}
 
 		public byte[] GetOctets()
-        {
-            return Arrays.Clone(m_contents);
-        }
+		{
+			return Arrays.Clone(m_contents);
+		}
 
-        internal override IAsn1Encoding GetEncoding(int encoding)
-        {
-            return new PrimitiveEncoding(Asn1Tags.Universal, Asn1Tags.IA5String, m_contents);
-        }
+		internal override IAsn1Encoding GetEncoding(int encoding)
+		{
+			return new PrimitiveEncoding(Asn1Tags.Universal, Asn1Tags.IA5String, m_contents);
+		}
 
-        internal override IAsn1Encoding GetEncodingImplicit(int encoding, int tagClass, int tagNo)
-        {
-            return new PrimitiveEncoding(tagClass, tagNo, m_contents);
-        }
+		internal override IAsn1Encoding GetEncodingImplicit(int encoding, int tagClass, int tagNo)
+		{
+			return new PrimitiveEncoding(tagClass, tagNo, m_contents);
+		}
 
-        protected override bool Asn1Equals(Asn1Object asn1Object)
-        {
-            DerIA5String that = asn1Object as DerIA5String;
-            return null != that
-                && Arrays.AreEqual(this.m_contents, that.m_contents);
-        }
+		protected override bool Asn1Equals(Asn1Object asn1Object)
+		{
+			DerIA5String that = asn1Object as DerIA5String;
+			return null != that
+			       && Arrays.AreEqual(this.m_contents, that.m_contents);
+		}
 
-        protected override int Asn1GetHashCode()
-        {
-            return Arrays.GetHashCode(m_contents);
-        }
+		protected override int Asn1GetHashCode()
+		{
+			return Arrays.GetHashCode(m_contents);
+		}
 
-        /**
+		/**
 		 * return true if the passed in String can be represented without
 		 * loss as an IA5String, false otherwise.
 		 *
 		 * @return true if in printable set, false otherwise.
 		 */
-        public static bool IsIA5String(string str)
+		public static bool IsIA5String(string str)
 		{
 			foreach (char ch in str)
 			{
@@ -158,11 +159,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return true;
 		}
 
-        internal static DerIA5String CreatePrimitive(byte[] contents)
-        {
-            return new DerIA5String(contents, false);
-        }
-    }
+		internal static DerIA5String CreatePrimitive(byte[] contents)
+		{
+			return new DerIA5String(contents, false);
+		}
+	}
 }
 #pragma warning restore
 #endif

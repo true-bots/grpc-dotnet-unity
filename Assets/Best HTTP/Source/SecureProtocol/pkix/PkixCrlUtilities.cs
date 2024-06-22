@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store;
@@ -37,16 +36,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			// based on RFC 5280 6.3.3
 			foreach (X509Crl crl in initialSet)
 			{
-                DateTime? nextUpdate = crl.NextUpdate;
+				DateTime? nextUpdate = crl.NextUpdate;
 
-                if (null == nextUpdate || nextUpdate.Value.CompareTo(validityDate) > 0)
+				if (null == nextUpdate || nextUpdate.Value.CompareTo(validityDate) > 0)
 				{
 					X509Certificate cert = crlSelector.CertificateChecking;
 
-                    if (null == cert || crl.ThisUpdate.CompareTo(cert.NotAfter) < 0)
-                    {
-                        finalSet.Add(crl);
-                    }
+					if (null == cert || crl.ThisUpdate.CompareTo(cert.NotAfter) < 0)
+					{
+						finalSet.Add(crl);
+					}
 				}
 			}
 
@@ -80,7 +79,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// </returns>
 		private HashSet<X509Crl> FindCrls(ISelector<X509Crl> crlSelector, IList<IStore<X509Crl>> crlStores)
 		{
-            var crls = new HashSet<X509Crl>();
+			var crls = new HashSet<X509Crl>();
 
 			Exception lastException = null;
 			bool foundValidStore = false;
@@ -98,8 +97,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				}
 			}
 
-	        if (!foundValidStore && lastException != null)
-	            throw lastException;
+			if (!foundValidStore && lastException != null)
+				throw lastException;
 
 			return crls;
 		}

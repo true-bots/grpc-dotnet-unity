@@ -1,31 +1,30 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
-    public class OriginatorIdentifierOrKey
-        : Asn1Encodable, IAsn1Choice
-    {
-        private readonly Asn1Encodable id;
+	public class OriginatorIdentifierOrKey
+		: Asn1Encodable, IAsn1Choice
+	{
+		private readonly Asn1Encodable id;
 
-        public OriginatorIdentifierOrKey(IssuerAndSerialNumber id)
-        {
-            this.id = id;
-        }
+		public OriginatorIdentifierOrKey(IssuerAndSerialNumber id)
+		{
+			this.id = id;
+		}
 
-        public OriginatorIdentifierOrKey(SubjectKeyIdentifier id)
-        {
-            this.id = new DerTaggedObject(false, 0, id);
-        }
+		public OriginatorIdentifierOrKey(SubjectKeyIdentifier id)
+		{
+			this.id = new DerTaggedObject(false, 0, id);
+		}
 
-        public OriginatorIdentifierOrKey(OriginatorPublicKey id)
-        {
-            this.id = new DerTaggedObject(false, 1, id);
-        }
+		public OriginatorIdentifierOrKey(OriginatorPublicKey id)
+		{
+			this.id = new DerTaggedObject(false, 1, id);
+		}
 
 		private OriginatorIdentifierOrKey(Asn1TaggedObject id)
 		{
@@ -42,30 +41,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * @exception ArgumentException if the object held by the
          *          tagged object cannot be converted.
          */
-        public static OriginatorIdentifierOrKey GetInstance(
-            Asn1TaggedObject	o,
-            bool				explicitly)
-        {
-            if (!explicitly)
-            {
-                throw new ArgumentException(
-                        "Can't implicitly tag OriginatorIdentifierOrKey");
-            }
+		public static OriginatorIdentifierOrKey GetInstance(
+			Asn1TaggedObject o,
+			bool explicitly)
+		{
+			if (!explicitly)
+			{
+				throw new ArgumentException(
+					"Can't implicitly tag OriginatorIdentifierOrKey");
+			}
 
 			return GetInstance(o.GetObject());
-        }
+		}
 
-        /**
-         * return an OriginatorIdentifierOrKey object from the given object.
-         *
-         * @param o the object we want converted.
-         * @exception ArgumentException if the object cannot be converted.
-         */
-        public static OriginatorIdentifierOrKey GetInstance(
-            object o)
-        {
-            if (o == null || o is OriginatorIdentifierOrKey)
-                return (OriginatorIdentifierOrKey)o;
+		/**
+		 * return an OriginatorIdentifierOrKey object from the given object.
+		 *
+		 * @param o the object we want converted.
+		 * @exception ArgumentException if the object cannot be converted.
+		 */
+		public static OriginatorIdentifierOrKey GetInstance(
+			object o)
+		{
+			if (o == null || o is OriginatorIdentifierOrKey)
+				return (OriginatorIdentifierOrKey)o;
 
 			if (o is IssuerAndSerialNumber)
 				return new OriginatorIdentifierOrKey((IssuerAndSerialNumber)o);
@@ -79,8 +78,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			if (o is Asn1TaggedObject)
 				return new OriginatorIdentifierOrKey((Asn1TaggedObject)o);
 
-            throw new ArgumentException("Invalid OriginatorIdentifierOrKey: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
-        }
+			throw new ArgumentException("Invalid OriginatorIdentifierOrKey: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+		}
 
 		public Asn1Encodable ID
 		{
@@ -138,11 +137,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * SubjectKeyIdentifier ::= OCTET STRING
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            return id.ToAsn1Object();
-        }
-    }
+		public override Asn1Object ToAsn1Object()
+		{
+			return id.ToAsn1Object();
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
 
@@ -9,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 {
 	public class Pkcs12StoreBuilder
 	{
-		private DerObjectIdentifier	keyAlgorithm = PkcsObjectIdentifiers.PbeWithShaAnd3KeyTripleDesCbc;
-		private DerObjectIdentifier	certAlgorithm = PkcsObjectIdentifiers.PbewithShaAnd40BitRC2Cbc;
+		private DerObjectIdentifier keyAlgorithm = PkcsObjectIdentifiers.PbeWithShaAnd3KeyTripleDesCbc;
+		private DerObjectIdentifier certAlgorithm = PkcsObjectIdentifiers.PbewithShaAnd40BitRC2Cbc;
 		private DerObjectIdentifier keyPrfAlgorithm = null;
 		private bool useDerEncoding = false;
 
@@ -42,6 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			this.keyPrfAlgorithm = keyPrfAlgorithm;
 			return this;
 		}
+
 		public Pkcs12StoreBuilder SetUseDerEncoding(bool useDerEncoding)
 		{
 			this.useDerEncoding = useDerEncoding;

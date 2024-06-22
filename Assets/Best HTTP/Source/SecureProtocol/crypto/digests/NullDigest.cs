@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
@@ -46,9 +45,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 		public int DoFinal(byte[] outBytes, int outOff)
 		{
-            try
-            {
-                byte[] data = bOut.GetBuffer();
+			try
+			{
+				byte[] data = bOut.GetBuffer();
 				int length = Convert.ToInt32(bOut.Length);
 
 				Array.Copy(data, 0, outBytes, outOff, length);
@@ -56,10 +55,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 				return length;
 			}
 			finally
-            {
-                Reset();
-            }
-        }
+			{
+				Reset();
+			}
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public int DoFinal(Span<byte> output)
@@ -80,7 +79,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        public void Reset()
+		public void Reset()
 		{
 			bOut.SetLength(0);
 		}

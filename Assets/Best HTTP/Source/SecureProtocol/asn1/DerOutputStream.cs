@@ -5,19 +5,19 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-    internal class DerOutputStream
-        : Asn1OutputStream
-    {
-        internal DerOutputStream(Stream os)
-            : base(os)
-        {
-        }
+	internal class DerOutputStream
+		: Asn1OutputStream
+	{
+		internal DerOutputStream(Stream os)
+			: base(os)
+		{
+		}
 
-        internal override int Encoding
-        {
-            get { return EncodingDer; }
-        }
-    }
+		internal override int Encoding
+		{
+			get { return EncodingDer; }
+		}
+	}
 }
 #pragma warning restore
 #endif

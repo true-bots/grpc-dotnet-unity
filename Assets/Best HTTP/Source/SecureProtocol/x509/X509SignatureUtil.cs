@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Nist;
@@ -20,8 +19,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		private static readonly Asn1Null derNull = DerNull.Instance;
 
 		internal static void SetSignatureParameters(
-			ISigner			signature,
-			Asn1Encodable	parameters)
+			ISigner signature,
+			Asn1Encodable parameters)
 		{
 			if (parameters != null && !derNull.Equals(parameters))
 			{
@@ -58,13 +57,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			if (parameters != null && !derNull.Equals(parameters))
 			{
-                if (sigAlgId.Algorithm.Equals(PkcsObjectIdentifiers.IdRsassaPss))
+				if (sigAlgId.Algorithm.Equals(PkcsObjectIdentifiers.IdRsassaPss))
 				{
 					RsassaPssParameters rsaParams = RsassaPssParameters.GetInstance(parameters);
 
-                    return GetDigestAlgName(rsaParams.HashAlgorithm.Algorithm) + "withRSAandMGF1";
+					return GetDigestAlgName(rsaParams.HashAlgorithm.Algorithm) + "withRSAandMGF1";
 				}
-                if (sigAlgId.Algorithm.Equals(X9ObjectIdentifiers.ECDsaWithSha2))
+
+				if (sigAlgId.Algorithm.Equals(X9ObjectIdentifiers.ECDsaWithSha2))
 				{
 					Asn1Sequence ecDsaParams = Asn1Sequence.GetInstance(parameters);
 
@@ -72,13 +72,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				}
 			}
 
-            string sigName = SignerUtilities.GetEncodingName(sigAlgId.Algorithm);
-            if (null != sigName)
-            {
-                return sigName;
-            }
+			string sigName = SignerUtilities.GetEncodingName(sigAlgId.Algorithm);
+			if (null != sigName)
+			{
+				return sigName;
+			}
 
-            return sigAlgId.Algorithm.Id;
+			return sigAlgId.Algorithm.Id;
 		}
 
 		/**

@@ -2,75 +2,84 @@ using System;
 
 namespace BestHTTP.Extensions
 {
-    public sealed class CircularBuffer<T>
-    {
-        public int Capacity { get; private set; }
-        public int Count { get; private set; }
-        public int StartIdx { get { return this.startIdx; } }
-        public int EndIdx { get { return this.endIdx; } }
+	public sealed class CircularBuffer<T>
+	{
+		public int Capacity { get; private set; }
+		public int Count { get; private set; }
 
-        public T this[int idx]
-        {
-            get
-            {
-                int realIdx = (this.startIdx + idx) % this.Capacity;
+		public int StartIdx
+		{
+			get { return this.startIdx; }
+		}
 
-                return this.buffer[realIdx];
-            }
+		public int EndIdx
+		{
+			get { return this.endIdx; }
+		}
 
-            set
-            {
-                int realIdx = (this.startIdx + idx) % this.Capacity;
+		public T this[int idx]
+		{
+			get
+			{
+				int realIdx = (this.startIdx + idx) % this.Capacity;
 
-                this.buffer[realIdx] = value;
-            }
-        }
+				return this.buffer[realIdx];
+			}
 
-        private T[] buffer;
-        private int startIdx;
-        private int endIdx;
+			set
+			{
+				int realIdx = (this.startIdx + idx) % this.Capacity;
 
-        public CircularBuffer(int capacity)
-        {
-            this.Capacity = capacity;
-        }
+				this.buffer[realIdx] = value;
+			}
+		}
 
-        public void Add(T element)
-        {
-            if (this.buffer == null)
-                this.buffer = new T[this.Capacity];
+		private T[] buffer;
+		private int startIdx;
+		private int endIdx;
 
-            this.buffer[this.endIdx] = element;
+		public CircularBuffer(int capacity)
+		{
+			this.Capacity = capacity;
+		}
 
-            this.endIdx = (this.endIdx + 1) % this.Capacity;
-            if (this.endIdx == this.startIdx)
-                this.startIdx = (this.startIdx + 1) % this.Capacity;
+		public void Add(T element)
+		{
+			if (this.buffer == null)
+				this.buffer = new T[this.Capacity];
 
-            this.Count = Math.Min(this.Count + 1, this.Capacity);
-        }
+			this.buffer[this.endIdx] = element;
 
-        public void Clear()
-        {
-            this.Count = this.startIdx = this.endIdx = 0;
-        }
+			this.endIdx = (this.endIdx + 1) % this.Capacity;
+			if (this.endIdx == this.startIdx)
+				this.startIdx = (this.startIdx + 1) % this.Capacity;
 
-        public override string ToString()
-        {
-            var sb = PlatformSupport.Text.StringBuilderPool.Get(2);
-            sb.Append("[");
+			this.Count = Math.Min(this.Count + 1, this.Capacity);
+		}
 
-            int idx = this.startIdx;
-            while (idx != this.endIdx)
-            {
-                sb.Append(this.buffer[idx].ToString());
+		public void Clear()
+		{
+			this.Count = this.startIdx = this.endIdx = 0;
+		}
 
-                idx = (idx + 1) % this.Capacity;
-                if (idx != this.endIdx)
-                    sb.Append("; ");
-            }
-            sb.Append("]");
+		public override string ToString()
+		{
+			var sb = PlatformSupport.Text.StringBuilderPool.Get(2);
+			sb.Append("[");
 
-            return sb.ToString();
-        }
-    }
+			int idx = this.startIdx;
+			while (idx != this.endIdx)
+			{
+				sb.Append(this.buffer[idx].ToString());
+
+				idx = (idx + 1) % this.Capacity;
+				if (idx != this.endIdx)
+					sb.Append("; ");
+			}
+
+			sb.Append("]");
+
+			return sb.ToString();
+		}
+	}
 }

@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -29,9 +28,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	*/
 	public class CmsCompressedDataStreamGenerator
 	{
-        public static readonly string ZLib = CmsObjectIdentifiers.ZlibCompress.Id;
+		public static readonly string ZLib = CmsObjectIdentifiers.ZlibCompress.Id;
 
-        private int _bufferSize;
+		private int _bufferSize;
 
 		/**
 		* base constructor
@@ -50,12 +49,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			_bufferSize = bufferSize;
 		}
 
-        public Stream Open(Stream outStream)
-        {
-            return Open(outStream, CmsObjectIdentifiers.Data.Id, ZLib);
-        }
+		public Stream Open(Stream outStream)
+		{
+			return Open(outStream, CmsObjectIdentifiers.Data.Id, ZLib);
+		}
 
-        public Stream Open(Stream outStream, string compressionOid)
+		public Stream Open(Stream outStream, string compressionOid)
 		{
 			return Open(outStream, CmsObjectIdentifiers.Data.Id, compressionOid);
 		}
@@ -105,10 +104,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			private BerSequenceGenerator _eiGen;
 
 			internal CmsCompressedOutputStream(
-				Stream					outStream,
-				BerSequenceGenerator	sGen,
-				BerSequenceGenerator	cGen,
-				BerSequenceGenerator	eiGen)
+				Stream outStream,
+				BerSequenceGenerator sGen,
+				BerSequenceGenerator cGen,
+				BerSequenceGenerator eiGen)
 			{
 				_out = outStream;
 				_sGen = sGen;
@@ -128,25 +127,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
             }
 #endif
 
-            public override void WriteByte(byte value)
+			public override void WriteByte(byte value)
 			{
 				_out.WriteByte(value);
 			}
 
-            protected override void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    _out.Dispose();
+			protected override void Dispose(bool disposing)
+			{
+				if (disposing)
+				{
+					_out.Dispose();
 
-                    // TODO Parent context(s) should really be be closed explicitly
+					// TODO Parent context(s) should really be be closed explicitly
 
-                    _eiGen.Close();
-				    _cGen.Close();
-				    _sGen.Close();
-                }
-                base.Dispose(disposing);
-            }
+					_eiGen.Close();
+					_cGen.Close();
+					_sGen.Close();
+				}
+
+				base.Dispose(disposing);
+			}
 		}
 	}
 }

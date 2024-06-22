@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -13,9 +12,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	 */
 	public class Gost3410ParametersGenerator
 	{
-		private int             size;
-		private int             typeproc;
-		private SecureRandom    init_random;
+		private int size;
+		private int typeproc;
+		private SecureRandom init_random;
 
 		/**
 		 * initialise the key generator.
@@ -25,9 +24,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * @param random random byte source.
 		 */
 		public void Init(
-			int             size,
-			int             typeProcedure,
-			SecureRandom    random)
+			int size,
+			int typeProcedure,
+			SecureRandom random)
 		{
 			this.size = size;
 			this.typeproc = typeProcedure;
@@ -35,17 +34,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		}
 
 		//Procedure A
-		private int procedure_A(int x0, int c,  BigInteger[] pq, int size)
+		private int procedure_A(int x0, int c, BigInteger[] pq, int size)
 		{
 			//Verify and perform condition: 0<x<2^16; 0<c<2^16; c - odd.
-			while(x0<0 || x0>65536)
+			while (x0 < 0 || x0 > 65536)
 			{
-				x0 = init_random.NextInt()/32768;
+				x0 = init_random.NextInt() / 32768;
 			}
 
-			while((c<0 || c>65536) || (c/2==0))
+			while ((c < 0 || c > 65536) || (c / 2 == 0))
 			{
-				c = init_random.NextInt()/32768 + 1;
+				c = init_random.NextInt() / 32768 + 1;
 			}
 
 			BigInteger C = BigInteger.ValueOf(c);
@@ -59,93 +58,95 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			int[] t = new int[1]; // t - orders; begin length = 1
 			t[0] = size;
 			int s = 0;
-			for (int i=0; t[i]>=17; i++)
+			for (int i = 0; t[i] >= 17; i++)
 			{
 				// extension array t
-				int[] tmp_t = new int[t.Length + 1];             ///////////////
-					Array.Copy(t,0,tmp_t,0,t.Length);          //  extension
-				t = new int[tmp_t.Length];                       //  array t
-				Array.Copy(tmp_t, 0, t, 0, tmp_t.Length);  ///////////////
+				int[] tmp_t = new int[t.Length + 1]; ///////////////
+				Array.Copy(t, 0, tmp_t, 0, t.Length); //  extension
+				t = new int[tmp_t.Length]; //  array t
+				Array.Copy(tmp_t, 0, t, 0, tmp_t.Length); ///////////////
 
-				t[i+1] = t[i]/2;
-				s = i+1;
+				t[i + 1] = t[i] / 2;
+				s = i + 1;
 			}
 
 			//step3
-			BigInteger[] p = new BigInteger[s+1];
-			p[s] = new BigInteger("8003",16); //set min prime number length 16 bit
+			BigInteger[] p = new BigInteger[s + 1];
+			p[s] = new BigInteger("8003", 16); //set min prime number length 16 bit
 
-			int m = s-1;  //step4
+			int m = s - 1; //step4
 
-			for (int i=0; i<s; i++)
+			for (int i = 0; i < s; i++)
 			{
-				int rm = t[m]/16;  //step5
+				int rm = t[m] / 16; //step5
 
-			step6: for(;;)
-				   {
-					   //step 6
-					   BigInteger[] tmp_y = new BigInteger[y.Length];  ////////////////
-					   Array.Copy(y,0,tmp_y,0,y.Length);         //  extension
-					   y = new BigInteger[rm+1];                       //  array y
-					   Array.Copy(tmp_y,0,y,0,tmp_y.Length);     ////////////////
+				step6:
+				for (;;)
+				{
+					//step 6
+					BigInteger[] tmp_y = new BigInteger[y.Length]; ////////////////
+					Array.Copy(y, 0, tmp_y, 0, y.Length); //  extension
+					y = new BigInteger[rm + 1]; //  array y
+					Array.Copy(tmp_y, 0, y, 0, tmp_y.Length); ////////////////
 
-					   for (int j=0; j<rm; j++)
-					   {
-						   y[j+1] = (y[j].Multiply(constA16).Add(C)).Mod(BigInteger.Two.Pow(16));
-					   }
+					for (int j = 0; j < rm; j++)
+					{
+						y[j + 1] = (y[j].Multiply(constA16).Add(C)).Mod(BigInteger.Two.Pow(16));
+					}
 
-					   //step 7
-					   BigInteger Ym = BigInteger.Zero;
-					   for (int j=0; j<rm; j++)
-					   {
-						   Ym = Ym.Add(y[j].ShiftLeft(16*j));
-					   }
+					//step 7
+					BigInteger Ym = BigInteger.Zero;
+					for (int j = 0; j < rm; j++)
+					{
+						Ym = Ym.Add(y[j].ShiftLeft(16 * j));
+					}
 
-					   y[0] = y[rm]; //step 8
+					y[0] = y[rm]; //step 8
 
-					   //step 9
-					   BigInteger N = BigInteger.One.ShiftLeft(t[m]-1).Divide(p[m+1]).Add(
-						   Ym.ShiftLeft(t[m]-1).Divide(p[m+1].ShiftLeft(16*rm)));
+					//step 9
+					BigInteger N = BigInteger.One.ShiftLeft(t[m] - 1).Divide(p[m + 1]).Add(
+						Ym.ShiftLeft(t[m] - 1).Divide(p[m + 1].ShiftLeft(16 * rm)));
 
-					   if (N.TestBit(0))
-					   {
-						   N = N.Add(BigInteger.One);
-					   }
+					if (N.TestBit(0))
+					{
+						N = N.Add(BigInteger.One);
+					}
 
-					   //step 10
+					//step 10
 
-						for(;;)
+					for (;;)
+					{
+						//step 11
+						BigInteger NByLastP = N.Multiply(p[m + 1]);
+
+						if (NByLastP.BitLength > t[m])
 						{
-							//step 11
-							BigInteger NByLastP = N.Multiply(p[m+1]);
-
-							if (NByLastP.BitLength > t[m])
-							{
-								goto step6; //step 12
-							}
-
-							p[m] = NByLastP.Add(BigInteger.One);
-
-							//step13
-							if (BigInteger.Two.ModPow(NByLastP, p[m]).CompareTo(BigInteger.One) == 0
-								&& BigInteger.Two.ModPow(N, p[m]).CompareTo(BigInteger.One) != 0)
-							{
-								break;
-							}
-
-							N = N.Add(BigInteger.Two);
+							goto step6; //step 12
 						}
 
-					   if (--m < 0)
-					   {
-						   pq[0] = p[0];
-						   pq[1] = p[1];
-						   return y[0].IntValue; //return for procedure B step 2
-					   }
+						p[m] = NByLastP.Add(BigInteger.One);
 
-					   break; //step 14
-				   }
+						//step13
+						if (BigInteger.Two.ModPow(NByLastP, p[m]).CompareTo(BigInteger.One) == 0
+						    && BigInteger.Two.ModPow(N, p[m]).CompareTo(BigInteger.One) != 0)
+						{
+							break;
+						}
+
+						N = N.Add(BigInteger.Two);
+					}
+
+					if (--m < 0)
+					{
+						pq[0] = p[0];
+						pq[1] = p[1];
+						return y[0].IntValue; //return for procedure B step 2
+					}
+
+					break; //step 14
+				}
 			}
+
 			return y[0].IntValue;
 		}
 
@@ -153,14 +154,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		private long procedure_Aa(long x0, long c, BigInteger[] pq, int size)
 		{
 			//Verify and perform condition: 0<x<2^32; 0<c<2^32; c - odd.
-			while(x0<0 || x0>4294967296L)
+			while (x0 < 0 || x0 > 4294967296L)
 			{
-				x0 = init_random.NextInt()*2;
+				x0 = init_random.NextInt() * 2;
 			}
 
-			while((c<0 || c>4294967296L) || (c/2==0))
+			while ((c < 0 || c > 4294967296L) || (c / 2 == 0))
 			{
-				c = init_random.NextInt()*2+1;
+				c = init_random.NextInt() * 2 + 1;
 			}
 
 			BigInteger C = BigInteger.ValueOf(c);
@@ -174,93 +175,95 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			int[] t = new int[1]; // t - orders; begin length = 1
 			t[0] = size;
 			int s = 0;
-			for (int i=0; t[i]>=33; i++)
+			for (int i = 0; t[i] >= 33; i++)
 			{
 				// extension array t
-				int[] tmp_t = new int[t.Length + 1];             ///////////////
-					Array.Copy(t,0,tmp_t,0,t.Length);          //  extension
-				t = new int[tmp_t.Length];                       //  array t
-				Array.Copy(tmp_t, 0, t, 0, tmp_t.Length);  ///////////////
+				int[] tmp_t = new int[t.Length + 1]; ///////////////
+				Array.Copy(t, 0, tmp_t, 0, t.Length); //  extension
+				t = new int[tmp_t.Length]; //  array t
+				Array.Copy(tmp_t, 0, t, 0, tmp_t.Length); ///////////////
 
-				t[i+1] = t[i]/2;
-				s = i+1;
+				t[i + 1] = t[i] / 2;
+				s = i + 1;
 			}
 
 			//step3
-			BigInteger[] p = new BigInteger[s+1];
-			p[s] = new BigInteger("8000000B",16); //set min prime number length 32 bit
+			BigInteger[] p = new BigInteger[s + 1];
+			p[s] = new BigInteger("8000000B", 16); //set min prime number length 32 bit
 
-			int m = s-1;  //step4
+			int m = s - 1; //step4
 
-			for (int i=0; i<s; i++)
+			for (int i = 0; i < s; i++)
 			{
-				int rm = t[m]/32;  //step5
+				int rm = t[m] / 32; //step5
 
-			step6: for(;;)
-				   {
-					   //step 6
-					   BigInteger[] tmp_y = new BigInteger[y.Length];  ////////////////
-						   Array.Copy(y,0,tmp_y,0,y.Length);         //  extension
-					   y = new BigInteger[rm+1];                       //  array y
-					   Array.Copy(tmp_y,0,y,0,tmp_y.Length);     ////////////////
+				step6:
+				for (;;)
+				{
+					//step 6
+					BigInteger[] tmp_y = new BigInteger[y.Length]; ////////////////
+					Array.Copy(y, 0, tmp_y, 0, y.Length); //  extension
+					y = new BigInteger[rm + 1]; //  array y
+					Array.Copy(tmp_y, 0, y, 0, tmp_y.Length); ////////////////
 
-					   for (int j=0; j<rm; j++)
-					   {
-						   y[j+1] = (y[j].Multiply(constA32).Add(C)).Mod(BigInteger.Two.Pow(32));
-					   }
+					for (int j = 0; j < rm; j++)
+					{
+						y[j + 1] = (y[j].Multiply(constA32).Add(C)).Mod(BigInteger.Two.Pow(32));
+					}
 
-					   //step 7
-					   BigInteger Ym = BigInteger.Zero;
-					   for (int j=0; j<rm; j++)
-					   {
-						   Ym = Ym.Add(y[j].ShiftLeft(32*j));
-					   }
+					//step 7
+					BigInteger Ym = BigInteger.Zero;
+					for (int j = 0; j < rm; j++)
+					{
+						Ym = Ym.Add(y[j].ShiftLeft(32 * j));
+					}
 
-					   y[0] = y[rm]; //step 8
+					y[0] = y[rm]; //step 8
 
-					   //step 9
-					   BigInteger N = BigInteger.One.ShiftLeft(t[m]-1).Divide(p[m+1]).Add(
-						   Ym.ShiftLeft(t[m]-1).Divide(p[m+1].ShiftLeft(32*rm)));
+					//step 9
+					BigInteger N = BigInteger.One.ShiftLeft(t[m] - 1).Divide(p[m + 1]).Add(
+						Ym.ShiftLeft(t[m] - 1).Divide(p[m + 1].ShiftLeft(32 * rm)));
 
-					   if (N.TestBit(0))
-					   {
-						   N = N.Add(BigInteger.One);
-					   }
+					if (N.TestBit(0))
+					{
+						N = N.Add(BigInteger.One);
+					}
 
-					   //step 10
+					//step 10
 
-						for(;;)
+					for (;;)
+					{
+						//step 11
+						BigInteger NByLastP = N.Multiply(p[m + 1]);
+
+						if (NByLastP.BitLength > t[m])
 						{
-							//step 11
-							BigInteger NByLastP = N.Multiply(p[m+1]);
-
-							if (NByLastP.BitLength > t[m])
-							{
-								goto step6; //step 12
-							}
-
-							p[m] = NByLastP.Add(BigInteger.One);
-
-							//step13
-							if (BigInteger.Two.ModPow(NByLastP, p[m]).CompareTo(BigInteger.One) == 0
-								&& BigInteger.Two.ModPow(N, p[m]).CompareTo(BigInteger.One) != 0)
-							{
-								break;
-							}
-
-							N = N.Add(BigInteger.Two);
+							goto step6; //step 12
 						}
 
-					   if (--m < 0)
-					   {
-						   pq[0] = p[0];
-						   pq[1] = p[1];
-						   return y[0].LongValue; //return for procedure B' step 2
-					   }
+						p[m] = NByLastP.Add(BigInteger.One);
 
-					   break; //step 14
-				   }
+						//step13
+						if (BigInteger.Two.ModPow(NByLastP, p[m]).CompareTo(BigInteger.One) == 0
+						    && BigInteger.Two.ModPow(N, p[m]).CompareTo(BigInteger.One) != 0)
+						{
+							break;
+						}
+
+						N = N.Add(BigInteger.Two);
+					}
+
+					if (--m < 0)
+					{
+						pq[0] = p[0];
+						pq[1] = p[1];
+						return y[0].LongValue; //return for procedure B' step 2
+					}
+
+					break; //step 14
+				}
 			}
+
 			return y[0].LongValue;
 		}
 
@@ -268,17 +271,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		private void procedure_B(int x0, int c, BigInteger[] pq)
 		{
 			//Verify and perform condition: 0<x<2^16; 0<c<2^16; c - odd.
-			while(x0<0 || x0>65536)
+			while (x0 < 0 || x0 > 65536)
 			{
-				x0 = init_random.NextInt()/32768;
+				x0 = init_random.NextInt() / 32768;
 			}
 
-			while((c<0 || c>65536) || (c/2==0))
+			while ((c < 0 || c > 65536) || (c / 2 == 0))
 			{
-				c = init_random.NextInt()/32768 + 1;
+				c = init_random.NextInt() / 32768 + 1;
 			}
 
-			BigInteger [] qp = new BigInteger[2];
+			BigInteger[] qp = new BigInteger[2];
 			BigInteger q = null, Q = null, p = null;
 			BigInteger C = BigInteger.ValueOf(c);
 			BigInteger constA16 = BigInteger.ValueOf(19381);
@@ -298,28 +301,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 			BigInteger qQ = q.Multiply(Q);
 
-step3:
-			for(;;)
+			step3:
+			for (;;)
 			{
 				//step 3
-				for (int j=0; j<64; j++)
+				for (int j = 0; j < 64; j++)
 				{
-					y[j+1] = (y[j].Multiply(constA16).Add(C)).Mod(BigInteger.Two.Pow(16));
+					y[j + 1] = (y[j].Multiply(constA16).Add(C)).Mod(BigInteger.Two.Pow(16));
 				}
 
 				//step 4
 				BigInteger Y = BigInteger.Zero;
 
-				for (int j=0; j<64; j++)
+				for (int j = 0; j < 64; j++)
 				{
-					Y = Y.Add(y[j].ShiftLeft(16*j));
+					Y = Y.Add(y[j].ShiftLeft(16 * j));
 				}
 
 				y[0] = y[64]; //step 5
 
 				//step 6
-				BigInteger N = BigInteger.One.ShiftLeft(tp-1).Divide(qQ).Add(
-					Y.ShiftLeft(tp-1).Divide(qQ.ShiftLeft(1024)));
+				BigInteger N = BigInteger.One.ShiftLeft(tp - 1).Divide(qQ).Add(
+					Y.ShiftLeft(tp - 1).Divide(qQ.ShiftLeft(1024)));
 
 				if (N.TestBit(0))
 				{
@@ -328,7 +331,7 @@ step3:
 
 				//step 7
 
-				for(;;)
+				for (;;)
 				{
 					//step 11
 					BigInteger qQN = qQ.Multiply(N);
@@ -342,7 +345,7 @@ step3:
 
 					//step10
 					if (BigInteger.Two.ModPow(qQN, p).CompareTo(BigInteger.One) == 0
-						&& BigInteger.Two.ModPow(q.Multiply(N), p).CompareTo(BigInteger.One) != 0)
+					    && BigInteger.Two.ModPow(q.Multiply(N), p).CompareTo(BigInteger.One) != 0)
 					{
 						pq[0] = p;
 						pq[1] = q;
@@ -358,17 +361,17 @@ step3:
 		private void procedure_Bb(long x0, long c, BigInteger[] pq)
 		{
 			//Verify and perform condition: 0<x<2^32; 0<c<2^32; c - odd.
-			while(x0<0 || x0>4294967296L)
+			while (x0 < 0 || x0 > 4294967296L)
 			{
-				x0 = init_random.NextInt()*2;
+				x0 = init_random.NextInt() * 2;
 			}
 
-			while((c<0 || c>4294967296L) || (c/2==0))
+			while ((c < 0 || c > 4294967296L) || (c / 2 == 0))
 			{
-				c = init_random.NextInt()*2+1;
+				c = init_random.NextInt() * 2 + 1;
 			}
 
-			BigInteger [] qp = new BigInteger[2];
+			BigInteger[] qp = new BigInteger[2];
 			BigInteger q = null, Q = null, p = null;
 			BigInteger C = BigInteger.ValueOf(c);
 			BigInteger constA32 = BigInteger.ValueOf(97781173);
@@ -388,27 +391,27 @@ step3:
 
 			BigInteger qQ = q.Multiply(Q);
 
-step3:
-			for(;;)
+			step3:
+			for (;;)
 			{
 				//step 3
-				for (int j=0; j<32; j++)
+				for (int j = 0; j < 32; j++)
 				{
-					y[j+1] = (y[j].Multiply(constA32).Add(C)).Mod(BigInteger.Two.Pow(32));
+					y[j + 1] = (y[j].Multiply(constA32).Add(C)).Mod(BigInteger.Two.Pow(32));
 				}
 
 				//step 4
 				BigInteger Y = BigInteger.Zero;
-				for (int j=0; j<32; j++)
+				for (int j = 0; j < 32; j++)
 				{
-					Y = Y.Add(y[j].ShiftLeft(32*j));
+					Y = Y.Add(y[j].ShiftLeft(32 * j));
 				}
 
 				y[0] = y[32]; //step 5
 
 				//step 6
-				BigInteger N = BigInteger.One.ShiftLeft(tp-1).Divide(qQ).Add(
-					Y.ShiftLeft(tp-1).Divide(qQ.ShiftLeft(1024)));
+				BigInteger N = BigInteger.One.ShiftLeft(tp - 1).Divide(qQ).Add(
+					Y.ShiftLeft(tp - 1).Divide(qQ.ShiftLeft(1024)));
 
 				if (N.TestBit(0))
 				{
@@ -417,7 +420,7 @@ step3:
 
 				//step 7
 
-				for(;;)
+				for (;;)
 				{
 					//step 11
 					BigInteger qQN = qQ.Multiply(N);
@@ -431,7 +434,7 @@ step3:
 
 					//step10
 					if (BigInteger.Two.ModPow(qQN, p).CompareTo(BigInteger.One) == 0
-						&& BigInteger.Two.ModPow(q.Multiply(N), p).CompareTo(BigInteger.One) != 0)
+					    && BigInteger.Two.ModPow(q.Multiply(N), p).CompareTo(BigInteger.One) != 0)
 					{
 						pq[0] = p;
 						pq[1] = q;
@@ -454,7 +457,7 @@ step3:
 			BigInteger pSub1 = p.Subtract(BigInteger.One);
 			BigInteger pSub1Divq = pSub1.Divide(q);
 
-			for(;;)
+			for (;;)
 			{
 				BigInteger d = new BigInteger(p.BitLength, init_random);
 
@@ -477,18 +480,18 @@ step3:
 		 */
 		public Gost3410Parameters GenerateParameters()
 		{
-			BigInteger [] pq = new BigInteger[2];
-			BigInteger    q = null, p = null, a = null;
+			BigInteger[] pq = new BigInteger[2];
+			BigInteger q = null, p = null, a = null;
 
-			int  x0, c;
-			long  x0L, cL;
+			int x0, c;
+			long x0L, cL;
 
-			if (typeproc==1)
+			if (typeproc == 1)
 			{
 				x0 = init_random.NextInt();
-				c  = init_random.NextInt();
+				c = init_random.NextInt();
 
-				switch(size)
+				switch (size)
 				{
 					case 512:
 						procedure_A(x0, c, pq, 512);
@@ -499,7 +502,9 @@ step3:
 					default:
 						throw new ArgumentException("Ooops! key size 512 or 1024 bit.");
 				}
-				p = pq[0];  q = pq[1];
+
+				p = pq[0];
+				q = pq[1];
 				a = procedure_C(p, q);
 				//System.out.println("p:"+p.toString(16)+"\n"+"q:"+q.toString(16)+"\n"+"a:"+a.toString(16));
 				//System.out.println("p:"+p+"\n"+"q:"+q+"\n"+"a:"+a);
@@ -508,9 +513,9 @@ step3:
 			else
 			{
 				x0L = init_random.NextLong();
-				cL  = init_random.NextLong();
+				cL = init_random.NextLong();
 
-				switch(size)
+				switch (size)
 				{
 					case 512:
 						procedure_Aa(x0L, cL, pq, 512);
@@ -521,7 +526,9 @@ step3:
 					default:
 						throw new InvalidOperationException("Ooops! key size 512 or 1024 bit.");
 				}
-				p = pq[0];  q = pq[1];
+
+				p = pq[0];
+				q = pq[1];
 				a = procedure_C(p, q);
 				//System.out.println("p:"+p.toString(16)+"\n"+"q:"+q.toString(16)+"\n"+"a:"+a.toString(16));
 				//System.out.println("p:"+p+"\n"+"q:"+q+"\n"+"a:"+a);

@@ -1,40 +1,39 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
-    public class DHValidationParameters
-    {
-        private readonly byte[] seed;
-        private readonly int counter;
+	public class DHValidationParameters
+	{
+		private readonly byte[] seed;
+		private readonly int counter;
 
 		public DHValidationParameters(
-            byte[]	seed,
-            int		counter)
-        {
+			byte[] seed,
+			int counter)
+		{
 			if (seed == null)
 				throw new ArgumentNullException("seed");
 
-			this.seed = (byte[]) seed.Clone();
-            this.counter = counter;
-        }
+			this.seed = (byte[])seed.Clone();
+			this.counter = counter;
+		}
 
 		public byte[] GetSeed()
-        {
-            return (byte[]) seed.Clone();
-        }
+		{
+			return (byte[])seed.Clone();
+		}
 
 		public int Counter
-        {
-            get { return counter; }
-        }
+		{
+			get { return counter; }
+		}
 
 		public override bool Equals(
-            object obj)
-        {
+			object obj)
+		{
 			if (obj == this)
 				return true;
 
@@ -50,14 +49,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			DHValidationParameters other)
 		{
 			return counter == other.counter
-				&& Arrays.AreEqual(this.seed, other.seed);
+			       && Arrays.AreEqual(this.seed, other.seed);
 		}
 
 		public override int GetHashCode()
-        {
+		{
 			return counter.GetHashCode() ^ Arrays.GetHashCode(seed);
 		}
-    }
+	}
 }
 #pragma warning restore
 #endif

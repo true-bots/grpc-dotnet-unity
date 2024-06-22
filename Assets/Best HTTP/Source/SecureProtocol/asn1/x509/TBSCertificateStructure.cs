@@ -1,49 +1,48 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 {
-    /**
-     * The TbsCertificate object.
-     * <pre>
-     * TbsCertificate ::= Sequence {
-     *      version          [ 0 ]  Version DEFAULT v1(0),
-     *      serialNumber            CertificateSerialNumber,
-     *      signature               AlgorithmIdentifier,
-     *      issuer                  Name,
-     *      validity                Validity,
-     *      subject                 Name,
-     *      subjectPublicKeyInfo    SubjectPublicKeyInfo,
-     *      issuerUniqueID    [ 1 ] IMPLICIT UniqueIdentifier OPTIONAL,
-     *      subjectUniqueID   [ 2 ] IMPLICIT UniqueIdentifier OPTIONAL,
-     *      extensions        [ 3 ] Extensions OPTIONAL
-     *      }
-     * </pre>
-     * <p>
-     * Note: issuerUniqueID and subjectUniqueID are both deprecated by the IETF. This class
-     * will parse them, but you really shouldn't be creating new ones.</p>
-     */
+	/**
+	 * The TbsCertificate object.
+	 * <pre>
+	 * TbsCertificate ::= Sequence {
+	 *      version          [ 0 ]  Version DEFAULT v1(0),
+	 *      serialNumber            CertificateSerialNumber,
+	 *      signature               AlgorithmIdentifier,
+	 *      issuer                  Name,
+	 *      validity                Validity,
+	 *      subject                 Name,
+	 *      subjectPublicKeyInfo    SubjectPublicKeyInfo,
+	 *      issuerUniqueID    [ 1 ] IMPLICIT UniqueIdentifier OPTIONAL,
+	 *      subjectUniqueID   [ 2 ] IMPLICIT UniqueIdentifier OPTIONAL,
+	 *      extensions        [ 3 ] Extensions OPTIONAL
+	 *      }
+	 * </pre>
+	 * <p>
+	 * Note: issuerUniqueID and subjectUniqueID are both deprecated by the IETF. This class
+	 * will parse them, but you really shouldn't be creating new ones.</p>
+	 */
 	public class TbsCertificateStructure
 		: Asn1Encodable
 	{
-		internal Asn1Sequence            seq;
-		internal DerInteger              version;
-		internal DerInteger              serialNumber;
-		internal AlgorithmIdentifier     signature;
-		internal X509Name                issuer;
-		internal Time                    startDate, endDate;
-		internal X509Name                subject;
-		internal SubjectPublicKeyInfo    subjectPublicKeyInfo;
-		internal DerBitString            issuerUniqueID;
-		internal DerBitString            subjectUniqueID;
-		internal X509Extensions          extensions;
+		internal Asn1Sequence seq;
+		internal DerInteger version;
+		internal DerInteger serialNumber;
+		internal AlgorithmIdentifier signature;
+		internal X509Name issuer;
+		internal Time startDate, endDate;
+		internal X509Name subject;
+		internal SubjectPublicKeyInfo subjectPublicKeyInfo;
+		internal DerBitString issuerUniqueID;
+		internal DerBitString subjectUniqueID;
+		internal X509Extensions extensions;
 
 		public static TbsCertificateStructure GetInstance(
-			Asn1TaggedObject	obj,
-			bool				explicitly)
+			Asn1TaggedObject obj,
+			bool explicitly)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
 		}
@@ -52,7 +51,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj is TbsCertificateStructure)
-				return (TbsCertificateStructure) obj;
+				return (TbsCertificateStructure)obj;
 
 			if (obj != null)
 				return new TbsCertificateStructure(Asn1Sequence.GetInstance(obj));
@@ -76,25 +75,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			}
 			else
 			{
-				seqStart = -1;          // field 0 is missing!
+				seqStart = -1; // field 0 is missing!
 				version = new DerInteger(0);
 			}
 
-            bool isV1 = false;
-            bool isV2 = false;
+			bool isV1 = false;
+			bool isV2 = false;
 
-            if (version.HasValue(0))
-            {
-                isV1 = true;
-            }
-            else if (version.HasValue(1))
-            {
-                isV2 = true;
-            }
-            else if (!version.HasValue(2))
-            {
-                throw new ArgumentException("version number not recognised");
-            }
+			if (version.HasValue(0))
+			{
+				isV1 = true;
+			}
+			else if (version.HasValue(1))
+			{
+				isV2 = true;
+			}
+			else if (!version.HasValue(2))
+			{
+				throw new ArgumentException("version number not recognised");
+			}
 
 			serialNumber = DerInteger.GetInstance(seq[seqStart + 1]);
 
@@ -104,7 +103,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			//
 			// before and after dates
 			//
-			Asn1Sequence  dates = (Asn1Sequence)seq[seqStart + 4];
+			Asn1Sequence dates = (Asn1Sequence)seq[seqStart + 4];
 
 			startDate = Time.GetInstance(dates[0]);
 			endDate = Time.GetInstance(dates[1]);
@@ -116,45 +115,46 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			//
 			subjectPublicKeyInfo = SubjectPublicKeyInfo.GetInstance(seq[seqStart + 6]);
 
-            int extras = seq.Count - (seqStart + 6) - 1;
-            if (extras != 0 && isV1)
-                throw new ArgumentException("version 1 certificate contains extra data");
+			int extras = seq.Count - (seqStart + 6) - 1;
+			if (extras != 0 && isV1)
+				throw new ArgumentException("version 1 certificate contains extra data");
 
-            while (extras > 0)
+			while (extras > 0)
 			{
-                Asn1TaggedObject extra = Asn1TaggedObject.GetInstance(seq[seqStart + 6 + extras]);
+				Asn1TaggedObject extra = Asn1TaggedObject.GetInstance(seq[seqStart + 6 + extras]);
 				switch (extra.TagNo)
 				{
-				case 1:
-                {
-					issuerUniqueID = DerBitString.GetInstance(extra, false);
-					break;
-                }
-                case 2:
-                {
-                    subjectUniqueID = DerBitString.GetInstance(extra, false);
-                    break;
-                }
-				case 3:
-                {
-                    if (isV2)
-                        throw new ArgumentException("version 2 certificate cannot contain extensions");
+					case 1:
+					{
+						issuerUniqueID = DerBitString.GetInstance(extra, false);
+						break;
+					}
+					case 2:
+					{
+						subjectUniqueID = DerBitString.GetInstance(extra, false);
+						break;
+					}
+					case 3:
+					{
+						if (isV2)
+							throw new ArgumentException("version 2 certificate cannot contain extensions");
 
-                    extensions = X509Extensions.GetInstance(Asn1Sequence.GetInstance(extra, true));
-					break;
-                }
-                default:
-                {
-                    throw new ArgumentException("Unknown tag encountered in structure: " + extra.TagNo);
-                }
-                }
-                extras--;
+						extensions = X509Extensions.GetInstance(Asn1Sequence.GetInstance(extra, true));
+						break;
+					}
+					default:
+					{
+						throw new ArgumentException("Unknown tag encountered in structure: " + extra.TagNo);
+					}
+				}
+
+				extras--;
 			}
 		}
 
 		public int Version
 		{
-            get { return version.IntValueExact + 1; }
+			get { return version.IntValueExact + 1; }
 		}
 
 		public DerInteger VersionNumber
@@ -200,51 +200,51 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public DerBitString IssuerUniqueID
 		{
 			get { return issuerUniqueID; }
-        }
+		}
 
 		public DerBitString SubjectUniqueID
-        {
+		{
 			get { return subjectUniqueID; }
-        }
+		}
 
 		public X509Extensions Extensions
-        {
+		{
 			get { return extensions; }
-        }
+		}
 
 		public override Asn1Object ToAsn1Object()
-        {
-            string property = Org.BouncyCastle.Utilities.Platform.GetEnvironmentVariable("BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Allow_Non-DER_TBSCert");
-            if (null == property || Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase("true", property))
-                return seq;
+		{
+			string property = Org.BouncyCastle.Utilities.Platform.GetEnvironmentVariable("BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Allow_Non-DER_TBSCert");
+			if (null == property || Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase("true", property))
+				return seq;
 
-            Asn1EncodableVector v = new Asn1EncodableVector();
+			Asn1EncodableVector v = new Asn1EncodableVector();
 
-            // DEFAULT Zero
-            if (!version.HasValue(0))
-            {
-                v.Add(new DerTaggedObject(true, 0, version));
-            }
+			// DEFAULT Zero
+			if (!version.HasValue(0))
+			{
+				v.Add(new DerTaggedObject(true, 0, version));
+			}
 
-            v.Add(serialNumber, signature, issuer);
+			v.Add(serialNumber, signature, issuer);
 
 			//
 			// before and after dates
 			//
 			v.Add(new DerSequence(startDate, endDate));
 
-            if (subject != null)
-            {
-                v.Add(subject);
-            }
-            else
-            {
-                v.Add(DerSequence.Empty);
-            }
+			if (subject != null)
+			{
+				v.Add(subject);
+			}
+			else
+			{
+				v.Add(DerSequence.Empty);
+			}
 
-            v.Add(subjectPublicKeyInfo);
+			v.Add(subjectPublicKeyInfo);
 
-            // Note: implicit tag
+			// Note: implicit tag
 			v.AddOptionalTagged(false, 1, issuerUniqueID);
 
 			// Note: implicit tag
@@ -252,9 +252,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 			v.AddOptionalTagged(true, 3, extensions);
 
-            return new DerSequence(v);
-        }
-    }
+			return new DerSequence(v);
+		}
+	}
 }
 #pragma warning restore
 #endif

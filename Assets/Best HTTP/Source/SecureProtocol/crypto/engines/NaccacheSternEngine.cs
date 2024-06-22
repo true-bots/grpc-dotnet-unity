@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -34,14 +33,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*      org.bouncycastle.crypto.CipherParameters)
 		*/
 		public virtual void Init(
-			bool				forEncryption,
-			ICipherParameters	parameters)
+			bool forEncryption,
+			ICipherParameters parameters)
 		{
 			this.forEncryption = forEncryption;
 
 			if (parameters is ParametersWithRandom)
 			{
-				parameters = ((ParametersWithRandom) parameters).Parameters;
+				parameters = ((ParametersWithRandom)parameters).Parameters;
 			}
 
 			key = (NaccacheSternKeyParameters)parameters;
@@ -76,7 +75,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @see org.bouncycastle.crypto.AsymmetricBlockCipher#GetInputBlockSize()
 		*/
-        public virtual int GetInputBlockSize()
+		public virtual int GetInputBlockSize()
 		{
 			if (forEncryption)
 			{
@@ -96,7 +95,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @see org.bouncycastle.crypto.AsymmetricBlockCipher#GetOutputBlockSize()
 		*/
-        public virtual int GetOutputBlockSize()
+		public virtual int GetOutputBlockSize()
 		{
 			if (forEncryption)
 			{
@@ -117,10 +116,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @see org.bouncycastle.crypto.AsymmetricBlockCipher#ProcessBlock(byte[],
 		*      int, int)
 		*/
-        public virtual byte[] ProcessBlock(
-			byte[]	inBytes,
-			int		inOff,
-			int		length)
+		public virtual byte[] ProcessBlock(
+			byte[] inBytes,
+			int inOff,
+			int length)
 		{
 			if (key == null)
 				throw new InvalidOperationException("NaccacheStern engine not initialised");
@@ -157,11 +156,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					if (lookup[i].Count != primes[i].IntValue)
 					{
 						throw new InvalidCipherTextException("Error in lookup Array for "
-										+ primes[i].IntValue
-										+ ": Size mismatch. Expected ArrayList with length "
-										+ primes[i].IntValue + " but found ArrayList of length "
-										+ lookup[i].Count);
+						                                     + primes[i].IntValue
+						                                     + ": Size mismatch. Expected ArrayList with length "
+						                                     + primes[i].IntValue + " but found ArrayList of length "
+						                                     + lookup[i].Count);
 					}
+
 					int lookedup = al.IndexOf(exp);
 
 					if (lookedup == -1)
@@ -169,6 +169,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 					plain.Add(BigInteger.ValueOf(lookedup));
 				}
+
 				BigInteger test = ChineseRemainder(plain, primes);
 
 				// Should not be used as an oracle, so reencrypt output to see
@@ -199,7 +200,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @return The byte[] representation of the encrypted BigInteger (i.e.
 		*         crypted.toByteArray())
 		*/
-        public virtual byte[] Encrypt(
+		public virtual byte[] Encrypt(
 			BigInteger plain)
 		{
 			// Always return modulus size values 0-padded at the beginning
@@ -223,7 +224,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @return encrypt((block1 + block2) mod sigma)
 		* @throws InvalidCipherTextException
 		*/
-        public virtual byte[] AddCryptedBlocks(
+		public virtual byte[] AddCryptedBlocks(
 			byte[] block1,
 			byte[] block2)
 		{
@@ -231,19 +232,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (forEncryption)
 			{
 				if ((block1.Length > GetOutputBlockSize())
-						|| (block2.Length > GetOutputBlockSize()))
+				    || (block2.Length > GetOutputBlockSize()))
 				{
 					throw new InvalidCipherTextException(
-							"BlockLength too large for simple addition.\n");
+						"BlockLength too large for simple addition.\n");
 				}
 			}
 			else
 			{
 				if ((block1.Length > GetInputBlockSize())
-						|| (block2.Length > GetInputBlockSize()))
+				    || (block2.Length > GetInputBlockSize()))
 				{
 					throw new InvalidCipherTextException(
-							"BlockLength too large for simple addition.\n");
+						"BlockLength too large for simple addition.\n");
 				}
 			}
 
@@ -273,7 +274,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @return the data after it went through the NaccacheSternEngine.
 		* @throws InvalidCipherTextException
 		*/
-        public virtual byte[] ProcessData(
+		public virtual byte[] ProcessData(
 			byte[] data)
 		{
 			if (data.Length > GetInputBlockSize())
@@ -296,6 +297,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 						tmp = ProcessBlock(data, datapos, data.Length - datapos);
 						datapos += data.Length - datapos;
 					}
+
 					if (tmp != null)
 					{
 						tmp.CopyTo(retval, retpos);
@@ -306,6 +308,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 						throw new InvalidCipherTextException("cipher returned null");
 					}
 				}
+
 				byte[] ret = new byte[retpos];
 				Array.Copy(retval, 0, ret, 0, retpos);
 				return ret;
@@ -334,6 +337,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				all = all.Multiply(primes[i]);
 			}
+
 			for (int i = 0; i < primes.Count; i++)
 			{
 				BigInteger a = primes[i];

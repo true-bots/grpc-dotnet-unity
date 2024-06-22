@@ -20,10 +20,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		private static readonly BigInteger Sixteen = BigInteger.ValueOf(16);
 		private static readonly BigInteger Six = BigInteger.ValueOf(6);
 
-		private static readonly byte[] shadows = { 0xe, 0x3, 0x5, 0x8, 0x9, 0x4, 0x2, 0xf,
-			0x0, 0xd, 0xb, 0x6, 0x7, 0xa, 0xc, 0x1 };
-		private static readonly byte[] inverse = { 0x8, 0xf, 0x6, 0x1, 0x5, 0x2, 0xb, 0xc,
-			0x3, 0x4, 0xd, 0xa, 0xe, 0x9, 0x0, 0x7 };
+		private static readonly byte[] shadows =
+		{
+			0xe, 0x3, 0x5, 0x8, 0x9, 0x4, 0x2, 0xf,
+			0x0, 0xd, 0xb, 0x6, 0x7, 0xa, 0xc, 0x1
+		};
+
+		private static readonly byte[] inverse =
+		{
+			0x8, 0xf, 0x6, 0x1, 0x5, 0x2, 0xb, 0xc,
+			0x3, 0x4, 0xd, 0xa, 0xe, 0x9, 0x0, 0x7
+		};
 
 		private readonly IAsymmetricBlockCipher engine;
 		private bool forEncryption;
@@ -40,9 +47,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 
 		public IAsymmetricBlockCipher UnderlyingCipher => engine;
 
-        public void Init(bool forEncryption, ICipherParameters parameters)
-        {
-            RsaKeyParameters kParam;
+		public void Init(bool forEncryption, ICipherParameters parameters)
+		{
+			RsaKeyParameters kParam;
 			if (parameters is ParametersWithRandom withRandom)
 			{
 				kParam = (RsaKeyParameters)withRandom.Parameters;
@@ -101,7 +108,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		* pad bits.
 		*/
 		public void SetPadBits(
-			int     padBits)
+			int padBits)
 		{
 			if (padBits > 7)
 			{
@@ -120,9 +127,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		}
 
 		public byte[] ProcessBlock(
-			byte[]	input,
-			int		inOff,
-			int		length)
+			byte[] input,
+			int inOff,
+			int length)
 		{
 			if (forEncryption)
 			{
@@ -135,14 +142,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		}
 
 		private byte[] EncodeBlock(
-			byte[]	input,
-			int		inOff,
-			int		inLen)
+			byte[] input,
+			int inOff,
+			int inLen)
 		{
-			byte[]  block = new byte[(bitSize + 7) / 8];
-			int     r = padBits + 1;
-			int     z = inLen;
-			int     t = (bitSize + 13) / 16;
+			byte[] block = new byte[(bitSize + 7) / 8];
+			int r = padBits + 1;
+			int z = inLen;
+			int t = (bitSize + 13) / 16;
 
 			for (int i = 0; i < t; i += z)
 			{
@@ -161,12 +168,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			{
 				byte val = block[block.Length - t + i / 2];
 
-				block[i] = (byte)((shadows[(uint) (val & 0xff) >> 4] << 4)
-					| shadows[val & 0x0f]);
+				block[i] = (byte)((shadows[(uint)(val & 0xff) >> 4] << 4)
+				                  | shadows[val & 0x0f]);
 				block[i + 1] = val;
 			}
 
-			block[block.Length - 2 * z] ^= (byte) r;
+			block[block.Length - 2 * z] ^= (byte)r;
 			block[block.Length - 1] = (byte)((block[block.Length - 1] << 4) | 0x06);
 
 			int maxBit = (8 - (bitSize - 1) % 8);
@@ -174,8 +181,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 
 			if (maxBit != 8)
 			{
-				block[0] &= (byte) ((ushort) 0xff >> maxBit);
-				block[0] |= (byte) ((ushort) 0x80 >> maxBit);
+				block[0] &= (byte)((ushort)0xff >> maxBit);
+				block[0] |= (byte)((ushort)0x80 >> maxBit);
 			}
 			else
 			{
@@ -191,13 +198,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		* @exception InvalidCipherTextException if the decrypted block is not a valid ISO 9796 bit string
 		*/
 		private byte[] DecodeBlock(
-			byte[]	input,
-			int		inOff,
-			int		inLen)
+			byte[] input,
+			int inOff,
+			int inLen)
 		{
-			byte[]  block = engine.ProcessBlock(input, inOff, inLen);
-			int     r = 1;
-			int     t = (bitSize + 13) / 16;
+			byte[] block = engine.ProcessBlock(input, inOff, inLen);
+			int r = 1;
+			int t = (bitSize + 13) / 16;
 
 			BigInteger iS = new BigInteger(1, block);
 			BigInteger iR;
@@ -220,18 +227,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 
 			block[block.Length - 1] =
 				(byte)(((ushort)(block[block.Length - 1] & 0xff) >> 4)
-				| ((inverse[(block[block.Length - 2] & 0xff) >> 4]) << 4));
+				       | ((inverse[(block[block.Length - 2] & 0xff) >> 4]) << 4));
 
-			block[0] = (byte)((shadows[(uint) (block[1] & 0xff) >> 4] << 4)
-				| shadows[block[1] & 0x0f]);
+			block[0] = (byte)((shadows[(uint)(block[1] & 0xff) >> 4] << 4)
+			                  | shadows[block[1] & 0x0f]);
 
 			bool boundaryFound = false;
 			int boundary = 0;
 
 			for (int i = block.Length - 1; i >= block.Length - 2 * t; i -= 2)
 			{
-				int val = ((shadows[(uint) (block[i] & 0xff) >> 4] << 4)
-					| shadows[block[i] & 0x0f]);
+				int val = ((shadows[(uint)(block[i] & 0xff) >> 4] << 4)
+				           | shadows[block[i] & 0x0f]);
 
 				if (((block[i - 1] ^ val) & 0xff) != 0)
 				{

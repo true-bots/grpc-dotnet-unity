@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -10,9 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class PkiStatusInfo
 		: Asn1Encodable
 	{
-		DerInteger      status;
-		PkiFreeText     statusString;
-		DerBitString    failInfo;
+		DerInteger status;
+		PkiFreeText statusString;
+		DerBitString failInfo;
 
 		public static PkiStatusInfo GetInstance(
 			Asn1TaggedObject obj,
@@ -33,7 +32,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new PkiStatusInfo((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public PkiStatusInfo(
@@ -76,17 +75,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		 * @param statusString
 		 */
 		public PkiStatusInfo(
-			int			status,
-			PkiFreeText	statusString)
+			int status,
+			PkiFreeText statusString)
 		{
 			this.status = new DerInteger(status);
 			this.statusString = statusString;
 		}
 
 		public PkiStatusInfo(
-			int				status,
-			PkiFreeText		statusString,
-			PkiFailureInfo	failInfo)
+			int status,
+			PkiFreeText statusString,
+			PkiFailureInfo failInfo)
 		{
 			this.status = new DerInteger(status);
 			this.statusString = statusString;
@@ -95,26 +94,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 
 		public BigInteger Status
 		{
-			get
-			{
-				return status.Value;
-			}
+			get { return status.Value; }
 		}
 
 		public PkiFreeText StatusString
 		{
-			get
-			{
-				return statusString;
-			}
+			get { return statusString; }
 		}
 
 		public DerBitString FailInfo
 		{
-			get
-			{
-				return failInfo;
-			}
+			get { return failInfo; }
 		}
 
 		/**
@@ -151,7 +141,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(status);
-            v.AddOptional(statusString, failInfo);
+			v.AddOptional(statusString, failInfo);
 			return new DerSequence(v);
 		}
 	}

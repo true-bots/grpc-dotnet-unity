@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -10,19 +9,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 	public class MessageImprint
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier	hashAlgorithm;
-		private readonly byte[]					hashedMessage;
+		private readonly AlgorithmIdentifier hashAlgorithm;
+		private readonly byte[] hashedMessage;
 
-        public static MessageImprint GetInstance(object obj)
-        {
-            if (obj is MessageImprint)
-                return (MessageImprint)obj;
-            if (obj == null)
-                return null;
-            return new MessageImprint(Asn1Sequence.GetInstance(obj));
-        }
+		public static MessageImprint GetInstance(object obj)
+		{
+			if (obj is MessageImprint)
+				return (MessageImprint)obj;
+			if (obj == null)
+				return null;
+			return new MessageImprint(Asn1Sequence.GetInstance(obj));
+		}
 
-        private MessageImprint(
+		private MessageImprint(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
@@ -33,8 +32,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 		}
 
 		public MessageImprint(
-			AlgorithmIdentifier	hashAlgorithm,
-			byte[]				hashedMessage)
+			AlgorithmIdentifier hashAlgorithm,
+			byte[] hashedMessage)
 		{
 			this.hashAlgorithm = hashAlgorithm;
 			this.hashedMessage = hashedMessage;

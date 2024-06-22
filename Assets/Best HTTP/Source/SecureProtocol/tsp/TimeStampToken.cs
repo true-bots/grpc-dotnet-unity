@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Nist;
@@ -21,11 +20,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 {
 	public class TimeStampToken
 	{
-		private readonly CmsSignedData		tsToken;
-		private readonly SignerInformation	tsaSignerInfo;
+		private readonly CmsSignedData tsToken;
+
+		private readonly SignerInformation tsaSignerInfo;
+
 //		private readonly DateTime			genTime;
-		private readonly TimeStampTokenInfo	tstInfo;
-		private readonly CertID				certID;
+		private readonly TimeStampTokenInfo tstInfo;
+		private readonly CertID certID;
 
 		public TimeStampToken(
 			Asn1.Cms.ContentInfo contentInfo)
@@ -48,8 +49,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			if (signers.Count != 1)
 			{
 				throw new ArgumentException("Time-stamp token signed by "
-					+ signers.Count
-					+ " signers, but it must contain just the TSA signature.");
+				                            + signers.Count
+				                            + " signers, but it must contain just the TSA signature.");
 			}
 
 
@@ -85,7 +86,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 				if (attr != null)
 				{
-
 					if (attr.AttrValues[0] is SigningCertificateV2)
 					{
 						SigningCertificateV2 signCert = SigningCertificateV2.GetInstance(attr.AttrValues[0]);
@@ -178,7 +178,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 					for (int i = 0; i != names.Length; i++)
 					{
 						if (names[i].TagNo == 4
-							&& X509Name.GetInstance(names[i].Name).Equivalent(principal))
+						    && X509Name.GetInstance(names[i].Name).Equivalent(principal))
 						{
 							found = true;
 							break;
@@ -236,18 +236,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		 */
 		public byte[] GetEncoded()
 		{
-            return tsToken.GetEncoded(Asn1Encodable.Der);
-        }
+			return tsToken.GetEncoded(Asn1Encodable.Der);
+		}
 
-        /**
-         * return the ASN.1 encoded representation of this object using the specified encoding.
-         *
-         * @param encoding the ASN.1 encoding format to use ("BER" or "DER").
-         */
-        public byte[] GetEncoded(string encoding)
-        {
-            return tsToken.GetEncoded(encoding);
-        }
+		/**
+		 * return the ASN.1 encoded representation of this object using the specified encoding.
+		 *
+		 * @param encoding the ASN.1 encoding format to use ("BER" or "DER").
+		 */
+		public byte[] GetEncoded(string encoding)
+		{
+			return tsToken.GetEncoded(encoding);
+		}
 
 		// perhaps this should be done using an interface on the ASN.1 classes...
 		private class CertID
@@ -272,24 +272,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 				if (certID != null)
 					return "SHA-1";
 
-                if (NistObjectIdentifiers.IdSha256.Equals(certIDv2.HashAlgorithm.Algorithm))
+				if (NistObjectIdentifiers.IdSha256.Equals(certIDv2.HashAlgorithm.Algorithm))
 					return "SHA-256";
 
-                return certIDv2.HashAlgorithm.Algorithm.Id;
+				return certIDv2.HashAlgorithm.Algorithm.Id;
 			}
 
 			public AlgorithmIdentifier GetHashAlgorithm()
 			{
 				return (certID != null)
-					?	new AlgorithmIdentifier(OiwObjectIdentifiers.IdSha1)
-					:	certIDv2.HashAlgorithm;
+					? new AlgorithmIdentifier(OiwObjectIdentifiers.IdSha1)
+					: certIDv2.HashAlgorithm;
 			}
 
 			public byte[] GetCertHash()
 			{
 				return certID != null
-					?	certID.GetCertHash()
-					:	certIDv2.GetCertHash();
+					? certID.GetCertHash()
+					: certIDv2.GetCertHash();
 			}
 
 			public IssuerSerial IssuerSerial
@@ -297,8 +297,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 				get
 				{
 					return certID != null
-						?	certID.IssuerSerial
-						:	certIDv2.IssuerSerial;
+						? certID.IssuerSerial
+						: certIDv2.IssuerSerial;
 				}
 			}
 		}

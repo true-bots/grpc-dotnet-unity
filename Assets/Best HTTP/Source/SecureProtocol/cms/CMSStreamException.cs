@@ -6,10 +6,10 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-    [Serializable]
-    public class CmsStreamException
-        : IOException
-    {
+	[Serializable]
+	public class CmsStreamException
+		: IOException
+	{
 		public CmsStreamException()
 			: base()
 		{

@@ -1,45 +1,44 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 {
-    public class KMac
-        : IMac, IXof
-    {
-        private static readonly byte[] padding = new byte[100];
+	public class KMac
+		: IMac, IXof
+	{
+		private static readonly byte[] padding = new byte[100];
 
-        private readonly CShakeDigest cshake;
-        private readonly int bitLength;
-        private readonly int outputLength;
+		private readonly CShakeDigest cshake;
+		private readonly int bitLength;
+		private readonly int outputLength;
 
-        private byte[] key;
-        private bool initialised;
-        private bool firstOutput;
+		private byte[] key;
+		private bool initialised;
+		private bool firstOutput;
 
-        public KMac(int bitLength, byte[] S)
-        {
-            this.cshake = new CShakeDigest(bitLength, Strings.ToAsciiByteArray("KMAC"), S);
-            this.bitLength = bitLength;
-            this.outputLength = bitLength * 2 / 8;
-        }
+		public KMac(int bitLength, byte[] S)
+		{
+			this.cshake = new CShakeDigest(bitLength, Strings.ToAsciiByteArray("KMAC"), S);
+			this.bitLength = bitLength;
+			this.outputLength = bitLength * 2 / 8;
+		}
 
-        public string AlgorithmName
-        {
-            get { return "KMAC" + cshake.AlgorithmName.Substring(6); }
-        }
+		public string AlgorithmName
+		{
+			get { return "KMAC" + cshake.AlgorithmName.Substring(6); }
+		}
 
-        public void BlockUpdate(byte[] input, int inOff, int len)
-        {
-            if (!initialised)
-                throw new InvalidOperationException("KMAC not initialized");
+		public void BlockUpdate(byte[] input, int inOff, int len)
+		{
+			if (!initialised)
+				throw new InvalidOperationException("KMAC not initialized");
 
-            cshake.BlockUpdate(input, inOff, len);
-        }
+			cshake.BlockUpdate(input, inOff, len);
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public void BlockUpdate(ReadOnlySpan<byte> input)
@@ -51,24 +50,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
         }
 #endif
 
-        public int DoFinal(byte[] output, int outOff)
-        {
-            if (firstOutput)
-            {
-                if (!initialised)
-                    throw new InvalidOperationException("KMAC not initialized");
+		public int DoFinal(byte[] output, int outOff)
+		{
+			if (firstOutput)
+			{
+				if (!initialised)
+					throw new InvalidOperationException("KMAC not initialized");
 
-                byte[] encOut = XofUtilities.RightEncode(GetMacSize() * 8);
+				byte[] encOut = XofUtilities.RightEncode(GetMacSize() * 8);
 
-                cshake.BlockUpdate(encOut, 0, encOut.Length);
-            }
+				cshake.BlockUpdate(encOut, 0, encOut.Length);
+			}
 
-            int rv = cshake.OutputFinal(output, outOff, GetMacSize());
+			int rv = cshake.OutputFinal(output, outOff, GetMacSize());
 
-            Reset();
+			Reset();
 
-            return rv;
-        }
+			return rv;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public int DoFinal(Span<byte> output)
@@ -91,24 +90,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
         }
 #endif
 
-        public int OutputFinal(byte[] output, int outOff, int outLen)
-        {
-            if (firstOutput)
-            {
-                if (!initialised)
-                    throw new InvalidOperationException("KMAC not initialized");
+		public int OutputFinal(byte[] output, int outOff, int outLen)
+		{
+			if (firstOutput)
+			{
+				if (!initialised)
+					throw new InvalidOperationException("KMAC not initialized");
 
-                byte[] encOut = XofUtilities.RightEncode(outLen * 8);
+				byte[] encOut = XofUtilities.RightEncode(outLen * 8);
 
-                cshake.BlockUpdate(encOut, 0, encOut.Length);
-            }
+				cshake.BlockUpdate(encOut, 0, encOut.Length);
+			}
 
-            int rv = cshake.OutputFinal(output, outOff, outLen);
+			int rv = cshake.OutputFinal(output, outOff, outLen);
 
-            Reset();
+			Reset();
 
-            return rv;
-        }
+			return rv;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public int OutputFinal(Span<byte> output)
@@ -131,22 +130,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
         }
 #endif
 
-        public int Output(byte[] output, int outOff, int outLen)
-        {
-            if (firstOutput)
-            {
-                if (!initialised)
-                    throw new InvalidOperationException("KMAC not initialized");
+		public int Output(byte[] output, int outOff, int outLen)
+		{
+			if (firstOutput)
+			{
+				if (!initialised)
+					throw new InvalidOperationException("KMAC not initialized");
 
-                byte[] encOut = XofUtilities.RightEncode(0);
+				byte[] encOut = XofUtilities.RightEncode(0);
 
-                cshake.BlockUpdate(encOut, 0, encOut.Length);
+				cshake.BlockUpdate(encOut, 0, encOut.Length);
 
-                firstOutput = false;
-            }
+				firstOutput = false;
+			}
 
-            return cshake.Output(output, outOff, outLen);
-        }
+			return cshake.Output(output, outOff, outLen);
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public int Output(Span<byte> output)
@@ -167,82 +166,82 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
         }
 #endif
 
-        public int GetByteLength()
-        {
-            return cshake.GetByteLength();
-        }
+		public int GetByteLength()
+		{
+			return cshake.GetByteLength();
+		}
 
-        public int GetDigestSize()
-        {
-            return outputLength;
-        }
+		public int GetDigestSize()
+		{
+			return outputLength;
+		}
 
-        public int GetMacSize()
-        {
-            return outputLength;
-        }
+		public int GetMacSize()
+		{
+			return outputLength;
+		}
 
-        public void Init(ICipherParameters parameters)
-        {
-            KeyParameter kParam = (KeyParameter)parameters;
-            this.key = Arrays.Clone(kParam.GetKey());
-            this.initialised = true;
-            Reset();
-        }
+		public void Init(ICipherParameters parameters)
+		{
+			KeyParameter kParam = (KeyParameter)parameters;
+			this.key = Arrays.Clone(kParam.GetKey());
+			this.initialised = true;
+			Reset();
+		}
 
-        public void Reset()
-        {
-            cshake.Reset();
+		public void Reset()
+		{
+			cshake.Reset();
 
-            if (key != null)
-            {
-                if (bitLength == 128)
-                {
-                    bytePad(key, 168);
-                }
-                else
-                {
-                    bytePad(key, 136);
-                }
-            }
+			if (key != null)
+			{
+				if (bitLength == 128)
+				{
+					bytePad(key, 168);
+				}
+				else
+				{
+					bytePad(key, 136);
+				}
+			}
 
-            firstOutput = true;
-        }
+			firstOutput = true;
+		}
 
-        private void bytePad(byte[] X, int w)
-        {
-            byte[] bytes = XofUtilities.LeftEncode(w);
-            BlockUpdate(bytes, 0, bytes.Length);
-            byte[] encX = encode(X);
-            BlockUpdate(encX, 0, encX.Length);
+		private void bytePad(byte[] X, int w)
+		{
+			byte[] bytes = XofUtilities.LeftEncode(w);
+			BlockUpdate(bytes, 0, bytes.Length);
+			byte[] encX = encode(X);
+			BlockUpdate(encX, 0, encX.Length);
 
-            int required = w - ((bytes.Length + encX.Length) % w);
+			int required = w - ((bytes.Length + encX.Length) % w);
 
-            if (required > 0 && required != w)
-            {
-                while (required > padding.Length)
-                {
-                    BlockUpdate(padding, 0, padding.Length);
-                    required -= padding.Length;
-                }
+			if (required > 0 && required != w)
+			{
+				while (required > padding.Length)
+				{
+					BlockUpdate(padding, 0, padding.Length);
+					required -= padding.Length;
+				}
 
-                BlockUpdate(padding, 0, required);
-            }
-        }
+				BlockUpdate(padding, 0, required);
+			}
+		}
 
-        private static byte[] encode(byte[] X)
-        {
-            return Arrays.Concatenate(XofUtilities.LeftEncode(X.Length * 8), X);
-        }
+		private static byte[] encode(byte[] X)
+		{
+			return Arrays.Concatenate(XofUtilities.LeftEncode(X.Length * 8), X);
+		}
 
-        public void Update(byte input)
-        {
-            if (!initialised)
-                throw new InvalidOperationException("KMAC not initialized");
+		public void Update(byte input)
+		{
+			if (!initialised)
+				throw new InvalidOperationException("KMAC not initialized");
 
-            cshake.Update(input);
-        }
-    }
+			cshake.Update(input);
+		}
+	}
 }
 #pragma warning restore
 #endif

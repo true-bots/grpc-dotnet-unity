@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms.Ecc
@@ -9,12 +8,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms.Ecc
 	public class MQVuserKeyingMaterial
 		: Asn1Encodable
 	{
-		private OriginatorPublicKey	ephemeralPublicKey;
-		private Asn1OctetString		addedukm;
+		private OriginatorPublicKey ephemeralPublicKey;
+		private Asn1OctetString addedukm;
 
 		public MQVuserKeyingMaterial(
-			OriginatorPublicKey	ephemeralPublicKey,
-			Asn1OctetString		addedukm)
+			OriginatorPublicKey ephemeralPublicKey,
+			Asn1OctetString addedukm)
 		{
 			// TODO Check ephemeralPublicKey not null
 
@@ -46,8 +45,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms.Ecc
 		 *                                  tagged object cannot be converted.
 		 */
 		public static MQVuserKeyingMaterial GetInstance(
-			Asn1TaggedObject	obj,
-			bool				isExplicit)
+			Asn1TaggedObject obj,
+			bool isExplicit)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, isExplicit));
 		}
@@ -59,7 +58,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms.Ecc
 		 * @throws ArgumentException if the object cannot be converted.
 		 */
 		public static MQVuserKeyingMaterial GetInstance(
-			object	obj)
+			object obj)
 		{
 			if (obj == null || obj is MQVuserKeyingMaterial)
 			{
@@ -71,9 +70,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms.Ecc
 				return new MQVuserKeyingMaterial((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("Invalid MQVuserKeyingMaterial: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid MQVuserKeyingMaterial: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
 		}
-		
+
 		public OriginatorPublicKey EphemeralPublicKey
 		{
 			get { return ephemeralPublicKey; }
@@ -95,7 +94,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms.Ecc
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(ephemeralPublicKey);
-            v.AddOptionalTagged(true, 0, addedukm);
+			v.AddOptionalTagged(true, 0, addedukm);
 			return new DerSequence(v);
 		}
 	}

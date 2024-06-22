@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.GM;
@@ -25,58 +24,58 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 	public class TspUtil
 	{
 		private static readonly Dictionary<string, int> DigestLengths = new Dictionary<string, int>();
-        private static readonly Dictionary<string, string> DigestNames = new Dictionary<string, string>();
+		private static readonly Dictionary<string, string> DigestNames = new Dictionary<string, string>();
 
 		static TspUtil()
 		{
 			DigestLengths.Add(PkcsObjectIdentifiers.MD5.Id, 16);
-            DigestLengths.Add(OiwObjectIdentifiers.IdSha1.Id, 20);
-            DigestLengths.Add(NistObjectIdentifiers.IdSha224.Id, 28);
-            DigestLengths.Add(NistObjectIdentifiers.IdSha256.Id, 32);
-            DigestLengths.Add(NistObjectIdentifiers.IdSha384.Id, 48);
-            DigestLengths.Add(NistObjectIdentifiers.IdSha512.Id, 64);
-            DigestLengths.Add(TeleTrusTObjectIdentifiers.RipeMD128.Id, 16);
-            DigestLengths.Add(TeleTrusTObjectIdentifiers.RipeMD160.Id, 20);
-            DigestLengths.Add(TeleTrusTObjectIdentifiers.RipeMD256.Id, 32);
-            DigestLengths.Add(CryptoProObjectIdentifiers.GostR3411.Id, 32);
-            DigestLengths.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256.Id, 32);
-            DigestLengths.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_512.Id, 64);
-            DigestLengths.Add(GMObjectIdentifiers.sm3.Id, 32);
+			DigestLengths.Add(OiwObjectIdentifiers.IdSha1.Id, 20);
+			DigestLengths.Add(NistObjectIdentifiers.IdSha224.Id, 28);
+			DigestLengths.Add(NistObjectIdentifiers.IdSha256.Id, 32);
+			DigestLengths.Add(NistObjectIdentifiers.IdSha384.Id, 48);
+			DigestLengths.Add(NistObjectIdentifiers.IdSha512.Id, 64);
+			DigestLengths.Add(TeleTrusTObjectIdentifiers.RipeMD128.Id, 16);
+			DigestLengths.Add(TeleTrusTObjectIdentifiers.RipeMD160.Id, 20);
+			DigestLengths.Add(TeleTrusTObjectIdentifiers.RipeMD256.Id, 32);
+			DigestLengths.Add(CryptoProObjectIdentifiers.GostR3411.Id, 32);
+			DigestLengths.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256.Id, 32);
+			DigestLengths.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_512.Id, 64);
+			DigestLengths.Add(GMObjectIdentifiers.sm3.Id, 32);
 
-            DigestNames.Add(PkcsObjectIdentifiers.MD5.Id, "MD5");
-            DigestNames.Add(OiwObjectIdentifiers.IdSha1.Id, "SHA1");
-            DigestNames.Add(NistObjectIdentifiers.IdSha224.Id, "SHA224");
-            DigestNames.Add(NistObjectIdentifiers.IdSha256.Id, "SHA256");
-            DigestNames.Add(NistObjectIdentifiers.IdSha384.Id, "SHA384");
-            DigestNames.Add(NistObjectIdentifiers.IdSha512.Id, "SHA512");
-            DigestNames.Add(PkcsObjectIdentifiers.MD5WithRsaEncryption.Id, "MD5");
+			DigestNames.Add(PkcsObjectIdentifiers.MD5.Id, "MD5");
+			DigestNames.Add(OiwObjectIdentifiers.IdSha1.Id, "SHA1");
+			DigestNames.Add(NistObjectIdentifiers.IdSha224.Id, "SHA224");
+			DigestNames.Add(NistObjectIdentifiers.IdSha256.Id, "SHA256");
+			DigestNames.Add(NistObjectIdentifiers.IdSha384.Id, "SHA384");
+			DigestNames.Add(NistObjectIdentifiers.IdSha512.Id, "SHA512");
+			DigestNames.Add(PkcsObjectIdentifiers.MD5WithRsaEncryption.Id, "MD5");
 			DigestNames.Add(PkcsObjectIdentifiers.Sha1WithRsaEncryption.Id, "SHA1");
-            DigestNames.Add(PkcsObjectIdentifiers.Sha224WithRsaEncryption.Id, "SHA224");
-            DigestNames.Add(PkcsObjectIdentifiers.Sha256WithRsaEncryption.Id, "SHA256");
-            DigestNames.Add(PkcsObjectIdentifiers.Sha384WithRsaEncryption.Id, "SHA384");
-            DigestNames.Add(PkcsObjectIdentifiers.Sha512WithRsaEncryption.Id, "SHA512");
-            DigestNames.Add(TeleTrusTObjectIdentifiers.RipeMD128.Id, "RIPEMD128");
-            DigestNames.Add(TeleTrusTObjectIdentifiers.RipeMD160.Id, "RIPEMD160");
-            DigestNames.Add(TeleTrusTObjectIdentifiers.RipeMD256.Id, "RIPEMD256");
-            DigestNames.Add(CryptoProObjectIdentifiers.GostR3411.Id, "GOST3411");
-            DigestNames.Add(OiwObjectIdentifiers.DsaWithSha1.Id, "SHA1");
-            DigestNames.Add(OiwObjectIdentifiers.Sha1WithRsa.Id, "SHA1");
-            DigestNames.Add(OiwObjectIdentifiers.MD5WithRsa.Id, "MD5");
-            DigestNames.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256.Id, "GOST3411-2012-256");
-            DigestNames.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_512.Id, "GOST3411-2012-512");
-            DigestNames.Add(GMObjectIdentifiers.sm3.Id, "SM3");
-        }
+			DigestNames.Add(PkcsObjectIdentifiers.Sha224WithRsaEncryption.Id, "SHA224");
+			DigestNames.Add(PkcsObjectIdentifiers.Sha256WithRsaEncryption.Id, "SHA256");
+			DigestNames.Add(PkcsObjectIdentifiers.Sha384WithRsaEncryption.Id, "SHA384");
+			DigestNames.Add(PkcsObjectIdentifiers.Sha512WithRsaEncryption.Id, "SHA512");
+			DigestNames.Add(TeleTrusTObjectIdentifiers.RipeMD128.Id, "RIPEMD128");
+			DigestNames.Add(TeleTrusTObjectIdentifiers.RipeMD160.Id, "RIPEMD160");
+			DigestNames.Add(TeleTrusTObjectIdentifiers.RipeMD256.Id, "RIPEMD256");
+			DigestNames.Add(CryptoProObjectIdentifiers.GostR3411.Id, "GOST3411");
+			DigestNames.Add(OiwObjectIdentifiers.DsaWithSha1.Id, "SHA1");
+			DigestNames.Add(OiwObjectIdentifiers.Sha1WithRsa.Id, "SHA1");
+			DigestNames.Add(OiwObjectIdentifiers.MD5WithRsa.Id, "MD5");
+			DigestNames.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256.Id, "GOST3411-2012-256");
+			DigestNames.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_512.Id, "GOST3411-2012-512");
+			DigestNames.Add(GMObjectIdentifiers.sm3.Id, "SM3");
+		}
 
 
-	    /**
-	     * Fetches the signature time-stamp attributes from a SignerInformation object.
-	     * Checks that the MessageImprint for each time-stamp matches the signature field.
-	     * (see RFC 3161 Appendix A).
-	     *
-	     * @param signerInfo a SignerInformation to search for time-stamps
-	     * @return a collection of TimeStampToken objects
-	     * @throws TSPValidationException
-	     */
+		/**
+		 * Fetches the signature time-stamp attributes from a SignerInformation object.
+		 * Checks that the MessageImprint for each time-stamp matches the signature field.
+		 * (see RFC 3161 Appendix A).
+		 *
+		 * @param signerInfo a SignerInformation to search for time-stamps
+		 * @return a collection of TimeStampToken objects
+		 * @throws TSPValidationException
+		 */
 		public static IList<TimeStampToken> GetSignatureTimestamps(
 			SignerInformation signerInfo)
 		{
@@ -86,7 +85,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			if (unsignedAttrs != null)
 			{
 				foreach (Asn1.Cms.Attribute tsAttr in unsignedAttrs.GetAll(
-					PkcsObjectIdentifiers.IdAASignatureTimeStampToken))
+					         PkcsObjectIdentifiers.IdAASignatureTimeStampToken))
 				{
 					foreach (Asn1Encodable asn1 in tsAttr.AttrValues)
 					{
@@ -99,7 +98,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 							byte[] expectedDigest = DigestUtilities.CalculateDigest(
 								GetDigestAlgName(tstInfo.MessageImprintAlgOid),
-							    signerInfo.GetSignature());
+								signerInfo.GetSignature());
 
 							if (!Arrays.ConstantTimeAreEqual(expectedDigest, tstInfo.GetMessageImprintDigest()))
 								throw new TspValidationException("Incorrect digest in message imprint");
@@ -175,7 +174,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 		internal static IDigest CreateDigestInstance(string digestAlgOID)
 		{
-	        string digestName = GetDigestAlgName(digestAlgOID);
+			string digestName = GetDigestAlgName(digestAlgOID);
 
 			return DigestUtilities.GetDigest(digestName);
 		}

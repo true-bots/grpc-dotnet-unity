@@ -1,5 +1,4 @@
 #if !BESTHTTP_DISABLE_SIGNALR_CORE && BESTHTTP_SIGNALR_CORE_ENABLE_GAMEDEVWARE_MESSAGEPACK
-
 using System;
 using System.Collections.Generic;
 using BestHTTP.PlatformSupport.Memory;
@@ -631,7 +630,8 @@ namespace BestHTTP.SignalRCore.Encoders
                                 ulong ulongValue = unchecked((ulong)longValue);
                                 long nanoseconds = (long)(ulongValue >> 34);
                                 ulong seconds = ulongValue & 0x00000003ffffffffL;
-                                value = CustomMessagePackExtensionTypeHandler.UnixEpoch.AddSeconds(seconds).AddTicks(nanoseconds / CustomMessagePackExtensionTypeHandler.NanosecondsPerTick);
+                                value =
+ CustomMessagePackExtensionTypeHandler.UnixEpoch.AddSeconds(seconds).AddTicks(nanoseconds / CustomMessagePackExtensionTypeHandler.NanosecondsPerTick);
                                 return true;
                             }
                         case 12:
@@ -640,7 +640,8 @@ namespace BestHTTP.SignalRCore.Encoders
                                 long longValue = FromBytes(data.Array, data.Offset, 8);
 
                                 var nanoseconds = unchecked((uint)intValue);
-                                value = CustomMessagePackExtensionTypeHandler.UnixEpoch.AddSeconds(longValue).AddTicks(nanoseconds / CustomMessagePackExtensionTypeHandler.NanosecondsPerTick);
+                                value =
+ CustomMessagePackExtensionTypeHandler.UnixEpoch.AddSeconds(longValue).AddTicks(nanoseconds / CustomMessagePackExtensionTypeHandler.NanosecondsPerTick);
                                 return true;
                             }
                         default:

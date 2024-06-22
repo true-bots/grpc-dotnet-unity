@@ -5,8 +5,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security.Certificates
 {
-    [Serializable]
-    public class CertificateExpiredException
+	[Serializable]
+	public class CertificateExpiredException
 		: CertificateException
 	{
 		public CertificateExpiredException()

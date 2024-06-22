@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
@@ -9,24 +8,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 	public class TstInfo
 		: Asn1Encodable
 	{
-		private readonly DerInteger				version;
-		private readonly DerObjectIdentifier	tsaPolicyId;
-		private readonly MessageImprint			messageImprint;
-		private readonly DerInteger				serialNumber;
-		private readonly Asn1GeneralizedTime	genTime;
-		private readonly Accuracy				accuracy;
-		private readonly DerBoolean				ordering;
-		private readonly DerInteger				nonce;
-		private readonly GeneralName			tsa;
-		private readonly X509Extensions			extensions;
+		private readonly DerInteger version;
+		private readonly DerObjectIdentifier tsaPolicyId;
+		private readonly MessageImprint messageImprint;
+		private readonly DerInteger serialNumber;
+		private readonly Asn1GeneralizedTime genTime;
+		private readonly Accuracy accuracy;
+		private readonly DerBoolean ordering;
+		private readonly DerInteger nonce;
+		private readonly GeneralName tsa;
+		private readonly X509Extensions extensions;
 
 		public static TstInfo GetInstance(object obj)
 		{
-            if (obj is TstInfo)
-                return (TstInfo)obj;
-            if (obj == null)
-                return null;
-            return new TstInfo(Asn1Sequence.GetInstance(obj));
+			if (obj is TstInfo)
+				return (TstInfo)obj;
+			if (obj == null)
+				return null;
+			return new TstInfo(Asn1Sequence.GetInstance(obj));
 		}
 
 		private TstInfo(Asn1Sequence seq)
@@ -58,11 +57,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 
 			while (e.MoveNext())
 			{
-				Asn1Object o = (Asn1Object) e.Current;
+				Asn1Object o = (Asn1Object)e.Current;
 
 				if (o is Asn1TaggedObject)
 				{
-					DerTaggedObject tagged = (DerTaggedObject) o;
+					DerTaggedObject tagged = (DerTaggedObject)o;
 
 					switch (tagged.TagNo)
 					{
@@ -95,15 +94,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 		}
 
 		public TstInfo(
-			DerObjectIdentifier	tsaPolicyId,
-			MessageImprint		messageImprint,
-			DerInteger			serialNumber,
-            Asn1GeneralizedTime genTime,
-			Accuracy			accuracy,
-			DerBoolean			ordering,
-			DerInteger			nonce,
-			GeneralName			tsa,
-			X509Extensions		extensions)
+			DerObjectIdentifier tsaPolicyId,
+			MessageImprint messageImprint,
+			DerInteger serialNumber,
+			Asn1GeneralizedTime genTime,
+			Accuracy accuracy,
+			DerBoolean ordering,
+			DerInteger nonce,
+			GeneralName tsa,
+			X509Extensions extensions)
 		{
 			this.version = new DerInteger(1);
 			this.tsaPolicyId = tsaPolicyId;
@@ -117,10 +116,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 			this.extensions = extensions;
 		}
 
-        public DerInteger Version
-        {
-            get { return version; }
-        }
+		public DerInteger Version
+		{
+			get { return version; }
+		}
 
 		public MessageImprint MessageImprint
 		{
@@ -190,21 +189,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 		 *
 		 * </pre>
 		 */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector(version, tsaPolicyId, messageImprint, serialNumber, genTime);
-            v.AddOptional(accuracy);
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector(version, tsaPolicyId, messageImprint, serialNumber, genTime);
+			v.AddOptional(accuracy);
 
-            if (ordering != null && ordering.IsTrue)
-            {
-                v.Add(ordering);
-            }
+			if (ordering != null && ordering.IsTrue)
+			{
+				v.Add(ordering);
+			}
 
-            v.AddOptional(nonce);
-            v.AddOptionalTagged(true, 0, tsa);
-            v.AddOptionalTagged(false, 1, extensions);
-            return new DerSequence(v);
-        }
+			v.AddOptional(nonce);
+			v.AddOptionalTagged(true, 0, tsa);
+			v.AddOptionalTagged(false, 1, extensions);
+			return new DerSequence(v);
+		}
 	}
 }
 #pragma warning restore

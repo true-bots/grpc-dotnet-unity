@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -18,20 +17,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 	public class PaddedBufferedBlockCipher
 		: BufferedBlockCipher
 	{
-        private readonly IBlockCipherPadding padding;
+		private readonly IBlockCipherPadding padding;
 
-        public PaddedBufferedBlockCipher(IBlockCipher cipher, IBlockCipherPadding padding)
+		public PaddedBufferedBlockCipher(IBlockCipher cipher, IBlockCipherPadding padding)
 			: this(EcbBlockCipher.GetBlockCipherMode(cipher), padding)
-        {
-        }
+		{
+		}
 
-        /**
+		/**
 		* Create a buffered block cipher with the desired padding.
 		*
 		* @param cipher the underlying block cipher this buffering object wraps.
 		* @param padding the padding type.
 		*/
-        public PaddedBufferedBlockCipher(IBlockCipherMode cipherMode, IBlockCipherPadding padding)
+		public PaddedBufferedBlockCipher(IBlockCipherMode cipherMode, IBlockCipherPadding padding)
 		{
 			m_cipherMode = cipherMode;
 			this.padding = padding;
@@ -259,7 +258,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 		}
 #endif
 
-        /**
+		/**
 		* Process the last block in the buffer. If the buffer is currently
 		* full and padding needs to be added a call to doFinal will produce
 		* 2 * GetBlockSize() bytes.
@@ -273,9 +272,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 		* initialised.
 		* @exception InvalidCipherTextException if padding is expected and not found.
 		*/
-        public override int DoFinal(byte[] output, int outOff)
-        {
-            int blockSize = m_cipherMode.GetBlockSize();
+		public override int DoFinal(byte[] output, int outOff)
+		{
+			int blockSize = m_cipherMode.GetBlockSize();
 			int resultLen = 0;
 
 			if (forEncryption)

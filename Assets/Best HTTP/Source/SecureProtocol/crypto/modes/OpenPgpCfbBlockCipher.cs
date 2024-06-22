@@ -1,32 +1,31 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 {
-    /**
-    * Implements OpenPGP's rather strange version of Cipher-FeedBack (CFB) mode
-    * on top of a simple cipher. This class assumes the IV has been prepended
-    * to the data stream already, and just accomodates the reset after
-    * (blockSize + 2) bytes have been read.
-    * <p>
-    * For further info see <a href="http://www.ietf.org/rfc/rfc2440.html">RFC 2440</a>.
+	/**
+	* Implements OpenPGP's rather strange version of Cipher-FeedBack (CFB) mode
+	* on top of a simple cipher. This class assumes the IV has been prepended
+	* to the data stream already, and just accomodates the reset after
+	* (blockSize + 2) bytes have been read.
+	* <p>
+	* For further info see <a href="http://www.ietf.org/rfc/rfc2440.html">RFC 2440</a>.
 	* </p>
-    */
-    public class OpenPgpCfbBlockCipher
-        : IBlockCipherMode
-    {
-        private byte[] IV;
-        private byte[] FR;
-        private byte[] FRE;
+	*/
+	public class OpenPgpCfbBlockCipher
+		: IBlockCipherMode
+	{
+		private byte[] IV;
+		private byte[] FR;
+		private byte[] FRE;
 
 		private readonly IBlockCipher cipher;
 		private readonly int blockSize;
 
 		private int count;
-        private bool forEncryption;
+		private bool forEncryption;
 
 		/**
         * Basic constructor.
@@ -34,23 +33,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         * @param cipher the block cipher to be used as the basis of the
         * feedback mode.
         */
-        public OpenPgpCfbBlockCipher(
-            IBlockCipher cipher)
-        {
-            this.cipher = cipher;
+		public OpenPgpCfbBlockCipher(
+			IBlockCipher cipher)
+		{
+			this.cipher = cipher;
 
-            this.blockSize = cipher.GetBlockSize();
-            this.IV = new byte[blockSize];
-            this.FR = new byte[blockSize];
-            this.FRE = new byte[blockSize];
-        }
+			this.blockSize = cipher.GetBlockSize();
+			this.IV = new byte[blockSize];
+			this.FR = new byte[blockSize];
+			this.FRE = new byte[blockSize];
+		}
 
-        /**
-        * return the underlying block cipher that we are wrapping.
-        *
-        * @return the underlying block cipher that we are wrapping.
-        */
-        public IBlockCipher UnderlyingCipher => cipher;
+		/**
+		* return the underlying block cipher that we are wrapping.
+		*
+		* @return the underlying block cipher that we are wrapping.
+		*/
+		public IBlockCipher UnderlyingCipher => cipher;
 
 		/**
         * return the algorithm name and mode.
@@ -58,10 +57,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         * @return the name of the underlying algorithm followed by "/PGPCFB"
         * and the block size in bits.
         */
-        public string AlgorithmName
-        {
-            get { return cipher.AlgorithmName + "/OpenPGPCFB"; }
-        }
+		public string AlgorithmName
+		{
+			get { return cipher.AlgorithmName + "/OpenPGPCFB"; }
+		}
 
 		public bool IsPartialBlockOkay
 		{
@@ -73,23 +72,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         *
         * @return the block size we are operating at (in bytes).
         */
-        public int GetBlockSize()
-        {
-            return cipher.GetBlockSize();
-        }
+		public int GetBlockSize()
+		{
+			return cipher.GetBlockSize();
+		}
 
-        public int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
-        {
+		public int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
+		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return forEncryption
                 ? EncryptBlock(input.AsSpan(inOff), output.AsSpan(outOff))
                 : DecryptBlock(input.AsSpan(inOff), output.AsSpan(outOff));
 #else
-            return forEncryption
-                ? EncryptBlock(input, inOff, output, outOff)
-                : DecryptBlock(input, inOff, output, outOff);
+			return forEncryption
+				? EncryptBlock(input, inOff, output, outOff)
+				: DecryptBlock(input, inOff, output, outOff);
 #endif
-        }
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public int ProcessBlock(ReadOnlySpan<byte> input, Span<byte> output)
@@ -100,57 +99,57 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         }
 #endif
 
-        /**
-        * reset the chaining vector back to the IV and reset the underlying
-        * cipher.
-        */
-        public void Reset()
-        {
-            count = 0;
+		/**
+		* reset the chaining vector back to the IV and reset the underlying
+		* cipher.
+		*/
+		public void Reset()
+		{
+			count = 0;
 
 			Array.Copy(IV, 0, FR, 0, FR.Length);
-        }
+		}
 
-        /**
-        * Initialise the cipher and, possibly, the initialisation vector (IV).
-        * If an IV isn't passed as part of the parameter, the IV will be all zeros.
-        * An IV which is too short is handled in FIPS compliant fashion.
-        *
-        * @param forEncryption if true the cipher is initialised for
-        *  encryption, if false for decryption.
-        * @param parameters the key and other data required by the cipher.
-        * @exception ArgumentException if the parameters argument is
-        * inappropriate.
-        */
-        public void Init(bool forEncryption, ICipherParameters parameters)
-        {
-            this.forEncryption = forEncryption;
+		/**
+		* Initialise the cipher and, possibly, the initialisation vector (IV).
+		* If an IV isn't passed as part of the parameter, the IV will be all zeros.
+		* An IV which is too short is handled in FIPS compliant fashion.
+		*
+		* @param forEncryption if true the cipher is initialised for
+		*  encryption, if false for decryption.
+		* @param parameters the key and other data required by the cipher.
+		* @exception ArgumentException if the parameters argument is
+		* inappropriate.
+		*/
+		public void Init(bool forEncryption, ICipherParameters parameters)
+		{
+			this.forEncryption = forEncryption;
 
-            if (parameters is ParametersWithIV ivParam)
-            {
-                byte[] iv = ivParam.GetIV();
+			if (parameters is ParametersWithIV ivParam)
+			{
+				byte[] iv = ivParam.GetIV();
 
-                if (iv.Length < IV.Length)
-                {
-                    // prepend the supplied IV with zeros (per FIPS PUB 81)
-                    Array.Copy(iv, 0, IV, IV.Length - iv.Length, iv.Length);
-                    for (int i = 0; i < IV.Length - iv.Length; i++)
-                    {
-                        IV[i] = 0;
-                    }
-                }
-                else
-                {
-                    Array.Copy(iv, 0, IV, 0, IV.Length);
-                }
+				if (iv.Length < IV.Length)
+				{
+					// prepend the supplied IV with zeros (per FIPS PUB 81)
+					Array.Copy(iv, 0, IV, IV.Length - iv.Length, iv.Length);
+					for (int i = 0; i < IV.Length - iv.Length; i++)
+					{
+						IV[i] = 0;
+					}
+				}
+				else
+				{
+					Array.Copy(iv, 0, IV, 0, IV.Length);
+				}
 
-                parameters = ivParam.Parameters;
-            }
+				parameters = ivParam.Parameters;
+			}
 
-            Reset();
+			Reset();
 
-            cipher.Init(true, parameters);
-        }
+			cipher.Init(true, parameters);
+		}
 
 		/**
         * Encrypt one byte of data according to CFB mode.
@@ -158,10 +157,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         * @param blockOff offset in the current block
         * @returns the encrypted byte
         */
-        private byte EncryptByte(byte data, int blockOff)
-        {
-            return (byte)(FRE[blockOff] ^ data);
-        }
+		private byte EncryptByte(byte data, int blockOff)
+		{
+			return (byte)(FRE[blockOff] ^ data);
+		}
 
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
@@ -284,67 +283,67 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
             return blockSize;
         }
 #else
-        private int EncryptBlock(byte[]	input, int inOff, byte[] outBytes, int outOff)
-        {
-            Check.DataLength(input, inOff, blockSize, "input buffer too short");
-            Check.OutputLength(outBytes, outOff, blockSize, "output buffer too short");
+		private int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		{
+			Check.DataLength(input, inOff, blockSize, "input buffer too short");
+			Check.OutputLength(outBytes, outOff, blockSize, "output buffer too short");
 
-            if (count > blockSize)
-            {
-                FR[blockSize - 2] = outBytes[outOff] = EncryptByte(input[inOff], blockSize - 2);
-                FR[blockSize - 1] = outBytes[outOff + 1] = EncryptByte(input[inOff + 1], blockSize - 1);
+			if (count > blockSize)
+			{
+				FR[blockSize - 2] = outBytes[outOff] = EncryptByte(input[inOff], blockSize - 2);
+				FR[blockSize - 1] = outBytes[outOff + 1] = EncryptByte(input[inOff + 1], blockSize - 1);
 
-                cipher.ProcessBlock(FR, 0, FRE, 0);
+				cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                for (int n = 2; n < blockSize; n++)
-                {
+				for (int n = 2; n < blockSize; n++)
+				{
 					FR[n - 2] = outBytes[outOff + n] = EncryptByte(input[inOff + n], n - 2);
-                }
-            }
-            else if (count == 0)
-            {
-                cipher.ProcessBlock(FR, 0, FRE, 0);
+				}
+			}
+			else if (count == 0)
+			{
+				cipher.ProcessBlock(FR, 0, FRE, 0);
 
 				for (int n = 0; n < blockSize; n++)
-                {
+				{
 					FR[n] = outBytes[outOff + n] = EncryptByte(input[inOff + n], n);
-                }
+				}
 
 				count += blockSize;
-            }
-            else if (count == blockSize)
-            {
-                cipher.ProcessBlock(FR, 0, FRE, 0);
+			}
+			else if (count == blockSize)
+			{
+				cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                outBytes[outOff] = EncryptByte(input[inOff], 0);
-                outBytes[outOff + 1] = EncryptByte(input[inOff + 1], 1);
+				outBytes[outOff] = EncryptByte(input[inOff], 0);
+				outBytes[outOff + 1] = EncryptByte(input[inOff + 1], 1);
 
-                //
-                // do reset
-                //
-                Array.Copy(FR, 2, FR, 0, blockSize - 2);
-                Array.Copy(outBytes, outOff, FR, blockSize - 2, 2);
+				//
+				// do reset
+				//
+				Array.Copy(FR, 2, FR, 0, blockSize - 2);
+				Array.Copy(outBytes, outOff, FR, blockSize - 2, 2);
 
-                cipher.ProcessBlock(FR, 0, FRE, 0);
+				cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                for (int n = 2; n < blockSize; n++)
-                {
+				for (int n = 2; n < blockSize; n++)
+				{
 					FR[n - 2] = outBytes[outOff + n] = EncryptByte(input[inOff + n], n - 2);
-                }
+				}
 
 				count += blockSize;
-            }
+			}
 
-            return blockSize;
-        }
+			return blockSize;
+		}
 
-        private int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
-        {
-            Check.DataLength(input, inOff, blockSize, "input buffer too short");
-            Check.OutputLength(outBytes, outOff, blockSize, "output buffer too short");
+		private int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		{
+			Check.DataLength(input, inOff, blockSize, "input buffer too short");
+			Check.OutputLength(outBytes, outOff, blockSize, "output buffer too short");
 
-            if (count > blockSize)
-            {
+			if (count > blockSize)
+			{
 				byte inVal = input[inOff];
 				FR[blockSize - 2] = inVal;
 				outBytes[outOff] = EncryptByte(inVal, blockSize - 2);
@@ -353,57 +352,57 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				FR[blockSize - 1] = inVal;
 				outBytes[outOff + 1] = EncryptByte(inVal, blockSize - 1);
 
-                cipher.ProcessBlock(FR, 0, FRE, 0);
+				cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                for (int n = 2; n < blockSize; n++)
-                {
+				for (int n = 2; n < blockSize; n++)
+				{
 					inVal = input[inOff + n];
 					FR[n - 2] = inVal;
 					outBytes[outOff + n] = EncryptByte(inVal, n - 2);
 				}
-            }
-            else if (count == 0)
-            {
-                cipher.ProcessBlock(FR, 0, FRE, 0);
+			}
+			else if (count == 0)
+			{
+				cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                for (int n = 0; n < blockSize; n++)
-                {
-                    FR[n] = input[inOff + n];
-                    outBytes[outOff + n] = EncryptByte(input[inOff + n], n);
-                }
+				for (int n = 0; n < blockSize; n++)
+				{
+					FR[n] = input[inOff + n];
+					outBytes[outOff + n] = EncryptByte(input[inOff + n], n);
+				}
 
-                count += blockSize;
-            }
-            else if (count == blockSize)
-            {
-                cipher.ProcessBlock(FR, 0, FRE, 0);
+				count += blockSize;
+			}
+			else if (count == blockSize)
+			{
+				cipher.ProcessBlock(FR, 0, FRE, 0);
 
 				byte inVal1 = input[inOff];
 				byte inVal2 = input[inOff + 1];
-				outBytes[outOff    ] = EncryptByte(inVal1, 0);
+				outBytes[outOff] = EncryptByte(inVal1, 0);
 				outBytes[outOff + 1] = EncryptByte(inVal2, 1);
 
-                Array.Copy(FR, 2, FR, 0, blockSize - 2);
+				Array.Copy(FR, 2, FR, 0, blockSize - 2);
 
 				FR[blockSize - 2] = inVal1;
 				FR[blockSize - 1] = inVal2;
 
-                cipher.ProcessBlock(FR, 0, FRE, 0);
+				cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                for (int n = 2; n < blockSize; n++)
-                {
+				for (int n = 2; n < blockSize; n++)
+				{
 					byte inVal = input[inOff + n];
 					FR[n - 2] = inVal;
 					outBytes[outOff + n] = EncryptByte(inVal, n - 2);
-                }
+				}
 
-                count += blockSize;
-            }
+				count += blockSize;
+			}
 
-            return blockSize;
-        }
+			return blockSize;
+		}
 #endif
-    }
+	}
 }
 #pragma warning restore
 #endif

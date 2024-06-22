@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -10,29 +9,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class SignerAttribute
 		: Asn1Encodable
 	{
-		private Asn1Sequence			claimedAttributes;
-		private AttributeCertificate	certifiedAttributes;
+		private Asn1Sequence claimedAttributes;
+		private AttributeCertificate certifiedAttributes;
 
 		public static SignerAttribute GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is SignerAttribute)
-				return (SignerAttribute) obj;
+				return (SignerAttribute)obj;
 
 			if (obj is Asn1Sequence)
 				return new SignerAttribute(obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'SignerAttribute' factory: "
-                + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
 		private SignerAttribute(
 			object obj)
 		{
-			Asn1Sequence seq = (Asn1Sequence) obj;
-			DerTaggedObject taggedObject = (DerTaggedObject) seq[0];
+			Asn1Sequence seq = (Asn1Sequence)obj;
+			DerTaggedObject taggedObject = (DerTaggedObject)seq[0];
 			if (taggedObject.TagNo == 0)
 			{
 				claimedAttributes = Asn1Sequence.GetInstance(taggedObject, true);

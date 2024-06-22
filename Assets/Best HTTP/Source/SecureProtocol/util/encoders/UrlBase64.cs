@@ -7,14 +7,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 {
 	/**
 	* Convert binary data to and from UrlBase64 encoding.  This is identical to
-	* Base64 encoding, except that the padding character is "." and the other 
+	* Base64 encoding, except that the padding character is "." and the other
 	* non-alphanumeric characters are "-" and "_" instead of "+" and "/".
 	* <p>
 	* The purpose of UrlBase64 encoding is to provide a compact encoding of binary
 	* data that is safe for use as an URL parameter. Base64 encoding does not
-	* produce encoded values that are safe for use in URLs, since "/" can be 
+	* produce encoded values that are safe for use in URLs, since "/" can be
 	* interpreted as a path delimiter; "+" is the encoded form of a space; and
-	* "=" is used to separate a name from the corresponding value in an URL 
+	* "=" is used to separate a name from the corresponding value in an URL
 	* parameter.
 	* </p>
 	*/
@@ -50,8 +50,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 		* @return the number of bytes produced.
 		*/
 		public static int Encode(
-			byte[]	data,
-			Stream	outStr)
+			byte[] data,
+			Stream outStr)
 		{
 			return encoder.Encode(data, 0, data.Length, outStr);
 		}
@@ -85,8 +85,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 		* @return the number of bytes produced.
 		*/
 		public static int Decode(
-			byte[]	data,
-			Stream	outStr)
+			byte[] data,
+			Stream outStr)
 		{
 			return encoder.Decode(data, 0, data.Length, outStr);
 		}
@@ -109,10 +109,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 			{
 				throw new Exception("exception decoding URL safe base64 string: " + e.Message, e);
 			}
-	        
+
 			return bOut.ToArray();
 		}
-	    
+
 		/**
 		* Decode the URL safe base 64 encoded string data writing it to the given output stream,
 		* whitespace characters will be ignored.
@@ -120,8 +120,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 		* @return the number of bytes produced.
 		*/
 		public static int Decode(
-			string	data,
-			Stream	outStr)
+			string data,
+			Stream outStr)
 		{
 			return encoder.DecodeString(data, outStr);
 		}

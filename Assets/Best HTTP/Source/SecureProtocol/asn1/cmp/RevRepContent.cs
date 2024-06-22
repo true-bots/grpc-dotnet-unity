@@ -5,25 +5,25 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 {
-    /**
-     * <pre>
-     * RevRepContent ::= SEQUENCE {
-     *          status       SEQUENCE SIZE (1..MAX) OF PKIStatusInfo,
-     *          -- in same order as was sent in RevReqContent
-     *          revCerts [0] SEQUENCE SIZE (1..MAX) OF CertId
-     *                                              OPTIONAL,
-     *          -- IDs for which revocation was requested
-     *          -- (same order as status)
-     *          crls     [1] SEQUENCE SIZE (1..MAX) OF CertificateList OPTIONAL
-     *          -- the resulting CRLs (there may be more than one)
-     *      }
-     *</pre>
-     */
-    public class RevRepContent
+	/**
+	 * <pre>
+	 * RevRepContent ::= SEQUENCE {
+	 *          status       SEQUENCE SIZE (1..MAX) OF PKIStatusInfo,
+	 *          -- in same order as was sent in RevReqContent
+	 *          revCerts [0] SEQUENCE SIZE (1..MAX) OF CertId
+	 *                                              OPTIONAL,
+	 *          -- IDs for which revocation was requested
+	 *          -- (same order as status)
+	 *          crls     [1] SEQUENCE SIZE (1..MAX) OF CertificateList OPTIONAL
+	 *          -- the resulting CRLs (there may be more than one)
+	 *      }
+	 *</pre>
+	 */
+	public class RevRepContent
 		: Asn1Encodable
 	{
-        public static RevRepContent GetInstance(object obj)
-        {
+		public static RevRepContent GetInstance(object obj)
+		{
 			if (obj is RevRepContent revRepContent)
 				return revRepContent;
 
@@ -31,9 +31,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new RevRepContent(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly Asn1Sequence m_status;
+		private readonly Asn1Sequence m_status;
 		private readonly Asn1Sequence m_revCerts;
 		private readonly Asn1Sequence m_crls;
 
@@ -94,8 +94,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(m_status);
-            v.AddOptionalTagged(true, 0, m_revCerts);
-            v.AddOptionalTagged(true, 1, m_crls);
+			v.AddOptionalTagged(true, 0, m_revCerts);
+			v.AddOptionalTagged(true, 1, m_crls);
 			return new DerSequence(v);
 		}
 	}

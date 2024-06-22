@@ -5,10 +5,10 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 {
-    [Serializable]
-    public class SecurityUtilityException
+	[Serializable]
+	public class SecurityUtilityException
 		: Exception
-    {
+	{
 		public SecurityUtilityException()
 			: base()
 		{

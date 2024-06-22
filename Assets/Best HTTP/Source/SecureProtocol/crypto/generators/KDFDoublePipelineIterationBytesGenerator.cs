@@ -1,163 +1,166 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 {
-    public sealed class KdfDoublePipelineIterationBytesGenerator
-        : IMacDerivationFunction
-    {
-        // fields set by the constructor       
-        private readonly IMac prf;
-        private readonly int h;
+	public sealed class KdfDoublePipelineIterationBytesGenerator
+		: IMacDerivationFunction
+	{
+		// fields set by the constructor       
+		private readonly IMac prf;
+		private readonly int h;
 
-        // fields set by init
-        private byte[] fixedInputData;
-        private int maxSizeExcl;
-        // ios is i defined as an octet string (the binary representation)
-        private byte[] ios;
-        private bool useCounter;
+		// fields set by init
+		private byte[] fixedInputData;
 
-        // operational
-        private int generatedBytes;
-        // k is used as buffer for all K(i) values
-        private byte[] a;
-        private byte[] k;
+		private int maxSizeExcl;
 
-        public KdfDoublePipelineIterationBytesGenerator(IMac prf)
-        {
-            this.prf = prf;
-            this.h = prf.GetMacSize();
-            this.a = new byte[h];
-            this.k = new byte[h];
-        }
+		// ios is i defined as an octet string (the binary representation)
+		private byte[] ios;
+		private bool useCounter;
 
-        public void Init(IDerivationParameters parameters)
-        {
-            if (!(parameters is KdfDoublePipelineIterationParameters dpiParams))
-                throw new ArgumentException("Wrong type of arguments given");
+		// operational
+		private int generatedBytes;
 
-            // --- init mac based PRF ---
+		// k is used as buffer for all K(i) values
+		private byte[] a;
+		private byte[] k;
 
-            this.prf.Init(new KeyParameter(dpiParams.Ki));
+		public KdfDoublePipelineIterationBytesGenerator(IMac prf)
+		{
+			this.prf = prf;
+			this.h = prf.GetMacSize();
+			this.a = new byte[h];
+			this.k = new byte[h];
+		}
 
-            // --- set arguments ---
+		public void Init(IDerivationParameters parameters)
+		{
+			if (!(parameters is KdfDoublePipelineIterationParameters dpiParams))
+				throw new ArgumentException("Wrong type of arguments given");
 
-            this.fixedInputData = dpiParams.FixedInputData;
+			// --- init mac based PRF ---
 
-            int r = dpiParams.R;
-            this.ios = new byte[r / 8];
+			this.prf.Init(new KeyParameter(dpiParams.Ki));
 
-            if (dpiParams.UseCounter)
-            {
-                // this is more conservative than the spec
-                BigInteger maxSize = BigInteger.One.ShiftLeft(r).Multiply(BigInteger.ValueOf(h));
-                this.maxSizeExcl = maxSize.BitLength > 31 ? int.MaxValue : maxSize.IntValueExact;
-            }
-            else
-            {
-                this.maxSizeExcl = int.MaxValue;
-            }
+			// --- set arguments ---
 
-            this.useCounter = dpiParams.UseCounter;
+			this.fixedInputData = dpiParams.FixedInputData;
 
-            // --- set operational state ---
+			int r = dpiParams.R;
+			this.ios = new byte[r / 8];
 
-            generatedBytes = 0;
-        }
+			if (dpiParams.UseCounter)
+			{
+				// this is more conservative than the spec
+				BigInteger maxSize = BigInteger.One.ShiftLeft(r).Multiply(BigInteger.ValueOf(h));
+				this.maxSizeExcl = maxSize.BitLength > 31 ? int.MaxValue : maxSize.IntValueExact;
+			}
+			else
+			{
+				this.maxSizeExcl = int.MaxValue;
+			}
 
-        private void GenerateNext()
-        {
-            if (generatedBytes == 0)
-            {
-                // --- step 4 ---
-                prf.BlockUpdate(fixedInputData, 0, fixedInputData.Length);
-                prf.DoFinal(a, 0);
-            }
-            else
-            {
-                // --- step 5a ---
-                prf.BlockUpdate(a, 0, a.Length);
-                prf.DoFinal(a, 0);
-            }
+			this.useCounter = dpiParams.UseCounter;
 
-            // --- step 5b ---
-            prf.BlockUpdate(a, 0, a.Length);
+			// --- set operational state ---
 
-            if (useCounter)
-            {
-                int i = generatedBytes / h + 1;
+			generatedBytes = 0;
+		}
 
-                // encode i into counter buffer
-                switch (ios.Length)
-                {
-                case 4:
-                    ios[0] = (byte)(i >> 24);
-                    // fall through
-                    goto case 3;
-                case 3:
-                    ios[ios.Length - 3] = (byte)(i >> 16);
-                    // fall through
-                    goto case 2;
-                case 2:
-                    ios[ios.Length - 2] = (byte)(i >> 8);
-                    // fall through
-                    goto case 1;
-                case 1:
-                    ios[ios.Length - 1] = (byte)i;
-                    break;
-                default:
-                    throw new InvalidOperationException("Unsupported size of counter i");
-                }
-                prf.BlockUpdate(ios, 0, ios.Length);
-            }
+		private void GenerateNext()
+		{
+			if (generatedBytes == 0)
+			{
+				// --- step 4 ---
+				prf.BlockUpdate(fixedInputData, 0, fixedInputData.Length);
+				prf.DoFinal(a, 0);
+			}
+			else
+			{
+				// --- step 5a ---
+				prf.BlockUpdate(a, 0, a.Length);
+				prf.DoFinal(a, 0);
+			}
 
-            prf.BlockUpdate(fixedInputData, 0, fixedInputData.Length);
-            prf.DoFinal(k, 0);
-        }
+			// --- step 5b ---
+			prf.BlockUpdate(a, 0, a.Length);
 
-        public IDigest Digest
-        {
-            get { return (prf as HMac)?.GetUnderlyingDigest(); }
-        }
+			if (useCounter)
+			{
+				int i = generatedBytes / h + 1;
 
-        public int GenerateBytes(byte[] output, int outOff, int length)
-        {
+				// encode i into counter buffer
+				switch (ios.Length)
+				{
+					case 4:
+						ios[0] = (byte)(i >> 24);
+						// fall through
+						goto case 3;
+					case 3:
+						ios[ios.Length - 3] = (byte)(i >> 16);
+						// fall through
+						goto case 2;
+					case 2:
+						ios[ios.Length - 2] = (byte)(i >> 8);
+						// fall through
+						goto case 1;
+					case 1:
+						ios[ios.Length - 1] = (byte)i;
+						break;
+					default:
+						throw new InvalidOperationException("Unsupported size of counter i");
+				}
+
+				prf.BlockUpdate(ios, 0, ios.Length);
+			}
+
+			prf.BlockUpdate(fixedInputData, 0, fixedInputData.Length);
+			prf.DoFinal(k, 0);
+		}
+
+		public IDigest Digest
+		{
+			get { return (prf as HMac)?.GetUnderlyingDigest(); }
+		}
+
+		public int GenerateBytes(byte[] output, int outOff, int length)
+		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return GenerateBytes(output.AsSpan(outOff, length));
 #else
-            if (generatedBytes >= maxSizeExcl - length)
-                throw new DataLengthException("Current KDFCTR may only be used for " + maxSizeExcl + " bytes");
+			if (generatedBytes >= maxSizeExcl - length)
+				throw new DataLengthException("Current KDFCTR may only be used for " + maxSizeExcl + " bytes");
 
-            int toGenerate = length;
-            int posInK = generatedBytes % h;
-            if (posInK != 0)
-            {
-                // copy what is left in the currentT (1..hash
-                int toCopy = System.Math.Min(h - posInK, toGenerate);
-                Array.Copy(k, posInK, output, outOff, toCopy);
-                generatedBytes += toCopy;
-                toGenerate -= toCopy;
-                outOff += toCopy;
-            }
+			int toGenerate = length;
+			int posInK = generatedBytes % h;
+			if (posInK != 0)
+			{
+				// copy what is left in the currentT (1..hash
+				int toCopy = System.Math.Min(h - posInK, toGenerate);
+				Array.Copy(k, posInK, output, outOff, toCopy);
+				generatedBytes += toCopy;
+				toGenerate -= toCopy;
+				outOff += toCopy;
+			}
 
-            while (toGenerate > 0)
-            {
-                GenerateNext();
-                int toCopy = System.Math.Min(h, toGenerate);
-                Array.Copy(k, 0, output, outOff, toCopy);
-                generatedBytes += toCopy;
-                toGenerate -= toCopy;
-                outOff += toCopy;
-            }
+			while (toGenerate > 0)
+			{
+				GenerateNext();
+				int toCopy = System.Math.Min(h, toGenerate);
+				Array.Copy(k, 0, output, outOff, toCopy);
+				generatedBytes += toCopy;
+				toGenerate -= toCopy;
+				outOff += toCopy;
+			}
 
-            return length;
+			return length;
 #endif
-        }
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public int GenerateBytes(Span<byte> output)
@@ -190,8 +193,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
         }
 #endif
 
-        public IMac Mac => prf;
-    }
+		public IMac Mac => prf;
+	}
 }
 #pragma warning restore
 #endif

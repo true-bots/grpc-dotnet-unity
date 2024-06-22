@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -103,7 +102,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 		public int Version
 		{
-            get { return req.TbsRequest.Version.IntValueExact + 1; }
+			get { return req.TbsRequest.Version.IntValueExact + 1; }
 		}
 
 		public GeneralName RequestorName
@@ -144,7 +143,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 				if (!this.IsSigned)
 					return null;
 
-                return req.OptionalSignature.SignatureAlgorithm.Algorithm.Id;
+				return req.OptionalSignature.SignatureAlgorithm.Algorithm.Id;
 			}
 		}
 
@@ -156,7 +155,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			return req.OptionalSignature.GetSignatureOctets();
 		}
 
-        private List<X509Certificate> GetCertList()
+		private List<X509Certificate> GetCertList()
 		{
 			// load the certificates if we have any
 
@@ -167,11 +166,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			{
 				foreach (Asn1Encodable ae in certs)
 				{
-                    if (ae != null && ae.ToAsn1Object() is Asn1Sequence s)
-                    {
-                        result.Add(new X509Certificate(X509CertificateStructure.GetInstance(s)));
-                    }
-                }
+					if (ae != null && ae.ToAsn1Object() is Asn1Sequence s)
+					{
+						result.Add(new X509Certificate(X509CertificateStructure.GetInstance(s)));
+					}
+				}
 			}
 
 			return result;

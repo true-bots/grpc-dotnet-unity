@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -24,17 +23,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		private bool forEncryption;
 
-        public RsaBlindingEngine()
-            : this(new RsaCoreEngine())
-        {
-        }
+		public RsaBlindingEngine()
+			: this(new RsaCoreEngine())
+		{
+		}
 
-        public RsaBlindingEngine(IRsa rsa)
-        {
-            this.core = rsa;
-        }
+		public RsaBlindingEngine(IRsa rsa)
+		{
+			this.core = rsa;
+		}
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return "RSA"; }
 		}
@@ -45,9 +44,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @param forEncryption true if we are encrypting (blinding), false otherwise.
 		* @param param         the necessary RSA key parameters.
 		*/
-        public virtual void Init(
-			bool				forEncryption,
-			ICipherParameters	param)
+		public virtual void Init(
+			bool forEncryption,
+			ICipherParameters param)
 		{
 			RsaBlindingParameters p;
 
@@ -76,7 +75,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @return maximum size for an input block.
 		*/
-        public virtual int GetInputBlockSize()
+		public virtual int GetInputBlockSize()
 		{
 			return core.GetInputBlockSize();
 		}
@@ -88,7 +87,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @return maximum size for an output block.
 		*/
-        public virtual int GetOutputBlockSize()
+		public virtual int GetOutputBlockSize()
 		{
 			return core.GetOutputBlockSize();
 		}
@@ -102,10 +101,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @return the result of the RSA process.
 		* @throws DataLengthException the input block is too large.
 		*/
-        public virtual byte[] ProcessBlock(
-			byte[]	inBuf,
-			int		inOff,
-			int		inLen)
+		public virtual byte[] ProcessBlock(
+			byte[] inBuf,
+			int inOff,
+			int inLen)
 		{
 			BigInteger msg = core.ConvertInput(inBuf, inOff, inLen);
 
@@ -122,8 +121,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 
 		/*
-		* Blind message with the blind factor.
-		*/
+		 * Blind message with the blind factor.
+		 */
 		private BigInteger BlindMessage(
 			BigInteger msg)
 		{
@@ -135,8 +134,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 
 		/*
-		* Unblind the message blinded with the blind factor.
-		*/
+		 * Unblind the message blinded with the blind factor.
+		 */
 		private BigInteger UnblindMessage(
 			BigInteger blindedMsg)
 		{

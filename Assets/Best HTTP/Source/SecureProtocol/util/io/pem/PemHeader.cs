@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			PemHeader other = (PemHeader)obj;
 
 			return Org.BouncyCastle.Utilities.Platform.Equals(this.name, other.name)
-				&& Org.BouncyCastle.Utilities.Platform.Equals(this.val, other.val);
+			       && Org.BouncyCastle.Utilities.Platform.Equals(this.val, other.val);
 		}
 
 		private int GetHashCode(string s)
@@ -54,11 +54,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			return s.GetHashCode();
 		}
 
-        public override string ToString()
-        {
+		public override string ToString()
+		{
 			return name + ":" + val;
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

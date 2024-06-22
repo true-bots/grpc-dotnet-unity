@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+
 /*
  * $Id: JZlib.cs,v 1.3 2011-02-15 05:46:04 bouncy Exp $
  *
@@ -12,8 +13,8 @@ modification, are permitted provided that the following conditions are met:
   1. Redistributions of source code must retain the above copyright notice,
      this list of conditions and the following disclaimer.
 
-  2. Redistributions in binary form must reproduce the above copyright 
-     notice, this list of conditions and the following disclaimer in 
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in
      the documentation and/or other materials provided with the distribution.
 
   3. The names of the authors may not be used to endorse or promote products
@@ -38,41 +39,42 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 {
-    public sealed class JZlib
-    {
-        private const string _version="1.0.7";
-        public static string version()
+	public sealed class JZlib
+	{
+		private const string _version = "1.0.7";
+
+		public static string version()
 		{
 			return _version;
 		}
 
-        // compression levels
-        public const int Z_NO_COMPRESSION=0;
-        public const int Z_BEST_SPEED=1;
-        public const int Z_BEST_COMPRESSION=9;
-        public const int Z_DEFAULT_COMPRESSION=-1;
+		// compression levels
+		public const int Z_NO_COMPRESSION = 0;
+		public const int Z_BEST_SPEED = 1;
+		public const int Z_BEST_COMPRESSION = 9;
+		public const int Z_DEFAULT_COMPRESSION = -1;
 
-        // compression strategy
-        public const int Z_FILTERED=1;
-        public const int Z_HUFFMAN_ONLY=2;
-        public const int Z_DEFAULT_STRATEGY=0;
+		// compression strategy
+		public const int Z_FILTERED = 1;
+		public const int Z_HUFFMAN_ONLY = 2;
+		public const int Z_DEFAULT_STRATEGY = 0;
 
-        public const int Z_NO_FLUSH=0;
-        public const int Z_PARTIAL_FLUSH=1;
-        public const int Z_SYNC_FLUSH=2;
-        public const int Z_FULL_FLUSH=3;
-        public const int Z_FINISH=4;
+		public const int Z_NO_FLUSH = 0;
+		public const int Z_PARTIAL_FLUSH = 1;
+		public const int Z_SYNC_FLUSH = 2;
+		public const int Z_FULL_FLUSH = 3;
+		public const int Z_FINISH = 4;
 
-        public const int Z_OK=0;
-        public const int Z_STREAM_END=1;
-        public const int Z_NEED_DICT=2;
-        public const int Z_ERRNO=-1;
-        public const int Z_STREAM_ERROR=-2;
-        public const int Z_DATA_ERROR=-3;
-        public const int Z_MEM_ERROR=-4;
-        public const int Z_BUF_ERROR=-5;
-        public const int Z_VERSION_ERROR=-6;
-    }
+		public const int Z_OK = 0;
+		public const int Z_STREAM_END = 1;
+		public const int Z_NEED_DICT = 2;
+		public const int Z_ERRNO = -1;
+		public const int Z_STREAM_ERROR = -2;
+		public const int Z_DATA_ERROR = -3;
+		public const int Z_MEM_ERROR = -4;
+		public const int Z_BUF_ERROR = -5;
+		public const int Z_VERSION_ERROR = -6;
+	}
 }
 #pragma warning restore
 #endif

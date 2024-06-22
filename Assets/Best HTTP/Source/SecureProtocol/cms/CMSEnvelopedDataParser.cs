@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -45,12 +44,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class CmsEnvelopedDataParser
 		: CmsContentInfoParser
 	{
-		internal RecipientInformationStore	recipientInfoStore;
-		internal EnvelopedDataParser		envelopedData;
+		internal RecipientInformationStore recipientInfoStore;
+		internal EnvelopedDataParser envelopedData;
 
-		private AlgorithmIdentifier			_encAlg;
-		private Asn1.Cms.AttributeTable		_unprotectedAttributes;
-		private bool						_attrNotRead;
+		private AlgorithmIdentifier _encAlg;
+		private Asn1.Cms.AttributeTable _unprotectedAttributes;
+		private bool _attrNotRead;
 
 		public CmsEnvelopedDataParser(
 			byte[] envelopedData)
@@ -101,7 +100,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 */
 		public string EncryptionAlgOid
 		{
-            get { return _encAlg.Algorithm.Id; }
+			get { return _encAlg.Algorithm.Id; }
 		}
 
 		/**

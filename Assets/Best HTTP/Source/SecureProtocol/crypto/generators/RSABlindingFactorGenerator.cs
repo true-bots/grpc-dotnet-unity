@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -59,8 +58,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			{
 				factor = new BigInteger(length, random);
 				gcd = factor.Gcd(m);
-			}
-			while (factor.SignValue == 0 || factor.Equals(BigInteger.One) || !gcd.Equals(BigInteger.One));
+			} while (factor.SignValue == 0 || factor.Equals(BigInteger.One) || !gcd.Equals(BigInteger.One));
 
 			return factor;
 		}

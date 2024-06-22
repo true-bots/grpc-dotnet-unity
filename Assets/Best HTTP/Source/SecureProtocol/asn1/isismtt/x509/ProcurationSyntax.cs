@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -31,34 +30,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 	*               ProcurationSyntax ::= SEQUENCE {
 	*                 country [1] EXPLICIT PrintableString(SIZE(2)) OPTIONAL,
 	*                 typeOfSubstitution [2] EXPLICIT DirectoryString (SIZE(1..128)) OPTIONAL,
-	*                 signingFor [3] EXPLICIT SigningFor 
+	*                 signingFor [3] EXPLICIT SigningFor
 	*               }
-	*               
-	*               SigningFor ::= CHOICE 
-	*               { 
+	*
+	*               SigningFor ::= CHOICE
+	*               {
 	*                 thirdPerson GeneralName,
-	*                 certRef IssuerSerial 
+	*                 certRef IssuerSerial
 	*               }
 	* </pre>
-	* 
+	*
 	*/
 	public class ProcurationSyntax
 		: Asn1Encodable
 	{
-		private readonly string				country;
-		private readonly DirectoryString	typeOfSubstitution;
-		private readonly GeneralName		thirdPerson;
-		private readonly IssuerSerial		certRef;
+		private readonly string country;
+		private readonly DirectoryString typeOfSubstitution;
+		private readonly GeneralName thirdPerson;
+		private readonly IssuerSerial certRef;
 
 		public static ProcurationSyntax GetInstance(object obj)
 		{
 			if (obj == null || obj is ProcurationSyntax)
-				return (ProcurationSyntax) obj;
+				return (ProcurationSyntax)obj;
 
 			if (obj is Asn1Sequence seq)
 				return new ProcurationSyntax(seq);
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -94,25 +93,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				Asn1TaggedObject o = Asn1TaggedObject.GetInstance(e.Current);
 				switch (o.TagNo)
 				{
-				case 1:
-					country = DerPrintableString.GetInstance(o, true).GetString();
-					break;
-				case 2:
-					typeOfSubstitution = DirectoryString.GetInstance(o, true);
-					break;
-				case 3:
-					Asn1Object signingFor = o.GetObject();
-					if (signingFor is Asn1TaggedObject)
-					{
-						thirdPerson = GeneralName.GetInstance(signingFor);
-					}
-					else
-					{
-						certRef = IssuerSerial.GetInstance(signingFor);
-					}
-					break;
-				default:
-					throw new ArgumentException("Bad tag number: " + o.TagNo);
+					case 1:
+						country = DerPrintableString.GetInstance(o, true).GetString();
+						break;
+					case 2:
+						typeOfSubstitution = DirectoryString.GetInstance(o, true);
+						break;
+					case 3:
+						Asn1Object signingFor = o.GetObject();
+						if (signingFor is Asn1TaggedObject)
+						{
+							thirdPerson = GeneralName.GetInstance(signingFor);
+						}
+						else
+						{
+							certRef = IssuerSerial.GetInstance(signingFor);
+						}
+
+						break;
+					default:
+						throw new ArgumentException("Bad tag number: " + o.TagNo);
 				}
 			}
 		}
@@ -129,9 +129,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		* @param certRef            Reference to certificate of the person who is represented.
 		*/
 		public ProcurationSyntax(
-			string			country,
-			DirectoryString	typeOfSubstitution,
-			IssuerSerial	certRef)
+			string country,
+			DirectoryString typeOfSubstitution,
+			IssuerSerial certRef)
 		{
 			this.country = country;
 			this.typeOfSubstitution = typeOfSubstitution;
@@ -151,9 +151,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		 * @param thirdPerson        The GeneralName of the person who is represented.
 		 */
 		public ProcurationSyntax(
-			string			country,
-			DirectoryString	typeOfSubstitution,
-			GeneralName		thirdPerson)
+			string country,
+			DirectoryString typeOfSubstitution,
+			GeneralName thirdPerson)
 		{
 			this.country = country;
 			this.typeOfSubstitution = typeOfSubstitution;
@@ -204,25 +204,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		*/
 		public override Asn1Object ToAsn1Object()
 		{
-            Asn1EncodableVector v = new Asn1EncodableVector();
+			Asn1EncodableVector v = new Asn1EncodableVector();
 
-            if (country != null)
-            {
-                v.Add(new DerTaggedObject(true, 1, new DerPrintableString(country, true)));
-            }
+			if (country != null)
+			{
+				v.Add(new DerTaggedObject(true, 1, new DerPrintableString(country, true)));
+			}
 
-            v.AddOptionalTagged(true, 2, typeOfSubstitution);
+			v.AddOptionalTagged(true, 2, typeOfSubstitution);
 
-            if (thirdPerson != null)
-            {
-                v.Add(new DerTaggedObject(true, 3, thirdPerson));
-            }
-            else
-            {
-                v.Add(new DerTaggedObject(true, 3, certRef));
-            }
+			if (thirdPerson != null)
+			{
+				v.Add(new DerTaggedObject(true, 3, thirdPerson));
+			}
+			else
+			{
+				v.Add(new DerTaggedObject(true, 3, certRef));
+			}
 
-            return new DerSequence(v);
+			return new DerSequence(v);
 		}
 	}
 }

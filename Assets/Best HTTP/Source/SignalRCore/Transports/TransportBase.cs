@@ -8,126 +8,130 @@ using BestHTTP.PlatformSupport.Text;
 
 namespace BestHTTP.SignalRCore.Transports
 {
-    internal abstract class TransportBase : ITransport
-    {
-        public abstract TransportTypes TransportType { get; }
+	internal abstract class TransportBase : ITransport
+	{
+		public abstract TransportTypes TransportType { get; }
 
-        public TransferModes TransferMode { get { return TransferModes.Binary; } }
+		public TransferModes TransferMode
+		{
+			get { return TransferModes.Binary; }
+		}
 
-        /// <summary>
-        /// Current state of the transport. All changes will be propagated to the HubConnection through the onstateChanged event.
-        /// </summary>
-        public TransportStates State
-        {
-            get { return this._state; }
-            protected set
-            {
-                if (this._state != value)
-                {
-                    TransportStates oldState = this._state;
-                    this._state = value;
+		/// <summary>
+		/// Current state of the transport. All changes will be propagated to the HubConnection through the onstateChanged event.
+		/// </summary>
+		public TransportStates State
+		{
+			get { return this._state; }
+			protected set
+			{
+				if (this._state != value)
+				{
+					TransportStates oldState = this._state;
+					this._state = value;
 
-                    if (this.OnStateChanged != null)
-                        this.OnStateChanged(oldState, this._state);
-                }
-            }
-        }
-        protected TransportStates _state;
+					if (this.OnStateChanged != null)
+						this.OnStateChanged(oldState, this._state);
+				}
+			}
+		}
 
-        /// <summary>
-        /// This will store the reason of failures so HubConnection can include it in its OnError event.
-        /// </summary>
-        public string ErrorReason { get; protected set; }
+		protected TransportStates _state;
 
-        /// <summary>
-        /// Called every time when the transport's <see cref="State"/> changed.
-        /// </summary>
-        public event Action<TransportStates, TransportStates> OnStateChanged;
+		/// <summary>
+		/// This will store the reason of failures so HubConnection can include it in its OnError event.
+		/// </summary>
+		public string ErrorReason { get; protected set; }
 
-        public LoggingContext Context { get; protected set; }
+		/// <summary>
+		/// Called every time when the transport's <see cref="State"/> changed.
+		/// </summary>
+		public event Action<TransportStates, TransportStates> OnStateChanged;
 
-        /// <summary>
-        /// Cached list of parsed messages.
-        /// </summary>
-        protected List<Messages.Message> messages = new List<Messages.Message>();
+		public LoggingContext Context { get; protected set; }
 
-        /// <summary>
-        /// Parent HubConnection instance.
-        /// </summary>
-        protected HubConnection connection;
+		/// <summary>
+		/// Cached list of parsed messages.
+		/// </summary>
+		protected List<Messages.Message> messages = new List<Messages.Message>();
 
-        internal TransportBase(HubConnection con)
-        {
-            this.connection = con;
-            this.Context = new LoggingContext(this);
-            this.Context.Add("Hub", this.connection.Context);
-            this.State = TransportStates.Initial;
-        }
+		/// <summary>
+		/// Parent HubConnection instance.
+		/// </summary>
+		protected HubConnection connection;
 
-        /// <summary>
-        /// ITransport.StartConnect
-        /// </summary>
-        public abstract void StartConnect();
+		internal TransportBase(HubConnection con)
+		{
+			this.connection = con;
+			this.Context = new LoggingContext(this);
+			this.Context.Add("Hub", this.connection.Context);
+			this.State = TransportStates.Initial;
+		}
 
-        /// <summary>
-        /// ITransport.Send
-        /// </summary>
-        /// <param name="msg"></param>
-        public abstract void Send(BufferSegment msg);
+		/// <summary>
+		/// ITransport.StartConnect
+		/// </summary>
+		public abstract void StartConnect();
 
-        /// <summary>
-        /// ITransport.StartClose
-        /// </summary>
-        public abstract void StartClose();
+		/// <summary>
+		/// ITransport.Send
+		/// </summary>
+		/// <param name="msg"></param>
+		public abstract void Send(BufferSegment msg);
 
-        protected string ParseHandshakeResponse(string data)
-        {
-            // The handshake response is
-            //  -an empty json object ('{}') if the handshake process is succesfull
-            //  -otherwise it has one 'error' field
+		/// <summary>
+		/// ITransport.StartClose
+		/// </summary>
+		public abstract void StartClose();
 
-            Dictionary<string, object> response = BestHTTP.JSON.Json.Decode(data) as Dictionary<string, object>;
+		protected string ParseHandshakeResponse(string data)
+		{
+			// The handshake response is
+			//  -an empty json object ('{}') if the handshake process is succesfull
+			//  -otherwise it has one 'error' field
 
-            if (response == null)
-                return "Couldn't parse json data: " + data;
+			Dictionary<string, object> response = BestHTTP.JSON.Json.Decode(data) as Dictionary<string, object>;
 
-            object error;
-            if (response.TryGetValue("error", out error))
-                return error.ToString();
+			if (response == null)
+				return "Couldn't parse json data: " + data;
 
-            return null;
-        }
+			object error;
+			if (response.TryGetValue("error", out error))
+				return error.ToString();
 
-        protected void HandleHandshakeResponse(string data)
-        {
-            this.ErrorReason = ParseHandshakeResponse(data);
+			return null;
+		}
 
-            this.State = string.IsNullOrEmpty(this.ErrorReason) ? TransportStates.Connected : TransportStates.Failed;
-        }
+		protected void HandleHandshakeResponse(string data)
+		{
+			this.ErrorReason = ParseHandshakeResponse(data);
 
-        //StringBuilder queryBuilder = new StringBuilder(3);
-        protected Uri BuildUri(Uri baseUri)
-        {
-            if (this.connection.NegotiationResult == null)
-                return baseUri;
+			this.State = string.IsNullOrEmpty(this.ErrorReason) ? TransportStates.Connected : TransportStates.Failed;
+		}
 
-            UriBuilder builder = new UriBuilder(baseUri);
+		//StringBuilder queryBuilder = new StringBuilder(3);
+		protected Uri BuildUri(Uri baseUri)
+		{
+			if (this.connection.NegotiationResult == null)
+				return baseUri;
 
-            var queryBuilder = StringBuilderPool.Get(3);
+			UriBuilder builder = new UriBuilder(baseUri);
 
-            queryBuilder.Append(baseUri.Query);
-            if (!string.IsNullOrEmpty(this.connection.NegotiationResult.ConnectionToken))
-                queryBuilder.Append("&id=").Append(this.connection.NegotiationResult.ConnectionToken);
-            else if (!string.IsNullOrEmpty(this.connection.NegotiationResult.ConnectionId))
-                queryBuilder.Append("&id=").Append(this.connection.NegotiationResult.ConnectionId);
+			var queryBuilder = StringBuilderPool.Get(3);
 
-            builder.Query = StringBuilderPool.ReleaseAndGrab(queryBuilder);
+			queryBuilder.Append(baseUri.Query);
+			if (!string.IsNullOrEmpty(this.connection.NegotiationResult.ConnectionToken))
+				queryBuilder.Append("&id=").Append(this.connection.NegotiationResult.ConnectionToken);
+			else if (!string.IsNullOrEmpty(this.connection.NegotiationResult.ConnectionId))
+				queryBuilder.Append("&id=").Append(this.connection.NegotiationResult.ConnectionId);
 
-            if (builder.Query.StartsWith("??"))
-                builder.Query = builder.Query.Substring(2);
+			builder.Query = StringBuilderPool.ReleaseAndGrab(queryBuilder);
 
-            return builder.Uri;
-        }
-    }
+			if (builder.Query.StartsWith("??"))
+				builder.Query = builder.Query.Substring(2);
+
+			return builder.Uri;
+		}
+	}
 }
 #endif

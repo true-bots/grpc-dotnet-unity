@@ -5,37 +5,37 @@ using System.Text;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 {
-    /// <summary>
-    /// Represents revocation key OpenPGP signature sub packet.
-    /// </summary>
-    public class RevocationKey
+	/// <summary>
+	/// Represents revocation key OpenPGP signature sub packet.
+	/// </summary>
+	public class RevocationKey
 		: SignatureSubpacket
-    {
+	{
 		// 1 octet of class, 
 		// 1 octet of public-key algorithm ID, 
 		// 20 octets of fingerprint
 		public RevocationKey(
-			bool	isCritical,
-            bool    isLongLength,
-            byte[]  data)
+			bool isCritical,
+			bool isLongLength,
+			byte[] data)
 			: base(SignatureSubpacketTag.RevocationKey, isCritical, isLongLength, data)
 		{
 		}
 
-        public RevocationKey(
-			bool					isCritical,
-			RevocationKeyTag		signatureClass,
-			PublicKeyAlgorithmTag	keyAlgorithm,
-			byte[]					fingerprint)
+		public RevocationKey(
+			bool isCritical,
+			RevocationKeyTag signatureClass,
+			PublicKeyAlgorithmTag keyAlgorithm,
+			byte[] fingerprint)
 			: base(SignatureSubpacketTag.RevocationKey, isCritical, false,
 				CreateData(signatureClass, keyAlgorithm, fingerprint))
 		{
 		}
 
 		private static byte[] CreateData(
-			RevocationKeyTag		signatureClass,
-			PublicKeyAlgorithmTag	keyAlgorithm,
-			byte[]					fingerprint)
+			RevocationKeyTag signatureClass,
+			PublicKeyAlgorithmTag keyAlgorithm,
+			byte[] fingerprint)
 		{
 			byte[] data = new byte[2 + fingerprint.Length];
 			data[0] = (byte)signatureClass;
@@ -54,14 +54,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			get { return (PublicKeyAlgorithmTag)this.GetData()[1]; }
 		}
 
-        public virtual byte[] GetFingerprint()
+		public virtual byte[] GetFingerprint()
 		{
 			byte[] data = this.GetData();
 			byte[] fingerprint = new byte[data.Length - 2];
 			Array.Copy(data, 2, fingerprint, 0, fingerprint.Length);
 			return fingerprint;
 		}
-    }
+	}
 }
 #pragma warning restore
 #endif

@@ -1,54 +1,54 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
-    public class OriginatorInfo
-        : Asn1Encodable
-    {
-        private Asn1Set certs;
-        private Asn1Set crls;
-
-        public OriginatorInfo(
-            Asn1Set certs,
-            Asn1Set crls)
-        {
-            this.certs = certs;
-            this.crls = crls;
-        }
+	public class OriginatorInfo
+		: Asn1Encodable
+	{
+		private Asn1Set certs;
+		private Asn1Set crls;
 
 		public OriginatorInfo(
-            Asn1Sequence seq)
-        {
-            switch (seq.Count)
-            {
-            case 0:     // empty
-                break;
-            case 1:
-                Asn1TaggedObject o = (Asn1TaggedObject) seq[0];
-                switch (o.TagNo)
-                {
-                case 0 :
-                    certs = Asn1Set.GetInstance(o, false);
-                    break;
-                case 1 :
-                    crls = Asn1Set.GetInstance(o, false);
-                    break;
-                default:
-                    throw new ArgumentException("Bad tag in OriginatorInfo: " + o.TagNo);
-                }
-                break;
-            case 2:
-                certs = Asn1Set.GetInstance((Asn1TaggedObject) seq[0], false);
-                crls  = Asn1Set.GetInstance((Asn1TaggedObject) seq[1], false);
-                break;
-            default:
-                throw new ArgumentException("OriginatorInfo too big");
-            }
-        }
+			Asn1Set certs,
+			Asn1Set crls)
+		{
+			this.certs = certs;
+			this.crls = crls;
+		}
+
+		public OriginatorInfo(
+			Asn1Sequence seq)
+		{
+			switch (seq.Count)
+			{
+				case 0: // empty
+					break;
+				case 1:
+					Asn1TaggedObject o = (Asn1TaggedObject)seq[0];
+					switch (o.TagNo)
+					{
+						case 0:
+							certs = Asn1Set.GetInstance(o, false);
+							break;
+						case 1:
+							crls = Asn1Set.GetInstance(o, false);
+							break;
+						default:
+							throw new ArgumentException("Bad tag in OriginatorInfo: " + o.TagNo);
+					}
+
+					break;
+				case 2:
+					certs = Asn1Set.GetInstance((Asn1TaggedObject)seq[0], false);
+					crls = Asn1Set.GetInstance((Asn1TaggedObject)seq[1], false);
+					break;
+				default:
+					throw new ArgumentException("OriginatorInfo too big");
+			}
+		}
 
 		/**
          * return an OriginatorInfo object from a tagged object.
@@ -59,12 +59,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * @exception ArgumentException if the object held by the
          *          tagged object cannot be converted.
          */
-        public static OriginatorInfo GetInstance(
-            Asn1TaggedObject	obj,
-            bool				explicitly)
-        {
-            return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
-        }
+		public static OriginatorInfo GetInstance(
+			Asn1TaggedObject obj,
+			bool explicitly)
+		{
+			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
+		}
 
 		/**
          * return an OriginatorInfo object from the given object.
@@ -72,17 +72,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * @param obj the object we want converted.
          * @exception ArgumentException if the object cannot be converted.
          */
-        public static OriginatorInfo GetInstance(
-            object obj)
-        {
-            if (obj == null || obj is OriginatorInfo)
-                return (OriginatorInfo)obj;
+		public static OriginatorInfo GetInstance(
+			object obj)
+		{
+			if (obj == null || obj is OriginatorInfo)
+				return (OriginatorInfo)obj;
 
 			if (obj is Asn1Sequence)
-                return new OriginatorInfo((Asn1Sequence)obj);
+				return new OriginatorInfo((Asn1Sequence)obj);
 
-            throw new ArgumentException("Invalid OriginatorInfo: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
-        }
+			throw new ArgumentException("Invalid OriginatorInfo: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+		}
 
 		public Asn1Set Certificates
 		{
@@ -103,14 +103,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptionalTagged(false, 0, certs);
-            v.AddOptionalTagged(false, 1, crls);
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
+			v.AddOptionalTagged(false, 0, certs);
+			v.AddOptionalTagged(false, 1, crls);
 			return new DerSequence(v);
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

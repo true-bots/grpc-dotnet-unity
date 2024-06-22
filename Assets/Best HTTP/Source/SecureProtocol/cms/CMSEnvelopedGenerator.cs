@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Kisa;
@@ -77,36 +76,36 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 
 		// TODO Create named constants for all of these
-		public static readonly string DesEde3Cbc		= PkcsObjectIdentifiers.DesEde3Cbc.Id;
-		public static readonly string RC2Cbc			= PkcsObjectIdentifiers.RC2Cbc.Id;
-		public const string IdeaCbc						= "1.3.6.1.4.1.188.7.1.1.2";
-		public const string Cast5Cbc					= "1.2.840.113533.7.66.10";
-		public static readonly string Aes128Cbc			= NistObjectIdentifiers.IdAes128Cbc.Id;
-		public static readonly string Aes192Cbc			= NistObjectIdentifiers.IdAes192Cbc.Id;
-		public static readonly string Aes256Cbc			= NistObjectIdentifiers.IdAes256Cbc.Id;
-		public static readonly string Camellia128Cbc	= NttObjectIdentifiers.IdCamellia128Cbc.Id;
-		public static readonly string Camellia192Cbc	= NttObjectIdentifiers.IdCamellia192Cbc.Id;
-		public static readonly string Camellia256Cbc	= NttObjectIdentifiers.IdCamellia256Cbc.Id;
-		public static readonly string SeedCbc			= KisaObjectIdentifiers.IdSeedCbc.Id;
+		public static readonly string DesEde3Cbc = PkcsObjectIdentifiers.DesEde3Cbc.Id;
+		public static readonly string RC2Cbc = PkcsObjectIdentifiers.RC2Cbc.Id;
+		public const string IdeaCbc = "1.3.6.1.4.1.188.7.1.1.2";
+		public const string Cast5Cbc = "1.2.840.113533.7.66.10";
+		public static readonly string Aes128Cbc = NistObjectIdentifiers.IdAes128Cbc.Id;
+		public static readonly string Aes192Cbc = NistObjectIdentifiers.IdAes192Cbc.Id;
+		public static readonly string Aes256Cbc = NistObjectIdentifiers.IdAes256Cbc.Id;
+		public static readonly string Camellia128Cbc = NttObjectIdentifiers.IdCamellia128Cbc.Id;
+		public static readonly string Camellia192Cbc = NttObjectIdentifiers.IdCamellia192Cbc.Id;
+		public static readonly string Camellia256Cbc = NttObjectIdentifiers.IdCamellia256Cbc.Id;
+		public static readonly string SeedCbc = KisaObjectIdentifiers.IdSeedCbc.Id;
 
-		public static readonly string DesEde3Wrap		= PkcsObjectIdentifiers.IdAlgCms3DesWrap.Id;
-		public static readonly string Aes128Wrap		= NistObjectIdentifiers.IdAes128Wrap.Id;
-		public static readonly string Aes192Wrap		= NistObjectIdentifiers.IdAes192Wrap.Id;
-		public static readonly string Aes256Wrap		= NistObjectIdentifiers.IdAes256Wrap.Id;
-		public static readonly string Camellia128Wrap	= NttObjectIdentifiers.IdCamellia128Wrap.Id;
-		public static readonly string Camellia192Wrap	= NttObjectIdentifiers.IdCamellia192Wrap.Id;
-		public static readonly string Camellia256Wrap	= NttObjectIdentifiers.IdCamellia256Wrap.Id;
-		public static readonly string SeedWrap			= KisaObjectIdentifiers.IdNpkiAppCmsSeedWrap.Id;
+		public static readonly string DesEde3Wrap = PkcsObjectIdentifiers.IdAlgCms3DesWrap.Id;
+		public static readonly string Aes128Wrap = NistObjectIdentifiers.IdAes128Wrap.Id;
+		public static readonly string Aes192Wrap = NistObjectIdentifiers.IdAes192Wrap.Id;
+		public static readonly string Aes256Wrap = NistObjectIdentifiers.IdAes256Wrap.Id;
+		public static readonly string Camellia128Wrap = NttObjectIdentifiers.IdCamellia128Wrap.Id;
+		public static readonly string Camellia192Wrap = NttObjectIdentifiers.IdCamellia192Wrap.Id;
+		public static readonly string Camellia256Wrap = NttObjectIdentifiers.IdCamellia256Wrap.Id;
+		public static readonly string SeedWrap = KisaObjectIdentifiers.IdNpkiAppCmsSeedWrap.Id;
 
-		public static readonly string ECDHSha1Kdf		= X9ObjectIdentifiers.DHSinglePassStdDHSha1KdfScheme.Id;
-		public static readonly string ECMqvSha1Kdf		= X9ObjectIdentifiers.MqvSinglePassSha1KdfScheme.Id;
+		public static readonly string ECDHSha1Kdf = X9ObjectIdentifiers.DHSinglePassStdDHSha1KdfScheme.Id;
+		public static readonly string ECMqvSha1Kdf = X9ObjectIdentifiers.MqvSinglePassSha1KdfScheme.Id;
 
 		internal readonly IList<RecipientInfoGenerator> recipientInfoGenerators = new List<RecipientInfoGenerator>();
 		internal readonly SecureRandom m_random;
 
-        internal CmsAttributeTableGenerator unprotectedAttributeGenerator = null;
+		internal CmsAttributeTableGenerator unprotectedAttributeGenerator = null;
 
-        protected CmsEnvelopedGenerator()
+		protected CmsEnvelopedGenerator()
 			: this(CryptoServicesRegistrar.GetSecureRandom())
 		{
 		}
@@ -121,11 +120,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			m_random = random;
 		}
 
-        public CmsAttributeTableGenerator UnprotectedAttributeGenerator
-        {
-            get { return this.unprotectedAttributeGenerator; }
-            set { this.unprotectedAttributeGenerator = value; }
-        }
+		public CmsAttributeTableGenerator UnprotectedAttributeGenerator
+		{
+			get { return this.unprotectedAttributeGenerator; }
+			set { this.unprotectedAttributeGenerator = value; }
+		}
 
 		/**
 		 * add a recipient.
@@ -149,11 +148,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @exception ArgumentException if there is a problem with the key
 		*/
 		public void AddKeyTransRecipient(
-			AsymmetricKeyParameter	pubKey,
-			byte[]					subKeyId)
+			AsymmetricKeyParameter pubKey,
+			byte[] subKeyId)
 		{
 			SubjectPublicKeyInfo info = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(pubKey);
-			this.AddRecipientInfoGenerator(new KeyTransRecipientInfoGenerator(subKeyId, new Asn1KeyWrapper(info.AlgorithmID.Algorithm, info.AlgorithmID.Parameters, pubKey)));
+			this.AddRecipientInfoGenerator(new KeyTransRecipientInfoGenerator(subKeyId,
+				new Asn1KeyWrapper(info.AlgorithmID.Algorithm, info.AlgorithmID.Parameters, pubKey)));
 		}
 
 		/**
@@ -162,9 +162,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 * @param keyIdentifier the byte string that identifies the key
 		 */
 		public void AddKekRecipient(
-			string			keyAlgorithm, // TODO Remove need for this parameter
-			KeyParameter	key,
-			byte[]			keyIdentifier)
+			string keyAlgorithm, // TODO Remove need for this parameter
+			KeyParameter key,
+			byte[] keyIdentifier)
 		{
 			AddKekRecipient(keyAlgorithm, key, new KekIdentifier(keyIdentifier, null, null));
 		}
@@ -175,9 +175,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @param keyIdentifier the byte string that identifies the key
 		*/
 		public void AddKekRecipient(
-			string			keyAlgorithm, // TODO Remove need for this parameter
-			KeyParameter	key,
-			KekIdentifier	kekIdentifier)
+			string keyAlgorithm, // TODO Remove need for this parameter
+			KeyParameter key,
+			KekIdentifier kekIdentifier)
 		{
 			KekRecipientInfoGenerator kekrig = new KekRecipientInfoGenerator();
 			kekrig.KekIdentifier = kekIdentifier;
@@ -188,8 +188,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		public void AddPasswordRecipient(
-			CmsPbeKey	pbeKey,
-			string		kekAlgorithmOid)
+			CmsPbeKey pbeKey,
+			string kekAlgorithmOid)
 		{
 			Pbkdf2Params p = new Pbkdf2Params(pbeKey.Salt, pbeKey.IterationCount);
 
@@ -213,13 +213,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @exception InvalidKeyException if the keys are inappropriate for the algorithm specified
 		*/
 		public void AddKeyAgreementRecipient(
-			string					agreementAlgorithm,
-			AsymmetricKeyParameter	senderPrivateKey,
-			AsymmetricKeyParameter	senderPublicKey,
-			X509Certificate			recipientCert,
-			string					cekWrapAlgorithm)
+			string agreementAlgorithm,
+			AsymmetricKeyParameter senderPrivateKey,
+			AsymmetricKeyParameter senderPublicKey,
+			X509Certificate recipientCert,
+			string cekWrapAlgorithm)
 		{
-            var recipientCerts = new List<X509Certificate>(1);
+			var recipientCerts = new List<X509Certificate>(1);
 			recipientCerts.Add(recipientCert);
 
 			AddKeyAgreementRecipients(agreementAlgorithm, senderPrivateKey, senderPublicKey,
@@ -238,11 +238,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 * @exception InvalidKeyException if the keys are inappropriate for the algorithm specified
 		 */
 		public void AddKeyAgreementRecipients(
-			string					agreementAlgorithm,
-			AsymmetricKeyParameter	senderPrivateKey,
-			AsymmetricKeyParameter	senderPublicKey,
+			string agreementAlgorithm,
+			AsymmetricKeyParameter senderPrivateKey,
+			AsymmetricKeyParameter senderPublicKey,
 			IEnumerable<X509Certificate> recipientCerts,
-			string					cekWrapAlgorithm)
+			string cekWrapAlgorithm)
 		{
 			if (!senderPrivateKey.IsPrivate)
 				throw new ArgumentException("Expected private key", "senderPrivateKey");
@@ -263,21 +263,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			recipientInfoGenerators.Add(karig);
 		}
 
-        /// <summary>
-        /// Add a generator to produce the recipient info required.
-        /// </summary>
-        /// <param name="recipientInfoGenerator">a generator of a recipient info object.</param>
-	    public void AddRecipientInfoGenerator(RecipientInfoGenerator recipientInfoGenerator)
-	    {
-	        recipientInfoGenerators.Add(recipientInfoGenerator);
-	    }
+		/// <summary>
+		/// Add a generator to produce the recipient info required.
+		/// </summary>
+		/// <param name="recipientInfoGenerator">a generator of a recipient info object.</param>
+		public void AddRecipientInfoGenerator(RecipientInfoGenerator recipientInfoGenerator)
+		{
+			recipientInfoGenerators.Add(recipientInfoGenerator);
+		}
 
 
-        protected internal virtual AlgorithmIdentifier GetAlgorithmIdentifier(
-			string					encryptionOid,
-			KeyParameter			encKey,
-			Asn1Encodable			asn1Params,
-			out ICipherParameters	cipherParameters)
+		protected internal virtual AlgorithmIdentifier GetAlgorithmIdentifier(
+			string encryptionOid,
+			KeyParameter encKey,
+			Asn1Encodable asn1Params,
+			out ICipherParameters cipherParameters)
 		{
 			Asn1Object asn1Object;
 			if (asn1Params != null)
@@ -298,8 +298,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		protected internal virtual Asn1Encodable GenerateAsn1Parameters(
-			string	encryptionOid,
-			byte[]	encKeyBytes)
+			string encryptionOid,
+			byte[] encKeyBytes)
 		{
 			Asn1Encodable asn1Params = null;
 
@@ -308,7 +308,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				if (encryptionOid.Equals(RC2Cbc))
 				{
 					byte[] iv = new byte[8];
-                    m_random.NextBytes(iv);
+					m_random.NextBytes(iv);
 
 					// TODO Is this detailed repeat of Java version really necessary?
 					int effKeyBits = encKeyBytes.Length * 8;

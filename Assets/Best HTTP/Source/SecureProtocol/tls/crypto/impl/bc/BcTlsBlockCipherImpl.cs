@@ -1,30 +1,29 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 {
-    internal sealed class BcTlsBlockCipherImpl
-        : TlsBlockCipherImpl
-    {
-        private readonly bool m_isEncrypting;
-        private readonly IBlockCipher m_cipher;
+	internal sealed class BcTlsBlockCipherImpl
+		: TlsBlockCipherImpl
+	{
+		private readonly bool m_isEncrypting;
+		private readonly IBlockCipher m_cipher;
 
-        private KeyParameter key;
+		private KeyParameter key;
 
-        internal BcTlsBlockCipherImpl(IBlockCipher cipher, bool isEncrypting)
-        {
-            this.m_cipher = cipher;
-            this.m_isEncrypting = isEncrypting;
-        }
+		internal BcTlsBlockCipherImpl(IBlockCipher cipher, bool isEncrypting)
+		{
+			this.m_cipher = cipher;
+			this.m_isEncrypting = isEncrypting;
+		}
 
-        public void SetKey(byte[] key, int keyOff, int keyLen)
-        {
-            this.key = new KeyParameter(key, keyOff, keyLen);
-        }
+		public void SetKey(byte[] key, int keyOff, int keyLen)
+		{
+			this.key = new KeyParameter(key, keyOff, keyLen);
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public void SetKey(ReadOnlySpan<byte> key)
@@ -33,10 +32,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
         }
 #endif
 
-        public void Init(byte[] iv, int ivOff, int ivLen)
-        {
-            m_cipher.Init(m_isEncrypting, new ParametersWithIV(key, iv, ivOff, ivLen));
-        }
+		public void Init(byte[] iv, int ivOff, int ivLen)
+		{
+			m_cipher.Init(m_isEncrypting, new ParametersWithIV(key, iv, ivOff, ivLen));
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public void Init(ReadOnlySpan<byte> iv)
@@ -45,23 +44,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
         }
 #endif
 
-        public int DoFinal(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset)
-        {
-            int blockSize = m_cipher.GetBlockSize();
+		public int DoFinal(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset)
+		{
+			int blockSize = m_cipher.GetBlockSize();
 
-            for (int i = 0; i < inputLength; i += blockSize)
-            {
-                m_cipher.ProcessBlock(input, inputOffset + i, output, outputOffset + i);
-            }
+			for (int i = 0; i < inputLength; i += blockSize)
+			{
+				m_cipher.ProcessBlock(input, inputOffset + i, output, outputOffset + i);
+			}
 
-            return inputLength;
-        }
+			return inputLength;
+		}
 
-        public int GetBlockSize()
-        {
-            return m_cipher.GetBlockSize();
-        }
-    }
+		public int GetBlockSize()
+		{
+			return m_cipher.GetBlockSize();
+		}
+	}
 }
 #pragma warning restore
 #endif

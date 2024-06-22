@@ -1,31 +1,30 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
-    public class OriginatorPublicKey
-        : Asn1Encodable
-    {
-        private readonly AlgorithmIdentifier mAlgorithm;
-        private readonly DerBitString        mPublicKey;
+	public class OriginatorPublicKey
+		: Asn1Encodable
+	{
+		private readonly AlgorithmIdentifier mAlgorithm;
+		private readonly DerBitString mPublicKey;
 
-        public OriginatorPublicKey(
-            AlgorithmIdentifier algorithm,
-            byte[]              publicKey)
-        {
-            this.mAlgorithm = algorithm;
-            this.mPublicKey = new DerBitString(publicKey);
-        }
+		public OriginatorPublicKey(
+			AlgorithmIdentifier algorithm,
+			byte[] publicKey)
+		{
+			this.mAlgorithm = algorithm;
+			this.mPublicKey = new DerBitString(publicKey);
+		}
 
 		private OriginatorPublicKey(Asn1Sequence seq)
-        {
-            this.mAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
-            this.mPublicKey = DerBitString.GetInstance(seq[1]);
-        }
+		{
+			this.mAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
+			this.mPublicKey = DerBitString.GetInstance(seq[1]);
+		}
 
 		/**
          * return an OriginatorPublicKey object from a tagged object.
@@ -36,12 +35,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * @exception ArgumentException if the object held by the
          *          tagged object cannot be converted.
          */
-        public static OriginatorPublicKey GetInstance(
-            Asn1TaggedObject	obj,
-            bool				explicitly)
-        {
-            return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
-        }
+		public static OriginatorPublicKey GetInstance(
+			Asn1TaggedObject obj,
+			bool explicitly)
+		{
+			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
+		}
 
 		/**
          * return an OriginatorPublicKey object from the given object.
@@ -49,17 +48,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * @param obj the object we want converted.
          * @exception ArgumentException if the object cannot be converted.
          */
-        public static OriginatorPublicKey GetInstance(
-            object obj)
-        {
-            if (obj == null || obj is OriginatorPublicKey)
-                return (OriginatorPublicKey)obj;
+		public static OriginatorPublicKey GetInstance(
+			object obj)
+		{
+			if (obj == null || obj is OriginatorPublicKey)
+				return (OriginatorPublicKey)obj;
 
 			if (obj is Asn1Sequence)
-                return new OriginatorPublicKey(Asn1Sequence.GetInstance(obj));
+				return new OriginatorPublicKey(Asn1Sequence.GetInstance(obj));
 
-            throw new ArgumentException("Invalid OriginatorPublicKey: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
-        }
+			throw new ArgumentException("Invalid OriginatorPublicKey: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+		}
 
 		public AlgorithmIdentifier Algorithm
 		{
@@ -80,11 +79,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
          * }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
+		public override Asn1Object ToAsn1Object()
+		{
 			return new DerSequence(mAlgorithm, mPublicKey);
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

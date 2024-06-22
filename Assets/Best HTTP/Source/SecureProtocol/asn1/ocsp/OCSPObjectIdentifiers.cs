@@ -4,12 +4,12 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 {
-    public abstract class OcspObjectIdentifiers
-    {
-        internal const string PkixOcspId = "1.3.6.1.5.5.7.48.1";
+	public abstract class OcspObjectIdentifiers
+	{
+		internal const string PkixOcspId = "1.3.6.1.5.5.7.48.1";
 
 		public static readonly DerObjectIdentifier PkixOcsp = new DerObjectIdentifier(PkixOcspId);
-        public static readonly DerObjectIdentifier PkixOcspBasic = new DerObjectIdentifier(PkixOcspId + ".1");
+		public static readonly DerObjectIdentifier PkixOcspBasic = new DerObjectIdentifier(PkixOcspId + ".1");
 
 		//
 		// extensions

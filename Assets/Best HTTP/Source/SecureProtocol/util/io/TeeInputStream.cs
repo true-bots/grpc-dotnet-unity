@@ -20,17 +20,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 			this.tee = tee;
 		}
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                input.Dispose();
-                tee.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				input.Dispose();
+				tee.Dispose();
+			}
 
-        public override int Read(byte[] buffer, int offset, int count)
+			base.Dispose(disposing);
+		}
+
+		public override int Read(byte[] buffer, int offset, int count)
 		{
 			int i = input.Read(buffer, offset, count);
 
@@ -56,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
         }
 #endif
 
-        public override int ReadByte()
+		public override int ReadByte()
 		{
 			int i = input.ReadByte();
 

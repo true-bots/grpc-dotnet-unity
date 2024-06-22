@@ -3,7 +3,6 @@
 using System;
 using System.IO;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
@@ -17,8 +16,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 	 */
 	public class TimeStampResponse
 	{
-		private TimeStampResp	resp;
-		private TimeStampToken	timeStampToken;
+		private TimeStampResp resp;
+		private TimeStampToken timeStampToken;
 
 		public TimeStampResponse(
 			TimeStampResp resp)
@@ -133,7 +132,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 					throw new TspValidationException("response contains wrong nonce value.");
 				}
 
-				if (this.Status != (int) PkiStatus.Granted && this.Status != (int) PkiStatus.GrantedWithMods)
+				if (this.Status != (int)PkiStatus.Granted && this.Status != (int)PkiStatus.GrantedWithMods)
 				{
 					throw new TspValidationException("time stamp token found in failed request.");
 				}
@@ -160,7 +159,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 				{
 					/*
 					 * RFC 5035 5.4. If both attributes exist in a single message,
-					 * they are independently evaluated. 
+					 * they are independently evaluated.
 					 */
 				}
 
@@ -169,7 +168,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 					throw new TspValidationException("TSA policy wrong for request.");
 				}
 			}
-			else if (this.Status == (int) PkiStatus.Granted || this.Status == (int) PkiStatus.GrantedWithMods)
+			else if (this.Status == (int)PkiStatus.Granted || this.Status == (int)PkiStatus.GrantedWithMods)
 			{
 				throw new TspValidationException("no time stamp token found and one expected.");
 			}

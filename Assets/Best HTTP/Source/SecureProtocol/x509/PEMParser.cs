@@ -3,7 +3,6 @@
 using System;
 using System.IO;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders;
@@ -43,8 +42,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 					l.Append((char)c);
 				}
-			}
-			while (c >= 0 && l.Length == 0);
+			} while (c >= 0 && l.Length == 0);
 
 			if (c < 0)
 			{
@@ -62,7 +60,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			while ((line = ReadLine(inStream)) != null)
 			{
-                if (Org.BouncyCastle.Utilities.Platform.StartsWith(line, _header1) || Org.BouncyCastle.Utilities.Platform.StartsWith(line, _header2))
+				if (Org.BouncyCastle.Utilities.Platform.StartsWith(line, _header1) || Org.BouncyCastle.Utilities.Platform.StartsWith(line, _header2))
 				{
 					break;
 				}
@@ -70,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			while ((line = ReadLine(inStream)) != null)
 			{
-                if (Org.BouncyCastle.Utilities.Platform.StartsWith(line, _footer1) || Org.BouncyCastle.Utilities.Platform.StartsWith(line, _footer2))
+				if (Org.BouncyCastle.Utilities.Platform.StartsWith(line, _footer1) || Org.BouncyCastle.Utilities.Platform.StartsWith(line, _footer2))
 				{
 					break;
 				}
@@ -87,7 +85,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 					throw new IOException("malformed PEM data encountered");
 				}
 
-				return (Asn1Sequence) o;
+				return (Asn1Sequence)o;
 			}
 
 			return null;

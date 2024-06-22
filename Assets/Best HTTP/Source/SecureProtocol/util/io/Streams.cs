@@ -14,23 +14,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 			inStr.CopyTo(Stream.Null, BufferSize);
 		}
 
-        /// <summary>Write the full contents of inStr to the destination stream outStr.</summary>
-        /// <param name="inStr">Source stream.</param>
-        /// <param name="outStr">Destination stream.</param>
-        /// <exception cref="IOException">In case of IO failure.</exception>
-        public static void PipeAll(Stream inStr, Stream outStr)
+		/// <summary>Write the full contents of inStr to the destination stream outStr.</summary>
+		/// <param name="inStr">Source stream.</param>
+		/// <param name="outStr">Destination stream.</param>
+		/// <exception cref="IOException">In case of IO failure.</exception>
+		public static void PipeAll(Stream inStr, Stream outStr)
 		{
 			inStr.CopyTo(outStr, BufferSize);
-        }
+		}
 
-        /// <summary>Write the full contents of inStr to the destination stream outStr.</summary>
-        /// <param name="inStr">Source stream.</param>
-        /// <param name="outStr">Destination stream.</param>
-        /// <param name="bufferSize">The size of temporary buffer to use.</param>
-        /// <exception cref="IOException">In case of IO failure.</exception>
-        public static void PipeAll(Stream inStr, Stream outStr, int bufferSize)
-        {
-            inStr.CopyTo(outStr, bufferSize);
+		/// <summary>Write the full contents of inStr to the destination stream outStr.</summary>
+		/// <param name="inStr">Source stream.</param>
+		/// <param name="outStr">Destination stream.</param>
+		/// <param name="bufferSize">The size of temporary buffer to use.</param>
+		/// <exception cref="IOException">In case of IO failure.</exception>
+		public static void PipeAll(Stream inStr, Stream outStr, int bufferSize)
+		{
+			inStr.CopyTo(outStr, bufferSize);
 		}
 
 		/// <summary>
@@ -51,7 +51,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 		public static long PipeAllLimited(Stream inStr, long limit, Stream outStr)
 		{
 			var limited = new LimitedInputStream(inStr, limit);
-            limited.CopyTo(outStr, BufferSize);
+			limited.CopyTo(outStr, BufferSize);
 			return limit - limited.CurrentLimit;
 		}
 
@@ -62,12 +62,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 			return buf.ToArray();
 		}
 
-        public static byte[] ReadAll(MemoryStream inStr)
-        {
+		public static byte[] ReadAll(MemoryStream inStr)
+		{
 			return inStr.ToArray();
-        }
+		}
 
-        public static byte[] ReadAllLimited(Stream inStr, int limit)
+		public static byte[] ReadAllLimited(Stream inStr, int limit)
 		{
 			MemoryStream buf = new MemoryStream();
 			PipeAllLimited(inStr, limit, buf);
@@ -89,6 +89,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 					break;
 				totalRead += numRead;
 			}
+
 			return totalRead;
 		}
 
@@ -107,8 +108,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
         }
 #endif
 
-        public static void ValidateBufferArguments(byte[] buffer, int offset, int count)
-        {
+		public static void ValidateBufferArguments(byte[] buffer, int offset, int count)
+		{
 			if (buffer == null)
 				throw new ArgumentNullException("buffer");
 			int available = buffer.Length - offset;
@@ -119,22 +120,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 				throw new ArgumentOutOfRangeException("count");
 		}
 
-        /// <exception cref="IOException"></exception>
-        public static int WriteBufTo(MemoryStream buf, byte[] output, int offset)
-        {
+		/// <exception cref="IOException"></exception>
+		public static int WriteBufTo(MemoryStream buf, byte[] output, int offset)
+		{
 #if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER || UNITY_2021_2_OR_NEWER
-            if (buf.TryGetBuffer(out var buffer))
-            {
+			if (buf.TryGetBuffer(out var buffer))
+			{
 				buffer.CopyTo(output, offset);
 				return buffer.Count;
-            }
+			}
 #endif
 
 			int size = Convert.ToInt32(buf.Length);
-            buf.WriteTo(new MemoryStream(output, offset, size));
-            return size;
-        }
-    }
+			buf.WriteTo(new MemoryStream(output, offset, size));
+			return size;
+		}
+	}
 }
 #pragma warning restore
 #endif

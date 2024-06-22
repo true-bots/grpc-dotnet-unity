@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -27,9 +26,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 	public class Admissions
 		: Asn1Encodable
 	{
-		private readonly GeneralName		admissionAuthority;
-		private readonly NamingAuthority	namingAuthority;
-		private readonly Asn1Sequence		professionInfos;
+		private readonly GeneralName admissionAuthority;
+		private readonly NamingAuthority namingAuthority;
+		private readonly Asn1Sequence professionInfos;
 
 		public static Admissions GetInstance(object obj)
 		{
@@ -39,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 			if (obj is Asn1Sequence seq)
 				return new Admissions(seq);
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -71,35 +70,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 			{
 				switch (tagged1.TagNo)
 				{
-				case 0:
-					admissionAuthority = GeneralName.GetInstance((Asn1TaggedObject)o, true);
-					break;
-				case 1:
-					namingAuthority = NamingAuthority.GetInstance((Asn1TaggedObject)o, true);
-					break;
-				default:
-					throw new ArgumentException("Bad tag number: " + ((Asn1TaggedObject)o).TagNo);
+					case 0:
+						admissionAuthority = GeneralName.GetInstance((Asn1TaggedObject)o, true);
+						break;
+					case 1:
+						namingAuthority = NamingAuthority.GetInstance((Asn1TaggedObject)o, true);
+						break;
+					default:
+						throw new ArgumentException("Bad tag number: " + ((Asn1TaggedObject)o).TagNo);
 				}
+
 				e.MoveNext();
 				o = e.Current;
 			}
+
 			if (o is Asn1TaggedObject tagged2)
 			{
 				switch (tagged2.TagNo)
 				{
-				case 1:
-					namingAuthority = NamingAuthority.GetInstance((Asn1TaggedObject)o, true);
-					break;
-				default:
-					throw new ArgumentException("Bad tag number: " + ((Asn1TaggedObject)o).TagNo);
+					case 1:
+						namingAuthority = NamingAuthority.GetInstance((Asn1TaggedObject)o, true);
+						break;
+					default:
+						throw new ArgumentException("Bad tag number: " + ((Asn1TaggedObject)o).TagNo);
 				}
+
 				e.MoveNext();
 				o = e.Current;
 			}
+
 			professionInfos = Asn1Sequence.GetInstance(o);
 			if (e.MoveNext())
 			{
-                throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(e.Current));
+				throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(e.Current));
 			}
 		}
 
@@ -113,9 +116,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		* @param professionInfos    The profession infos.
 		*/
 		public Admissions(
-			GeneralName			admissionAuthority,
-			NamingAuthority		namingAuthority,
-			ProfessionInfo[]	professionInfos)
+			GeneralName admissionAuthority,
+			NamingAuthority namingAuthority,
+			ProfessionInfo[] professionInfos)
 		{
 			this.admissionAuthority = admissionAuthority;
 			this.namingAuthority = namingAuthority;
@@ -140,6 +143,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 			{
 				infos[count++] = ProfessionInfo.GetInstance(ae);
 			}
+
 			return infos;
 		}
 
@@ -163,8 +167,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptionalTagged(true, 0, admissionAuthority);
-            v.AddOptionalTagged(true, 1, namingAuthority);
+			v.AddOptionalTagged(true, 0, admissionAuthority);
+			v.AddOptionalTagged(true, 1, namingAuthority);
 			v.Add(professionInfos);
 			return new DerSequence(v);
 		}

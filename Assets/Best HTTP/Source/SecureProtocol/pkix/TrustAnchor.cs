@@ -3,7 +3,6 @@
 using System;
 using System.IO;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -33,26 +32,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		/// <summary>
 		/// Creates an instance of TrustAnchor with the specified X509Certificate and
-	    /// optional name constraints, which are intended to be used as additional
-	    /// constraints when validating an X.509 certification path.
-	    ///	The name constraints are specified as a byte array. This byte array
-	    ///	should contain the DER encoded form of the name constraints, as they
-	    ///	would appear in the NameConstraints structure defined in RFC 2459 and
-	    ///	X.509. The ASN.1 definition of this structure appears below.
-	    ///	
-	    ///	<pre>
-	    ///	NameConstraints ::= SEQUENCE {
-	    ///		permittedSubtrees       [0]     GeneralSubtrees OPTIONAL,
-	    ///		excludedSubtrees        [1]     GeneralSubtrees OPTIONAL }
-	    ///	   
-        /// GeneralSubtrees ::= SEQUENCE SIZE (1..MAX) OF GeneralSubtree
-        /// 
-        ///		GeneralSubtree ::= SEQUENCE {
-        ///		base                    GeneralName,
-        ///		minimum         [0]     BaseDistance DEFAULT 0,
-        ///		maximum         [1]     BaseDistance OPTIONAL }
-        ///		
-        ///		BaseDistance ::= INTEGER (0..MAX)
+		/// optional name constraints, which are intended to be used as additional
+		/// constraints when validating an X.509 certification path.
+		///	The name constraints are specified as a byte array. This byte array
+		///	should contain the DER encoded form of the name constraints, as they
+		///	would appear in the NameConstraints structure defined in RFC 2459 and
+		///	X.509. The ASN.1 definition of this structure appears below.
+		///	
+		///	<pre>
+		///	NameConstraints ::= SEQUENCE {
+		///		permittedSubtrees       [0]     GeneralSubtrees OPTIONAL,
+		///		excludedSubtrees        [1]     GeneralSubtrees OPTIONAL }
+		///	   
+		/// GeneralSubtrees ::= SEQUENCE SIZE (1..MAX) OF GeneralSubtree
+		/// 
+		///		GeneralSubtree ::= SEQUENCE {
+		///		base                    GeneralName,
+		///		minimum         [0]     BaseDistance DEFAULT 0,
+		///		maximum         [1]     BaseDistance OPTIONAL }
+		///		
+		///		BaseDistance ::= INTEGER (0..MAX)
 		///
 		///		GeneralName ::= CHOICE {
 		///		otherName                       [0]     OtherName,
@@ -77,8 +76,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// parameter.</param>
 		/// <exception cref="ArgumentNullException">if the specified X509Certificate is null</exception>
 		public TrustAnchor(
-			X509Certificate	trustedCert,
-			byte[]			nameConstraints)
+			X509Certificate trustedCert,
+			byte[] nameConstraints)
 		{
 			if (trustedCert == null)
 				throw new ArgumentNullException("trustedCert");
@@ -120,9 +119,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// if <c>caPrincipal</c> or <c>pubKey</c> is null
 		/// </exception>
 		public TrustAnchor(
-			X509Name				caPrincipal,
-			AsymmetricKeyParameter	pubKey,
-			byte[]					nameConstraints) 
+			X509Name caPrincipal,
+			AsymmetricKeyParameter pubKey,
+			byte[] nameConstraints)
 		{
 			if (caPrincipal == null)
 				throw new ArgumentNullException("caPrincipal");
@@ -156,9 +155,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// parameter.</param>
 		/// throws NullPointerException, IllegalArgumentException
 		public TrustAnchor(
-			string					caName,
-			AsymmetricKeyParameter	pubKey,
-			byte[]					nameConstraints)
+			string caName,
+			AsymmetricKeyParameter pubKey,
+			byte[] nameConstraints)
 		{
 			if (caName == null)
 				throw new ArgumentNullException("caName");
@@ -210,16 +209,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// Decode the name constraints and clone them if not null.
 		/// </summary>
 		private void setNameConstraints(
-			byte[] bytes) 
+			byte[] bytes)
 		{
-			if (bytes == null) 
+			if (bytes == null)
 			{
 				ncBytes = null;
 				nc = null;
-			} 
-			else 
+			}
+			else
 			{
-				ncBytes = (byte[]) bytes.Clone();
+				ncBytes = (byte[])bytes.Clone();
 				// validate DER encoding
 				//nc = new NameConstraintsExtension(Boolean.FALSE, bytes);
 				nc = NameConstraints.GetInstance(Asn1Object.FromByteArray(bytes));
@@ -249,10 +248,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			{
 				sb.Append("  Trusted CA cert: ").Append(this.TrustedCert).AppendLine();
 			}
+
 			if (nc != null)
 			{
 				sb.Append("  Name Constraints: ").Append(nc).AppendLine();
 			}
+
 			return sb.ToString();
 		}
 	}

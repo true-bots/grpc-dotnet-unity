@@ -2,10 +2,10 @@
 #pragma warning disable
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 {
-    public class Packet
-        //: PacketTag
-    {
-    }
+	public class Packet
+		//: PacketTag
+	{
+	}
 }
 #pragma warning restore
 #endif

@@ -4,12 +4,12 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-    internal interface IAsn1Encoding
-    {
-        void Encode(Asn1OutputStream asn1Out);
+	internal interface IAsn1Encoding
+	{
+		void Encode(Asn1OutputStream asn1Out);
 
-        int GetLength();
-    }
+		int GetLength();
+	}
 }
 #pragma warning restore
 #endif

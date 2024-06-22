@@ -1,28 +1,27 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 {
-    public class Signature
-        : Asn1Encodable
-    {
-        internal AlgorithmIdentifier	signatureAlgorithm;
-        internal DerBitString			signatureValue;
-        internal Asn1Sequence			certs;
+	public class Signature
+		: Asn1Encodable
+	{
+		internal AlgorithmIdentifier signatureAlgorithm;
+		internal DerBitString signatureValue;
+		internal Asn1Sequence certs;
 
 		public static Signature GetInstance(
-			Asn1TaggedObject	obj,
-			bool				explicitly)
+			Asn1TaggedObject obj,
+			bool explicitly)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
 		}
 
 		public static Signature GetInstance(
-			object  obj)
+			object obj)
 		{
 			if (obj == null || obj is Signature)
 			{
@@ -34,43 +33,43 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new Signature((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public Signature(
-            AlgorithmIdentifier signatureAlgorithm,
-            DerBitString        signatureValue)
+			AlgorithmIdentifier signatureAlgorithm,
+			DerBitString signatureValue)
 			: this(signatureAlgorithm, signatureValue, null)
-        {
-        }
+		{
+		}
 
 		public Signature(
-            AlgorithmIdentifier	signatureAlgorithm,
-            DerBitString		signatureValue,
-            Asn1Sequence		certs)
-        {
+			AlgorithmIdentifier signatureAlgorithm,
+			DerBitString signatureValue,
+			Asn1Sequence certs)
+		{
 			if (signatureAlgorithm == null)
 				throw new ArgumentException("signatureAlgorithm");
 			if (signatureValue == null)
 				throw new ArgumentException("signatureValue");
 
 			this.signatureAlgorithm = signatureAlgorithm;
-            this.signatureValue = signatureValue;
-            this.certs = certs;
-        }
+			this.signatureValue = signatureValue;
+			this.certs = certs;
+		}
 
 		private Signature(
-            Asn1Sequence seq)
-        {
-            signatureAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
-            signatureValue = (DerBitString)seq[1];
+			Asn1Sequence seq)
+		{
+			signatureAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
+			signatureValue = (DerBitString)seq[1];
 
 			if (seq.Count == 3)
-            {
-                certs = Asn1Sequence.GetInstance(
+			{
+				certs = Asn1Sequence.GetInstance(
 					(Asn1TaggedObject)seq[2], true);
-            }
-        }
+			}
+		}
 
 		public AlgorithmIdentifier SignatureAlgorithm
 		{
@@ -82,12 +81,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			get { return signatureValue; }
 		}
 
-        public byte[] GetSignatureOctets()
-        {
-            return signatureValue.GetOctets();
-        }
+		public byte[] GetSignatureOctets()
+		{
+			return signatureValue.GetOctets();
+		}
 
-        public Asn1Sequence Certs
+		public Asn1Sequence Certs
 		{
 			get { return certs; }
 		}
@@ -101,13 +100,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
          *     certs               [0] EXPLICIT Sequence OF Certificate OPTIONAL}
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector(signatureAlgorithm, signatureValue);
-            v.AddOptionalTagged(true, 0, certs);
-            return new DerSequence(v);
-        }
-    }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector(signatureAlgorithm, signatureValue);
+			v.AddOptionalTagged(true, 0, certs);
+			return new DerSequence(v);
+		}
+	}
 }
 #pragma warning restore
 #endif

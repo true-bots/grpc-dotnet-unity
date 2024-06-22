@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
@@ -44,8 +43,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		}
 
 		public DeclarationOfMajority(
-			bool	fullAge,
-			string	country)
+			bool fullAge,
+			string country)
 		{
 			if (country.Length > 2)
 				throw new ArgumentException("country can only be 2 characters");
@@ -66,7 +65,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		}
 
 		public DeclarationOfMajority(
-            Asn1GeneralizedTime dateOfBirth)
+			Asn1GeneralizedTime dateOfBirth)
 		{
 			this.declaration = new DerTaggedObject(false, 2, dateOfBirth);
 		}
@@ -76,15 +75,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		{
 			if (obj == null || obj is DeclarationOfMajority)
 			{
-				return (DeclarationOfMajority) obj;
+				return (DeclarationOfMajority)obj;
 			}
 
 			if (obj is Asn1TaggedObject)
 			{
-				return new DeclarationOfMajority((Asn1TaggedObject) obj);
+				return new DeclarationOfMajority((Asn1TaggedObject)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		private DeclarationOfMajority(
@@ -123,7 +122,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 
 		public Choice Type
 		{
-			get { return (Choice) declaration.TagNo; }
+			get { return (Choice)declaration.TagNo; }
 		}
 
 		/**
@@ -133,10 +132,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		{
 			get
 			{
-				switch ((Choice) declaration.TagNo)
+				switch ((Choice)declaration.TagNo)
 				{
 					case Choice.NotYoungerThan:
-                        return DerInteger.GetInstance(declaration, false).IntValueExact;
+						return DerInteger.GetInstance(declaration, false).IntValueExact;
 					default:
 						return -1;
 				}
@@ -147,7 +146,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		{
 			get
 			{
-				switch ((Choice) declaration.TagNo)
+				switch ((Choice)declaration.TagNo)
 				{
 					case Choice.FullAgeAtCountry:
 						return Asn1Sequence.GetInstance(declaration, false);
@@ -161,7 +160,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		{
 			get
 			{
-				switch ((Choice) declaration.TagNo)
+				switch ((Choice)declaration.TagNo)
 				{
 					case Choice.DateOfBirth:
 						return Asn1GeneralizedTime.GetInstance(declaration, false);

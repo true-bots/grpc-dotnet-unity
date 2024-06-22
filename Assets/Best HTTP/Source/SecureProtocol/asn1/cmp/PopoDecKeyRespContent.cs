@@ -5,8 +5,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class PopoDecKeyRespContent
 		: Asn1Encodable
 	{
-        public static PopoDecKeyRespContent GetInstance(object obj)
-        {
+		public static PopoDecKeyRespContent GetInstance(object obj)
+		{
 			if (obj is PopoDecKeyRespContent popoDecKeyRespContent)
 				return popoDecKeyRespContent;
 
@@ -14,9 +14,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new PopoDecKeyRespContent(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly Asn1Sequence m_content;
+		private readonly Asn1Sequence m_content;
 
 		private PopoDecKeyRespContent(Asn1Sequence seq)
 		{

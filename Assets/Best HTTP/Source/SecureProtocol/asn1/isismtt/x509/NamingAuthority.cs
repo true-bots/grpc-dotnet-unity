@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -10,9 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 	/**
 	* Names of authorities which are responsible for the administration of title
 	* registers.
-	* 
+	*
 	* <pre>
-	*             NamingAuthority ::= SEQUENCE 
+	*             NamingAuthority ::= SEQUENCE
 	*             {
 	*               namingAuthorityID OBJECT IDENTIFIER OPTIONAL,
 	*               namingAuthorityUrl IA5String OPTIONAL,
@@ -20,7 +19,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 	*             }
 	* </pre>
 	* @see BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509.AdmissionSyntax
-	* 
+	*
 	*/
 	public class NamingAuthority
 		: Asn1Encodable
@@ -34,19 +33,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		public static readonly DerObjectIdentifier IdIsisMttATNamingAuthoritiesRechtWirtschaftSteuern
 			= new DerObjectIdentifier(IsisMttObjectIdentifiers.IdIsisMttATNamingAuthorities + ".1");
 
-		private readonly DerObjectIdentifier	namingAuthorityID;
-		private readonly string					namingAuthorityUrl;
-		private readonly DirectoryString		namingAuthorityText;
+		private readonly DerObjectIdentifier namingAuthorityID;
+		private readonly string namingAuthorityUrl;
+		private readonly DirectoryString namingAuthorityText;
 
 		public static NamingAuthority GetInstance(object obj)
 		{
 			if (obj == null || obj is NamingAuthority)
-				return (NamingAuthority) obj;
+				return (NamingAuthority)obj;
 
 			if (obj is Asn1Sequence seq)
 				return new NamingAuthority(seq);
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public static NamingAuthority GetInstance(Asn1TaggedObject obj, bool isExplicit)
@@ -93,7 +92,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				}
 				else
 				{
-                    throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+					throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
 				}
 			}
 
@@ -110,7 +109,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				}
 				else
 				{
-                    throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+					throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
 				}
 			}
 
@@ -123,7 +122,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				}
 				else
 				{
-                    throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+					throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
 				}
 			}
 		}
@@ -162,9 +161,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		* @param namingAuthorityText Textual representation of naming authority.
 		*/
 		public NamingAuthority(
-			DerObjectIdentifier	namingAuthorityID,
-			string				namingAuthorityUrl,
-			DirectoryString		namingAuthorityText)
+			DerObjectIdentifier namingAuthorityID,
+			string namingAuthorityUrl,
+			DirectoryString namingAuthorityText)
 		{
 			this.namingAuthorityID = namingAuthorityID;
 			this.namingAuthorityUrl = namingAuthorityUrl;
@@ -190,14 +189,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptional(namingAuthorityID);
+			v.AddOptional(namingAuthorityID);
 
 			if (namingAuthorityUrl != null)
 			{
 				v.Add(new DerIA5String(namingAuthorityUrl, true));
 			}
 
-            v.AddOptional(namingAuthorityText);
+			v.AddOptional(namingAuthorityText);
 			return new DerSequence(v);
 		}
 	}

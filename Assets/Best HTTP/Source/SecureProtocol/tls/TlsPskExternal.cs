@@ -4,10 +4,10 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-    public interface TlsPskExternal
-        : TlsPsk
-    {
-    }
+	public interface TlsPskExternal
+		: TlsPsk
+	{
+	}
 }
 #pragma warning restore
 #endif

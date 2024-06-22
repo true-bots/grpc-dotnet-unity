@@ -5,90 +5,91 @@ using System.Collections.Generic;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-    public class SignerInformationStore
-    {
-        private readonly IList<SignerInformation> all;
-        private readonly IDictionary<SignerID, IList<SignerInformation>> m_table =
-            new Dictionary<SignerID, IList<SignerInformation>>();
+	public class SignerInformationStore
+	{
+		private readonly IList<SignerInformation> all;
 
-        /**
-         * Create a store containing a single SignerInformation object.
-         *
-         * @param signerInfo the signer information to contain.
-         */
-        public SignerInformationStore(SignerInformation signerInfo)
-        {
-            this.all = new List<SignerInformation>(1);
-            this.all.Add(signerInfo);
+		private readonly IDictionary<SignerID, IList<SignerInformation>> m_table =
+			new Dictionary<SignerID, IList<SignerInformation>>();
 
-            SignerID sid = signerInfo.SignerID;
+		/**
+		 * Create a store containing a single SignerInformation object.
+		 *
+		 * @param signerInfo the signer information to contain.
+		 */
+		public SignerInformationStore(SignerInformation signerInfo)
+		{
+			this.all = new List<SignerInformation>(1);
+			this.all.Add(signerInfo);
 
-            m_table[sid] = all;
-        }
+			SignerID sid = signerInfo.SignerID;
 
-        /**
-         * Create a store containing a collection of SignerInformation objects.
-         *
-         * @param signerInfos a collection signer information objects to contain.
-         */
-        public SignerInformationStore(IEnumerable<SignerInformation> signerInfos)
-        {
-            foreach (SignerInformation signer in signerInfos)
-            {
-                SignerID sid = signer.SignerID;
+			m_table[sid] = all;
+		}
 
-                if (!m_table.TryGetValue(sid, out var list))
-                {
-                    m_table[sid] = list = new List<SignerInformation>(1);
-                }
+		/**
+		 * Create a store containing a collection of SignerInformation objects.
+		 *
+		 * @param signerInfos a collection signer information objects to contain.
+		 */
+		public SignerInformationStore(IEnumerable<SignerInformation> signerInfos)
+		{
+			foreach (SignerInformation signer in signerInfos)
+			{
+				SignerID sid = signer.SignerID;
 
-                list.Add(signer);
-            }
+				if (!m_table.TryGetValue(sid, out var list))
+				{
+					m_table[sid] = list = new List<SignerInformation>(1);
+				}
 
-            this.all = new List<SignerInformation>(signerInfos);
-        }
+				list.Add(signer);
+			}
 
-        /**
-        * Return the first SignerInformation object that matches the
-        * passed in selector. Null if there are no matches.
-        *
-        * @param selector to identify a signer
-        * @return a single SignerInformation object. Null if none matches.
-        */
-        public SignerInformation GetFirstSigner(SignerID selector)
-        {
-            if (m_table.TryGetValue(selector, out var list))
-                return list[0];
+			this.all = new List<SignerInformation>(signerInfos);
+		}
 
-            return null;
-        }
+		/**
+		* Return the first SignerInformation object that matches the
+		* passed in selector. Null if there are no matches.
+		*
+		* @param selector to identify a signer
+		* @return a single SignerInformation object. Null if none matches.
+		*/
+		public SignerInformation GetFirstSigner(SignerID selector)
+		{
+			if (m_table.TryGetValue(selector, out var list))
+				return list[0];
 
-        /// <summary>The number of signers in the collection.</summary>
-        public int Count
-        {
-            get { return all.Count; }
-        }
+			return null;
+		}
 
-        /// <returns>An ICollection of all signers in the collection</returns>
-        public IList<SignerInformation> GetSigners()
-        {
-            return new List<SignerInformation>(all);
-        }
+		/// <summary>The number of signers in the collection.</summary>
+		public int Count
+		{
+			get { return all.Count; }
+		}
 
-        /**
-        * Return possible empty collection with signers matching the passed in SignerID
-        *
-        * @param selector a signer id to select against.
-        * @return a collection of SignerInformation objects.
-        */
-        public IList<SignerInformation> GetSigners(SignerID selector)
-        {
-            if (m_table.TryGetValue(selector, out var list))
-                return new List<SignerInformation>(list);
+		/// <returns>An ICollection of all signers in the collection</returns>
+		public IList<SignerInformation> GetSigners()
+		{
+			return new List<SignerInformation>(all);
+		}
 
-            return new List<SignerInformation>(0);
-        }
-    }
+		/**
+		* Return possible empty collection with signers matching the passed in SignerID
+		*
+		* @param selector a signer id to select against.
+		* @return a collection of SignerInformation objects.
+		*/
+		public IList<SignerInformation> GetSigners(SignerID selector)
+		{
+			if (m_table.TryGetValue(selector, out var list))
+				return new List<SignerInformation>(list);
+
+			return new List<SignerInformation>(0);
+		}
+	}
 }
 #pragma warning restore
 #endif

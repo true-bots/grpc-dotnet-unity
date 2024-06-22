@@ -1,34 +1,33 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 {
-    public class AsymmetricKeyEntry
-        : Pkcs12Entry
-    {
-        private readonly AsymmetricKeyParameter key;
+	public class AsymmetricKeyEntry
+		: Pkcs12Entry
+	{
+		private readonly AsymmetricKeyParameter key;
 
 		public AsymmetricKeyEntry(AsymmetricKeyParameter key)
 			: base(new Dictionary<DerObjectIdentifier, Asn1Encodable>())
-        {
-            this.key = key;
-        }
+		{
+			this.key = key;
+		}
 
-        public AsymmetricKeyEntry(AsymmetricKeyParameter key,
+		public AsymmetricKeyEntry(AsymmetricKeyParameter key,
 			IDictionary<DerObjectIdentifier, Asn1Encodable> attributes)
 			: base(attributes)
-        {
-            this.key = key;
-        }
+		{
+			this.key = key;
+		}
 
 		public AsymmetricKeyParameter Key
-        {
-            get { return this.key; }
-        }
+		{
+			get { return this.key; }
+		}
 
 		public override bool Equals(object obj)
 		{

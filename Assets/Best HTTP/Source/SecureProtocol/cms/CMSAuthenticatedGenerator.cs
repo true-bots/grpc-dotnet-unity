@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -20,9 +19,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		{
 		}
 
-        /// <summary>Constructor allowing specific source of randomness</summary>
-        /// <param name="random">Instance of <c>SecureRandom</c> to use.</param>
-        public CmsAuthenticatedGenerator(SecureRandom random)
+		/// <summary>Constructor allowing specific source of randomness</summary>
+		/// <param name="random">Instance of <c>SecureRandom</c> to use.</param>
+		public CmsAuthenticatedGenerator(SecureRandom random)
 			: base(random)
 		{
 		}

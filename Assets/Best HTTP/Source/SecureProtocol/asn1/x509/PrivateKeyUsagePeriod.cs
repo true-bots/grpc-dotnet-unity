@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -22,17 +21,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 			if (obj is PrivateKeyUsagePeriod)
 			{
-				return (PrivateKeyUsagePeriod) obj;
+				return (PrivateKeyUsagePeriod)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new PrivateKeyUsagePeriod((Asn1Sequence) obj);
+				return new PrivateKeyUsagePeriod((Asn1Sequence)obj);
 			}
 
 			if (obj is X509Extension)
 			{
-				return GetInstance(X509Extension.ConvertValueToObject((X509Extension) obj));
+				return GetInstance(X509Extension.ConvertValueToObject((X509Extension)obj));
 			}
 
 			throw new ArgumentException("unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
@@ -66,13 +65,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			get { return _notAfter; }
 		}
 
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptionalTagged(false, 0, _notBefore);
-            v.AddOptionalTagged(false, 1, _notAfter);
-            return new DerSequence(v);
-        }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
+			v.AddOptionalTagged(false, 0, _notBefore);
+			v.AddOptionalTagged(false, 1, _notAfter);
+			return new DerSequence(v);
+		}
 	}
 }
 #pragma warning restore

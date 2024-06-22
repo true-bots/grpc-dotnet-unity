@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -9,30 +8,30 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Compression;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-    /**
-    * containing class for an CMS Compressed Data object
-    */
-    public class CmsCompressedData
-    {
-        internal ContentInfo contentInfo;
+	/**
+	* containing class for an CMS Compressed Data object
+	*/
+	public class CmsCompressedData
+	{
+		internal ContentInfo contentInfo;
 
 		public CmsCompressedData(
-            byte[] compressedData)
-            : this(CmsUtilities.ReadContentInfo(compressedData))
-        {
-        }
+			byte[] compressedData)
+			: this(CmsUtilities.ReadContentInfo(compressedData))
+		{
+		}
 
 		public CmsCompressedData(
-            Stream compressedDataStream)
-            : this(CmsUtilities.ReadContentInfo(compressedDataStream))
-        {
-        }
+			Stream compressedDataStream)
+			: this(CmsUtilities.ReadContentInfo(compressedDataStream))
+		{
+		}
 
 		public CmsCompressedData(
-            ContentInfo contentInfo)
-        {
-            this.contentInfo = contentInfo;
-        }
+			ContentInfo contentInfo)
+		{
+			this.contentInfo = contentInfo;
+		}
 
 		/**
 		 * Return the uncompressed content.
@@ -41,11 +40,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 * @throws CmsException if there is an exception uncompressing the data.
 		 */
 		public byte[] GetContent()
-        {
-            CompressedData comData = CompressedData.GetInstance(contentInfo.Content);
-            ContentInfo content = comData.EncapContentInfo;
+		{
+			CompressedData comData = CompressedData.GetInstance(contentInfo.Content);
+			ContentInfo content = comData.EncapContentInfo;
 
-			Asn1OctetString bytes = (Asn1OctetString) content.Content;
+			Asn1OctetString bytes = (Asn1OctetString)content.Content;
 			Stream zIn = ZLib.DecompressInput(bytes.GetOctetStream());
 
 			try
@@ -58,26 +57,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			}
 			finally
 			{
-                zIn.Dispose();
+				zIn.Dispose();
 			}
-        }
+		}
 
-	    /**
-	     * Return the uncompressed content, throwing an exception if the data size
-	     * is greater than the passed in limit. If the content is exceeded getCause()
-	     * on the CMSException will contain a StreamOverflowException
-	     *
-	     * @param limit maximum number of bytes to read
-	     * @return the content read
-	     * @throws CMSException if there is an exception uncompressing the data.
-	     */
+		/**
+		 * Return the uncompressed content, throwing an exception if the data size
+		 * is greater than the passed in limit. If the content is exceeded getCause()
+		 * on the CMSException will contain a StreamOverflowException
+		 *
+		 * @param limit maximum number of bytes to read
+		 * @return the content read
+		 * @throws CMSException if there is an exception uncompressing the data.
+		 */
 		public byte[] GetContent(int limit)
 		{
-			CompressedData  comData = CompressedData.GetInstance(contentInfo.Content);
-			ContentInfo     content = comData.EncapContentInfo;
+			CompressedData comData = CompressedData.GetInstance(contentInfo.Content);
+			ContentInfo content = comData.EncapContentInfo;
 
 			Asn1OctetString bytes = (Asn1OctetString)content.Content;
-            Stream zIn = ZLib.DecompressInput(bytes.GetOctetStream());
+			Stream zIn = ZLib.DecompressInput(bytes.GetOctetStream());
 
 			try
 			{
@@ -90,7 +89,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		/**
-		 * return the ContentInfo 
+		 * return the ContentInfo
 		 */
 		public ContentInfo ContentInfo
 		{
@@ -100,11 +99,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		/**
         * return the ASN.1 encoded representation of this object.
         */
-        public byte[] GetEncoded()
-        {
+		public byte[] GetEncoded()
+		{
 			return contentInfo.GetEncoded();
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

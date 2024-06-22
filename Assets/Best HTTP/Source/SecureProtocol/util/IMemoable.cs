@@ -26,7 +26,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 		/// <exception cref="MemoableResetException">if the <b>other</b> parameter is in some other way invalid.</exception>
 		void Reset(IMemoable other);
 	}
-
 }
 
 #pragma warning restore

@@ -5,37 +5,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class GenRepContent
 		: Asn1Encodable
 	{
-        public static GenRepContent GetInstance(object obj)
-        {
-            if (obj is GenRepContent genRepContent)
-                return genRepContent;
+		public static GenRepContent GetInstance(object obj)
+		{
+			if (obj is GenRepContent genRepContent)
+				return genRepContent;
 
-            if (obj != null)
-                return new GenRepContent(Asn1Sequence.GetInstance(obj));
+			if (obj != null)
+				return new GenRepContent(Asn1Sequence.GetInstance(obj));
 
-            return null;
-        }
+			return null;
+		}
 
-        private readonly Asn1Sequence m_content;
+		private readonly Asn1Sequence m_content;
 
 		private GenRepContent(Asn1Sequence seq)
 		{
 			m_content = seq;
 		}
 
-        public GenRepContent(InfoTypeAndValue itv)
-        {
-            m_content = new DerSequence(itv);
-        }
+		public GenRepContent(InfoTypeAndValue itv)
+		{
+			m_content = new DerSequence(itv);
+		}
 
-        public GenRepContent(params InfoTypeAndValue[] itvs)
+		public GenRepContent(params InfoTypeAndValue[] itvs)
 		{
 			m_content = new DerSequence(itvs);
 		}
 
 		public virtual InfoTypeAndValue[] ToInfoTypeAndValueArray()
 		{
-            return m_content.MapElements(InfoTypeAndValue.GetInstance);
+			return m_content.MapElements(InfoTypeAndValue.GetInstance);
 		}
 
 		/**

@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
@@ -25,14 +24,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			object obj)
 		{
 			if (obj == null || obj is CrlListID)
-				return (CrlListID) obj;
+				return (CrlListID)obj;
 
 			if (obj is Asn1Sequence)
-				return new CrlListID((Asn1Sequence) obj);
+				return new CrlListID((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'CrlListID' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -44,7 +43,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			if (seq.Count != 1)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.crls = (Asn1Sequence) seq[0].ToAsn1Object();
+			this.crls = (Asn1Sequence)seq[0].ToAsn1Object();
 
 			foreach (Asn1Encodable ae in this.crls)
 			{
@@ -78,6 +77,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			{
 				result[i] = CrlValidatedID.GetInstance(crls[i].ToAsn1Object());
 			}
+
 			return result;
 		}
 

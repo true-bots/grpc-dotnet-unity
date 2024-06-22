@@ -15,9 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		}
 
 		public BerSetGenerator(
-			Stream	outStream,
-			int		tagNo,
-			bool	isExplicit)
+			Stream outStream,
+			int tagNo,
+			bool isExplicit)
 			: base(outStream, tagNo, isExplicit)
 		{
 			WriteBerHeader(Asn1Tags.Constructed | Asn1Tags.Set);

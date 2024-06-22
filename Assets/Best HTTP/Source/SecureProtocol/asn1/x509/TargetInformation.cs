@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -9,11 +8,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	/**
 	 * Target information extension for attributes certificates according to RFC
 	 * 3281.
-	 * 
+	 *
 	 * <pre>
 	 *           SEQUENCE OF Targets
 	 * </pre>
-	 * 
+	 *
 	 */
 	public class TargetInformation
 		: Asn1Encodable
@@ -24,7 +23,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * Creates an instance of a TargetInformation from the given object.
 		 * <p>
 		 * <code>obj</code> can be a TargetInformation or a {@link Asn1Sequence}</p>
-		 * 
+		 *
 		 * @param obj The object.
 		 * @return A TargetInformation instance.
 		 * @throws ArgumentException if the given object cannot be interpreted as TargetInformation.
@@ -34,20 +33,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 			if (obj is TargetInformation)
 			{
-				return (TargetInformation) obj;
+				return (TargetInformation)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new TargetInformation((Asn1Sequence) obj);
+				return new TargetInformation((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
 		 * Constructor from a Asn1Sequence.
-		 * 
+		 *
 		 * @param seq The Asn1Sequence.
 		 * @throws ArgumentException if the sequence does not contain
 		 *             correctly encoded Targets elements.
@@ -62,7 +61,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * Returns the targets in this target information extension.
 		 * <p>
 		 * The ArrayList is cloned before it is returned.</p>
-		 * 
+		 *
 		 * @return Returns the targets.
 		 */
 		public virtual Targets[] GetTargetsObjects()
@@ -78,9 +77,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		/**
-		 * Constructs a target information from a single targets element. 
+		 * Constructs a target information from a single targets element.
 		 * According to RFC 3281 only one targets element must be produced.
-		 * 
+		 *
 		 * @param targets A Targets instance.
 		 */
 		public TargetInformation(
@@ -104,19 +103,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		/**
 		 * Produce an object suitable for an Asn1OutputStream.
-		 * 
+		 *
 		 * Returns:
-		 * 
+		 *
 		 * <pre>
 		 *          SEQUENCE OF Targets
 		 * </pre>
-		 * 
+		 *
 		 * <p>
 		 * According to RFC 3281 only one targets element must be produced. If
 		 * multiple targets are given in the constructor they are merged into one
 		 * targets element. If this was produced from a
 		 * {@link BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Asn1Sequence} the encoding is kept.</p>
-		 * 
+		 *
 		 * @return an Asn1Object
 		 */
 		public override Asn1Object ToAsn1Object()

@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -94,10 +93,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			tbsGen.SetSubject(subject);
 		}
 
-        /// <summary>
-        /// Set the public key that this certificate identifies.
-        /// </summary>
-        /// <param name="publicKey"/>
+		/// <summary>
+		/// Set the public key that this certificate identifies.
+		/// </summary>
+		/// <param name="publicKey"/>
 		public void SetPublicKey(
 			AsymmetricKeyParameter publicKey)
 		{

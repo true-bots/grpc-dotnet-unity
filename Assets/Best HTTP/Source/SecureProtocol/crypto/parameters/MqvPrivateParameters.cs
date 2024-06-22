@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier;
 
@@ -13,55 +12,55 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		private readonly ECPrivateKeyParameters staticPrivateKey;
 		private readonly ECPrivateKeyParameters ephemeralPrivateKey;
 		private readonly ECPublicKeyParameters ephemeralPublicKey;
-		
+
 		public MqvPrivateParameters(
-			ECPrivateKeyParameters	staticPrivateKey,
-			ECPrivateKeyParameters	ephemeralPrivateKey)
+			ECPrivateKeyParameters staticPrivateKey,
+			ECPrivateKeyParameters ephemeralPrivateKey)
 			: this(staticPrivateKey, ephemeralPrivateKey, null)
 		{
 		}
 
 		public MqvPrivateParameters(
-			ECPrivateKeyParameters	staticPrivateKey,
-			ECPrivateKeyParameters	ephemeralPrivateKey,
-			ECPublicKeyParameters	ephemeralPublicKey)
+			ECPrivateKeyParameters staticPrivateKey,
+			ECPrivateKeyParameters ephemeralPrivateKey,
+			ECPublicKeyParameters ephemeralPublicKey)
 		{
-            if (staticPrivateKey == null)
-                throw new ArgumentNullException("staticPrivateKey");
-            if (ephemeralPrivateKey == null)
-                throw new ArgumentNullException("ephemeralPrivateKey");
+			if (staticPrivateKey == null)
+				throw new ArgumentNullException("staticPrivateKey");
+			if (ephemeralPrivateKey == null)
+				throw new ArgumentNullException("ephemeralPrivateKey");
 
-            ECDomainParameters parameters = staticPrivateKey.Parameters;
-            if (!parameters.Equals(ephemeralPrivateKey.Parameters))
-                throw new ArgumentException("Static and ephemeral private keys have different domain parameters");
+			ECDomainParameters parameters = staticPrivateKey.Parameters;
+			if (!parameters.Equals(ephemeralPrivateKey.Parameters))
+				throw new ArgumentException("Static and ephemeral private keys have different domain parameters");
 
-            if (ephemeralPublicKey == null)
-            {
-                ECPoint q = new FixedPointCombMultiplier().Multiply(parameters.G, ephemeralPrivateKey.D);
+			if (ephemeralPublicKey == null)
+			{
+				ECPoint q = new FixedPointCombMultiplier().Multiply(parameters.G, ephemeralPrivateKey.D);
 
-                ephemeralPublicKey = new ECPublicKeyParameters(q, parameters);
-            }
-            else if (!parameters.Equals(ephemeralPublicKey.Parameters))
-            {
-                throw new ArgumentException("Ephemeral public key has different domain parameters");
-            }
+				ephemeralPublicKey = new ECPublicKeyParameters(q, parameters);
+			}
+			else if (!parameters.Equals(ephemeralPublicKey.Parameters))
+			{
+				throw new ArgumentException("Ephemeral public key has different domain parameters");
+			}
 
-            this.staticPrivateKey = staticPrivateKey;
-            this.ephemeralPrivateKey = ephemeralPrivateKey;
-            this.ephemeralPublicKey = ephemeralPublicKey;
+			this.staticPrivateKey = staticPrivateKey;
+			this.ephemeralPrivateKey = ephemeralPrivateKey;
+			this.ephemeralPublicKey = ephemeralPublicKey;
 		}
 
-        public virtual ECPrivateKeyParameters StaticPrivateKey
+		public virtual ECPrivateKeyParameters StaticPrivateKey
 		{
 			get { return staticPrivateKey; }
 		}
 
-        public virtual ECPrivateKeyParameters EphemeralPrivateKey
+		public virtual ECPrivateKeyParameters EphemeralPrivateKey
 		{
 			get { return ephemeralPrivateKey; }
 		}
 
-        public virtual ECPublicKeyParameters EphemeralPublicKey
+		public virtual ECPublicKeyParameters EphemeralPublicKey
 		{
 			get { return ephemeralPublicKey; }
 		}

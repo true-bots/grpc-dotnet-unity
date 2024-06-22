@@ -1,16 +1,15 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 {
-    public class AttributePkcs
-        : Asn1Encodable
-    {
-        private readonly DerObjectIdentifier attrType;
-        private readonly Asn1Set attrValues;
+	public class AttributePkcs
+		: Asn1Encodable
+	{
+		private readonly DerObjectIdentifier attrType;
+		private readonly Asn1Set attrValues;
 
 		/**
          * return an Attribute object from the given object.
@@ -18,41 +17,41 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
          * @param o the object we want converted.
          * @exception ArgumentException if the object cannot be converted.
          */
-        public static AttributePkcs GetInstance(
-            object obj)
-        {
-            AttributePkcs attr = obj as AttributePkcs;
-            if (obj == null || attr != null)
-            {
-                return attr;
-            }
+		public static AttributePkcs GetInstance(
+			object obj)
+		{
+			AttributePkcs attr = obj as AttributePkcs;
+			if (obj == null || attr != null)
+			{
+				return attr;
+			}
 
 			Asn1Sequence seq = obj as Asn1Sequence;
-            if (seq != null)
-            {
-                return new AttributePkcs(seq);
-            }
+			if (seq != null)
+			{
+				return new AttributePkcs(seq);
+			}
 
 			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		private AttributePkcs(
-            Asn1Sequence seq)
-        {
+			Asn1Sequence seq)
+		{
 			if (seq.Count != 2)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
 			attrType = DerObjectIdentifier.GetInstance(seq[0]);
-            attrValues = Asn1Set.GetInstance(seq[1]);
-        }
+			attrValues = Asn1Set.GetInstance(seq[1]);
+		}
 
 		public AttributePkcs(
-            DerObjectIdentifier	attrType,
-            Asn1Set				attrValues)
-        {
-            this.attrType = attrType;
-            this.attrValues = attrValues;
-        }
+			DerObjectIdentifier attrType,
+			Asn1Set attrValues)
+		{
+			this.attrType = attrType;
+			this.attrValues = attrValues;
+		}
 
 		public DerObjectIdentifier AttrType
 		{
@@ -73,11 +72,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
          * }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
+		public override Asn1Object ToAsn1Object()
+		{
 			return new DerSequence(attrType, attrValues);
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

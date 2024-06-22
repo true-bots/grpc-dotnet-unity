@@ -11,8 +11,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 	 * If a failure code is associated with the exception it can be retrieved using
 	 * the getFailureCode() method.</p>
 	 */
-    [Serializable]
-    public class TspValidationException
+	[Serializable]
+	public class TspValidationException
 		: TspException
 	{
 		protected readonly int m_failureCode;

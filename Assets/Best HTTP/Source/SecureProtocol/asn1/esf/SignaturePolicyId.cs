@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
@@ -23,22 +22,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class SignaturePolicyId
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier	sigPolicyIdentifier;
-		private readonly OtherHashAlgAndValue	sigPolicyHash;
-		private readonly Asn1Sequence			sigPolicyQualifiers;
+		private readonly DerObjectIdentifier sigPolicyIdentifier;
+		private readonly OtherHashAlgAndValue sigPolicyHash;
+		private readonly Asn1Sequence sigPolicyQualifiers;
 
 		public static SignaturePolicyId GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is SignaturePolicyId)
-				return (SignaturePolicyId) obj;
+				return (SignaturePolicyId)obj;
 
 			if (obj is Asn1Sequence)
-				return new SignaturePolicyId((Asn1Sequence) obj);
+				return new SignaturePolicyId((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'SignaturePolicyId' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -50,26 +49,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			if (seq.Count < 2 || seq.Count > 3)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.sigPolicyIdentifier = (DerObjectIdentifier) seq[0].ToAsn1Object();
+			this.sigPolicyIdentifier = (DerObjectIdentifier)seq[0].ToAsn1Object();
 			this.sigPolicyHash = OtherHashAlgAndValue.GetInstance(seq[1].ToAsn1Object());
 
 			if (seq.Count > 2)
 			{
-				this.sigPolicyQualifiers = (Asn1Sequence) seq[2].ToAsn1Object();
+				this.sigPolicyQualifiers = (Asn1Sequence)seq[2].ToAsn1Object();
 			}
 		}
 
 		public SignaturePolicyId(
-			DerObjectIdentifier		sigPolicyIdentifier,
-			OtherHashAlgAndValue	sigPolicyHash)
+			DerObjectIdentifier sigPolicyIdentifier,
+			OtherHashAlgAndValue sigPolicyHash)
 			: this(sigPolicyIdentifier, sigPolicyHash, null)
 		{
 		}
 
 		public SignaturePolicyId(
-			DerObjectIdentifier				sigPolicyIdentifier,
-			OtherHashAlgAndValue			sigPolicyHash,
-			params SigPolicyQualifierInfo[]	sigPolicyQualifiers)
+			DerObjectIdentifier sigPolicyIdentifier,
+			OtherHashAlgAndValue sigPolicyHash,
+			params SigPolicyQualifierInfo[] sigPolicyQualifiers)
 		{
 			if (sigPolicyIdentifier == null)
 				throw new ArgumentNullException("sigPolicyIdentifier");
@@ -125,6 +124,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			{
 				infos[i] = SigPolicyQualifierInfo.GetInstance(sigPolicyQualifiers[i]);
 			}
+
 			return infos;
 		}
 

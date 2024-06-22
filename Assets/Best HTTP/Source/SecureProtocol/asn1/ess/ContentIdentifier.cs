@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
@@ -16,17 +15,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 		{
 			if (o == null || o is ContentIdentifier)
 			{
-				return (ContentIdentifier) o;
+				return (ContentIdentifier)o;
 			}
 
 			if (o is Asn1OctetString)
 			{
-				return new ContentIdentifier((Asn1OctetString) o);
+				return new ContentIdentifier((Asn1OctetString)o);
 			}
 
 			throw new ArgumentException(
 				"unknown object in 'ContentIdentifier' factory : "
-                + Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
 		}
 
 		/**

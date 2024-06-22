@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
@@ -9,21 +8,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class AuthEnvelopedData
 		: Asn1Encodable
 	{
-		private DerInteger				version;
-		private OriginatorInfo			originatorInfo;
-		private Asn1Set					recipientInfos;
-		private EncryptedContentInfo	authEncryptedContentInfo;
-		private Asn1Set					authAttrs;
-		private Asn1OctetString			mac;
-		private Asn1Set					unauthAttrs;
+		private DerInteger version;
+		private OriginatorInfo originatorInfo;
+		private Asn1Set recipientInfos;
+		private EncryptedContentInfo authEncryptedContentInfo;
+		private Asn1Set authAttrs;
+		private Asn1OctetString mac;
+		private Asn1Set unauthAttrs;
 
 		public AuthEnvelopedData(
-			OriginatorInfo			originatorInfo,
-			Asn1Set					recipientInfos,
-			EncryptedContentInfo	authEncryptedContentInfo,
-			Asn1Set					authAttrs,
-			Asn1OctetString			mac,
-			Asn1Set					unauthAttrs)
+			OriginatorInfo originatorInfo,
+			Asn1Set recipientInfos,
+			EncryptedContentInfo authEncryptedContentInfo,
+			Asn1Set authAttrs,
+			Asn1OctetString mac,
+			Asn1Set unauthAttrs)
 		{
 			// "It MUST be set to 0."
 			this.version = new DerInteger(0);
@@ -49,10 +48,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			this.mac = mac;
 
 			this.unauthAttrs = unauthAttrs;
-	    }
+		}
 
 		private AuthEnvelopedData(
-			Asn1Sequence	seq)
+			Asn1Sequence seq)
 		{
 			int index = 0;
 
@@ -113,8 +112,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		 *                                  tagged object cannot be converted.
 		 */
 		public static AuthEnvelopedData GetInstance(
-			Asn1TaggedObject	obj,
-			bool				isExplicit)
+			Asn1TaggedObject obj,
+			bool isExplicit)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, isExplicit));
 		}
@@ -126,7 +125,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		 * @throws ArgumentException if the object cannot be converted.
 		 */
 		public static AuthEnvelopedData GetInstance(
-			object	obj)
+			object obj)
 		{
 			if (obj == null || obj is AuthEnvelopedData)
 				return (AuthEnvelopedData)obj;
@@ -134,7 +133,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			if (obj is Asn1Sequence)
 				return new AuthEnvelopedData((Asn1Sequence)obj);
 
-            throw new ArgumentException("Invalid AuthEnvelopedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid AuthEnvelopedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
 		}
 
 		public DerInteger Version
@@ -185,23 +184,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		 *   unauthAttrs [2] IMPLICIT UnauthAttributes OPTIONAL }
 		 * </pre>
 		 */
-	    public override Asn1Object ToAsn1Object()
+		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(version);
-            v.AddOptionalTagged(false, 0, originatorInfo);
+			v.AddOptionalTagged(false, 0, originatorInfo);
 			v.Add(recipientInfos, authEncryptedContentInfo);
 
 			// "authAttrs optionally contains the authenticated attributes."
-            // "AuthAttributes MUST be DER encoded, even if the rest of the
-            // AuthEnvelopedData structure is BER encoded."
-            v.AddOptionalTagged(false, 1, authAttrs);
+			// "AuthAttributes MUST be DER encoded, even if the rest of the
+			// AuthEnvelopedData structure is BER encoded."
+			v.AddOptionalTagged(false, 1, authAttrs);
 
-            v.Add(mac);
+			v.Add(mac);
 
-            // "unauthAttrs optionally contains the unauthenticated attributes."
-            v.AddOptionalTagged(false, 2, unauthAttrs);
+			// "unauthAttrs optionally contains the unauthenticated attributes."
+			v.AddOptionalTagged(false, 2, unauthAttrs);
 
-            return new BerSequence(v);
+			return new BerSequence(v);
 		}
 	}
 }

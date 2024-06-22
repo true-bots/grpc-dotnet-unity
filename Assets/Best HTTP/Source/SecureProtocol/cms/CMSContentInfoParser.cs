@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -11,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
 	public class CmsContentInfoParser
 	{
-		protected ContentInfoParser	contentInfo;
+		protected ContentInfoParser contentInfo;
 		protected Stream data;
 
 		protected CmsContentInfoParser(
@@ -44,7 +43,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		*/
 		public void Close()
 		{
-            data.Dispose();
+			data.Dispose();
 		}
 	}
 }

@@ -14,8 +14,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
      */
 	[Serializable]
 	public class MemoableResetException
-        : InvalidCastException
-    {
+		: InvalidCastException
+	{
 		public MemoableResetException()
 			: base()
 		{

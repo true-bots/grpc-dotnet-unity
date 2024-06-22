@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -16,9 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	{
 		private static readonly PemParser PemAttrCertParser = new PemParser("ATTRIBUTE CERTIFICATE");
 
-		private Asn1Set	sData;
-		private int		sDataObjectCount;
-		private Stream	currentStream;
+		private Asn1Set sData;
+		private int sDataObjectCount;
+		private Stream currentStream;
 
 		private X509V2AttributeCertificate ReadDerCertificate(
 			Asn1InputStream dIn)
@@ -30,7 +29,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				if (seq[0].Equals(PkcsObjectIdentifiers.SignedData))
 				{
 					sData = SignedData.GetInstance(
-						Asn1Sequence.GetInstance((Asn1TaggedObject) seq[1], true)).Certificates;
+						Asn1Sequence.GetInstance((Asn1TaggedObject)seq[1], true)).Certificates;
 
 					return GetCertificate();
 				}
@@ -64,8 +63,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			Asn1Sequence seq = PemAttrCertParser.ReadPemObject(inStream);
 
 			return seq == null
-				?	null
-				:	new X509V2AttributeCertificate(AttributeCertificate.GetInstance(seq));
+				? null
+				: new X509V2AttributeCertificate(AttributeCertificate.GetInstance(seq));
 		}
 
 		/// <summary>
@@ -125,22 +124,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 					return null;
 				}
 
-                int tag = inStream.ReadByte();
-                if (tag < 0)
-                    return null;
+				int tag = inStream.ReadByte();
+				if (tag < 0)
+					return null;
 
-                if (inStream.CanSeek)
-                {
-                    inStream.Seek(-1L, SeekOrigin.Current);
-                }
-                else
-                {
-                    PushbackStream pis = new PushbackStream(inStream);
-                    pis.Unread(tag);
-                    inStream = pis;
-                }
+				if (inStream.CanSeek)
+				{
+					inStream.Seek(-1L, SeekOrigin.Current);
+				}
+				else
+				{
+					PushbackStream pis = new PushbackStream(inStream);
+					pis.Unread(tag);
+					inStream = pis;
+				}
 
-                if (tag != 0x30)  // assume ascii PEM encoded.
+				if (tag != 0x30) // assume ascii PEM encoded.
 				{
 					return ReadPemCertificate(inStream);
 				}

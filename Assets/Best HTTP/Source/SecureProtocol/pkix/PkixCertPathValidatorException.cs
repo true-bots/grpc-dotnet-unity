@@ -2,22 +2,21 @@
 #pragma warning disable
 using System;
 using System.Runtime.Serialization;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 {
 	/**
-	 * An exception indicating one of a variety of problems encountered when 
+	 * An exception indicating one of a variety of problems encountered when
 	 * validating a certification path. <br />
 	 * <br />
 	 * A <code>CertPathValidatorException</code> provides support for wrapping
-	 * exceptions. The {@link #getCause getCause} method returns the throwable, 
+	 * exceptions. The {@link #getCause getCause} method returns the throwable,
 	 * if any, that caused this exception to be thrown. <br />
 	 * <br />
-	 * A <code>CertPathValidatorException</code> may also include the 
-	 * certification path that was being validated when the exception was thrown 
-	 * and the index of the certificate in the certification path that caused the 
+	 * A <code>CertPathValidatorException</code> may also include the
+	 * certification path that was being validated when the exception was thrown
+	 * and the index of the certificate in the certification path that caused the
 	 * exception to be thrown. Use the {@link #getCertPath getCertPath} and
 	 * {@link #getIndex getIndex} methods to retrieve this information.<br />
 	 * <br />
@@ -31,9 +30,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 	 *
 	 * @see CertPathValidator
 	 **/
-    [Serializable]
-    public class PkixCertPathValidatorException
-        : GeneralSecurityException
+	[Serializable]
+	public class PkixCertPathValidatorException
+		: GeneralSecurityException
 	{
 		protected readonly int m_index = -1;
 

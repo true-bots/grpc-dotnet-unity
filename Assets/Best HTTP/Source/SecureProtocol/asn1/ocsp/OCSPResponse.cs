@@ -1,20 +1,19 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 {
-    public class OcspResponse
-        : Asn1Encodable
-    {
-        private readonly OcspResponseStatus	responseStatus;
-        private readonly ResponseBytes		responseBytes;
+	public class OcspResponse
+		: Asn1Encodable
+	{
+		private readonly OcspResponseStatus responseStatus;
+		private readonly ResponseBytes responseBytes;
 
 		public static OcspResponse GetInstance(
-			Asn1TaggedObject	obj,
-			bool				explicitly)
+			Asn1TaggedObject obj,
+			bool explicitly)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
 		}
@@ -32,32 +31,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new OcspResponse((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public OcspResponse(
-            OcspResponseStatus	responseStatus,
-            ResponseBytes		responseBytes)
-        {
+			OcspResponseStatus responseStatus,
+			ResponseBytes responseBytes)
+		{
 			if (responseStatus == null)
 				throw new ArgumentNullException("responseStatus");
 
 			this.responseStatus = responseStatus;
-            this.responseBytes = responseBytes;
-        }
+			this.responseBytes = responseBytes;
+		}
 
 		private OcspResponse(
-            Asn1Sequence seq)
-        {
-            responseStatus = new OcspResponseStatus(
+			Asn1Sequence seq)
+		{
+			responseStatus = new OcspResponseStatus(
 				DerEnumerated.GetInstance(seq[0]));
 
 			if (seq.Count == 2)
-            {
-                responseBytes = ResponseBytes.GetInstance(
+			{
+				responseBytes = ResponseBytes.GetInstance(
 					(Asn1TaggedObject)seq[1], true);
-            }
-        }
+			}
+		}
 
 		public OcspResponseStatus ResponseStatus
 		{
@@ -77,13 +76,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
          *     responseBytes          [0] EXPLICIT ResponseBytes OPTIONAL }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector(responseStatus);
-            v.AddOptionalTagged(true, 0, responseBytes);
-            return new DerSequence(v);
-        }
-    }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector(responseStatus);
+			v.AddOptionalTagged(true, 0, responseBytes);
+			return new DerSequence(v);
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
@@ -19,12 +18,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		 *          tagged object cannot be converted.
 		 */
 		public static KeyAgreeRecipientIdentifier GetInstance(
-			Asn1TaggedObject	obj,
-			bool				isExplicit)
+			Asn1TaggedObject obj,
+			bool isExplicit)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, isExplicit));
 		}
-    
+
 		/**
 		 * return an KeyAgreeRecipientIdentifier object from the given object.
 		 *
@@ -47,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			}
 
 			throw new ArgumentException("Invalid KeyAgreeRecipientIdentifier: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
-		} 
+		}
 
 		private readonly IssuerAndSerialNumber issuerSerial;
 		private readonly RecipientKeyIdentifier rKeyID;
@@ -74,7 +73,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			get { return rKeyID; }
 		}
 
-		/** 
+		/**
 		 * Produce an object suitable for an Asn1OutputStream.
 		 * <pre>
 		 * KeyAgreeRecipientIdentifier ::= CHOICE {

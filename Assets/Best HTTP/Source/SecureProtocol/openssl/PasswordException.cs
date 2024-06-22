@@ -6,8 +6,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 {
-    [Serializable]
-    public class PasswordException
+	[Serializable]
+	public class PasswordException
 		: IOException
 	{
 		public PasswordException()

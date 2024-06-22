@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -23,21 +22,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class OtherHashAlgAndValue
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier	hashAlgorithm;
-		private readonly Asn1OctetString		hashValue;
+		private readonly AlgorithmIdentifier hashAlgorithm;
+		private readonly Asn1OctetString hashValue;
 
 		public static OtherHashAlgAndValue GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is OtherHashAlgAndValue)
-				return (OtherHashAlgAndValue) obj;
+				return (OtherHashAlgAndValue)obj;
 
 			if (obj is Asn1Sequence)
-				return new OtherHashAlgAndValue((Asn1Sequence) obj);
+				return new OtherHashAlgAndValue((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'OtherHashAlgAndValue' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -50,12 +49,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
 			this.hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0].ToAsn1Object());
-			this.hashValue = (Asn1OctetString) seq[1].ToAsn1Object();
+			this.hashValue = (Asn1OctetString)seq[1].ToAsn1Object();
 		}
 
 		public OtherHashAlgAndValue(
-			AlgorithmIdentifier	hashAlgorithm,
-			byte[]				hashValue)
+			AlgorithmIdentifier hashAlgorithm,
+			byte[] hashValue)
 		{
 			if (hashAlgorithm == null)
 				throw new ArgumentNullException("hashAlgorithm");
@@ -67,8 +66,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		}
 
 		public OtherHashAlgAndValue(
-			AlgorithmIdentifier	hashAlgorithm,
-			Asn1OctetString		hashValue)
+			AlgorithmIdentifier hashAlgorithm,
+			Asn1OctetString hashValue)
 		{
 			if (hashAlgorithm == null)
 				throw new ArgumentNullException("hashAlgorithm");

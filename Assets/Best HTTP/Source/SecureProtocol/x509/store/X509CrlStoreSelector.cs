@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
@@ -74,7 +73,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public IList<X509Name> Issuers
 		{
 			get { return new List<X509Name>(issuers); }
-            set { issuers = new List<X509Name>(value); }
+			set { issuers = new List<X509Name>(value); }
 		}
 
 		public BigInteger MaxCrlNumber

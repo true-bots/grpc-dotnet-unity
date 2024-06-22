@@ -4,13 +4,13 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
-    /**
-    * a buffer wrapper for an asymmetric block cipher, allowing input
-    * to be accumulated in a piecemeal fashion until final processing.
-    */
-    public class BufferedAsymmetricBlockCipher
+	/**
+	* a buffer wrapper for an asymmetric block cipher, allowing input
+	* to be accumulated in a piecemeal fashion until final processing.
+	*/
+	public class BufferedAsymmetricBlockCipher
 		: BufferedCipherBase
-    {
+	{
 		private readonly IAsymmetricBlockCipher cipher;
 
 		private byte[] buffer;
@@ -21,10 +21,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         *
         * @param cipher the cipher this buffering object wraps.
         */
-        public BufferedAsymmetricBlockCipher(
-            IAsymmetricBlockCipher cipher)
-        {
-            this.cipher = cipher;
+		public BufferedAsymmetricBlockCipher(
+			IAsymmetricBlockCipher cipher)
+		{
+			this.cipher = cipher;
 		}
 
 		/**
@@ -32,20 +32,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         *
         * @return the amount of data sitting in the buffer.
         */
-        internal int GetBufferPosition()
-        {
-            return bufOff;
-        }
+		internal int GetBufferPosition()
+		{
+			return bufOff;
+		}
 
 		public override string AlgorithmName
-        {
-            get { return cipher.AlgorithmName; }
-        }
+		{
+			get { return cipher.AlgorithmName; }
+		}
 
 		public override int GetBlockSize()
-        {
+		{
 			return cipher.GetInputBlockSize();
-        }
+		}
 
 		public override int GetOutputSize(
 			int length)
@@ -66,10 +66,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         *  encryption, if false for decryption.
         * @param param the key and other data required by the cipher.
         */
-        public override void Init(
-            bool				forEncryption,
-            ICipherParameters	parameters)
-        {
+		public override void Init(
+			bool forEncryption,
+			ICipherParameters parameters)
+		{
 			Reset();
 
 			cipher.Init(forEncryption, parameters);
@@ -80,7 +80,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			//
 			this.buffer = new byte[cipher.GetInputBlockSize() + (forEncryption ? 1 : 0)];
 			this.bufOff = 0;
-        }
+		}
 
 		public override byte[] ProcessByte(
 			byte input)
@@ -92,14 +92,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			return null;
 		}
 
-        public override int ProcessByte(byte input, byte[] output, int outOff)
-        {
-            if (bufOff >= buffer.Length)
-                throw new DataLengthException("attempt to process message too long for cipher");
+		public override int ProcessByte(byte input, byte[] output, int outOff)
+		{
+			if (bufOff >= buffer.Length)
+				throw new DataLengthException("attempt to process message too long for cipher");
 
-            buffer[bufOff++] = input;
-            return 0;
-        }
+			buffer[bufOff++] = input;
+			return 0;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public override int ProcessByte(byte input, Span<byte> output)
@@ -112,10 +112,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        public override byte[] ProcessBytes(
-			byte[]	input,
-			int		inOff,
-			int		length)
+		public override byte[] ProcessBytes(
+			byte[] input,
+			int inOff,
+			int length)
 		{
 			if (length < 1)
 				return null;
@@ -141,29 +141,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        /**
-        * process the contents of the buffer using the underlying
-        * cipher.
-        *
-        * @return the result of the encryption/decryption process on the
-        * buffer.
-        * @exception InvalidCipherTextException if we are given a garbage block.
-        */
-        public override byte[] DoFinal()
-        {
+		/**
+		* process the contents of the buffer using the underlying
+		* cipher.
+		*
+		* @return the result of the encryption/decryption process on the
+		* buffer.
+		* @exception InvalidCipherTextException if we are given a garbage block.
+		*/
+		public override byte[] DoFinal()
+		{
 			byte[] outBytes = bufOff > 0
-				?	cipher.ProcessBlock(buffer, 0, bufOff)
-				:	EmptyBuffer;
+				? cipher.ProcessBlock(buffer, 0, bufOff)
+				: EmptyBuffer;
 
 			Reset();
 
 			return outBytes;
-        }
+		}
 
 		public override byte[] DoFinal(
-			byte[]	input,
-			int		inOff,
-			int		length)
+			byte[] input,
+			int inOff,
+			int length)
 		{
 			ProcessBytes(input, inOff, length);
 			return DoFinal();
@@ -186,16 +186,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         }
 #endif
 
-        /// <summary>Reset the buffer</summary>
-        public override void Reset()
-        {
+		/// <summary>Reset the buffer</summary>
+		public override void Reset()
+		{
 			if (buffer != null)
 			{
 				Array.Clear(buffer, 0, buffer.Length);
 				bufOff = 0;
 			}
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

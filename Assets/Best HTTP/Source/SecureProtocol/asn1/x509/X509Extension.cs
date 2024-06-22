@@ -4,38 +4,44 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 {
-    /**
-     * an object for the elements in the X.509 V3 extension block.
-     */
-    public class X509Extension
-    {
-        internal bool				critical;
-        internal Asn1OctetString	value;
+	/**
+	 * an object for the elements in the X.509 V3 extension block.
+	 */
+	public class X509Extension
+	{
+		internal bool critical;
+		internal Asn1OctetString value;
 
 		public X509Extension(
-            DerBoolean		critical,
-            Asn1OctetString	value)
-        {
-            if (critical == null)
-            {
-                throw new ArgumentNullException("critical");
-            }
+			DerBoolean critical,
+			Asn1OctetString value)
+		{
+			if (critical == null)
+			{
+				throw new ArgumentNullException("critical");
+			}
 
 			this.critical = critical.IsTrue;
-            this.value = value;
-        }
+			this.value = value;
+		}
 
 		public X509Extension(
-            bool			critical,
-            Asn1OctetString	value)
-        {
-            this.critical = critical;
-            this.value = value;
-        }
+			bool critical,
+			Asn1OctetString value)
+		{
+			this.critical = critical;
+			this.value = value;
+		}
 
-		public bool IsCritical { get { return critical; } }
+		public bool IsCritical
+		{
+			get { return critical; }
+		}
 
-		public Asn1OctetString Value { get { return value; } }
+		public Asn1OctetString Value
+		{
+			get { return value; }
+		}
 
 		public Asn1Encodable GetParsedValue()
 		{
@@ -43,23 +49,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public override int GetHashCode()
-        {
+		{
 			int vh = this.Value.GetHashCode();
 
 			return IsCritical ? vh : ~vh;
-        }
+		}
 
 		public override bool Equals(
-            object obj)
-        {
-            X509Extension other = obj as X509Extension;
-            if (other == null)
-            {
-                return false;
-            }
+			object obj)
+		{
+			X509Extension other = obj as X509Extension;
+			if (other == null)
+			{
+				return false;
+			}
 
 			return Value.Equals(other.Value) && IsCritical == other.IsCritical;
-        }
+		}
 
 		/// <sumary>Convert the value of the passed in extension to an object.</sumary>
 		/// <param name="ext">The extension to parse.</param>

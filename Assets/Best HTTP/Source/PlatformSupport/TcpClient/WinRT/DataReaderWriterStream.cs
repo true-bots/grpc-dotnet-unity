@@ -1,5 +1,4 @@
 ﻿#if UNITY_WSA && !UNITY_EDITOR && !ENABLE_IL2CPP
-
 using System;
 using System.IO;
 
@@ -53,7 +52,7 @@ namespace BestHTTP.PlatformSupport.TcpClient.WinRT
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            var task  = Client.Socket.OutputStream.WriteAsync(buffer.AsBuffer(offset, count)).AsTask<uint, uint>();
+            var task = Client.Socket.OutputStream.WriteAsync(buffer.AsBuffer(offset, count)).AsTask<uint, uint>();
             task.ConfigureAwait(false);
             task.Wait();
         }

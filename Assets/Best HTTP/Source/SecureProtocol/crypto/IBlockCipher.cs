@@ -5,8 +5,8 @@ using System;
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
 	/// <remarks>Base interface for a symmetric key block cipher.</remarks>
-    public interface IBlockCipher
-    {
+	public interface IBlockCipher
+	{
 		/// <summary>The name of the algorithm this cipher implements.</summary>
 		string AlgorithmName { get; }
 
@@ -28,7 +28,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		int ProcessBlock(byte[] inBuf, int inOff, byte[] outBuf, int outOff);
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
-
 		/// <summary>Process a block.</summary>
 		/// <param name="input">The input block as a span.</param>
 		/// <param name="output">The output span.</param>
@@ -36,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		/// <returns>The number of bytes processed and produced.</returns>
 		int ProcessBlock(ReadOnlySpan<byte> input, Span<byte> output);
 #endif
-    }
+	}
 }
 #pragma warning restore
 #endif

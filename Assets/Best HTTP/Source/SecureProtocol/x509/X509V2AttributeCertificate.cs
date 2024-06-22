@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -73,7 +72,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 		public virtual int Version
 		{
-            get { return cert.ACInfo.Version.IntValueExact + 1; }
+			get { return cert.ACInfo.Version.IntValueExact + 1; }
 		}
 
 		public virtual BigInteger SerialNumber
@@ -83,18 +82,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 		public virtual AttributeCertificateHolder Holder
 		{
-			get
-			{
-				return new AttributeCertificateHolder((Asn1Sequence)cert.ACInfo.Holder.ToAsn1Object());
-			}
+			get { return new AttributeCertificateHolder((Asn1Sequence)cert.ACInfo.Holder.ToAsn1Object()); }
 		}
 
 		public virtual AttributeCertificateIssuer Issuer
 		{
-			get
-			{
-				return new AttributeCertificateIssuer(cert.ACInfo.Issuer);
-			}
+			get { return new AttributeCertificateIssuer(cert.ACInfo.Issuer); }
 		}
 
 		public virtual DateTime NotBefore
@@ -153,52 +146,52 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				throw new CertificateNotYetValidException("certificate not valid until " + NotBefore);
 		}
 
-        public virtual AlgorithmIdentifier SignatureAlgorithm
-        {
-            get { return cert.SignatureAlgorithm; }
-        }
+		public virtual AlgorithmIdentifier SignatureAlgorithm
+		{
+			get { return cert.SignatureAlgorithm; }
+		}
 
 		public virtual byte[] GetSignature()
 		{
-            return cert.GetSignatureOctets();
+			return cert.GetSignatureOctets();
 		}
 
-        public virtual void Verify(
-            AsymmetricKeyParameter key)
-        {
-            CheckSignature(new Asn1VerifierFactory(cert.SignatureAlgorithm, key));
-        }
+		public virtual void Verify(
+			AsymmetricKeyParameter key)
+		{
+			CheckSignature(new Asn1VerifierFactory(cert.SignatureAlgorithm, key));
+		}
 
-        /// <summary>
-        /// Verify the certificate's signature using a verifier created using the passed in verifier provider.
-        /// </summary>
-        /// <param name="verifierProvider">An appropriate provider for verifying the certificate's signature.</param>
-        /// <returns>True if the signature is valid.</returns>
-        /// <exception cref="Exception">If verifier provider is not appropriate or the certificate algorithm is invalid.</exception>
-        public virtual void Verify(
-            IVerifierFactoryProvider verifierProvider)
-        {
-            CheckSignature(verifierProvider.CreateVerifierFactory(cert.SignatureAlgorithm));
-        }
+		/// <summary>
+		/// Verify the certificate's signature using a verifier created using the passed in verifier provider.
+		/// </summary>
+		/// <param name="verifierProvider">An appropriate provider for verifying the certificate's signature.</param>
+		/// <returns>True if the signature is valid.</returns>
+		/// <exception cref="Exception">If verifier provider is not appropriate or the certificate algorithm is invalid.</exception>
+		public virtual void Verify(
+			IVerifierFactoryProvider verifierProvider)
+		{
+			CheckSignature(verifierProvider.CreateVerifierFactory(cert.SignatureAlgorithm));
+		}
 
-        protected virtual void CheckSignature(
-            IVerifierFactory verifier)
-        {
-            // TODO Compare IsAlgIDEqual in X509Certificate.CheckSignature
-            if (!cert.SignatureAlgorithm.Equals(cert.ACInfo.Signature))
+		protected virtual void CheckSignature(
+			IVerifierFactory verifier)
+		{
+			// TODO Compare IsAlgIDEqual in X509Certificate.CheckSignature
+			if (!cert.SignatureAlgorithm.Equals(cert.ACInfo.Signature))
 				throw new CertificateException("Signature algorithm in certificate info not same as outer certificate");
 
-            IStreamCalculator<IVerifier> streamCalculator = verifier.CreateCalculator();
+			IStreamCalculator<IVerifier> streamCalculator = verifier.CreateCalculator();
 
 			try
 			{
-                byte[] b = this.cert.ACInfo.GetEncoded();
+				byte[] b = this.cert.ACInfo.GetEncoded();
 
 				using (var stream = streamCalculator.Stream)
 				{
-                    stream.Write(b, 0, b.Length);
-                }
-            }
+					stream.Write(b, 0, b.Length);
+				}
+			}
 			catch (IOException e)
 			{
 				throw new SignatureException("Exception encoding certificate info object", e);

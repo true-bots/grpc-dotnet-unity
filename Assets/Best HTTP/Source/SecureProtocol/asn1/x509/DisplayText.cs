@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -29,21 +28,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 *
 		 */
 		public const int ContentTypeIA5String = 0;
+
 		/**
 		 * Constant corresponding to bmpString encoding.
 		 *
 		 */
 		public const int ContentTypeBmpString = 1;
+
 		/**
 		 * Constant corresponding to utf8String encoding.
 		 *
 		 */
 		public const int ContentTypeUtf8String = 2;
+
 		/**
 		 * Constant corresponding to visibleString encoding.
 		 *
 		 */
 		public const int ContentTypeVisibleString = 3;
+
 		/**
 		 * Describe constant <code>DisplayTextMaximumSize</code> here.
 		 *
@@ -61,8 +64,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * characters are truncated.
 		 */
 		public DisplayText(
-			int		type,
-			string	text)
+			int type,
+			string text)
 		{
 			if (text.Length > DisplayTextMaximumSize)
 			{
@@ -75,7 +78,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			switch (type)
 			{
 				case ContentTypeIA5String:
-					contents = (IAsn1String)new DerIA5String (text);
+					contents = (IAsn1String)new DerIA5String(text);
 					break;
 				case ContentTypeUtf8String:
 					contents = (IAsn1String)new DerUtf8String(text);
@@ -147,20 +150,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 			if (obj is IAsn1String)
 			{
-				return new DisplayText((IAsn1String) obj);
+				return new DisplayText((IAsn1String)obj);
 			}
 
 			if (obj is DisplayText)
 			{
-				return (DisplayText) obj;
+				return (DisplayText)obj;
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public override Asn1Object ToAsn1Object()
 		{
-			return (Asn1Object) contents;
+			return (Asn1Object)contents;
 		}
 
 		/**

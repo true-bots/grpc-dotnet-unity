@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 
 		public TimeStampTokenEvidence(TimeStampAndCrl timeStampAndCrl)
 		{
-			this.timeStampAndCrls = new TimeStampAndCrl[]{ timeStampAndCrl };
+			this.timeStampAndCrls = new TimeStampAndCrl[] { timeStampAndCrl };
 		}
 
 		private TimeStampTokenEvidence(Asn1Sequence seq)

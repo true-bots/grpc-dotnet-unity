@@ -5,8 +5,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 {
-    [Serializable]
-    public class OcspException
+	[Serializable]
+	public class OcspException
 		: Exception
 	{
 		public OcspException()

@@ -2,13 +2,12 @@
 #pragma warning disable
 using System;
 using System.Runtime.Serialization;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 {
-    [Serializable]
-    public class PkixCertPathBuilderException
+	[Serializable]
+	public class PkixCertPathBuilderException
 		: GeneralSecurityException
 	{
 		public PkixCertPathBuilderException()

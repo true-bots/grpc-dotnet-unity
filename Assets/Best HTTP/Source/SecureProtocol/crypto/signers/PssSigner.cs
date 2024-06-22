@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -28,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		private int hLen;
 		private int mgfhLen;
 		private int sLen;
-        private bool sSet;
+		private bool sSet;
 		private int emBits;
 		private byte[] salt;
 		private byte[] mDash;
@@ -53,8 +52,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		}
 
 		public PssSigner(
-			IAsymmetricBlockCipher	cipher,
-			IDigest					digest)
+			IAsymmetricBlockCipher cipher,
+			IDigest digest)
 			: this(cipher, digest, digest.GetDigestSize())
 		{
 		}
@@ -64,70 +63,70 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		/// <param name="digest">the digest to use.</param>
 		/// <param name="saltLen">the length of the salt to use (in bytes).</param>
 		public PssSigner(
-			IAsymmetricBlockCipher	cipher,
-			IDigest					digest,
-			int						saltLen)
+			IAsymmetricBlockCipher cipher,
+			IDigest digest,
+			int saltLen)
 			: this(cipher, digest, saltLen, TrailerImplicit)
 		{
 		}
 
-        /// <summary>Basic constructor</summary>
-        /// <param name="cipher">the asymmetric cipher to use.</param>
-        /// <param name="digest">the digest to use.</param>
-        /// <param name="salt">the fixed salt to be used.</param>
-        public PssSigner(
-            IAsymmetricBlockCipher cipher,
-            IDigest digest,
-            byte[] salt)
-            : this(cipher, digest, digest, digest, salt.Length, salt, TrailerImplicit)
-        {
-        }
+		/// <summary>Basic constructor</summary>
+		/// <param name="cipher">the asymmetric cipher to use.</param>
+		/// <param name="digest">the digest to use.</param>
+		/// <param name="salt">the fixed salt to be used.</param>
+		public PssSigner(
+			IAsymmetricBlockCipher cipher,
+			IDigest digest,
+			byte[] salt)
+			: this(cipher, digest, digest, digest, salt.Length, salt, TrailerImplicit)
+		{
+		}
 
-        public PssSigner(
-			IAsymmetricBlockCipher	cipher,
-			IDigest					contentDigest,
-			IDigest					mgfDigest,
-			int						saltLen)
+		public PssSigner(
+			IAsymmetricBlockCipher cipher,
+			IDigest contentDigest,
+			IDigest mgfDigest,
+			int saltLen)
 			: this(cipher, contentDigest, mgfDigest, saltLen, TrailerImplicit)
 		{
 		}
 
-        public PssSigner(
-            IAsymmetricBlockCipher cipher,
-            IDigest contentDigest,
-            IDigest mgfDigest,
-            byte[] salt)
-            : this(cipher, contentDigest, contentDigest, mgfDigest, salt.Length, salt, TrailerImplicit)
-        {
-        }
+		public PssSigner(
+			IAsymmetricBlockCipher cipher,
+			IDigest contentDigest,
+			IDigest mgfDigest,
+			byte[] salt)
+			: this(cipher, contentDigest, contentDigest, mgfDigest, salt.Length, salt, TrailerImplicit)
+		{
+		}
 
-        public PssSigner(
-			IAsymmetricBlockCipher	cipher,
-			IDigest					digest,
-			int						saltLen,
-			byte					trailer)
+		public PssSigner(
+			IAsymmetricBlockCipher cipher,
+			IDigest digest,
+			int saltLen,
+			byte trailer)
 			: this(cipher, digest, digest, saltLen, trailer)
 		{
 		}
 
 		public PssSigner(
-			IAsymmetricBlockCipher	cipher,
-			IDigest					contentDigest,
-			IDigest					mgfDigest,
-			int						saltLen,
-			byte					trailer)
+			IAsymmetricBlockCipher cipher,
+			IDigest contentDigest,
+			IDigest mgfDigest,
+			int saltLen,
+			byte trailer)
 			: this(cipher, contentDigest, contentDigest, mgfDigest, saltLen, null, trailer)
 		{
 		}
 
 		private PssSigner(
-			IAsymmetricBlockCipher	cipher,
-			IDigest					contentDigest1,
-			IDigest					contentDigest2,
-			IDigest					mgfDigest,
-			int						saltLen,
-            byte[]                  salt,
-			byte					trailer)
+			IAsymmetricBlockCipher cipher,
+			IDigest contentDigest1,
+			IDigest contentDigest2,
+			IDigest mgfDigest,
+			int saltLen,
+			byte[] salt,
+			byte trailer)
 		{
 			this.cipher = cipher;
 			this.contentDigest1 = contentDigest1;
@@ -136,20 +135,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			this.hLen = contentDigest2.GetDigestSize();
 			this.mgfhLen = mgfDigest.GetDigestSize();
 			this.sLen = saltLen;
-            this.sSet = salt != null;
-            if (sSet)
-            {
-                this.salt = salt;
-            }
-            else
-            {
-                this.salt = new byte[saltLen];
-            }
+			this.sSet = salt != null;
+			if (sSet)
+			{
+				this.salt = salt;
+			}
+			else
+			{
+				this.salt = new byte[saltLen];
+			}
+
 			this.mDash = new byte[8 + saltLen + hLen];
 			this.trailer = trailer;
 		}
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return mgfDigest.AlgorithmName + "withRSAandMGF1"; }
 		}
@@ -227,10 +227,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 			if (sLen != 0)
 			{
-                if (!sSet)
-                {
-                    random.NextBytes(salt);
-                }
+				if (!sSet)
+				{
+					random.NextBytes(salt);
+				}
+
 				salt.CopyTo(mDash, mDash.Length - sLen);
 			}
 
@@ -240,7 +241,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 			contentDigest2.DoFinal(h, 0);
 
-			block[block.Length - sLen - 1 - hLen - 1] = (byte) (0x01);
+			block[block.Length - sLen - 1 - hLen - 1] = (byte)(0x01);
 			salt.CopyTo(block, block.Length - sLen - hLen - 1);
 
 			byte[] dbMask = MaskGeneratorFunction(h, 0, h.Length, block.Length - hLen - 1);
@@ -249,12 +250,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				block[i] ^= dbMask[i];
 			}
 
-            h.CopyTo(block, block.Length - hLen - 1);
+			h.CopyTo(block, block.Length - hLen - 1);
 
-            uint firstByteMask = 0xFFU >> ((block.Length * 8) - emBits);
+			uint firstByteMask = 0xFFU >> ((block.Length * 8) - emBits);
 
-            block[0] &= (byte)firstByteMask;
-            block[block.Length - 1] = trailer;
+			block[0] &= (byte)firstByteMask;
+			block[block.Length - 1] = trailer;
 
 			byte[] b = cipher.ProcessBlock(block, 0, block.Length);
 
@@ -270,14 +271,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 			contentDigest1.DoFinal(mDash, mDash.Length - hLen - sLen);
 
-            byte[] b = cipher.ProcessBlock(signature, 0, signature.Length);
-            Arrays.Fill(block, 0, block.Length - b.Length, 0);
+			byte[] b = cipher.ProcessBlock(signature, 0, signature.Length);
+			Arrays.Fill(block, 0, block.Length - b.Length, 0);
 			b.CopyTo(block, block.Length - b.Length);
 
-            uint firstByteMask = 0xFFU >> ((block.Length * 8) - emBits);
+			uint firstByteMask = 0xFFU >> ((block.Length * 8) - emBits);
 
 			if (block[0] != (byte)(block[0] & firstByteMask)
-                || block[block.Length - 1] != trailer)
+			    || block[block.Length - 1] != trailer)
 			{
 				ClearBlock(block);
 				return false;
@@ -290,7 +291,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				block[i] ^= dbMask[i];
 			}
 
-            block[0] &= (byte)firstByteMask;
+			block[0] &= (byte)firstByteMask;
 
 			for (int i = 0; i != block.Length - hLen - sLen - 2; i++)
 			{
@@ -307,14 +308,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				return false;
 			}
 
-            if (sSet)
-            {
-                Array.Copy(salt, 0, mDash, mDash.Length - sLen, sLen);
-            }
-            else
-            {
-                Array.Copy(block, block.Length - sLen - hLen - 1, mDash, mDash.Length - sLen, sLen);
-            }
+			if (sSet)
+			{
+				Array.Copy(salt, 0, mDash, mDash.Length - sLen, sLen);
+			}
+			else
+			{
+				Array.Copy(block, block.Length - sLen - hLen - 1, mDash, mDash.Length - sLen, sLen);
+			}
 
 			contentDigest2.BlockUpdate(mDash, 0, mDash.Length);
 			contentDigest2.DoFinal(mDash, mDash.Length - hLen);
@@ -337,13 +338,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 		/// <summary> int to octet string.</summary>
 		private void ItoOSP(
-			int		i,
-			byte[]	sp)
+			int i,
+			byte[] sp)
 		{
-			sp[0] = (byte)((uint) i >> 24);
-			sp[1] = (byte)((uint) i >> 16);
-			sp[2] = (byte)((uint) i >> 8);
-			sp[3] = (byte)((uint) i >> 0);
+			sp[0] = (byte)((uint)i >> 24);
+			sp[1] = (byte)((uint)i >> 16);
+			sp[2] = (byte)((uint)i >> 8);
+			sp[3] = (byte)((uint)i >> 0);
 		}
 
 		private byte[] MaskGeneratorFunction(
@@ -368,10 +369,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 		/// <summary> mask generator function, as described in Pkcs1v2.</summary>
 		private byte[] MaskGeneratorFunction1(
-			byte[]	Z,
-			int		zOff,
-			int		zLen,
-			int		length)
+			byte[] Z,
+			int zOff,
+			int zLen,
+			int length)
 		{
 			byte[] mask = new byte[length];
 			byte[] hashBuf = new byte[mgfhLen];

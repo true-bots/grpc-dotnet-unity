@@ -4,19 +4,19 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
-    public interface IMacFactory
-    {
-        /// <summary>The algorithm details object for this calculator.</summary>
-        object AlgorithmDetails { get; }
+	public interface IMacFactory
+	{
+		/// <summary>The algorithm details object for this calculator.</summary>
+		object AlgorithmDetails { get; }
 
-        /// <summary>
-        /// Create a stream calculator for this signature calculator. The stream
-        /// calculator is used for the actual operation of entering the data to be signed
-        /// and producing the signature block.
-        /// </summary>
-        /// <returns>A calculator producing an IBlockResult with a signature in it.</returns>
-        IStreamCalculator<IBlockResult> CreateCalculator();
-    }
+		/// <summary>
+		/// Create a stream calculator for this signature calculator. The stream
+		/// calculator is used for the actual operation of entering the data to be signed
+		/// and producing the signature block.
+		/// </summary>
+		/// <returns>A calculator producing an IBlockResult with a signature in it.</returns>
+		IStreamCalculator<IBlockResult> CreateCalculator();
+	}
 }
 #pragma warning restore
 #endif

@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
@@ -24,22 +23,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 			DerInteger millis,
 			DerInteger micros)
 		{
-            if (null != millis)
-            {
-                int millisValue = millis.IntValueExact;
-                if (millisValue < MinMillis || millisValue > MaxMillis)
-                    throw new ArgumentException("Invalid millis field : not in (1..999)");
-            }
-            if (null != micros)
-            {
-                int microsValue = micros.IntValueExact;
-                if (microsValue < MinMicros || microsValue > MaxMicros)
-                    throw new ArgumentException("Invalid micros field : not in (1..999)");
-            }
+			if (null != millis)
+			{
+				int millisValue = millis.IntValueExact;
+				if (millisValue < MinMillis || millisValue > MaxMillis)
+					throw new ArgumentException("Invalid millis field : not in (1..999)");
+			}
 
-            this.seconds = seconds;
-            this.millis = millis;
-            this.micros = micros;
+			if (null != micros)
+			{
+				int microsValue = micros.IntValueExact;
+				if (microsValue < MinMicros || microsValue > MaxMicros)
+					throw new ArgumentException("Invalid micros field : not in (1..999)");
+			}
+
+			this.seconds = seconds;
+			this.millis = millis;
+			this.micros = micros;
 		}
 
 		private Accuracy(
@@ -50,43 +50,43 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 				// seconds
 				if (seq[i] is DerInteger)
 				{
-					seconds = (DerInteger) seq[i];
+					seconds = (DerInteger)seq[i];
 				}
-                else if (seq[i] is Asn1TaggedObject)
+				else if (seq[i] is Asn1TaggedObject)
 				{
-                    Asn1TaggedObject extra = (Asn1TaggedObject)seq[i];
+					Asn1TaggedObject extra = (Asn1TaggedObject)seq[i];
 
-                    switch (extra.TagNo)
-                    {
-                    case 0:
-                        millis = DerInteger.GetInstance(extra, false);
-                        int millisValue = millis.IntValueExact;
-                        if (millisValue < MinMillis || millisValue > MaxMillis)
-                            throw new ArgumentException("Invalid millis field : not in (1..999)");
-                        break;
-                    case 1:
-                        micros = DerInteger.GetInstance(extra, false);
-                        int microsValue = micros.IntValueExact;
-                        if (microsValue < MinMicros || microsValue > MaxMicros)
-                            throw new ArgumentException("Invalid micros field : not in (1..999)");
-                        break;
-                    default:
-                        throw new ArgumentException("Invalid tag number");
-                    }
+					switch (extra.TagNo)
+					{
+						case 0:
+							millis = DerInteger.GetInstance(extra, false);
+							int millisValue = millis.IntValueExact;
+							if (millisValue < MinMillis || millisValue > MaxMillis)
+								throw new ArgumentException("Invalid millis field : not in (1..999)");
+							break;
+						case 1:
+							micros = DerInteger.GetInstance(extra, false);
+							int microsValue = micros.IntValueExact;
+							if (microsValue < MinMicros || microsValue > MaxMicros)
+								throw new ArgumentException("Invalid micros field : not in (1..999)");
+							break;
+						default:
+							throw new ArgumentException("Invalid tag number");
+					}
 				}
 			}
 		}
 
-        public static Accuracy GetInstance(object obj)
-        {
-            if (obj is Accuracy)
-                return (Accuracy)obj;
-            if (obj == null)
-                return null;
-            return new Accuracy(Asn1Sequence.GetInstance(obj));
-        }
+		public static Accuracy GetInstance(object obj)
+		{
+			if (obj is Accuracy)
+				return (Accuracy)obj;
+			if (obj == null)
+				return null;
+			return new Accuracy(Asn1Sequence.GetInstance(obj));
+		}
 
-        public DerInteger Seconds
+		public DerInteger Seconds
 		{
 			get { return seconds; }
 		}
@@ -110,14 +110,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 		 *             }
 		 * </pre>
 		 */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptional(seconds);
-            v.AddOptionalTagged(false, 0, millis);
-            v.AddOptionalTagged(false, 1, micros);
-            return new DerSequence(v);
-        }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
+			v.AddOptional(seconds);
+			v.AddOptionalTagged(false, 0, millis);
+			v.AddOptionalTagged(false, 1, micros);
+			return new DerSequence(v);
+		}
 	}
 }
 #pragma warning restore

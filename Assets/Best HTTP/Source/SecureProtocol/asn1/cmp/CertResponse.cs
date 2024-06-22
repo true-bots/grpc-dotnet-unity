@@ -7,8 +7,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class CertResponse
 		: Asn1Encodable
 	{
-        public static CertResponse GetInstance(object obj)
-        {
+		public static CertResponse GetInstance(object obj)
+		{
 			if (obj is CertResponse certResponse)
 				return certResponse;
 
@@ -16,9 +16,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new CertResponse(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly DerInteger m_certReqId;
+		private readonly DerInteger m_certReqId;
 		private readonly PkiStatusInfo m_status;
 		private readonly CertifiedKeyPair m_certifiedKeyPair;
 		private readonly Asn1OctetString m_rspInfo;
@@ -55,10 +55,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		{
 		}
 
-        public CertResponse(DerInteger certReqId, PkiStatusInfo status, CertifiedKeyPair certifiedKeyPair,
-            Asn1OctetString rspInfo)
-        {
-            if (certReqId == null)
+		public CertResponse(DerInteger certReqId, PkiStatusInfo status, CertifiedKeyPair certifiedKeyPair,
+			Asn1OctetString rspInfo)
+		{
+			if (certReqId == null)
 				throw new ArgumentNullException(nameof(certReqId));
 
 			if (status == null)
@@ -89,7 +89,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		 *                            -- analogous to the id-regInfo-utf8Pairs string defined
 		 *                            -- for regInfo in CertReqMsg [CRMF]
 		 *             }
-		 * </pre> 
+		 * </pre>
 		 * @return a basic ASN.1 object representation.
 		 */
 		public override Asn1Object ToAsn1Object()

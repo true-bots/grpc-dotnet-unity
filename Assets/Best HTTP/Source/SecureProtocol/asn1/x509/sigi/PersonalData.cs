@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -29,27 +28,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 	public class PersonalData
 		: Asn1Encodable
 	{
-		private readonly NameOrPseudonym	nameOrPseudonym;
-		private readonly BigInteger			nameDistinguisher;
+		private readonly NameOrPseudonym nameOrPseudonym;
+		private readonly BigInteger nameDistinguisher;
 		private readonly Asn1GeneralizedTime dateOfBirth;
-		private readonly DirectoryString	placeOfBirth;
-		private readonly string				gender;
-		private readonly DirectoryString	postalAddress;
+		private readonly DirectoryString placeOfBirth;
+		private readonly string gender;
+		private readonly DirectoryString postalAddress;
 
 		public static PersonalData GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is PersonalData)
 			{
-				return (PersonalData) obj;
+				return (PersonalData)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new PersonalData((Asn1Sequence) obj);
+				return new PersonalData((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -86,23 +85,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 				int tag = o.TagNo;
 				switch (tag)
 				{
-				case 0:
-					nameDistinguisher = DerInteger.GetInstance(o, false).Value;
-					break;
-				case 1:
-					dateOfBirth = Asn1GeneralizedTime.GetInstance(o, false);
-					break;
-				case 2:
-					placeOfBirth = DirectoryString.GetInstance(o, true);
-					break;
-				case 3:
-					gender = DerPrintableString.GetInstance(o, false).GetString();
-					break;
-				case 4:
-					postalAddress = DirectoryString.GetInstance(o, true);
-					break;
-				default:
-					throw new ArgumentException("Bad tag number: " + o.TagNo);
+					case 0:
+						nameDistinguisher = DerInteger.GetInstance(o, false).Value;
+						break;
+					case 1:
+						dateOfBirth = Asn1GeneralizedTime.GetInstance(o, false);
+						break;
+					case 2:
+						placeOfBirth = DirectoryString.GetInstance(o, true);
+						break;
+					case 3:
+						gender = DerPrintableString.GetInstance(o, false).GetString();
+						break;
+					case 4:
+						postalAddress = DirectoryString.GetInstance(o, true);
+						break;
+					default:
+						throw new ArgumentException("Bad tag number: " + o.TagNo);
 				}
 			}
 		}
@@ -118,12 +117,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 		* @param postalAddress    Postal Address.
 		*/
 		public PersonalData(
-			NameOrPseudonym		nameOrPseudonym,
-			BigInteger			nameDistinguisher,
-            Asn1GeneralizedTime dateOfBirth,
-			DirectoryString		placeOfBirth,
-			string				gender,
-			DirectoryString		postalAddress)
+			NameOrPseudonym nameOrPseudonym,
+			BigInteger nameDistinguisher,
+			Asn1GeneralizedTime dateOfBirth,
+			DirectoryString placeOfBirth,
+			string gender,
+			DirectoryString postalAddress)
 		{
 			this.nameOrPseudonym = nameOrPseudonym;
 			this.dateOfBirth = dateOfBirth;
@@ -181,26 +180,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 		*
 		* @return an Asn1Object
 		*/
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector(nameOrPseudonym);
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector(nameOrPseudonym);
 
-            if (null != nameDistinguisher)
-            {
-                v.Add(new DerTaggedObject(false, 0, new DerInteger(nameDistinguisher)));
-            }
+			if (null != nameDistinguisher)
+			{
+				v.Add(new DerTaggedObject(false, 0, new DerInteger(nameDistinguisher)));
+			}
 
-            v.AddOptionalTagged(false, 1, dateOfBirth);
-            v.AddOptionalTagged(true, 2, placeOfBirth);
+			v.AddOptionalTagged(false, 1, dateOfBirth);
+			v.AddOptionalTagged(true, 2, placeOfBirth);
 
-            if (null != gender)
-            {
-                v.Add(new DerTaggedObject(false, 3, new DerPrintableString(gender, true)));
-            }
+			if (null != gender)
+			{
+				v.Add(new DerTaggedObject(false, 3, new DerPrintableString(gender, true)));
+			}
 
-            v.AddOptionalTagged(true, 4, postalAddress);
-            return new DerSequence(v);
-        }
+			v.AddOptionalTagged(true, 4, postalAddress);
+			return new DerSequence(v);
+		}
 	}
 }
 #pragma warning restore

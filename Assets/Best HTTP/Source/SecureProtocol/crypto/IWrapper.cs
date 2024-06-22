@@ -2,8 +2,8 @@
 #pragma warning disable
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
-    public interface IWrapper
-    {
+	public interface IWrapper
+	{
 		/// <summary>The name of the algorithm this cipher implements.</summary>
 		string AlgorithmName { get; }
 
@@ -11,8 +11,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 
 		byte[] Wrap(byte[] input, int inOff, int length);
 
-        byte[] Unwrap(byte[] input, int inOff, int length);
-    }
+		byte[] Unwrap(byte[] input, int inOff, int length);
+	}
 }
 #pragma warning restore
 #endif

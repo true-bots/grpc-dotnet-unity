@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -14,27 +13,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class Gost28147Mac
 		: IMac
 	{
-		private const int			BlockSize = 8;
-		private const int			MacSize = 4;
-		private int					bufOff;
-		private byte[]				buf;
-		private byte[]				mac;
-		private bool				firstStep = true;
-		private int[]				workingKey;
-        private byte[]              macIV = null;
+		private const int BlockSize = 8;
+		private const int MacSize = 4;
+		private int bufOff;
+		private byte[] buf;
+		private byte[] mac;
+		private bool firstStep = true;
+		private int[] workingKey;
+		private byte[] macIV = null;
 
 		//
 		// This is default S-box - E_A.
 		private byte[] S =
 		{
-			0x9,0x6,0x3,0x2,0x8,0xB,0x1,0x7,0xA,0x4,0xE,0xF,0xC,0x0,0xD,0x5,
-			0x3,0x7,0xE,0x9,0x8,0xA,0xF,0x0,0x5,0x2,0x6,0xC,0xB,0x4,0xD,0x1,
-			0xE,0x4,0x6,0x2,0xB,0x3,0xD,0x8,0xC,0xF,0x5,0xA,0x0,0x7,0x1,0x9,
-			0xE,0x7,0xA,0xC,0xD,0x1,0x3,0x9,0x0,0x2,0xB,0x4,0xF,0x8,0x5,0x6,
-			0xB,0x5,0x1,0x9,0x8,0xD,0xF,0x0,0xE,0x4,0x2,0x3,0xC,0x7,0xA,0x6,
-			0x3,0xA,0xD,0xC,0x1,0x2,0x0,0xB,0x7,0x5,0x9,0x4,0x8,0xF,0xE,0x6,
-			0x1,0xD,0x2,0x9,0x7,0xA,0x6,0x0,0x8,0xC,0x4,0x5,0xF,0x3,0xB,0xE,
-			0xB,0xA,0xF,0x5,0x0,0xC,0xE,0x8,0x6,0x2,0x3,0x9,0x1,0x7,0xD,0x4
+			0x9, 0x6, 0x3, 0x2, 0x8, 0xB, 0x1, 0x7, 0xA, 0x4, 0xE, 0xF, 0xC, 0x0, 0xD, 0x5,
+			0x3, 0x7, 0xE, 0x9, 0x8, 0xA, 0xF, 0x0, 0x5, 0x2, 0x6, 0xC, 0xB, 0x4, 0xD, 0x1,
+			0xE, 0x4, 0x6, 0x2, 0xB, 0x3, 0xD, 0x8, 0xC, 0xF, 0x5, 0xA, 0x0, 0x7, 0x1, 0x9,
+			0xE, 0x7, 0xA, 0xC, 0xD, 0x1, 0x3, 0x9, 0x0, 0x2, 0xB, 0x4, 0xF, 0x8, 0x5, 0x6,
+			0xB, 0x5, 0x1, 0x9, 0x8, 0xD, 0xF, 0x0, 0xE, 0x4, 0x2, 0x3, 0xC, 0x7, 0xA, 0x6,
+			0x3, 0xA, 0xD, 0xC, 0x1, 0x2, 0x0, 0xB, 0x7, 0x5, 0x9, 0x4, 0x8, 0xF, 0xE, 0x6,
+			0x1, 0xD, 0x2, 0x9, 0x7, 0xA, 0x6, 0x0, 0x8, 0xC, 0x4, 0x5, 0xF, 0x3, 0xB, 0xE,
+			0xB, 0xA, 0xF, 0x5, 0x0, 0xC, 0xE, 0x8, 0x6, 0x2, 0x3, 0x9, 0x1, 0x7, 0xD, 0x4
 		};
 
 		public Gost28147Mac()
@@ -51,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 				throw new ArgumentException("Key length invalid. Key needs to be 32 byte - 256 bit!!!");
 
 			int[] key = new int[8];
-			for(int i=0; i!=8; i++)
+			for (int i = 0; i != 8; i++)
 			{
 				key[i] = (int)Pack.LE_To_UInt32(userKey, i * 4);
 			}
@@ -63,8 +62,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		{
 			Reset();
 			buf = new byte[BlockSize];
-            macIV = null;
-            if (parameters is ParametersWithSBox param)
+			macIV = null;
+			if (parameters is ParametersWithSBox param)
 			{
 				//
 				// Set the S-Box
@@ -83,16 +82,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			{
 				workingKey = GenerateWorkingKey(keyParameter.GetKey());
 			}
-            else if (parameters is ParametersWithIV ivParam)
-            {
-                workingKey = GenerateWorkingKey(((KeyParameter)ivParam.Parameters).GetKey());
+			else if (parameters is ParametersWithIV ivParam)
+			{
+				workingKey = GenerateWorkingKey(((KeyParameter)ivParam.Parameters).GetKey());
 				macIV = ivParam.GetIV(); // don't skip the initial CM5Func
 				Array.Copy(macIV, 0, mac, 0, mac.Length);
-            }
+			}
 			else
 			{
 				throw new ArgumentException("invalid parameter passed to Gost28147 init - "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
 			}
 		}
 
@@ -112,34 +111,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 
 			// S-box replacing
 
-			int om = S[  0 + ((cm >> (0 * 4)) & 0xF)] << (0 * 4);
-			om += S[ 16 + ((cm >> (1 * 4)) & 0xF)] << (1 * 4);
-			om += S[ 32 + ((cm >> (2 * 4)) & 0xF)] << (2 * 4);
-			om += S[ 48 + ((cm >> (3 * 4)) & 0xF)] << (3 * 4);
-			om += S[ 64 + ((cm >> (4 * 4)) & 0xF)] << (4 * 4);
-			om += S[ 80 + ((cm >> (5 * 4)) & 0xF)] << (5 * 4);
-			om += S[ 96 + ((cm >> (6 * 4)) & 0xF)] << (6 * 4);
+			int om = S[0 + ((cm >> (0 * 4)) & 0xF)] << (0 * 4);
+			om += S[16 + ((cm >> (1 * 4)) & 0xF)] << (1 * 4);
+			om += S[32 + ((cm >> (2 * 4)) & 0xF)] << (2 * 4);
+			om += S[48 + ((cm >> (3 * 4)) & 0xF)] << (3 * 4);
+			om += S[64 + ((cm >> (4 * 4)) & 0xF)] << (4 * 4);
+			om += S[80 + ((cm >> (5 * 4)) & 0xF)] << (5 * 4);
+			om += S[96 + ((cm >> (6 * 4)) & 0xF)] << (6 * 4);
 			om += S[112 + ((cm >> (7 * 4)) & 0xF)] << (7 * 4);
 
 //			return om << 11 | om >>> (32-11); // 11-leftshift
 			int omLeft = om << 11;
-			int omRight = (int)(((uint) om) >> (32 - 11)); // Note: Casts required to get unsigned bit rotation
+			int omRight = (int)(((uint)om) >> (32 - 11)); // Note: Casts required to get unsigned bit rotation
 
 			return omLeft | omRight;
 		}
 
 		private void Gost28147MacFunc(
-			int[]	workingKey,
-			byte[]	input,
-			int		inOff,
-			byte[]	output,
-			int		outOff)
+			int[] workingKey,
+			byte[] input,
+			int inOff,
+			byte[] output,
+			int outOff)
 		{
 			int N1 = (int)Pack.LE_To_UInt32(input, inOff);
 			int N2 = (int)Pack.LE_To_UInt32(input, inOff + 4);
-			int tmp;  //tmp -> for saving N1
+			int tmp; //tmp -> for saving N1
 
-			for (int k = 0; k < 2; k++)  // 1-16 steps
+			for (int k = 0; k < 2; k++) // 1-16 steps
 			{
 				for (int j = 0; j < 8; j++)
 				{
@@ -161,12 +160,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 				if (firstStep)
 				{
 					firstStep = false;
-                    if (macIV != null)
-                    {
-                        Cm5Func(buf, 0, macIV, sum);
-                    }
+					if (macIV != null)
+					{
+						Cm5Func(buf, 0, macIV, sum);
+					}
 					else
-                    {
+					{
 						Array.Copy(buf, 0, sum, 0, mac.Length);
 					}
 				}
@@ -200,12 +199,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 				if (firstStep)
 				{
 					firstStep = false;
-                    if (macIV != null)
-                    {
-                        Cm5Func(buf, 0, macIV, sum);
-                    }
+					if (macIV != null)
+					{
+						Cm5Func(buf, 0, macIV, sum);
+					}
 					else
-                    {
+					{
 						Array.Copy(buf, 0, sum, 0, mac.Length);
 					}
 				}
@@ -307,7 +306,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 
 			Gost28147MacFunc(workingKey, sum, 0, mac, 0);
 
-			Array.Copy(mac, (mac.Length/2)-MacSize, output, outOff, MacSize);
+			Array.Copy(mac, (mac.Length / 2) - MacSize, output, outOff, MacSize);
 
 			Reset();
 

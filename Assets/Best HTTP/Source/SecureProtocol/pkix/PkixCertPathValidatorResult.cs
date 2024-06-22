@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
@@ -36,9 +35,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		public PkixCertPathValidatorResult(TrustAnchor trustAnchor, PkixPolicyNode policyTree,
 			AsymmetricKeyParameter subjectPublicKey)
 		{
-            if (trustAnchor == null)
-                throw new ArgumentNullException(nameof(trustAnchor));
-            if (subjectPublicKey == null)
+			if (trustAnchor == null)
+				throw new ArgumentNullException(nameof(trustAnchor));
+			if (subjectPublicKey == null)
 				throw new ArgumentNullException(nameof(subjectPublicKey));
 
 			this.trustAnchor = trustAnchor;
@@ -51,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			return new PkixCertPathValidatorResult(this.TrustAnchor, this.PolicyTree, this.SubjectPublicKey);
 		}
 
-		public override string ToString() 
+		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine("PKIXCertPathValidatorResult: [");

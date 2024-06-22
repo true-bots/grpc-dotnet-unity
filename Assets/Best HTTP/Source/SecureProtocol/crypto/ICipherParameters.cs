@@ -4,12 +4,12 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
-    /**
-     * all parameter classes implement this.
-     */
-    public interface ICipherParameters
-    {
-    }
+	/**
+	 * all parameter classes implement this.
+	 */
+	public interface ICipherParameters
+	{
+	}
 }
 #pragma warning restore
 #endif

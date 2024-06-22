@@ -5,27 +5,27 @@ using BestHTTP.Logger;
 
 namespace BestHTTP.Core
 {
-    public interface IHTTPRequestHandler : IDisposable
-    {
-        bool HasCustomRequestProcessor { get; }
+	public interface IHTTPRequestHandler : IDisposable
+	{
+		bool HasCustomRequestProcessor { get; }
 
-        KeepAliveHeader KeepAlive { get; }
+		KeepAliveHeader KeepAlive { get; }
 
-        bool CanProcessMultiple { get; }
+		bool CanProcessMultiple { get; }
 
-        ShutdownTypes ShutdownType { get; }
+		ShutdownTypes ShutdownType { get; }
 
-        LoggingContext Context { get; }
+		LoggingContext Context { get; }
 
-        void Process(HTTPRequest request);
+		void Process(HTTPRequest request);
 
-        void RunHandler();
+		void RunHandler();
 
-        /// <summary>
-        /// An immediate shutdown request that called only on application closure.
-        /// </summary>
-        void Shutdown(ShutdownTypes type);
-    }
+		/// <summary>
+		/// An immediate shutdown request that called only on application closure.
+		/// </summary>
+		void Shutdown(ShutdownTypes type);
+	}
 }
 
 #endif

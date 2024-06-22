@@ -2,12 +2,10 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
@@ -23,6 +21,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 		private Dictionary<DerObjectIdentifier, X509Extension> m_extensions =
 			new Dictionary<DerObjectIdentifier, X509Extension>();
+
 		private List<DerObjectIdentifier> m_ordering = new List<DerObjectIdentifier>();
 
 		public void SetReqPolicy(string reqPolicy)

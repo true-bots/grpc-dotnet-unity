@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -26,9 +25,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class GeneralSubtree
 		: Asn1Encodable
 	{
-		private readonly GeneralName	baseName;
-		private readonly DerInteger		minimum;
-		private readonly DerInteger		maximum;
+		private readonly GeneralName baseName;
+		private readonly DerInteger minimum;
+		private readonly DerInteger maximum;
 
 		private GeneralSubtree(
 			Asn1Sequence seq)
@@ -53,6 +52,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 						default:
 							throw new ArgumentException("Bad tag number: " + o.TagNo);
 					}
+
 					break;
 				}
 				case 3:
@@ -96,15 +96,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 *            Maximum
 		 */
 		public GeneralSubtree(
-			GeneralName	baseName,
-			BigInteger	minimum,
-			BigInteger	maximum)
+			GeneralName baseName,
+			BigInteger minimum,
+			BigInteger maximum)
 		{
 			this.baseName = baseName;
 			if (minimum != null)
 			{
 				this.minimum = new DerInteger(minimum);
 			}
+
 			if (maximum != null)
 			{
 				this.maximum = new DerInteger(maximum);
@@ -118,8 +119,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public static GeneralSubtree GetInstance(
-			Asn1TaggedObject	o,
-			bool				isExplicit)
+			Asn1TaggedObject o,
+			bool isExplicit)
 		{
 			return new GeneralSubtree(Asn1Sequence.GetInstance(o, isExplicit));
 		}
@@ -134,7 +135,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 			if (obj is GeneralSubtree)
 			{
-				return (GeneralSubtree) obj;
+				return (GeneralSubtree)obj;
 			}
 
 			return new GeneralSubtree(Asn1Sequence.GetInstance(obj));
@@ -180,7 +181,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				v.Add(new DerTaggedObject(false, 0, minimum));
 			}
 
-            v.AddOptionalTagged(false, 1, maximum);
+			v.AddOptionalTagged(false, 1, maximum);
 			return new DerSequence(v);
 		}
 	}

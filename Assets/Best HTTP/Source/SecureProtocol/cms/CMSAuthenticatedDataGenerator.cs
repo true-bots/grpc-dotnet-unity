@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -29,27 +28,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	 * </pre>
 	 */
 	public class CmsAuthenticatedDataGenerator
-	    : CmsAuthenticatedGenerator
+		: CmsAuthenticatedGenerator
 	{
-	    public CmsAuthenticatedDataGenerator()
-	    {
-	    }
+		public CmsAuthenticatedDataGenerator()
+		{
+		}
 
-        /// <summary>Constructor allowing specific source of randomness</summary>
-        /// <param name="random">Instance of <c>SecureRandom</c> to use.</param>
-	    public CmsAuthenticatedDataGenerator(SecureRandom random)
-	        : base(random)
-	    {
-	    }
+		/// <summary>Constructor allowing specific source of randomness</summary>
+		/// <param name="random">Instance of <c>SecureRandom</c> to use.</param>
+		public CmsAuthenticatedDataGenerator(SecureRandom random)
+			: base(random)
+		{
+		}
 
-	    /**
-	     * generate an enveloped object that contains an CMS Enveloped Data
-	     * object using the given provider and the passed in key generator.
-	     */
+		/**
+		 * generate an enveloped object that contains an CMS Enveloped Data
+		 * object using the given provider and the passed in key generator.
+		 */
 		private CmsAuthenticatedData Generate(
-			CmsProcessable		content,
-			string				macOid,
-			CipherKeyGenerator	keyGen)
+			CmsProcessable content,
+			string macOid,
+			CipherKeyGenerator keyGen)
 		{
 			AlgorithmIdentifier macAlgId;
 			KeyParameter encKey;
@@ -78,7 +77,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					content.Write(mOut);
 				}
 
-                encContent = new BerOctetString(bOut.ToArray());
+				encContent = new BerOctetString(bOut.ToArray());
 
 				byte[] macOctets = MacUtilities.DoFinal(mac);
 				macResult = new DerOctetString(macOctets);
@@ -98,7 +97,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 			var recipientInfos = new Asn1EncodableVector();
 
-			foreach (RecipientInfoGenerator rig in recipientInfoGenerators) 
+			foreach (RecipientInfoGenerator rig in recipientInfoGenerators)
 			{
 				try
 				{
@@ -113,37 +112,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					throw new CmsException("error making encrypted content.", e);
 				}
 			}
-			
+
 			var eci = new ContentInfo(CmsObjectIdentifiers.Data, encContent);
 
 			var contentInfo = new ContentInfo(
 				CmsObjectIdentifiers.AuthenticatedData,
 				new AuthenticatedData(null, new DerSet(recipientInfos), macAlgId, null, eci, null, macResult, null));
-			
+
 			return new CmsAuthenticatedData(contentInfo);
 		}
 
-	    /**
-	     * generate an authenticated object that contains an CMS Authenticated Data object
-	     */
-	    public CmsAuthenticatedData Generate(
-	        CmsProcessable	content,
-	        string			encryptionOid)
-	    {
-            try
-            {
+		/**
+		 * generate an authenticated object that contains an CMS Authenticated Data object
+		 */
+		public CmsAuthenticatedData Generate(
+			CmsProcessable content,
+			string encryptionOid)
+		{
+			try
+			{
 				// FIXME Will this work for macs?
 				CipherKeyGenerator keyGen = GeneratorUtilities.GetKeyGenerator(encryptionOid);
 
 				keyGen.Init(new KeyGenerationParameters(m_random, keyGen.DefaultStrength));
 
 				return Generate(content, encryptionOid, keyGen);
-            }
-            catch (SecurityUtilityException e)
-            {
-                throw new CmsException("can't find key generation algorithm.", e);
-            }
-	    }
+			}
+			catch (SecurityUtilityException e)
+			{
+				throw new CmsException("can't find key generation algorithm.", e);
+			}
+		}
 	}
 }
 #pragma warning restore

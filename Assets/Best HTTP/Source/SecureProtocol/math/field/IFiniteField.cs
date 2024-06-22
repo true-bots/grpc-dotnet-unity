@@ -4,12 +4,12 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Field
 {
-    public interface IFiniteField
-    {
-        BigInteger Characteristic { get; }
+	public interface IFiniteField
+	{
+		BigInteger Characteristic { get; }
 
-        int Dimension { get; }
-    }
+		int Dimension { get; }
+	}
 }
 #pragma warning restore
 #endif

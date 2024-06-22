@@ -1,14 +1,13 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 {
-    public class DesKeyGenerator
+	public class DesKeyGenerator
 		: CipherKeyGenerator
-    {
+	{
 		public DesKeyGenerator()
 		{
 		}
@@ -42,19 +41,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		}
 
 		protected override byte[] EngineGenerateKey()
-        {
-            byte[] newKey = new byte[DesParameters.DesKeyLength];
+		{
+			byte[] newKey = new byte[DesParameters.DesKeyLength];
 
-            do
-            {
-                random.NextBytes(newKey);
-                DesParameters.SetOddParity(newKey);
-            }
-            while (DesParameters.IsWeakKey(newKey, 0));
+			do
+			{
+				random.NextBytes(newKey);
+				DesParameters.SetOddParity(newKey);
+			} while (DesParameters.IsWeakKey(newKey, 0));
 
 			return newKey;
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

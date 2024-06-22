@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Kisa;
@@ -20,10 +19,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	{
 		private static readonly CmsEnvelopedHelper Helper = CmsEnvelopedHelper.Instance;
 
-		private KeyParameter	keyEncryptionKey;
+		private KeyParameter keyEncryptionKey;
+
 		// TODO Can get this from keyEncryptionKey?		
-		private string			keyEncryptionKeyOID;
-		private KekIdentifier	kekIdentifier;
+		private string keyEncryptionKeyOID;
+		private KekIdentifier kekIdentifier;
 
 		// Derived
 		private AlgorithmIdentifier keyEncryptionAlgorithm;
@@ -55,9 +55,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		{
 			byte[] keyBytes = contentEncryptionKey.GetKey();
 
-            IWrapper keyWrapper = Helper.CreateWrapper(keyEncryptionAlgorithm.Algorithm.Id);
+			IWrapper keyWrapper = Helper.CreateWrapper(keyEncryptionAlgorithm.Algorithm.Id);
 			keyWrapper.Init(true, new ParametersWithRandom(keyEncryptionKey, random));
-        	Asn1OctetString encryptedKey = new DerOctetString(
+			Asn1OctetString encryptedKey = new DerOctetString(
 				keyWrapper.Wrap(keyBytes, 0, keyBytes.Length));
 
 			return new RecipientInfo(new KekRecipientInfo(kekIdentifier, keyEncryptionAlgorithm, encryptedKey));
@@ -72,7 +72,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					PkcsObjectIdentifiers.IdAlgCms3DesWrap,
 					DerNull.Instance);
 			}
-            else if (Org.BouncyCastle.Utilities.Platform.StartsWith(algorithm, "RC2"))
+			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(algorithm, "RC2"))
 			{
 				return new AlgorithmIdentifier(
 					PkcsObjectIdentifiers.IdAlgCmsRC2Wrap,
@@ -100,7 +100,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					throw new ArgumentException("illegal keysize in AES");
 				}
 
-				return new AlgorithmIdentifier(wrapOid);  // parameters absent
+				return new AlgorithmIdentifier(wrapOid); // parameters absent
 			}
 			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(algorithm, "SEED"))
 			{

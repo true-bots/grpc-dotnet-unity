@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -27,18 +26,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 		private class ResponseObject
 		{
-			internal CertificateID         certId;
-			internal CertStatus            certStatus;
-			internal Asn1GeneralizedTime   thisUpdate;
-			internal Asn1GeneralizedTime   nextUpdate;
-			internal X509Extensions        extensions;
+			internal CertificateID certId;
+			internal CertStatus certStatus;
+			internal Asn1GeneralizedTime thisUpdate;
+			internal Asn1GeneralizedTime nextUpdate;
+			internal X509Extensions extensions;
 
 			internal ResponseObject(
-				CertificateID		certId,
-				CertificateStatus	certStatus,
-				DateTime			thisUpdate,
-				DateTime?			nextUpdate,
-				X509Extensions		extensions)
+				CertificateID certId,
+				CertificateStatus certStatus,
+				DateTime thisUpdate,
+				DateTime? nextUpdate,
+				X509Extensions extensions)
 			{
 				this.certId = certId;
 
@@ -52,10 +51,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 				}
 				else
 				{
-					RevokedStatus rs = (RevokedStatus) certStatus;
+					RevokedStatus rs = (RevokedStatus)certStatus;
 					CrlReason revocationReason = rs.HasRevocationReason
-						?	new CrlReason(rs.RevocationReason)
-						:	null;
+						? new CrlReason(rs.RevocationReason)
+						: null;
 
 					this.certStatus = new CertStatus(
 						new RevokedInfo(new Asn1GeneralizedTime(rs.RevocationTime), revocationReason));
@@ -98,8 +97,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		 * @param certStatus status of the certificate - null if okay
 		 */
 		public void AddResponse(
-			CertificateID		certID,
-			CertificateStatus	certStatus)
+			CertificateID certID,
+			CertificateStatus certStatus)
 		{
 			list.Add(new ResponseObject(certID, certStatus, DateTime.UtcNow, null, null));
 		}
@@ -112,9 +111,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		 * @param singleExtensions optional extensions
 		 */
 		public void AddResponse(
-			CertificateID		certID,
-			CertificateStatus	certStatus,
-			X509Extensions		singleExtensions)
+			CertificateID certID,
+			CertificateStatus certStatus,
+			X509Extensions singleExtensions)
 		{
 			list.Add(new ResponseObject(certID, certStatus, DateTime.UtcNow, null, singleExtensions));
 		}
@@ -128,10 +127,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		 * @param singleExtensions optional extensions
 		 */
 		public void AddResponse(
-			CertificateID		certID,
-			CertificateStatus	certStatus,
-			DateTime?			nextUpdate,
-			X509Extensions		singleExtensions)
+			CertificateID certID,
+			CertificateStatus certStatus,
+			DateTime? nextUpdate,
+			X509Extensions singleExtensions)
 		{
 			list.Add(new ResponseObject(certID, certStatus, DateTime.UtcNow, nextUpdate, singleExtensions));
 		}
@@ -146,11 +145,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		 * @param singleExtensions optional extensions
 		 */
 		public void AddResponse(
-			CertificateID		certID,
-			CertificateStatus	certStatus,
-			DateTime			thisUpdate,
-			DateTime?			nextUpdate,
-			X509Extensions		singleExtensions)
+			CertificateID certID,
+			CertificateStatus certStatus,
+			DateTime thisUpdate,
+			DateTime? nextUpdate,
+			X509Extensions singleExtensions)
 		{
 			list.Add(new ResponseObject(certID, certStatus, thisUpdate, nextUpdate, singleExtensions));
 		}
@@ -167,12 +166,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		}
 
 		private BasicOcspResp GenerateResponse(
-			ISignatureFactory    signatureCalculator,
-			X509Certificate[]		chain,
-			DateTime				producedAt)
+			ISignatureFactory signatureCalculator,
+			X509Certificate[] chain,
+			DateTime producedAt)
 		{
-            AlgorithmIdentifier signingAlgID = (AlgorithmIdentifier)signatureCalculator.AlgorithmDetails;
-            DerObjectIdentifier signingAlgorithm = signingAlgID.Algorithm;
+			AlgorithmIdentifier signingAlgID = (AlgorithmIdentifier)signatureCalculator.AlgorithmDetails;
+			DerObjectIdentifier signingAlgorithm = signingAlgID.Algorithm;
 
 			Asn1EncodableVector responses = new Asn1EncodableVector();
 
@@ -194,7 +193,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 			try
 			{
-                IStreamCalculator<IBlockResult> streamCalculator = signatureCalculator.CreateCalculator();
+				IStreamCalculator<IBlockResult> streamCalculator = signatureCalculator.CreateCalculator();
 				using (Stream sigStream = streamCalculator.Stream)
 				{
 					tbsResp.EncodeTo(sigStream, Asn1Encodable.Der);
@@ -236,20 +235,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		}
 
 		public BasicOcspResp Generate(
-			string					signingAlgorithm,
-			AsymmetricKeyParameter	privateKey,
-			X509Certificate[]		chain,
-			DateTime				thisUpdate)
+			string signingAlgorithm,
+			AsymmetricKeyParameter privateKey,
+			X509Certificate[] chain,
+			DateTime thisUpdate)
 		{
 			return Generate(signingAlgorithm, privateKey, chain, thisUpdate, null);
 		}
 
 		public BasicOcspResp Generate(
-			string					signingAlgorithm,
-			AsymmetricKeyParameter	privateKey,
-			X509Certificate[]		chain,
-			DateTime				producedAt,
-			SecureRandom			random)
+			string signingAlgorithm,
+			AsymmetricKeyParameter privateKey,
+			X509Certificate[] chain,
+			DateTime producedAt,
+			SecureRandom random)
 		{
 			if (signingAlgorithm == null)
 			{
@@ -259,32 +258,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			return GenerateResponse(new Asn1SignatureFactory(signingAlgorithm, privateKey, random), chain, producedAt);
 		}
 
-        /// <summary>
-        /// Generate the signed response using the passed in signature calculator.
-        /// </summary>
-        /// <param name="signatureCalculatorFactory">Implementation of signing calculator factory.</param>
-        /// <param name="chain">The certificate chain associated with the response signer.</param>
-        /// <param name="producedAt">"produced at" date.</param>
-        /// <returns></returns>
-        public BasicOcspResp Generate(
-            ISignatureFactory signatureCalculatorFactory,
-            X509Certificate[] chain,
-            DateTime producedAt)
-        {
-            if (signatureCalculatorFactory == null)
-            {
-                throw new ArgumentException("no signature calculator specified");
-            }
+		/// <summary>
+		/// Generate the signed response using the passed in signature calculator.
+		/// </summary>
+		/// <param name="signatureCalculatorFactory">Implementation of signing calculator factory.</param>
+		/// <param name="chain">The certificate chain associated with the response signer.</param>
+		/// <param name="producedAt">"produced at" date.</param>
+		/// <returns></returns>
+		public BasicOcspResp Generate(
+			ISignatureFactory signatureCalculatorFactory,
+			X509Certificate[] chain,
+			DateTime producedAt)
+		{
+			if (signatureCalculatorFactory == null)
+			{
+				throw new ArgumentException("no signature calculator specified");
+			}
 
-            return GenerateResponse(signatureCalculatorFactory, chain, producedAt);
-        }
+			return GenerateResponse(signatureCalculatorFactory, chain, producedAt);
+		}
 
-        /**
+		/**
 		 * Return an IEnumerable of the signature names supported by the generator.
 		 *
 		 * @return an IEnumerable containing recognised names.
 		 */
-        public IEnumerable<string> SignatureAlgNames
+		public IEnumerable<string> SignatureAlgNames
 		{
 			get { return OcspUtilities.AlgNames; }
 		}

@@ -1,5 +1,4 @@
 #if !BESTHTTP_DISABLE_SOCKETIO && BESTHTTP_SOCKETIO_ENABLE_GAMEDEVWARE_MESSAGEPACK
-
 using System;
 using System.Linq;
 
@@ -145,7 +144,8 @@ namespace BestHTTP.SocketIO3.Parsers
                                 {
                                     readData = true;
 
-                                    packet = new IncomingPacket(transportEvent != TransportEventTypes.Unknown ? transportEvent : TransportEventTypes.Message, (SocketIOEventTypes)type, nsp, id);
+                                    packet =
+ new IncomingPacket(transportEvent != TransportEventTypes.Unknown ? transportEvent : TransportEventTypes.Message, (SocketIOEventTypes)type, nsp, id);
                                     (string eventName, object[] args) = ReadData(manager, packet, reader);
 
                                     packet.EventName = eventName;

@@ -6,24 +6,24 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 {
-    public sealed class EdDsaPublicBcpgKey
-        : ECPublicBcpgKey
-    {
-        internal EdDsaPublicBcpgKey(BcpgInputStream bcpgIn)
-            : base(bcpgIn)
-        {
-        }
+	public sealed class EdDsaPublicBcpgKey
+		: ECPublicBcpgKey
+	{
+		internal EdDsaPublicBcpgKey(BcpgInputStream bcpgIn)
+			: base(bcpgIn)
+		{
+		}
 
-        public EdDsaPublicBcpgKey(DerObjectIdentifier oid, ECPoint point)
-            : base(oid, point)
-        {
-        }
+		public EdDsaPublicBcpgKey(DerObjectIdentifier oid, ECPoint point)
+			: base(oid, point)
+		{
+		}
 
-        public EdDsaPublicBcpgKey(DerObjectIdentifier oid, BigInteger encodedPoint)
-            : base(oid, encodedPoint)
-        {
-        }
-    }
+		public EdDsaPublicBcpgKey(DerObjectIdentifier oid, BigInteger encodedPoint)
+			: base(oid, encodedPoint)
+		{
+		}
+	}
 }
 #pragma warning restore
 #endif

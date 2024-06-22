@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
@@ -17,9 +16,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		}
 
 		public BerOctetStringGenerator(
-			Stream	outStream,
-			int		tagNo,
-			bool	isExplicit)
+			Stream outStream,
+			int tagNo,
+			bool isExplicit)
 			: base(outStream, tagNo, isExplicit)
 		{
 			WriteBerHeader(Asn1Tags.Constructed | Asn1Tags.OctetString);
@@ -34,8 +33,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			int bufSize)
 		{
 			return bufSize < 1
-				?	GetOctetOutputStream()
-				:	GetOctetOutputStream(new byte[bufSize]);
+				? GetOctetOutputStream()
+				: GetOctetOutputStream(new byte[bufSize]);
 		}
 
 		public Stream GetOctetOutputStream(
@@ -48,13 +47,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			: BaseOutputStream
 		{
 			private byte[] _buf;
-			private int    _off;
+			private int _off;
 			private readonly BerOctetStringGenerator _gen;
 			private readonly Asn1OutputStream _derOut;
 
 			internal BufferedBerOctetStream(
-				BerOctetStringGenerator	gen,
-				byte[]					buf)
+				BerOctetStringGenerator gen,
+				byte[] buf)
 			{
 				_gen = gen;
 				_buf = buf;
@@ -69,35 +68,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
                 Write(buffer.AsSpan(offset, count));
 #else
-                int bufLen = _buf.Length;
-                int available = bufLen - _off;
-                if (count < available)
-                {
-                    Array.Copy(buffer, offset, _buf, _off, count);
-                    _off += count;
-                    return;
-                }
+				int bufLen = _buf.Length;
+				int available = bufLen - _off;
+				if (count < available)
+				{
+					Array.Copy(buffer, offset, _buf, _off, count);
+					_off += count;
+					return;
+				}
 
-                int pos = 0;
-                if (_off > 0)
-                {
-                    Array.Copy(buffer, offset, _buf, _off, available);
-                    pos = available;
-                    DerOctetString.Encode(_derOut, _buf, 0, bufLen);
-                    //_off = 0;
-                }
+				int pos = 0;
+				if (_off > 0)
+				{
+					Array.Copy(buffer, offset, _buf, _off, available);
+					pos = available;
+					DerOctetString.Encode(_derOut, _buf, 0, bufLen);
+					//_off = 0;
+				}
 
-                int remaining;
-                while ((remaining = count - pos) >= bufLen)
-                {
-                    DerOctetString.Encode(_derOut, buffer, offset + pos, bufLen);
-                    pos += bufLen;
-                }
+				int remaining;
+				while ((remaining = count - pos) >= bufLen)
+				{
+					DerOctetString.Encode(_derOut, buffer, offset + pos, bufLen);
+					pos += bufLen;
+				}
 
-                Array.Copy(buffer, offset + pos, _buf, 0, remaining);
-                this._off = remaining;
+				Array.Copy(buffer, offset + pos, _buf, 0, remaining);
+				this._off = remaining;
 #endif
-            }
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             public override void Write(ReadOnlySpan<byte> buffer)
@@ -129,7 +128,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
             }
 #endif
 
-            public override void WriteByte(byte value)
+			public override void WriteByte(byte value)
 			{
 				_buf[_off++] = value;
 
@@ -140,23 +139,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-            protected override void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    if (_off != 0)
-                    {
-                        DerOctetString.Encode(_derOut, _buf, 0, _off);
-                    }
+			protected override void Dispose(bool disposing)
+			{
+				if (disposing)
+				{
+					if (_off != 0)
+					{
+						DerOctetString.Encode(_derOut, _buf, 0, _off);
+					}
 
-                    _derOut.FlushInternal();
+					_derOut.FlushInternal();
 
-                    _gen.WriteBerEnd();
-                }
-                base.Dispose(disposing);
-            }
-        }
-    }
+					_gen.WriteBerEnd();
+				}
+
+				base.Dispose(disposing);
+			}
+		}
+	}
 }
 #pragma warning restore
 #endif

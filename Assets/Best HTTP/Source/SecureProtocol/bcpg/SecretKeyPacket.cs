@@ -2,29 +2,28 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 {
 	/// <remarks>Basic packet for a PGP secret key.</remarks>
-    public class SecretKeyPacket
-        : ContainedPacket //, PublicKeyAlgorithmTag
-    {
+	public class SecretKeyPacket
+		: ContainedPacket //, PublicKeyAlgorithmTag
+	{
 		public const int UsageNone = 0x00;
 		public const int UsageChecksum = 0xff;
 		public const int UsageSha1 = 0xfe;
 
 		private PublicKeyPacket pubKeyPacket;
-        private readonly byte[] secKeyData;
+		private readonly byte[] secKeyData;
 		private int s2kUsage;
 		private SymmetricKeyAlgorithmTag encAlgorithm;
-        private S2k s2k;
-        private byte[] iv;
+		private S2k s2k;
+		private byte[] iv;
 
 		internal SecretKeyPacket(
-            BcpgInputStream bcpgIn)
-        {
+			BcpgInputStream bcpgIn)
+		{
 			if (this is SecretSubkeyPacket)
 			{
 				pubKeyPacket = new PublicSubkeyPacket(bcpgIn);
@@ -37,43 +36,44 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			s2kUsage = bcpgIn.ReadByte();
 
 			if (s2kUsage == UsageChecksum || s2kUsage == UsageSha1)
-            {
-                encAlgorithm = (SymmetricKeyAlgorithmTag) bcpgIn.ReadByte();
-                s2k = new S2k(bcpgIn);
-            }
-            else
-            {
-                encAlgorithm = (SymmetricKeyAlgorithmTag) s2kUsage;
+			{
+				encAlgorithm = (SymmetricKeyAlgorithmTag)bcpgIn.ReadByte();
+				s2k = new S2k(bcpgIn);
+			}
+			else
+			{
+				encAlgorithm = (SymmetricKeyAlgorithmTag)s2kUsage;
 			}
 
 			if (!(s2k != null && s2k.Type == S2k.GnuDummyS2K && s2k.ProtectionMode == 0x01))
-            {
+			{
 				if (s2kUsage != 0)
 				{
-                    if (((int) encAlgorithm) < 7)
-                    {
-                        iv = new byte[8];
-                    }
-                    else
-                    {
-                        iv = new byte[16];
-                    }
-                    bcpgIn.ReadFully(iv);
-                }
-            }
+					if (((int)encAlgorithm) < 7)
+					{
+						iv = new byte[8];
+					}
+					else
+					{
+						iv = new byte[16];
+					}
+
+					bcpgIn.ReadFully(iv);
+				}
+			}
 
 			secKeyData = bcpgIn.ReadAll();
-        }
+		}
 
 		public SecretKeyPacket(
-            PublicKeyPacket				pubKeyPacket,
-            SymmetricKeyAlgorithmTag	encAlgorithm,
-            S2k							s2k,
-            byte[]						iv,
-            byte[]						secKeyData)
-        {
-            this.pubKeyPacket = pubKeyPacket;
-            this.encAlgorithm = encAlgorithm;
+			PublicKeyPacket pubKeyPacket,
+			SymmetricKeyAlgorithmTag encAlgorithm,
+			S2k s2k,
+			byte[] iv,
+			byte[] secKeyData)
+		{
+			this.pubKeyPacket = pubKeyPacket;
+			this.encAlgorithm = encAlgorithm;
 
 			if (encAlgorithm != SymmetricKeyAlgorithmTag.Null)
 			{
@@ -87,15 +87,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			this.s2k = s2k;
 			this.iv = Arrays.Clone(iv);
 			this.secKeyData = secKeyData;
-        }
+		}
 
 		public SecretKeyPacket(
-			PublicKeyPacket				pubKeyPacket,
-			SymmetricKeyAlgorithmTag	encAlgorithm,
-			int							s2kUsage,
-			S2k							s2k,
-			byte[]						iv,
-			byte[]						secKeyData)
+			PublicKeyPacket pubKeyPacket,
+			SymmetricKeyAlgorithmTag encAlgorithm,
+			int s2kUsage,
+			S2k s2k,
+			byte[] iv,
+			byte[] secKeyData)
 		{
 			this.pubKeyPacket = pubKeyPacket;
 			this.encAlgorithm = encAlgorithm;
@@ -106,9 +106,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		}
 
 		public SymmetricKeyAlgorithmTag EncAlgorithm
-        {
+		{
 			get { return encAlgorithm; }
-        }
+		}
 
 		public int S2kUsage
 		{
@@ -116,59 +116,59 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		}
 
 		public byte[] GetIV()
-        {
-            return Arrays.Clone(iv);
-        }
+		{
+			return Arrays.Clone(iv);
+		}
 
 		public S2k S2k
-        {
+		{
 			get { return s2k; }
-        }
+		}
 
 		public PublicKeyPacket PublicKeyPacket
-        {
+		{
 			get { return pubKeyPacket; }
-        }
+		}
 
 		public byte[] GetSecretKeyData()
-        {
-            return secKeyData;
-        }
+		{
+			return secKeyData;
+		}
 
 		public byte[] GetEncodedContents()
-        {
-            MemoryStream bOut = new MemoryStream();
-            BcpgOutputStream pOut = new BcpgOutputStream(bOut);
+		{
+			MemoryStream bOut = new MemoryStream();
+			BcpgOutputStream pOut = new BcpgOutputStream(bOut);
 
-            pOut.Write(pubKeyPacket.GetEncodedContents());
+			pOut.Write(pubKeyPacket.GetEncodedContents());
 
-			pOut.WriteByte((byte) s2kUsage);
+			pOut.WriteByte((byte)s2kUsage);
 
 			if (s2kUsage == UsageChecksum || s2kUsage == UsageSha1)
-            {
-                pOut.WriteByte((byte) encAlgorithm);
-                pOut.WriteObject(s2k);
-            }
+			{
+				pOut.WriteByte((byte)encAlgorithm);
+				pOut.WriteObject(s2k);
+			}
 
 			if (iv != null)
-            {
-                pOut.Write(iv);
-            }
+			{
+				pOut.Write(iv);
+			}
 
-            if (secKeyData != null && secKeyData.Length > 0)
-            {
-                pOut.Write(secKeyData);
-            }
+			if (secKeyData != null && secKeyData.Length > 0)
+			{
+				pOut.Write(secKeyData);
+			}
 
-            return bOut.ToArray();
-        }
+			return bOut.ToArray();
+		}
 
-        public override void Encode(
-            BcpgOutputStream bcpgOut)
-        {
-            bcpgOut.WritePacket(PacketTag.SecretKey, GetEncodedContents(), true);
-        }
-    }
+		public override void Encode(
+			BcpgOutputStream bcpgOut)
+		{
+			bcpgOut.WritePacket(PacketTag.SecretKey, GetEncodedContents(), true);
+		}
+	}
 }
 #pragma warning restore
 #endif

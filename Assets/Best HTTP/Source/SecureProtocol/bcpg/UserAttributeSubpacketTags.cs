@@ -2,13 +2,13 @@
 #pragma warning disable
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 {
-    /**
-    * Basic PGP user attribute sub-packet tag types.
-    */
-    public enum UserAttributeSubpacketTag
-    {
-        ImageAttribute = 1
-    }
+	/**
+	* Basic PGP user attribute sub-packet tag types.
+	*/
+	public enum UserAttributeSubpacketTag
+	{
+		ImageAttribute = 1
+	}
 }
 #pragma warning restore
 #endif

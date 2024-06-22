@@ -4,17 +4,17 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-    /// <summary>Base interface for a carrier object for a TLS session.</summary>
-    public interface TlsSession
-    {
-        SessionParameters ExportSessionParameters();
+	/// <summary>Base interface for a carrier object for a TLS session.</summary>
+	public interface TlsSession
+	{
+		SessionParameters ExportSessionParameters();
 
-        byte[] SessionID { get; }
+		byte[] SessionID { get; }
 
-        void Invalidate();
+		void Invalidate();
 
-        bool IsResumable { get; }
-    }
+		bool IsResumable { get; }
+	}
 }
 #pragma warning restore
 #endif

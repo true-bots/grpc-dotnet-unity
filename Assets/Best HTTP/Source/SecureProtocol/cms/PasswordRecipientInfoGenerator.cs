@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
@@ -17,10 +16,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	{
 		private static readonly CmsEnvelopedHelper Helper = CmsEnvelopedHelper.Instance;
 
-		private AlgorithmIdentifier	keyDerivationAlgorithm;
-		private KeyParameter		keyEncryptionKey;
+		private AlgorithmIdentifier keyDerivationAlgorithm;
+
+		private KeyParameter keyEncryptionKey;
+
 		// TODO Can get this from keyEncryptionKey?		
-		private string				keyEncryptionKeyOID;
+		private string keyEncryptionKeyOID;
 
 		internal PasswordRecipientInfoGenerator()
 		{
@@ -55,7 +56,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 			ICipherParameters parameters = new ParametersWithIV(keyEncryptionKey, iv);
 			keyWrapper.Init(true, new ParametersWithRandom(parameters, random));
-        	Asn1OctetString encryptedKey = new DerOctetString(
+			Asn1OctetString encryptedKey = new DerOctetString(
 				keyWrapper.Wrap(keyBytes, 0, keyBytes.Length));
 
 			DerSequence seq = new DerSequence(

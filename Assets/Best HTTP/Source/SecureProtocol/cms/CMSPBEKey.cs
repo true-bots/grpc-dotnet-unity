@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -17,14 +16,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		//	: PBEKey
 		: ICipherParameters
 	{
-		internal readonly char[]	password;
-		internal readonly byte[]	salt;
-		internal readonly int		iterationCount;
+		internal readonly char[] password;
+		internal readonly byte[] salt;
+		internal readonly int iterationCount;
 
 		public CmsPbeKey(
-			char[]	password,
-			byte[]	salt,
-			int		iterationCount)
+			char[] password,
+			byte[] salt,
+			int iterationCount)
 		{
 			this.password = (char[])password.Clone();
 			this.salt = Arrays.Clone(salt);
@@ -32,12 +31,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		public CmsPbeKey(
-			char[]				password,
+			char[] password,
 			AlgorithmIdentifier keyDerivationAlgorithm)
 		{
-            if (!keyDerivationAlgorithm.Algorithm.Equals(PkcsObjectIdentifiers.IdPbkdf2))
+			if (!keyDerivationAlgorithm.Algorithm.Equals(PkcsObjectIdentifiers.IdPbkdf2))
 				throw new ArgumentException("Unsupported key derivation algorithm: "
-                    + keyDerivationAlgorithm.Algorithm);
+				                            + keyDerivationAlgorithm.Algorithm);
 
 			Pbkdf2Params kdfParams = Pbkdf2Params.GetInstance(
 				keyDerivationAlgorithm.Parameters.ToAsn1Object());

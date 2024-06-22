@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -41,15 +40,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		// TODO Add support
 //		private object              _originatorInfo = null;
 //		private object              _unprotectedAttributes = null;
-		private int                 _bufferSize;
-		private bool                _berEncodeRecipientSet;
+		private int _bufferSize;
+		private bool _berEncodeRecipientSet;
 
 		public CmsAuthenticatedDataStreamGenerator()
 		{
 		}
 
-        /// <summary>Constructor allowing specific source of randomness</summary>
-        /// <param name="random">Instance of <c>SecureRandom</c> to use.</param>
+		/// <summary>Constructor allowing specific source of randomness</summary>
+		/// <param name="random">Instance of <c>SecureRandom</c> to use.</param>
 		public CmsAuthenticatedDataStreamGenerator(SecureRandom random)
 			: base(random)
 		{
@@ -81,9 +80,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* @throws java.io.IOException
 		*/
 		private Stream Open(
-			Stream				outStr,
-			string				macOid,
-			CipherKeyGenerator	keyGen)
+			Stream outStr,
+			string macOid,
+			CipherKeyGenerator keyGen)
 		{
 			// FIXME Will this work for macs?
 			byte[] encKeyBytes = keyGen.GenerateKey();
@@ -119,10 +118,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		}
 
 		protected Stream Open(
-			Stream        			outStr,
-			AlgorithmIdentifier		macAlgId,
-			ICipherParameters		cipherParameters,
-			Asn1EncodableVector		recipientInfos)
+			Stream outStr,
+			AlgorithmIdentifier macAlgId,
+			ICipherParameters cipherParameters,
+			Asn1EncodableVector recipientInfos)
 		{
 			try
 			{
@@ -143,8 +142,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 				Stream authRaw = authGen.GetRawOutputStream();
 				Asn1Generator recipGen = _berEncodeRecipientSet
-					?	(Asn1Generator) new BerSetGenerator(authRaw)
-					:	new DerSetGenerator(authRaw);
+					? (Asn1Generator)new BerSetGenerator(authRaw)
+					: new DerSetGenerator(authRaw);
 
 				foreach (Asn1Encodable ae in recipientInfos)
 				{
@@ -161,9 +160,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				Stream octetOutputStream = CmsUtilities.CreateBerOctetOutputStream(
 					eiGen.GetRawOutputStream(), 0, true, _bufferSize);
 
-                IMac mac = MacUtilities.GetMac(macAlgId.Algorithm);
+				IMac mac = MacUtilities.GetMac(macAlgId.Algorithm);
 				// TODO Confirm no ParametersWithRandom needed
-	            mac.Init(cipherParameters);
+				mac.Init(cipherParameters);
 				Stream mOut = new TeeOutputStream(octetOutputStream, new MacSink(mac));
 
 				return new CmsAuthenticatedDataOutputStream(mOut, mac, cGen, authGen, eiGen);
@@ -186,8 +185,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* generate an enveloped object that contains an CMS Enveloped Data object
 		*/
 		public Stream Open(
-			Stream	outStr,
-			string	encryptionOid)
+			Stream outStr,
+			string encryptionOid)
 		{
 			CipherKeyGenerator keyGen = GeneratorUtilities.GetKeyGenerator(encryptionOid);
 
@@ -200,9 +199,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* generate an enveloped object that contains an CMS Enveloped Data object
 		*/
 		public Stream Open(
-			Stream	outStr,
-			string	encryptionOid,
-			int		keySize)
+			Stream outStr,
+			string encryptionOid,
+			int keySize)
 		{
 			CipherKeyGenerator keyGen = GeneratorUtilities.GetKeyGenerator(encryptionOid);
 
@@ -214,18 +213,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		private class CmsAuthenticatedDataOutputStream
 			: BaseOutputStream
 		{
-			private readonly Stream					macStream;
-			private readonly IMac					mac;
-			private readonly BerSequenceGenerator	cGen;
-			private readonly BerSequenceGenerator	authGen;
-			private readonly BerSequenceGenerator	eiGen;
+			private readonly Stream macStream;
+			private readonly IMac mac;
+			private readonly BerSequenceGenerator cGen;
+			private readonly BerSequenceGenerator authGen;
+			private readonly BerSequenceGenerator eiGen;
 
 			public CmsAuthenticatedDataOutputStream(
-				Stream					macStream,
-				IMac					mac,
-				BerSequenceGenerator	cGen,
-				BerSequenceGenerator	authGen,
-				BerSequenceGenerator	eiGen)
+				Stream macStream,
+				IMac mac,
+				BerSequenceGenerator cGen,
+				BerSequenceGenerator authGen,
+				BerSequenceGenerator eiGen)
 			{
 				this.macStream = macStream;
 				this.mac = mac;
@@ -234,10 +233,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				this.eiGen = eiGen;
 			}
 
-            public override void Write(byte[] buffer, int offset, int count)
-            {
-                macStream.Write(buffer, offset, count);
-            }
+			public override void Write(byte[] buffer, int offset, int count)
+			{
+				macStream.Write(buffer, offset, count);
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             public override void Write(ReadOnlySpan<byte> buffer)
@@ -246,31 +245,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
             }
 #endif
 
-            public override void WriteByte(byte value)
+			public override void WriteByte(byte value)
 			{
 				macStream.WriteByte(value);
 			}
 
-            protected override void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    macStream.Dispose();
+			protected override void Dispose(bool disposing)
+			{
+				if (disposing)
+				{
+					macStream.Dispose();
 
-                    // TODO Parent context(s) should really be be closed explicitly
+					// TODO Parent context(s) should really be be closed explicitly
 
-				    eiGen.Close();
+					eiGen.Close();
 
-				    // [TODO] auth attributes go here 
-				    byte[] macOctets = MacUtilities.DoFinal(mac);
-				    authGen.AddObject(new DerOctetString(macOctets));
-				    // [TODO] unauth attributes go here
+					// [TODO] auth attributes go here 
+					byte[] macOctets = MacUtilities.DoFinal(mac);
+					authGen.AddObject(new DerOctetString(macOctets));
+					// [TODO] unauth attributes go here
 
-				    authGen.Close();
-				    cGen.Close();
-                }
-                base.Dispose(disposing);
-            }
+					authGen.Close();
+					cGen.Close();
+				}
+
+				base.Dispose(disposing);
+			}
 		}
 	}
 }

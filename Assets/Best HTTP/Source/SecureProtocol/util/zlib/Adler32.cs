@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+
 /*
  * $Id: Adler32.cs,v 1.1 2006-07-31 13:59:25 bouncy Exp $
  *
@@ -12,8 +13,8 @@ modification, are permitted provided that the following conditions are met:
   1. Redistributions of source code must retain the above copyright notice,
      this list of conditions and the following disclaimer.
 
-  2. Redistributions in binary form must reproduce the above copyright 
-     notice, this list of conditions and the following disclaimer in 
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in
      the documentation and/or other materials provided with the distribution.
 
   3. The names of the authors may not be used to endorse or promote products
@@ -36,57 +37,84 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * and contributors of zlib.
  */
 
-namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib {
+namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
+{
+	internal sealed class Adler32
+	{
+		// largest prime smaller than 65536
+		private const int BASE = 65521;
 
-    internal sealed class Adler32{
+		// NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1
+		private const int NMAX = 5552;
 
-        // largest prime smaller than 65536
-        private const int BASE=65521; 
-        // NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1
-        private const int NMAX=5552;
+		internal long adler32(long adler, byte[] buf, int index, int len)
+		{
+			if (buf == null)
+			{
+				return 1L;
+			}
 
-        internal long adler32(long adler, byte[] buf, int index, int len){
-            if(buf == null){ return 1L; }
+			long s1 = adler & 0xffff;
+			long s2 = (adler >> 16) & 0xffff;
+			int k;
 
-            long s1=adler&0xffff;
-            long s2=(adler>>16)&0xffff;
-            int k;
+			while (len > 0)
+			{
+				k = len < NMAX ? len : NMAX;
+				len -= k;
+				while (k >= 16)
+				{
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					s1 += buf[index++] & 0xff;
+					s2 += s1;
+					k -= 16;
+				}
 
-            while(len > 0) {
-                k=len<NMAX?len:NMAX;
-                len-=k;
-                while(k>=16){
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    s1+=buf[index++]&0xff; s2+=s1;
-                    k-=16;
-                }
-                if(k!=0){
-                    do{
-                        s1+=buf[index++]&0xff; s2+=s1;
-                    }
-                    while(--k!=0);
-                }
-                s1%=BASE;
-                s2%=BASE;
-            }
-            return (s2<<16)|s1;
-        }
+				if (k != 0)
+				{
+					do
+					{
+						s1 += buf[index++] & 0xff;
+						s2 += s1;
+					} while (--k != 0);
+				}
 
-    }
+				s1 %= BASE;
+				s2 %= BASE;
+			}
+
+			return (s2 << 16) | s1;
+		}
+	}
 }
 #pragma warning restore
 #endif

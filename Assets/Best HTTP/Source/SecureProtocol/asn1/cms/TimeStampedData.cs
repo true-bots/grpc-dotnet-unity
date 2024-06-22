@@ -26,20 +26,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		private TimeStampedData(Asn1Sequence seq)
 		{
 			this.version = DerInteger.GetInstance(seq[0]);
-			
+
 			int index = 1;
 			if (seq[index] is DerIA5String)
 			{
 				this.dataUri = DerIA5String.GetInstance(seq[index++]);
 			}
+
 			if (seq[index] is MetaData || seq[index] is Asn1Sequence)
 			{
 				this.metaData = MetaData.GetInstance(seq[index++]);
 			}
+
 			if (seq[index] is Asn1OctetString)
 			{
 				this.content = Asn1OctetString.GetInstance(seq[index++]);
 			}
+
 			this.temporalEvidence = Evidence.GetInstance(seq[index]);
 		}
 

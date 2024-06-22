@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security.Certificates;
@@ -18,7 +17,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		private X509CertificatePair ReadDerCrossCertificatePair(
 			Stream inStream)
 		{
-			Asn1InputStream dIn = new Asn1InputStream(inStream);//, ProviderUtil.getReadLimit(in));
+			Asn1InputStream dIn = new Asn1InputStream(inStream); //, ProviderUtil.getReadLimit(in));
 			Asn1Sequence seq = (Asn1Sequence)dIn.ReadObject();
 			CertificatePair pair = CertificatePair.GetInstance(seq);
 			return new X509CertificatePair(pair);
@@ -60,22 +59,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			try
 			{
-                int tag = inStream.ReadByte();
-                if (tag < 0)
-                    return null;
+				int tag = inStream.ReadByte();
+				if (tag < 0)
+					return null;
 
-                if (inStream.CanSeek)
-                {
-                    inStream.Seek(-1L, SeekOrigin.Current);
-                }
-                else
-                {
-                    PushbackStream pis = new PushbackStream(inStream);
-                    pis.Unread(tag);
-                    inStream = pis;
-                }
+				if (inStream.CanSeek)
+				{
+					inStream.Seek(-1L, SeekOrigin.Current);
+				}
+				else
+				{
+					PushbackStream pis = new PushbackStream(inStream);
+					pis.Unread(tag);
+					inStream = pis;
+				}
 
-                return ReadDerCrossCertificatePair(inStream);
+				return ReadDerCrossCertificatePair(inStream);
 			}
 			catch (Exception e)
 			{

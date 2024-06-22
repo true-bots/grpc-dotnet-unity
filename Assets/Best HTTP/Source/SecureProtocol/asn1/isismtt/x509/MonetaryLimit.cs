@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -34,16 +33,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 	public class MonetaryLimit
 		: Asn1Encodable
 	{
-		private readonly DerPrintableString	currency;
-		private readonly DerInteger			amount;
-		private readonly DerInteger			exponent;
+		private readonly DerPrintableString currency;
+		private readonly DerInteger amount;
+		private readonly DerInteger exponent;
 
 		public static MonetaryLimit GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is MonetaryLimit)
 			{
-				return (MonetaryLimit) obj;
+				return (MonetaryLimit)obj;
 			}
 
 			if (obj is Asn1Sequence)
@@ -51,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				return new MonetaryLimit(Asn1Sequence.GetInstance(obj));
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		private MonetaryLimit(
@@ -76,9 +75,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		* @param exponent The exponent
 		*/
 		public MonetaryLimit(
-			string	currency,
-			int		amount,
-			int		exponent)
+			string currency,
+			int amount,
+			int exponent)
 		{
 			this.currency = new DerPrintableString(currency, true);
 			this.amount = new DerInteger(amount);

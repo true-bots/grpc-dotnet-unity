@@ -1,13 +1,11 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 {
-
 	/// <summary>
 	/// Implementation of Chinese SM3 digest as described at
 	/// http://tools.ietf.org/html/draft-shen-sm3-hash-00
@@ -24,7 +22,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class SM3Digest
 		: GeneralDigest
 	{
-		private const int DIGEST_LENGTH = 32;   // bytes
+		private const int DIGEST_LENGTH = 32; // bytes
 		private const int BLOCK_SIZE = 64 / 4; // of 32 bit ints (16 ints)
 
 		private uint[] V = new uint[DIGEST_LENGTH / 4]; // in 32 bit ints (8 ints)
@@ -34,7 +32,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		// Work-bufs used within processBlock()
 		private uint[] W = new uint[68];
 
-        // Round constant T for processBlock() which is 32 bit integer rolled left up to (63 MOD 32) bit positions.
+		// Round constant T for processBlock() which is 32 bit integer rolled left up to (63 MOD 32) bit positions.
 		private static readonly uint[] T = new uint[64];
 
 		static SM3Digest()
@@ -44,6 +42,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 				uint t = 0x79CC4519;
 				T[i] = (t << i) | (t >> (32 - i));
 			}
+
 			for (int i = 16; i < 64; ++i)
 			{
 				int n = i % 32;
@@ -124,7 +123,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		{
 			Finish();
 
-            Pack.UInt32_To_BE(V, output, outOff);
+			Pack.UInt32_To_BE(V, output, outOff);
 
 			Reset();
 
@@ -144,7 +143,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        internal override void ProcessWord(byte[] input, int inOff)
+		internal override void ProcessWord(byte[] input, int inOff)
 		{
 			inwords[xOff++] = Pack.BE_To_UInt32(input, inOff);
 
@@ -166,7 +165,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        internal override void ProcessLength(long bitLength)
+		internal override void ProcessLength(long bitLength)
 		{
 			if (this.xOff > (BLOCK_SIZE - 2))
 			{
@@ -176,6 +175,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 				ProcessBlock();
 			}
+
 			// Fill with zero words, until reach 2nd to last slot
 			while (this.xOff < (BLOCK_SIZE - 2))
 			{
@@ -267,6 +267,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			{
 				this.W[j] = this.inwords[j];
 			}
+
 			for (int j = 16; j < 68; ++j)
 			{
 				uint wj3 = this.W[j - 3];
@@ -292,8 +293,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 				uint s1_ = a12 + E + T[j];
 				uint SS1 = ((s1_ << 7) | (s1_ >> (32 - 7)));
 				uint SS2 = SS1 ^ a12;
-                uint Wj = W[j];
-                uint W1j = Wj ^ W[j + 4];
+				uint Wj = W[j];
+				uint W1j = Wj ^ W[j + 4];
 				uint TT1 = FF0(A, B, C) + D + SS2 + W1j;
 				uint TT2 = GG0(E, F, G) + H + SS1 + Wj;
 				D = C;

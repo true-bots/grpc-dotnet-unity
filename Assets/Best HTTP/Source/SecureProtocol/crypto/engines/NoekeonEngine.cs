@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -17,10 +16,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		// Block and key size, as well as the amount of rounds.
 		private const int Size = 16;
 
-        private static readonly byte[] RoundConstants = { 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e,
-			0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4 };
+		private static readonly byte[] RoundConstants =
+		{
+			0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e,
+			0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4
+		};
 
-        private readonly uint[] k = new uint[4];
+		private readonly uint[] k = new uint[4];
 
 		private bool _initialised, _forEncryption;
 
@@ -38,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			get { return "Noekeon"; }
 		}
 
-        public virtual int GetBlockSize()
+		public virtual int GetBlockSize()
 		{
 			return Size;
 		}
@@ -55,14 +57,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		{
 			if (!(parameters is KeyParameter))
 				throw new ArgumentException("Invalid parameters passed to Noekeon init - "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters), "parameters");
+				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters), "parameters");
 
-			KeyParameter p = (KeyParameter) parameters;
-            byte[] key = p.GetKey();
-            if (key.Length != 16)
-                throw new ArgumentException("Key length not 128 bits.");
+			KeyParameter p = (KeyParameter)parameters;
+			byte[] key = p.GetKey();
+			if (key.Length != 16)
+				throw new ArgumentException("Key length not 128 bits.");
 
-            Pack.BE_To_UInt32(key, 0, k, 0, 4);
+			Pack.BE_To_UInt32(key, 0, k, 0, 4);
 
 			if (!forEncryption)
 			{
@@ -77,25 +79,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					t13 ^= Integers.RotateLeft(t13, 8) ^ Integers.RotateLeft(t13, 24);
 
 					a0 ^= t13;
-                    a1 ^= t02;
-                    a2 ^= t13;
-                    a3 ^= t02;
+					a1 ^= t02;
+					a2 ^= t13;
+					a3 ^= t02;
 
-                    k[0] = a0; k[1] = a1; k[2] = a2; k[3] = a3;
+					k[0] = a0;
+					k[1] = a1;
+					k[2] = a2;
+					k[3] = a3;
 				}
 			}
 
-            this._forEncryption = forEncryption;
-            this._initialised = true;
-        }
+			this._forEncryption = forEncryption;
+			this._initialised = true;
+		}
 
-        public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
+		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (!_initialised)
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
 
-            Check.DataLength(input, inOff, Size, "input buffer too short");
-            Check.OutputLength(output, outOff, Size, "output buffer too short");
+			Check.DataLength(input, inOff, Size, "input buffer too short");
+			Check.OutputLength(output, outOff, Size, "output buffer too short");
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			return _forEncryption
@@ -266,7 +271,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return Size;
 		}
 #else
-		private int EncryptBlock(byte[]	input, int inOff, byte[] output, int outOff)
+		private int EncryptBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			uint a0 = Pack.BE_To_UInt32(input, inOff);
 			uint a1 = Pack.BE_To_UInt32(input, inOff + 4);
@@ -290,13 +295,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					a2 ^= k2;
 					a3 ^= k3;
 
-                    uint t13 = a1 ^ a3;
-                    t13 ^= Integers.RotateLeft(t13, 8) ^ Integers.RotateLeft(t13, 24);
+					uint t13 = a1 ^ a3;
+					t13 ^= Integers.RotateLeft(t13, 8) ^ Integers.RotateLeft(t13, 24);
 
-                    a0 ^= t13;
-                    a1 ^= t02;
-                    a2 ^= t13;
-                    a3 ^= t02;
+					a0 ^= t13;
+					a1 ^= t02;
+					a2 ^= t13;
+					a3 ^= t02;
 				}
 
 				if (++round > Size)
@@ -311,14 +316,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 				// gamma(a);
 				{
-                    uint t = a3;
-                    a1 ^= a3 | a2;
-                    a3 = a0 ^ (a2 & ~a1);
+					uint t = a3;
+					a1 ^= a3 | a2;
+					a3 = a0 ^ (a2 & ~a1);
 
-                    a2 = t ^ ~a1 ^ a2 ^ a3;
+					a2 = t ^ ~a1 ^ a2 ^ a3;
 
-                    a1 ^= a3 | a2;
-                    a0 = t ^ (a2 & a1);
+					a1 ^= a3 | a2;
+					a0 = t ^ (a2 & a1);
 				}
 
 				// pi2(a);
@@ -337,7 +342,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return Size;
 		}
 
-		private int DecryptBlock(byte[]	input, int inOff, byte[] output, int outOff)
+		private int DecryptBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			uint a0 = Pack.BE_To_UInt32(input, inOff);
 			uint a1 = Pack.BE_To_UInt32(input, inOff + 4);
@@ -351,24 +356,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				// theta(a, k);
 				{
-                    uint t02 = a0 ^ a2;
-                    t02 ^= Integers.RotateLeft(t02, 8) ^ Integers.RotateLeft(t02, 24);
+					uint t02 = a0 ^ a2;
+					t02 ^= Integers.RotateLeft(t02, 8) ^ Integers.RotateLeft(t02, 24);
 
-                    a0 ^= k0;
-                    a1 ^= k1;
-                    a2 ^= k2;
-                    a3 ^= k3;
+					a0 ^= k0;
+					a1 ^= k1;
+					a2 ^= k2;
+					a3 ^= k3;
 
-                    uint t13 = a1 ^ a3;
-                    t13 ^= Integers.RotateLeft(t13, 8) ^ Integers.RotateLeft(t13, 24);
+					uint t13 = a1 ^ a3;
+					t13 ^= Integers.RotateLeft(t13, 8) ^ Integers.RotateLeft(t13, 24);
 
-                    a0 ^= t13;
-                    a1 ^= t02;
-                    a2 ^= t13;
-                    a3 ^= t02;
-                }
+					a0 ^= t13;
+					a1 ^= t02;
+					a2 ^= t13;
+					a3 ^= t02;
+				}
 
-                a0 ^= RoundConstants[round];
+				a0 ^= RoundConstants[round];
 
 				if (--round < 0)
 					break;
@@ -382,18 +387,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 				// gamma(a);
 				{
-                    uint t = a3;
-                    a1 ^= a3 | a2;
-                    a3 = a0 ^ (a2 & ~a1);
+					uint t = a3;
+					a1 ^= a3 | a2;
+					a3 = a0 ^ (a2 & ~a1);
 
-                    a2 = t ^ ~a1 ^ a2 ^ a3;
+					a2 = t ^ ~a1 ^ a2 ^ a3;
 
-                    a1 ^= a3 | a2;
-                    a0 = t ^ (a2 & a1);
-                }
+					a1 ^= a3 | a2;
+					a0 = t ^ (a2 & a1);
+				}
 
-                // pi2(a);
-                {
+				// pi2(a);
+				{
 					a1 = Integers.RotateLeft(a1, 31);
 					a2 = Integers.RotateLeft(a2, 27);
 					a3 = Integers.RotateLeft(a3, 30);

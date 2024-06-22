@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Kdf;
@@ -17,8 +16,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 		private readonly IDerivationFunction kdf;
 
 		public ECDHWithKdfBasicAgreement(
-			string				algorithm,
-			IDerivationFunction	kdf)
+			string algorithm,
+			IDerivationFunction kdf)
 		{
 			if (algorithm == null)
 				throw new ArgumentNullException("algorithm");

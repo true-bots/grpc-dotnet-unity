@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
@@ -11,8 +10,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	 */
 	public class CipherKeyGenerator
 	{
-		protected internal SecureRandom	random;
-		protected internal int			strength;
+		protected internal SecureRandom random;
+		protected internal int strength;
 		private bool uninitialised = true;
 		private int defaultStrength;
 
@@ -75,9 +74,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			return EngineGenerateKey();
 		}
 
-        protected virtual byte[] EngineGenerateKey()
+		protected virtual byte[] EngineGenerateKey()
 		{
-            return SecureRandom.GetNextBytes(random, strength);
+			return SecureRandom.GetNextBytes(random, strength);
 		}
 	}
 }

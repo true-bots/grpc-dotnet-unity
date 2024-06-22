@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -17,15 +16,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 			if (obj == null || obj is NameConstraints)
 			{
-				return (NameConstraints) obj;
+				return (NameConstraints)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new NameConstraints((Asn1Sequence) obj);
+				return new NameConstraints((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public NameConstraints(
@@ -45,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			}
 		}
 
-        /**
+		/**
 		 * Constructor from a given details.
 		 *
 		 * <p>permitted and excluded are Vectors of GeneralSubtree objects.</p>
@@ -70,12 +69,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		private DerSequence CreateSequence(IList<GeneralSubtree> subtrees)
 		{
-            GeneralSubtree[] gsts = new GeneralSubtree[subtrees.Count];
-            for (int i = 0; i < subtrees.Count; ++i)
-            {
-                gsts[i] = subtrees[i];
-            }
-            return new DerSequence(gsts);
+			GeneralSubtree[] gsts = new GeneralSubtree[subtrees.Count];
+			for (int i = 0; i < subtrees.Count; ++i)
+			{
+				gsts[i] = subtrees[i];
+			}
+
+			return new DerSequence(gsts);
 		}
 
 		public Asn1Sequence PermittedSubtrees
@@ -92,13 +92,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * NameConstraints ::= SEQUENCE { permittedSubtrees [0] GeneralSubtrees
 		 * OPTIONAL, excludedSubtrees [1] GeneralSubtrees OPTIONAL }
 		 */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptionalTagged(false, 0, permitted);
-            v.AddOptionalTagged(false, 1, excluded);
-            return new DerSequence(v);
-        }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
+			v.AddOptionalTagged(false, 0, permitted);
+			v.AddOptionalTagged(false, 1, excluded);
+			return new DerSequence(v);
+		}
 	}
 }
 #pragma warning restore

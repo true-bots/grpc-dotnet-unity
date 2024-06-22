@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -20,7 +19,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		private readonly int certainty;
 		private readonly int countSmallPrimes;
 
-        /**
+		/**
 		 * Parameters for generating a NaccacheStern KeyPair.
 		 *
 		 * @param random
@@ -34,20 +33,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		 *            How many small key factors are desired
 		 */
 		public NaccacheSternKeyGenerationParameters(
-			SecureRandom	random,
-			int				strength,
-			int				certainty,
-			int				countSmallPrimes)
-            : base(random, strength)
-        {
-            if (countSmallPrimes % 2 == 1)
-                throw new ArgumentException("countSmallPrimes must be a multiple of 2");
-            if (countSmallPrimes < 30)
-                throw new ArgumentException("countSmallPrimes must be >= 30 for security reasons");
+			SecureRandom random,
+			int strength,
+			int certainty,
+			int countSmallPrimes)
+			: base(random, strength)
+		{
+			if (countSmallPrimes % 2 == 1)
+				throw new ArgumentException("countSmallPrimes must be a multiple of 2");
+			if (countSmallPrimes < 30)
+				throw new ArgumentException("countSmallPrimes must be >= 30 for security reasons");
 
-            this.certainty = certainty;
-            this.countSmallPrimes = countSmallPrimes;
-        }
+			this.certainty = certainty;
+			this.countSmallPrimes = countSmallPrimes;
+		}
 
 		/**
 		 * @return Returns the certainty.

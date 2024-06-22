@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro;
@@ -23,21 +22,21 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-    internal class CmsSignedHelper
-    {
-        internal static readonly CmsSignedHelper Instance = new CmsSignedHelper();
+	internal class CmsSignedHelper
+	{
+		internal static readonly CmsSignedHelper Instance = new CmsSignedHelper();
 
-        private static readonly string EncryptionECDsaWithSha1 = X9ObjectIdentifiers.ECDsaWithSha1.Id;
-        private static readonly string EncryptionECDsaWithSha224 = X9ObjectIdentifiers.ECDsaWithSha224.Id;
-        private static readonly string EncryptionECDsaWithSha256 = X9ObjectIdentifiers.ECDsaWithSha256.Id;
-        private static readonly string EncryptionECDsaWithSha384 = X9ObjectIdentifiers.ECDsaWithSha384.Id;
-        private static readonly string EncryptionECDsaWithSha512 = X9ObjectIdentifiers.ECDsaWithSha512.Id;
+		private static readonly string EncryptionECDsaWithSha1 = X9ObjectIdentifiers.ECDsaWithSha1.Id;
+		private static readonly string EncryptionECDsaWithSha224 = X9ObjectIdentifiers.ECDsaWithSha224.Id;
+		private static readonly string EncryptionECDsaWithSha256 = X9ObjectIdentifiers.ECDsaWithSha256.Id;
+		private static readonly string EncryptionECDsaWithSha384 = X9ObjectIdentifiers.ECDsaWithSha384.Id;
+		private static readonly string EncryptionECDsaWithSha512 = X9ObjectIdentifiers.ECDsaWithSha512.Id;
 
 		private static readonly IDictionary<string, string> m_encryptionAlgs = new Dictionary<string, string>();
 		private static readonly IDictionary<string, string> m_digestAlgs = new Dictionary<string, string>();
 		private static readonly IDictionary<string, string[]> m_digestAliases = new Dictionary<string, string[]>();
 
-        private static readonly HashSet<string> noParams = new HashSet<string>();
+		private static readonly HashSet<string> noParams = new HashSet<string>();
 		private static readonly IDictionary<string, string> m_ecAlgorithms = new Dictionary<string, string>();
 
 		private static void AddEntries(DerObjectIdentifier oid, string digest, string encryption)
@@ -66,13 +65,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			AddEntries(PkcsObjectIdentifiers.Sha256WithRsaEncryption, "SHA256", "RSA");
 			AddEntries(PkcsObjectIdentifiers.Sha384WithRsaEncryption, "SHA384", "RSA");
 			AddEntries(PkcsObjectIdentifiers.Sha512WithRsaEncryption, "SHA512", "RSA");
-            AddEntries(PkcsObjectIdentifiers.Sha512_224WithRSAEncryption, "SHA512(224)", "RSA");
-            AddEntries(PkcsObjectIdentifiers.Sha512_256WithRSAEncryption, "SHA512(256)", "RSA");
-            AddEntries(NistObjectIdentifiers.IdRsassaPkcs1V15WithSha3_224, "SHA3-224", "RSA");
-            AddEntries(NistObjectIdentifiers.IdRsassaPkcs1V15WithSha3_256, "SHA3-256", "RSA");
-            AddEntries(NistObjectIdentifiers.IdRsassaPkcs1V15WithSha3_384, "SHA3-384", "RSA");
-            AddEntries(NistObjectIdentifiers.IdRsassaPkcs1V15WithSha3_512, "SHA3-512", "RSA");
-            AddEntries(X9ObjectIdentifiers.ECDsaWithSha1, "SHA1", "ECDSA");
+			AddEntries(PkcsObjectIdentifiers.Sha512_224WithRSAEncryption, "SHA512(224)", "RSA");
+			AddEntries(PkcsObjectIdentifiers.Sha512_256WithRSAEncryption, "SHA512(256)", "RSA");
+			AddEntries(NistObjectIdentifiers.IdRsassaPkcs1V15WithSha3_224, "SHA3-224", "RSA");
+			AddEntries(NistObjectIdentifiers.IdRsassaPkcs1V15WithSha3_256, "SHA3-256", "RSA");
+			AddEntries(NistObjectIdentifiers.IdRsassaPkcs1V15WithSha3_384, "SHA3-384", "RSA");
+			AddEntries(NistObjectIdentifiers.IdRsassaPkcs1V15WithSha3_512, "SHA3-512", "RSA");
+			AddEntries(X9ObjectIdentifiers.ECDsaWithSha1, "SHA1", "ECDSA");
 			AddEntries(X9ObjectIdentifiers.ECDsaWithSha224, "SHA224", "ECDSA");
 			AddEntries(X9ObjectIdentifiers.ECDsaWithSha256, "SHA256", "ECDSA");
 			AddEntries(X9ObjectIdentifiers.ECDsaWithSha384, "SHA384", "ECDSA");
@@ -87,21 +86,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			AddEntries(EacObjectIdentifiers.id_TA_RSA_v1_5_SHA_256, "SHA256", "RSA");
 			AddEntries(EacObjectIdentifiers.id_TA_RSA_PSS_SHA_1, "SHA1", "RSAandMGF1");
 			AddEntries(EacObjectIdentifiers.id_TA_RSA_PSS_SHA_256, "SHA256", "RSAandMGF1");
-            AddEntries(CryptoProObjectIdentifiers.GostR3411x94WithGostR3410x94, "GOST3411", "GOST3410");
-            AddEntries(CryptoProObjectIdentifiers.GostR3411x94WithGostR3410x2001, "GOST3411", "ECGOST3410");
-            AddEntries(RosstandartObjectIdentifiers.id_tc26_signwithdigest_gost_3410_12_256, "GOST3411-2012-256", "ECGOST3410");
-            AddEntries(RosstandartObjectIdentifiers.id_tc26_signwithdigest_gost_3410_12_512, "GOST3411-2012-512", "ECGOST3410");
+			AddEntries(CryptoProObjectIdentifiers.GostR3411x94WithGostR3410x94, "GOST3411", "GOST3410");
+			AddEntries(CryptoProObjectIdentifiers.GostR3411x94WithGostR3410x2001, "GOST3411", "ECGOST3410");
+			AddEntries(RosstandartObjectIdentifiers.id_tc26_signwithdigest_gost_3410_12_256, "GOST3411-2012-256", "ECGOST3410");
+			AddEntries(RosstandartObjectIdentifiers.id_tc26_signwithdigest_gost_3410_12_512, "GOST3411-2012-512", "ECGOST3410");
 
-            m_encryptionAlgs.Add(X9ObjectIdentifiers.IdDsa.Id, "DSA");
+			m_encryptionAlgs.Add(X9ObjectIdentifiers.IdDsa.Id, "DSA");
 			m_encryptionAlgs.Add(PkcsObjectIdentifiers.RsaEncryption.Id, "RSA");
 			m_encryptionAlgs.Add(TeleTrusTObjectIdentifiers.TeleTrusTRsaSignatureAlgorithm.Id, "RSA");
 			m_encryptionAlgs.Add(X509ObjectIdentifiers.IdEARsa.Id, "RSA");
 			m_encryptionAlgs.Add(CmsSignedGenerator.EncryptionRsaPss, "RSAandMGF1");
 			m_encryptionAlgs.Add(CryptoProObjectIdentifiers.GostR3410x94.Id, "GOST3410");
 			m_encryptionAlgs.Add(CryptoProObjectIdentifiers.GostR3410x2001.Id, "ECGOST3410");
-            m_encryptionAlgs.Add(RosstandartObjectIdentifiers.id_tc26_gost_3410_12_256.Id, "ECGOST3410");
-            m_encryptionAlgs.Add(RosstandartObjectIdentifiers.id_tc26_gost_3410_12_512.Id, "ECGOST3410");
-            m_encryptionAlgs.Add("1.3.6.1.4.1.5849.1.6.2", "ECGOST3410");
+			m_encryptionAlgs.Add(RosstandartObjectIdentifiers.id_tc26_gost_3410_12_256.Id, "ECGOST3410");
+			m_encryptionAlgs.Add(RosstandartObjectIdentifiers.id_tc26_gost_3410_12_512.Id, "ECGOST3410");
+			m_encryptionAlgs.Add("1.3.6.1.4.1.5849.1.6.2", "ECGOST3410");
 			m_encryptionAlgs.Add("1.3.6.1.4.1.5849.1.1.5", "GOST3410");
 
 			m_digestAlgs.Add(PkcsObjectIdentifiers.MD2.Id, "MD2");
@@ -121,24 +120,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			m_digestAlgs.Add(TeleTrusTObjectIdentifiers.RipeMD128.Id, "RIPEMD128");
 			m_digestAlgs.Add(TeleTrusTObjectIdentifiers.RipeMD160.Id, "RIPEMD160");
 			m_digestAlgs.Add(TeleTrusTObjectIdentifiers.RipeMD256.Id, "RIPEMD256");
-			m_digestAlgs.Add(CryptoProObjectIdentifiers.GostR3411.Id,  "GOST3411");
-			m_digestAlgs.Add("1.3.6.1.4.1.5849.1.2.1",  "GOST3411");
-            m_digestAlgs.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256.Id, "GOST3411-2012-256");
-            m_digestAlgs.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_512.Id, "GOST3411-2012-512");
+			m_digestAlgs.Add(CryptoProObjectIdentifiers.GostR3411.Id, "GOST3411");
+			m_digestAlgs.Add("1.3.6.1.4.1.5849.1.2.1", "GOST3411");
+			m_digestAlgs.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256.Id, "GOST3411-2012-256");
+			m_digestAlgs.Add(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_512.Id, "GOST3411-2012-512");
 
-            m_digestAliases.Add("SHA1", new string[]{ "SHA-1" });
-			m_digestAliases.Add("SHA224", new string[]{ "SHA-224" });
-			m_digestAliases.Add("SHA256", new string[]{ "SHA-256" });
-			m_digestAliases.Add("SHA384", new string[]{ "SHA-384" });
-			m_digestAliases.Add("SHA512", new string[]{ "SHA-512" });
+			m_digestAliases.Add("SHA1", new string[] { "SHA-1" });
+			m_digestAliases.Add("SHA224", new string[] { "SHA-224" });
+			m_digestAliases.Add("SHA256", new string[] { "SHA-256" });
+			m_digestAliases.Add("SHA384", new string[] { "SHA-384" });
+			m_digestAliases.Add("SHA512", new string[] { "SHA-512" });
 
-            noParams.Add(CmsSignedGenerator.EncryptionDsa);
-            //noParams.Add(EncryptionECDsa);
-            noParams.Add(EncryptionECDsaWithSha1);
-            noParams.Add(EncryptionECDsaWithSha224);
-            noParams.Add(EncryptionECDsaWithSha256);
-            noParams.Add(EncryptionECDsaWithSha384);
-            noParams.Add(EncryptionECDsaWithSha512);
+			noParams.Add(CmsSignedGenerator.EncryptionDsa);
+			//noParams.Add(EncryptionECDsa);
+			noParams.Add(EncryptionECDsaWithSha1);
+			noParams.Add(EncryptionECDsaWithSha224);
+			noParams.Add(EncryptionECDsaWithSha256);
+			noParams.Add(EncryptionECDsaWithSha384);
+			noParams.Add(EncryptionECDsaWithSha512);
 
 			m_ecAlgorithms.Add(CmsSignedGenerator.DigestSha1, EncryptionECDsaWithSha1);
 			m_ecAlgorithms.Add(CmsSignedGenerator.DigestSha224, EncryptionECDsaWithSha224);
@@ -152,9 +151,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
         * representations rather than the algorithm identifier (if possible).
         */
 		internal string GetDigestAlgName(string digestAlgOid)
-        {
+		{
 			return m_digestAlgs.TryGetValue(digestAlgOid, out var algName) ? algName : digestAlgOid;
-        }
+		}
 
 		internal AlgorithmIdentifier GetEncAlgorithmIdentifier(DerObjectIdentifier encOid,
 			Asn1Encodable sigX509Parameters)
@@ -177,10 +176,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
         * JCA string representations rather than the algorithm identifier (if
         * possible).
         */
-        internal string GetEncryptionAlgName(string encryptionAlgOid)
-        {
+		internal string GetEncryptionAlgName(string encryptionAlgOid)
+		{
 			return m_encryptionAlgs.TryGetValue(encryptionAlgOid, out var algName) ? algName : encryptionAlgOid;
-        }
+		}
 
 		internal IDigest GetDigestInstance(
 			string algorithm)
@@ -195,9 +194,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				// assuming DigestUtilities already knows all the aliases
 				foreach (string alias in GetDigestAliases(algorithm))
 				{
-					try { return DigestUtilities.GetDigest(alias); }
-					catch (SecurityUtilityException) {}
+					try
+					{
+						return DigestUtilities.GetDigest(alias);
+					}
+					catch (SecurityUtilityException)
+					{
+					}
 				}
+
 				throw e;
 			}
 		}
@@ -212,93 +217,93 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			AlgorithmIdentifier algId)
 		{
 			if (algId.Parameters == null)
-                return new AlgorithmIdentifier(algId.Algorithm, DerNull.Instance);
+				return new AlgorithmIdentifier(algId.Algorithm, DerNull.Instance);
 
 			return algId;
 		}
 
-        internal string GetEncOid(
-            AsymmetricKeyParameter key,
-            string digestOID)
-        {
-            string encOID = null;
+		internal string GetEncOid(
+			AsymmetricKeyParameter key,
+			string digestOID)
+		{
+			string encOID = null;
 
-            if (key is RsaKeyParameters rsaKeyParameters)
-            {
-                if (!rsaKeyParameters.IsPrivate)
-                    throw new ArgumentException("Expected RSA private key");
+			if (key is RsaKeyParameters rsaKeyParameters)
+			{
+				if (!rsaKeyParameters.IsPrivate)
+					throw new ArgumentException("Expected RSA private key");
 
-                encOID = CmsSignedGenerator.EncryptionRsa;
-            }
-            else if (key is DsaPrivateKeyParameters)
-            {
-                if (digestOID.Equals(CmsSignedGenerator.DigestSha1))
-                {
-                    encOID = CmsSignedGenerator.EncryptionDsa;
-                }
-                else if (digestOID.Equals(CmsSignedGenerator.DigestSha224))
-                {
-                    encOID = NistObjectIdentifiers.DsaWithSha224.Id;
-                }
-                else if (digestOID.Equals(CmsSignedGenerator.DigestSha256))
-                {
-                    encOID = NistObjectIdentifiers.DsaWithSha256.Id;
-                }
-                else if (digestOID.Equals(CmsSignedGenerator.DigestSha384))
-                {
-                    encOID = NistObjectIdentifiers.DsaWithSha384.Id;
-                }
-                else if (digestOID.Equals(CmsSignedGenerator.DigestSha512))
-                {
-                    encOID = NistObjectIdentifiers.DsaWithSha512.Id;
-                }
-                else
-                {
-                    throw new ArgumentException("can't mix DSA with anything but SHA1/SHA2");
-                }
-            }
-            else if (key is ECPrivateKeyParameters ecPrivKey)
-            {
-                string algName = ecPrivKey.AlgorithmName;
+				encOID = CmsSignedGenerator.EncryptionRsa;
+			}
+			else if (key is DsaPrivateKeyParameters)
+			{
+				if (digestOID.Equals(CmsSignedGenerator.DigestSha1))
+				{
+					encOID = CmsSignedGenerator.EncryptionDsa;
+				}
+				else if (digestOID.Equals(CmsSignedGenerator.DigestSha224))
+				{
+					encOID = NistObjectIdentifiers.DsaWithSha224.Id;
+				}
+				else if (digestOID.Equals(CmsSignedGenerator.DigestSha256))
+				{
+					encOID = NistObjectIdentifiers.DsaWithSha256.Id;
+				}
+				else if (digestOID.Equals(CmsSignedGenerator.DigestSha384))
+				{
+					encOID = NistObjectIdentifiers.DsaWithSha384.Id;
+				}
+				else if (digestOID.Equals(CmsSignedGenerator.DigestSha512))
+				{
+					encOID = NistObjectIdentifiers.DsaWithSha512.Id;
+				}
+				else
+				{
+					throw new ArgumentException("can't mix DSA with anything but SHA1/SHA2");
+				}
+			}
+			else if (key is ECPrivateKeyParameters ecPrivKey)
+			{
+				string algName = ecPrivKey.AlgorithmName;
 
-                if (algName == "ECGOST3410")
-                {
-                    encOID = CmsSignedGenerator.EncryptionECGost3410;
-                }
-                else if (ecPrivKey.Parameters is ECGost3410Parameters ecGost3410Parameters)
-                {
+				if (algName == "ECGOST3410")
+				{
+					encOID = CmsSignedGenerator.EncryptionECGost3410;
+				}
+				else if (ecPrivKey.Parameters is ECGost3410Parameters ecGost3410Parameters)
+				{
 					var digestParamSet = ecGost3410Parameters.DigestParamSet;
-                    if (digestParamSet.Equals(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256))
+					if (digestParamSet.Equals(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256))
 					{
-                        encOID = CmsSignedGenerator.EncryptionECGost3410_2012_256;
-                    }
-                    else if (digestParamSet.Equals(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_512))
+						encOID = CmsSignedGenerator.EncryptionECGost3410_2012_256;
+					}
+					else if (digestParamSet.Equals(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_512))
 					{
-                        encOID = CmsSignedGenerator.EncryptionECGost3410_2012_512;
-                    }
-                    else
+						encOID = CmsSignedGenerator.EncryptionECGost3410_2012_512;
+					}
+					else
 					{
-                        throw new ArgumentException("can't determine GOST3410 algorithm");
-                    }
-                }
-                else
+						throw new ArgumentException("can't determine GOST3410 algorithm");
+					}
+				}
+				else
 				{
 					// TODO Should we insist on algName being one of "EC" or "ECDSA", as Java does?
 					if (!m_ecAlgorithms.TryGetValue(digestOID, out encOID))
 						throw new ArgumentException("can't mix ECDSA with anything but SHA family digests");
-                }
-            }
-            else if (key is Gost3410PrivateKeyParameters)
-            {
-                encOID = CmsSignedGenerator.EncryptionGost3410;
-            }
-            else
-            {
-                throw new ArgumentException("Unknown algorithm in CmsSignedGenerator.GetEncOid");
-            }
+				}
+			}
+			else if (key is Gost3410PrivateKeyParameters)
+			{
+				encOID = CmsSignedGenerator.EncryptionGost3410;
+			}
+			else
+			{
+				throw new ArgumentException("Unknown algorithm in CmsSignedGenerator.GetEncOid");
+			}
 
-            return encOID;
-        }
+			return encOID;
+		}
 
 		internal IStore<X509V2AttributeCertificate> GetAttributeCertificates(Asn1Set attrCertSet)
 		{
@@ -318,6 +323,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					}
 				}
 			}
+
 			return CollectionUtilities.CreateStore(contents);
 		}
 
@@ -325,7 +331,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		{
 			var contents = new List<X509Certificate>();
 			if (certSet != null)
-            {
+			{
 				foreach (Asn1Encodable ae in certSet)
 				{
 					if (ae != null && ae.ToAsn1Object() is Asn1Sequence s)
@@ -334,6 +340,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					}
 				}
 			}
+
 			return CollectionUtilities.CreateStore(contents);
 		}
 
@@ -350,33 +357,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					}
 				}
 			}
+
 			return CollectionUtilities.CreateStore(contents);
 		}
 
-        internal IStore<Asn1Encodable> GetOtherRevInfos(Asn1Set crlSet, DerObjectIdentifier otherRevInfoFormat)
-        {
-            var contents = new List<Asn1Encodable>();
-            if (crlSet != null && otherRevInfoFormat != null)
-            {
-                foreach (Asn1Encodable ae in crlSet)
-                {
-                    if (ae != null && ae.ToAsn1Object() is Asn1TaggedObject taggedObject)
-                    {
+		internal IStore<Asn1Encodable> GetOtherRevInfos(Asn1Set crlSet, DerObjectIdentifier otherRevInfoFormat)
+		{
+			var contents = new List<Asn1Encodable>();
+			if (crlSet != null && otherRevInfoFormat != null)
+			{
+				foreach (Asn1Encodable ae in crlSet)
+				{
+					if (ae != null && ae.ToAsn1Object() is Asn1TaggedObject taggedObject)
+					{
 						if (taggedObject.HasContextTag(1))
 						{
-                            var otherRevocationInfo = OtherRevocationInfoFormat.GetInstance(taggedObject, false);
+							var otherRevocationInfo = OtherRevocationInfoFormat.GetInstance(taggedObject, false);
 
 							if (otherRevInfoFormat.Equals(otherRevocationInfo.InfoFormat))
 							{
 								contents.Add(otherRevocationInfo.Info);
 							}
-                        }
-                    }
-                }
-            }
-            return CollectionUtilities.CreateStore(contents);
-        }
-    }
+						}
+					}
+				}
+			}
+
+			return CollectionUtilities.CreateStore(contents);
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -1,28 +1,27 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 {
-    public class ElGamalParametersGenerator
-    {
-		private int				size;
-        private int				certainty;
-        private SecureRandom	random;
+	public class ElGamalParametersGenerator
+	{
+		private int size;
+		private int certainty;
+		private SecureRandom random;
 
 		public void Init(
-            int				size,
-            int				certainty,
-            SecureRandom	random)
-        {
-            this.size = size;
-            this.certainty = certainty;
-            this.random = random;
-        }
+			int size,
+			int certainty,
+			SecureRandom random)
+		{
+			this.size = size;
+			this.certainty = certainty;
+			this.random = random;
+		}
 
 		/**
          * which Generates the p and g values from the given parameters,
@@ -31,8 +30,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
          * Note: can take a while...
 		 * </p>
          */
-        public ElGamalParameters GenerateParameters()
-        {
+		public ElGamalParameters GenerateParameters()
+		{
 			//
 			// find a safe prime p where p = 2*q + 1, where p and q are prime.
 			//
@@ -43,8 +42,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			BigInteger g = DHParametersHelper.SelectGenerator(p, q, random);
 
 			return new ElGamalParameters(p, g);
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

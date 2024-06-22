@@ -2,185 +2,190 @@
 
 using System;
 using System.Text;
-
 using BestHTTP.PlatformSupport.Text;
-
 using PlatformSupport.Collections.ObjectModel;
 
 #if !NETFX_CORE
-    using PlatformSupport.Collections.Specialized;
+using PlatformSupport.Collections.Specialized;
+
 #else
     using System.Collections.Specialized;
 #endif
 
 namespace BestHTTP.SocketIO3
 {
-    public delegate void HTTPRequestCallbackDelegate(SocketManager manager, HTTPRequest request);
+	public delegate void HTTPRequestCallbackDelegate(SocketManager manager, HTTPRequest request);
 
-    public sealed class WebsocketOptions
-    {
+	public sealed class WebsocketOptions
+	{
 #if !BESTHTTP_DISABLE_WEBSOCKET && (!UNITY_WEBGL || UNITY_EDITOR)
-        public Func<WebSocket.Extensions.IExtension[]> ExtensionsFactory { get; set; } = WebSocket.WebSocket.GetDefaultExtensions;
+		public Func<WebSocket.Extensions.IExtension[]> ExtensionsFactory { get; set; } = WebSocket.WebSocket.GetDefaultExtensions;
 
-        public TimeSpan? PingIntervalOverride { get; set; } = TimeSpan.Zero;
+		public TimeSpan? PingIntervalOverride { get; set; } = TimeSpan.Zero;
 #endif
-    }
+	}
 
-    public sealed class SocketOptions
-    {
-        #region Properties
+	public sealed class SocketOptions
+	{
+		#region Properties
 
-        /// <summary>
-        /// The SocketManager will try to connect with this transport.
-        /// </summary>
-        public Transports.TransportTypes ConnectWith { get; set; }
+		/// <summary>
+		/// The SocketManager will try to connect with this transport.
+		/// </summary>
+		public Transports.TransportTypes ConnectWith { get; set; }
 
-        /// <summary>
-        /// Whether to reconnect automatically after a disconnect (default true)
-        /// </summary>
-        public bool Reconnection { get; set; }
+		/// <summary>
+		/// Whether to reconnect automatically after a disconnect (default true)
+		/// </summary>
+		public bool Reconnection { get; set; }
 
-        /// <summary>
-        /// Number of attempts before giving up (default Int.MaxValue)
-        /// </summary>
-        public int ReconnectionAttempts { get; set; }
+		/// <summary>
+		/// Number of attempts before giving up (default Int.MaxValue)
+		/// </summary>
+		public int ReconnectionAttempts { get; set; }
 
-        /// <summary>
-        /// How long to initially wait before attempting a new reconnection (default 1000ms).
-        /// Affected by +/- RandomizationFactor, for example the default initial delay will be between 500ms to 1500ms.
-        /// </summary>
-        public TimeSpan ReconnectionDelay { get; set; }
+		/// <summary>
+		/// How long to initially wait before attempting a new reconnection (default 1000ms).
+		/// Affected by +/- RandomizationFactor, for example the default initial delay will be between 500ms to 1500ms.
+		/// </summary>
+		public TimeSpan ReconnectionDelay { get; set; }
 
-        /// <summary>
-        /// Maximum amount of time to wait between reconnections (default 5000ms).
-        /// Each attempt increases the reconnection delay along with a randomization as above.
-        /// </summary>
-        public TimeSpan ReconnectionDelayMax { get; set; }
+		/// <summary>
+		/// Maximum amount of time to wait between reconnections (default 5000ms).
+		/// Each attempt increases the reconnection delay along with a randomization as above.
+		/// </summary>
+		public TimeSpan ReconnectionDelayMax { get; set; }
 
-        /// <summary>
-        /// (default 0.5`), [0..1]
-        /// </summary>
-        public float RandomizationFactor { get { return randomizationFactor; } set { randomizationFactor = Math.Min(1.0f, Math.Max(0.0f, value)); } }
-        private float randomizationFactor;
+		/// <summary>
+		/// (default 0.5`), [0..1]
+		/// </summary>
+		public float RandomizationFactor
+		{
+			get { return randomizationFactor; }
+			set { randomizationFactor = Math.Min(1.0f, Math.Max(0.0f, value)); }
+		}
 
-        /// <summary>
-        /// Connection timeout before a connect_error and connect_timeout events are emitted (default 20000ms)
-        /// </summary>
-        public TimeSpan Timeout { get; set; }
+		private float randomizationFactor;
 
-        /// <summary>
-        /// By setting this false, you have to call SocketManager's Open() whenever you decide it's appropriate.
-        /// </summary>
-        public bool AutoConnect { get; set; }
+		/// <summary>
+		/// Connection timeout before a connect_error and connect_timeout events are emitted (default 20000ms)
+		/// </summary>
+		public TimeSpan Timeout { get; set; }
 
-        /// <summary>
-        /// Additional query parameters that will be passed for accessed uris. If the value is null, or an empty string it will be not appended to the query only the key.
-        /// <remarks>The keys and values must be escaped properly, as the plugin will not escape these. </remarks>
-        /// </summary>
-        public ObservableDictionary<string, string> AdditionalQueryParams
-        {
-            get { return additionalQueryParams; }
-            set
-            {
-                // Unsubscribe from previous dictionary's events
-                if (additionalQueryParams != null)
-                    additionalQueryParams.CollectionChanged -= AdditionalQueryParams_CollectionChanged;
+		/// <summary>
+		/// By setting this false, you have to call SocketManager's Open() whenever you decide it's appropriate.
+		/// </summary>
+		public bool AutoConnect { get; set; }
 
-                additionalQueryParams = value;
+		/// <summary>
+		/// Additional query parameters that will be passed for accessed uris. If the value is null, or an empty string it will be not appended to the query only the key.
+		/// <remarks>The keys and values must be escaped properly, as the plugin will not escape these. </remarks>
+		/// </summary>
+		public ObservableDictionary<string, string> AdditionalQueryParams
+		{
+			get { return additionalQueryParams; }
+			set
+			{
+				// Unsubscribe from previous dictionary's events
+				if (additionalQueryParams != null)
+					additionalQueryParams.CollectionChanged -= AdditionalQueryParams_CollectionChanged;
 
-                // Clear out the cached value
-                BuiltQueryParams = null;
+				additionalQueryParams = value;
 
-                // Subscribe to the collection changed event
-                if (value != null)
-                    value.CollectionChanged += AdditionalQueryParams_CollectionChanged;
-            }
-        }
-        private ObservableDictionary<string, string> additionalQueryParams;
+				// Clear out the cached value
+				BuiltQueryParams = null;
 
-        /// <summary>
-        /// If it's false, the parameters in the AdditionalQueryParams will be passed for all HTTP requests. Its default value is true.
-        /// </summary>
-        public bool QueryParamsOnlyForHandshake { get; set; }
+				// Subscribe to the collection changed event
+				if (value != null)
+					value.CollectionChanged += AdditionalQueryParams_CollectionChanged;
+			}
+		}
 
-        /// <summary>
-        /// A callback that called for every HTTPRequest the socket.io protocol sends out. It can be used to further customize (add additional request for example) requests.
-        /// </summary>
-        public HTTPRequestCallbackDelegate HTTPRequestCustomizationCallback { get; set; }
+		private ObservableDictionary<string, string> additionalQueryParams;
 
-        /// <summary>
-        /// Starting with Socket.IO v3, connecting to a namespace a client can send payload data. When the Auth callback function is set, the plugin going to call it when connecting to a namespace. Its return value must be a json string!
-        /// </summary>
-        public Func<SocketManager, Socket, object> Auth;
+		/// <summary>
+		/// If it's false, the parameters in the AdditionalQueryParams will be passed for all HTTP requests. Its default value is true.
+		/// </summary>
+		public bool QueryParamsOnlyForHandshake { get; set; }
 
-        /// <summary>
-        /// Customization options for the websocket transport.
-        /// </summary>
-        public WebsocketOptions WebsocketOptions { get; set; } = new WebsocketOptions();
+		/// <summary>
+		/// A callback that called for every HTTPRequest the socket.io protocol sends out. It can be used to further customize (add additional request for example) requests.
+		/// </summary>
+		public HTTPRequestCallbackDelegate HTTPRequestCustomizationCallback { get; set; }
 
-        #endregion
+		/// <summary>
+		/// Starting with Socket.IO v3, connecting to a namespace a client can send payload data. When the Auth callback function is set, the plugin going to call it when connecting to a namespace. Its return value must be a json string!
+		/// </summary>
+		public Func<SocketManager, Socket, object> Auth;
 
-        /// <summary>
-        /// The cached value of the result of the BuildQueryParams() call.
-        /// </summary>
-        private string BuiltQueryParams;
+		/// <summary>
+		/// Customization options for the websocket transport.
+		/// </summary>
+		public WebsocketOptions WebsocketOptions { get; set; } = new WebsocketOptions();
 
-        /// <summary>
-        /// Constructor, setting the default option values.
-        /// </summary>
-        public SocketOptions()
-        {
-            ConnectWith = Transports.TransportTypes.Polling;
-            Reconnection = true;
-            ReconnectionAttempts = int.MaxValue;
-            ReconnectionDelay = TimeSpan.FromMilliseconds(1000);
-            ReconnectionDelayMax = TimeSpan.FromMilliseconds(5000);
-            RandomizationFactor = 0.5f;
-            Timeout = TimeSpan.FromMilliseconds(20000);
-            AutoConnect = true;
-            QueryParamsOnlyForHandshake = true;
-        }
+		#endregion
 
-        #region Helper Functions
+		/// <summary>
+		/// The cached value of the result of the BuildQueryParams() call.
+		/// </summary>
+		private string BuiltQueryParams;
 
-        /// <summary>
-        /// Builds the keys and values from the AdditionalQueryParams to an key=value form. If AdditionalQueryParams is null or empty, it will return an empty string.
-        /// </summary>
-        internal string BuildQueryParams()
-        {
-            if (AdditionalQueryParams == null || AdditionalQueryParams.Count == 0)
-                return string.Empty;
+		/// <summary>
+		/// Constructor, setting the default option values.
+		/// </summary>
+		public SocketOptions()
+		{
+			ConnectWith = Transports.TransportTypes.Polling;
+			Reconnection = true;
+			ReconnectionAttempts = int.MaxValue;
+			ReconnectionDelay = TimeSpan.FromMilliseconds(1000);
+			ReconnectionDelayMax = TimeSpan.FromMilliseconds(5000);
+			RandomizationFactor = 0.5f;
+			Timeout = TimeSpan.FromMilliseconds(20000);
+			AutoConnect = true;
+			QueryParamsOnlyForHandshake = true;
+		}
 
-            if (!string.IsNullOrEmpty(BuiltQueryParams))
-                return BuiltQueryParams;
+		#region Helper Functions
 
-            StringBuilder sb = StringBuilderPool.Get(AdditionalQueryParams.Count * 4); //new StringBuilder(AdditionalQueryParams.Count * 4);
+		/// <summary>
+		/// Builds the keys and values from the AdditionalQueryParams to an key=value form. If AdditionalQueryParams is null or empty, it will return an empty string.
+		/// </summary>
+		internal string BuildQueryParams()
+		{
+			if (AdditionalQueryParams == null || AdditionalQueryParams.Count == 0)
+				return string.Empty;
 
-            foreach(var kvp in AdditionalQueryParams)
-            {
-                sb.Append("&");
-                sb.Append(kvp.Key);
+			if (!string.IsNullOrEmpty(BuiltQueryParams))
+				return BuiltQueryParams;
 
-                if (!string.IsNullOrEmpty(kvp.Value))
-                {
-                    sb.Append("=");
-                    sb.Append(kvp.Value);
-                }
-            }
+			StringBuilder sb = StringBuilderPool.Get(AdditionalQueryParams.Count * 4); //new StringBuilder(AdditionalQueryParams.Count * 4);
 
-            return BuiltQueryParams = StringBuilderPool.ReleaseAndGrab(sb);
-        }
+			foreach (var kvp in AdditionalQueryParams)
+			{
+				sb.Append("&");
+				sb.Append(kvp.Key);
 
-        /// <summary>
-        /// This event will be called when the AdditonalQueryPrams dictionary changed. We have to reset the cached values.
-        /// </summary>
-        private void AdditionalQueryParams_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            BuiltQueryParams = null;
-        }
+				if (!string.IsNullOrEmpty(kvp.Value))
+				{
+					sb.Append("=");
+					sb.Append(kvp.Value);
+				}
+			}
 
-        #endregion
-    }
+			return BuiltQueryParams = StringBuilderPool.ReleaseAndGrab(sb);
+		}
+
+		/// <summary>
+		/// This event will be called when the AdditonalQueryPrams dictionary changed. We have to reset the cached values.
+		/// </summary>
+		private void AdditionalQueryParams_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			BuiltQueryParams = null;
+		}
+
+		#endregion
+	}
 }
 
 #endif

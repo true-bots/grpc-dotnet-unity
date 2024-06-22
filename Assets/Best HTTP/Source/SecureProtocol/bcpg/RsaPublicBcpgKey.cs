@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
@@ -23,8 +22,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		/// <param name="n">The modulus.</param>
 		/// <param name="e">The public exponent.</param>
 		public RsaPublicBcpgKey(
-			BigInteger	n,
-			BigInteger	e)
+			BigInteger n,
+			BigInteger e)
 		{
 			this.n = new MPInteger(n);
 			this.e = new MPInteger(e);

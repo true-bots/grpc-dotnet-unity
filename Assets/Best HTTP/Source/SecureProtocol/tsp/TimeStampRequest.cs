@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp;
@@ -72,12 +71,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 		public int Version
 		{
-            get { return req.Version.IntValueExact; }
+			get { return req.Version.IntValueExact; }
 		}
 
 		public string MessageImprintAlgOid
 		{
-            get { return req.MessageImprint.HashAlgorithm.Algorithm.Id; }
+			get { return req.MessageImprint.HashAlgorithm.Algorithm.Id; }
 		}
 
 		public byte[] GetMessageImprintDigest()
@@ -90,8 +89,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			get
 			{
 				return req.ReqPolicy == null
-					?	null
-					:	req.ReqPolicy.Id;
+					? null
+					: req.ReqPolicy.Id;
 			}
 		}
 
@@ -100,8 +99,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			get
 			{
 				return req.Nonce == null
-					?	null
-					:	req.Nonce.Value;
+					? null
+					: req.Nonce.Value;
 			}
 		}
 
@@ -110,8 +109,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			get
 			{
 				return req.CertReq == null
-					?	false
-					:	req.CertReq.IsTrue;
+					? false
+					: req.CertReq.IsTrue;
 			}
 		}
 
@@ -129,10 +128,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			if (!algorithms.Contains(this.MessageImprintAlgOid))
 				throw new TspValidationException("request contains unknown algorithm", PkiFailureInfo.BadAlg);
 
-            if (policies != null && this.ReqPolicy != null && !policies.Contains(this.ReqPolicy))
+			if (policies != null && this.ReqPolicy != null && !policies.Contains(this.ReqPolicy))
 				throw new TspValidationException("request contains unknown policy", PkiFailureInfo.UnacceptedPolicy);
 
-            if (this.Extensions != null && extensions != null)
+			if (this.Extensions != null && extensions != null)
 			{
 				foreach (DerObjectIdentifier oid in this.Extensions.ExtensionOids)
 				{
@@ -159,7 +158,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		{
 			get { return req.Extensions; }
 		}
-		
+
 		public virtual bool HasExtensions
 		{
 			get { return extensions != null; }

@@ -5,8 +5,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class ProtectedPart
 		: Asn1Encodable
 	{
-        public static ProtectedPart GetInstance(object obj)
-        {
+		public static ProtectedPart GetInstance(object obj)
+		{
 			if (obj is ProtectedPart protectedPart)
 				return protectedPart;
 
@@ -14,9 +14,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new ProtectedPart(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly PkiHeader m_header;
+		private readonly PkiHeader m_header;
 		private readonly PkiBody m_body;
 
 		private ProtectedPart(Asn1Sequence seq)

@@ -1,45 +1,44 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 {
-    public class RsaPublicKeyStructure
-        : Asn1Encodable
-    {
-        private BigInteger modulus;
-        private BigInteger publicExponent;
+	public class RsaPublicKeyStructure
+		: Asn1Encodable
+	{
+		private BigInteger modulus;
+		private BigInteger publicExponent;
 
 		public static RsaPublicKeyStructure GetInstance(
-            Asn1TaggedObject	obj,
-            bool				explicitly)
-        {
-            return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
-        }
+			Asn1TaggedObject obj,
+			bool explicitly)
+		{
+			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
+		}
 
 		public static RsaPublicKeyStructure GetInstance(
-            object obj)
-        {
-            if (obj == null || obj is RsaPublicKeyStructure)
-            {
-                return (RsaPublicKeyStructure) obj;
-            }
+			object obj)
+		{
+			if (obj == null || obj is RsaPublicKeyStructure)
+			{
+				return (RsaPublicKeyStructure)obj;
+			}
 
 			if (obj is Asn1Sequence)
-            {
-                return new RsaPublicKeyStructure((Asn1Sequence) obj);
-            }
+			{
+				return new RsaPublicKeyStructure((Asn1Sequence)obj);
+			}
 
-            throw new ArgumentException("Invalid RsaPublicKeyStructure: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
-        }
+			throw new ArgumentException("Invalid RsaPublicKeyStructure: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+		}
 
 		public RsaPublicKeyStructure(
-            BigInteger	modulus,
-            BigInteger	publicExponent)
-        {
+			BigInteger modulus,
+			BigInteger publicExponent)
+		{
 			if (modulus == null)
 				throw new ArgumentNullException("modulus");
 			if (publicExponent == null)
@@ -49,13 +48,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			if (publicExponent.SignValue <= 0)
 				throw new ArgumentException("Not a valid RSA public exponent", "publicExponent");
 
-            this.modulus = modulus;
-            this.publicExponent = publicExponent;
-        }
+			this.modulus = modulus;
+			this.publicExponent = publicExponent;
+		}
 
 		private RsaPublicKeyStructure(
-            Asn1Sequence seq)
-        {
+			Asn1Sequence seq)
+		{
 			if (seq.Count != 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
 
@@ -65,14 +64,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		}
 
 		public BigInteger Modulus
-        {
-            get { return modulus; }
-        }
+		{
+			get { return modulus; }
+		}
 
 		public BigInteger PublicExponent
-        {
-            get { return publicExponent; }
-        }
+		{
+			get { return publicExponent; }
+		}
 
 		/**
          * This outputs the key in Pkcs1v2 format.
@@ -83,13 +82,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
          *                      }
          * </pre>
          */
-        public override Asn1Object ToAsn1Object()
-        {
+		public override Asn1Object ToAsn1Object()
+		{
 			return new DerSequence(
 				new DerInteger(Modulus),
 				new DerInteger(PublicExponent));
-        }
-    }
+		}
+	}
 }
 #pragma warning restore
 #endif

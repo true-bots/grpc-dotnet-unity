@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -27,12 +26,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj is AccessDescription)
-				return (AccessDescription) obj;
+				return (AccessDescription)obj;
 
 			if (obj is Asn1Sequence)
-				return new AccessDescription((Asn1Sequence) obj);
+				return new AccessDescription((Asn1Sequence)obj);
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		private AccessDescription(
@@ -49,8 +48,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * create an AccessDescription with the oid and location provided.
 		 */
 		public AccessDescription(
-			DerObjectIdentifier	oid,
-			GeneralName			location)
+			DerObjectIdentifier oid,
+			GeneralName location)
 		{
 			accessMethod = oid;
 			accessLocation = location;

@@ -1,14 +1,13 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 {
-    public class DesEdeKeyGenerator
+	public class DesEdeKeyGenerator
 		: DesKeyGenerator
-    {
+	{
 		public DesEdeKeyGenerator()
 		{
 		}
@@ -28,43 +27,42 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
         *
         * @param param the parameters to be used for key generation
         */
-        protected override void EngineInit(KeyGenerationParameters parameters)
-        {
+		protected override void EngineInit(KeyGenerationParameters parameters)
+		{
 			this.random = parameters.Random;
 			this.strength = (parameters.Strength + 7) / 8;
 
 			if (strength == 0 || strength == (168 / 8))
-            {
-                strength = DesEdeParameters.DesEdeKeyLength;
-            }
-            else if (strength == (112 / 8))
-            {
-                strength = 2 * DesEdeParameters.DesKeyLength;
-            }
-            else if (strength != DesEdeParameters.DesEdeKeyLength
-                && strength != (2 * DesEdeParameters.DesKeyLength))
-            {
-                throw new ArgumentException("DESede key must be "
-                    + (DesEdeParameters.DesEdeKeyLength * 8) + " or "
-                    + (2 * 8 * DesEdeParameters.DesKeyLength)
-                    + " bits long.");
-            }
-        }
+			{
+				strength = DesEdeParameters.DesEdeKeyLength;
+			}
+			else if (strength == (112 / 8))
+			{
+				strength = 2 * DesEdeParameters.DesKeyLength;
+			}
+			else if (strength != DesEdeParameters.DesEdeKeyLength
+			         && strength != (2 * DesEdeParameters.DesKeyLength))
+			{
+				throw new ArgumentException("DESede key must be "
+				                            + (DesEdeParameters.DesEdeKeyLength * 8) + " or "
+				                            + (2 * 8 * DesEdeParameters.DesKeyLength)
+				                            + " bits long.");
+			}
+		}
 
-        protected override byte[] EngineGenerateKey()
-        {
-            byte[] newKey = new byte[strength];
+		protected override byte[] EngineGenerateKey()
+		{
+			byte[] newKey = new byte[strength];
 
-            do
-            {
-                random.NextBytes(newKey);
-                DesEdeParameters.SetOddParity(newKey);
-            }
-            while (DesEdeParameters.IsWeakKey(newKey, 0, newKey.Length) || !DesEdeParameters.IsRealEdeKey(newKey, 0));
+			do
+			{
+				random.NextBytes(newKey);
+				DesEdeParameters.SetOddParity(newKey);
+			} while (DesEdeParameters.IsWeakKey(newKey, 0, newKey.Length) || !DesEdeParameters.IsRealEdeKey(newKey, 0));
 
-            return newKey;
-        }
-    }
+			return newKey;
+		}
+	}
 }
 #pragma warning restore
 #endif

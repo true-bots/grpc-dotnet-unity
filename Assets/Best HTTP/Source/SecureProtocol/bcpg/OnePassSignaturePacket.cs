@@ -17,12 +17,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		private int nested;
 
 		internal OnePassSignaturePacket(
-			BcpgInputStream	bcpgIn)
+			BcpgInputStream bcpgIn)
 		{
 			version = bcpgIn.ReadByte();
 			sigType = bcpgIn.ReadByte();
-			hashAlgorithm = (HashAlgorithmTag) bcpgIn.ReadByte();
-			keyAlgorithm = (PublicKeyAlgorithmTag) bcpgIn.ReadByte();
+			hashAlgorithm = (HashAlgorithmTag)bcpgIn.ReadByte();
+			keyAlgorithm = (PublicKeyAlgorithmTag)bcpgIn.ReadByte();
 
 			keyId |= (long)bcpgIn.ReadByte() << 56;
 			keyId |= (long)bcpgIn.ReadByte() << 48;
@@ -37,11 +37,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		}
 
 		public OnePassSignaturePacket(
-			int						sigType,
-			HashAlgorithmTag		hashAlgorithm,
-			PublicKeyAlgorithmTag	keyAlgorithm,
-			long					keyId,
-			bool					isNested)
+			int sigType,
+			HashAlgorithmTag hashAlgorithm,
+			PublicKeyAlgorithmTag keyAlgorithm,
+			long keyId,
+			bool isNested)
 		{
 			this.version = 3;
 			this.sigType = sigType;
@@ -77,7 +77,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		{
 			MemoryStream bOut = new MemoryStream();
 			using (var pOut = new BcpgOutputStream(bOut))
-            {
+			{
 				pOut.Write((byte)version, (byte)sigType, (byte)hashAlgorithm, (byte)keyAlgorithm);
 				pOut.WriteLong(keyId);
 				pOut.WriteByte((byte)nested);

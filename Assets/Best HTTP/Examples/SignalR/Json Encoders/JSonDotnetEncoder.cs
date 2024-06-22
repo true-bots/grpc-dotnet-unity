@@ -1,5 +1,4 @@
 ﻿#if !BESTHTTP_DISABLE_SIGNALR && BESTHTTP_SIGNALR_WITH_JSONDOTNET
-
 using System.Collections.Generic;
 
 using Newtonsoft.Json;

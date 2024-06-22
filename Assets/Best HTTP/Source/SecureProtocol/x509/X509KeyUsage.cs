@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
@@ -29,14 +28,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		: Asn1Encodable
 	{
 		public const int DigitalSignature = 1 << 7;
-		public const int NonRepudiation   = 1 << 6;
-		public const int KeyEncipherment  = 1 << 5;
+		public const int NonRepudiation = 1 << 6;
+		public const int KeyEncipherment = 1 << 5;
 		public const int DataEncipherment = 1 << 4;
-		public const int KeyAgreement     = 1 << 3;
-		public const int KeyCertSign      = 1 << 2;
-		public const int CrlSign          = 1 << 1;
-		public const int EncipherOnly     = 1 << 0;
-		public const int DecipherOnly     = 1 << 15;
+		public const int KeyAgreement = 1 << 3;
+		public const int KeyCertSign = 1 << 2;
+		public const int CrlSign = 1 << 1;
+		public const int EncipherOnly = 1 << 0;
+		public const int DecipherOnly = 1 << 15;
 
 		private readonly int usage;
 

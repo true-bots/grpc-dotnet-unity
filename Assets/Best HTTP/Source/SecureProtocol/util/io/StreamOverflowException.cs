@@ -6,8 +6,8 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 {
-    [Serializable]
-    public class StreamOverflowException
+	[Serializable]
+	public class StreamOverflowException
 		: IOException
 	{
 		public StreamOverflowException()

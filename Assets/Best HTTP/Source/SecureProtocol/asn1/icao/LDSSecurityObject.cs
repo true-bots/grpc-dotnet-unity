@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
@@ -69,15 +68,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 			CheckDatagroupHashSeqSize(datagroupHashSeq.Count);
 
 			datagroupHash = new DataGroupHash[datagroupHashSeq.Count];
-			for (int i= 0; i< datagroupHashSeq.Count; i++)
+			for (int i = 0; i < datagroupHashSeq.Count; i++)
 			{
 				datagroupHash[i] = DataGroupHash.GetInstance(datagroupHashSeq[i]);
 			}
 		}
 
 		public LdsSecurityObject(
-			AlgorithmIdentifier	digestAlgorithmIdentifier,
-			DataGroupHash[]		datagroupHash)
+			AlgorithmIdentifier digestAlgorithmIdentifier,
+			DataGroupHash[] datagroupHash)
 		{
 			this.version = new DerInteger(0);
 			this.digestAlgorithmIdentifier = digestAlgorithmIdentifier;
@@ -88,9 +87,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 
 
 		public LdsSecurityObject(
-			AlgorithmIdentifier	digestAlgorithmIdentifier,
-			DataGroupHash[]		datagroupHash,
-			LdsVersionInfo		versionInfo)
+			AlgorithmIdentifier digestAlgorithmIdentifier,
+			DataGroupHash[] datagroupHash,
+			LdsVersionInfo versionInfo)
 		{
 			this.version = new DerInteger(1);
 			this.digestAlgorithmIdentifier = digestAlgorithmIdentifier;
@@ -103,7 +102,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 		private void CheckDatagroupHashSeqSize(int size)
 		{
 			if (size < 2 || size > UBDataGroups)
-				throw new ArgumentException("wrong size in DataGroupHashValues : not in (2.."+ UBDataGroups +")");
+				throw new ArgumentException("wrong size in DataGroupHashValues : not in (2.." + UBDataGroups + ")");
 		}
 
 		public BigInteger Version
@@ -131,7 +130,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 			DerSequence hashSeq = new DerSequence(datagroupHash);
 
 			Asn1EncodableVector v = new Asn1EncodableVector(version, digestAlgorithmIdentifier, hashSeq);
-            v.AddOptional(versionInfo);
+			v.AddOptional(versionInfo);
 			return new DerSequence(v);
 		}
 	}

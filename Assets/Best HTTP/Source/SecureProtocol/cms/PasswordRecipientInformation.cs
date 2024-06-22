@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -19,11 +18,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class PasswordRecipientInformation
 		: RecipientInformation
 	{
-		private readonly PasswordRecipientInfo	info;
+		private readonly PasswordRecipientInfo info;
 
 		internal PasswordRecipientInformation(
-			PasswordRecipientInfo	info,
-			CmsSecureReadable		secureReadable)
+			PasswordRecipientInfo info,
+			CmsSecureReadable secureReadable)
 			: base(info.KeyEncryptionAlgorithm, secureReadable)
 		{
 			this.info = info;
@@ -50,11 +49,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			try
 			{
 				AlgorithmIdentifier kekAlg = AlgorithmIdentifier.GetInstance(info.KeyEncryptionAlgorithm);
-				Asn1Sequence        kekAlgParams = (Asn1Sequence)kekAlg.Parameters;
-				byte[]              encryptedKey = info.EncryptedKey.GetOctets();
-				string              kekAlgName = DerObjectIdentifier.GetInstance(kekAlgParams[0]).Id;
-				string				cName = CmsEnvelopedHelper.Instance.GetRfc3211WrapperName(kekAlgName);
-				IWrapper			keyWrapper = WrapperUtilities.GetWrapper(cName);
+				Asn1Sequence kekAlgParams = (Asn1Sequence)kekAlg.Parameters;
+				byte[] encryptedKey = info.EncryptedKey.GetOctets();
+				string kekAlgName = DerObjectIdentifier.GetInstance(kekAlgParams[0]).Id;
+				string cName = CmsEnvelopedHelper.Instance.GetRfc3211WrapperName(kekAlgName);
+				IWrapper keyWrapper = WrapperUtilities.GetWrapper(cName);
 
 				byte[] iv = Asn1OctetString.GetInstance(kekAlgParams[1]).GetOctets();
 

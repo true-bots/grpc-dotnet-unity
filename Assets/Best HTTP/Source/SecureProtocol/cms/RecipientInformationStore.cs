@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
@@ -10,6 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class RecipientInformationStore
 	{
 		private readonly IList<RecipientInformation> m_all;
+
 		private readonly IDictionary<RecipientID, IList<RecipientInformation>> m_table =
 			new Dictionary<RecipientID, IList<RecipientInformation>>();
 
@@ -20,14 +20,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				RecipientID rid = recipientInformation.RecipientID;
 
 				if (!m_table.TryGetValue(rid, out var list))
-                {
+				{
 					m_table[rid] = list = new List<RecipientInformation>(1);
 				}
 
 				list.Add(recipientInformation);
 			}
 
-            this.m_all = new List<RecipientInformation>(recipientInfos);
+			this.m_all = new List<RecipientInformation>(recipientInfos);
 		}
 
 		public RecipientInformation this[RecipientID selector]

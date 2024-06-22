@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
@@ -15,16 +14,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		private readonly DerObjectIdentifier publicKeyParamSet;
 
 		protected Gost3410KeyParameters(
-			bool				isPrivate,
-			Gost3410Parameters	parameters)
+			bool isPrivate,
+			Gost3410Parameters parameters)
 			: base(isPrivate)
 		{
 			this.parameters = parameters;
 		}
 
 		protected Gost3410KeyParameters(
-			bool				isPrivate,
-			DerObjectIdentifier	publicKeyParamSet)
+			bool isPrivate,
+			DerObjectIdentifier publicKeyParamSet)
 			: base(isPrivate)
 		{
 			this.parameters = LookupParameters(publicKeyParamSet);

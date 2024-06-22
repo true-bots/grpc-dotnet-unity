@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -11,29 +10,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class DsaDigestSigner
 		: ISigner
 	{
-        private readonly IDsa dsa;
-        private readonly IDigest digest;
-        private readonly IDsaEncoding encoding;
-        private bool forSigning;
+		private readonly IDsa dsa;
+		private readonly IDigest digest;
+		private readonly IDsaEncoding encoding;
+		private bool forSigning;
 
 		public DsaDigestSigner(IDsa dsa, IDigest digest)
 			: this(dsa, digest, StandardDsaEncoding.Instance)
 		{
 		}
 
-        public DsaDigestSigner(IDsa dsa, IDigest digest, IDsaEncoding encoding)
-        {
-            this.dsa = dsa;
-            this.digest = digest;
-            this.encoding = encoding;
-        }
+		public DsaDigestSigner(IDsa dsa, IDigest digest, IDsaEncoding encoding)
+		{
+			this.dsa = dsa;
+			this.digest = digest;
+			this.encoding = encoding;
+		}
 
 		public virtual string AlgorithmName
 		{
 			get { return digest.AlgorithmName + "with" + dsa.AlgorithmName; }
 		}
 
-        public virtual void Init(bool forSigning, ICipherParameters parameters)
+		public virtual void Init(bool forSigning, ICipherParameters parameters)
 		{
 			this.forSigning = forSigning;
 
@@ -58,12 +57,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			dsa.Init(forSigning, parameters);
 		}
 
-        public virtual void Update(byte input)
+		public virtual void Update(byte input)
 		{
 			digest.Update(input);
 		}
 
-        public virtual void BlockUpdate(byte[] input, int inOff, int inLen)
+		public virtual void BlockUpdate(byte[] input, int inOff, int inLen)
 		{
 			digest.BlockUpdate(input, inOff, inLen);
 		}
@@ -83,19 +82,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			byte[] hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
 
-            BigInteger[] sig = dsa.GenerateSignature(hash);
+			BigInteger[] sig = dsa.GenerateSignature(hash);
 
-            try
-            {
-                return encoding.Encode(GetOrder(), sig[0], sig[1]);
-            }
-            catch (Exception)
-            {
-                throw new InvalidOperationException("unable to encode signature");
-            }
+			try
+			{
+				return encoding.Encode(GetOrder(), sig[0], sig[1]);
+			}
+			catch (Exception)
+			{
+				throw new InvalidOperationException("unable to encode signature");
+			}
 		}
 
-        public virtual bool VerifySignature(byte[] signature)
+		public virtual bool VerifySignature(byte[] signature)
 		{
 			if (forSigning)
 				throw new InvalidOperationException("DSADigestSigner not initialised for verification");
@@ -103,27 +102,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			byte[] hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
 
-            try
-            {
-                BigInteger[] sig = encoding.Decode(GetOrder(), signature);
+			try
+			{
+				BigInteger[] sig = encoding.Decode(GetOrder(), signature);
 
-                return dsa.VerifySignature(hash, sig[0], sig[1]);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+				return dsa.VerifySignature(hash, sig[0], sig[1]);
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 
-        public virtual void Reset()
+		public virtual void Reset()
 		{
 			digest.Reset();
 		}
 
-        protected virtual BigInteger GetOrder()
-        {
-            return dsa.Order;
-        }
+		protected virtual BigInteger GetOrder()
+		{
+			return dsa.Order;
+		}
 	}
 }
 #pragma warning restore

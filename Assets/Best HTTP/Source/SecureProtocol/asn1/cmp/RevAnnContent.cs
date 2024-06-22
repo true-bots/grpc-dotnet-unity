@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class RevAnnContent
 		: Asn1Encodable
 	{
-        public static RevAnnContent GetInstance(object obj)
-        {
+		public static RevAnnContent GetInstance(object obj)
+		{
 			if (obj is RevAnnContent revAnnContent)
 				return revAnnContent;
 
@@ -17,31 +17,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new RevAnnContent(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly PkiStatusEncodable m_status;
+		private readonly PkiStatusEncodable m_status;
 		private readonly CertId m_certID;
 		private readonly Asn1GeneralizedTime m_willBeRevokedAt;
 		private readonly Asn1GeneralizedTime m_badSinceDate;
 		private readonly X509Extensions m_crlDetails;
 
-        public RevAnnContent(PkiStatusEncodable status, CertId certID, Asn1GeneralizedTime willBeRevokedAt,
-            Asn1GeneralizedTime badSinceDate)
-            : this(status, certID, willBeRevokedAt, badSinceDate, null)
-        {
+		public RevAnnContent(PkiStatusEncodable status, CertId certID, Asn1GeneralizedTime willBeRevokedAt,
+			Asn1GeneralizedTime badSinceDate)
+			: this(status, certID, willBeRevokedAt, badSinceDate, null)
+		{
 		}
 
-        public RevAnnContent(PkiStatusEncodable status, CertId certID, Asn1GeneralizedTime willBeRevokedAt,
-            Asn1GeneralizedTime badSinceDate, X509Extensions crlDetails)
-        {
-            m_status = status;
-            m_certID = certID;
-            m_willBeRevokedAt = willBeRevokedAt;
-            m_badSinceDate = badSinceDate;
-            m_crlDetails = crlDetails;
-        }
+		public RevAnnContent(PkiStatusEncodable status, CertId certID, Asn1GeneralizedTime willBeRevokedAt,
+			Asn1GeneralizedTime badSinceDate, X509Extensions crlDetails)
+		{
+			m_status = status;
+			m_certID = certID;
+			m_willBeRevokedAt = willBeRevokedAt;
+			m_badSinceDate = badSinceDate;
+			m_crlDetails = crlDetails;
+		}
 
-        private RevAnnContent(Asn1Sequence seq)
+		private RevAnnContent(Asn1Sequence seq)
 		{
 			m_status = PkiStatusEncodable.GetInstance(seq[0]);
 			m_certID = CertId.GetInstance(seq[1]);

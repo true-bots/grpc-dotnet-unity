@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Nist;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Oiw;
@@ -15,304 +14,307 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 {
-    public class Asn1KeyWrapper
-        : IKeyWrapper
-    {
-        private string algorithm;
-        private IKeyWrapper wrapper;
+	public class Asn1KeyWrapper
+		: IKeyWrapper
+	{
+		private string algorithm;
+		private IKeyWrapper wrapper;
 
-        public Asn1KeyWrapper(string algorithm, X509Certificate cert)
-        {
-            this.algorithm = algorithm;
-            wrapper = KeyWrapperUtil.WrapperForName(algorithm, cert.GetPublicKey());
-        }
+		public Asn1KeyWrapper(string algorithm, X509Certificate cert)
+		{
+			this.algorithm = algorithm;
+			wrapper = KeyWrapperUtil.WrapperForName(algorithm, cert.GetPublicKey());
+		}
 
-        public Asn1KeyWrapper(DerObjectIdentifier algorithm, X509Certificate cert)
-             : this(algorithm, cert.GetPublicKey())
-        {
-        }
+		public Asn1KeyWrapper(DerObjectIdentifier algorithm, X509Certificate cert)
+			: this(algorithm, cert.GetPublicKey())
+		{
+		}
 
-        public Asn1KeyWrapper(DerObjectIdentifier algorithm, ICipherParameters key)
-            : this(algorithm, null, key)
-        {
-        }
+		public Asn1KeyWrapper(DerObjectIdentifier algorithm, ICipherParameters key)
+			: this(algorithm, null, key)
+		{
+		}
 
-        public Asn1KeyWrapper(DerObjectIdentifier algorithm, Asn1Encodable parameters, X509Certificate cert)
-            :this(algorithm, parameters, cert.GetPublicKey())
-        {
-        }
+		public Asn1KeyWrapper(DerObjectIdentifier algorithm, Asn1Encodable parameters, X509Certificate cert)
+			: this(algorithm, parameters, cert.GetPublicKey())
+		{
+		}
 
-        public Asn1KeyWrapper(DerObjectIdentifier algorithm, Asn1Encodable parameters, ICipherParameters key)
-        {
-            this.algorithm = algorithm.Id;
-            if (algorithm.Equals(PkcsObjectIdentifiers.IdRsaesOaep))
-            {
-                RsaesOaepParameters oaepParams = RsaesOaepParameters.GetInstance(parameters);
-                WrapperProvider provider;
-                if (oaepParams.MaskGenAlgorithm.Algorithm.Equals(PkcsObjectIdentifiers.IdMgf1))
-                {
-                    AlgorithmIdentifier digAlg = AlgorithmIdentifier.GetInstance(oaepParams.MaskGenAlgorithm.Parameters);
+		public Asn1KeyWrapper(DerObjectIdentifier algorithm, Asn1Encodable parameters, ICipherParameters key)
+		{
+			this.algorithm = algorithm.Id;
+			if (algorithm.Equals(PkcsObjectIdentifiers.IdRsaesOaep))
+			{
+				RsaesOaepParameters oaepParams = RsaesOaepParameters.GetInstance(parameters);
+				WrapperProvider provider;
+				if (oaepParams.MaskGenAlgorithm.Algorithm.Equals(PkcsObjectIdentifiers.IdMgf1))
+				{
+					AlgorithmIdentifier digAlg = AlgorithmIdentifier.GetInstance(oaepParams.MaskGenAlgorithm.Parameters);
 
-                    provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, digAlg.Algorithm);
-                }
-                else
-                {
-                    provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, oaepParams.MaskGenAlgorithm.Algorithm);
-                }
-                wrapper = (IKeyWrapper)provider.CreateWrapper(true, key);
-            }
-            else if (algorithm.Equals(PkcsObjectIdentifiers.RsaEncryption))
-            {
-                wrapper = (IKeyWrapper)new RsaPkcs1Wrapper(true, key);
-            }
-            else
-            {
-                throw new ArgumentException("unknown algorithm: " + algorithm.Id);
-            }
-        }
+					provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, digAlg.Algorithm);
+				}
+				else
+				{
+					provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, oaepParams.MaskGenAlgorithm.Algorithm);
+				}
 
-        public object AlgorithmDetails
-        {
-            get { return wrapper.AlgorithmDetails; }
-        }
+				wrapper = (IKeyWrapper)provider.CreateWrapper(true, key);
+			}
+			else if (algorithm.Equals(PkcsObjectIdentifiers.RsaEncryption))
+			{
+				wrapper = (IKeyWrapper)new RsaPkcs1Wrapper(true, key);
+			}
+			else
+			{
+				throw new ArgumentException("unknown algorithm: " + algorithm.Id);
+			}
+		}
 
-        public IBlockResult Wrap(byte[] keyData)
-        {
-            return wrapper.Wrap(keyData);
-        }
-    }
+		public object AlgorithmDetails
+		{
+			get { return wrapper.AlgorithmDetails; }
+		}
 
-    public class Asn1KeyUnwrapper
-     : IKeyUnwrapper
-    {
-        private string algorithm;
-        private IKeyUnwrapper wrapper;
+		public IBlockResult Wrap(byte[] keyData)
+		{
+			return wrapper.Wrap(keyData);
+		}
+	}
 
-        public Asn1KeyUnwrapper(string algorithm, ICipherParameters key)
-        {
-            this.algorithm = algorithm;
-            wrapper = KeyWrapperUtil.UnwrapperForName(algorithm, key);
-        }
+	public class Asn1KeyUnwrapper
+		: IKeyUnwrapper
+	{
+		private string algorithm;
+		private IKeyUnwrapper wrapper;
 
-        public Asn1KeyUnwrapper(DerObjectIdentifier algorithm, ICipherParameters key)
-            : this(algorithm, null, key)
-        {
-        }
+		public Asn1KeyUnwrapper(string algorithm, ICipherParameters key)
+		{
+			this.algorithm = algorithm;
+			wrapper = KeyWrapperUtil.UnwrapperForName(algorithm, key);
+		}
 
-        public Asn1KeyUnwrapper(DerObjectIdentifier algorithm, Asn1Encodable parameters, ICipherParameters key)
-        {
-            this.algorithm = algorithm.Id;
-            if (algorithm.Equals(PkcsObjectIdentifiers.IdRsaesOaep))
-            {
-                RsaesOaepParameters oaepParams = RsaesOaepParameters.GetInstance(parameters);
-                WrapperProvider provider;
-                if (oaepParams.MaskGenAlgorithm.Algorithm.Equals(PkcsObjectIdentifiers.IdMgf1))
-                {
-                    AlgorithmIdentifier digAlg = AlgorithmIdentifier.GetInstance(oaepParams.MaskGenAlgorithm.Parameters);
+		public Asn1KeyUnwrapper(DerObjectIdentifier algorithm, ICipherParameters key)
+			: this(algorithm, null, key)
+		{
+		}
 
-                    provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, digAlg.Algorithm);
-                }
-                else
-                {
-                    provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, oaepParams.MaskGenAlgorithm.Algorithm);
-                }
-                wrapper = (IKeyUnwrapper)provider.CreateWrapper(false, key);
-            }
-            else if (algorithm.Equals(PkcsObjectIdentifiers.RsaEncryption))
-            {
-                RsaesOaepParameters oaepParams = RsaesOaepParameters.GetInstance(parameters);
-                WrapperProvider provider;
-                if (oaepParams.MaskGenAlgorithm.Algorithm.Equals(PkcsObjectIdentifiers.IdMgf1))
-                {
-                    AlgorithmIdentifier digAlg = AlgorithmIdentifier.GetInstance(oaepParams.MaskGenAlgorithm.Parameters);
+		public Asn1KeyUnwrapper(DerObjectIdentifier algorithm, Asn1Encodable parameters, ICipherParameters key)
+		{
+			this.algorithm = algorithm.Id;
+			if (algorithm.Equals(PkcsObjectIdentifiers.IdRsaesOaep))
+			{
+				RsaesOaepParameters oaepParams = RsaesOaepParameters.GetInstance(parameters);
+				WrapperProvider provider;
+				if (oaepParams.MaskGenAlgorithm.Algorithm.Equals(PkcsObjectIdentifiers.IdMgf1))
+				{
+					AlgorithmIdentifier digAlg = AlgorithmIdentifier.GetInstance(oaepParams.MaskGenAlgorithm.Parameters);
 
-                    provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, digAlg.Algorithm);
-                }
-                else
-                {
-                    provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, oaepParams.MaskGenAlgorithm.Algorithm);
-                }
-                wrapper = (IKeyUnwrapper)new RsaPkcs1Wrapper(false, key);
-            }
-            else
-            {
-                throw new ArgumentException("unknown algorithm: " + algorithm.Id);
-            }
-        }
+					provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, digAlg.Algorithm);
+				}
+				else
+				{
+					provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, oaepParams.MaskGenAlgorithm.Algorithm);
+				}
 
-        public object AlgorithmDetails
-        {
-            get { return wrapper.AlgorithmDetails; }
-        }
+				wrapper = (IKeyUnwrapper)provider.CreateWrapper(false, key);
+			}
+			else if (algorithm.Equals(PkcsObjectIdentifiers.RsaEncryption))
+			{
+				RsaesOaepParameters oaepParams = RsaesOaepParameters.GetInstance(parameters);
+				WrapperProvider provider;
+				if (oaepParams.MaskGenAlgorithm.Algorithm.Equals(PkcsObjectIdentifiers.IdMgf1))
+				{
+					AlgorithmIdentifier digAlg = AlgorithmIdentifier.GetInstance(oaepParams.MaskGenAlgorithm.Parameters);
 
-        public IBlockResult Unwrap(byte[] keyData, int offSet, int length)
-        {
-            return wrapper.Unwrap(keyData, offSet, length);
-        }
-    }
+					provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, digAlg.Algorithm);
+				}
+				else
+				{
+					provider = new RsaOaepWrapperProvider(oaepParams.HashAlgorithm.Algorithm, oaepParams.MaskGenAlgorithm.Algorithm);
+				}
 
-    internal class KeyWrapperUtil
-    {
-        //
-        // Provider 
-        //
-        private static readonly Dictionary<string, WrapperProvider> m_providerMap =
-            new Dictionary<string, WrapperProvider>(StringComparer.OrdinalIgnoreCase);
+				wrapper = (IKeyUnwrapper)new RsaPkcs1Wrapper(false, key);
+			}
+			else
+			{
+				throw new ArgumentException("unknown algorithm: " + algorithm.Id);
+			}
+		}
 
-        static KeyWrapperUtil()
-        {
-            m_providerMap.Add("RSA/ECB/PKCS1PADDING", new RsaOaepWrapperProvider(OiwObjectIdentifiers.IdSha1));
-            m_providerMap.Add("RSA/NONE/PKCS1PADDING", new RsaOaepWrapperProvider(OiwObjectIdentifiers.IdSha1));
-            m_providerMap.Add("RSA/NONE/OAEPWITHSHA1ANDMGF1PADDING", new RsaOaepWrapperProvider(OiwObjectIdentifiers.IdSha1));
-            m_providerMap.Add("RSA/NONE/OAEPWITHSHA224ANDMGF1PADDING", new RsaOaepWrapperProvider(NistObjectIdentifiers.IdSha224));
-            m_providerMap.Add("RSA/NONE/OAEPWITHSHA256ANDMGF1PADDING", new RsaOaepWrapperProvider(NistObjectIdentifiers.IdSha256));
-            m_providerMap.Add("RSA/NONE/OAEPWITHSHA384ANDMGF1PADDING", new RsaOaepWrapperProvider(NistObjectIdentifiers.IdSha384));
-            m_providerMap.Add("RSA/NONE/OAEPWITHSHA512ANDMGF1PADDING", new RsaOaepWrapperProvider(NistObjectIdentifiers.IdSha512));
-            m_providerMap.Add("RSA/NONE/OAEPWITHSHA256ANDMGF1WITHSHA1PADDING", new RsaOaepWrapperProvider(NistObjectIdentifiers.IdSha256, OiwObjectIdentifiers.IdSha1));
-        }
+		public object AlgorithmDetails
+		{
+			get { return wrapper.AlgorithmDetails; }
+		}
 
-        public static IKeyWrapper WrapperForName(string algorithm, ICipherParameters parameters)
-        {
-            if (!m_providerMap.TryGetValue(algorithm, out var provider))
-                throw new ArgumentException("could not resolve " + algorithm + " to a KeyWrapper");
+		public IBlockResult Unwrap(byte[] keyData, int offSet, int length)
+		{
+			return wrapper.Unwrap(keyData, offSet, length);
+		}
+	}
 
-            return (IKeyWrapper)provider.CreateWrapper(true, parameters);
-        }
+	internal class KeyWrapperUtil
+	{
+		//
+		// Provider 
+		//
+		private static readonly Dictionary<string, WrapperProvider> m_providerMap =
+			new Dictionary<string, WrapperProvider>(StringComparer.OrdinalIgnoreCase);
 
-        public static IKeyUnwrapper UnwrapperForName(string algorithm, ICipherParameters parameters)
-        {
-            if (!m_providerMap.TryGetValue(algorithm, out var provider))
-                throw new ArgumentException("could not resolve " + algorithm + " to a KeyUnwrapper");
+		static KeyWrapperUtil()
+		{
+			m_providerMap.Add("RSA/ECB/PKCS1PADDING", new RsaOaepWrapperProvider(OiwObjectIdentifiers.IdSha1));
+			m_providerMap.Add("RSA/NONE/PKCS1PADDING", new RsaOaepWrapperProvider(OiwObjectIdentifiers.IdSha1));
+			m_providerMap.Add("RSA/NONE/OAEPWITHSHA1ANDMGF1PADDING", new RsaOaepWrapperProvider(OiwObjectIdentifiers.IdSha1));
+			m_providerMap.Add("RSA/NONE/OAEPWITHSHA224ANDMGF1PADDING", new RsaOaepWrapperProvider(NistObjectIdentifiers.IdSha224));
+			m_providerMap.Add("RSA/NONE/OAEPWITHSHA256ANDMGF1PADDING", new RsaOaepWrapperProvider(NistObjectIdentifiers.IdSha256));
+			m_providerMap.Add("RSA/NONE/OAEPWITHSHA384ANDMGF1PADDING", new RsaOaepWrapperProvider(NistObjectIdentifiers.IdSha384));
+			m_providerMap.Add("RSA/NONE/OAEPWITHSHA512ANDMGF1PADDING", new RsaOaepWrapperProvider(NistObjectIdentifiers.IdSha512));
+			m_providerMap.Add("RSA/NONE/OAEPWITHSHA256ANDMGF1WITHSHA1PADDING", new RsaOaepWrapperProvider(NistObjectIdentifiers.IdSha256, OiwObjectIdentifiers.IdSha1));
+		}
 
-            return (IKeyUnwrapper)provider.CreateWrapper(false, parameters);
-        }
-    }
+		public static IKeyWrapper WrapperForName(string algorithm, ICipherParameters parameters)
+		{
+			if (!m_providerMap.TryGetValue(algorithm, out var provider))
+				throw new ArgumentException("could not resolve " + algorithm + " to a KeyWrapper");
 
-    internal interface WrapperProvider
-    {
-        object CreateWrapper(bool forWrapping, ICipherParameters parameters);
-    }
+			return (IKeyWrapper)provider.CreateWrapper(true, parameters);
+		}
 
-    internal class RsaPkcs1Wrapper : IKeyWrapper, IKeyUnwrapper
-    {
-        private readonly AlgorithmIdentifier algId;
-        private readonly IAsymmetricBlockCipher engine;
+		public static IKeyUnwrapper UnwrapperForName(string algorithm, ICipherParameters parameters)
+		{
+			if (!m_providerMap.TryGetValue(algorithm, out var provider))
+				throw new ArgumentException("could not resolve " + algorithm + " to a KeyUnwrapper");
 
-        public RsaPkcs1Wrapper(bool forWrapping, ICipherParameters parameters)
-        {
-            this.algId = new AlgorithmIdentifier(
-                                PkcsObjectIdentifiers.RsaEncryption,
-                                DerNull.Instance);
+			return (IKeyUnwrapper)provider.CreateWrapper(false, parameters);
+		}
+	}
 
-            this.engine = new Pkcs1Encoding(new RsaBlindedEngine());
-            this.engine.Init(forWrapping, parameters);
-        }
+	internal interface WrapperProvider
+	{
+		object CreateWrapper(bool forWrapping, ICipherParameters parameters);
+	}
 
-        public object AlgorithmDetails
-        {
-            get { return algId; }
-        }
+	internal class RsaPkcs1Wrapper : IKeyWrapper, IKeyUnwrapper
+	{
+		private readonly AlgorithmIdentifier algId;
+		private readonly IAsymmetricBlockCipher engine;
 
-        public IBlockResult Unwrap(byte[] cipherText, int offset, int length)
-        {
-            return new SimpleBlockResult(engine.ProcessBlock(cipherText, offset, length));
-        }
+		public RsaPkcs1Wrapper(bool forWrapping, ICipherParameters parameters)
+		{
+			this.algId = new AlgorithmIdentifier(
+				PkcsObjectIdentifiers.RsaEncryption,
+				DerNull.Instance);
 
-        public IBlockResult Wrap(byte[] keyData)
-        {
-            return new SimpleBlockResult(engine.ProcessBlock(keyData, 0, keyData.Length));
-        }
-    }
+			this.engine = new Pkcs1Encoding(new RsaBlindedEngine());
+			this.engine.Init(forWrapping, parameters);
+		}
 
-    internal class RsaPkcs1WrapperProvider
-    : WrapperProvider
-    {
-        internal RsaPkcs1WrapperProvider()
-        {
-        }
+		public object AlgorithmDetails
+		{
+			get { return algId; }
+		}
 
-        object WrapperProvider.CreateWrapper(bool forWrapping, ICipherParameters parameters)
-        {
-            return new RsaPkcs1Wrapper(forWrapping, parameters);
-        }
-    }
+		public IBlockResult Unwrap(byte[] cipherText, int offset, int length)
+		{
+			return new SimpleBlockResult(engine.ProcessBlock(cipherText, offset, length));
+		}
 
-    internal class RsaOaepWrapper : IKeyWrapper, IKeyUnwrapper
-    {
-        private readonly AlgorithmIdentifier algId;
-        private readonly IAsymmetricBlockCipher engine;
+		public IBlockResult Wrap(byte[] keyData)
+		{
+			return new SimpleBlockResult(engine.ProcessBlock(keyData, 0, keyData.Length));
+		}
+	}
 
-        public RsaOaepWrapper(bool forWrapping, ICipherParameters parameters, DerObjectIdentifier digestOid)
-            : this(forWrapping, parameters, digestOid, digestOid)
-        {
-        }
+	internal class RsaPkcs1WrapperProvider
+		: WrapperProvider
+	{
+		internal RsaPkcs1WrapperProvider()
+		{
+		}
 
-        public RsaOaepWrapper(bool forWrapping, ICipherParameters parameters, DerObjectIdentifier digestOid, DerObjectIdentifier mgfOid)
-        {
-            AlgorithmIdentifier digestAlgId = new AlgorithmIdentifier(digestOid, DerNull.Instance);
+		object WrapperProvider.CreateWrapper(bool forWrapping, ICipherParameters parameters)
+		{
+			return new RsaPkcs1Wrapper(forWrapping, parameters);
+		}
+	}
 
-            if (mgfOid.Equals(NistObjectIdentifiers.IdShake128) || mgfOid.Equals(NistObjectIdentifiers.IdShake256))
-            {
-                this.algId = new AlgorithmIdentifier(
-                    PkcsObjectIdentifiers.IdRsaesOaep,
-                    new RsaesOaepParameters(
-                        digestAlgId,
-                        new AlgorithmIdentifier(mgfOid),
-                        RsaesOaepParameters.DefaultPSourceAlgorithm));
-            }
-            else
-            {
-                this.algId = new AlgorithmIdentifier(
-                     PkcsObjectIdentifiers.IdRsaesOaep,
-                     new RsaesOaepParameters(
-                         digestAlgId,
-                         new AlgorithmIdentifier(PkcsObjectIdentifiers.IdMgf1, new AlgorithmIdentifier(mgfOid, DerNull.Instance)),
-                         RsaesOaepParameters.DefaultPSourceAlgorithm));
-            }
+	internal class RsaOaepWrapper : IKeyWrapper, IKeyUnwrapper
+	{
+		private readonly AlgorithmIdentifier algId;
+		private readonly IAsymmetricBlockCipher engine;
 
-            this.engine = new OaepEncoding(new RsaBlindedEngine(), DigestUtilities.GetDigest(digestOid), DigestUtilities.GetDigest(mgfOid), null);
-            this.engine.Init(forWrapping, parameters);
-        }
+		public RsaOaepWrapper(bool forWrapping, ICipherParameters parameters, DerObjectIdentifier digestOid)
+			: this(forWrapping, parameters, digestOid, digestOid)
+		{
+		}
 
-        public object AlgorithmDetails
-        {
-            get { return algId; }
-        }
+		public RsaOaepWrapper(bool forWrapping, ICipherParameters parameters, DerObjectIdentifier digestOid, DerObjectIdentifier mgfOid)
+		{
+			AlgorithmIdentifier digestAlgId = new AlgorithmIdentifier(digestOid, DerNull.Instance);
 
-        public IBlockResult Unwrap(byte[] cipherText, int offset, int length)
-        {
-            return new SimpleBlockResult(engine.ProcessBlock(cipherText, offset, length));
-        }
+			if (mgfOid.Equals(NistObjectIdentifiers.IdShake128) || mgfOid.Equals(NistObjectIdentifiers.IdShake256))
+			{
+				this.algId = new AlgorithmIdentifier(
+					PkcsObjectIdentifiers.IdRsaesOaep,
+					new RsaesOaepParameters(
+						digestAlgId,
+						new AlgorithmIdentifier(mgfOid),
+						RsaesOaepParameters.DefaultPSourceAlgorithm));
+			}
+			else
+			{
+				this.algId = new AlgorithmIdentifier(
+					PkcsObjectIdentifiers.IdRsaesOaep,
+					new RsaesOaepParameters(
+						digestAlgId,
+						new AlgorithmIdentifier(PkcsObjectIdentifiers.IdMgf1, new AlgorithmIdentifier(mgfOid, DerNull.Instance)),
+						RsaesOaepParameters.DefaultPSourceAlgorithm));
+			}
 
-        public IBlockResult Wrap(byte[] keyData)
-        {
-            return new SimpleBlockResult(engine.ProcessBlock(keyData, 0, keyData.Length));
-        }
-    }
+			this.engine = new OaepEncoding(new RsaBlindedEngine(), DigestUtilities.GetDigest(digestOid), DigestUtilities.GetDigest(mgfOid), null);
+			this.engine.Init(forWrapping, parameters);
+		}
 
-    internal class RsaOaepWrapperProvider
-        : WrapperProvider
-    {
-        private readonly DerObjectIdentifier digestOid;
-        private readonly DerObjectIdentifier mgfOid;
+		public object AlgorithmDetails
+		{
+			get { return algId; }
+		}
 
-        internal RsaOaepWrapperProvider(DerObjectIdentifier digestOid)
-        {
-            this.digestOid = digestOid;
-            this.mgfOid = digestOid;
-        }
+		public IBlockResult Unwrap(byte[] cipherText, int offset, int length)
+		{
+			return new SimpleBlockResult(engine.ProcessBlock(cipherText, offset, length));
+		}
 
-        internal RsaOaepWrapperProvider(DerObjectIdentifier digestOid, DerObjectIdentifier mgfOid)
-        {
-            this.digestOid = digestOid;
-            this.mgfOid = mgfOid;
-        }
+		public IBlockResult Wrap(byte[] keyData)
+		{
+			return new SimpleBlockResult(engine.ProcessBlock(keyData, 0, keyData.Length));
+		}
+	}
 
-        object WrapperProvider.CreateWrapper(bool forWrapping, ICipherParameters parameters)
-        {
-            return new RsaOaepWrapper(forWrapping, parameters, digestOid, mgfOid);
-        }
-    }
+	internal class RsaOaepWrapperProvider
+		: WrapperProvider
+	{
+		private readonly DerObjectIdentifier digestOid;
+		private readonly DerObjectIdentifier mgfOid;
+
+		internal RsaOaepWrapperProvider(DerObjectIdentifier digestOid)
+		{
+			this.digestOid = digestOid;
+			this.mgfOid = digestOid;
+		}
+
+		internal RsaOaepWrapperProvider(DerObjectIdentifier digestOid, DerObjectIdentifier mgfOid)
+		{
+			this.digestOid = digestOid;
+			this.mgfOid = mgfOid;
+		}
+
+		object WrapperProvider.CreateWrapper(bool forWrapping, ICipherParameters parameters)
+		{
+			return new RsaOaepWrapper(forWrapping, parameters, digestOid, mgfOid);
+		}
+	}
 }
 #pragma warning restore
 #endif

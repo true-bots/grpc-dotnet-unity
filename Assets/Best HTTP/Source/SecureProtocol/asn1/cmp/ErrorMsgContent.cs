@@ -4,32 +4,32 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 {
-    /**
-     * <pre>
-     *      ErrorMsgContent ::= SEQUENCE {
-     *          pKIStatusInfo          PKIStatusInfo,
-     *          errorCode              INTEGER           OPTIONAL,
-     *          -- implementation-specific error codes
-     *          errorDetails           PKIFreeText       OPTIONAL
-     *          -- implementation-specific error details
-     *      }
-     * </pre>
-     */
-    public class ErrorMsgContent
+	/**
+	 * <pre>
+	 *      ErrorMsgContent ::= SEQUENCE {
+	 *          pKIStatusInfo          PKIStatusInfo,
+	 *          errorCode              INTEGER           OPTIONAL,
+	 *          -- implementation-specific error codes
+	 *          errorDetails           PKIFreeText       OPTIONAL
+	 *          -- implementation-specific error details
+	 *      }
+	 * </pre>
+	 */
+	public class ErrorMsgContent
 		: Asn1Encodable
 	{
-        public static ErrorMsgContent GetInstance(object obj)
-        {
-            if (obj is ErrorMsgContent errorMsgContent)
-                return errorMsgContent;
+		public static ErrorMsgContent GetInstance(object obj)
+		{
+			if (obj is ErrorMsgContent errorMsgContent)
+				return errorMsgContent;
 
-            if (obj != null)
-                return new ErrorMsgContent(Asn1Sequence.GetInstance(obj));
+			if (obj != null)
+				return new ErrorMsgContent(Asn1Sequence.GetInstance(obj));
 
-            return null;
-        }
+			return null;
+		}
 
-        private readonly PkiStatusInfo m_pkiStatusInfo;
+		private readonly PkiStatusInfo m_pkiStatusInfo;
 		private readonly DerInteger m_errorCode;
 		private readonly PkiFreeText m_errorDetails;
 
@@ -57,9 +57,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		}
 
 		public ErrorMsgContent(
-			PkiStatusInfo	pkiStatusInfo,
-			DerInteger		errorCode,
-			PkiFreeText		errorDetails)
+			PkiStatusInfo pkiStatusInfo,
+			DerInteger errorCode,
+			PkiFreeText errorDetails)
 		{
 			if (pkiStatusInfo == null)
 				throw new ArgumentNullException(nameof(pkiStatusInfo));

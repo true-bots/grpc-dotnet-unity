@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
@@ -19,22 +18,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class CrlOcspRef
 		: Asn1Encodable
 	{
-		private readonly CrlListID		crlids;
-		private readonly OcspListID		ocspids;
-		private readonly OtherRevRefs	otherRev;
+		private readonly CrlListID crlids;
+		private readonly OcspListID ocspids;
+		private readonly OtherRevRefs otherRev;
 
 		public static CrlOcspRef GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is CrlOcspRef)
-				return (CrlOcspRef) obj;
+				return (CrlOcspRef)obj;
 
 			if (obj is Asn1Sequence)
-				return new CrlOcspRef((Asn1Sequence) obj);
+				return new CrlOcspRef((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'CrlOcspRef' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -66,9 +65,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		}
 
 		public CrlOcspRef(
-			CrlListID		crlids,
-			OcspListID		ocspids,
-			OtherRevRefs	otherRev)
+			CrlListID crlids,
+			OcspListID ocspids,
+			OtherRevRefs otherRev)
 		{
 			this.crlids = crlids;
 			this.ocspids = ocspids;

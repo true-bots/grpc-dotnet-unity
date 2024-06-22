@@ -15,16 +15,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			this.accuracy = accuracy;
 		}
 
-		public int Seconds { get { return GetTimeComponent(accuracy.Seconds); } }
+		public int Seconds
+		{
+			get { return GetTimeComponent(accuracy.Seconds); }
+		}
 
-		public int Millis { get { return GetTimeComponent(accuracy.Millis); } }
+		public int Millis
+		{
+			get { return GetTimeComponent(accuracy.Millis); }
+		}
 
-		public int Micros { get { return GetTimeComponent(accuracy.Micros); } }
+		public int Micros
+		{
+			get { return GetTimeComponent(accuracy.Micros); }
+		}
 
 		private int GetTimeComponent(
 			DerInteger time)
 		{
-            return time == null ? 0 : time.IntValueExact;
+			return time == null ? 0 : time.IntValueExact;
 		}
 
 		public override string ToString()

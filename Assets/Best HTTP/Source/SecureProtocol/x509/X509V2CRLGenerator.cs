@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -63,9 +62,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		* or 0 if CrlReason is not to be used
 		**/
 		public void AddCrlEntry(
-			BigInteger	userCertificate,
-			DateTime	revocationDate,
-			int			reason)
+			BigInteger userCertificate,
+			DateTime revocationDate,
+			int reason)
 		{
 			tbsGen.AddCrlEntry(new DerInteger(userCertificate), new Time(revocationDate), reason);
 		}
@@ -76,10 +75,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		* or 0 if CrlReason is not to be used
 		**/
 		public void AddCrlEntry(
-			BigInteger	userCertificate,
-			DateTime	revocationDate,
-			int			reason,
-			DateTime	invalidityDate)
+			BigInteger userCertificate,
+			DateTime revocationDate,
+			int reason,
+			DateTime invalidityDate)
 		{
 			tbsGen.AddCrlEntry(new DerInteger(userCertificate), new Time(revocationDate), reason,
 				new Asn1GeneralizedTime(invalidityDate));
@@ -89,9 +88,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		* Add a CRL entry with extensions.
 		**/
 		public void AddCrlEntry(
-			BigInteger		userCertificate,
-			DateTime		revocationDate,
-			X509Extensions	extensions)
+			BigInteger userCertificate,
+			DateTime revocationDate,
+			X509Extensions extensions)
 		{
 			tbsGen.AddCrlEntry(new DerInteger(userCertificate), new Time(revocationDate), extensions);
 		}
@@ -116,7 +115,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 					{
 						tbsGen.AddCrlEntry(
 							Asn1Sequence.GetInstance(
-							Asn1Object.FromByteArray(entry.GetEncoded())));
+								Asn1Object.FromByteArray(entry.GetEncoded())));
 					}
 					catch (IOException e)
 					{
@@ -130,9 +129,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		* add a given extension field for the standard extensions tag (tag 0)
 		*/
 		public void AddExtension(
-			string			oid,
-			bool			critical,
-			Asn1Encodable	extensionValue)
+			string oid,
+			bool critical,
+			Asn1Encodable extensionValue)
 		{
 			extGenerator.AddExtension(new DerObjectIdentifier(oid), critical, extensionValue);
 		}
@@ -141,9 +140,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		* add a given extension field for the standard extensions tag (tag 0)
 		*/
 		public void AddExtension(
-			DerObjectIdentifier	oid,
-			bool				critical,
-			Asn1Encodable		extensionValue)
+			DerObjectIdentifier oid,
+			bool critical,
+			Asn1Encodable extensionValue)
 		{
 			extGenerator.AddExtension(oid, critical, extensionValue);
 		}
@@ -152,9 +151,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		* add a given extension field for the standard extensions tag (tag 0)
 		*/
 		public void AddExtension(
-			string	oid,
-			bool	critical,
-			byte[]	extensionValue)
+			string oid,
+			bool critical,
+			byte[] extensionValue)
 		{
 			extGenerator.AddExtension(new DerObjectIdentifier(oid), critical, new DerOctetString(extensionValue));
 		}
@@ -163,9 +162,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		* add a given extension field for the standard extensions tag (tag 0)
 		*/
 		public void AddExtension(
-			DerObjectIdentifier	oid,
-			bool				critical,
-			byte[]				extensionValue)
+			DerObjectIdentifier oid,
+			bool critical,
+			byte[] extensionValue)
 		{
 			extGenerator.AddExtension(oid, critical, new DerOctetString(extensionValue));
 		}
@@ -177,7 +176,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		/// algorithm details.</param>
 		/// <returns>An <see cref="X509Crl"/>.</returns>
 		public X509Crl Generate(ISignatureFactory signatureFactory)
-        {
+		{
 			var sigAlgID = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
 
 			tbsGen.SetSignature(sigAlgID);
@@ -189,7 +188,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			TbsCertificateList tbsCertList = tbsGen.GenerateTbsCertList();
 
-            IStreamCalculator<IBlockResult> streamCalculator = signatureFactory.CreateCalculator();
+			IStreamCalculator<IBlockResult> streamCalculator = signatureFactory.CreateCalculator();
 			using (Stream sigStream = streamCalculator.Stream)
 			{
 				tbsCertList.EncodeTo(sigStream, Asn1Encodable.Der);

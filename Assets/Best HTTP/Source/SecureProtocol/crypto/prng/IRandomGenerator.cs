@@ -15,9 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
         void AddSeedMaterial(ReadOnlySpan<byte> seed);
 #endif
 
-        /// <summary>Add more seed material to the generator.</summary>
-        /// <param name="seed">A long value to be mixed into the generator's state.</param>
-        void AddSeedMaterial(long seed);
+		/// <summary>Add more seed material to the generator.</summary>
+		/// <param name="seed">A long value to be mixed into the generator's state.</param>
+		void AddSeedMaterial(long seed);
 
 		/// <summary>Fill byte array with random values.</summary>
 		/// <param name="bytes">Array to be filled.</param>

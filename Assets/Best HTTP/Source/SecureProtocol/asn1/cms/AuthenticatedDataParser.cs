@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
@@ -29,31 +28,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	 */
 	public class AuthenticatedDataParser
 	{
-	    private Asn1SequenceParser	seq;
-	    private DerInteger			version;
-	    private IAsn1Convertible	nextObject;
-	    private bool				originatorInfoCalled;
+		private Asn1SequenceParser seq;
+		private DerInteger version;
+		private IAsn1Convertible nextObject;
+		private bool originatorInfoCalled;
 
-	    public AuthenticatedDataParser(
-	        Asn1SequenceParser	seq)
-	    {
-	        this.seq = seq;
-	        this.version = (DerInteger)seq.ReadObject();
-	    }
+		public AuthenticatedDataParser(
+			Asn1SequenceParser seq)
+		{
+			this.seq = seq;
+			this.version = (DerInteger)seq.ReadObject();
+		}
 
-	    public DerInteger Version
-	    {
-	        get { return version; }
-	    }
+		public DerInteger Version
+		{
+			get { return version; }
+		}
 
-	    public OriginatorInfo GetOriginatorInfo()
-	    {
-	        originatorInfoCalled = true;
+		public OriginatorInfo GetOriginatorInfo()
+		{
+			originatorInfoCalled = true;
 
-	        if (nextObject == null)
-	        {
-	            nextObject = seq.ReadObject();
-	        }
+			if (nextObject == null)
+			{
+				nextObject = seq.ReadObject();
+			}
 
 			if (nextObject is Asn1TaggedObjectParser o)
 			{
@@ -65,42 +64,42 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 				}
 			}
 
-	        return null;
-	    }
+			return null;
+		}
 
-	    public Asn1SetParser GetRecipientInfos()
-	    {
-	        if (!originatorInfoCalled)
-	        {
-	            GetOriginatorInfo();
-	        }
+		public Asn1SetParser GetRecipientInfos()
+		{
+			if (!originatorInfoCalled)
+			{
+				GetOriginatorInfo();
+			}
 
-	        if (nextObject == null)
-	        {
-	            nextObject = seq.ReadObject();
-	        }
+			if (nextObject == null)
+			{
+				nextObject = seq.ReadObject();
+			}
 
-	        Asn1SetParser recipientInfos = (Asn1SetParser)nextObject;
-	        nextObject = null;
-	        return recipientInfos;
-	    }
+			Asn1SetParser recipientInfos = (Asn1SetParser)nextObject;
+			nextObject = null;
+			return recipientInfos;
+		}
 
-	    public AlgorithmIdentifier GetMacAlgorithm()
-	    {
-	        if (nextObject == null)
-	        {
-	            nextObject = seq.ReadObject();
-	        }
+		public AlgorithmIdentifier GetMacAlgorithm()
+		{
+			if (nextObject == null)
+			{
+				nextObject = seq.ReadObject();
+			}
 
-	        if (nextObject != null)
-	        {
-	            Asn1SequenceParser o = (Asn1SequenceParser)nextObject;
-	            nextObject = null;
-	            return AlgorithmIdentifier.GetInstance(o.ToAsn1Object());
-	        }
+			if (nextObject != null)
+			{
+				Asn1SequenceParser o = (Asn1SequenceParser)nextObject;
+				nextObject = null;
+				return AlgorithmIdentifier.GetInstance(o.ToAsn1Object());
+			}
 
-	        return null;
-	    }
+			return null;
+		}
 
 		public AlgorithmIdentifier GetDigestAlgorithm()
 		{
@@ -120,29 +119,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			return null;
 		}
 
-	    public ContentInfoParser GetEnapsulatedContentInfo()
-	    {
-	        if (nextObject == null)
-	        {
-	            nextObject = seq.ReadObject();
-	        }
+		public ContentInfoParser GetEnapsulatedContentInfo()
+		{
+			if (nextObject == null)
+			{
+				nextObject = seq.ReadObject();
+			}
 
-	        if (nextObject != null)
-	        {
-	            Asn1SequenceParser o = (Asn1SequenceParser)nextObject;
-	            nextObject = null;
-	            return new ContentInfoParser(o);
-	        }
+			if (nextObject != null)
+			{
+				Asn1SequenceParser o = (Asn1SequenceParser)nextObject;
+				nextObject = null;
+				return new ContentInfoParser(o);
+			}
 
-	        return null;
-	    }
+			return null;
+		}
 
-	    public Asn1SetParser GetAuthAttrs()
-	    {
-	        if (nextObject == null)
-	        {
-	            nextObject = seq.ReadObject();
-	        }
+		public Asn1SetParser GetAuthAttrs()
+		{
+			if (nextObject == null)
+			{
+				nextObject = seq.ReadObject();
+			}
 
 			if (nextObject is Asn1TaggedObjectParser o)
 			{
@@ -150,28 +149,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 				return (Asn1SetParser)Asn1Utilities.ParseContextBaseUniversal(o, 2, false, Asn1Tags.SetOf);
 			}
 
-	        return null;
-	    }
+			return null;
+		}
 
-	    public Asn1OctetString GetMac()
-	    {
-	        if (nextObject == null)
-	        {
-	            nextObject = seq.ReadObject();
-	        }
+		public Asn1OctetString GetMac()
+		{
+			if (nextObject == null)
+			{
+				nextObject = seq.ReadObject();
+			}
 
-	        IAsn1Convertible o = nextObject;
-	        nextObject = null;
+			IAsn1Convertible o = nextObject;
+			nextObject = null;
 
-	        return Asn1OctetString.GetInstance(o.ToAsn1Object());
-	    }
+			return Asn1OctetString.GetInstance(o.ToAsn1Object());
+		}
 
-	    public Asn1SetParser GetUnauthAttrs()
-	    {
-	        if (nextObject == null)
-	        {
-	            nextObject = seq.ReadObject();
-	        }
+		public Asn1SetParser GetUnauthAttrs()
+		{
+			if (nextObject == null)
+			{
+				nextObject = seq.ReadObject();
+			}
 
 			if (nextObject != null)
 			{
@@ -180,8 +179,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 				return (Asn1SetParser)Asn1Utilities.ParseContextBaseUniversal(o, 3, false, Asn1Tags.SetOf);
 			}
 
-	        return null;
-	    }
+			return null;
+		}
 	}
 }
 #pragma warning restore

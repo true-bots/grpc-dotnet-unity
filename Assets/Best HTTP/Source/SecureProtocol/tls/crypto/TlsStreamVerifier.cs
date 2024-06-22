@@ -5,14 +5,14 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 {
-    public interface TlsStreamVerifier
-    {
-        /// <exception cref="IOException"/>
-        Stream Stream { get; }
+	public interface TlsStreamVerifier
+	{
+		/// <exception cref="IOException"/>
+		Stream Stream { get; }
 
-        /// <exception cref="IOException"/>
-        bool IsVerified();
-    }
+		/// <exception cref="IOException"/>
+		bool IsVerified();
+	}
 }
 #pragma warning restore
 #endif

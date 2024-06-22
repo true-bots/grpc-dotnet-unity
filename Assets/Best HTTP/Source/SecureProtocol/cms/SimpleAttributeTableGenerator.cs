@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms

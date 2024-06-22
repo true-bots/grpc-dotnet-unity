@@ -10,27 +10,27 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Compression
 {
-    internal static class ZLib
-    {
-        internal static Stream CompressOutput(Stream stream, int zlibCompressionLevel, bool leaveOpen = false)
-        {
+	internal static class ZLib
+	{
+		internal static Stream CompressOutput(Stream stream, int zlibCompressionLevel, bool leaveOpen = false)
+		{
 #if NET6_0_OR_GREATER
             return new ZLibStream(stream, GetCompressionLevel(zlibCompressionLevel), leaveOpen);
 #else
-            return leaveOpen
-                ?   new ZOutputStreamLeaveOpen(stream, zlibCompressionLevel, false)
-                :   new ZOutputStream(stream, zlibCompressionLevel, false);
+			return leaveOpen
+				? new ZOutputStreamLeaveOpen(stream, zlibCompressionLevel, false)
+				: new ZOutputStream(stream, zlibCompressionLevel, false);
 #endif
-        }
+		}
 
-        internal static Stream DecompressInput(Stream stream)
-        {
+		internal static Stream DecompressInput(Stream stream)
+		{
 #if NET6_0_OR_GREATER
             return new ZLibStream(stream, CompressionMode.Decompress, leaveOpen: false);
 #else
-            return new ZInputStream(stream);
+			return new ZInputStream(stream);
 #endif
-        }
+		}
 
 #if NET6_0_OR_GREATER
         internal static CompressionLevel GetCompressionLevel(int zlibCompressionLevel)
@@ -44,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Compression
             };
         }
 #endif
-    }
+	}
 }
 #pragma warning restore
 #endif

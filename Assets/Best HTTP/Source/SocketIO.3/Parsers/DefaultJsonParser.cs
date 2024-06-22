@@ -3,308 +3,307 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using BestHTTP.PlatformSupport.Memory;
 using BestHTTP.SocketIO3.Events;
 
 namespace BestHTTP.SocketIO3.Parsers
 {
-    public sealed class Placeholder
-    {
-        public bool _placeholder;
-        public int num;
-    }
+	public sealed class Placeholder
+	{
+		public bool _placeholder;
+		public int num;
+	}
 
-    [PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
-    public sealed class DefaultJsonParser : IParser
-    {
-        static DefaultJsonParser()
-        {
-            BestHTTP.JSON.LitJson.JsonMapper.RegisterImporter<string, byte[]>(str => Convert.FromBase64String(str));
-        }
+	[PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	public sealed class DefaultJsonParser : IParser
+	{
+		static DefaultJsonParser()
+		{
+			BestHTTP.JSON.LitJson.JsonMapper.RegisterImporter<string, byte[]>(str => Convert.FromBase64String(str));
+		}
 
-        private IncomingPacket PacketWithAttachment = IncomingPacket.Empty;
+		private IncomingPacket PacketWithAttachment = IncomingPacket.Empty;
 
-        private int ToInt(char ch)
-        {
-            int charValue = Convert.ToInt32(ch);
-            int num = charValue - '0';
-            if (num < 0 || num > 9)
-                return -1;
+		private int ToInt(char ch)
+		{
+			int charValue = Convert.ToInt32(ch);
+			int num = charValue - '0';
+			if (num < 0 || num > 9)
+				return -1;
 
-            return num;
-        }
+			return num;
+		}
 
-        public IncomingPacket Parse(SocketManager manager, string from)
-        {
-            int idx = 0;
-            var transportEvent = (TransportEventTypes)ToInt(from[idx++]);
-            var socketIOEvent = SocketIOEventTypes.Unknown;
-            var nsp = string.Empty;
-            var id = -1;
-            var payload = string.Empty;
-            int attachments = 0;
+		public IncomingPacket Parse(SocketManager manager, string from)
+		{
+			int idx = 0;
+			var transportEvent = (TransportEventTypes)ToInt(from[idx++]);
+			var socketIOEvent = SocketIOEventTypes.Unknown;
+			var nsp = string.Empty;
+			var id = -1;
+			var payload = string.Empty;
+			int attachments = 0;
 
-            if (from.Length > idx && ToInt(from[idx]) >= 0)
-                socketIOEvent = (SocketIOEventTypes)ToInt(from[idx++]);
-            else
-                socketIOEvent = SocketIOEventTypes.Unknown;
+			if (from.Length > idx && ToInt(from[idx]) >= 0)
+				socketIOEvent = (SocketIOEventTypes)ToInt(from[idx++]);
+			else
+				socketIOEvent = SocketIOEventTypes.Unknown;
 
-            // Parse Attachment
-            if (socketIOEvent == SocketIOEventTypes.BinaryEvent || socketIOEvent == SocketIOEventTypes.BinaryAck)
-            {
-                int endIdx = from.IndexOf('-', idx);
-                if (endIdx == -1)
-                    endIdx = from.Length;
+			// Parse Attachment
+			if (socketIOEvent == SocketIOEventTypes.BinaryEvent || socketIOEvent == SocketIOEventTypes.BinaryAck)
+			{
+				int endIdx = from.IndexOf('-', idx);
+				if (endIdx == -1)
+					endIdx = from.Length;
 
-                int.TryParse(from.Substring(idx, endIdx - idx), out attachments);
+				int.TryParse(from.Substring(idx, endIdx - idx), out attachments);
 
-                idx = endIdx + 1;
-            }
+				idx = endIdx + 1;
+			}
 
-            // Parse Namespace
-            if (from.Length > idx && from[idx] == '/')
-            {
-                int endIdx = from.IndexOf(',', idx);
-                if (endIdx == -1)
-                    endIdx = from.Length;
+			// Parse Namespace
+			if (from.Length > idx && from[idx] == '/')
+			{
+				int endIdx = from.IndexOf(',', idx);
+				if (endIdx == -1)
+					endIdx = from.Length;
 
-                nsp = from.Substring(idx, endIdx - idx);
-                idx = endIdx + 1;
-            }
-            else
-                nsp = "/";
+				nsp = from.Substring(idx, endIdx - idx);
+				idx = endIdx + 1;
+			}
+			else
+				nsp = "/";
 
-            // Parse Id
-            if (from.Length > idx && ToInt(from[idx]) >= 0)
-            {
-                int startIdx = idx++;
-                while (from.Length > idx && ToInt(from[idx]) >= 0)
-                    idx++;
+			// Parse Id
+			if (from.Length > idx && ToInt(from[idx]) >= 0)
+			{
+				int startIdx = idx++;
+				while (from.Length > idx && ToInt(from[idx]) >= 0)
+					idx++;
 
-                int.TryParse(from.Substring(startIdx, idx - startIdx), out id);
-            }
+				int.TryParse(from.Substring(startIdx, idx - startIdx), out id);
+			}
 
-            // What left is the payload data
-            if (from.Length > idx)
-                payload = from.Substring(idx);
-            else
-                payload = string.Empty;
+			// What left is the payload data
+			if (from.Length > idx)
+				payload = from.Substring(idx);
+			else
+				payload = string.Empty;
 
-            var packet = new IncomingPacket(transportEvent, socketIOEvent, nsp, id);
-            packet.AttachementCount = attachments;
+			var packet = new IncomingPacket(transportEvent, socketIOEvent, nsp, id);
+			packet.AttachementCount = attachments;
 
-            string eventName = packet.EventName;
-            object[] args = null;
+			string eventName = packet.EventName;
+			object[] args = null;
 
-            switch (socketIOEvent)
-            {
-                case SocketIOEventTypes.Unknown:
-                    packet.DecodedArg = payload;
-                    break;
+			switch (socketIOEvent)
+			{
+				case SocketIOEventTypes.Unknown:
+					packet.DecodedArg = payload;
+					break;
 
-                case SocketIOEventTypes.Connect:
-                    // No Data | Object
-                    if (!string.IsNullOrEmpty(payload))
-                        (eventName, args) = ReadData(manager, packet, payload);
-                    break;
+				case SocketIOEventTypes.Connect:
+					// No Data | Object
+					if (!string.IsNullOrEmpty(payload))
+						(eventName, args) = ReadData(manager, packet, payload);
+					break;
 
-                case SocketIOEventTypes.Disconnect:
-                    // No Data
-                    break;
+				case SocketIOEventTypes.Disconnect:
+					// No Data
+					break;
 
-                case SocketIOEventTypes.Error:
-                    // String | Object
-                    (eventName, args) = ReadData(manager, packet, payload);
-                    break;
+				case SocketIOEventTypes.Error:
+					// String | Object
+					(eventName, args) = ReadData(manager, packet, payload);
+					break;
 
-                case SocketIOEventTypes.BinaryAck:
-                    // Save payload until all attachments arrive
-                    if (packet.AttachementCount > 0)
-                        packet.DecodedArg = payload;
-                    break;
+				case SocketIOEventTypes.BinaryAck:
+					// Save payload until all attachments arrive
+					if (packet.AttachementCount > 0)
+						packet.DecodedArg = payload;
+					break;
 
-                default:
-                    // Array
-                    (eventName, args) = ReadData(manager, packet, payload);
-                    // Save payload until all attachments arrive
-                    if (packet.AttachementCount > 0)
-                        packet.DecodedArg = payload;
-                    break;
-            }
+				default:
+					// Array
+					(eventName, args) = ReadData(manager, packet, payload);
+					// Save payload until all attachments arrive
+					if (packet.AttachementCount > 0)
+						packet.DecodedArg = payload;
+					break;
+			}
 
-            packet.EventName = eventName;
-            
-            if (args != null)
-            {
-                if (args.Length == 1)
-                    packet.DecodedArg = args[0];
-                else
-                    packet.DecodedArgs = args;
-            }
+			packet.EventName = eventName;
 
-            if (packet.AttachementCount > 0)
-            {
-                PacketWithAttachment = packet;
-                return IncomingPacket.Empty;
-            }
+			if (args != null)
+			{
+				if (args.Length == 1)
+					packet.DecodedArg = args[0];
+				else
+					packet.DecodedArgs = args;
+			}
 
-            return packet;
-        }
+			if (packet.AttachementCount > 0)
+			{
+				PacketWithAttachment = packet;
+				return IncomingPacket.Empty;
+			}
 
-        public IncomingPacket MergeAttachements(SocketManager manager, IncomingPacket packet)
-        {
-            string payload = packet.DecodedArg as string;
-            packet.DecodedArg = null;
+			return packet;
+		}
 
-            string placeholderFormat = "{{\"_placeholder\":true,\"num\":{0}}}";
+		public IncomingPacket MergeAttachements(SocketManager manager, IncomingPacket packet)
+		{
+			string payload = packet.DecodedArg as string;
+			packet.DecodedArg = null;
 
-            for (int i = 0; i < packet.Attachements.Count; ++i)
-            {
-                string placeholder = string.Format(placeholderFormat, i);
-                BufferSegment data = packet.Attachements[i];
+			string placeholderFormat = "{{\"_placeholder\":true,\"num\":{0}}}";
 
-                payload = payload.Replace(placeholder, "\"" + Convert.ToBase64String(data.Data, data.Offset, data.Count) + "\"");
-            }
+			for (int i = 0; i < packet.Attachements.Count; ++i)
+			{
+				string placeholder = string.Format(placeholderFormat, i);
+				BufferSegment data = packet.Attachements[i];
 
-            (string eventName, object[] args) = ReadData(manager, packet, payload);
+				payload = payload.Replace(placeholder, "\"" + Convert.ToBase64String(data.Data, data.Offset, data.Count) + "\"");
+			}
 
-            packet.EventName = eventName;
-            
-            if (args != null)
-            {
-                if (args.Length == 1)
-                    packet.DecodedArg = args[0];
-                else
-                    packet.DecodedArgs = args;
-            }
+			(string eventName, object[] args) = ReadData(manager, packet, payload);
 
-            return packet;
-        }
+			packet.EventName = eventName;
 
-        private (string, object[]) ReadData(SocketManager manager, IncomingPacket packet, string payload)
-        {
-            Socket socket = manager.GetSocket(packet.Namespace);
+			if (args != null)
+			{
+				if (args.Length == 1)
+					packet.DecodedArg = args[0];
+				else
+					packet.DecodedArgs = args;
+			}
 
-            string eventName = packet.EventName;
-            Subscription subscription = socket.GetSubscription(eventName);
+			return packet;
+		}
 
-            object[] args = null;
+		private (string, object[]) ReadData(SocketManager manager, IncomingPacket packet, string payload)
+		{
+			Socket socket = manager.GetSocket(packet.Namespace);
 
-            switch (packet.SocketIOEvent)
-            {
-                case SocketIOEventTypes.Unknown:
-                    // TODO: Error?
-                    break;
+			string eventName = packet.EventName;
+			Subscription subscription = socket.GetSubscription(eventName);
 
-                case SocketIOEventTypes.Connect:
-                    // No Data | Object
-                    using (var strReader = new System.IO.StringReader(payload))
-                        args = ReadParameters(socket, subscription, strReader);
-                    break;
+			object[] args = null;
 
-                case SocketIOEventTypes.Disconnect:
-                    // No Data
-                    break;
+			switch (packet.SocketIOEvent)
+			{
+				case SocketIOEventTypes.Unknown:
+					// TODO: Error?
+					break;
 
-                case SocketIOEventTypes.Error:
-                    // String | Object
-                    switch (payload[0])
-                    {
-                        case '{':
-                            using (var strReader = new System.IO.StringReader(payload))
-                                args = ReadParameters(socket, subscription, strReader);
-                            break;
+				case SocketIOEventTypes.Connect:
+					// No Data | Object
+					using (var strReader = new System.IO.StringReader(payload))
+						args = ReadParameters(socket, subscription, strReader);
+					break;
 
-                        default:
-                            args = new object[] { new Error(payload) };
-                            break;
+				case SocketIOEventTypes.Disconnect:
+					// No Data
+					break;
 
-                    }
-                    break;
+				case SocketIOEventTypes.Error:
+					// String | Object
+					switch (payload[0])
+					{
+						case '{':
+							using (var strReader = new System.IO.StringReader(payload))
+								args = ReadParameters(socket, subscription, strReader);
+							break;
 
-                case SocketIOEventTypes.Ack:
-                case SocketIOEventTypes.BinaryAck:
-                    eventName = IncomingPacket.GenerateAcknowledgementNameFromId(packet.Id);
-                    subscription = socket.GetSubscription(eventName);
+						default:
+							args = new object[] { new Error(payload) };
+							break;
+					}
 
-                    args = ReadParameters(socket, subscription, JSON.LitJson.JsonMapper.ToObject<List<object>>(payload), 0);
-                    
-                    break;
+					break;
 
-                default:
-                    // Array
+				case SocketIOEventTypes.Ack:
+				case SocketIOEventTypes.BinaryAck:
+					eventName = IncomingPacket.GenerateAcknowledgementNameFromId(packet.Id);
+					subscription = socket.GetSubscription(eventName);
 
-                    List<object> array = null;
-                    using (var reader = new System.IO.StringReader(payload))
-                        array = JSON.LitJson.JsonMapper.ToObject<List<object>>(new JSON.LitJson.JsonReader(reader));
+					args = ReadParameters(socket, subscription, JSON.LitJson.JsonMapper.ToObject<List<object>>(payload), 0);
 
-                    if (array.Count > 0)
-                    {
-                        eventName = array[0].ToString();
-                        subscription = socket.GetSubscription(eventName);
-                    }
+					break;
 
-                    if (packet.AttachementCount == 0 || packet.Attachements != null)
-                    {
-                        try
-                        {
-                            args = ReadParameters(socket, subscription, array, 1);
-                        }
-                        catch(Exception ex)
-                        {
-                            HTTPManager.Logger.Exception("DefaultJsonParser", string.Format("ReadParameters with eventName: {0}", eventName), ex);
-                        }
-                    }
+				default:
+					// Array
 
-                    break;
-            }
+					List<object> array = null;
+					using (var reader = new System.IO.StringReader(payload))
+						array = JSON.LitJson.JsonMapper.ToObject<List<object>>(new JSON.LitJson.JsonReader(reader));
 
-            return (eventName, args);
-        }
+					if (array.Count > 0)
+					{
+						eventName = array[0].ToString();
+						subscription = socket.GetSubscription(eventName);
+					}
 
-        private object[] ReadParameters(Socket socket, Subscription subscription, List<object> array, int startIdx)
-        {
-            object[] args = null;
+					if (packet.AttachementCount == 0 || packet.Attachements != null)
+					{
+						try
+						{
+							args = ReadParameters(socket, subscription, array, 1);
+						}
+						catch (Exception ex)
+						{
+							HTTPManager.Logger.Exception("DefaultJsonParser", string.Format("ReadParameters with eventName: {0}", eventName), ex);
+						}
+					}
 
-            if (array.Count > startIdx)
-            {
-                var desc = subscription != null ? subscription.callbacks.FirstOrDefault() : default(CallbackDescriptor);
-                int paramCount = desc.ParamTypes != null ? desc.ParamTypes.Length : 0;
+					break;
+			}
 
-                int arrayIdx = startIdx;
-                if (paramCount > 0)
-                {
-                    args = new object[paramCount];
+			return (eventName, args);
+		}
 
-                    for (int i = 0; i < desc.ParamTypes.Length; ++i)
-                    {
-                        Type type = desc.ParamTypes[i];
+		private object[] ReadParameters(Socket socket, Subscription subscription, List<object> array, int startIdx)
+		{
+			object[] args = null;
 
-                        if (type == typeof(Socket))
-                            args[i] = socket;
-                        else if (type == typeof(SocketManager))
-                            args[i] = socket.Manager;
-                        else if (type == typeof(Placeholder))
-                            args[i] = new Placeholder();
-                        else
-                            args[i] = ConvertTo(desc.ParamTypes[i], array[arrayIdx++]);
-                    }
-                }
-            }
+			if (array.Count > startIdx)
+			{
+				var desc = subscription != null ? subscription.callbacks.FirstOrDefault() : default(CallbackDescriptor);
+				int paramCount = desc.ParamTypes != null ? desc.ParamTypes.Length : 0;
 
-            return args;
-        }
+				int arrayIdx = startIdx;
+				if (paramCount > 0)
+				{
+					args = new object[paramCount];
 
-        public object ConvertTo(Type toType, object obj)
-        {
-            if (obj == null)
-                return null;
+					for (int i = 0; i < desc.ParamTypes.Length; ++i)
+					{
+						Type type = desc.ParamTypes[i];
+
+						if (type == typeof(Socket))
+							args[i] = socket;
+						else if (type == typeof(SocketManager))
+							args[i] = socket.Manager;
+						else if (type == typeof(Placeholder))
+							args[i] = new Placeholder();
+						else
+							args[i] = ConvertTo(desc.ParamTypes[i], array[arrayIdx++]);
+					}
+				}
+			}
+
+			return args;
+		}
+
+		public object ConvertTo(Type toType, object obj)
+		{
+			if (obj == null)
+				return null;
 
 #if NETFX_CORE
             TypeInfo objType = obj.GetType().GetTypeInfo();
 #else
-            Type objType = obj.GetType();
+			Type objType = obj.GetType();
 #endif
 
 #if NETFX_CORE
@@ -314,249 +313,257 @@ namespace BestHTTP.SocketIO3.Parsers
 #if NETFX_CORE
             if (typeInfo.IsEnum)
 #else
-            if (toType.IsEnum)
+			if (toType.IsEnum)
 #endif
-                return Enum.Parse(toType, obj.ToString(), true);
+				return Enum.Parse(toType, obj.ToString(), true);
 
 #if NETFX_CORE
             if (typeInfo.IsPrimitive)
 #else
-            if (toType.IsPrimitive)
+			if (toType.IsPrimitive)
 #endif
-                return Convert.ChangeType(obj, toType);
+				return Convert.ChangeType(obj, toType);
 
-            if (toType == typeof(string))
-                return obj.ToString();
+			if (toType == typeof(string))
+				return obj.ToString();
 
 #if NETFX_CORE
             if (typeInfo.IsGenericType && toType.Name == "Nullable`1")
                 return Convert.ChangeType(obj, toType.GenericTypeArguments[0]);
 #else
-            if (toType.IsGenericType && toType.Name == "Nullable`1")
-                return Convert.ChangeType(obj, toType.GetGenericArguments()[0]);
+			if (toType.IsGenericType && toType.Name == "Nullable`1")
+				return Convert.ChangeType(obj, toType.GetGenericArguments()[0]);
 #endif
 
 #if NETFX_CORE
             if (objType.Equals(typeInfo))
 #else
-            if (objType.Equals(toType))
+			if (objType.Equals(toType))
 #endif
-                return obj;
+				return obj;
 
-            if (toType == typeof(byte[]) && objType == typeof(string))
-                return Convert.FromBase64String(obj.ToString());
+			if (toType == typeof(byte[]) && objType == typeof(string))
+				return Convert.FromBase64String(obj.ToString());
 
-            return JSON.LitJson.JsonMapper.ToObject(toType, JSON.LitJson.JsonMapper.ToJson(obj));
-        }
+			return JSON.LitJson.JsonMapper.ToObject(toType, JSON.LitJson.JsonMapper.ToJson(obj));
+		}
 
-        private object[] ReadParameters(Socket socket, Subscription subscription, System.IO.TextReader reader)
-        {
-            var desc = subscription != null ? subscription.callbacks.FirstOrDefault() : default(CallbackDescriptor);
-            int paramCount = desc.ParamTypes != null ? desc.ParamTypes.Length : 0;
-            object[] args = null;
+		private object[] ReadParameters(Socket socket, Subscription subscription, System.IO.TextReader reader)
+		{
+			var desc = subscription != null ? subscription.callbacks.FirstOrDefault() : default(CallbackDescriptor);
+			int paramCount = desc.ParamTypes != null ? desc.ParamTypes.Length : 0;
+			object[] args = null;
 
-            if (paramCount > 0)
-            {
-                args = new object[paramCount];
+			if (paramCount > 0)
+			{
+				args = new object[paramCount];
 
-                for (int i = 0; i < desc.ParamTypes.Length; ++i)
-                {
-                    Type type = desc.ParamTypes[i];
+				for (int i = 0; i < desc.ParamTypes.Length; ++i)
+				{
+					Type type = desc.ParamTypes[i];
 
-                    if (type == typeof(Socket))
-                        args[i] = socket;
-                    else if (type == typeof(SocketManager))
-                        args[i] = socket.Manager;
-                    else {
-                        BestHTTP.JSON.LitJson.JsonReader jr = new JSON.LitJson.JsonReader(reader);
-                        args[i] = JSON.LitJson.JsonMapper.ToObject(desc.ParamTypes[i], jr);
-                        reader.Read();
-                    }
-                }
-            }
+					if (type == typeof(Socket))
+						args[i] = socket;
+					else if (type == typeof(SocketManager))
+						args[i] = socket.Manager;
+					else
+					{
+						BestHTTP.JSON.LitJson.JsonReader jr = new JSON.LitJson.JsonReader(reader);
+						args[i] = JSON.LitJson.JsonMapper.ToObject(desc.ParamTypes[i], jr);
+						reader.Read();
+					}
+				}
+			}
 
-            return args;
-        }
+			return args;
+		}
 
-        public IncomingPacket Parse(SocketManager manager, BufferSegment data, TransportEventTypes transportEvent = TransportEventTypes.Unknown)
-        {
-            IncomingPacket packet = IncomingPacket.Empty;
+		public IncomingPacket Parse(SocketManager manager, BufferSegment data, TransportEventTypes transportEvent = TransportEventTypes.Unknown)
+		{
+			IncomingPacket packet = IncomingPacket.Empty;
 
-            if (PacketWithAttachment.Attachements == null)
-                PacketWithAttachment.Attachements = new List<BufferSegment>(PacketWithAttachment.AttachementCount);
-            PacketWithAttachment.Attachements.Add(data);
-            
-            if (PacketWithAttachment.Attachements.Count == PacketWithAttachment.AttachementCount)
-            {
-                packet = manager.Parser.MergeAttachements(manager, PacketWithAttachment);
-                PacketWithAttachment = IncomingPacket.Empty;
-            }
+			if (PacketWithAttachment.Attachements == null)
+				PacketWithAttachment.Attachements = new List<BufferSegment>(PacketWithAttachment.AttachementCount);
+			PacketWithAttachment.Attachements.Add(data);
 
-            return packet;
-        }
+			if (PacketWithAttachment.Attachements.Count == PacketWithAttachment.AttachementCount)
+			{
+				packet = manager.Parser.MergeAttachements(manager, PacketWithAttachment);
+				PacketWithAttachment = IncomingPacket.Empty;
+			}
 
-        public OutgoingPacket CreateOutgoing(TransportEventTypes transportEvent, string payload)
-        {
-            return new OutgoingPacket { Payload = "" + (char)('0' + (byte)transportEvent) + payload };
-        }
+			return packet;
+		}
 
-        private StringBuilder builder = new StringBuilder();
-        public OutgoingPacket CreateOutgoing(Socket socket, SocketIOEventTypes socketIOEvent, int id, string name, object arg)
-        {
-            return CreateOutgoing(socket, socketIOEvent, id, name, arg != null ? new object[] { arg } : null);
-        }
+		public OutgoingPacket CreateOutgoing(TransportEventTypes transportEvent, string payload)
+		{
+			return new OutgoingPacket { Payload = "" + (char)('0' + (byte)transportEvent) + payload };
+		}
 
-        private int GetBinaryCount(object[] args)
-        {
-            if (args == null || args.Length == 0)
-                return 0;
+		private StringBuilder builder = new StringBuilder();
 
-            int count = 0;
-            for (int i = 0; i < args.Length; ++i)
-                if (args[i] is byte[])
-                    count++;
+		public OutgoingPacket CreateOutgoing(Socket socket, SocketIOEventTypes socketIOEvent, int id, string name, object arg)
+		{
+			return CreateOutgoing(socket, socketIOEvent, id, name, arg != null ? new object[] { arg } : null);
+		}
 
-            return count;
-        }
-        public OutgoingPacket CreateOutgoing(Socket socket, SocketIOEventTypes socketIOEvent, int id, string name, object[] args)
-        {
-            builder.Length = 0;
-            List<byte[]> attachements = null;
+		private int GetBinaryCount(object[] args)
+		{
+			if (args == null || args.Length == 0)
+				return 0;
 
-            switch(socketIOEvent)
-            {
-                case SocketIOEventTypes.Ack:
-                    if (GetBinaryCount(args) > 0)
-                    {
-                        attachements = CreatePlaceholders(args);
-                        socketIOEvent = SocketIOEventTypes.BinaryAck;
-                    }
-                    break;
+			int count = 0;
+			for (int i = 0; i < args.Length; ++i)
+				if (args[i] is byte[])
+					count++;
 
-                case SocketIOEventTypes.Event:
-                    if (GetBinaryCount(args) > 0)
-                    {
-                        attachements = CreatePlaceholders(args);
-                        socketIOEvent = SocketIOEventTypes.BinaryEvent;
-                    }
-                    break;
-            }
+			return count;
+		}
 
-            builder.Append(((int)TransportEventTypes.Message).ToString());
-            builder.Append(((int)socketIOEvent).ToString());
+		public OutgoingPacket CreateOutgoing(Socket socket, SocketIOEventTypes socketIOEvent, int id, string name, object[] args)
+		{
+			builder.Length = 0;
+			List<byte[]> attachements = null;
 
-            if (socketIOEvent == SocketIOEventTypes.BinaryEvent || socketIOEvent == SocketIOEventTypes.BinaryAck)
-            {
-                builder.Append(attachements.Count.ToString());
-                builder.Append('-');
-            }
+			switch (socketIOEvent)
+			{
+				case SocketIOEventTypes.Ack:
+					if (GetBinaryCount(args) > 0)
+					{
+						attachements = CreatePlaceholders(args);
+						socketIOEvent = SocketIOEventTypes.BinaryAck;
+					}
 
-            // Add the namespace. If there is any other then the root nsp ("/")
-            // then we have to add a trailing "," if we have more data.
-            bool nspAdded = false;
-            if (socket.Namespace != "/")
-            {
-                builder.Append(socket.Namespace);
-                nspAdded = true;
-            }
+					break;
 
-            // ack id, if any
-            if (id >= 0)
-            {
-                if (nspAdded)
-                {
-                    builder.Append(',');
-                    nspAdded = false;
-                }
+				case SocketIOEventTypes.Event:
+					if (GetBinaryCount(args) > 0)
+					{
+						attachements = CreatePlaceholders(args);
+						socketIOEvent = SocketIOEventTypes.BinaryEvent;
+					}
 
-                builder.Append(id.ToString());
-            }
+					break;
+			}
 
-            // payload
-            switch (socketIOEvent)
-            {
-                case SocketIOEventTypes.Connect:
-                    // No Data | Object
-                    if (args != null && args.Length > 0)
-                    {
-                        if (nspAdded) builder.Append(',');
+			builder.Append(((int)TransportEventTypes.Message).ToString());
+			builder.Append(((int)socketIOEvent).ToString());
 
-                        builder.Append(BestHTTP.JSON.LitJson.JsonMapper.ToJson(args[0]));
-                    }
-                    break;
+			if (socketIOEvent == SocketIOEventTypes.BinaryEvent || socketIOEvent == SocketIOEventTypes.BinaryAck)
+			{
+				builder.Append(attachements.Count.ToString());
+				builder.Append('-');
+			}
 
-                case SocketIOEventTypes.Disconnect:
-                    // No Data
-                    break;
+			// Add the namespace. If there is any other then the root nsp ("/")
+			// then we have to add a trailing "," if we have more data.
+			bool nspAdded = false;
+			if (socket.Namespace != "/")
+			{
+				builder.Append(socket.Namespace);
+				nspAdded = true;
+			}
 
-                case SocketIOEventTypes.Error:
-                    // String | Object
-                    if (args != null && args.Length > 0)
-                    {
-                        if (nspAdded) builder.Append(',');
+			// ack id, if any
+			if (id >= 0)
+			{
+				if (nspAdded)
+				{
+					builder.Append(',');
+					nspAdded = false;
+				}
 
-                        builder.Append(BestHTTP.JSON.LitJson.JsonMapper.ToJson(args[0]));
-                    }
-                    break;
+				builder.Append(id.ToString());
+			}
 
-                case SocketIOEventTypes.Ack:
-                case SocketIOEventTypes.BinaryAck:
-                    if (nspAdded) builder.Append(',');
+			// payload
+			switch (socketIOEvent)
+			{
+				case SocketIOEventTypes.Connect:
+					// No Data | Object
+					if (args != null && args.Length > 0)
+					{
+						if (nspAdded) builder.Append(',');
 
-                    if (args != null && args.Length > 0)
-                    {
-                        var argsJson = JSON.LitJson.JsonMapper.ToJson(args);
-                        builder.Append(argsJson);
-                    }
-                    else
-                        builder.Append("[]");
-                    break;
+						builder.Append(BestHTTP.JSON.LitJson.JsonMapper.ToJson(args[0]));
+					}
 
-                default:
-                    if (nspAdded) builder.Append(',');
+					break;
 
-                    // Array
-                    builder.Append('[');
-                    if (!string.IsNullOrEmpty(name))
-                    {
-                        builder.Append('\"');
-                        builder.Append(name);
-                        builder.Append('\"');
-                    }
+				case SocketIOEventTypes.Disconnect:
+					// No Data
+					break;
 
-                    if (args != null && args.Length > 0)
-                    {
-                        builder.Append(',');
-                        var argsJson = JSON.LitJson.JsonMapper.ToJson(args);
-                        builder.Append(argsJson, 1, argsJson.Length - 2);                        
-                    }
+				case SocketIOEventTypes.Error:
+					// String | Object
+					if (args != null && args.Length > 0)
+					{
+						if (nspAdded) builder.Append(',');
 
-                    builder.Append(']');
-                    break;
-            }
+						builder.Append(BestHTTP.JSON.LitJson.JsonMapper.ToJson(args[0]));
+					}
 
-            return new OutgoingPacket { Payload = builder.ToString(), Attachements = attachements };
-        }
+					break;
 
-        private List<byte[]> CreatePlaceholders(object[] args)
-        {
-            List<byte[]> attachements = null;
+				case SocketIOEventTypes.Ack:
+				case SocketIOEventTypes.BinaryAck:
+					if (nspAdded) builder.Append(',');
 
-            for (int i = 0; i < args.Length; ++i)
-            {
-                var binary = args[i] as byte[];
-                if (binary != null)
-                {
-                    if (attachements == null)
-                        attachements = new List<byte[]>();
-                    attachements.Add(binary);
+					if (args != null && args.Length > 0)
+					{
+						var argsJson = JSON.LitJson.JsonMapper.ToJson(args);
+						builder.Append(argsJson);
+					}
+					else
+						builder.Append("[]");
 
-                    args[i] = new Placeholder { _placeholder = true, num = attachements.Count - 1 };
-                }
-            }
+					break;
 
-            return attachements;
-        }
-    }
+				default:
+					if (nspAdded) builder.Append(',');
+
+					// Array
+					builder.Append('[');
+					if (!string.IsNullOrEmpty(name))
+					{
+						builder.Append('\"');
+						builder.Append(name);
+						builder.Append('\"');
+					}
+
+					if (args != null && args.Length > 0)
+					{
+						builder.Append(',');
+						var argsJson = JSON.LitJson.JsonMapper.ToJson(args);
+						builder.Append(argsJson, 1, argsJson.Length - 2);
+					}
+
+					builder.Append(']');
+					break;
+			}
+
+			return new OutgoingPacket { Payload = builder.ToString(), Attachements = attachements };
+		}
+
+		private List<byte[]> CreatePlaceholders(object[] args)
+		{
+			List<byte[]> attachements = null;
+
+			for (int i = 0; i < args.Length; ++i)
+			{
+				var binary = args[i] as byte[];
+				if (binary != null)
+				{
+					if (attachements == null)
+						attachements = new List<byte[]>();
+					attachements.Add(binary);
+
+					args[i] = new Placeholder { _placeholder = true, num = attachements.Count - 1 };
+				}
+			}
+
+			return attachements;
+		}
+	}
 }
 #endif

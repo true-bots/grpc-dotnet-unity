@@ -2,81 +2,82 @@ using System;
 
 namespace BestHTTP.Timings
 {
-    public struct TimingEvent : IEquatable<TimingEvent>
-    {
-        public static readonly TimingEvent Empty = new TimingEvent(null, TimeSpan.Zero);
-        /// <summary>
-        /// Name of the event
-        /// </summary>
-        public readonly string Name;
+	public struct TimingEvent : IEquatable<TimingEvent>
+	{
+		public static readonly TimingEvent Empty = new TimingEvent(null, TimeSpan.Zero);
 
-        /// <summary>
-        /// Duration of the event.
-        /// </summary>
-        public readonly TimeSpan Duration;
+		/// <summary>
+		/// Name of the event
+		/// </summary>
+		public readonly string Name;
 
-        /// <summary>
-        /// When the event occurred.
-        /// </summary>
-        public readonly DateTime When;
+		/// <summary>
+		/// Duration of the event.
+		/// </summary>
+		public readonly TimeSpan Duration;
 
-        public TimingEvent(string name, TimeSpan duration)
-        {
-            this.Name = name;
-            this.Duration = duration;
-            this.When = DateTime.Now;
-        }
+		/// <summary>
+		/// When the event occurred.
+		/// </summary>
+		public readonly DateTime When;
 
-        public TimingEvent(string name, DateTime when, TimeSpan duration)
-        {
-            this.Name = name;
-            this.When = when;
-            this.Duration = duration;
-        }
+		public TimingEvent(string name, TimeSpan duration)
+		{
+			this.Name = name;
+			this.Duration = duration;
+			this.When = DateTime.Now;
+		}
 
-        public TimeSpan CalculateDuration(TimingEvent @event)
-        {
-            if (this.When < @event.When)
-                return @event.When - this.When;
+		public TimingEvent(string name, DateTime when, TimeSpan duration)
+		{
+			this.Name = name;
+			this.When = when;
+			this.Duration = duration;
+		}
 
-            return this.When - @event.When;
-        }
+		public TimeSpan CalculateDuration(TimingEvent @event)
+		{
+			if (this.When < @event.When)
+				return @event.When - this.When;
 
-        public bool Equals(TimingEvent other)
-        {
-            return this.Name == other.Name &&
-                   this.Duration == other.Duration &&
-                   this.When == other.When;
-        }
+			return this.When - @event.When;
+		}
 
-        public override bool Equals(object obj)
-        {
-            if (obj is TimingEvent)
-                return this.Equals((TimingEvent)obj);
+		public bool Equals(TimingEvent other)
+		{
+			return this.Name == other.Name &&
+			       this.Duration == other.Duration &&
+			       this.When == other.When;
+		}
 
-            return false;
-        }
+		public override bool Equals(object obj)
+		{
+			if (obj is TimingEvent)
+				return this.Equals((TimingEvent)obj);
 
-        public override int GetHashCode()
-        {
-            return (this.Name != null ? this.Name.GetHashCode() : 0) ^
-                this.Duration.GetHashCode() ^
-                this.When.GetHashCode();
-        }
+			return false;
+		}
 
-        public static bool operator ==(TimingEvent lhs, TimingEvent rhs)
-        {
-            return lhs.Equals(rhs);
-        }
+		public override int GetHashCode()
+		{
+			return (this.Name != null ? this.Name.GetHashCode() : 0) ^
+			       this.Duration.GetHashCode() ^
+			       this.When.GetHashCode();
+		}
 
-        public static bool operator !=(TimingEvent lhs, TimingEvent rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
+		public static bool operator==(TimingEvent lhs, TimingEvent rhs)
+		{
+			return lhs.Equals(rhs);
+		}
 
-        public override string ToString()
-        {
-            return string.Format("['{0}': {1}]", this.Name, this.Duration);
-        }
-    }
+		public static bool operator!=(TimingEvent lhs, TimingEvent rhs)
+		{
+			return !lhs.Equals(rhs);
+		}
+
+		public override string ToString()
+		{
+			return string.Format("['{0}': {1}]", this.Name, this.Duration);
+		}
+	}
 }

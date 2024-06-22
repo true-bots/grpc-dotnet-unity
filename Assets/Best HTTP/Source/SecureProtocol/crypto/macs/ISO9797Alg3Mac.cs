@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings;
@@ -48,8 +47,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		* @param padding the padding to be used to complete the last block.
 		*/
 		public ISO9797Alg3Mac(
-			IBlockCipher		cipher,
-			IBlockCipherPadding	padding)
+			IBlockCipher cipher,
+			IBlockCipherPadding padding)
 			: this(cipher, cipher.GetBlockSize() * 8, padding)
 		{
 		}
@@ -68,8 +67,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		* @param macSizeInBits the size of the MAC in bits, must be a multiple of 8.
 		*/
 		public ISO9797Alg3Mac(
-			IBlockCipher	cipher,
-			int				macSizeInBits)
+			IBlockCipher cipher,
+			int macSizeInBits)
 			: this(cipher, macSizeInBits, null)
 		{
 		}
@@ -90,9 +89,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		* @param padding the padding to be used to complete the last block.
 		*/
 		public ISO9797Alg3Mac(
-			IBlockCipher		cipher,
-			int					macSizeInBits,
-			IBlockCipherPadding	padding)
+			IBlockCipher cipher,
+			int macSizeInBits,
+			IBlockCipherPadding padding)
 		{
 			if ((macSizeInBits % 8) != 0)
 				throw new ArgumentException("MAC size must be multiple of 8");
@@ -140,13 +139,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			byte[] keyvalue = kp.GetKey();
 
 			if (keyvalue.Length == 16)
-			{ // Double length DES key
+			{
+				// Double length DES key
 				key1 = new KeyParameter(keyvalue, 0, 8);
 				this.lastKey2 = new KeyParameter(keyvalue, 8, 8);
 				this.lastKey3 = key1;
 			}
 			else if (keyvalue.Length == 24)
-			{ // Triple length DES key
+			{
+				// Triple length DES key
 				key1 = new KeyParameter(keyvalue, 0, 8);
 				this.lastKey2 = new KeyParameter(keyvalue, 8, 8);
 				this.lastKey3 = new KeyParameter(keyvalue, 16, 8);

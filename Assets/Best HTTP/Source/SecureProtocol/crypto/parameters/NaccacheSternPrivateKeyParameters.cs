@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
@@ -34,11 +33,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		 *            the private modulus phi(n) = (p-1)(q-1)
 		 */
 		public NaccacheSternPrivateKeyParameters(
-			BigInteger	g,
-			BigInteger	n,
-			int			lowerSigmaBound,
+			BigInteger g,
+			BigInteger n,
+			int lowerSigmaBound,
 			IList<BigInteger> smallPrimes,
-			BigInteger	phiN)
+			BigInteger phiN)
 			: base(true, g, n, lowerSigmaBound)
 		{
 			this.smallPrimes = smallPrimes;
@@ -50,11 +49,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			get { return phiN; }
 		}
 
-        public IList<BigInteger> SmallPrimesList
-        {
-            get { return smallPrimes; }
-        }
-    }
+		public IList<BigInteger> SmallPrimesList
+		{
+			get { return smallPrimes; }
+		}
+	}
 }
 #pragma warning restore
 #endif

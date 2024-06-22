@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -88,6 +87,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 							names.Add(genNames[j]);
 						}
 					}
+
 					if (dpName.PointType == DistributionPointName.NameRelativeToCrlIssuer)
 					{
 						var seq = Asn1Sequence.GetInstance(crl.IssuerDN.ToAsn1Object());
@@ -97,10 +97,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						{
 							vec.Add(element);
 						}
+
 						vec.Add(dpName.Name);
 
 						names.Add(new GeneralName(X509Name.GetInstance(new DerSequence(vec))));
 					}
+
 					bool matches = false;
 					// verify that one of the names in the IDP matches one
 					// of the names in the DP.
@@ -112,6 +114,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						{
 							genNames = GeneralNames.GetInstance(dpName.Name).GetNames();
 						}
+
 						if (dpName.PointType == DistributionPointName.NameRelativeToCrlIssuer)
 						{
 							if (dp.CrlIssuer != null)
@@ -131,6 +134,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 									throw new Exception("Could not read certificate issuer.", e);
 								}
 							}
+
 							for (int j = 0; j < genNames.Length; j++)
 							{
 								var seq = Asn1Sequence.GetInstance(genNames[j].Name.ToAsn1Object());
@@ -140,11 +144,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 								{
 									vec.Add(element);
 								}
+
 								vec.Add(dpName.Name);
 
 								genNames[j] = new GeneralName(X509Name.GetInstance(new DerSequence(vec)));
 							}
 						}
+
 						if (genNames != null)
 						{
 							for (int j = 0; j < genNames.Length; j++)
@@ -156,22 +162,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 								}
 							}
 						}
+
 						if (!matches)
 						{
 							throw new Exception(
 								"No match for certificate CRL issuing distribution point name to cRLIssuer CRL distribution point.");
 						}
 					}
-						// verify that one of the names in
-						// the IDP matches one of the names in the cRLIssuer field of
-						// the DP
+					// verify that one of the names in
+					// the IDP matches one of the names in the cRLIssuer field of
+					// the DP
 					else
 					{
 						if (dp.CrlIssuer == null)
 						{
 							throw new Exception("Either the cRLIssuer or the distributionPoint field must "
-								+ "be contained in DistributionPoint.");
+							                    + "be contained in DistributionPoint.");
 						}
+
 						GeneralName[] genNames = dp.CrlIssuer.GetNames();
 						for (int j = 0; j < genNames.Length; j++)
 						{
@@ -181,6 +189,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 								break;
 							}
 						}
+
 						if (!matches)
 						{
 							throw new Exception(
@@ -188,6 +197,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						}
 					}
 				}
+
 				BasicConstraints bc = null;
 				try
 				{
@@ -224,9 +234,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		/// <exception cref="PkixCertPathValidatorException"/>
 		internal static void ProcessCertBC(
-			PkixCertPath				certPath,
-			int							index,
-			PkixNameConstraintValidator	nameConstraintValidator)
+			PkixCertPath certPath,
+			int index,
+			PkixNameConstraintValidator nameConstraintValidator)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -289,6 +299,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 							"Subtree check for certificate subject alternative email failed.", ex, index);
 					}
 				}
+
 				if (altName != null)
 				{
 					GeneralName[] genNames = null;
@@ -301,6 +312,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						throw new PkixCertPathValidatorException(
 							"Subject alternative name contents could not be decoded.", e, index);
 					}
+
 					foreach (GeneralName genName in genNames)
 					{
 						try
@@ -338,6 +350,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				throw new PkixCertPathValidatorException(
 					"Policy mappings extension could not be decoded.", ex, index);
 			}
+
 			if (pm != null)
 			{
 				Asn1Sequence mappings = pm;
@@ -348,7 +361,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					DerObjectIdentifier subjectDomainPolicy;
 					try
 					{
-                        Asn1Sequence mapping = Asn1Sequence.GetInstance(mappings[j]);
+						Asn1Sequence mapping = Asn1Sequence.GetInstance(mappings[j]);
 
 						issuerDomainPolicy = DerObjectIdentifier.GetInstance(mapping[0]);
 						subjectDomainPolicy = DerObjectIdentifier.GetInstance(mapping[1]);
@@ -394,6 +407,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				throw new PkixCertPathValidatorException(
 					"Could not read certificate policies extension from certificate.", e, index);
 			}
+
 			if (certPolicies != null && validPolicyTree != null)
 			{
 				//
@@ -446,6 +460,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 							t1.Add(o);
 						}
 					}
+
 					acceptablePolicies.Clear();
 					acceptablePolicies.UnionWith(t1);
 				}
@@ -489,6 +504,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 									}
 								}
 							}
+
 							break;
 						}
 					}
@@ -529,8 +545,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						node.IsCritical = critical;
 					}
 				}
+
 				return _validPolicyTree;
 			}
+
 			return null;
 		}
 
@@ -586,10 +604,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						}
 					}
 				}
+
 				if (matchIssuer && !isIndirect)
 				{
 					throw new Exception("Distribution point contains cRLIssuer field but CRL is not indirect.");
 				}
+
 				if (!matchIssuer)
 				{
 					throw new Exception("CRL issuer of CRL does not match CRL issuer of distribution point.");
@@ -602,6 +622,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					matchIssuer = true;
 				}
 			}
+
 			if (!matchIssuer)
 			{
 				throw new Exception("Cannot find matching CRL issuer for certificate.");
@@ -626,6 +647,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			{
 				return new ReasonsMask(dp.Reasons.IntValue).Intersect(new ReasonsMask(idp.OnlySomeReasons.IntValue));
 			}
+
 			// (d) (4)
 			if ((idp == null || idp.OnlySomeReasons == null) && dp.Reasons == null)
 			{
@@ -677,12 +699,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		*                            some error occurs.
 		*/
 		internal static ISet<AsymmetricKeyParameter> ProcessCrlF(
-			X509Crl					crl,
-			object					cert,
-			X509Certificate			defaultCRLSignCert,
-			AsymmetricKeyParameter	defaultCRLSignKey,
-			PkixParameters			paramsPKIX,
-			IList<X509Certificate>	certPathCerts)
+			X509Crl crl,
+			object cert,
+			X509Certificate defaultCRLSignCert,
+			AsymmetricKeyParameter defaultCRLSignKey,
+			PkixParameters paramsPKIX,
+			IList<X509Certificate> certPathCerts)
 		{
 			// (f)
 
@@ -713,7 +735,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			signingCerts.Add(defaultCRLSignCert);
 
 
-            var validCerts = new List<X509Certificate>();
+			var validCerts = new List<X509Certificate>();
 			var validKeys = new List<AsymmetricKeyParameter>();
 
 			foreach (X509Certificate signingCert in signingCerts)
@@ -728,6 +750,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					validKeys.Add(defaultCRLSignKey);
 					continue;
 				}
+
 				try
 				{
 					PkixCertPathBuilder builder = new PkixCertPathBuilder();
@@ -755,18 +778,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					{
 						parameters.IsRevocationEnabled = true;
 					}
+
 					var certs = builder.Build(parameters).CertPath.Certificates;
 					validCerts.Add(signingCert);
 					validKeys.Add(PkixCertPathValidatorUtilities.GetNextWorkingKey(certs, 0));
 				}
-                catch (PkixCertPathBuilderException e)
-                {
-                    throw new Exception("CertPath for CRL signer failed to validate.", e);
-                }
-                catch (PkixCertPathValidatorException e)
-                {
-                    throw new Exception("Public key of issuer certificate of CRL could not be retrieved.", e);
-                }
+				catch (PkixCertPathBuilderException e)
+				{
+					throw new Exception("CertPath for CRL signer failed to validate.", e);
+				}
+				catch (PkixCertPathValidatorException e)
+				{
+					throw new Exception("Public key of issuer certificate of CRL could not be retrieved.", e);
+				}
 			}
 
 			var checkKeys = new HashSet<AsymmetricKeyParameter>();
@@ -792,6 +816,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			{
 				throw new Exception("Cannot find a valid issuer certificate.");
 			}
+
 			if ((checkKeys.Count == 0) && lastException != null)
 			{
 				throw lastException;
@@ -815,6 +840,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					lastException = e;
 				}
 			}
+
 			throw new Exception("Cannot verify CRL.", lastException);
 		}
 
@@ -833,10 +859,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					lastException = e;
 				}
 			}
+
 			if (lastException != null)
 			{
 				throw new Exception("Cannot verify delta CRL.", lastException);
 			}
+
 			return null;
 		}
 
@@ -1008,6 +1036,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					lastException = e;
 				}
 			}
+
 			if (!validCrlFound)
 			{
 				throw lastException;
@@ -1028,12 +1057,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		 *                            or some error occurs.
 		 */
 		internal static void CheckCrls(
-			PkixParameters			paramsPKIX,
-			X509Certificate			cert,
-			DateTime				validDate,
-			X509Certificate			sign,
-			AsymmetricKeyParameter	workingPublicKey,
-			IList<X509Certificate>	certPathCerts)
+			PkixParameters paramsPKIX,
+			X509Certificate cert,
+			DateTime validDate,
+			X509Certificate sign,
+			AsymmetricKeyParameter workingPublicKey,
+			IList<X509Certificate> certPathCerts)
 		{
 			Exception lastException = null;
 			CrlDistPoint crldp;
@@ -1056,6 +1085,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				throw new Exception(
 					"No additional CRL locations could be decoded from CRL distribution point extension.", e);
 			}
+
 			CertStatus certStatus = new CertStatus();
 			ReasonsMask reasonsMask = new ReasonsMask();
 
@@ -1073,6 +1103,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				{
 					throw new Exception("Distribution points could not be read.", e);
 				}
+
 				if (dps != null)
 				{
 					for (int i = 0; i < dps.Length && certStatus.Status == CertStatus.Unrevoked && !reasonsMask.IsAllReasons; i++)
@@ -1116,6 +1147,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					{
 						throw new Exception("Issuer from certificate for CRL could not be reencoded.", e);
 					}
+
 					DistributionPoint dp = new DistributionPoint(new DistributionPointName(0, new GeneralNames(
 						new GeneralName(GeneralName.DirectoryName, issuer))), null, null);
 					PkixParameters paramsPKIXClone = (PkixParameters)paramsPKIX.Clone();
@@ -1135,12 +1167,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			{
 				throw lastException;
 			}
+
 			if (certStatus.Status != CertStatus.Unrevoked)
 			{
 				// This format is enforced by the NistCertPath tests
-                string formattedDate = certStatus.RevocationDate.Value.ToString(
-                    "ddd MMM dd HH:mm:ss K yyyy");
-                string message = "Certificate revocation after " + formattedDate;
+				string formattedDate = certStatus.RevocationDate.Value.ToString(
+					"ddd MMM dd HH:mm:ss K yyyy");
+				string message = "Certificate revocation after " + formattedDate;
 				message += ", reason: " + CrlReasons[certStatus.Status];
 				throw new Exception(message);
 			}
@@ -1178,6 +1211,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				throw new PkixCertPathValidatorException(
 					"Policy mappings extension could not be decoded.", ex, index);
 			}
+
 			PkixPolicyNode _validPolicyTree = validPolicyTree;
 			if (pm != null)
 			{
@@ -1193,16 +1227,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 					ISet<string> tmp;
 					if (m_idp.TryGetValue(id_p, out tmp))
-                    {
-                        tmp.Add(sd_p);
-                    }
+					{
+						tmp.Add(sd_p);
+					}
 					else
-                    {
-                        tmp = new HashSet<string>();
-                        tmp.Add(sd_p);
-                        m_idp[id_p] = tmp;
-                        s_idp.Add(id_p);
-                    }
+					{
+						tmp = new HashSet<string>();
+						tmp.Add(sd_p);
+						m_idp[id_p] = tmp;
+						s_idp.Add(id_p);
+					}
 				}
 
 				foreach (var id_p in s_idp)
@@ -1256,6 +1290,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 											throw new PkixCertPathValidatorException(
 												"Policy information could not be decoded.", ex, index);
 										}
+
 										if (ANY_POLICY.Equals(pinfo.PolicyIdentifier.Id))
 										{
 											try
@@ -1268,9 +1303,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 												throw new PkixCertPathValidatorException(
 													"Policy qualifier info set could not be decoded.", ex, index);
 											}
+
 											break;
 										}
 									}
+
 									bool ci = false;
 									var critExtOids = cert.GetCriticalExtensionOids();
 									if (critExtOids != null)
@@ -1286,6 +1323,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 										p_node.AddChild(c_node);
 										policyNodes[i].Add(c_node);
 									}
+
 									break;
 								}
 							}
@@ -1297,22 +1335,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					}
 					else if (policyMapping <= 0)
 					{
-                        foreach (var node in new List<PkixPolicyNode>(policyNodes[i]))
-                        {
+						foreach (var node in new List<PkixPolicyNode>(policyNodes[i]))
+						{
 							if (node.ValidPolicy.Equals(id_p))
 							{
 								node.Parent.RemoveChild(node);
 
-                                for (int k = i - 1; k >= 0; k--)
+								for (int k = i - 1; k >= 0; k--)
 								{
-                                    foreach (var node2 in new List<PkixPolicyNode>(policyNodes[k]))
+									foreach (var node2 in new List<PkixPolicyNode>(policyNodes[k]))
 									{
 										if (!node2.HasChildren)
 										{
 											_validPolicyTree = PkixCertPathValidatorUtilities.RemovePolicyNode(
 												_validPolicyTree, policyNodes, node2);
 
-                                            if (_validPolicyTree == null)
+											if (_validPolicyTree == null)
 												break;
 										}
 									}
@@ -1322,14 +1360,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					}
 				}
 			}
+
 			return _validPolicyTree;
 		}
 
 		internal static ISet<X509Crl>[] ProcessCrlA1ii(
-			DateTime		currentDate,
-			PkixParameters	paramsPKIX,
-			X509Certificate	cert,
-			X509Crl			crl)
+			DateTime currentDate,
+			PkixParameters paramsPKIX,
+			X509Certificate cert,
+			X509Crl crl)
 		{
 			X509CrlStoreSelector crlselect = new X509CrlStoreSelector();
 			crlselect.CertificateChecking = cert;
@@ -1362,14 +1401,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				}
 			}
 
-			return new []{ completeSet, deltaSet };
+			return new[] { completeSet, deltaSet };
 		}
 
 		internal static ISet<X509Crl> ProcessCrlA1i(
-			DateTime		currentDate,
-			PkixParameters	paramsPKIX,
-			X509Certificate	cert,
-			X509Crl			crl)
+			DateTime currentDate,
+			PkixParameters paramsPKIX,
+			X509Certificate cert,
+			X509Crl crl)
 		{
 			var deltaSet = new HashSet<X509Crl>();
 			if (paramsPKIX.IsUseDeltasEnabled)
@@ -1397,6 +1436,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						throw new Exception("Freshest CRL extension could not be decoded from CRL.", e);
 					}
 				}
+
 				if (freshestCRL != null)
 				{
 					try
@@ -1409,6 +1449,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						throw new Exception(
 							"No new delta CRL locations could be added from Freshest CRL extension.", e);
 					}
+
 					// get delta CRL(s)
 					try
 					{
@@ -1420,14 +1461,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					}
 				}
 			}
+
 			return deltaSet;
 		}
 
 		internal static void ProcessCertF(
-			PkixCertPath	certPath,
-			int				index,
-			PkixPolicyNode	validPolicyTree,
-			int				explicitPolicy)
+			PkixCertPath certPath,
+			int index,
+			PkixPolicyNode validPolicyTree,
+			int explicitPolicy)
 		{
 			//
 			// (f)
@@ -1440,12 +1482,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		}
 
 		internal static void ProcessCertA(
-			PkixCertPath			certPath,
-			PkixParameters			paramsPKIX,
-			int						index,
-			AsymmetricKeyParameter	workingPublicKey,
-			X509Name				workingIssuerName,
-			X509Certificate			sign)
+			PkixCertPath certPath,
+			PkixParameters paramsPKIX,
+			int index,
+			AsymmetricKeyParameter workingPublicKey,
+			X509Name workingIssuerName,
+			X509Certificate sign)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1500,6 +1542,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					{
 						cause = e;
 					}
+
 					throw new PkixCertPathValidatorException(e.Message, cause, index);
 				}
 			}
@@ -1511,7 +1554,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			if (!issuer.Equivalent(workingIssuerName, true))
 			{
 				throw new PkixCertPathValidatorException("IssuerName(" + issuer
-					+ ") does not match SubjectName(" + workingIssuerName + ") of signing certificate.", null, index);
+				                                                       + ") does not match SubjectName(" + workingIssuerName + ") of signing certificate.", null, index);
 			}
 		}
 
@@ -1525,7 +1568,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			Asn1Sequence pc;
 			try
 			{
-                pc = Asn1Sequence.GetInstance(
+				pc = Asn1Sequence.GetInstance(
 					PkixCertPathValidatorUtilities.GetExtensionValue(cert, X509Extensions.PolicyConstraints));
 			}
 			catch (Exception e)
@@ -1543,7 +1586,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						Asn1TaggedObject constraint = Asn1TaggedObject.GetInstance(policyConstraint);
 						if (constraint.HasContextTag(0))
 						{
-                            int tmpInt = DerInteger.GetInstance(constraint, false).IntValueExact;
+							int tmpInt = DerInteger.GetInstance(constraint, false).IntValueExact;
 							if (tmpInt < explicitPolicy)
 								return tmpInt;
 
@@ -1557,14 +1600,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					}
 				}
 			}
+
 			return explicitPolicy;
 		}
 
 		/// <exception cref="PkixCertPathValidatorException"/>
 		internal static int PrepareNextCertI2(
-			PkixCertPath	certPath,
-			int				index,
-			int				policyMapping)
+			PkixCertPath certPath,
+			int index,
+			int policyMapping)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1575,7 +1619,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			Asn1Sequence pc = null;
 			try
 			{
-                pc = Asn1Sequence.GetInstance(
+				pc = Asn1Sequence.GetInstance(
 					PkixCertPathValidatorUtilities.GetExtensionValue(cert, X509Extensions.PolicyConstraints));
 			}
 			catch (Exception e)
@@ -1592,7 +1636,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						Asn1TaggedObject constraint = Asn1TaggedObject.GetInstance(policyConstraint);
 						if (constraint.HasContextTag(1))
 						{
-                            int tmpInt = DerInteger.GetInstance(constraint, false).IntValueExact;
+							int tmpInt = DerInteger.GetInstance(constraint, false).IntValueExact;
 							if (tmpInt < policyMapping)
 								return tmpInt;
 
@@ -1606,14 +1650,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					}
 				}
 			}
+
 			return policyMapping;
 		}
 
 		/// <exception cref="PkixCertPathValidatorException"/>
 		internal static void PrepareNextCertG(
-			PkixCertPath				certPath,
-			int							index,
-			PkixNameConstraintValidator	nameConstraintValidator)
+			PkixCertPath certPath,
+			int index,
+			PkixNameConstraintValidator nameConstraintValidator)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1624,7 +1669,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			NameConstraints nc = null;
 			try
 			{
-                Asn1Sequence ncSeq = Asn1Sequence.GetInstance(
+				Asn1Sequence ncSeq = Asn1Sequence.GetInstance(
 					PkixCertPathValidatorUtilities.GetExtensionValue(cert, X509Extensions.NameConstraints));
 				if (ncSeq != null)
 				{
@@ -1636,6 +1681,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				throw new PkixCertPathValidatorException(
 					"Name constraints extension could not be decoded.", e, index);
 			}
+
 			if (nc != null)
 			{
 				//
@@ -1680,9 +1726,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		/// <exception cref="PkixCertPathValidatorException"/>
 		internal static int PrepareNextCertJ(
-			PkixCertPath	certPath,
-			int				index,
-			int				inhibitAnyPolicy)
+			PkixCertPath certPath,
+			int index,
+			int inhibitAnyPolicy)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1703,18 +1749,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 			if (iap != null)
 			{
-                int _inhibitAnyPolicy = iap.IntValueExact;
+				int _inhibitAnyPolicy = iap.IntValueExact;
 
 				if (_inhibitAnyPolicy < inhibitAnyPolicy)
 					return _inhibitAnyPolicy;
 			}
+
 			return inhibitAnyPolicy;
 		}
 
 		/// <exception cref="PkixCertPathValidatorException"/>
 		internal static void PrepareNextCertK(
-			PkixCertPath	certPath,
-			int				index)
+			PkixCertPath certPath,
+			int index)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1731,6 +1778,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			{
 				throw new PkixCertPathValidatorException("Basic constraints extension cannot be decoded.", e, index);
 			}
+
 			if (bc != null)
 			{
 				if (!(bc.IsCA()))
@@ -1744,9 +1792,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		/// <exception cref="PkixCertPathValidatorException"/>
 		internal static int PrepareNextCertL(
-			PkixCertPath	certPath,
-			int				index,
-			int				maxPathLength)
+			PkixCertPath certPath,
+			int index,
+			int maxPathLength)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1760,14 +1808,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 				return maxPathLength - 1;
 			}
+
 			return maxPathLength;
 		}
 
 		/// <exception cref="PkixCertPathValidatorException"/>
 		internal static int PrepareNextCertM(
-			PkixCertPath	certPath,
-			int				index,
-			int				maxPathLength)
+			PkixCertPath certPath,
+			int index,
+			int maxPathLength)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1785,6 +1834,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			{
 				throw new PkixCertPathValidatorException("Basic constraints extension cannot be decoded.", e, index);
 			}
+
 			if (bc != null)
 			{
 				BigInteger _pathLengthConstraint = bc.PathLenConstraint;
@@ -1799,13 +1849,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					}
 				}
 			}
+
 			return maxPathLength;
 		}
 
 		/// <exception cref="PkixCertPathValidatorException"/>
 		internal static void PrepareNextCertN(
-			PkixCertPath	certPath,
-			int				index)
+			PkixCertPath certPath,
+			int index)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1843,6 +1894,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					throw new PkixCertPathValidatorException(e.Message, e.InnerException, index);
 				}
 			}
+
 			if (criticalExtensions.Count > 0)
 			{
 				throw new PkixCertPathValidatorException("Certificate has unsupported critical extension.", null, index);
@@ -1850,9 +1902,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		}
 
 		internal static int PrepareNextCertH1(
-			PkixCertPath	certPath,
-			int				index,
-			int				explicitPolicy)
+			PkixCertPath certPath,
+			int index,
+			int explicitPolicy)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1868,13 +1920,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				if (explicitPolicy != 0)
 					return explicitPolicy - 1;
 			}
+
 			return explicitPolicy;
 		}
 
 		internal static int PrepareNextCertH2(
-			PkixCertPath	certPath,
-			int				index,
-			int				policyMapping)
+			PkixCertPath certPath,
+			int index,
+			int policyMapping)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1890,14 +1943,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				if (policyMapping != 0)
 					return policyMapping - 1;
 			}
+
 			return policyMapping;
 		}
 
 
 		internal static int PrepareNextCertH3(
-			PkixCertPath	certPath,
-			int				index,
-			int				inhibitAnyPolicy)
+			PkixCertPath certPath,
+			int index,
+			int inhibitAnyPolicy)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1913,12 +1967,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				if (inhibitAnyPolicy != 0)
 					return inhibitAnyPolicy - 1;
 			}
+
 			return inhibitAnyPolicy;
 		}
 
 		internal static int WrapupCertA(
-			int				explicitPolicy,
-			X509Certificate	cert)
+			int explicitPolicy,
+			X509Certificate cert)
 		{
 			//
 			// (a)
@@ -1927,14 +1982,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			{
 				explicitPolicy--;
 			}
+
 			return explicitPolicy;
 		}
 
 		/// <exception cref="PkixCertPathValidatorException"/>
 		internal static int WrapupCertB(
-			PkixCertPath	certPath,
-			int				index,
-			int				explicitPolicy)
+			PkixCertPath certPath,
+			int index,
+			int explicitPolicy)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -1945,7 +2001,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			Asn1Sequence pc;
 			try
 			{
-                pc = Asn1Sequence.GetInstance(
+				pc = Asn1Sequence.GetInstance(
 					PkixCertPathValidatorUtilities.GetExtensionValue(cert, X509Extensions.PolicyConstraints));
 			}
 			catch (Exception e)
@@ -1959,7 +2015,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				{
 					Asn1TaggedObject constraint = Asn1TaggedObject.GetInstance(policyConstraint);
 					if (constraint.HasContextTag(0))
-                    {
+					{
 						int tmpInt;
 						try
 						{
@@ -1970,6 +2026,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 							throw new PkixCertPathValidatorException(
 								"Policy constraints requireExplicitPolicy field could not be decoded.", e, index);
 						}
+
 						if (tmpInt == 0)
 							return 0;
 
@@ -1977,6 +2034,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					}
 				}
 			}
+
 			return explicitPolicy;
 		}
 
@@ -2027,6 +2085,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					throw new PkixCertPathValidatorException(
 						"Explicit policy requested but none available.", null, index);
 				}
+
 				intersection = null;
 			}
 			else if (PkixCertPathValidatorUtilities.IsAnyPolicy(userInitialPolicySet)) // (g) (ii)
@@ -2043,8 +2102,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 					foreach (var _nodeDepth in policyNodes)
 					{
-                        foreach (var _node in _nodeDepth)
-                        {
+						foreach (var _node in _nodeDepth)
+						{
 							if (ANY_POLICY.Equals(_node.ValidPolicy))
 							{
 								foreach (var o in _node.Children)
@@ -2065,6 +2124,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 							// _node);
 						}
 					}
+
 					if (validPolicyTree != null)
 					{
 						for (int j = n - 1; j >= 0; j--)
@@ -2155,6 +2215,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 				intersection = validPolicyTree;
 			}
+
 			return intersection;
 		}
 
@@ -2167,9 +2228,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		* @throws AnnotatedException if an exception occurs.
 		*/
 		internal static void ProcessCrlC(
-			X509Crl			deltaCRL,
-			X509Crl			completeCRL,
-			PkixParameters	pkixParams)
+			X509Crl deltaCRL,
+			X509Crl completeCRL,
+			PkixParameters pkixParams)
 		{
 			if (deltaCRL == null)
 				return;
@@ -2250,11 +2311,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		}
 
 		internal static void ProcessCrlI(
-			DateTime		validDate,
-			X509Crl			deltacrl,
-			object			cert,
-			CertStatus		certStatus,
-			PkixParameters	pkixParams)
+			DateTime validDate,
+			X509Crl deltacrl,
+			object cert,
+			CertStatus certStatus,
+			PkixParameters pkixParams)
 		{
 			if (pkixParams.IsUseDeltasEnabled && deltacrl != null)
 			{
@@ -2263,10 +2324,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		}
 
 		internal static void ProcessCrlJ(
-			DateTime	validDate,
-			X509Crl		completecrl,
-			object		cert,
-			CertStatus	certStatus)
+			DateTime validDate,
+			X509Crl completecrl,
+			object cert,
+			CertStatus certStatus)
 		{
 			if (certStatus.Status == CertStatus.Unrevoked)
 			{
@@ -2275,9 +2336,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		}
 
 		internal static PkixPolicyNode ProcessCertE(
-			PkixCertPath	certPath,
-			int				index,
-			PkixPolicyNode	validPolicyTree)
+			PkixCertPath certPath,
+			int index,
+			PkixPolicyNode validPolicyTree)
 		{
 			var certs = certPath.Certificates;
 			X509Certificate cert = certs[index];
@@ -2288,7 +2349,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			Asn1Sequence certPolicies = null;
 			try
 			{
-                certPolicies = Asn1Sequence.GetInstance(
+				certPolicies = Asn1Sequence.GetInstance(
 					PkixCertPathValidatorUtilities.GetExtensionValue(cert, X509Extensions.CertificatePolicies));
 			}
 			catch (Exception e)
@@ -2296,10 +2357,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				throw new PkixCertPathValidatorException("Could not read certificate policies extension from certificate.",
 					e, index);
 			}
+
 			if (certPolicies == null)
 			{
 				validPolicyTree = null;
 			}
+
 			return validPolicyTree;
 		}
 

@@ -13,19 +13,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return pkiFreeText;
 
 			if (obj != null)
-                return new PkiFreeText(Asn1Sequence.GetInstance(obj));
+				return new PkiFreeText(Asn1Sequence.GetInstance(obj));
 
-            return null;
+			return null;
 		}
 
-        public static PkiFreeText GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
-        {
-            return GetInstance(Asn1Sequence.GetInstance(taggedObject, declaredExplicit));
-        }
+		public static PkiFreeText GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
+		{
+			return GetInstance(Asn1Sequence.GetInstance(taggedObject, declaredExplicit));
+		}
 
-        internal Asn1Sequence m_strings;
+		internal Asn1Sequence m_strings;
 
-        internal PkiFreeText(Asn1Sequence seq)
+		internal PkiFreeText(Asn1Sequence seq)
 		{
 			foreach (var element in seq)
 			{
@@ -58,6 +58,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			{
 				v.Add(new DerUtf8String(strs[i]));
 			}
+
 			m_strings = new DerSequence(v);
 		}
 

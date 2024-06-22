@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -17,17 +16,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 		{
 			if (o == null || o is SigningCertificate)
 			{
-				return (SigningCertificate) o;
+				return (SigningCertificate)o;
 			}
 
 			if (o is Asn1Sequence)
 			{
-				return new SigningCertificate((Asn1Sequence) o);
+				return new SigningCertificate((Asn1Sequence)o);
 			}
 
 			throw new ArgumentException(
 				"unknown object in 'SigningCertificate' factory : "
-                + Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
 		}
 
 		/**
@@ -99,7 +98,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(certs);
-            v.AddOptional(policies);
+			v.AddOptional(policies);
 			return new DerSequence(v);
 		}
 	}

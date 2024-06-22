@@ -1,5 +1,4 @@
 #if UNITY_WEBGL && !UNITY_EDITOR
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -187,7 +186,8 @@ namespace BestHTTP.Connections
                             this.CurrentRequest.State = HTTPRequestStates.Finished;
                         else
                         {
-                            this.CurrentRequest.Exception = new Exception(string.Format("[{0}] Remote server closed the connection before sending response header! Previous request state: {1}. Connection state: {2}",
+                            this.CurrentRequest.Exception =
+ new Exception(string.Format("[{0}] Remote server closed the connection before sending response header! Previous request state: {1}. Connection state: {2}",
                                     this.ToString(),
                                     this.CurrentRequest.State.ToString(),
                                     this.State.ToString()));
@@ -407,10 +407,12 @@ namespace BestHTTP.Connections
         private static extern void XHR_SetProgressHandler(int nativeId, OnWebGLProgressDelegate onDownloadProgress, OnWebGLProgressDelegate onUploadProgress);
 
         [DllImport("__Internal")]
-        private static extern void XHR_CopyResponseTo(int nativeId, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U1, SizeParamIndex = 2)] byte[] response, int length);
+        private static extern void XHR_CopyResponseTo(int nativeId, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U1, SizeParamIndex =
+ 2)] byte[] response, int length);
 
         [DllImport("__Internal")]
-        private static extern void XHR_Send(int nativeId, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U1, SizeParamIndex = 2)] byte[] body, int length);
+        private static extern void XHR_Send(int nativeId, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U1, SizeParamIndex =
+ 2)] byte[] body, int length);
 
         [DllImport("__Internal")]
         private static extern void XHR_GetResponseHeaders(int nativeId, OnWebGLBufferDelegate callback);

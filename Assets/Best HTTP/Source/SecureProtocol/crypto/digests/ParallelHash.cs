@@ -1,131 +1,129 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 {
-    /// <summary>
-    /// ParallelHash - a hash designed  to  support the efficient hashing of very long strings, by taking advantage,
-    /// of the parallelism available in modern processors with an optional XOF mode.
-    /// <para>
-    /// From NIST Special Publication 800-185 - SHA-3 Derived Functions:cSHAKE, KMAC, TupleHash and ParallelHash
-    /// </para>
-    /// </summary>
-    public class ParallelHash
-        : IXof, IDigest
-    {
-        private static readonly byte[] N_PARALLEL_HASH = Strings.ToByteArray("ParallelHash");
+	/// <summary>
+	/// ParallelHash - a hash designed  to  support the efficient hashing of very long strings, by taking advantage,
+	/// of the parallelism available in modern processors with an optional XOF mode.
+	/// <para>
+	/// From NIST Special Publication 800-185 - SHA-3 Derived Functions:cSHAKE, KMAC, TupleHash and ParallelHash
+	/// </para>
+	/// </summary>
+	public class ParallelHash
+		: IXof, IDigest
+	{
+		private static readonly byte[] N_PARALLEL_HASH = Strings.ToByteArray("ParallelHash");
 
-        private readonly CShakeDigest cshake;
-        private readonly CShakeDigest compressor;
-        private readonly int bitLength;
-        private readonly int outputLength;
-        private readonly int B;
-        private readonly byte[] buffer;
-        private readonly byte[] compressorBuffer;
+		private readonly CShakeDigest cshake;
+		private readonly CShakeDigest compressor;
+		private readonly int bitLength;
+		private readonly int outputLength;
+		private readonly int B;
+		private readonly byte[] buffer;
+		private readonly byte[] compressorBuffer;
 
-        private bool firstOutput;
-        private int nCount;
-        private int bufOff;
+		private bool firstOutput;
+		private int nCount;
+		private int bufOff;
 
-        /**
-	     * Base constructor.
-	     *
-	     * @param bitLength bit length of the underlying SHAKE function, 128 or 256.
-	     * @param S the customization string - available for local use.
-	     * @param B the blocksize (in bytes) for hashing.
-	     */
-        public ParallelHash(int bitLength, byte[] S, int B)
-            : this(bitLength, S, B, bitLength * 2)
-        {
+		/**
+		 * Base constructor.
+		 *
+		 * @param bitLength bit length of the underlying SHAKE function, 128 or 256.
+		 * @param S the customization string - available for local use.
+		 * @param B the blocksize (in bytes) for hashing.
+		 */
+		public ParallelHash(int bitLength, byte[] S, int B)
+			: this(bitLength, S, B, bitLength * 2)
+		{
+		}
 
-        }
+		public ParallelHash(int bitLength, byte[] S, int B, int outputSize)
+		{
+			this.cshake = new CShakeDigest(bitLength, N_PARALLEL_HASH, S);
+			this.compressor = new CShakeDigest(bitLength, new byte[0], new byte[0]);
+			this.bitLength = bitLength;
+			this.B = B;
+			this.outputLength = (outputSize + 7) / 8;
+			this.buffer = new byte[B];
+			this.compressorBuffer = new byte[bitLength * 2 / 8];
 
-        public ParallelHash(int bitLength, byte[] S, int B, int outputSize)
-        {
-            this.cshake = new CShakeDigest(bitLength, N_PARALLEL_HASH, S);
-            this.compressor = new CShakeDigest(bitLength, new byte[0], new byte[0]);
-            this.bitLength = bitLength;
-            this.B = B;
-            this.outputLength = (outputSize + 7) / 8;
-            this.buffer = new byte[B];
-            this.compressorBuffer = new byte[bitLength * 2 / 8];
+			Reset();
+		}
 
-            Reset();
-        }
+		public ParallelHash(ParallelHash source)
+		{
+			this.cshake = new CShakeDigest(source.cshake);
+			this.compressor = new CShakeDigest(source.compressor);
+			this.bitLength = source.bitLength;
+			this.B = source.B;
+			this.outputLength = source.outputLength;
+			this.buffer = Arrays.Clone(source.buffer);
+			this.compressorBuffer = Arrays.Clone(source.compressorBuffer);
+		}
 
-        public ParallelHash(ParallelHash source)
-        {
-            this.cshake = new CShakeDigest(source.cshake);
-            this.compressor = new CShakeDigest(source.compressor);
-            this.bitLength = source.bitLength;
-            this.B = source.B;
-            this.outputLength = source.outputLength;
-            this.buffer = Arrays.Clone(source.buffer);
-            this.compressorBuffer = Arrays.Clone(source.compressorBuffer);
-        }
+		public virtual string AlgorithmName
+		{
+			get { return "ParallelHash" + cshake.AlgorithmName.Substring(6); }
+		}
 
-        public virtual string AlgorithmName
-        {
-            get { return "ParallelHash" + cshake.AlgorithmName.Substring(6); }
-        }
+		public virtual int GetByteLength()
+		{
+			return cshake.GetByteLength();
+		}
 
-        public virtual int GetByteLength()
-        {
-            return cshake.GetByteLength();
-        }
+		public virtual int GetDigestSize()
+		{
+			return outputLength;
+		}
 
-        public virtual int GetDigestSize()
-        {
-            return outputLength;
-        }
+		public virtual void Update(byte b)
+		{
+			buffer[bufOff++] = b;
+			if (bufOff == buffer.Length)
+			{
+				Compress();
+			}
+		}
 
-        public virtual void Update(byte b)
-        {
-            buffer[bufOff++] = b;
-            if (bufOff == buffer.Length)
-            {
-                Compress();
-            }
-        }
+		public virtual void BlockUpdate(byte[] inBuf, int inOff, int len)
+		{
+			len = System.Math.Max(0, len);
 
-        public virtual void BlockUpdate(byte[] inBuf, int inOff, int len)
-        {
-            len = System.Math.Max(0, len);
+			//
+			// fill the current word
+			//
+			int i = 0;
+			if (bufOff != 0)
+			{
+				while (i < len && bufOff != buffer.Length)
+				{
+					buffer[bufOff++] = inBuf[inOff + i++];
+				}
 
-            //
-            // fill the current word
-            //
-            int i = 0;
-            if (bufOff != 0)
-            {
-                while (i < len && bufOff != buffer.Length)
-                {
-                    buffer[bufOff++] = inBuf[inOff + i++];
-                }
+				if (bufOff == buffer.Length)
+				{
+					Compress();
+				}
+			}
 
-                if (bufOff == buffer.Length)
-                {
-                    Compress();
-                }
-            }
+			if (i < len)
+			{
+				while (len - i >= B)
+				{
+					Compress(inBuf, inOff + i, B);
+					i += B;
+				}
+			}
 
-            if (i < len)
-            {
-                while (len - i >= B)
-                {
-                    Compress(inBuf, inOff + i, B);
-                    i += B;
-                }
-            }
-
-            while (i < len)
-            {
-                Update(inBuf[inOff + i++]);
-            }
-        }
+			while (i < len)
+			{
+				Update(inBuf[inOff + i++]);
+			}
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public virtual void BlockUpdate(ReadOnlySpan<byte> input)
@@ -163,21 +161,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        private void Compress()
-        {
-            Compress(buffer, 0, bufOff);
-            bufOff = 0;
-        }
+		private void Compress()
+		{
+			Compress(buffer, 0, bufOff);
+			bufOff = 0;
+		}
 
-        private void Compress(byte[] buf, int offSet, int len)
-        {
-            compressor.BlockUpdate(buf, offSet, len);
-            compressor.OutputFinal(compressorBuffer, 0, compressorBuffer.Length);
+		private void Compress(byte[] buf, int offSet, int len)
+		{
+			compressor.BlockUpdate(buf, offSet, len);
+			compressor.OutputFinal(compressorBuffer, 0, compressorBuffer.Length);
 
-            cshake.BlockUpdate(compressorBuffer, 0, compressorBuffer.Length);
+			cshake.BlockUpdate(compressorBuffer, 0, compressorBuffer.Length);
 
-            nCount++;
-        }
+			nCount++;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private void Compress(ReadOnlySpan<byte> input, int pos, int len)
@@ -191,34 +189,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        private void WrapUp(int outputSize)
-        {
-            if (bufOff != 0)
-            {
-                Compress();
-            }
-            byte[] nOut = XofUtilities.RightEncode(nCount);
-            byte[] encOut = XofUtilities.RightEncode(outputSize * 8);
+		private void WrapUp(int outputSize)
+		{
+			if (bufOff != 0)
+			{
+				Compress();
+			}
 
-            cshake.BlockUpdate(nOut, 0, nOut.Length);
-            cshake.BlockUpdate(encOut, 0, encOut.Length);
+			byte[] nOut = XofUtilities.RightEncode(nCount);
+			byte[] encOut = XofUtilities.RightEncode(outputSize * 8);
 
-            firstOutput = false;
-        }
+			cshake.BlockUpdate(nOut, 0, nOut.Length);
+			cshake.BlockUpdate(encOut, 0, encOut.Length);
 
-        public virtual int DoFinal(byte[] outBuf, int outOff)
-        {
-            if (firstOutput)
-            {
-                WrapUp(outputLength);
-            }
+			firstOutput = false;
+		}
 
-            int rv = cshake.DoFinal(outBuf, outOff);
+		public virtual int DoFinal(byte[] outBuf, int outOff)
+		{
+			if (firstOutput)
+			{
+				WrapUp(outputLength);
+			}
 
-            Reset();
+			int rv = cshake.DoFinal(outBuf, outOff);
 
-            return rv;
-        }
+			Reset();
+
+			return rv;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public virtual int DoFinal(Span<byte> output)
@@ -236,19 +235,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        public virtual int OutputFinal(byte[] outBuf, int outOff, int outLen)
-        {
-            if (firstOutput)
-            {
-                WrapUp(outputLength);
-            }
+		public virtual int OutputFinal(byte[] outBuf, int outOff, int outLen)
+		{
+			if (firstOutput)
+			{
+				WrapUp(outputLength);
+			}
 
-            int rv = cshake.OutputFinal(outBuf, outOff, outLen);
+			int rv = cshake.OutputFinal(outBuf, outOff, outLen);
 
-            Reset();
+			Reset();
 
-            return rv;
-        }
+			return rv;
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public virtual int OutputFinal(Span<byte> output)
@@ -266,15 +265,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        public virtual int Output(byte[] outBuf, int outOff, int outLen)
-        {
-            if (firstOutput)
-            {
-                WrapUp(0);
-            }
+		public virtual int Output(byte[] outBuf, int outOff, int outLen)
+		{
+			if (firstOutput)
+			{
+				WrapUp(0);
+			}
 
-            return cshake.Output(outBuf, outOff, outLen);
-        }
+			return cshake.Output(outBuf, outOff, outLen);
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public virtual int Output(Span<byte> output)
@@ -288,19 +287,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-        public virtual void Reset()
-        {
-            cshake.Reset();
-            Arrays.Clear(buffer);
+		public virtual void Reset()
+		{
+			cshake.Reset();
+			Arrays.Clear(buffer);
 
-            byte[] hdr = XofUtilities.LeftEncode(B);
-            cshake.BlockUpdate(hdr, 0, hdr.Length);
+			byte[] hdr = XofUtilities.LeftEncode(B);
+			cshake.BlockUpdate(hdr, 0, hdr.Length);
 
-            nCount = 0;
-            bufOff = 0;
-            firstOutput = true;
-        }
-    }
+			nCount = 0;
+			bufOff = 0;
+			firstOutput = true;
+		}
+	}
 }
 #pragma warning restore
 #endif

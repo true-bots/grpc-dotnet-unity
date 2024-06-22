@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
@@ -26,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 			}
 
 			throw new ArgumentException("unknown object in 'ContentHints' factory : "
-                + Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
+			                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
 		}
 
 		/**
@@ -55,8 +54,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 		}
 
 		public ContentHints(
-			DerObjectIdentifier	contentType,
-			DerUtf8String		contentDescription)
+			DerObjectIdentifier contentType,
+			DerUtf8String contentDescription)
 		{
 			this.contentType = contentType;
 			this.contentDescription = contentDescription;
@@ -82,7 +81,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptional(contentDescription);
+			v.AddOptional(contentDescription);
 			v.Add(contentType);
 			return new DerSequence(v);
 		}

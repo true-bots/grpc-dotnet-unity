@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -13,37 +12,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	* this does your basic RSA algorithm.
 	*/
 	public class RsaCoreEngine
-        : IRsa
+		: IRsa
 	{
-		private RsaKeyParameters	key;
-		private bool				forEncryption;
-		private int					bitSize;
+		private RsaKeyParameters key;
+		private bool forEncryption;
+		private int bitSize;
 
-        private void CheckInitialised()
-        {
-            if (key == null)
-                throw new InvalidOperationException("RSA engine not initialised");
-        }
+		private void CheckInitialised()
+		{
+			if (key == null)
+				throw new InvalidOperationException("RSA engine not initialised");
+		}
 
-        /**
+		/**
 		* initialise the RSA engine.
 		*
 		* @param forEncryption true if we are encrypting, false otherwise.
 		* @param param the necessary RSA key parameters.
 		*/
-        public virtual void Init(
-			bool				forEncryption,
-			ICipherParameters	parameters)
+		public virtual void Init(
+			bool forEncryption,
+			ICipherParameters parameters)
 		{
 			if (parameters is ParametersWithRandom)
 			{
-				parameters = ((ParametersWithRandom) parameters).Parameters;
+				parameters = ((ParametersWithRandom)parameters).Parameters;
 			}
 
 			if (!(parameters is RsaKeyParameters))
 				throw new InvalidKeyException("Not an RSA key");
 
-			this.key = (RsaKeyParameters) parameters;
+			this.key = (RsaKeyParameters)parameters;
 			this.forEncryption = forEncryption;
 			this.bitSize = key.Modulus.BitLength;
 		}
@@ -55,9 +54,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @return maximum size for an input block.
 		*/
-        public virtual int GetInputBlockSize()
+		public virtual int GetInputBlockSize()
 		{
-            CheckInitialised();
+			CheckInitialised();
 
 			if (forEncryption)
 			{
@@ -74,11 +73,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @return maximum size for an output block.
 		*/
-        public virtual int GetOutputBlockSize()
+		public virtual int GetOutputBlockSize()
 		{
-            CheckInitialised();
+			CheckInitialised();
 
-            if (forEncryption)
+			if (forEncryption)
 			{
 				return (bitSize + 7) / 8;
 			}
@@ -86,14 +85,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return (bitSize - 1) / 8;
 		}
 
-        public virtual BigInteger ConvertInput(
-			byte[]	inBuf,
-			int		inOff,
-			int		inLen)
+		public virtual BigInteger ConvertInput(
+			byte[] inBuf,
+			int inOff,
+			int inLen)
 		{
-            CheckInitialised();
+			CheckInitialised();
 
-            int maxLength = (bitSize + 7) / 8;
+			int maxLength = (bitSize + 7) / 8;
 
 			if (inLen > maxLength)
 				throw new DataLengthException("input too large for RSA cipher.");
@@ -106,21 +105,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return input;
 		}
 
-        public virtual byte[] ConvertOutput(BigInteger result)
+		public virtual byte[] ConvertOutput(BigInteger result)
 		{
-            CheckInitialised();
+			CheckInitialised();
 
 			return forEncryption
 				? BigIntegers.AsUnsignedByteArray(GetOutputBlockSize(), result)
 				: BigIntegers.AsUnsignedByteArray(result);
 		}
 
-        public virtual BigInteger ProcessBlock(
+		public virtual BigInteger ProcessBlock(
 			BigInteger input)
 		{
-            CheckInitialised();
+			CheckInitialised();
 
-            if (key is RsaPrivateCrtKeyParameters)
+			if (key is RsaPrivateCrtKeyParameters)
 			{
 				//
 				// we have the extra factors, use the Chinese Remainder Theorem - the author
@@ -146,7 +145,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				// h = qInv * (mP - mQ) Mod p
 				h = mP.Subtract(mQ);
 				h = h.Multiply(qInv);
-				h = h.Mod(p);               // Mod (in Java) returns the positive residual
+				h = h.Mod(p); // Mod (in Java) returns the positive residual
 
 				// m = h * q + mQ
 				m = h.Multiply(q);

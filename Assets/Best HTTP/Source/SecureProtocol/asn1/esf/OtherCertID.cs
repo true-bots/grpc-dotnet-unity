@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -18,21 +17,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class OtherCertID
 		: Asn1Encodable
 	{
-		private readonly OtherHash		otherCertHash;
-		private readonly IssuerSerial	issuerSerial;
+		private readonly OtherHash otherCertHash;
+		private readonly IssuerSerial issuerSerial;
 
 		public static OtherCertID GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is OtherCertID)
-				return (OtherCertID) obj;
+				return (OtherCertID)obj;
 
 			if (obj is Asn1Sequence)
-				return new OtherCertID((Asn1Sequence) obj);
+				return new OtherCertID((Asn1Sequence)obj);
 
 			throw new ArgumentException(
 				"Unknown object in 'OtherCertID' factory: "
-                    + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -59,8 +58,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		}
 
 		public OtherCertID(
-			OtherHash		otherCertHash,
-			IssuerSerial	issuerSerial)
+			OtherHash otherCertHash,
+			IssuerSerial issuerSerial)
 		{
 			if (otherCertHash == null)
 				throw new ArgumentNullException("otherCertHash");
@@ -91,7 +90,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 
 			return new DerSequence(v);
 		}
-
 	}
 }
 #pragma warning restore

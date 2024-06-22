@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security.Certificates;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
@@ -73,7 +72,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				if (issuers.Count < 1)
 					throw new PkixCertPathBuilderException("Public key certificate for attribute certificate cannot be found.");
 
-                var certPathList = new List<X509Certificate>();
+				var certPathList = new List<X509Certificate>();
 
 				foreach (X509Certificate issuer in issuers)
 				{
@@ -100,10 +99,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		private Exception certPathException;
 
 		private PkixCertPathBuilderResult Build(
-			X509V2AttributeCertificate  attrCert,
-			X509Certificate				tbvCert,
-			PkixBuilderParameters		pkixParams,
-			IList<X509Certificate>      tbvPath)
+			X509V2AttributeCertificate attrCert,
+			X509Certificate tbvCert,
+			PkixBuilderParameters pkixParams,
+			IList<X509Certificate> tbvPath)
 		{
 			// If tbvCert is readily present in tbvPath, it indicates having run
 			// into a cycle in the

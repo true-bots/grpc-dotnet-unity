@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -51,16 +50,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 			AttributeCertificate = 1
 		}
 
-		private readonly X509CertificateStructure	cert;
-		private readonly byte[]						publicKeyCert;
-		private readonly byte[]						attributeCert;
+		private readonly X509CertificateStructure cert;
+		private readonly byte[] publicKeyCert;
+		private readonly byte[] attributeCert;
 
 		public static RequestedCertificate GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is RequestedCertificate)
 			{
-				return (RequestedCertificate) obj;
+				return (RequestedCertificate)obj;
 			}
 
 			if (obj is Asn1Sequence)
@@ -70,15 +69,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 
 			if (obj is Asn1TaggedObject)
 			{
-				return new RequestedCertificate((Asn1TaggedObject) obj);
+				return new RequestedCertificate((Asn1TaggedObject)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public static RequestedCertificate GetInstance(
-			Asn1TaggedObject	obj,
-			bool				isExplicit)
+			Asn1TaggedObject obj,
+			bool isExplicit)
 		{
 			if (!isExplicit)
 				throw new ArgumentException("choice item must be explicitly tagged");
@@ -89,7 +88,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 		private RequestedCertificate(
 			Asn1TaggedObject tagged)
 		{
-			switch ((Choice) tagged.TagNo)
+			switch ((Choice)tagged.TagNo)
 			{
 				case Choice.AttributeCertificate:
 					this.attributeCert = Asn1OctetString.GetInstance(tagged, true).GetOctets();
@@ -116,9 +115,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 		}
 
 		public RequestedCertificate(
-			Choice	type,
-			byte[]	certificateOctets)
-			: this(new DerTaggedObject((int) type, new DerOctetString(certificateOctets)))
+			Choice type,
+			byte[] certificateOctets)
+			: this(new DerTaggedObject((int)type, new DerOctetString(certificateOctets)))
 		{
 		}
 
@@ -155,7 +154,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 
 			return attributeCert;
 		}
-    
+
 
 		/**
 		* Produce an object suitable for an Asn1OutputStream.

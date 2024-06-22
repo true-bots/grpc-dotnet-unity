@@ -4,28 +4,28 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 {
-    public class SubsequentMessage
-        : DerInteger
-    {
-        public static readonly SubsequentMessage encrCert = new SubsequentMessage(0);
-        public static readonly SubsequentMessage challengeResp = new SubsequentMessage(1);
-    
-        private SubsequentMessage(int value)
-            : base(value)
-        {
-        }
+	public class SubsequentMessage
+		: DerInteger
+	{
+		public static readonly SubsequentMessage encrCert = new SubsequentMessage(0);
+		public static readonly SubsequentMessage challengeResp = new SubsequentMessage(1);
 
-        public static SubsequentMessage ValueOf(int value)
-        {
-            if (value == 0)
-                return encrCert;
+		private SubsequentMessage(int value)
+			: base(value)
+		{
+		}
 
-            if (value == 1)
-                return challengeResp;
+		public static SubsequentMessage ValueOf(int value)
+		{
+			if (value == 0)
+				return encrCert;
 
-            throw new ArgumentException("unknown value: " + value, "value");
-        }
-    }
+			if (value == 1)
+				return challengeResp;
+
+			throw new ArgumentException("unknown value: " + value, "value");
+		}
+	}
 }
 #pragma warning restore
 #endif

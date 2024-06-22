@@ -5,11 +5,11 @@ using System.Runtime.Serialization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
-	 /// <summary>This exception is thrown whenever we find something we don't expect in a message.</summary>
-    [Serializable]
-    public class InvalidCipherTextException
+	/// <summary>This exception is thrown whenever we find something we don't expect in a message.</summary>
+	[Serializable]
+	public class InvalidCipherTextException
 		: CryptoException
-    {
+	{
 		public InvalidCipherTextException()
 			: base()
 		{

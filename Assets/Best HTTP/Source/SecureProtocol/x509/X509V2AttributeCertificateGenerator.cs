@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -82,9 +81,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 		/// <summary>Add a given extension field for the standard extensions tag.</summary>
 		public void AddExtension(
-			string			oid,
-			bool			critical,
-			Asn1Encodable	extensionValue)
+			string oid,
+			bool critical,
+			Asn1Encodable extensionValue)
 		{
 			extGenerator.AddExtension(new DerObjectIdentifier(oid), critical, extensionValue);
 		}
@@ -95,9 +94,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		/// with the extension.
 		/// </summary>
 		public void AddExtension(
-			string	oid,
-			bool	critical,
-			byte[]	extensionValue)
+			string oid,
+			bool critical,
+			byte[] extensionValue)
 		{
 			extGenerator.AddExtension(new DerObjectIdentifier(oid), critical, extensionValue);
 		}
@@ -109,7 +108,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		/// algorithm details.</param>
 		/// <returns>An <see cref="X509V2AttributeCertificate"/>.</returns>
 		public X509V2AttributeCertificate Generate(ISignatureFactory signatureFactory)
-        {
+		{
 			var sigAlgID = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
 
 			acInfoGen.SetSignature(sigAlgID);
@@ -119,7 +118,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				acInfoGen.SetExtensions(extGenerator.Generate());
 			}
 
-            AttributeCertificateInfo acInfo = acInfoGen.GenerateAttributeCertificateInfo();
+			AttributeCertificateInfo acInfo = acInfoGen.GenerateAttributeCertificateInfo();
 
 			IStreamCalculator<IBlockResult> streamCalculator = signatureFactory.CreateCalculator();
 			using (Stream sigStream = streamCalculator.Stream)

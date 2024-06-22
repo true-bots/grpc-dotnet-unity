@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -23,7 +22,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
 		 */
 		public SubjectKeyIdentifierStructure(
 			Asn1OctetString encodedValue)
-			: base((Asn1OctetString) X509ExtensionUtilities.FromExtensionValue(encodedValue))
+			: base((Asn1OctetString)X509ExtensionUtilities.FromExtensionValue(encodedValue))
 		{
 		}
 
@@ -34,7 +33,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
 			{
 				SubjectPublicKeyInfo info = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(pubKey);
 
-				return (Asn1OctetString) new SubjectKeyIdentifier(info).ToAsn1Object();
+				return (Asn1OctetString)new SubjectKeyIdentifier(info).ToAsn1Object();
 			}
 			catch (Exception e)
 			{

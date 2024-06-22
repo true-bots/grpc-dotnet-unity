@@ -4,13 +4,13 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Field
 {
-    public interface IExtensionField
-        : IFiniteField
-    {
-        IFiniteField Subfield { get; }
+	public interface IExtensionField
+		: IFiniteField
+	{
+		IFiniteField Subfield { get; }
 
-        int Degree { get; }
-    }
+		int Degree { get; }
+	}
 }
 #pragma warning restore
 #endif

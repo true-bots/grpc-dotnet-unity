@@ -5,11 +5,11 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-    public interface TlsCloseable
-    {
-        /// <exception cref="IOException"/>
-        void Close();
-    }
+	public interface TlsCloseable
+	{
+		/// <exception cref="IOException"/>
+		void Close();
+	}
 }
 #pragma warning restore
 #endif

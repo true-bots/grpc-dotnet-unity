@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -19,8 +18,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 	public class OcspReqGenerator
 	{
 		private List<RequestObject> list = new List<RequestObject>();
-		private GeneralName		requestorName = null;
-		private X509Extensions	requestExtensions = null;
+		private GeneralName requestorName = null;
+		private X509Extensions requestExtensions = null;
 
 		private class RequestObject
 		{
@@ -28,8 +27,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			internal X509Extensions extensions;
 
 			public RequestObject(
-				CertificateID	certId,
-				X509Extensions	extensions)
+				CertificateID certId,
+				X509Extensions extensions)
 			{
 				this.certId = certId;
 				this.extensions = extensions;
@@ -59,8 +58,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		 * @param singleRequestExtensions the extensions to attach to the request
 		 */
 		public void AddRequest(
-			CertificateID   certId,
-			X509Extensions  singleRequestExtensions)
+			CertificateID certId,
+			X509Extensions singleRequestExtensions)
 		{
 			list.Add(new RequestObject(certId, singleRequestExtensions));
 		}
@@ -71,16 +70,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		* @param requestorName a X509Principal representing the requestor name.
 		*/
 		public void SetRequestorName(
-		    X509Name requestorName)
+			X509Name requestorName)
 		{
-		    try
-		    {
-		        this.requestorName = new GeneralName(GeneralName.DirectoryName, requestorName);
-		    }
-		    catch (Exception e)
-		    {
-		        throw new ArgumentException("cannot encode principal", e);
-		    }
+			try
+			{
+				this.requestorName = new GeneralName(GeneralName.DirectoryName, requestorName);
+			}
+			catch (Exception e)
+			{
+				throw new ArgumentException("cannot encode principal", e);
+			}
 		}
 
 		public void SetRequestorName(
@@ -96,10 +95,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		}
 
 		private OcspReq GenerateRequest(
-			DerObjectIdentifier		signingAlgorithm,
-			AsymmetricKeyParameter	privateKey,
-			X509Certificate[]		chain,
-			SecureRandom			random)
+			DerObjectIdentifier signingAlgorithm,
+			AsymmetricKeyParameter privateKey,
+			X509Certificate[] chain,
+			SecureRandom random)
 		{
 			Asn1EncodableVector requests = new Asn1EncodableVector();
 
@@ -202,18 +201,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		}
 
 		public OcspReq Generate(
-			string					signingAlgorithm,
-			AsymmetricKeyParameter	privateKey,
-			X509Certificate[]		chain)
+			string signingAlgorithm,
+			AsymmetricKeyParameter privateKey,
+			X509Certificate[] chain)
 		{
 			return Generate(signingAlgorithm, privateKey, chain, null);
 		}
 
 		public OcspReq Generate(
-			string					signingAlgorithm,
-			AsymmetricKeyParameter	privateKey,
-			X509Certificate[]		chain,
-			SecureRandom			random)
+			string signingAlgorithm,
+			AsymmetricKeyParameter privateKey,
+			X509Certificate[] chain,
+			SecureRandom random)
 		{
 			if (signingAlgorithm == null)
 				throw new ArgumentException("no signing algorithm specified");

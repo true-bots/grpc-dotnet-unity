@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -19,8 +18,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	{
 		private readonly IBlockCipher engine;
 
-		private KeyParameter	param;
-		private bool			forWrapping;
+		private KeyParameter param;
+		private bool forWrapping;
 
 		private byte[] iv =
 		{
@@ -34,31 +33,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			this.engine = engine;
 		}
 
-        public virtual void Init(
-			bool				forWrapping,
-			ICipherParameters	parameters)
+		public virtual void Init(
+			bool forWrapping,
+			ICipherParameters parameters)
 		{
 			this.forWrapping = forWrapping;
 
 			if (parameters is ParametersWithRandom)
 			{
-				parameters = ((ParametersWithRandom) parameters).Parameters;
+				parameters = ((ParametersWithRandom)parameters).Parameters;
 			}
 
 			if (parameters is KeyParameter)
 			{
-				this.param = (KeyParameter) parameters;
+				this.param = (KeyParameter)parameters;
 			}
 			else if (parameters is ParametersWithIV)
 			{
-				ParametersWithIV pIV = (ParametersWithIV) parameters;
+				ParametersWithIV pIV = (ParametersWithIV)parameters;
 				byte[] iv = pIV.GetIV();
 
 				if (iv.Length != 8)
 					throw new ArgumentException("IV length not equal to 8", "parameters");
 
 				this.iv = iv;
-				this.param = (KeyParameter) pIV.Parameters;
+				this.param = (KeyParameter)pIV.Parameters;
 			}
 			else
 			{
@@ -66,15 +65,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return engine.AlgorithmName; }
 		}
 
-        public virtual byte[] Wrap(
-			byte[]	input,
-			int		inOff,
-			int		inLen)
+		public virtual byte[] Wrap(
+			byte[] input,
+			int inOff,
+			int inLen)
 		{
 			if (!forWrapping)
 			{
@@ -110,7 +109,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 						byte v = (byte)t;
 
 						buf[iv.Length - k] ^= v;
-						t = (int) ((uint)t >> 8);
+						t = (int)((uint)t >> 8);
 					}
 
 					Array.Copy(buf, 0, block, 0, 8);
@@ -121,10 +120,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return block;
 		}
 
-        public virtual byte[] Unwrap(
-			byte[]  input,
-			int     inOff,
-			int     inLen)
+		public virtual byte[] Unwrap(
+			byte[] input,
+			int inOff,
+			int inLen)
 		{
 			if (forWrapping)
 			{
@@ -138,12 +137,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				throw new InvalidCipherTextException("unwrap data must be a multiple of 8 bytes");
 			}
 
-			byte[]  block = new byte[inLen - iv.Length];
-			byte[]  a = new byte[iv.Length];
-			byte[]  buf = new byte[8 + iv.Length];
+			byte[] block = new byte[inLen - iv.Length];
+			byte[] a = new byte[iv.Length];
+			byte[] buf = new byte[8 + iv.Length];
 
 			Array.Copy(input, inOff, a, 0, iv.Length);
-            Array.Copy(input, inOff + iv.Length, block, 0, inLen - iv.Length);
+			Array.Copy(input, inOff + iv.Length, block, 0, inLen - iv.Length);
 
 			engine.Init(false, param);
 
@@ -162,7 +161,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 						byte v = (byte)t;
 
 						buf[iv.Length - k] ^= v;
-						t = (int) ((uint)t >> 8);
+						t = (int)((uint)t >> 8);
 					}
 
 					engine.ProcessBlock(buf, 0, buf, 0);

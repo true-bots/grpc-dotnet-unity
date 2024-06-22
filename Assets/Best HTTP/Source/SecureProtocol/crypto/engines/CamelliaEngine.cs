@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 
@@ -22,7 +21,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		private uint[] kw = new uint[4 * 2]; // for whitening
 		private uint[] ke = new uint[6 * 2]; // for FL and FL^(-1)
 
-		private static readonly uint[] SIGMA = new uint[]{
+		private static readonly uint[] SIGMA = new uint[]
+		{
 			0xa09e667f, 0x3bcc908b,
 			0xb67ae858, 0x4caa73b2,
 			0xc6ef372f, 0xe94f82be,
@@ -32,11 +32,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		};
 
 		/*
-		*
-		* S-box data
-		*
-		*/
-		private static readonly uint[] SBOX1_1110 = new uint[]{
+		 *
+		 * S-box data
+		 *
+		 */
+		private static readonly uint[] SBOX1_1110 = new uint[]
+		{
 			0x70707000, 0x82828200, 0x2c2c2c00, 0xececec00, 0xb3b3b300, 0x27272700,
 			0xc0c0c000, 0xe5e5e500, 0xe4e4e400, 0x85858500, 0x57575700, 0x35353500,
 			0xeaeaea00, 0x0c0c0c00, 0xaeaeae00, 0x41414100, 0x23232300, 0xefefef00,
@@ -82,7 +83,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x77777700, 0xc7c7c700, 0x80808000, 0x9e9e9e00
 		};
 
-		private static readonly uint[] SBOX4_4404 = new uint[]{
+		private static readonly uint[] SBOX4_4404 = new uint[]
+		{
 			0x70700070, 0x2c2c002c, 0xb3b300b3, 0xc0c000c0, 0xe4e400e4, 0x57570057,
 			0xeaea00ea, 0xaeae00ae, 0x23230023, 0x6b6b006b, 0x45450045, 0xa5a500a5,
 			0xeded00ed, 0x4f4f004f, 0x1d1d001d, 0x92920092, 0x86860086, 0xafaf00af,
@@ -128,7 +130,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0xe3e300e3, 0xf4f400f4, 0xc7c700c7, 0x9e9e009e
 		};
 
-		private static readonly uint[] SBOX2_0222 = new uint[]{
+		private static readonly uint[] SBOX2_0222 = new uint[]
+		{
 			0x00e0e0e0, 0x00050505, 0x00585858, 0x00d9d9d9, 0x00676767, 0x004e4e4e,
 			0x00818181, 0x00cbcbcb, 0x00c9c9c9, 0x000b0b0b, 0x00aeaeae, 0x006a6a6a,
 			0x00d5d5d5, 0x00181818, 0x005d5d5d, 0x00828282, 0x00464646, 0x00dfdfdf,
@@ -174,7 +177,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x00eeeeee, 0x008f8f8f, 0x00010101, 0x003d3d3d
 		};
 
-		private static readonly uint[] SBOX3_3033 = new uint[]{
+		private static readonly uint[] SBOX3_3033 = new uint[]
+		{
 			0x38003838, 0x41004141, 0x16001616, 0x76007676, 0xd900d9d9, 0x93009393,
 			0x60006060, 0xf200f2f2, 0x72007272, 0xc200c2c2, 0xab00abab, 0x9a009a9a,
 			0x75007575, 0x06000606, 0x57005757, 0xa000a0a0, 0x91009191, 0xf700f7f7,
@@ -313,7 +317,6 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		private static void camelliaFLs(uint[] s, uint[] fkey, int keyoff)
 		{
-
 			s[1] ^= leftRotate(s[0] & fkey[0 + keyoff], 1);
 			s[0] ^= fkey[1 + keyoff] | s[1];
 
@@ -330,35 +333,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			switch (key.Length)
 			{
-			case 16:
-				_keyIs128 = true;
-				Pack.BE_To_UInt32(key, 0, k, 0, 4);
-				k[4] = k[5] = k[6] = k[7] = 0;
-				break;
-			case 24:
-				Pack.BE_To_UInt32(key, 0, k, 0, 6);
-				k[6] = ~k[4];
-				k[7] = ~k[5];
-				_keyIs128 = false;
-				break;
-			case 32:
-				Pack.BE_To_UInt32(key, 0, k, 0, 8);
-				_keyIs128 = false;
-				break;
-			default:
-				throw new ArgumentException("key sizes are only 16/24/32 bytes.");
+				case 16:
+					_keyIs128 = true;
+					Pack.BE_To_UInt32(key, 0, k, 0, 4);
+					k[4] = k[5] = k[6] = k[7] = 0;
+					break;
+				case 24:
+					Pack.BE_To_UInt32(key, 0, k, 0, 6);
+					k[6] = ~k[4];
+					k[7] = ~k[5];
+					_keyIs128 = false;
+					break;
+				case 32:
+					Pack.BE_To_UInt32(key, 0, k, 0, 8);
+					_keyIs128 = false;
+					break;
+				default:
+					throw new ArgumentException("key sizes are only 16/24/32 bytes.");
 			}
 
 			for (int i = 0; i < 4; i++)
 			{
 				ka[i] = k[i] ^ k[i + 4];
 			}
+
 			/* compute KA */
 			camelliaF2(ka, SIGMA, 0);
 			for (int i = 0; i < 4; i++)
 			{
 				ka[i] ^= k[i];
 			}
+
 			camelliaF2(ka, SIGMA, 4);
 
 			if (_keyIs128)
@@ -391,10 +396,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					roldq(15, ka, 0, subkey, 20);
 					roldqo32(34, ka, 0, subkey, 28);
 					roldq(17, ka, 0, kw, 4);
-
 				}
 				else
-				{ // decryption
+				{
+					// decryption
 					/* KL dependant keys */
 					kw[4] = k[0];
 					kw[5] = k[1];
@@ -424,12 +429,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				}
 			}
 			else
-			{ // 192bit or 256bit
+			{
+				// 192bit or 256bit
 				/* compute KB */
 				for (int i = 0; i < 4; i++)
 				{
 					kb[i] = ka[i] ^ k[i + 4];
 				}
+
 				camelliaF2(kb, SIGMA, 8);
 
 				if (forEncryption)
@@ -466,10 +473,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					roldq(30, kb, 0, subkey, 12);
 					roldq(30, kb, 0, subkey, 28);
 					roldqo32(51, kb, 0, kw, 4);
-
 				}
 				else
-				{ // decryption
+				{
+					// decryption
 					/* KL dependant keys */
 					kw[4] = k[0];
 					kw[5] = k[1];
@@ -638,9 +645,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		{
 		}
 
-        public virtual void Init(
-			bool				forEncryption,
-			ICipherParameters	parameters)
+		public virtual void Init(
+			bool forEncryption,
+			ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
 				throw new ArgumentException("only simple KeyParameter expected.");
@@ -650,23 +657,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			initialised = true;
 		}
 
-        public virtual string AlgorithmName
+		public virtual string AlgorithmName
 		{
 			get { return "Camellia"; }
 		}
 
-        public virtual int GetBlockSize()
+		public virtual int GetBlockSize()
 		{
 			return BLOCK_SIZE;
 		}
 
-        public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
+		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (!initialised)
 				throw new InvalidOperationException("Camellia engine not initialised");
 
-            Check.DataLength(input, inOff, BLOCK_SIZE, "input buffer too short");
-            Check.OutputLength(output, outOff, BLOCK_SIZE, "output buffer too short");
+			Check.DataLength(input, inOff, BLOCK_SIZE, "input buffer too short");
+			Check.OutputLength(output, outOff, BLOCK_SIZE, "output buffer too short");
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			if (_keyIs128)

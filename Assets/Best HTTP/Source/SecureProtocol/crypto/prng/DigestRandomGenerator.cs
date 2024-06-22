@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -19,11 +18,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 	{
 		private const long CYCLE_COUNT = 10;
 
-		private long	stateCounter;
-		private long	seedCounter;
-		private IDigest	digest;
-		private byte[]	state;
-		private byte[]	seed;
+		private long stateCounter;
+		private long seedCounter;
+		private IDigest digest;
+		private byte[] state;
+		private byte[] seed;
 
 		public DigestRandomGenerator(IDigest digest)
 		{
@@ -40,11 +39,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		{
 			lock (this)
 			{
-                if (!Arrays.IsNullOrEmpty(inSeed))
-                {
-                    DigestUpdate(inSeed);
-                }
-                DigestUpdate(seed);
+				if (!Arrays.IsNullOrEmpty(inSeed))
+				{
+					DigestUpdate(inSeed);
+				}
+
+				DigestUpdate(seed);
 				DigestDoFinal(seed);
 			}
 		}
@@ -64,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
         }
 #endif
 
-        public void AddSeedMaterial(long rSeed)
+		public void AddSeedMaterial(long rSeed)
 		{
 			lock (this)
 			{
@@ -98,6 +98,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 						GenerateState();
 						stateOff = 0;
 					}
+
 					bytes[i] = state[stateOff++];
 				}
 			}
@@ -164,24 +165,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
             digest.DoFinal(result);
         }
 #else
-        private void DigestAddCounter(long seedVal)
-        {
-            byte[] bytes = new byte[8];
-            Pack.UInt64_To_LE((ulong)seedVal, bytes);
-            digest.BlockUpdate(bytes, 0, bytes.Length);
-        }
+		private void DigestAddCounter(long seedVal)
+		{
+			byte[] bytes = new byte[8];
+			Pack.UInt64_To_LE((ulong)seedVal, bytes);
+			digest.BlockUpdate(bytes, 0, bytes.Length);
+		}
 
 		private void DigestUpdate(byte[] inSeed)
 		{
 			digest.BlockUpdate(inSeed, 0, inSeed.Length);
 		}
 
-        private void DigestDoFinal(byte[] result)
+		private void DigestDoFinal(byte[] result)
 		{
 			digest.DoFinal(result, 0);
 		}
 #endif
-    }
+	}
 }
 #pragma warning restore
 #endif

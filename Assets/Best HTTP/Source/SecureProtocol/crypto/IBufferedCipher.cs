@@ -5,8 +5,8 @@ using System;
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
 	/// <remarks>Block cipher engines are expected to conform to this interface.</remarks>
-    public interface IBufferedCipher
-    {
+	public interface IBufferedCipher
+	{
 		/// <summary>The name of the algorithm this cipher implements.</summary>
 		string AlgorithmName { get; }
 
@@ -14,7 +14,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		/// <param name="forEncryption">If true the cipher is initialised for encryption,
 		/// if false for decryption.</param>
 		/// <param name="parameters">The key and other data required by the cipher.</param>
-        void Init(bool forEncryption, ICipherParameters parameters);
+		void Init(bool forEncryption, ICipherParameters parameters);
 
 		int GetBlockSize();
 
@@ -29,7 +29,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
         int ProcessByte(byte input, Span<byte> output);
 #endif
 
-        byte[] ProcessBytes(byte[] input);
+		byte[] ProcessBytes(byte[] input);
 		byte[] ProcessBytes(byte[] input, int inOff, int length);
 		int ProcessBytes(byte[] input, byte[] output, int outOff);
 		int ProcessBytes(byte[] input, int inOff, int length, byte[] output, int outOff);
@@ -54,8 +54,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		/// Reset the cipher. After resetting the cipher is in the same state
 		/// as it was after the last init (if there was one).
 		/// </summary>
-        void Reset();
-    }
+		void Reset();
+	}
 }
 #pragma warning restore
 #endif

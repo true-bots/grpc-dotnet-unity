@@ -7,8 +7,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class CrlAnnContent
 		: Asn1Encodable
 	{
-        public static CrlAnnContent GetInstance(object obj)
-        {
+		public static CrlAnnContent GetInstance(object obj)
+		{
 			if (obj is CrlAnnContent crlAnnContent)
 				return crlAnnContent;
 
@@ -16,21 +16,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new CrlAnnContent(Asn1Sequence.GetInstance(obj));
 
 			return null;
-        }
+		}
 
-        private readonly Asn1Sequence m_content;
+		private readonly Asn1Sequence m_content;
 
 		private CrlAnnContent(Asn1Sequence seq)
 		{
 			m_content = seq;
 		}
 
-        public CrlAnnContent(CertificateList crl)
-        {
-            m_content = new DerSequence(crl);
-        }
+		public CrlAnnContent(CertificateList crl)
+		{
+			m_content = new DerSequence(crl);
+		}
 
-        public virtual CertificateList[] ToCertificateListArray()
+		public virtual CertificateList[] ToCertificateListArray()
 		{
 			return m_content.MapElements(CertificateList.GetInstance);
 		}

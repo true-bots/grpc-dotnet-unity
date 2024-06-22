@@ -1,19 +1,18 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 {
-    public sealed class SignerSink
+	public sealed class SignerSink
 		: BaseOutputStream
 	{
 		private readonly ISigner m_signer;
 
-        public SignerSink(ISigner signer)
+		public SignerSink(ISigner signer)
 		{
-            m_signer = signer;
+			m_signer = signer;
 		}
 
 		public ISigner Signer => m_signer;

@@ -34,10 +34,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			if (null == m_content)
 				return null;
 
-            // TODO[cms] Ideally we could enforce the claimed tag
-            //return Asn1Utilities.ParseContextBaseUniversal(content, 0, true, tag);
-            return Asn1Utilities.ParseExplicitContextBaseObject(m_content, 0);
-        }
+			// TODO[cms] Ideally we could enforce the claimed tag
+			//return Asn1Utilities.ParseContextBaseUniversal(content, 0, true, tag);
+			return Asn1Utilities.ParseExplicitContextBaseObject(m_content, 0);
+		}
 	}
 }
 #pragma warning restore

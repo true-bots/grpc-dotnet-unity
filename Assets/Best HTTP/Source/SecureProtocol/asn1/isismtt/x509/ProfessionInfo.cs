@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -9,18 +8,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 {
 	/**
 	* Professions, specializations, disciplines, fields of activity, etc.
-	* 
+	*
 	* <pre>
-	*               ProfessionInfo ::= SEQUENCE 
+	*               ProfessionInfo ::= SEQUENCE
 	*               {
 	*                 namingAuthority [0] EXPLICIT NamingAuthority OPTIONAL,
 	*                 professionItems SEQUENCE OF DirectoryString (SIZE(1..128)),
 	*                 professionOids SEQUENCE OF OBJECT IDENTIFIER OPTIONAL,
 	*                 registrationNumber PrintableString(SIZE(1..128)) OPTIONAL,
-	*                 addProfessionInfo OCTET STRING OPTIONAL 
+	*                 addProfessionInfo OCTET STRING OPTIONAL
 	*               }
 	* </pre>
-	* 
+	*
 	* @see BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509.AdmissionSyntax
 	*/
 	public class ProfessionInfo
@@ -140,21 +139,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		public static readonly DerObjectIdentifier Patentanwalt = new DerObjectIdentifier(
 			NamingAuthority.IdIsisMttATNamingAuthoritiesRechtWirtschaftSteuern + ".19");
 
-		private readonly NamingAuthority	namingAuthority;
-		private readonly Asn1Sequence		professionItems;
-		private readonly Asn1Sequence		professionOids;
-		private readonly string				registrationNumber;
-		private readonly Asn1OctetString	addProfessionInfo;
+		private readonly NamingAuthority namingAuthority;
+		private readonly Asn1Sequence professionItems;
+		private readonly Asn1Sequence professionOids;
+		private readonly string registrationNumber;
+		private readonly Asn1OctetString addProfessionInfo;
 
 		public static ProfessionInfo GetInstance(object obj)
 		{
 			if (obj == null || obj is ProfessionInfo)
-				return (ProfessionInfo) obj;
+				return (ProfessionInfo)obj;
 
 			if (obj is Asn1Sequence seq)
 				return new ProfessionInfo(seq);
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -213,7 +212,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				}
 				else
 				{
-                    throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+					throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
 				}
 			}
 
@@ -230,7 +229,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				}
 				else
 				{
-                    throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+					throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
 				}
 			}
 
@@ -243,7 +242,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				}
 				else
 				{
-                    throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+					throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
 				}
 			}
 		}
@@ -262,11 +261,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		* @param addProfessionInfo  Additional infos in encoded form.
 		*/
 		public ProfessionInfo(
-			NamingAuthority			namingAuthority,
-			DirectoryString[]		professionItems,
-			DerObjectIdentifier[]	professionOids,
-			string					registrationNumber,
-			Asn1OctetString			addProfessionInfo)
+			NamingAuthority namingAuthority,
+			DirectoryString[] professionItems,
+			DerObjectIdentifier[] professionOids,
+			string registrationNumber,
+			Asn1OctetString addProfessionInfo)
 		{
 			this.namingAuthority = namingAuthority;
 			this.professionItems = new DerSequence(professionItems);
@@ -274,6 +273,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 			{
 				this.professionOids = new DerSequence(professionOids);
 			}
+
 			this.registrationNumber = registrationNumber;
 			this.addProfessionInfo = addProfessionInfo;
 		}
@@ -296,21 +296,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		*
 		* @return an Asn1Object
 		*/
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector();
-            v.AddOptionalTagged(true, 0, namingAuthority);
-            v.Add(professionItems);
-            v.AddOptional(professionOids);
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector();
+			v.AddOptionalTagged(true, 0, namingAuthority);
+			v.Add(professionItems);
+			v.AddOptional(professionOids);
 
-            if (registrationNumber != null)
-            {
-                v.Add(new DerPrintableString(registrationNumber, true));
-            }
+			if (registrationNumber != null)
+			{
+				v.Add(new DerPrintableString(registrationNumber, true));
+			}
 
-            v.AddOptional(addProfessionInfo);
-            return new DerSequence(v);
-        }
+			v.AddOptional(addProfessionInfo);
+			return new DerSequence(v);
+		}
 
 		/**
 		* @return Returns the addProfessionInfo.

@@ -9,8 +9,8 @@ modification, are permitted provided that the following conditions are met:
   1. Redistributions of source code must retain the above copyright notice,
      this list of conditions and the following disclaimer.
 
-  2. Redistributions in binary form must reproduce the above copyright 
-     notice, this list of conditions and the following disclaimer in 
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in
      the documentation and/or other materials provided with the distribution.
 
   3. The names of the authors may not be used to endorse or promote products
@@ -38,268 +38,269 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Diagnostics;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 {
-    public class ZOutputStream
-        : BaseOutputStream
-    {
-        private static ZStream GetDefaultZStream(bool nowrap)
-        {
-            ZStream z = new ZStream();
-            z.inflateInit(nowrap);
-            return z;
-        }
+	public class ZOutputStream
+		: BaseOutputStream
+	{
+		private static ZStream GetDefaultZStream(bool nowrap)
+		{
+			ZStream z = new ZStream();
+			z.inflateInit(nowrap);
+			return z;
+		}
 
-        private const int BufferSize = 4096;
+		private const int BufferSize = 4096;
 
-        protected ZStream z;
-        protected int flushLevel = JZlib.Z_NO_FLUSH;
-        // TODO Allow custom buf
-        protected byte[] buf = new byte[BufferSize];
-        protected byte[] buf1 = new byte[1];
-        protected bool compress;
+		protected ZStream z;
 
-        protected Stream output;
-        protected bool closed;
+		protected int flushLevel = JZlib.Z_NO_FLUSH;
 
-        public ZOutputStream(Stream output)
-            : this(output, false)
-        {
-        }
+		// TODO Allow custom buf
+		protected byte[] buf = new byte[BufferSize];
+		protected byte[] buf1 = new byte[1];
+		protected bool compress;
 
-        public ZOutputStream(Stream output, bool nowrap)
-            : this(output, GetDefaultZStream(nowrap))
-        {
-        }
+		protected Stream output;
+		protected bool closed;
 
-        public ZOutputStream(Stream output, ZStream z)
-            : base()
-        {
-            Debug.Assert(output.CanWrite);
+		public ZOutputStream(Stream output)
+			: this(output, false)
+		{
+		}
 
-            if (z == null)
-            {
-                z = new ZStream();
-            }
+		public ZOutputStream(Stream output, bool nowrap)
+			: this(output, GetDefaultZStream(nowrap))
+		{
+		}
 
-            if (z.istate == null && z.dstate == null)
-            {
-                z.inflateInit();
-            }
+		public ZOutputStream(Stream output, ZStream z)
+			: base()
+		{
+			Debug.Assert(output.CanWrite);
 
-            this.output = output;
-            this.compress = (z.istate == null);
-            this.z = z;
-        }
+			if (z == null)
+			{
+				z = new ZStream();
+			}
 
-        public ZOutputStream(Stream output, int level)
-            : this(output, level, false)
-        {
-        }
+			if (z.istate == null && z.dstate == null)
+			{
+				z.inflateInit();
+			}
 
-        public ZOutputStream(Stream output, int level, bool nowrap)
-            : base()
-        {
-            Debug.Assert(output.CanWrite);
+			this.output = output;
+			this.compress = (z.istate == null);
+			this.z = z;
+		}
 
-            this.output = output;
-            this.compress = true;
-            this.z = new ZStream();
-            this.z.deflateInit(level, nowrap);
-        }
+		public ZOutputStream(Stream output, int level)
+			: this(output, level, false)
+		{
+		}
 
-        protected void Detach(bool disposing)
-        {
-            if (disposing)
-            {
-                if (!closed)
-                {
-                    try
-                    {
-                        try
-                        {
-                            Finish();
-                        }
-                        catch (IOException)
-                        {
-                            // Ignore
-                        }
-                    }
-                    finally
-                    {
-                        this.closed = true;
-                        End();
-                        output = null;
-                    }
-                }
-            }
-            base.Dispose(disposing);
-        }
+		public ZOutputStream(Stream output, int level, bool nowrap)
+			: base()
+		{
+			Debug.Assert(output.CanWrite);
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-			    if (!closed)
-                {
-                    try
-                    {
-                        try
-                        {
-                            Finish();
-                        }
-                        catch (IOException)
-                        {
-                            // Ignore
-                        }
-                    }
-                    finally
-                    {
-                        this.closed = true;
-                        End();
-                        output.Dispose();
-                        output = null;
-                    }
-                }
-            }
-            base.Dispose(disposing);
-        }
+			this.output = output;
+			this.compress = true;
+			this.z = new ZStream();
+			this.z.deflateInit(level, nowrap);
+		}
 
-        public virtual void End()
-        {
-            if (z == null)
-                return;
-            if (compress)
-                z.deflateEnd();
-            else
-                z.inflateEnd();
-            z.free();
-            z = null;
-        }
+		protected void Detach(bool disposing)
+		{
+			if (disposing)
+			{
+				if (!closed)
+				{
+					try
+					{
+						try
+						{
+							Finish();
+						}
+						catch (IOException)
+						{
+							// Ignore
+						}
+					}
+					finally
+					{
+						this.closed = true;
+						End();
+						output = null;
+					}
+				}
+			}
 
-        public virtual void Finish()
-        {
-            do
-            {
-                z.next_out = buf;
-                z.next_out_index = 0;
-                z.avail_out = buf.Length;
+			base.Dispose(disposing);
+		}
 
-                int err = compress
-                    ? z.deflate(JZlib.Z_FINISH)
-                    : z.inflate(JZlib.Z_FINISH);
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				if (!closed)
+				{
+					try
+					{
+						try
+						{
+							Finish();
+						}
+						catch (IOException)
+						{
+							// Ignore
+						}
+					}
+					finally
+					{
+						this.closed = true;
+						End();
+						output.Dispose();
+						output = null;
+					}
+				}
+			}
 
-                if (err != JZlib.Z_STREAM_END && err != JZlib.Z_OK)
-                    // TODO
-                    //throw new ZStreamException((compress?"de":"in")+"flating: "+z.msg);
-                    throw new IOException((compress ? "de" : "in") + "flating: " + z.msg);
+			base.Dispose(disposing);
+		}
 
-                int count = buf.Length - z.avail_out;
-                if (count > 0)
-                {
-                    output.Write(buf, 0, count);
-                }
-            }
-            while (z.avail_in > 0 || z.avail_out == 0);
+		public virtual void End()
+		{
+			if (z == null)
+				return;
+			if (compress)
+				z.deflateEnd();
+			else
+				z.inflateEnd();
+			z.free();
+			z = null;
+		}
 
-            Flush();
-        }
+		public virtual void Finish()
+		{
+			do
+			{
+				z.next_out = buf;
+				z.next_out_index = 0;
+				z.avail_out = buf.Length;
 
-        public override void Flush()
-        {
-            output.Flush();
-        }
+				int err = compress
+					? z.deflate(JZlib.Z_FINISH)
+					: z.inflate(JZlib.Z_FINISH);
 
-        public virtual int FlushMode
-        {
-            get { return flushLevel; }
-            set { this.flushLevel = value; }
-        }
+				if (err != JZlib.Z_STREAM_END && err != JZlib.Z_OK)
+					// TODO
+					//throw new ZStreamException((compress?"de":"in")+"flating: "+z.msg);
+					throw new IOException((compress ? "de" : "in") + "flating: " + z.msg);
 
-        public virtual long TotalIn
-        {
-            get { return z.total_in; }
-        }
+				int count = buf.Length - z.avail_out;
+				if (count > 0)
+				{
+					output.Write(buf, 0, count);
+				}
+			} while (z.avail_in > 0 || z.avail_out == 0);
 
-        public virtual long TotalOut
-        {
-            get { return z.total_out; }
-        }
+			Flush();
+		}
 
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            Streams.ValidateBufferArguments(buffer, offset, count);
+		public override void Flush()
+		{
+			output.Flush();
+		}
 
-            if (count == 0)
-                return;
+		public virtual int FlushMode
+		{
+			get { return flushLevel; }
+			set { this.flushLevel = value; }
+		}
 
-            z.next_in = buffer;
-            z.next_in_index = offset;
-            z.avail_in = count;
+		public virtual long TotalIn
+		{
+			get { return z.total_in; }
+		}
 
-            do
-            {
-                z.next_out = buf;
-                z.next_out_index = 0;
-                z.avail_out = buf.Length;
+		public virtual long TotalOut
+		{
+			get { return z.total_out; }
+		}
 
-                int err = compress
-                    ? z.deflate(flushLevel)
-                    : z.inflate(flushLevel);
+		public override void Write(byte[] buffer, int offset, int count)
+		{
+			Streams.ValidateBufferArguments(buffer, offset, count);
 
-                if (err != JZlib.Z_OK)
-                    // TODO
-                    //throw new ZStreamException((compress ? "de" : "in") + "flating: " + z.msg);
-                    throw new IOException((compress ? "de" : "in") + "flating: " + z.msg);
+			if (count == 0)
+				return;
 
-                output.Write(buf, 0, buf.Length - z.avail_out);
-            }
-            while (z.avail_in > 0 || z.avail_out == 0);
-        }
+			z.next_in = buffer;
+			z.next_in_index = offset;
+			z.avail_in = count;
 
-        public override void WriteByte(byte value)
-        {
-            buf1[0] = value;
-            Write(buf1, 0, 1);
-        }
-    }
+			do
+			{
+				z.next_out = buf;
+				z.next_out_index = 0;
+				z.avail_out = buf.Length;
 
-    public class ZOutputStreamLeaveOpen
-        : ZOutputStream
-    {
-        public ZOutputStreamLeaveOpen(Stream output)
-            : base(output)
-        {
-        }
+				int err = compress
+					? z.deflate(flushLevel)
+					: z.inflate(flushLevel);
 
-        public ZOutputStreamLeaveOpen(Stream output, bool nowrap)
-            : base(output, nowrap)
-        {
-        }
+				if (err != JZlib.Z_OK)
+					// TODO
+					//throw new ZStreamException((compress ? "de" : "in") + "flating: " + z.msg);
+					throw new IOException((compress ? "de" : "in") + "flating: " + z.msg);
 
-        public ZOutputStreamLeaveOpen(Stream output, ZStream z)
-            : base(output, z)
-        {
-        }
+				output.Write(buf, 0, buf.Length - z.avail_out);
+			} while (z.avail_in > 0 || z.avail_out == 0);
+		}
 
-        public ZOutputStreamLeaveOpen(Stream output, int level)
-            : base(output, level)
-        {
-        }
+		public override void WriteByte(byte value)
+		{
+			buf1[0] = value;
+			Write(buf1, 0, 1);
+		}
+	}
 
-        public ZOutputStreamLeaveOpen(Stream output, int level, bool nowrap)
-            : base(output, level, nowrap)
-        {
-        }
+	public class ZOutputStreamLeaveOpen
+		: ZOutputStream
+	{
+		public ZOutputStreamLeaveOpen(Stream output)
+			: base(output)
+		{
+		}
 
-        protected override void Dispose(bool disposing)
-        {
-            Detach(disposing);
-        }
-    }
+		public ZOutputStreamLeaveOpen(Stream output, bool nowrap)
+			: base(output, nowrap)
+		{
+		}
+
+		public ZOutputStreamLeaveOpen(Stream output, ZStream z)
+			: base(output, z)
+		{
+		}
+
+		public ZOutputStreamLeaveOpen(Stream output, int level)
+			: base(output, level)
+		{
+		}
+
+		public ZOutputStreamLeaveOpen(Stream output, int level, bool nowrap)
+			: base(output, level, nowrap)
+		{
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			Detach(disposing);
+		}
+	}
 }
 #pragma warning restore
 #endif

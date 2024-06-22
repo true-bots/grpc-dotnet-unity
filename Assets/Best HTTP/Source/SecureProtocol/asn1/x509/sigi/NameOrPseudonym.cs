@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -9,26 +8,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 {
 	/**
 	* Structure for a name or pseudonym.
-	* 
+	*
 	* <pre>
 	*       NameOrPseudonym ::= CHOICE {
 	*     	   surAndGivenName SEQUENCE {
 	*     	     surName DirectoryString,
-	*     	     givenName SEQUENCE OF DirectoryString 
+	*     	     givenName SEQUENCE OF DirectoryString
 	*         },
-	*     	   pseudonym DirectoryString 
+	*     	   pseudonym DirectoryString
 	*       }
 	* </pre>
-	* 
+	*
 	* @see org.bouncycastle.asn1.x509.sigi.PersonalData
-	* 
+	*
 	*/
 	public class NameOrPseudonym
 		: Asn1Encodable, IAsn1Choice
 	{
-		private readonly DirectoryString	pseudonym;
-		private readonly DirectoryString	surname;
-		private readonly Asn1Sequence		givenName;
+		private readonly DirectoryString pseudonym;
+		private readonly DirectoryString surname;
+		private readonly Asn1Sequence givenName;
 
 		public static NameOrPseudonym GetInstance(
 			object obj)
@@ -45,10 +44,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 
 			if (obj is Asn1Sequence)
 			{
-				return new NameOrPseudonym((Asn1Sequence) obj);
+				return new NameOrPseudonym((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -97,7 +96,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
 
 			if (!(seq[0] is IAsn1String))
-                throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(seq[0]));
+				throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(seq[0]));
 
 			surname = DirectoryString.GetInstance(seq[0]);
 			givenName = Asn1Sequence.GetInstance(seq[1]);
@@ -121,8 +120,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 		 * @param givenName A sequence of directory strings making up the givenName
 		 */
 		public NameOrPseudonym(
-			DirectoryString	surname,
-			Asn1Sequence	givenName)
+			DirectoryString surname,
+			Asn1Sequence givenName)
 		{
 			this.surname = surname;
 			this.givenName = givenName;
@@ -146,6 +145,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 			{
 				items[count++] = DirectoryString.GetInstance(o);
 			}
+
 			return items;
 		}
 

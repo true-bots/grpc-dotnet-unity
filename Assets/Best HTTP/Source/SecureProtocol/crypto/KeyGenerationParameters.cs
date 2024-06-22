@@ -5,33 +5,33 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 {
-    /**
-     * The base class for parameters to key generators.
-     */
-    public class KeyGenerationParameters
-    {
-        private SecureRandom	random;
-        private int				strength;
+	/**
+	 * The base class for parameters to key generators.
+	 */
+	public class KeyGenerationParameters
+	{
+		private SecureRandom random;
+		private int strength;
 
-        /**
-         * initialise the generator with a source of randomness
-         * and a strength (in bits).
-         *
-         * @param random the random byte source.
-         * @param strength the size, in bits, of the keys we want to produce.
-         */
-        public KeyGenerationParameters(
-            SecureRandom	random,
-            int				strength)
-        {
+		/**
+		 * initialise the generator with a source of randomness
+		 * and a strength (in bits).
+		 *
+		 * @param random the random byte source.
+		 * @param strength the size, in bits, of the keys we want to produce.
+		 */
+		public KeyGenerationParameters(
+			SecureRandom random,
+			int strength)
+		{
 			if (random == null)
 				throw new ArgumentNullException("random");
 			if (strength < 1)
 				throw new ArgumentException("strength must be a positive value", "strength");
 
 			this.random = random;
-            this.strength = strength;
-        }
+			this.strength = strength;
+		}
 
 		/**
          * return the random source associated with this
@@ -39,21 +39,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
          *
          * @return the generators random source.
          */
-        public SecureRandom Random
-        {
-            get { return random; }
-        }
+		public SecureRandom Random
+		{
+			get { return random; }
+		}
 
 		/**
          * return the bit strength for keys produced by this generator,
          *
          * @return the strength of the keys this generator produces (in bits).
          */
-        public int Strength
-        {
-            get { return strength; }
-        }
-    }
+		public int Strength
+		{
+			get { return strength; }
+		}
+	}
 }
 #pragma warning restore
 #endif

@@ -2,30 +2,29 @@
 #pragma warning disable
 using System;
 using System.IO;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
-    public sealed class X25519PublicKeyParameters
-        : AsymmetricKeyParameter
-    {
-        public static readonly int KeySize = X25519.PointSize;
+	public sealed class X25519PublicKeyParameters
+		: AsymmetricKeyParameter
+	{
+		public static readonly int KeySize = X25519.PointSize;
 
-        private readonly byte[] data = new byte[KeySize];
+		private readonly byte[] data = new byte[KeySize];
 
-        public X25519PublicKeyParameters(byte[] buf)
-            : this(Validate(buf), 0)
-        {
-        }
+		public X25519PublicKeyParameters(byte[] buf)
+			: this(Validate(buf), 0)
+		{
+		}
 
-        public X25519PublicKeyParameters(byte[] buf, int off)
-            : base(false)
-        {
-            Array.Copy(buf, off, data, 0, KeySize);
-        }
+		public X25519PublicKeyParameters(byte[] buf, int off)
+			: base(false)
+		{
+			Array.Copy(buf, off, data, 0, KeySize);
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public X25519PublicKeyParameters(ReadOnlySpan<byte> buf)
@@ -38,17 +37,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
         }
 #endif
 
-        public X25519PublicKeyParameters(Stream input)
-            : base(false)
-        {
-            if (KeySize != Streams.ReadFully(input, data))
-                throw new EndOfStreamException("EOF encountered in middle of X25519 public key");
-        }
+		public X25519PublicKeyParameters(Stream input)
+			: base(false)
+		{
+			if (KeySize != Streams.ReadFully(input, data))
+				throw new EndOfStreamException("EOF encountered in middle of X25519 public key");
+		}
 
-        public void Encode(byte[] buf, int off)
-        {
-            Array.Copy(data, 0, buf, off, KeySize);
-        }
+		public void Encode(byte[] buf, int off)
+		{
+			Array.Copy(data, 0, buf, off, KeySize);
+		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public void Encode(Span<byte> buf)
@@ -57,19 +56,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
         }
 #endif
 
-        public byte[] GetEncoded()
-        {
-            return Arrays.Clone(data);
-        }
+		public byte[] GetEncoded()
+		{
+			return Arrays.Clone(data);
+		}
 
-        private static byte[] Validate(byte[] buf)
-        {
-            if (buf.Length != KeySize)
-                throw new ArgumentException("must have length " + KeySize, nameof(buf));
+		private static byte[] Validate(byte[] buf)
+		{
+			if (buf.Length != KeySize)
+				throw new ArgumentException("must have length " + KeySize, nameof(buf));
 
-            return buf;
-        }
-    }
+			return buf;
+		}
+	}
 }
 #pragma warning restore
 #endif

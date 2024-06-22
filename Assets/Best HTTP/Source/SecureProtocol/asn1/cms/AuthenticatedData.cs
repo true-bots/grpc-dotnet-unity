@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -21,14 +20,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		private Asn1Set unauthAttrs;
 
 		public AuthenticatedData(
-			OriginatorInfo		originatorInfo,
-			Asn1Set				recipientInfos,
-			AlgorithmIdentifier	macAlgorithm,
-			AlgorithmIdentifier	digestAlgorithm,
-			ContentInfo			encapsulatedContent,
-			Asn1Set				authAttrs,
-			Asn1OctetString		mac,
-			Asn1Set				unauthAttrs)
+			OriginatorInfo originatorInfo,
+			Asn1Set recipientInfos,
+			AlgorithmIdentifier macAlgorithm,
+			AlgorithmIdentifier digestAlgorithm,
+			ContentInfo encapsulatedContent,
+			Asn1Set authAttrs,
+			Asn1OctetString mac,
+			Asn1Set unauthAttrs)
 		{
 			if (digestAlgorithm != null || authAttrs != null)
 			{
@@ -51,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		}
 
 		private AuthenticatedData(
-			Asn1Sequence	seq)
+			Asn1Sequence seq)
 		{
 			int index = 0;
 
@@ -101,8 +100,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		 *                                  tagged object cannot be converted.
 		 */
 		public static AuthenticatedData GetInstance(
-			Asn1TaggedObject	obj,
-			bool				isExplicit)
+			Asn1TaggedObject obj,
+			bool isExplicit)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, isExplicit));
 		}
@@ -114,7 +113,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		 * @throws ArgumentException if the object cannot be converted.
 		 */
 		public static AuthenticatedData GetInstance(
-			object	obj)
+			object obj)
 		{
 			if (obj == null || obj is AuthenticatedData)
 			{
@@ -126,7 +125,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 				return new AuthenticatedData((Asn1Sequence)obj);
 			}
 
-            throw new ArgumentException("Invalid AuthenticatedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid AuthenticatedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
 		}
 
 		public DerInteger Version
@@ -149,10 +148,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			get { return macAlgorithm; }
 		}
 
-        public AlgorithmIdentifier DigestAlgorithm
-        {
-            get { return digestAlgorithm; }
-        }
+		public AlgorithmIdentifier DigestAlgorithm
+		{
+			get { return digestAlgorithm; }
+		}
 
 		public ContentInfo EncapsulatedContentInfo
 		{
@@ -198,13 +197,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public override Asn1Object ToAsn1Object()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(version);
-            v.AddOptionalTagged(false, 0, originatorInfo);
+			v.AddOptionalTagged(false, 0, originatorInfo);
 			v.Add(recipientInfos, macAlgorithm);
-            v.AddOptionalTagged(false, 1, digestAlgorithm);
+			v.AddOptionalTagged(false, 1, digestAlgorithm);
 			v.Add(encapsulatedContentInfo);
-            v.AddOptionalTagged(false, 2, authAttrs);
+			v.AddOptionalTagged(false, 2, authAttrs);
 			v.Add(mac);
-            v.AddOptionalTagged(false, 3, unauthAttrs);
+			v.AddOptionalTagged(false, 3, unauthAttrs);
 			return new BerSequence(v);
 		}
 

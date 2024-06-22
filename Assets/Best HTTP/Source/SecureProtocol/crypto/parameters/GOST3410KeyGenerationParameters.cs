@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
@@ -23,8 +22,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		}
 
 		public Gost3410KeyGenerationParameters(
-			SecureRandom		random,
-			DerObjectIdentifier	publicKeyParamSet)
+			SecureRandom random,
+			DerObjectIdentifier publicKeyParamSet)
 			: this(random, LookupParameters(publicKeyParamSet))
 		{
 			this.publicKeyParamSet = publicKeyParamSet;

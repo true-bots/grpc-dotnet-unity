@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
@@ -16,7 +15,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 //		const string Signature = "encryptedDigest";
 //		const string DigestAlgorithmIdentifier = "digestAlgID";
 
-		ContentType, Digest, Signature, DigestAlgorithmIdentifier
+		ContentType,
+		Digest,
+		Signature,
+		DigestAlgorithmIdentifier
 	}
 
 	public interface CmsAttributeTableGenerator

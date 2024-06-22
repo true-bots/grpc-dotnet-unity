@@ -1,16 +1,15 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 {
 	/**
 	 * ObjectDigestInfo ASN.1 structure used in v2 attribute certificates.
-	 * 
+	 *
 	 * <pre>
-	 *  
+	 *
 	 *    ObjectDigestInfo ::= SEQUENCE {
 	 *         digestedObjectType  ENUMERATED {
 	 *                 publicKey            (0),
@@ -22,13 +21,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	 *         digestAlgorithm     AlgorithmIdentifier,
 	 *         objectDigest        BIT STRING
 	 *    }
-	 *   
+	 *
 	 * </pre>
-	 * 
+	 *
 	 */
 	public class ObjectDigestInfo
-        : Asn1Encodable
-    {
+		: Asn1Encodable
+	{
 		/**
 		 * The public key is hashed.
 		 */
@@ -44,33 +43,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 */
 		public const int OtherObjectDigest = 2;
 
-		internal readonly DerEnumerated			digestedObjectType;
-        internal readonly DerObjectIdentifier	otherObjectTypeID;
-        internal readonly AlgorithmIdentifier	digestAlgorithm;
-        internal readonly DerBitString			objectDigest;
+		internal readonly DerEnumerated digestedObjectType;
+		internal readonly DerObjectIdentifier otherObjectTypeID;
+		internal readonly AlgorithmIdentifier digestAlgorithm;
+		internal readonly DerBitString objectDigest;
 
 		public static ObjectDigestInfo GetInstance(
-            object obj)
-        {
-            if (obj == null || obj is ObjectDigestInfo)
-            {
-                return (ObjectDigestInfo) obj;
-            }
+			object obj)
+		{
+			if (obj == null || obj is ObjectDigestInfo)
+			{
+				return (ObjectDigestInfo)obj;
+			}
 
 			if (obj is Asn1Sequence)
-            {
-                return new ObjectDigestInfo((Asn1Sequence) obj);
-            }
+			{
+				return new ObjectDigestInfo((Asn1Sequence)obj);
+			}
 
-            throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public static ObjectDigestInfo GetInstance(
-            Asn1TaggedObject	obj,
-            bool				isExplicit)
-        {
-            return GetInstance(Asn1Sequence.GetInstance(obj, isExplicit));
-        }
+			Asn1TaggedObject obj,
+			bool isExplicit)
+		{
+			return GetInstance(Asn1Sequence.GetInstance(obj, isExplicit));
+		}
 
 		/**
 		 * Constructor from given details.
@@ -78,7 +77,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * If <code>digestedObjectType</code> is not {@link #publicKeyCert} or
 		 * {@link #publicKey} <code>otherObjectTypeID</code> must be given,
 		 * otherwise it is ignored.</p>
-		 * 
+		 *
 		 * @param digestedObjectType The digest object type.
 		 * @param otherObjectTypeID The object type ID for
 		 *            <code>otherObjectDigest</code>.
@@ -86,10 +85,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * @param objectDigest The hash value.
 		 */
 		public ObjectDigestInfo(
-			int					digestedObjectType,
-			string				otherObjectTypeID,
-			AlgorithmIdentifier	digestAlgorithm,
-			byte[]				objectDigest)
+			int digestedObjectType,
+			string otherObjectTypeID,
+			AlgorithmIdentifier digestAlgorithm,
+			byte[] objectDigest)
 		{
 			this.digestedObjectType = new DerEnumerated(digestedObjectType);
 
@@ -98,14 +97,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				this.otherObjectTypeID = new DerObjectIdentifier(otherObjectTypeID);
 			}
 
-			this.digestAlgorithm = digestAlgorithm; 
+			this.digestAlgorithm = digestAlgorithm;
 
 			this.objectDigest = new DerBitString(objectDigest);
 		}
 
 		private ObjectDigestInfo(
 			Asn1Sequence seq)
-        {
+		{
 			if (seq.Count > 4 || seq.Count < 3)
 			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
@@ -116,10 +115,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			int offset = 0;
 
 			if (seq.Count == 4)
-            {
-                otherObjectTypeID = DerObjectIdentifier.GetInstance(seq[1]);
-                offset++;
-            }
+			{
+				otherObjectTypeID = DerObjectIdentifier.GetInstance(seq[1]);
+				offset++;
+			}
 
 			digestAlgorithm = AlgorithmIdentifier.GetInstance(seq[1 + offset]);
 			objectDigest = DerBitString.GetInstance(seq[2 + offset]);
@@ -147,9 +146,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		/**
 		 * Produce an object suitable for an Asn1OutputStream.
-		 * 
+		 *
 		 * <pre>
-		 *  
+		 *
 		 *    ObjectDigestInfo ::= SEQUENCE {
 		 *         digestedObjectType  ENUMERATED {
 		 *                 publicKey            (0),
@@ -161,17 +160,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 *         digestAlgorithm     AlgorithmIdentifier,
 		 *         objectDigest        BIT STRING
 		 *    }
-		 *   
+		 *
 		 * </pre>
 		 */
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector(digestedObjectType);
-            v.AddOptional(otherObjectTypeID);
-            v.Add(digestAlgorithm, objectDigest);
-            return new DerSequence(v);
-        }
-    }
+		public override Asn1Object ToAsn1Object()
+		{
+			Asn1EncodableVector v = new Asn1EncodableVector(digestedObjectType);
+			v.AddOptional(otherObjectTypeID);
+			v.Add(digestAlgorithm, objectDigest);
+			return new DerSequence(v);
+		}
+	}
 }
 #pragma warning restore
 #endif

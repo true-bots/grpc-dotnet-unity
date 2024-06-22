@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
@@ -10,18 +9,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class GeneralNames
 		: Asn1Encodable
 	{
-        private static GeneralName[] Copy(GeneralName[] names)
-        {
-            return (GeneralName[])names.Clone();
-        }
-
-        public static GeneralNames GetInstance(object obj)
+		private static GeneralName[] Copy(GeneralName[] names)
 		{
-            if (obj is GeneralNames)
-                return (GeneralNames)obj;
-            if (obj == null)
-                return null;
-            return new GeneralNames(Asn1Sequence.GetInstance(obj));
+			return (GeneralName[])names.Clone();
+		}
+
+		public static GeneralNames GetInstance(object obj)
+		{
+			if (obj is GeneralNames)
+				return (GeneralNames)obj;
+			if (obj == null)
+				return null;
+			return new GeneralNames(Asn1Sequence.GetInstance(obj));
 		}
 
 		public static GeneralNames GetInstance(Asn1TaggedObject obj, bool explicitly)
@@ -29,26 +28,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return GetInstance(Asn1Sequence.GetInstance(obj, explicitly));
 		}
 
-        public static GeneralNames FromExtensions(X509Extensions extensions, DerObjectIdentifier extOid)
-        {
-            return GetInstance(X509Extensions.GetExtensionParsedValue(extensions, extOid));
-        }
+		public static GeneralNames FromExtensions(X509Extensions extensions, DerObjectIdentifier extOid)
+		{
+			return GetInstance(X509Extensions.GetExtensionParsedValue(extensions, extOid));
+		}
 
-        private readonly GeneralName[] names;
+		private readonly GeneralName[] names;
 
-        /// <summary>Construct a GeneralNames object containing one GeneralName.</summary>
+		/// <summary>Construct a GeneralNames object containing one GeneralName.</summary>
 		/// <param name="name">The name to be contained.</param>
 		public GeneralNames(
 			GeneralName name)
 		{
-			names = new GeneralName[]{ name };
+			names = new GeneralName[] { name };
 		}
 
-        public GeneralNames(
-            GeneralName[] names)
-        {
-            this.names = Copy(names);
-        }
+		public GeneralNames(
+			GeneralName[] names)
+		{
+			this.names = Copy(names);
+		}
 
 		private GeneralNames(
 			Asn1Sequence seq)
@@ -63,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public GeneralName[] GetNames()
 		{
-            return Copy(names);
+			return Copy(names);
 		}
 
 		/**
@@ -84,9 +83,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			foreach (GeneralName name in names)
 			{
 				buf.Append("    ")
-				   .Append(name)
-				   .AppendLine();
+					.Append(name)
+					.AppendLine();
 			}
+
 			return buf.ToString();
 		}
 	}

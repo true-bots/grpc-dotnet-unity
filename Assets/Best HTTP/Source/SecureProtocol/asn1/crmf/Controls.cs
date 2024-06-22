@@ -2,58 +2,58 @@
 #pragma warning disable
 using System;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 {
-    public class Controls
-        : Asn1Encodable
-    {
-        private readonly Asn1Sequence content;
+	public class Controls
+		: Asn1Encodable
+	{
+		private readonly Asn1Sequence content;
 
-        private Controls(Asn1Sequence seq)
-        {
-            content = seq;
-        }
+		private Controls(Asn1Sequence seq)
+		{
+			content = seq;
+		}
 
-        public static Controls GetInstance(object obj)
-        {
-            if (obj is Controls)
-                return (Controls)obj;
+		public static Controls GetInstance(object obj)
+		{
+			if (obj is Controls)
+				return (Controls)obj;
 
-            if (obj is Asn1Sequence)
-                return new Controls((Asn1Sequence)obj);
+			if (obj is Asn1Sequence)
+				return new Controls((Asn1Sequence)obj);
 
-            throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
-        }
+			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+		}
 
-        public Controls(params AttributeTypeAndValue[] atvs)
-        {
-            content = new DerSequence(atvs);
-        }
+		public Controls(params AttributeTypeAndValue[] atvs)
+		{
+			content = new DerSequence(atvs);
+		}
 
-        public virtual AttributeTypeAndValue[] ToAttributeTypeAndValueArray()
-        {
-            AttributeTypeAndValue[] result = new AttributeTypeAndValue[content.Count];
-            for (int i = 0; i != result.Length; ++i)
-            {
-                result[i] = AttributeTypeAndValue.GetInstance(content[i]);
-            }
-            return result;
-        }
+		public virtual AttributeTypeAndValue[] ToAttributeTypeAndValueArray()
+		{
+			AttributeTypeAndValue[] result = new AttributeTypeAndValue[content.Count];
+			for (int i = 0; i != result.Length; ++i)
+			{
+				result[i] = AttributeTypeAndValue.GetInstance(content[i]);
+			}
 
-        /**
-         * <pre>
-         * Controls  ::= SEQUENCE SIZE(1..MAX) OF AttributeTypeAndValue
-         * </pre>
-         * @return a basic ASN.1 object representation.
-         */
-        public override Asn1Object ToAsn1Object()
-        {
-            return content;
-        }
-    }
+			return result;
+		}
+
+		/**
+		 * <pre>
+		 * Controls  ::= SEQUENCE SIZE(1..MAX) OF AttributeTypeAndValue
+		 * </pre>
+		 * @return a basic ASN.1 object representation.
+		 */
+		public override Asn1Object ToAsn1Object()
+		{
+			return content;
+		}
+	}
 }
 #pragma warning restore
 #endif

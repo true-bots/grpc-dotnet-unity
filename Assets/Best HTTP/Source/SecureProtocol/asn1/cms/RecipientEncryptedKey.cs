@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
@@ -16,7 +15,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			Asn1Sequence seq)
 		{
 			identifier = KeyAgreeRecipientIdentifier.GetInstance(seq[0]);
-			encryptedKey = (Asn1OctetString) seq[1];
+			encryptedKey = (Asn1OctetString)seq[1];
 		}
 
 		/**
@@ -29,8 +28,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		 *          tagged object cannot be converted.
 		 */
 		public static RecipientEncryptedKey GetInstance(
-			Asn1TaggedObject	obj,
-			bool				isExplicit)
+			Asn1TaggedObject obj,
+			bool isExplicit)
 		{
 			return GetInstance(Asn1Sequence.GetInstance(obj, isExplicit));
 		}
@@ -46,20 +45,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		{
 			if (obj == null || obj is RecipientEncryptedKey)
 			{
-				return (RecipientEncryptedKey) obj;
+				return (RecipientEncryptedKey)obj;
 			}
 
 			if (obj is Asn1Sequence)
 			{
-				return new RecipientEncryptedKey((Asn1Sequence) obj);
+				return new RecipientEncryptedKey((Asn1Sequence)obj);
 			}
 
 			throw new ArgumentException("Invalid RecipientEncryptedKey: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
 		}
 
 		public RecipientEncryptedKey(
-			KeyAgreeRecipientIdentifier	id,
-			Asn1OctetString				encryptedKey)
+			KeyAgreeRecipientIdentifier id,
+			Asn1OctetString encryptedKey)
 		{
 			this.identifier = id;
 			this.encryptedKey = encryptedKey;
@@ -75,7 +74,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			get { return encryptedKey; }
 		}
 
-		/** 
+		/**
 		 * Produce an object suitable for an Asn1OutputStream.
 		 * <pre>
 		 * RecipientEncryptedKey ::= SEQUENCE {

@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -12,7 +11,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 {
 	/// <summary>
-    /// Summary description for PkixBuilderParameters.
+	/// Summary description for PkixBuilderParameters.
 	/// </summary>
 	public class PkixBuilderParameters
 		: PkixParameters
@@ -66,6 +65,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					throw new InvalidParameterException(
 						"The maximum path length parameter can not be less than -1.");
 				}
+
 				this.maxPathLength = value;
 			}
 		}
@@ -103,7 +103,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/**
 		* Can alse handle <code>ExtendedPKIXBuilderParameters</code> and
 		* <code>PKIXBuilderParameters</code>.
-		* 
+		*
 		* @param params Parameters to set.
 		* @see org.bouncycastle.x509.ExtendedPKIXParameters#setParams(java.security.cert.PKIXParameters)
 		*/

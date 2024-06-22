@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
@@ -23,7 +22,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
 		public static Asn1Object FromExtensionValue(IX509Extension extensions, DerObjectIdentifier oid)
 		{
 			Asn1OctetString extensionValue = extensions.GetExtensionValue(oid);
-			return extensionValue == null ? null : FromExtensionValue(extensionValue);	
+			return extensionValue == null ? null : FromExtensionValue(extensionValue);
 		}
 	}
 }

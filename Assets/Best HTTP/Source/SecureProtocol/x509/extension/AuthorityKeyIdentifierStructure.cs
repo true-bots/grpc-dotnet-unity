@@ -1,7 +1,6 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
@@ -23,7 +22,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
 		// TODO Add a functional constructor from byte[]?
 		public AuthorityKeyIdentifierStructure(
 			Asn1OctetString encodedValue)
-			: base((Asn1Sequence) X509ExtensionUtilities.FromExtensionValue(encodedValue))
+			: base((Asn1Sequence)X509ExtensionUtilities.FromExtensionValue(encodedValue))
 		{
 		}
 
@@ -41,9 +40,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
 
 					if (ext != null)
 					{
-						Asn1OctetString str = (Asn1OctetString) X509ExtensionUtilities.FromExtensionValue(ext);
+						Asn1OctetString str = (Asn1OctetString)X509ExtensionUtilities.FromExtensionValue(ext);
 
-						return (Asn1Sequence) new AuthorityKeyIdentifier(
+						return (Asn1Sequence)new AuthorityKeyIdentifier(
 							str.GetOctets(), new GeneralNames(genName), certificate.SerialNumber).ToAsn1Object();
 					}
 				}
@@ -51,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
 				SubjectPublicKeyInfo info = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(
 					certificate.GetPublicKey());
 
-				return (Asn1Sequence) new AuthorityKeyIdentifier(
+				return (Asn1Sequence)new AuthorityKeyIdentifier(
 					info, new GeneralNames(genName), certificate.SerialNumber).ToAsn1Object();
 			}
 			catch (Exception e)
@@ -67,7 +66,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
 			{
 				SubjectPublicKeyInfo info = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(pubKey);
 
-				return (Asn1Sequence) new AuthorityKeyIdentifier(info).ToAsn1Object();
+				return (Asn1Sequence)new AuthorityKeyIdentifier(info).ToAsn1Object();
 			}
 			catch (Exception e)
 			{

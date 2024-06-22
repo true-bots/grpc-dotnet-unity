@@ -2,7 +2,6 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
-
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
@@ -12,8 +11,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 		private static readonly IDictionary<string, int> MaxSecurityStrengths =
 			new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-        static DrbgUtilities()
-	    {
+		static DrbgUtilities()
+		{
 			MaxSecurityStrengths.Add("SHA-1", 128);
 
 			MaxSecurityStrengths.Add("SHA-224", 192);
@@ -23,29 +22,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 
 			MaxSecurityStrengths.Add("SHA-512/224", 192);
 			MaxSecurityStrengths.Add("SHA-512/256", 256);
-	    }
+		}
 
-        internal static int GetMaxSecurityStrength(IDigest d)
-	    {
-	        return MaxSecurityStrengths[d.AlgorithmName];
-	    }
+		internal static int GetMaxSecurityStrength(IDigest d)
+		{
+			return MaxSecurityStrengths[d.AlgorithmName];
+		}
 
-        internal static int GetMaxSecurityStrength(IMac m)
-	    {
-	        string name = m.AlgorithmName;
+		internal static int GetMaxSecurityStrength(IMac m)
+		{
+			string name = m.AlgorithmName;
 
-            return MaxSecurityStrengths[name.Substring(0, name.IndexOf("/"))];
-	    }
+			return MaxSecurityStrengths[name.Substring(0, name.IndexOf("/"))];
+		}
 
-        /**
-	     * Used by both Dual EC and Hash.
-	     */
+		/**
+		 * Used by both Dual EC and Hash.
+		 */
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         internal static void HashDF(IDigest digest, ReadOnlySpan<byte> seedMaterial, int seedLength, Span<byte> output)
 #else
 		internal static void HashDF(IDigest digest, byte[] seedMaterial, int seedLength, byte[] output)
 #endif
-        {
+		{
 			// 1. temp = the Null string.
 			// 2. .
 			// 3. counter = an 8-bit binary value representing the integer "1".
@@ -59,9 +58,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			// 6. Return SUCCESS and requested_bits.
 			int outputLength = (seedLength + 7) / 8;
 
-            int digestSize = digest.GetDigestSize();
-            int len = outputLength / digestSize;
-	        int counter = 1;
+			int digestSize = digest.GetDigestSize();
+			int len = outputLength / digestSize;
+			int counter = 1;
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			Span<byte> dig = digestSize <= 128
@@ -72,12 +71,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 #else
 			byte[] dig = new byte[digestSize];
 			byte[] header = new byte[5];
-            Pack.UInt32_To_BE((uint)seedLength, header, 1);
+			Pack.UInt32_To_BE((uint)seedLength, header, 1);
 #endif
 
-            for (int i = 0; i <= len; i++, counter++)
-	        {
-                header[0] = (byte)counter;
+			for (int i = 0; i <= len; i++, counter++)
+			{
+				header[0] = (byte)counter;
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
                 digest.BlockUpdate(header);
                 digest.BlockUpdate(seedMaterial);
@@ -88,27 +87,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 #else
 				digest.BlockUpdate(header, 0, header.Length);
 				digest.BlockUpdate(seedMaterial, 0, seedMaterial.Length);
-                digest.DoFinal(dig, 0);
+				digest.DoFinal(dig, 0);
 
 				int bytesToCopy = System.Math.Min(digestSize, outputLength - i * digestSize);
-	            Array.Copy(dig, 0, output, i * digestSize, bytesToCopy);
+				Array.Copy(dig, 0, output, i * digestSize, bytesToCopy);
 #endif
-            }
+			}
 
-            // do a left shift to get rid of excess bits.
-            if (seedLength % 8 != 0)
-	        {
-	            int shift = 8 - (seedLength % 8);
-	            uint carry = 0;
+			// do a left shift to get rid of excess bits.
+			if (seedLength % 8 != 0)
+			{
+				int shift = 8 - (seedLength % 8);
+				uint carry = 0;
 
-                for (int i = 0; i != outputLength; i++)
-	            {
-	                uint b = output[i];
-                    output[i] = (byte)((b >> shift) | (carry << (8 - shift)));
-	                carry = b;
-	            }
-	        }
-	    }
+				for (int i = 0; i != outputLength; i++)
+				{
+					uint b = output[i];
+					output[i] = (byte)((b >> shift) | (carry << (8 - shift)));
+					carry = b;
+				}
+			}
+		}
 	}
 }
 #pragma warning restore
