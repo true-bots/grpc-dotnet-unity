@@ -1,204 +1,48 @@
-# Created by https://www.toptal.com/developers/gitignore/api/intellij,unity,rider,java,gradle
-# Edit at https://www.toptal.com/developers/gitignore?templates=intellij,unity,rider,java,gradle
+#stealth
+Database.sqlite
+.idea/
 
-### Intellij ###
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
-# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+# Common IntelliJ Platform excludes
 
-**/.idea/**
-
-# User-specific stuff
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/usage.statistics.xml
-.idea/**/dictionaries
-.idea/**/shelf
-
-# AWS User-specific
-.idea/**/aws.xml
-
-# Generated files
-.idea/**/contentModel.xml
+# User specific
+**/.idea/**/workspace.xml
+**/.idea/**/tasks.xml
+**/.idea/shelf/*
+**/.idea/dictionaries
+**/.idea/httpRequests/
 
 # Sensitive or high-churn files
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
-.idea/**/dbnavigator.xml
+**/.idea/**/dataSources/
+**/.idea/**/dataSources.ids
+**/.idea/**/dataSources.xml
+**/.idea/**/dataSources.local.xml
+**/.idea/**/sqlDataSources.xml
+**/.idea/**/dynamic.xml
 
-# Gradle
-.idea/**/gradle.xml
-.idea/**/libraries
+# Rider
+# Rider auto-generates .iml files, and contentModel.xml
+**/.idea/**/*.iml
+**/.idea/**/contentModel.xml
+**/.idea/**/modules.xml
 
-# Gradle and Maven with auto-import
-# When using Gradle or Maven with auto-import, you should exclude module files,
-# since they will be recreated, and may cause churn.  Uncomment if using
-# auto-import.
-# .idea/artifacts
-# .idea/compiler.xml
-# .idea/jarRepositories.xml
-# .idea/modules.xml
-# .idea/*.iml
-# .idea/modules
-# *.iml
-# *.ipr
+[Bb]in/
+_UpgradeReport_Files/
 
-# CMake
-cmake-build-*/
+Thumbs.db
+Thumbs.db.meta
+Desktop.ini
+.DS_Store
 
-# Mongo Explorer plugin
-.idea/**/mongoSettings.xml
-
-# File-based project format
-*.iws
-
-# IntelliJ
-out/
-
-# mpeltonen/sbt-idea plugin
-.idea_modules/
-
-# JIRA plugin
-atlassian-ide-plugin.xml
-
-# Cursive Clojure plugin
-.idea/replstate.xml
-
-# SonarLint plugin
-.idea/sonarlint/
-
-# Crashlytics plugin (for Android Studio and IntelliJ)
-com_crashlytics_export_strings.xml
-crashlytics.properties
-crashlytics-build.properties
-fabric.properties
-
-# Editor-based Rest Client
-.idea/httpRequests
-
-# Android studio 3.1+ serialized cache file
-.idea/caches/build_file_checksums.ser
-
-### Intellij Patch ###
-# Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
-
-# *.iml
-# modules.xml
-# .idea/misc.xml
-# *.ipr
-
-# Sonarlint plugin
-# https://plugins.jetbrains.com/plugin/7973-sonarlint
-.idea/**/sonarlint/
-
-# SonarQube Plugin
-# https://plugins.jetbrains.com/plugin/7238-sonarqube-community-plugin
-.idea/**/sonarIssues.xml
-
-# Markdown Navigator plugin
-# https://plugins.jetbrains.com/plugin/7896-markdown-navigator-enhanced
-.idea/**/markdown-navigator.xml
-.idea/**/markdown-navigator-enh.xml
-.idea/**/markdown-navigator/
-
-# Cache file creation bug
-# See https://youtrack.jetbrains.com/issue/JBR-2257
-.idea/$CACHE_FILE$
-
-# CodeStream plugin
-# https://plugins.jetbrains.com/plugin/12206-codestream
-.idea/codestream.xml
-
-# Azure Toolkit for IntelliJ plugin
-# https://plugins.jetbrains.com/plugin/8053-azure-toolkit-for-intellij
-.idea/**/azureSettings.xml
-
-### Java ###
-# Compiled class file
-*.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
-
-### Rider ###
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
-# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
-
-# User-specific stuff
-
-# AWS User-specific
-
-# Generated files
-
-# Sensitive or high-churn files
-
-# Gradle
-
-# Gradle and Maven with auto-import
-# When using Gradle or Maven with auto-import, you should exclude module files,
-# since they will be recreated, and may cause churn.  Uncomment if using
-# auto-import.
-# .idea/artifacts
-# .idea/compiler.xml
-# .idea/jarRepositories.xml
-# .idea/modules.xml
-# .idea/*.iml
-# .idea/modules
-# *.iml
-# *.ipr
-
-# CMake
-
-# Mongo Explorer plugin
-
-# File-based project format
-
-# IntelliJ
-
-# mpeltonen/sbt-idea plugin
-
-# JIRA plugin
-
-# Cursive Clojure plugin
-
-# SonarLint plugin
-
-# Crashlytics plugin (for Android Studio and IntelliJ)
-
-# Editor-based Rest Client
-
-# Android studio 3.1+ serialized cache file
-
-### Unity ###
 # This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
+#
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
 /[Bb]uild/
+/[Bb]uild[Ww]eb/
+/[Bb]uild64/
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
@@ -207,6 +51,8 @@ replay_pid*
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
 
+# Asset meta data should only be ignored when the corresponding asset is also ignored
+!/[Aa]ssets/**/*.meta
 # Recordings can get excessive in size
 /[Rr]ecordings/
 
@@ -214,10 +60,14 @@ replay_pid*
 # /[Aa]ssets/AssetStoreTools*
 
 # Autogenerated Jetbrains Rider plugin
-/[Aa]ssets/Plugins/Editor/JetBrains*
+[Aa]ssets/Plugins/Editor/JetBrains*
+![Aa]ssets/Plugins/Editor/JetBrains.RiderFlow
 
 # Visual Studio cache directory
 .vs/
+
+# Rider chache directory
+.idea/
 
 # Gradle cache directory
 .gradle/
@@ -250,47 +100,122 @@ sysinfo.txt
 
 # Builds
 *.apk
+SerializedBuildInfo/
 *.aab
-*.unitypackage
 *.app
 
 # Crashlytics generated file
+crashlytics-build.properties
+UserSettings/
 
-# Packed Addressables
-/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+bakery_times.log
+.denoiserlog.txt
+.ftracelog.txt
+.uvgblog.txt
+ProjectSettings/RiderScriptEditorPersistedState.asset
 
-# Temporary auto-generated Android Assets
-/[Aa]ssets/[Ss]treamingAssets/aa.meta
-/[Aa]ssets/[Ss]treamingAssets/aa/*
+########################################
+# Bakery .gitignore
+# Ignore: https://geom.io/bakery/wiki/index.php?title=How_do_I...#How_do_I_use_git.2Fcollab.2Fother_version_control_system_with_Bakery.3F
+# Never ignore: https://geom.io/bakery/wiki/index.php?title=How_do_I...#How_do_I_share_a_scene_with_someone_who_doesn.E2.80.99t_have_Bakery_installed.3F
+########################################
 
-### Gradle ###
-.gradle
-**/build/
-!src/**/build/
+############# BAKERY ASSETS ############
+# Ignore Bakery Assets folder
+/[Aa]ssets/Bakery/*
 
-# Ignore Gradle GUI config
-gradle-app.setting
+# Never ignore these Bakery Asset files
+# Unignore specific files in ignored subdirectory https://stackoverflow.com/a/32504500/2129422
+!/[Aa]ssets/Bakery/ftLightmaps.cs
+!/[Aa]ssets/Bakery/ftLightmapsStorage.cs
+!/[Aa]ssets/Bakery/ftLocalStorage.cs
+!/[Aa]ssets/Bakery/ftGlobalStorage.cs
+!/[Aa]ssets/Bakery/BakeryProjectSettings.cs
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
+############# BAKERY EDITOR ############
+#Ignore Bakery Editor folder
+/[Aa]ssets/Editor/x64/Bakery/*
 
-# Avoid ignore Gradle wrappper properties
-!gradle-wrapper.properties
+#Unignore subdirectories only https://stackoverflow.com/a/18930104/2129422
+!/[Aa]ssets/Editor/x64/Bakery/*/
 
-# Cache of project
-.gradletasknamecache
+#Re-ignore all *files* in subdirectories
+/[Aa]ssets/Editor/x64/Bakery/hwtestdata/*
+/[Aa]ssets/Editor/x64/Bakery/lightingDataChunks/*
+/[Aa]ssets/Editor/x64/Bakery/shaderSrc/*
+/[Aa]ssets/Editor/x64/Bakery/scripts/*
 
-# Eclipse Gradle plugin generated files
-# Eclipse Core
-.project
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
+# Never ignore these Bakery Editor files
+!/**/ftModelPostProcessor.cs
+!/**/ftSavedPadding2.cs
 
-### Gradle Patch ###
-# Java heap dump
-*.hprof
+Assets/MMData/MMSaveLoadManager/
 
-# End of https://www.toptal.com/developers/gitignore/api/intellij,unity,rider,java,gradle
 
-# Never commit BestHTTP2 to git
-**/Best HTTP**
+
+# Never ignore DLLs in the FMOD subfolder.
+!/[Aa]ssets/Plugins/FMOD/**/lib/*
+!/[Aa]ssets/Plugins/FMOD/**/*.dll
+
+# Don't ignore images and gizmos used by FMOD in the Unity Editor.
+!/[Aa]ssets/Gizmos/FMOD/*
+!/[Aa]ssets/Editor Default Resources/FMOD/*
+                    
+# Ignore the Cache folder since it is updated locally.
+/[Aa]ssets/Plugins/FMOD/Cache/*
+        
+# Ignore the Cache-file since it is updated locally either way
+/[Aa]ssets/**/FMODStudioCache.asset
+/[Aa]ssets/**/FMODStudioCache.asset.meta
+/[Aa]ssets/Plugins/FMOD/Cache.meta
+/[Aa]ssets/Plugins/FMOD/Cache/Editor.meta
+		
+# Ignore bank files in the StreamingAssets folder.
+/[Aa]ssets/StreamingAssets/**/*.bank
+/[Aa]ssets/StreamingAssets/**/*.bank.meta
+                    
+# If the source bank files are kept outside of the StreamingAssets folder then these can be ignored.
+# Log files can be ignored.
+fmod_editor.log
+fmod.log
+
+FMOD/stealth/.cache/*
+Assets/Plugins/ConsolePro/Remote/LiteNetLib/LiteNetLib.csproj.meta
+
+# Never ignore analytics assets
+!/[Aa]ssets/ExternalDependencyManager/*
+!/[Aa]ssets/FacebookSDK/*
+!/[Aa]ssets/Plugins/ExternalDependencyManager/*
+!/[Aa]ssets/Plugins/FacebookSDK/*
+Assets/ExternalDependencyManager/Editor/Google.VersionHandlerImpl_v1.2.164.dll.meta
+Assets/ExternalDependencyManager/Editor/Google.VersionHandler.dll.meta
+Assets/ExternalDependencyManager/Editor/Google.PackageManagerResolver_v1.2.164.dll.meta
+Assets/ExternalDependencyManager/Editor/Google.JarResolver_v1.2.164.dll.meta
+Assets/ExternalDependencyManager/Editor/Google.IOSResolver_v1.2.164.dll.meta
+/venv/
+/results/
+/Recordings/
+/Assets/ML-Agents/
+/Assets/ML-Agents.meta
+/Assets/ML-Agents/Timers/
+/Assets/ML-Agents/Timers.meta
+Assets/Editor/x64/Bakery/cudnn64_7.dll
+*BackUpThisFolder_ButDontShipItWithYourGame/
+*BurstDebugInformation_DoNotShip/tempburstlibs*
+Assets/Bakery/ftGlobalStorage.asset
+Assets/Bakery/ftGlobalStorage.asset.meta
+bakery-compiled-cver.txt
+bakery-compiled-dver.txt
+bakery-compiled.zip
+bakery-csharp-cver.txt
+bakery-csharp-dver.txt
+bakery-csharp.zip
+.vscode/settings.json
+.vsconfig
+Assets/StreamingAssets.meta
+Assets/Resources/PerformanceTestRunInfo.json
+Assets/Resources/PerformanceTestRunInfo.json.meta
+Assets/Plugins/Rowlan/Tools/QuickNav Data/Preferences.asset
+Assets/Plugins/Rowlan/Tools/QuickNav Data/Preferences.asset.meta
+Assets/Resources/PerformanceTestRunSettings.json
+Assets/Resources/PerformanceTestRunSettings.json.meta
