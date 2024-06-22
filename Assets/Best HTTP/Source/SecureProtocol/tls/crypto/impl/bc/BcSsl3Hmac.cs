@@ -12,19 +12,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 	/// The difference is that padding is concatenated versus XORed with the key, e.g:
 	/// <code>H(K + opad, H(K + ipad, text))</code>
 	/// </remarks>
-	internal class BcSsl3Hmac
+	class BcSsl3Hmac
 		: TlsHmac
 	{
-		private const byte IPAD_BYTE = (byte)0x36;
-		private const byte OPAD_BYTE = (byte)0x5C;
+		const byte IPAD_BYTE = (byte)0x36;
+		const byte OPAD_BYTE = (byte)0x5C;
 
-		private static readonly byte[] IPAD = GenPad(IPAD_BYTE, 48);
-		private static readonly byte[] OPAD = GenPad(OPAD_BYTE, 48);
+		static readonly byte[] IPAD = GenPad(IPAD_BYTE, 48);
+		static readonly byte[] OPAD = GenPad(OPAD_BYTE, 48);
 
-		private readonly IDigest m_digest;
-		private readonly int m_padLength;
+		readonly IDigest m_digest;
+		readonly int m_padLength;
 
-		private byte[] m_secret;
+		byte[] m_secret;
 
 		/// <summary>Base constructor for one of the standard digest algorithms for which the byteLength is known.
 		/// </summary>
@@ -34,21 +34,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		/// <param name="digest">the digest.</param>
 		internal BcSsl3Hmac(IDigest digest)
 		{
-			this.m_digest = digest;
+			m_digest = digest;
 
 			if (digest.GetDigestSize() == 20)
 			{
-				this.m_padLength = 40;
+				m_padLength = 40;
 			}
 			else
 			{
-				this.m_padLength = 48;
+				m_padLength = 48;
 			}
 		}
 
 		public virtual void SetKey(byte[] key, int keyOff, int keyLen)
 		{
-			this.m_secret = TlsUtilities.CopyOfRangeExact(key, keyOff, keyOff + keyLen);
+			m_secret = TlsUtilities.CopyOfRangeExact(key, keyOff, keyOff + keyLen);
 
 			Reset();
 		}
@@ -106,7 +106,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			m_digest.BlockUpdate(IPAD, 0, m_padLength);
 		}
 
-		private void DoFinal(byte[] output, int outOff)
+		void DoFinal(byte[] output, int outOff)
 		{
 			byte[] tmp = new byte[m_digest.GetDigestSize()];
 			m_digest.DoFinal(tmp, 0);
@@ -120,7 +120,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			Reset();
 		}
 
-		private static byte[] GenPad(byte b, int count)
+		static byte[] GenPad(byte b, int count)
 		{
 			byte[] padding = new byte[count];
 			Arrays.Fill(padding, b);

@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerBmpString), Asn1Tags.BmpString)
+			Meta() : base(typeof(DerBmpString), Asn1Tags.BmpString)
 			{
 			}
 
@@ -35,16 +35,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerBmpString GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerBmpString derBmpString)
+			{
 				return derBmpString;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerBmpString converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -58,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj));
 		}
 
 		/**
@@ -73,16 +79,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (DerBmpString)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly string m_str;
+		readonly string m_str;
 
 		internal DerBmpString(byte[] contents)
 		{
 			if (null == contents)
+			{
 				throw new ArgumentNullException("contents");
+			}
 
 			int byteLen = contents.Length;
 			if (0 != (byteLen & 1))
+			{
 				throw new ArgumentException("malformed BMPString encoding encountered", "contents");
+			}
 
 			int charLen = byteLen / 2;
 			char[] cs = new char[charLen];
@@ -98,7 +108,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal DerBmpString(char[] str)
 		{
 			if (str == null)
+			{
 				throw new ArgumentNullException("str");
+			}
 
 			m_str = new string(str);
 		}
@@ -109,7 +121,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public DerBmpString(string str)
 		{
 			if (str == null)
+			{
 				throw new ArgumentNullException("str");
+			}
 
 			m_str = str;
 		}
@@ -123,7 +137,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			DerBmpString that = asn1Object as DerBmpString;
 			return null != that
-			       && this.m_str.Equals(that.m_str);
+			       && m_str.Equals(that.m_str);
 		}
 
 		protected override int Asn1GetHashCode()
@@ -141,7 +155,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return new PrimitiveEncoding(tagClass, tagNo, GetContents());
 		}
 
-		private byte[] GetContents()
+		byte[] GetContents()
 		{
 			char[] c = m_str.ToCharArray();
 			byte[] b = new byte[c.Length * 2];

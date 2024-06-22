@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		public RespID(
 			X509Name name)
 		{
-			this.id = new ResponderID(name);
+			id = new ResponderID(name);
 		}
 
 		public RespID(
@@ -38,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 				byte[] keyHash = DigestUtilities.CalculateDigest("SHA1", info.PublicKeyData.GetBytes());
 
-				this.id = new ResponderID(new DerOctetString(keyHash));
+				id = new ResponderID(new DerOctetString(keyHash));
 			}
 			catch (Exception e)
 			{
@@ -55,12 +55,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			RespID other = obj as RespID;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return id.Equals(other.id);
 		}

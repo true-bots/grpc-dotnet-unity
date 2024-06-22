@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		{
 			try
 			{
-				CompressedDataParser comData = new CompressedDataParser((Asn1SequenceParser)this.contentInfo.GetContent(Asn1Tags.Sequence));
+				CompressedDataParser comData = new CompressedDataParser((Asn1SequenceParser)contentInfo.GetContent(Asn1Tags.Sequence));
 				ContentInfoParser content = comData.GetEncapContentInfo();
 
 				Asn1OctetStringParser bytes = (Asn1OctetStringParser)content.GetContent(Asn1Tags.OctetString);

@@ -22,24 +22,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class KeyUsage
 		: DerBitString
 	{
-		public const int DigitalSignature = (1 << 7);
-		public const int NonRepudiation = (1 << 6);
-		public const int KeyEncipherment = (1 << 5);
-		public const int DataEncipherment = (1 << 4);
-		public const int KeyAgreement = (1 << 3);
-		public const int KeyCertSign = (1 << 2);
-		public const int CrlSign = (1 << 1);
-		public const int EncipherOnly = (1 << 0);
-		public const int DecipherOnly = (1 << 15);
+		public const int DigitalSignature = 1 << 7;
+		public const int NonRepudiation = 1 << 6;
+		public const int KeyEncipherment = 1 << 5;
+		public const int DataEncipherment = 1 << 4;
+		public const int KeyAgreement = 1 << 3;
+		public const int KeyCertSign = 1 << 2;
+		public const int CrlSign = 1 << 1;
+		public const int EncipherOnly = 1 << 0;
+		public const int DecipherOnly = 1 << 15;
 
-		public static new KeyUsage GetInstance(object obj)
+		public new static KeyUsage GetInstance(object obj)
 		{
 			if (obj is KeyUsage)
+			{
 				return (KeyUsage)obj;
+			}
+
 			if (obj is X509Extension)
+			{
 				return GetInstance(X509Extension.ConvertValueToObject((X509Extension)obj));
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new KeyUsage(DerBitString.GetInstance(obj));
 		}
 
@@ -60,7 +69,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 		}
 
-		private KeyUsage(
+		KeyUsage(
 			DerBitString usage)
 			: base(usage.GetBytes(), usage.PadBits)
 		{
@@ -74,7 +83,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return "KeyUsage: 0x" + (data[0] & 0xff).ToString("X");
 			}
 
-			return "KeyUsage: 0x" + ((data[1] & 0xff) << 8 | (data[0] & 0xff)).ToString("X");
+			return "KeyUsage: 0x" + (((data[1] & 0xff) << 8) | (data[0] & 0xff)).ToString("X");
 		}
 	}
 }

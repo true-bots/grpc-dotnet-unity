@@ -17,8 +17,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 	public class Asn1KeyWrapper
 		: IKeyWrapper
 	{
-		private string algorithm;
-		private IKeyWrapper wrapper;
+		string algorithm;
+		IKeyWrapper wrapper;
 
 		public Asn1KeyWrapper(string algorithm, X509Certificate cert)
 		{
@@ -85,8 +85,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 	public class Asn1KeyUnwrapper
 		: IKeyUnwrapper
 	{
-		private string algorithm;
-		private IKeyUnwrapper wrapper;
+		string algorithm;
+		IKeyUnwrapper wrapper;
 
 		public Asn1KeyUnwrapper(string algorithm, ICipherParameters key)
 		{
@@ -153,12 +153,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 		}
 	}
 
-	internal class KeyWrapperUtil
+	class KeyWrapperUtil
 	{
 		//
 		// Provider 
 		//
-		private static readonly Dictionary<string, WrapperProvider> m_providerMap =
+		static readonly Dictionary<string, WrapperProvider> m_providerMap =
 			new Dictionary<string, WrapperProvider>(StringComparer.OrdinalIgnoreCase);
 
 		static KeyWrapperUtil()
@@ -175,39 +175,43 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 
 		public static IKeyWrapper WrapperForName(string algorithm, ICipherParameters parameters)
 		{
-			if (!m_providerMap.TryGetValue(algorithm, out var provider))
+			if (!m_providerMap.TryGetValue(algorithm, out WrapperProvider provider))
+			{
 				throw new ArgumentException("could not resolve " + algorithm + " to a KeyWrapper");
+			}
 
 			return (IKeyWrapper)provider.CreateWrapper(true, parameters);
 		}
 
 		public static IKeyUnwrapper UnwrapperForName(string algorithm, ICipherParameters parameters)
 		{
-			if (!m_providerMap.TryGetValue(algorithm, out var provider))
+			if (!m_providerMap.TryGetValue(algorithm, out WrapperProvider provider))
+			{
 				throw new ArgumentException("could not resolve " + algorithm + " to a KeyUnwrapper");
+			}
 
 			return (IKeyUnwrapper)provider.CreateWrapper(false, parameters);
 		}
 	}
 
-	internal interface WrapperProvider
+	interface WrapperProvider
 	{
 		object CreateWrapper(bool forWrapping, ICipherParameters parameters);
 	}
 
-	internal class RsaPkcs1Wrapper : IKeyWrapper, IKeyUnwrapper
+	class RsaPkcs1Wrapper : IKeyWrapper, IKeyUnwrapper
 	{
-		private readonly AlgorithmIdentifier algId;
-		private readonly IAsymmetricBlockCipher engine;
+		readonly AlgorithmIdentifier algId;
+		readonly IAsymmetricBlockCipher engine;
 
 		public RsaPkcs1Wrapper(bool forWrapping, ICipherParameters parameters)
 		{
-			this.algId = new AlgorithmIdentifier(
+			algId = new AlgorithmIdentifier(
 				PkcsObjectIdentifiers.RsaEncryption,
 				DerNull.Instance);
 
-			this.engine = new Pkcs1Encoding(new RsaBlindedEngine());
-			this.engine.Init(forWrapping, parameters);
+			engine = new Pkcs1Encoding(new RsaBlindedEngine());
+			engine.Init(forWrapping, parameters);
 		}
 
 		public object AlgorithmDetails
@@ -226,7 +230,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 		}
 	}
 
-	internal class RsaPkcs1WrapperProvider
+	class RsaPkcs1WrapperProvider
 		: WrapperProvider
 	{
 		internal RsaPkcs1WrapperProvider()
@@ -239,10 +243,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 		}
 	}
 
-	internal class RsaOaepWrapper : IKeyWrapper, IKeyUnwrapper
+	class RsaOaepWrapper : IKeyWrapper, IKeyUnwrapper
 	{
-		private readonly AlgorithmIdentifier algId;
-		private readonly IAsymmetricBlockCipher engine;
+		readonly AlgorithmIdentifier algId;
+		readonly IAsymmetricBlockCipher engine;
 
 		public RsaOaepWrapper(bool forWrapping, ICipherParameters parameters, DerObjectIdentifier digestOid)
 			: this(forWrapping, parameters, digestOid, digestOid)
@@ -255,7 +259,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 
 			if (mgfOid.Equals(NistObjectIdentifiers.IdShake128) || mgfOid.Equals(NistObjectIdentifiers.IdShake256))
 			{
-				this.algId = new AlgorithmIdentifier(
+				algId = new AlgorithmIdentifier(
 					PkcsObjectIdentifiers.IdRsaesOaep,
 					new RsaesOaepParameters(
 						digestAlgId,
@@ -264,7 +268,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 			}
 			else
 			{
-				this.algId = new AlgorithmIdentifier(
+				algId = new AlgorithmIdentifier(
 					PkcsObjectIdentifiers.IdRsaesOaep,
 					new RsaesOaepParameters(
 						digestAlgId,
@@ -272,8 +276,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 						RsaesOaepParameters.DefaultPSourceAlgorithm));
 			}
 
-			this.engine = new OaepEncoding(new RsaBlindedEngine(), DigestUtilities.GetDigest(digestOid), DigestUtilities.GetDigest(mgfOid), null);
-			this.engine.Init(forWrapping, parameters);
+			engine = new OaepEncoding(new RsaBlindedEngine(), DigestUtilities.GetDigest(digestOid), DigestUtilities.GetDigest(mgfOid), null);
+			engine.Init(forWrapping, parameters);
 		}
 
 		public object AlgorithmDetails
@@ -292,16 +296,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 		}
 	}
 
-	internal class RsaOaepWrapperProvider
+	class RsaOaepWrapperProvider
 		: WrapperProvider
 	{
-		private readonly DerObjectIdentifier digestOid;
-		private readonly DerObjectIdentifier mgfOid;
+		readonly DerObjectIdentifier digestOid;
+		readonly DerObjectIdentifier mgfOid;
 
 		internal RsaOaepWrapperProvider(DerObjectIdentifier digestOid)
 		{
 			this.digestOid = digestOid;
-			this.mgfOid = digestOid;
+			mgfOid = digestOid;
 		}
 
 		internal RsaOaepWrapperProvider(DerObjectIdentifier digestOid, DerObjectIdentifier mgfOid)

@@ -76,8 +76,8 @@ namespace BestHTTP.SignalR.Authentication
 		/// </summary>
 		public HeaderAuthenticator(string user, string roles)
 		{
-			this.User = user;
-			this.Roles = roles;
+			User = user;
+			Roles = roles;
 		}
 
 		/// <summary>
@@ -90,10 +90,10 @@ namespace BestHTTP.SignalR.Authentication
 		/// <summary>
 		/// Prepares the request by adding two headers to it
 		/// </summary>
-		public void PrepareRequest(BestHTTP.HTTPRequest request, RequestTypes type)
+		public void PrepareRequest(HTTPRequest request, RequestTypes type)
 		{
-			request.SetHeader("username", this.User);
-			request.SetHeader("roles", this.Roles);
+			request.SetHeader("username", User);
+			request.SetHeader("roles", Roles);
 		}
 	}
 }

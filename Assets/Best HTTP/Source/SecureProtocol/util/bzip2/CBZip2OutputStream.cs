@@ -84,13 +84,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 		 * Knuth's increments seem to work better than Incerpi-Sedgewick here, possibly because the number of elements
 		 * to sort is usually small, typically <= 20.
 		 */
-		private static readonly int[] Incs =
+		static readonly int[] Incs =
 		{
 			1, 4, 13, 40, 121, 364, 1093, 3280, 9841, 29524, 88573, 265720, 797161,
 			2391484
 		};
 
-		private bool finished;
+		bool finished;
 
 		protected static void HbMakeCodeLengths(byte[] len, int[] freq, int alphaSize, int maxLen)
 		{
@@ -133,8 +133,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					}
 				}
 
-				if (!(nHeap < (BZip2Constants.MAX_ALPHA_SIZE + 2)))
+				if (!(nHeap < BZip2Constants.MAX_ALPHA_SIZE + 2))
+				{
 					throw new InvalidOperationException();
+				}
 
 				while (nHeap > 1)
 				{
@@ -147,7 +149,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 						{
 							int yy = zz << 1;
 							if (yy > nHeap)
+							{
 								break;
+							}
 
 							if (yy < nHeap
 							    && weight[heap[yy + 1]] < weight[heap[yy]])
@@ -156,7 +160,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 							}
 
 							if (weight[tmp] < weight[heap[yy]])
+							{
 								break;
+							}
 
 							heap[zz] = heap[yy];
 							zz = yy;
@@ -173,7 +179,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 						{
 							int yy = zz << 1;
 							if (yy > nHeap)
+							{
 								break;
+							}
 
 							if (yy < nHeap
 							    && weight[heap[yy + 1]] < weight[heap[yy]])
@@ -182,7 +190,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 							}
 
 							if (weight[tmp] < weight[heap[yy]])
+							{
 								break;
+							}
 
 							heap[zz] = heap[yy];
 							zz = yy;
@@ -195,10 +205,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 
 					weight[nNodes] = (int)((uint)((weight[n1] & 0xffffff00)
 					                              + (weight[n2] & 0xffffff00))
-					                       | (uint)(1 + (((weight[n1] & 0x000000ff) >
-					                                      (weight[n2] & 0x000000ff))
-						                       ? (weight[n1] & 0x000000ff)
-						                       : (weight[n2] & 0x000000ff))));
+					                       | (uint)(1 + ((weight[n1] & 0x000000ff) >
+					                                     (weight[n2] & 0x000000ff)
+						                       ? weight[n1] & 0x000000ff
+						                       : weight[n2] & 0x000000ff)));
 
 					parent[nNodes] = -1;
 					heap[++nHeap] = nNodes;
@@ -215,8 +225,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					}
 				}
 
-				if (!(nNodes < (BZip2Constants.MAX_ALPHA_SIZE * 2)))
+				if (!(nNodes < BZip2Constants.MAX_ALPHA_SIZE * 2))
+				{
 					throw new InvalidOperationException();
+				}
 
 				//bool tooLong = false;
 				int tooLongBits = 0;
@@ -237,12 +249,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 
 				//if (!tooLong)
 				if (tooLongBits >= 0)
+				{
 					break;
+				}
 
 				for (int i = 1; i <= alphaSize; i++)
 				{
 					int j = weight[i] >> 8;
-					j = 1 + (j / 2);
+					j = 1 + j / 2;
 					weight[i] = j << 8;
 				}
 			}
@@ -262,44 +276,44 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 		always: in the range 0 .. 9.
 		The current block size is 100000 * this number.
 		*/
-		private readonly int blockSize100k;
-		private readonly int allowableBlockSize;
+		readonly int blockSize100k;
+		readonly int allowableBlockSize;
 
 		bool blockRandomised;
-		private readonly IList<StackElem> blocksortStack = new List<StackElem>();
+		readonly IList<StackElem> blocksortStack = new List<StackElem>();
 
 		int bsBuff;
 		int bsLivePos;
-		private readonly CRC m_blockCrc = new CRC();
+		readonly CRC m_blockCrc = new CRC();
 
-		private bool[] inUse = new bool[256];
-		private int nInUse;
+		bool[] inUse = new bool[256];
+		int nInUse;
 
-		private byte[] m_selectors = new byte[BZip2Constants.MAX_SELECTORS];
+		byte[] m_selectors = new byte[BZip2Constants.MAX_SELECTORS];
 
-		private byte[] blockBytes;
-		private ushort[] quadrantShorts;
-		private int[] zptr;
-		private int[] szptr;
-		private int[] ftab;
+		byte[] blockBytes;
+		ushort[] quadrantShorts;
+		int[] zptr;
+		int[] szptr;
+		int[] ftab;
 
-		private int nMTF;
+		int nMTF;
 
-		private int[] mtfFreq = new int[BZip2Constants.MAX_ALPHA_SIZE];
+		int[] mtfFreq = new int[BZip2Constants.MAX_ALPHA_SIZE];
 
 		/*
 		 * Used when sorting.  If too many long comparisons
 		 * happen, we stop sorting, randomise the block
 		 * slightly, and try again.
 		 */
-		private int workFactor;
-		private int workDone;
-		private int workLimit;
-		private bool firstAttempt;
+		int workFactor;
+		int workDone;
+		int workLimit;
+		bool firstAttempt;
 
-		private int currentByte = -1;
-		private int runLength = 0;
-		private int m_streamCrc;
+		int currentByte = -1;
+		int runLength = 0;
+		int m_streamCrc;
 
 		public CBZip2OutputStream(Stream outStream)
 			: this(outStream, 9)
@@ -336,8 +350,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			allowableBlockSize = BZip2Constants.baseBlockSize * blockSize100k - 20;
 
 			int n = BZip2Constants.baseBlockSize * blockSize100k;
-			blockBytes = new byte[(n + 1 + BZip2Constants.NUM_OVERSHOOT_BYTES)];
-			quadrantShorts = new ushort[(n + 1 + BZip2Constants.NUM_OVERSHOOT_BYTES)];
+			blockBytes = new byte[n + 1 + BZip2Constants.NUM_OVERSHOOT_BYTES];
+			quadrantShorts = new ushort[n + 1 + BZip2Constants.NUM_OVERSHOOT_BYTES];
 			zptr = new int[n];
 			ftab = new int[65537];
 
@@ -391,7 +405,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			runLength = 1;
 		}
 
-		private void WriteRun()
+		void WriteRun()
 		{
 			if (count > allowableBlockSize)
 			{
@@ -457,7 +471,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 				{
 					Finish();
 					closed = true;
-					this.bsStream.Dispose();
+					bsStream.Dispose();
 				}
 			}
 
@@ -467,7 +481,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 		public void Finish()
 		{
 			if (finished)
+			{
 				return;
+			}
 
 			if (runLength > 0)
 			{
@@ -490,7 +506,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			bsStream.Flush();
 		}
 
-		private void InitBlock()
+		void InitBlock()
 		{
 			m_blockCrc.Initialise();
 			count = 0;
@@ -501,7 +517,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void EndBlock()
+		void EndBlock()
 		{
 			int blockFinalCrc = m_blockCrc.GetFinal();
 			m_streamCrc = Integers.RotateLeft(m_streamCrc, 1) ^ blockFinalCrc;
@@ -534,7 +550,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			MoveToFrontCodeAndSend();
 		}
 
-		private void EndCompression()
+		void EndCompression()
 		{
 			/*
 			Now another magic 48-bit number, 0x177245385090, to
@@ -550,7 +566,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			BsFinishedWithStream();
 		}
 
-		private void HbAssignCodes(int[] code, byte[] length, int minLen, int maxLen, int alphaSize)
+		void HbAssignCodes(int[] code, byte[] length, int minLen, int maxLen, int alphaSize)
 		{
 			int vec = 0;
 			for (int n = minLen; n <= maxLen; n++)
@@ -567,7 +583,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void BsFinishedWithStream()
+		void BsFinishedWithStream()
 		{
 			if (bsLivePos < 32)
 			{
@@ -577,7 +593,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void BsPutBit(int v)
+		void BsPutBit(int v)
 		{
 			--bsLivePos;
 			bsBuff |= v << bsLivePos;
@@ -590,7 +606,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void BsPutBits(int n, int v)
+		void BsPutBits(int n, int v)
 		{
 			Debug.Assert(1 <= n && n <= 24);
 
@@ -605,7 +621,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void BsPutBitsSmall(int n, int v)
+		void BsPutBitsSmall(int n, int v)
 		{
 			Debug.Assert(1 <= n && n <= 8);
 
@@ -620,19 +636,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void BsPutInt32(int u)
+		void BsPutInt32(int u)
 		{
 			BsPutBits(16, (u >> 16) & 0xFFFF);
 			BsPutBits(16, u & 0xFFFF);
 		}
 
-		private void BsPutLong48(long u)
+		void BsPutLong48(long u)
 		{
 			BsPutBits(24, (int)(u >> 24) & 0xFFFFFF);
 			BsPutBits(24, (int)u & 0xFFFFFF);
 		}
 
-		private void SendMtfValues()
+		void SendMtfValues()
 		{
 			int v, t, i, j, bt, bc, iter;
 
@@ -640,7 +656,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 
 			/* Decide how many coding tables to use */
 			if (nMTF <= 0)
+			{
 				throw new InvalidOperationException();
+			}
 
 			int nGroups;
 			if (nMTF < 200)
@@ -685,7 +703,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					}
 
 					if (ge > gs && nPart != nGroups && nPart != 1
-					    && ((nGroups - nPart) % 2 == 1))
+					    && (nGroups - nPart) % 2 == 1)
 					{
 						aFreq -= mtfFreq[ge--];
 					}
@@ -821,9 +839,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 
 			if (nGroups >= 8 || nGroups > BZip2Constants.N_GROUPS)
+			{
 				throw new InvalidOperationException();
+			}
+
 			if (nSelectors >= 32768 || nSelectors > BZip2Constants.MAX_SELECTORS)
+			{
 				throw new InvalidOperationException();
+			}
 
 			int[][] code = CBZip2InputStream.CreateIntArray(BZip2Constants.N_GROUPS, BZip2Constants.MAX_ALPHA_SIZE);
 
@@ -839,8 +862,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					minLen = System.Math.Min(minLen, lti);
 				}
 
-				if (minLen < 1 | maxLen > BZip2Constants.MAX_CODE_LEN_GEN)
+				if ((minLen < 1) | (maxLen > BZip2Constants.MAX_CODE_LEN_GEN))
+				{
 					throw new InvalidOperationException();
+				}
 
 				HbAssignCodes(code[t], len_t, minLen, maxLen, alphaSize);
 			}
@@ -951,26 +976,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 				}
 
 				if (selCtr != nSelectors)
+				{
 					throw new InvalidOperationException();
+				}
 			}
 		}
 
-		private void MoveToFrontCodeAndSend()
+		void MoveToFrontCodeAndSend()
 		{
 			BsPutBits(24, origPtr);
 			GenerateMtfValues();
 			SendMtfValues();
 		}
 
-		private Stream bsStream;
+		Stream bsStream;
 
-		private void SimpleSort(int lo, int hi, int d)
+		void SimpleSort(int lo, int hi, int d)
 		{
 			int i, j, h, v;
 
 			int bigN = hi - lo + 1;
 			if (bigN < 2)
+			{
 				return;
+			}
 
 			int hp = 0;
 			while (Incs[hp] < bigN)
@@ -994,15 +1023,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					{
 						zptr[j] = zptr[j - h];
 						j = j - h;
-						if (j <= (lo + h - 1))
+						if (j <= lo + h - 1)
+						{
 							break;
+						}
 					}
 
 					zptr[j] = v;
 
 					/* copy 2 */
 					if (++i > hi)
+					{
 						break;
+					}
 
 					v = zptr[i];
 					j = i;
@@ -1010,15 +1043,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					{
 						zptr[j] = zptr[j - h];
 						j = j - h;
-						if (j <= (lo + h - 1))
+						if (j <= lo + h - 1)
+						{
 							break;
+						}
 					}
 
 					zptr[j] = v;
 
 					/* copy 3 */
 					if (++i > hi)
+					{
 						break;
+					}
 
 					v = zptr[i];
 					j = i;
@@ -1026,20 +1063,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					{
 						zptr[j] = zptr[j - h];
 						j = j - h;
-						if (j <= (lo + h - 1))
+						if (j <= lo + h - 1)
+						{
 							break;
+						}
 					}
 
 					zptr[j] = v;
 					i++;
 
 					if (workDone > workLimit && firstAttempt)
+					{
 						return;
+					}
 				}
 			}
 		}
 
-		private void Vswap(int p1, int p2, int n)
+		void Vswap(int p1, int p2, int n)
 		{
 			while (--n >= 0)
 			{
@@ -1049,11 +1090,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private int Med3(int a, int b, int c)
+		int Med3(int a, int b, int c)
 		{
 			return a > b
-				? (c < b ? b : c > a ? a : c)
-				: (c < a ? a : c > b ? b : c);
+				? c < b ? b : c > a ? a : c
+				: c < a
+					? a
+					: c > b
+						? b
+						: c;
 		}
 
 		internal class StackElem
@@ -1063,7 +1108,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			internal int dd;
 		}
 
-		private static void PushStackElem(IList<StackElem> stack, int stackCount, int ll, int hh, int dd)
+		static void PushStackElem(IList<StackElem> stack, int stackCount, int ll, int hh, int dd)
 		{
 			StackElem stackElem;
 			if (stackCount < stack.Count)
@@ -1081,11 +1126,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			stackElem.dd = dd;
 		}
 
-		private void QSort3(int loSt, int hiSt, int dSt)
+		void QSort3(int loSt, int hiSt, int dSt)
 		{
 			int unLo, unHi, ltLo, gtHi, n, m;
 
-			var stack = blocksortStack;
+			IList<StackElem> stack = blocksortStack;
 			int stackCount = 0;
 			StackElem stackElem;
 
@@ -1099,7 +1144,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 				{
 					SimpleSort(lo, hi, d);
 					if (stackCount < 1 || (workDone > workLimit && firstAttempt))
+					{
 						return;
+					}
 
 					stackElem = stack[--stackCount];
 					lo = stackElem.ll;
@@ -1124,7 +1171,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 						int zUnLo = zptr[unLo];
 						n = blockBytes[zUnLo + d1] - med;
 						if (n > 0)
+						{
 							break;
+						}
 
 						if (n == 0)
 						{
@@ -1140,7 +1189,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 						int zUnHi = zptr[unHi];
 						n = blockBytes[zUnHi + d1] - med;
 						if (n < 0)
+						{
 							break;
+						}
 
 						if (n == 0)
 						{
@@ -1152,7 +1203,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					}
 
 					if (unLo > unHi)
+					{
 						break;
+					}
 
 					int temp = zptr[unLo];
 					zptr[unLo++] = zptr[unHi];
@@ -1181,7 +1234,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void MainSort()
+		void MainSort()
 		{
 			int i, j, ss, sb;
 			int[] runningOrder = new int[256];
@@ -1196,7 +1249,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			*/
 			for (i = 0; i < BZip2Constants.NUM_OVERSHOOT_BYTES; i++)
 			{
-				blockBytes[count + i + 1] = blockBytes[(i % count) + 1];
+				blockBytes[count + i + 1] = blockBytes[i % count + 1];
 			}
 
 			for (i = 0; i <= count + BZip2Constants.NUM_OVERSHOOT_BYTES; i++)
@@ -1247,7 +1300,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 				}
 
 				c1 = blockBytes[1];
-				for (i = 0; i < (count - 1); i++)
+				for (i = 0; i < count - 1; i++)
 				{
 					c2 = blockBytes[i + 2];
 					j = (c1 << 8) + c2;
@@ -1285,13 +1338,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 						{
 							int vv = runningOrder[i];
 							j = i;
-							while ((ftab[(runningOrder[j - h] + 1) << 8] - ftab[runningOrder[j - h] << 8])
-							       > (ftab[(vv + 1) << 8] - ftab[vv << 8]))
+							while (ftab[(runningOrder[j - h] + 1) << 8] - ftab[runningOrder[j - h] << 8]
+							       > ftab[(vv + 1) << 8] - ftab[vv << 8])
 							{
 								runningOrder[j] = runningOrder[j - h];
 								j = j - h;
 								if (j < h)
+								{
 									break;
+								}
 							}
 
 							runningOrder[j] = vv;
@@ -1327,7 +1382,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 							{
 								QSort3(lo, hi, 2);
 								if (workDone > workLimit && firstAttempt)
+								{
 									return;
+								}
 							}
 
 							ftab[sb] |= SETMASK;
@@ -1350,7 +1407,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 						int bbSize = (ftab[(ss + 1) << 8] & CLEARMASK) - bbStart;
 
 						int shifts = 0;
-						while ((bbSize >> shifts) > 65534)
+						while (bbSize >> shifts > 65534)
 						{
 							shifts++;
 						}
@@ -1366,8 +1423,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 							}
 						}
 
-						if (!(((bbSize - 1) >> shifts) <= 65535))
+						if (!((bbSize - 1) >> shifts <= 65535))
+						{
 							throw new InvalidOperationException();
+						}
 					}
 
 					/*
@@ -1400,7 +1459,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void RandomiseBlock()
+		void RandomiseBlock()
 		{
 			for (int i = 0; i < 256; i++)
 			{
@@ -1424,7 +1483,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void DoReversibleTransformation()
+		void DoReversibleTransformation()
 		{
 			workLimit = workFactor * (count - 1);
 			workDone = 0;
@@ -1453,42 +1512,56 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 
 			if (origPtr == -1)
+			{
 				throw new InvalidOperationException();
+			}
 		}
 
-		private bool FullGtU(int i1, int i2)
+		bool FullGtU(int i1, int i2)
 		{
 			int c1, c2;
 
 			c1 = blockBytes[++i1];
 			c2 = blockBytes[++i2];
 			if (c1 != c2)
+			{
 				return c1 > c2;
+			}
 
 			c1 = blockBytes[++i1];
 			c2 = blockBytes[++i2];
 			if (c1 != c2)
+			{
 				return c1 > c2;
+			}
 
 			c1 = blockBytes[++i1];
 			c2 = blockBytes[++i2];
 			if (c1 != c2)
+			{
 				return c1 > c2;
+			}
 
 			c1 = blockBytes[++i1];
 			c2 = blockBytes[++i2];
 			if (c1 != c2)
+			{
 				return c1 > c2;
+			}
 
 			c1 = blockBytes[++i1];
 			c2 = blockBytes[++i2];
 			if (c1 != c2)
+			{
 				return c1 > c2;
+			}
 
 			c1 = blockBytes[++i1];
 			c2 = blockBytes[++i2];
 			if (c1 != c2)
+			{
 				return c1 > c2;
+			}
 
 			int k = count;
 			int s1, s2;
@@ -1498,42 +1571,58 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 				c1 = blockBytes[++i1];
 				c2 = blockBytes[++i2];
 				if (c1 != c2)
+				{
 					return c1 > c2;
+				}
 
 				s1 = quadrantShorts[i1];
 				s2 = quadrantShorts[i2];
 				if (s1 != s2)
+				{
 					return s1 > s2;
+				}
 
 				c1 = blockBytes[++i1];
 				c2 = blockBytes[++i2];
 				if (c1 != c2)
+				{
 					return c1 > c2;
+				}
 
 				s1 = quadrantShorts[i1];
 				s2 = quadrantShorts[i2];
 				if (s1 != s2)
+				{
 					return s1 > s2;
+				}
 
 				c1 = blockBytes[++i1];
 				c2 = blockBytes[++i2];
 				if (c1 != c2)
+				{
 					return c1 > c2;
+				}
 
 				s1 = quadrantShorts[i1];
 				s2 = quadrantShorts[i2];
 				if (s1 != s2)
+				{
 					return s1 > s2;
+				}
 
 				c1 = blockBytes[++i1];
 				c2 = blockBytes[++i2];
 				if (c1 != c2)
+				{
 					return c1 > c2;
+				}
 
 				s1 = quadrantShorts[i1];
 				s2 = quadrantShorts[i2];
 				if (s1 != s2)
+				{
 					return s1 > s2;
+				}
 
 				if (i1 >= count)
 				{
@@ -1552,7 +1641,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			return false;
 		}
 
-		private void GenerateMtfValues()
+		void GenerateMtfValues()
 		{
 			int i;
 

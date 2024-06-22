@@ -17,15 +17,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 	 */
 	public class TimeStampResponseGenerator
 	{
-		private PkiStatus status;
+		PkiStatus status;
 
-		private Asn1EncodableVector statusStrings;
+		Asn1EncodableVector statusStrings;
 
-		private int failInfo;
-		private TimeStampTokenGenerator tokenGenerator;
-		private IList<string> acceptedAlgorithms;
-		private IList<string> acceptedPolicies;
-		private IList<string> acceptedExtensions;
+		int failInfo;
+		TimeStampTokenGenerator tokenGenerator;
+		IList<string> acceptedAlgorithms;
+		IList<string> acceptedPolicies;
+		IList<string> acceptedExtensions;
 
 		public TimeStampResponseGenerator(
 			TimeStampTokenGenerator tokenGenerator,
@@ -56,17 +56,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			statusStrings = new Asn1EncodableVector();
 		}
 
-		private void AddStatusString(string statusString)
+		void AddStatusString(string statusString)
 		{
 			statusStrings.Add(new DerUtf8String(statusString));
 		}
 
-		private void SetFailInfoField(int field)
+		void SetFailInfoField(int field)
 		{
 			failInfo |= field;
 		}
 
-		private PkiStatusInfo GetPkiStatusInfo()
+		PkiStatusInfo GetPkiStatusInfo()
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector(
 				new DerInteger((int)status));
@@ -106,13 +106,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			try
 			{
 				if (genTime == null)
+				{
 					throw new TspValidationException("The time source is not available.",
 						PkiFailureInfo.TimeNotAvailable);
+				}
 
 				request.Validate(acceptedAlgorithms, acceptedPolicies, acceptedExtensions);
 
-				this.status = PkiStatus.Granted;
-				this.AddStatusString("Operation Okay");
+				status = PkiStatus.Granted;
+				AddStatusString("Operation Okay");
 
 				PkiStatusInfo pkiStatusInfo = GetPkiStatusInfo();
 
@@ -135,8 +137,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			{
 				status = PkiStatus.Rejection;
 
-				this.SetFailInfoField(e.FailureCode);
-				this.AddStatusString(e.Message);
+				SetFailInfoField(e.FailureCode);
+				AddStatusString(e.Message);
 
 				PkiStatusInfo pkiStatusInfo = GetPkiStatusInfo();
 
@@ -161,13 +163,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			try
 			{
 				if (genTime == null)
+				{
 					throw new TspValidationException("The time source is not available.",
 						PkiFailureInfo.TimeNotAvailable);
+				}
 
 				request.Validate(acceptedAlgorithms, acceptedPolicies, acceptedExtensions);
 
-				this.status = PkiStatus.Granted;
-				this.AddStatusString(statusString);
+				status = PkiStatus.Granted;
+				AddStatusString(statusString);
 
 				PkiStatusInfo pkiStatusInfo = GetPkiStatusInfo();
 
@@ -190,8 +194,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			{
 				status = PkiStatus.Rejection;
 
-				this.SetFailInfoField(e.FailureCode);
-				this.AddStatusString(e.Message);
+				SetFailInfoField(e.FailureCode);
+				AddStatusString(e.Message);
 
 				PkiStatusInfo pkiStatusInfo = GetPkiStatusInfo();
 
@@ -231,11 +235,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		{
 			this.status = status;
 
-			this.SetFailInfoField(failInfoField);
+			SetFailInfoField(failInfoField);
 
 			if (statusString != null)
 			{
-				this.AddStatusString(statusString);
+				AddStatusString(statusString);
 			}
 
 			PkiStatusInfo pkiStatusInfo = GetPkiStatusInfo();

@@ -119,31 +119,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/*
 		 * Queues for data from some protocols.
 		 */
-		private readonly ByteQueue m_applicationDataQueue = new ByteQueue(0);
-		private readonly ByteQueue m_alertQueue = new ByteQueue(2);
-		private readonly ByteQueue m_handshakeQueue = new ByteQueue(0);
+		readonly ByteQueue m_applicationDataQueue = new ByteQueue(0);
+		readonly ByteQueue m_alertQueue = new ByteQueue(2);
+
+		readonly ByteQueue m_handshakeQueue = new ByteQueue(0);
 		//private readonly ByteQueue m_heartbeatQueue = new ByteQueue(0);
 
 		internal readonly RecordStream m_recordStream;
 		//internal readonly object m_recordWriteLock = new object();
 
-		private int m_maxHandshakeMessageSize = -1;
+		int m_maxHandshakeMessageSize = -1;
 
 		internal TlsHandshakeHash m_handshakeHash;
 
-		private TlsStream m_tlsStream = null;
+		TlsStream m_tlsStream = null;
 
-		private volatile bool m_closed = false;
-		private volatile bool m_failedWithError = false;
-		private volatile bool m_appDataReady = false;
-		private volatile bool m_appDataSplitEnabled = true;
+		volatile bool m_closed = false;
+		volatile bool m_failedWithError = false;
+		volatile bool m_appDataReady = false;
+		volatile bool m_appDataSplitEnabled = true;
 
-		private volatile bool m_keyUpdateEnabled = false;
+		volatile bool m_keyUpdateEnabled = false;
 
 		//private volatile bool m_keyUpdatePendingReceive = false;
-		private volatile bool m_keyUpdatePendingSend = false;
-		private volatile bool m_resumableHandshake = false;
-		private volatile int m_appDataSplitMode = ADS_MODE_1_Nsub1;
+		volatile bool m_keyUpdatePendingSend = false;
+		volatile bool m_resumableHandshake = false;
+		volatile int m_appDataSplitMode = ADS_MODE_1_Nsub1;
 
 		protected TlsSession m_tlsSession = null;
 		protected SessionParameters m_sessionParameters = null;
@@ -165,10 +166,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		protected TlsProtocol()
 		{
-			this.m_blocking = false;
-			this.m_inputBuffers = new ByteQueueInputStream();
-			this.m_outputBuffer = new ByteQueueOutputStream();
-			this.m_recordStream = new RecordStream(this, m_inputBuffers, m_outputBuffer);
+			m_blocking = false;
+			m_inputBuffers = new ByteQueueInputStream();
+			m_outputBuffer = new ByteQueueOutputStream();
+			m_recordStream = new RecordStream(this, m_inputBuffers, m_outputBuffer);
 		}
 
 		public TlsProtocol(Stream stream)
@@ -178,19 +179,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public TlsProtocol(Stream input, Stream output)
 		{
-			this.m_blocking = true;
-			this.m_inputBuffers = null;
-			this.m_outputBuffer = null;
-			this.m_recordStream = new RecordStream(this, input, output);
+			m_blocking = true;
+			m_inputBuffers = null;
+			m_outputBuffer = null;
+			m_recordStream = new RecordStream(this, input, output);
 		}
 
 		/// <exception cref="IOException"/>
 		public virtual void ResumeHandshake()
 		{
 			if (!m_blocking)
+			{
 				throw new InvalidOperationException("Cannot use ResumeHandshake() in non-blocking mode!");
+			}
+
 			if (!IsHandshaking)
+			{
 				throw new InvalidOperationException("No handshake in progress");
+			}
 
 			BlockForHandshake();
 		}
@@ -236,7 +242,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				case AlertDescription.close_notify:
 				{
 					if (!m_appDataReady)
+					{
 						throw new TlsFatalAlert(AlertDescription.handshake_failure);
+					}
 
 					HandleClose(false);
 					break;
@@ -263,7 +271,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			if (!m_closed)
 			{
-				this.m_closed = true;
+				m_closed = true;
 
 				if (!m_appDataReady)
 				{
@@ -299,8 +307,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <exception cref="IOException"/>
 		protected virtual void HandleFailure()
 		{
-			this.m_closed = true;
-			this.m_failedWithError = true;
+			m_closed = true;
+			m_failedWithError = true;
 
 			/*
 			 * RFC 2246 7.2.1. The session becomes unresumable if any connection is terminated
@@ -326,7 +334,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			if (maxFragmentLength >= 0)
 			{
 				if (!MaxFragmentLength.IsValid(maxFragmentLength))
+				{
 					throw new TlsFatalAlert(AlertDescription.internal_error);
+				}
 
 				int plainTextLimit = 1 << (8 + maxFragmentLength);
 				m_recordStream.SetPlaintextLimit(plainTextLimit);
@@ -337,7 +347,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		protected virtual void CheckReceivedChangeCipherSpec(bool expected)
 		{
 			if (expected != m_receivedChangeCipherSpec)
+			{
 				throw new TlsFatalAlert(AlertDescription.unexpected_message);
+			}
 		}
 
 		/// <exception cref="IOException"/>
@@ -351,8 +363,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					throw new TlsFatalAlert(AlertDescription.internal_error);
 				}
 
-				using (new WriteLock(this.applicationDataLock))
+				using (new WriteLock(applicationDataLock))
+				{
 					SafeReadRecord();
+				}
 			}
 		}
 
@@ -368,11 +382,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			AbstractTlsContext context = ContextAdmin;
 			TlsPeer peer = Peer;
 
-			this.m_maxHandshakeMessageSize = System.Math.Max(1024, peer.GetMaxHandshakeMessageSize());
+			m_maxHandshakeMessageSize = System.Math.Max(1024, peer.GetMaxHandshakeMessageSize());
 
-			this.m_handshakeHash = new DeferredHash(context);
-			this.m_connectionState = CS_START;
-			this.m_selectedPsk13 = false;
+			m_handshakeHash = new DeferredHash(context);
+			m_connectionState = CS_START;
+			m_selectedPsk13 = false;
 
 			context.HandshakeBeginning(peer);
 
@@ -398,18 +412,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				}
 			}
 
-			this.m_tlsSession = null;
-			this.m_sessionParameters = null;
-			this.m_sessionMasterSecret = null;
+			m_tlsSession = null;
+			m_sessionParameters = null;
+			m_sessionMasterSecret = null;
 
-			this.m_retryCookie = null;
-			this.m_retryGroup = -1;
-			this.m_clientExtensions = null;
-			this.m_serverExtensions = null;
+			m_retryCookie = null;
+			m_retryGroup = -1;
+			m_clientExtensions = null;
+			m_serverExtensions = null;
 
-			this.m_selectedPsk13 = false;
-			this.m_receivedChangeCipherSpec = false;
-			this.m_expectSessionTicket = false;
+			m_selectedPsk13 = false;
+			m_receivedChangeCipherSpec = false;
+			m_expectSessionTicket = false;
 		}
 
 		/// <exception cref="IOException"/>
@@ -428,31 +442,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				}
 
 				m_recordStream.FinaliseHandshake();
-				this.m_connectionState = CS_END;
+				m_connectionState = CS_END;
 
 				// TODO Prefer to set to null, but would need guards elsewhere
-				this.m_handshakeHash = new DeferredHash(context);
+				m_handshakeHash = new DeferredHash(context);
 
 				m_alertQueue.Shrink();
 				m_handshakeQueue.Shrink();
 
 				ProtocolVersion negotiatedVersion = securityParameters.NegotiatedVersion;
 
-				this.m_appDataSplitEnabled = !TlsUtilities.IsTlsV11(negotiatedVersion);
-				this.m_appDataReady = true;
+				m_appDataSplitEnabled = !TlsUtilities.IsTlsV11(negotiatedVersion);
+				m_appDataReady = true;
 
-				this.m_keyUpdateEnabled = TlsUtilities.IsTlsV13(negotiatedVersion);
+				m_keyUpdateEnabled = TlsUtilities.IsTlsV13(negotiatedVersion);
 
 				if (m_blocking)
 				{
-					this.m_tlsStream = new TlsStream(this);
+					m_tlsStream = new TlsStream(this);
 				}
 
 				if (m_sessionParameters == null)
 				{
-					this.m_sessionMasterSecret = securityParameters.MasterSecret;
+					m_sessionMasterSecret = securityParameters.MasterSecret;
 
-					this.m_sessionParameters = new SessionParameters.Builder()
+					m_sessionParameters = new SessionParameters.Builder()
 						.SetCipherSuite(securityParameters.CipherSuite)
 						.SetExtendedMasterSecret(securityParameters.IsExtendedMasterSecret)
 						.SetLocalCertificate(securityParameters.LocalCertificate)
@@ -465,7 +479,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 						.SetServerExtensions(m_serverExtensions)
 						.Build();
 
-					this.m_tlsSession = TlsUtilities.ImportSession(securityParameters.SessionID, m_sessionParameters);
+					m_tlsSession = TlsUtilities.ImportSession(securityParameters.SessionID, m_sessionParameters);
 				}
 				else
 				{
@@ -500,7 +514,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				case ContentType.application_data:
 				{
 					if (!m_appDataReady)
+					{
 						throw new TlsFatalAlert(AlertDescription.unexpected_message);
+					}
 
 					m_applicationDataQueue.AddData(buf, off, len);
 					ProcessApplicationDataQueue();
@@ -547,7 +563,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private void ProcessHandshakeQueue(ByteQueue queue)
+		void ProcessHandshakeQueue(ByteQueue queue)
 		{
 			/*
 			 * We need the first 4 bytes, they contain type and length of the message.
@@ -590,7 +606,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					{
 						ProtocolVersion negotiatedVersion = Context.ServerVersion;
 						if (null != negotiatedVersion && TlsUtilities.IsTlsV13(negotiatedVersion))
+						{
 							break;
+						}
 
 						CheckReceivedChangeCipherSpec(HandshakeType.finished == type);
 						break;
@@ -647,7 +665,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 		}
 
-		private void ProcessApplicationDataQueue()
+		void ProcessApplicationDataQueue()
 		{
 			/*
 			 * There is nothing we need to do here.
@@ -657,7 +675,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private void ProcessAlertQueue()
+		void ProcessAlertQueue()
 		{
 			while (m_alertQueue.Available >= 2)
 			{
@@ -675,7 +693,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <summary>This method is called, when a change cipher spec message is received.</summary>
 		/// <exception cref="IOException">If the message has an invalid content or the handshake is not in the correct
 		/// state.</exception>
-		private void ProcessChangeCipherSpec(byte[] buf, int off, int len)
+		void ProcessChangeCipherSpec(byte[] buf, int off, int len)
 		{
 			ProtocolVersion negotiatedVersion = Context.ServerVersion;
 			if (null == negotiatedVersion || TlsUtilities.IsTlsV13(negotiatedVersion))
@@ -689,9 +707,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				short message = TlsUtilities.ReadUint8(buf, off + i);
 
 				if (message != ChangeCipherSpec.change_cipher_spec)
+				{
 					throw new TlsFatalAlert(AlertDescription.decode_error);
+				}
 
-				if (this.m_receivedChangeCipherSpec
+				if (m_receivedChangeCipherSpec
 				    || m_alertQueue.Available > 0
 				    || m_handshakeQueue.Available > 0)
 				{
@@ -700,7 +720,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 				m_recordStream.NotifyChangeCipherSpecReceived();
 
-				this.m_receivedChangeCipherSpec = true;
+				m_receivedChangeCipherSpec = true;
 
 				HandleChangeCipherSpecMessage();
 			}
@@ -729,16 +749,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
             return ReadApplicationData(buffer.AsSpan(offset, count));
 #else
 			if (!m_appDataReady)
+			{
 				throw new InvalidOperationException("Cannot read application data until initial handshake completed.");
+			}
 
-			using (new WriteLock(this.applicationDataLock))
+			using (new WriteLock(applicationDataLock))
 			{
 				while (m_applicationDataQueue.Available < 1)
 				{
-					if (this.m_closed)
+					if (m_closed)
 					{
-						if (this.m_failedWithError)
+						if (m_failedWithError)
+						{
 							throw new IOException("Cannot read application data on failed TLS connection");
+						}
 
 						return 0;
 					}
@@ -765,30 +789,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public bool TryEnterApplicationDataLock(int millisecondsTimeout)
 		{
-			return this.applicationDataLock.TryEnterWriteLock(millisecondsTimeout);
+			return applicationDataLock.TryEnterWriteLock(millisecondsTimeout);
 		}
 
 		public void ExitApplicationDataLock()
 		{
-			this.applicationDataLock.ExitWriteLock();
+			applicationDataLock.ExitWriteLock();
 		}
 
 		public int TestApplicationData()
 		{
-			using (new WriteLock(this.applicationDataLock))
+			using (new WriteLock(applicationDataLock))
 			{
 				while (m_applicationDataQueue.Available == 0)
 				{
-					if (this.m_closed)
+					if (m_closed)
 					{
-						if (this.m_failedWithError)
+						if (m_failedWithError)
+						{
 							throw new IOException("Cannot read application data on failed TLS connection");
+						}
 
 						return -1;
 					}
 
 					if (!m_appDataReady)
+					{
 						throw new InvalidOperationException("Cannot read application data until initial handshake completed.");
+					}
 
 					/*
 					 * NOTE: Only called more than once when empty records are received, so no special
@@ -864,10 +892,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			try
 			{
 				if (m_recordStream.ReadRecord())
+				{
 					return;
+				}
 
 				if (!m_appDataReady)
+				{
 					throw new TlsFatalAlert(AlertDescription.handshake_failure);
+				}
 
 				if (!Peer.RequiresCloseNotify())
 				{
@@ -998,15 +1030,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
             WriteApplicationData(buffer.AsSpan(offset, count));
 #else
 			if (!m_appDataReady)
+			{
 				throw new InvalidOperationException(
 					"Cannot write application data until initial handshake completed.");
+			}
 
 			//lock (m_recordWriteLock)
 			{
 				while (count > 0)
 				{
 					if (m_closed)
+					{
 						throw new IOException("Cannot write application data on closed/failed TLS connection");
+					}
 
 					/*
 					 * RFC 5246 6.2.1. Zero-length fragments of Application data MAY be sent as they are
@@ -1025,7 +1061,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 						{
 							case ADS_MODE_0_N_FIRSTONLY:
 							{
-								this.m_appDataSplitEnabled = false;
+								m_appDataSplitEnabled = false;
 								SafeWriteRecord(ContentType.application_data, TlsUtilities.EmptyBytes, 0, 0);
 								break;
 							}
@@ -1150,23 +1186,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			set
 			{
 				if (value < ADS_MODE_1_Nsub1 || value > ADS_MODE_0_N_FIRSTONLY)
+				{
 					throw new InvalidOperationException("Illegal appDataSplitMode mode: " + value);
+				}
 
-				this.m_appDataSplitMode = value;
+				m_appDataSplitMode = value;
 			}
 		}
 
 		public virtual bool IsResumableHandshake
 		{
 			get { return m_resumableHandshake; }
-			set { this.m_resumableHandshake = value; }
+			set { m_resumableHandshake = value; }
 		}
 
 		/// <exception cref="IOException"/>
 		internal void WriteHandshakeMessage(byte[] buf, int off, int len)
 		{
 			if (len < 4)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			short type = TlsUtilities.ReadUint8(buf, off);
 			switch (type)
@@ -1225,10 +1265,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			get
 			{
 				if (!m_blocking)
+				{
 					throw new InvalidOperationException(
 						"Cannot use Stream in non-blocking mode! Use OfferInput()/OfferOutput() instead.");
+				}
 
-				return this.m_tlsStream;
+				return m_tlsStream;
 			}
 		}
 
@@ -1237,16 +1279,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual void CloseInput()
 		{
 			if (m_blocking)
+			{
 				throw new InvalidOperationException("Cannot use CloseInput() in blocking mode!");
+			}
 
 			if (m_closed)
+			{
 				return;
+			}
 
 			if (m_inputBuffers.Available > 0)
+			{
 				throw new EndOfStreamException();
+			}
 
 			if (!m_appDataReady)
+			{
 				throw new TlsFatalAlert(AlertDescription.handshake_failure);
+			}
 
 			if (!Peer.RequiresCloseNotify())
 			{
@@ -1263,11 +1313,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual RecordPreview PreviewInputRecord(byte[] recordHeader)
 		{
 			if (m_blocking)
+			{
 				throw new InvalidOperationException("Cannot use PreviewInputRecord() in blocking mode!");
+			}
+
 			if (m_inputBuffers.Available != 0)
+			{
 				throw new InvalidOperationException("Can only use PreviewInputRecord() for record-aligned input.");
+			}
+
 			if (m_closed)
+			{
 				throw new IOException("Connection is closed, cannot accept any more input");
+			}
 
 			return SafePreviewRecordHeader(recordHeader);
 		}
@@ -1275,12 +1333,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual int PreviewOutputRecord()
 		{
 			if (m_blocking)
+			{
 				throw new InvalidOperationException("Cannot use PreviewOutputRecord() in blocking mode!");
+			}
 
 			ByteQueue buffer = m_outputBuffer.Buffer;
 			int available = buffer.Available;
 			if (available < 1)
+			{
 				return 0;
+			}
 
 			if (available >= RecordFormat.FragmentOffset)
 			{
@@ -1288,7 +1350,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				int recordSize = RecordFormat.FragmentOffset + length;
 
 				if (available >= recordSize)
+				{
 					return recordSize;
+				}
 			}
 
 			throw new InvalidOperationException("Can only use PreviewOutputRecord() for record-aligned output.");
@@ -1298,17 +1362,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual RecordPreview PreviewOutputRecord(int applicationDataSize)
 		{
 			if (!m_appDataReady)
+			{
 				throw new InvalidOperationException(
 					"Cannot use PreviewOutputRecord() until initial handshake completed.");
+			}
+
 			if (m_blocking)
+			{
 				throw new InvalidOperationException("Cannot use PreviewOutputRecord() in blocking mode!");
+			}
+
 			if (m_outputBuffer.Buffer.Available != 0)
+			{
 				throw new InvalidOperationException("Can only use PreviewOutputRecord() for record-aligned output.");
+			}
+
 			if (m_closed)
+			{
 				throw new IOException("Connection is closed, cannot produce any more output");
+			}
 
 			if (applicationDataSize < 1)
+			{
 				return new RecordPreview(0, 0);
+			}
 
 			if (m_appDataSplitEnabled)
 			{
@@ -1374,9 +1451,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual void OfferInput(byte[] input, int inputOff, int inputLen)
 		{
 			if (m_blocking)
+			{
 				throw new InvalidOperationException("Cannot use OfferInput() in blocking mode! Use Stream instead.");
+			}
+
 			if (m_closed)
+			{
 				throw new IOException("Connection is closed, cannot accept any more input");
+			}
 
 			// Fast path if the input is arriving one record at a time
 			if (m_inputBuffers.Available == 0 && SafeReadFullRecord(input, inputOff, inputLen))
@@ -1400,7 +1482,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				byte[] recordHeader = new byte[RecordFormat.FragmentOffset];
 				if (RecordFormat.FragmentOffset != m_inputBuffers.Peek(recordHeader))
+				{
 					throw new TlsFatalAlert(AlertDescription.internal_error);
+				}
 
 				RecordPreview preview = SafePreviewRecordHeader(recordHeader);
 				if (m_inputBuffers.Available < preview.RecordSize)
@@ -1439,7 +1523,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual int GetAvailableInputBytes()
 		{
 			if (m_blocking)
+			{
 				throw new InvalidOperationException("Cannot use GetAvailableInputBytes() in blocking mode!");
+			}
 
 			return ApplicationDataAvailable;
 		}
@@ -1459,11 +1545,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual int ReadInput(byte[] buf, int off, int len)
 		{
 			if (m_blocking)
+			{
 				throw new InvalidOperationException("Cannot use ReadInput() in blocking mode! Use Stream instead.");
+			}
 
 			len = System.Math.Min(len, ApplicationDataAvailable);
 			if (len < 1)
+			{
 				return 0;
+			}
 
 			m_applicationDataQueue.RemoveData(buf, off, len, 0);
 			return len;
@@ -1478,7 +1568,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual int GetAvailableOutputBytes()
 		{
 			if (m_blocking)
+			{
 				throw new InvalidOperationException("Cannot use GetAvailableOutputBytes() in blocking mode! Use Stream instead.");
+			}
 
 			return m_outputBuffer.Buffer.Available;
 		}
@@ -1497,7 +1589,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual int ReadOutput(byte[] buffer, int offset, int length)
 		{
 			if (m_blocking)
+			{
 				throw new InvalidOperationException("Cannot use ReadOutput() in blocking mode! Use 'Stream() instead.");
+			}
 
 			int bytesToRead = System.Math.Min(GetAvailableOutputBytes(), length);
 			m_outputBuffer.Buffer.RemoveData(buffer, offset, bytesToRead, 0);
@@ -1506,22 +1600,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		protected virtual bool EstablishSession(TlsSession sessionToResume)
 		{
-			this.m_tlsSession = null;
-			this.m_sessionParameters = null;
-			this.m_sessionMasterSecret = null;
+			m_tlsSession = null;
+			m_sessionParameters = null;
+			m_sessionMasterSecret = null;
 
 			if (null == sessionToResume || !sessionToResume.IsResumable)
+			{
 				return false;
+			}
 
 			SessionParameters sessionParameters = sessionToResume.ExportSessionParameters();
 			if (null == sessionParameters)
+			{
 				return false;
+			}
 
 			if (!sessionParameters.IsExtendedMasterSecret)
 			{
 				TlsPeer peer = Peer;
 				if (!peer.AllowLegacyResumption() || peer.RequiresExtendedMasterSecret())
+				{
 					return false;
+				}
 
 				/*
 				 * NOTE: For session resumption without extended_master_secret, renegotiation MUST be disabled
@@ -1532,11 +1632,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			TlsSecret sessionMasterSecret = TlsUtilities.GetSessionMasterSecret(Context.Crypto,
 				sessionParameters.MasterSecret);
 			if (null == sessionMasterSecret)
+			{
 				return false;
+			}
 
-			this.m_tlsSession = sessionToResume;
-			this.m_sessionParameters = sessionParameters;
-			this.m_sessionMasterSecret = sessionMasterSecret;
+			m_tlsSession = sessionToResume;
+			m_sessionParameters = sessionParameters;
+			m_sessionMasterSecret = sessionMasterSecret;
 
 			return true;
 		}
@@ -1546,19 +1648,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			if (m_sessionMasterSecret != null)
 			{
 				m_sessionMasterSecret.Destroy();
-				this.m_sessionMasterSecret = null;
+				m_sessionMasterSecret = null;
 			}
 
 			if (m_sessionParameters != null)
 			{
 				m_sessionParameters.Clear();
-				this.m_sessionParameters = null;
+				m_sessionParameters = null;
 			}
 
 			if (m_tlsSession != null)
 			{
 				m_tlsSession.Invalidate();
-				this.m_tlsSession = null;
+				m_tlsSession = null;
 			}
 		}
 
@@ -1669,22 +1771,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			// TODO[tls13] This is interesting enough to notify the TlsPeer for possible logging/vetting
 
 			if (!(m_appDataReady && m_keyUpdateEnabled))
+			{
 				throw new TlsFatalAlert(AlertDescription.unexpected_message);
+			}
 
 			short requestUpdate = TlsUtilities.ReadUint8(buf);
 
 			AssertEmpty(buf);
 
 			if (!KeyUpdateRequest.IsValid(requestUpdate))
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
-			bool updateRequested = (KeyUpdateRequest.update_requested == requestUpdate);
+			bool updateRequested = KeyUpdateRequest.update_requested == requestUpdate;
 
 			TlsUtilities.Update13TrafficSecretPeer(Context);
 			m_recordStream.NotifyKeyUpdateReceived();
 
 			//this.m_keyUpdatePendingReceive &= updateRequested;
-			this.m_keyUpdatePendingSend |= updateRequested;
+			m_keyUpdatePendingSend |= updateRequested;
 		}
 
 		/// <exception cref="IOException"/>
@@ -1693,7 +1799,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			TlsContext context = Context;
 			SecurityParameters securityParameters = context.SecurityParameters;
 			if (null != securityParameters.LocalCertificate)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			if (null == certificate)
 			{
@@ -1719,12 +1827,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		protected virtual void Send13CertificateMessage(Certificate certificate)
 		{
 			if (null == certificate)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			TlsContext context = Context;
 			SecurityParameters securityParameters = context.SecurityParameters;
 			if (null != securityParameters.LocalCertificate)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			HandshakeMessageOutput message = new HandshakeMessageOutput(HandshakeType.certificate);
 			certificate.Encode(context, message, null);
@@ -1798,7 +1910,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			// TODO[tls13] This is interesting enough to notify the TlsPeer for possible logging/vetting
 
 			if (!(m_appDataReady && m_keyUpdateEnabled))
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			short requestUpdate = updateRequested
 				? KeyUpdateRequest.update_requested
@@ -1810,7 +1924,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			m_recordStream.NotifyKeyUpdateSent();
 
 			//this.m_keyUpdatePendingReceive |= updateRequested;
-			this.m_keyUpdatePendingSend &= updateRequested;
+			m_keyUpdatePendingSend &= updateRequested;
 		}
 
 		/// <exception cref="IOException"/>
@@ -1847,7 +1961,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			get
 			{
 				if (m_closed)
+				{
 					return false;
+				}
 
 				AbstractTlsContext context = ContextAdmin;
 
@@ -1860,7 +1976,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			get
 			{
 				if (m_closed)
+				{
 					return false;
+				}
 
 				AbstractTlsContext context = ContextAdmin;
 
@@ -1893,7 +2011,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			 * RFC 5746 4.5 SSLv3 clients [..] SHOULD use a fatal handshake_failure alert.
 			 */
 			if (TlsUtilities.IsSsl(Context))
+			{
 				throw new TlsFatalAlert(AlertDescription.handshake_failure);
+			}
 
 			RaiseAlertWarning(AlertDescription.no_renegotiation, "Renegotiation not supported");
 		}
@@ -1904,7 +2024,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static void AssertEmpty(MemoryStream buf)
 		{
 			if (buf.Position < buf.Length)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 		}
 
 		internal static byte[] CreateRandomBlock(bool useGmtUnixTime, TlsContext context)
@@ -1930,7 +2052,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			TlsSecret preMasterSecret = keyExchange.GeneratePreMasterSecret();
 			if (preMasterSecret == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			try
 			{
@@ -1938,7 +2062,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					preMasterSecret);
 
 				if (context.SecurityParameters.NegotiatedVersion != ProtocolVersion.TLSv13)
+				{
 					KeyLogFileWriter.WriteLabel(Labels.CLIENT_RANDOM, context.SecurityParameters);
+				}
 			}
 			finally
 			{
@@ -1954,7 +2080,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static IDictionary<int, byte[]> ReadExtensions(MemoryStream input)
 		{
 			if (input.Position >= input.Length)
+			{
 				return null;
+			}
 
 			byte[] extBytes = TlsUtilities.ReadOpaque16(input);
 
@@ -1967,7 +2095,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static IDictionary<int, byte[]> ReadExtensionsData(byte[] extBytes)
 		{
 			// Int32 -> byte[]
-			var extensions = new Dictionary<int, byte[]>();
+			Dictionary<int, byte[]> extensions = new Dictionary<int, byte[]>();
 
 			if (extBytes.Length > 0)
 			{
@@ -1982,8 +2110,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					 * RFC 3546 2.3 There MUST NOT be more than one extension of the same type.
 					 */
 					if (extensions.ContainsKey(extension_type))
+					{
 						throw new TlsFatalAlert(AlertDescription.illegal_parameter,
 							"Repeated extension: " + ExtensionType.GetText(extension_type));
+					}
 
 					extensions.Add(extension_type, extension_data);
 				} while (buf.Position < buf.Length);
@@ -1996,7 +2126,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static IDictionary<int, byte[]> ReadExtensionsData13(int handshakeType, byte[] extBytes)
 		{
 			// Int32 -> byte[]
-			var extensions = new Dictionary<int, byte[]>();
+			Dictionary<int, byte[]> extensions = new Dictionary<int, byte[]>();
 
 			if (extBytes.Length > 0)
 			{
@@ -2018,8 +2148,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					 * RFC 3546 2.3 There MUST NOT be more than one extension of the same type.
 					 */
 					if (extensions.ContainsKey(extension_type))
+					{
 						throw new TlsFatalAlert(AlertDescription.illegal_parameter,
 							"Repeated extension: " + ExtensionType.GetText(extension_type));
+					}
 
 					extensions.Add(extension_type, extension_data);
 				} while (buf.Position < buf.Length);
@@ -2039,7 +2171,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			 */
 
 			// Int32 -> byte[]
-			var extensions = new Dictionary<int, byte[]>();
+			Dictionary<int, byte[]> extensions = new Dictionary<int, byte[]>();
 
 			if (extBytes.Length > 0)
 			{
@@ -2057,17 +2189,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					 * RFC 3546 2.3 There MUST NOT be more than one extension of the same type.
 					 */
 					if (extensions.ContainsKey(extension_type))
+					{
 						throw new TlsFatalAlert(AlertDescription.illegal_parameter,
 							"Repeated extension: " + ExtensionType.GetText(extension_type));
+					}
 
 					extensions.Add(extension_type, extension_data);
 
-					pre_shared_key_found |= (ExtensionType.pre_shared_key == extension_type);
+					pre_shared_key_found |= ExtensionType.pre_shared_key == extension_type;
 				} while (buf.Position < buf.Length);
 
-				if (pre_shared_key_found && (ExtensionType.pre_shared_key != extension_type))
+				if (pre_shared_key_found && ExtensionType.pre_shared_key != extension_type)
+				{
 					throw new TlsFatalAlert(AlertDescription.illegal_parameter,
 						"'pre_shared_key' MUST be last in ClientHello");
+				}
 			}
 
 			return extensions;
@@ -2082,7 +2218,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			MemoryStream buf = new MemoryStream(supp_data, false);
 
-			var supplementalData = new List<SupplementalDataEntry>();
+			List<SupplementalDataEntry> supplementalData = new List<SupplementalDataEntry>();
 
 			while (buf.Position < buf.Length)
 			{
@@ -2105,7 +2241,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static void WriteExtensions(Stream output, IDictionary<int, byte[]> extensions, int bindersSize)
 		{
 			if (null == extensions || extensions.Count < 1)
+			{
 				return;
+			}
 
 			byte[] extBytes = WriteExtensionsData(extensions, bindersSize);
 
@@ -2151,7 +2289,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static void WritePreSharedKeyExtension(MemoryStream buf, IDictionary<int, byte[]> extensions,
 			int bindersSize)
 		{
-			if (extensions.TryGetValue(ExtensionType.pre_shared_key, out var extension_data))
+			if (extensions.TryGetValue(ExtensionType.pre_shared_key, out byte[] extension_data))
 			{
 				TlsUtilities.CheckUint16(ExtensionType.pre_shared_key);
 				TlsUtilities.WriteUint16(ExtensionType.pre_shared_key, buf);
@@ -2167,13 +2305,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static void WriteSelectedExtensions(Stream output, IDictionary<int, byte[]> extensions,
 			bool selectEmpty)
 		{
-			foreach (var extension in extensions)
+			foreach (KeyValuePair<int, byte[]> extension in extensions)
 			{
 				int extension_type = extension.Key;
 
 				// NOTE: Must be last; handled by 'WritePreSharedKeyExtension'
 				if (ExtensionType.pre_shared_key == extension_type)
+				{
 					continue;
+				}
 
 				byte[] extension_data = extension.Value;
 

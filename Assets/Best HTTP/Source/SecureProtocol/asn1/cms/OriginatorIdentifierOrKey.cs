@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class OriginatorIdentifierOrKey
 		: Asn1Encodable, IAsn1Choice
 	{
-		private readonly Asn1Encodable id;
+		readonly Asn1Encodable id;
 
 		public OriginatorIdentifierOrKey(IssuerAndSerialNumber id)
 		{
@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			this.id = new DerTaggedObject(false, 1, id);
 		}
 
-		private OriginatorIdentifierOrKey(Asn1TaggedObject id)
+		OriginatorIdentifierOrKey(Asn1TaggedObject id)
 		{
 			// TODO Add validation
 			this.id = id;
@@ -64,21 +64,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object o)
 		{
 			if (o == null || o is OriginatorIdentifierOrKey)
+			{
 				return (OriginatorIdentifierOrKey)o;
+			}
 
 			if (o is IssuerAndSerialNumber)
+			{
 				return new OriginatorIdentifierOrKey((IssuerAndSerialNumber)o);
+			}
 
 			if (o is SubjectKeyIdentifier)
+			{
 				return new OriginatorIdentifierOrKey((SubjectKeyIdentifier)o);
+			}
 
 			if (o is OriginatorPublicKey)
+			{
 				return new OriginatorIdentifierOrKey((OriginatorPublicKey)o);
+			}
 
 			if (o is Asn1TaggedObject)
+			{
 				return new OriginatorIdentifierOrKey((Asn1TaggedObject)o);
+			}
 
-			throw new ArgumentException("Invalid OriginatorIdentifierOrKey: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+			throw new ArgumentException("Invalid OriginatorIdentifierOrKey: " + Platform.GetTypeName(o));
 		}
 
 		public Asn1Encodable ID

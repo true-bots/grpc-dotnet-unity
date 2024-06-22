@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 {
 	public class AttributeTable
 	{
-		private readonly IDictionary<DerObjectIdentifier, AttributeX509> m_attributes;
+		readonly IDictionary<DerObjectIdentifier, AttributeX509> m_attributes;
 
 		public AttributeTable(IDictionary<DerObjectIdentifier, AttributeX509> attrs)
 		{

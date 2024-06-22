@@ -75,7 +75,7 @@ namespace BestHTTP.Decompression.Zlib
 	/// </remarks>
 	///
 	/// <seealso cref="DeflateStream" />
-	public class GZipStream : System.IO.Stream
+	public class GZipStream : Stream
 	{
 		// GZip format
 		// source: http://tools.ietf.org/html/rfc1952
@@ -134,12 +134,16 @@ namespace BestHTTP.Decompression.Zlib
 		///   (<c>Nothing</c> in VB).
 		/// </para>
 		/// </remarks>
-		public String Comment
+		public string Comment
 		{
 			get { return _Comment; }
 			set
 			{
-				if (_disposed) throw new ObjectDisposedException("GZipStream");
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("GZipStream");
+				}
+
 				_Comment = value;
 			}
 		}
@@ -167,21 +171,32 @@ namespace BestHTTP.Decompression.Zlib
 		///   in VB).
 		/// </para>
 		/// </remarks>
-		public String FileName
+		public string FileName
 		{
 			get { return _FileName; }
 			set
 			{
-				if (_disposed) throw new ObjectDisposedException("GZipStream");
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("GZipStream");
+				}
+
 				_FileName = value;
-				if (_FileName == null) return;
+				if (_FileName == null)
+				{
+					return;
+				}
+
 				if (_FileName.IndexOf("/") != -1)
 				{
 					_FileName = _FileName.Replace("/", "\\");
 				}
 
 				if (_FileName.EndsWith("\\"))
+				{
 					throw new Exception("Illegal filename");
+				}
+
 				if (_FileName.IndexOf("\\") != -1)
 				{
 					// trim any leading path
@@ -213,7 +228,7 @@ namespace BestHTTP.Decompression.Zlib
 			get { return _Crc32; }
 		}
 
-		private int _headerByteCount;
+		int _headerByteCount;
 		internal ZlibBaseStream _baseStream;
 		bool _disposed;
 		bool _firstReadDone;
@@ -538,13 +553,17 @@ namespace BestHTTP.Decompression.Zlib
 		/// <summary>
 		/// This property sets the flush behavior on the stream.
 		/// </summary>
-		virtual public FlushType FlushMode
+		public virtual FlushType FlushMode
 		{
-			get { return (this._baseStream._flushMode); }
+			get { return _baseStream._flushMode; }
 			set
 			{
-				if (_disposed) throw new ObjectDisposedException("GZipStream");
-				this._baseStream._flushMode = value;
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("GZipStream");
+				}
+
+				_baseStream._flushMode = value;
 			}
 		}
 
@@ -567,29 +586,39 @@ namespace BestHTTP.Decompression.Zlib
 		/// </remarks>
 		public int BufferSize
 		{
-			get { return this._baseStream._bufferSize; }
+			get { return _baseStream._bufferSize; }
 			set
 			{
-				if (_disposed) throw new ObjectDisposedException("GZipStream");
-				if (this._baseStream._workingBuffer != null)
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("GZipStream");
+				}
+
+				if (_baseStream._workingBuffer != null)
+				{
 					throw new ZlibException("The working buffer is already set.");
+				}
+
 				if (value < ZlibConstants.WorkingBufferSizeMin)
-					throw new ZlibException(String.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
-				this._baseStream._bufferSize = value;
+				{
+					throw new ZlibException(string.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
+				}
+
+				_baseStream._bufferSize = value;
 			}
 		}
 
 
 		/// <summary> Returns the total number of bytes input so far.</summary>
-		virtual public long TotalIn
+		public virtual long TotalIn
 		{
-			get { return this._baseStream._z.TotalBytesIn; }
+			get { return _baseStream._z.TotalBytesIn; }
 		}
 
 		/// <summary> Returns the total number of bytes output so far.</summary>
-		virtual public long TotalOut
+		public virtual long TotalOut
 		{
-			get { return this._baseStream._z.TotalBytesOut; }
+			get { return _baseStream._z.TotalBytesOut; }
 		}
 
 		#endregion
@@ -625,10 +654,10 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				if (!_disposed)
 				{
-					if (disposing && (this._baseStream != null))
+					if (disposing && _baseStream != null)
 					{
-						this._baseStream.Close();
-						this._Crc32 = _baseStream.Crc32;
+						_baseStream.Close();
+						_Crc32 = _baseStream.Crc32;
 					}
 
 					_disposed = true;
@@ -651,7 +680,11 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			get
 			{
-				if (_disposed) throw new ObjectDisposedException("GZipStream");
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("GZipStream");
+				}
+
 				return _baseStream._stream.CanRead;
 			}
 		}
@@ -678,7 +711,11 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			get
 			{
-				if (_disposed) throw new ObjectDisposedException("GZipStream");
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("GZipStream");
+				}
+
 				return _baseStream._stream.CanWrite;
 			}
 		}
@@ -688,7 +725,11 @@ namespace BestHTTP.Decompression.Zlib
 		/// </summary>
 		public override void Flush()
 		{
-			if (_disposed) throw new ObjectDisposedException("GZipStream");
+			if (_disposed)
+			{
+				throw new ObjectDisposedException("GZipStream");
+			}
+
 			_baseStream.Flush();
 		}
 
@@ -715,10 +756,16 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			get
 			{
-				if (this._baseStream._streamMode == BestHTTP.Decompression.Zlib.ZlibBaseStream.StreamMode.Writer)
-					return this._baseStream._z.TotalBytesOut + _headerByteCount;
-				if (this._baseStream._streamMode == BestHTTP.Decompression.Zlib.ZlibBaseStream.StreamMode.Reader)
-					return this._baseStream._z.TotalBytesIn + this._baseStream._gzipHeaderByteCount;
+				if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Writer)
+				{
+					return _baseStream._z.TotalBytesOut + _headerByteCount;
+				}
+
+				if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Reader)
+				{
+					return _baseStream._z.TotalBytesIn + _baseStream._gzipHeaderByteCount;
+				}
+
 				return 0;
 			}
 
@@ -758,7 +805,11 @@ namespace BestHTTP.Decompression.Zlib
 		/// <returns>the number of bytes actually read</returns>
 		public override int Read(byte[] buffer, int offset, int count)
 		{
-			if (_disposed) throw new ObjectDisposedException("GZipStream");
+			if (_disposed)
+			{
+				throw new ObjectDisposedException("GZipStream");
+			}
+
 			int n = _baseStream.Read(buffer, offset, count);
 
 			// Console.WriteLine("GZipStream::Read(buffer, off({0}), c({1}) = {2}", offset, count, n);
@@ -820,8 +871,12 @@ namespace BestHTTP.Decompression.Zlib
 		/// <param name="count">the number of bytes to write.</param>
 		public override void Write(byte[] buffer, int offset, int count)
 		{
-			if (_disposed) throw new ObjectDisposedException("GZipStream");
-			if (_baseStream._streamMode == BestHTTP.Decompression.Zlib.ZlibBaseStream.StreamMode.Undefined)
+			if (_disposed)
+			{
+				throw new ObjectDisposedException("GZipStream");
+			}
+
+			if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Undefined)
 			{
 				//Console.WriteLine("GZipStream: First write");
 				if (_baseStream._wantCompress)
@@ -841,17 +896,17 @@ namespace BestHTTP.Decompression.Zlib
 		#endregion
 
 
-		internal static readonly System.DateTime _unixEpoch = new System.DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		internal static readonly DateTime _unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 		internal static readonly System.Text.Encoding iso8859dash1 = System.Text.Encoding.GetEncoding("iso-8859-1");
 
 
-		private int EmitHeader()
+		int EmitHeader()
 		{
-			byte[] commentBytes = (Comment == null) ? null : iso8859dash1.GetBytes(Comment);
-			byte[] filenameBytes = (FileName == null) ? null : iso8859dash1.GetBytes(FileName);
+			byte[] commentBytes = Comment == null ? null : iso8859dash1.GetBytes(Comment);
+			byte[] filenameBytes = FileName == null ? null : iso8859dash1.GetBytes(FileName);
 
-			int cbLength = (Comment == null) ? 0 : commentBytes.Length + 1;
-			int fnLength = (FileName == null) ? 0 : filenameBytes.Length + 1;
+			int cbLength = Comment == null ? 0 : commentBytes.Length + 1;
+			int fnLength = FileName == null ? 0 : filenameBytes.Length + 1;
 
 			int bufferLength = 10 + cbLength + fnLength;
 			byte[] header = BufferPool.Get(bufferLength, true);
@@ -864,17 +919,26 @@ namespace BestHTTP.Decompression.Zlib
 			header[i++] = 8;
 			byte flag = 0;
 			if (Comment != null)
+			{
 				flag ^= 0x10;
+			}
+
 			if (FileName != null)
+			{
 				flag ^= 0x8;
+			}
 
 			// flag
 			header[i++] = flag;
 
 			// mtime
-			if (!LastModified.HasValue) LastModified = DateTime.Now;
-			System.TimeSpan delta = LastModified.Value - _unixEpoch;
-			Int32 timet = (Int32)delta.TotalSeconds;
+			if (!LastModified.HasValue)
+			{
+				LastModified = DateTime.Now;
+			}
+
+			TimeSpan delta = LastModified.Value - _unixEpoch;
+			int timet = (int)delta.TotalSeconds;
 			Array.Copy(BitConverter.GetBytes(timet), 0, header, i, 4);
 			i += 4;
 

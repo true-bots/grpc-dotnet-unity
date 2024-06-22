@@ -9,9 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class MqvPrivateParameters
 		: ICipherParameters
 	{
-		private readonly ECPrivateKeyParameters staticPrivateKey;
-		private readonly ECPrivateKeyParameters ephemeralPrivateKey;
-		private readonly ECPublicKeyParameters ephemeralPublicKey;
+		readonly ECPrivateKeyParameters staticPrivateKey;
+		readonly ECPrivateKeyParameters ephemeralPrivateKey;
+		readonly ECPublicKeyParameters ephemeralPublicKey;
 
 		public MqvPrivateParameters(
 			ECPrivateKeyParameters staticPrivateKey,
@@ -26,13 +26,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			ECPublicKeyParameters ephemeralPublicKey)
 		{
 			if (staticPrivateKey == null)
+			{
 				throw new ArgumentNullException("staticPrivateKey");
+			}
+
 			if (ephemeralPrivateKey == null)
+			{
 				throw new ArgumentNullException("ephemeralPrivateKey");
+			}
 
 			ECDomainParameters parameters = staticPrivateKey.Parameters;
 			if (!parameters.Equals(ephemeralPrivateKey.Parameters))
+			{
 				throw new ArgumentException("Static and ephemeral private keys have different domain parameters");
+			}
 
 			if (ephemeralPublicKey == null)
 			{

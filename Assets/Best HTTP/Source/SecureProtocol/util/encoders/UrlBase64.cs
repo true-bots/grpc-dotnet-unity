@@ -20,7 +20,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 	*/
 	public class UrlBase64
 	{
-		private static readonly IEncoder encoder = new UrlBase64Encoder();
+		static readonly IEncoder encoder = new UrlBase64Encoder();
 
 		/**
 		* Encode the input data producing a URL safe base 64 encoded byte array.

@@ -47,7 +47,7 @@ namespace BestHTTP.Connections
 
 		#region Privates
 
-		private bool IsThreaded;
+		bool IsThreaded;
 
 		#endregion
 
@@ -58,21 +58,23 @@ namespace BestHTTP.Connections
 
 		public ConnectionBase(string serverAddress, bool threaded)
 		{
-			this.ServerAddress = serverAddress;
-			this.State = HTTPConnectionStates.Initial;
-			this.LastProcessTime = DateTime.Now;
-			this.KeepAliveTime = HTTPManager.MaxConnectionIdleTime;
-			this.IsThreaded = threaded;
+			ServerAddress = serverAddress;
+			State = HTTPConnectionStates.Initial;
+			LastProcessTime = DateTime.Now;
+			KeepAliveTime = HTTPManager.MaxConnectionIdleTime;
+			IsThreaded = threaded;
 
-			this.Context = new LoggingContext(this);
-			this.Context.Add("ServerAddress", serverAddress);
-			this.Context.Add("Threaded", threaded);
+			Context = new LoggingContext(this);
+			Context.Add("ServerAddress", serverAddress);
+			Context.Add("Threaded", threaded);
 		}
 
 		internal virtual void Process(HTTPRequest request)
 		{
 			if (State == HTTPConnectionStates.Processing)
-				throw new Exception("Connection already processing a request! " + this.ToString());
+			{
+				throw new Exception("Connection already processing a request! " + ToString());
+			}
 
 			StartTime = DateTime.MaxValue;
 			State = HTTPConnectionStates.Processing;
@@ -81,9 +83,13 @@ namespace BestHTTP.Connections
 			LastProcessedUri = CurrentRequest.CurrentUri;
 
 			if (IsThreaded)
+			{
 				PlatformSupport.Threading.ThreadedRunner.RunLongLiving(ThreadFunc);
+			}
 			else
+			{
 				ThreadFunc();
+			}
 		}
 
 		protected virtual void ThreadFunc()
@@ -97,7 +103,7 @@ namespace BestHTTP.Connections
 		/// </summary>
 		public virtual void Shutdown(ShutdownTypes type)
 		{
-			this.ShutdownType = type;
+			ShutdownType = type;
 		}
 
 		#region Dispose Pattern
@@ -121,9 +127,12 @@ namespace BestHTTP.Connections
 
 		public override string ToString()
 		{
-			return string.Format("[{0}:{1}]", this.GetHashCode(), this.ServerAddress);
+			return string.Format("[{0}:{1}]", GetHashCode(), ServerAddress);
 		}
 
-		public virtual bool TestConnection() => true;
+		public virtual bool TestConnection()
+		{
+			return true;
+		}
 	}
 }

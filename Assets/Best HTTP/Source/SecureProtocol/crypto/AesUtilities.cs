@@ -19,7 +19,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 #if NETCOREAPP3_0_OR_GREATER
         public static bool IsHardwareAccelerated => AesEngine_X86.IsSupported;
 #else
-		public static bool IsHardwareAccelerated => false;
+		public static bool IsHardwareAccelerated
+		{
+			get { return false; }
+		}
 #endif
 	}
 }

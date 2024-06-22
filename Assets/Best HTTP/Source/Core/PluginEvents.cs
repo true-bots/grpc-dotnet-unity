@@ -31,25 +31,25 @@ namespace BestHTTP.Core
 
 		public PluginEventInfo(PluginEvents @event)
 		{
-			this.Event = @event;
-			this.Payload = null;
+			Event = @event;
+			Payload = null;
 		}
 
 		public PluginEventInfo(PluginEvents @event, object payload)
 		{
-			this.Event = @event;
-			this.Payload = payload;
+			Event = @event;
+			Payload = payload;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("[PluginEventInfo Event: {0}]", this.Event);
+			return string.Format("[PluginEventInfo Event: {0}]", Event);
 		}
 	}
 
 	public static class PluginEventHelper
 	{
-		private static ConcurrentQueue<PluginEventInfo> pluginEvents = new ConcurrentQueue<PluginEventInfo>();
+		static ConcurrentQueue<PluginEventInfo> pluginEvents = new ConcurrentQueue<PluginEventInfo>();
 
 #pragma warning disable 0649
 		public static Action<PluginEventInfo> OnEvent;
@@ -58,7 +58,9 @@ namespace BestHTTP.Core
 		public static void EnqueuePluginEvent(PluginEventInfo @event)
 		{
 			if (HTTPManager.Logger.Level == Loglevels.All)
+			{
 				HTTPManager.Logger.Information("PluginEventHelper", "Enqueue plugin event: " + @event.ToString());
+			}
 
 			pluginEvents.Enqueue(@event);
 		}
@@ -82,7 +84,9 @@ namespace BestHTTP.Core
 			while (pluginEvents.TryDequeue(out pluginEvent))
 			{
 				if (HTTPManager.Logger.Level == Loglevels.All)
+				{
 					HTTPManager.Logger.Information("PluginEventHelper", "Processing plugin event: " + pluginEvent.ToString());
+				}
 
 				if (OnEvent != null)
 				{
@@ -126,12 +130,16 @@ namespace BestHTTP.Core
 
 #if !BESTHTTP_DISABLE_COOKIES
 			if (saveCookieLibrary)
+			{
 				PlatformSupport.Threading.ThreadedRunner.RunShortLiving(Cookies.CookieJar.Persist);
+			}
 #endif
 
 #if !BESTHTTP_DISABLE_CACHING
 			if (saveCacheLibrary)
+			{
 				PlatformSupport.Threading.ThreadedRunner.RunShortLiving(Caching.HTTPCacheService.SaveLibrary);
+			}
 #endif
 		}
 	}
@@ -143,8 +151,8 @@ namespace BestHTTP.Core
 
 		public AltSvcEventInfo(string host, HTTPResponse resp)
 		{
-			this.Host = host;
-			this.Response = resp;
+			Host = host;
+			Response = resp;
 		}
 	}
 
@@ -155,8 +163,8 @@ namespace BestHTTP.Core
 
 		public HTTP2ConnectProtocolInfo(string host, bool enabled)
 		{
-			this.Host = host;
-			this.Enabled = enabled;
+			Host = host;
+			Enabled = enabled;
 		}
 	}
 }

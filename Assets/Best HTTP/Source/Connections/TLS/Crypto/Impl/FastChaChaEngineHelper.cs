@@ -12,20 +12,22 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 #if BESTHTTP_WITH_BURST
     [Unity.Burst.BurstCompile]
 #endif
-	internal static class FastChaChaEngineHelper
+	static class FastChaChaEngineHelper
 	{
-		internal unsafe static void ChachaCore(int rounds, uint[] input, byte[] output)
+		internal static unsafe void ChachaCore(int rounds, uint[] input, byte[] output)
 		{
 			fixed (uint* pinput = input)
 			fixed (byte* poutput = output)
+			{
 				ChachaCoreImpl(rounds, pinput, poutput);
+			}
 		}
 
 #if BESTHTTP_WITH_BURST
         [Unity.Burst.BurstCompile]
         [Unity.Burst.CompilerServices.SkipLocalsInit]
 #endif
-		internal unsafe static void ChachaCoreImpl(int rounds,
+		internal static unsafe void ChachaCoreImpl(int rounds,
 #if BESTHTTP_WITH_BURST
             [NoAlias]
 #endif
@@ -38,7 +40,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			uint* x = stackalloc uint[16];
 
 			for (int i = 0; i < 16; i++)
+			{
 				x[i] = input[i];
+			}
 
 			uint tmp = 0;
 			for (int i = rounds; i > 0; i -= 2)
@@ -151,10 +155,10 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			{
 				uint n = x[i] + input[i];
 
-				output[(i * 4)] = (byte)n;
-				output[(i * 4) + 1] = (byte)(n >> 8);
-				output[(i * 4) + 2] = (byte)(n >> 16);
-				output[(i * 4) + 3] = (byte)(n >> 24);
+				output[i * 4] = (byte)n;
+				output[i * 4 + 1] = (byte)(n >> 8);
+				output[i * 4 + 2] = (byte)(n >> 16);
+				output[i * 4 + 3] = (byte)(n >> 24);
 			}
 		}
 

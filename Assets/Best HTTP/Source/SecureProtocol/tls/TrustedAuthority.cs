@@ -10,16 +10,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class TrustedAuthority
 	{
-		private readonly short m_identifierType;
-		private readonly object m_identifier;
+		readonly short m_identifierType;
+		readonly object m_identifier;
 
 		public TrustedAuthority(short identifierType, object identifier)
 		{
 			if (!IsCorrectType(identifierType, identifier))
+			{
 				throw new ArgumentException("not an instance of the correct type", "identifier");
+			}
 
-			this.m_identifierType = identifierType;
-			this.m_identifier = identifier;
+			m_identifierType = identifierType;
+			m_identifier = identifier;
 		}
 
 		public short IdentifierType
@@ -121,14 +123,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return new TrustedAuthority(identifier_type, identifier);
 		}
 
-		private void CheckCorrectType(short expectedIdentifierType)
+		void CheckCorrectType(short expectedIdentifierType)
 		{
 			if (m_identifierType != expectedIdentifierType || !IsCorrectType(expectedIdentifierType, m_identifier))
+			{
 				throw new InvalidOperationException("TrustedAuthority is not of type "
 				                                    + Tls.IdentifierType.GetName(expectedIdentifierType));
+			}
 		}
 
-		private static bool IsCorrectType(short identifierType, object identifier)
+		static bool IsCorrectType(short identifierType, object identifier)
 		{
 			switch (identifierType)
 			{
@@ -144,7 +148,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 		}
 
-		private static bool IsSha1Hash(object identifier)
+		static bool IsSha1Hash(object identifier)
 		{
 			return identifier is byte[] && ((byte[])identifier).Length == 20;
 		}

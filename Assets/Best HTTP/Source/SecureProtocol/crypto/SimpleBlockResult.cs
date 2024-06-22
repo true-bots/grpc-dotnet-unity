@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	public class SimpleBlockResult
 		: IBlockResult
 	{
-		private readonly byte[] result;
+		readonly byte[] result;
 
 		/// <summary>
 		/// Base constructor - a wrapper for the passed in byte array.

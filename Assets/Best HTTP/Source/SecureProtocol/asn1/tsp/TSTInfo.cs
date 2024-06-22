@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
@@ -8,29 +9,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 	public class TstInfo
 		: Asn1Encodable
 	{
-		private readonly DerInteger version;
-		private readonly DerObjectIdentifier tsaPolicyId;
-		private readonly MessageImprint messageImprint;
-		private readonly DerInteger serialNumber;
-		private readonly Asn1GeneralizedTime genTime;
-		private readonly Accuracy accuracy;
-		private readonly DerBoolean ordering;
-		private readonly DerInteger nonce;
-		private readonly GeneralName tsa;
-		private readonly X509Extensions extensions;
+		readonly DerInteger version;
+		readonly DerObjectIdentifier tsaPolicyId;
+		readonly MessageImprint messageImprint;
+		readonly DerInteger serialNumber;
+		readonly Asn1GeneralizedTime genTime;
+		readonly Accuracy accuracy;
+		readonly DerBoolean ordering;
+		readonly DerInteger nonce;
+		readonly GeneralName tsa;
+		readonly X509Extensions extensions;
 
 		public static TstInfo GetInstance(object obj)
 		{
 			if (obj is TstInfo)
+			{
 				return (TstInfo)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new TstInfo(Asn1Sequence.GetInstance(obj));
 		}
 
-		private TstInfo(Asn1Sequence seq)
+		TstInfo(Asn1Sequence seq)
 		{
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
 			// version
 			e.MoveNext();
@@ -104,7 +111,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 			GeneralName tsa,
 			X509Extensions extensions)
 		{
-			this.version = new DerInteger(1);
+			version = new DerInteger(1);
 			this.tsaPolicyId = tsaPolicyId;
 			this.messageImprint = messageImprint;
 			this.serialNumber = serialNumber;

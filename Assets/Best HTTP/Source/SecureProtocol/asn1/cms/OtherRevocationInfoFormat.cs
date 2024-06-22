@@ -5,8 +5,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class OtherRevocationInfoFormat
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier otherRevInfoFormat;
-		private readonly Asn1Encodable otherRevInfo;
+		readonly DerObjectIdentifier otherRevInfoFormat;
+		readonly Asn1Encodable otherRevInfo;
 
 		public OtherRevocationInfoFormat(
 			DerObjectIdentifier otherRevInfoFormat,
@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			this.otherRevInfo = otherRevInfo;
 		}
 
-		private OtherRevocationInfoFormat(Asn1Sequence seq)
+		OtherRevocationInfoFormat(Asn1Sequence seq)
 		{
 			otherRevInfoFormat = DerObjectIdentifier.GetInstance(seq[0]);
 			otherRevInfo = seq[1];
@@ -45,9 +45,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public static OtherRevocationInfoFormat GetInstance(object obj)
 		{
 			if (obj is OtherRevocationInfoFormat otherRevocationInfoFormat)
+			{
 				return otherRevocationInfoFormat;
+			}
+
 			if (obj != null)
+			{
 				return new OtherRevocationInfoFormat(Asn1Sequence.GetInstance(obj));
+			}
+
 			return null;
 		}
 

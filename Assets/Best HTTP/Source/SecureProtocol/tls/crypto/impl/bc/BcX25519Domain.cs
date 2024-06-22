@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 
 		public BcX25519Domain(BcTlsCrypto crypto)
 		{
-			this.m_crypto = crypto;
+			m_crypto = crypto;
 		}
 
 		public virtual TlsAgreement CreateECDH()

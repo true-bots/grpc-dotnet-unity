@@ -8,26 +8,26 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP160R1Field
+	class SecP160R1Field
 	{
 		// 2^160 - 2^31 - 1
 		internal static readonly uint[] P = new uint[] { 0x7FFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
 
-		private static readonly uint[] PExt = new uint[]
+		static readonly uint[] PExt = new uint[]
 		{
 			0x00000001, 0x40000001, 0x00000000, 0x00000000, 0x00000000,
 			0xFFFFFFFE, 0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
 		};
 
-		private static readonly uint[] PExtInv = new uint[]
+		static readonly uint[] PExtInv = new uint[]
 		{
 			0xFFFFFFFF, 0xBFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF,
 			0xFFFFFFFF, 0x00000001, 0x00000001
 		};
 
-		private const uint P4 = 0xFFFFFFFF;
-		private const uint PExt9 = 0xFFFFFFFF;
-		private const uint PInv = 0x80000001;
+		const uint P4 = 0xFFFFFFFF;
+		const uint PExt9 = 0xFFFFFFFF;
+		const uint PInv = 0x80000001;
 
 		public static void Add(uint[] x, uint[] y, uint[] z)
 		{

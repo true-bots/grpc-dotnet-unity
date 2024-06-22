@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class TlsFatalAlert
 		: TlsException
 	{
-		private static string GetMessage(short alertDescription, string detailMessage)
+		static string GetMessage(short alertDescription, string detailMessage)
 		{
 			string msg = Tls.AlertDescription.GetText(alertDescription);
 			if (null != detailMessage)
@@ -41,7 +41,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			: base(GetMessage(alertDescription, detailMessage), alertCause)
 		{
 			if (!TlsUtilities.IsValidUint8(alertDescription))
+			{
 				throw new ArgumentOutOfRangeException(nameof(alertDescription));
+			}
 
 			m_alertDescription = (byte)alertDescription;
 		}

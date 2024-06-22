@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
 	public class RecipientInformationStore
 	{
-		private readonly IList<RecipientInformation> m_all;
+		readonly IList<RecipientInformation> m_all;
 
-		private readonly IDictionary<RecipientID, IList<RecipientInformation>> m_table =
+		readonly IDictionary<RecipientID, IList<RecipientInformation>> m_table =
 			new Dictionary<RecipientID, IList<RecipientInformation>>();
 
 		public RecipientInformationStore(IEnumerable<RecipientInformation> recipientInfos)
@@ -19,7 +19,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			{
 				RecipientID rid = recipientInformation.RecipientID;
 
-				if (!m_table.TryGetValue(rid, out var list))
+				if (!m_table.TryGetValue(rid, out IList<RecipientInformation> list))
 				{
 					m_table[rid] = list = new List<RecipientInformation>(1);
 				}
@@ -27,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				list.Add(recipientInformation);
 			}
 
-			this.m_all = new List<RecipientInformation>(recipientInfos);
+			m_all = new List<RecipientInformation>(recipientInfos);
 		}
 
 		public RecipientInformation this[RecipientID selector]
@@ -44,8 +44,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		*/
 		public RecipientInformation GetFirstRecipient(RecipientID selector)
 		{
-			if (!m_table.TryGetValue(selector, out var list))
+			if (!m_table.TryGetValue(selector, out IList<RecipientInformation> list))
+			{
 				return null;
+			}
 
 			return list[0];
 		}
@@ -78,8 +80,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		*/
 		public IList<RecipientInformation> GetRecipients(RecipientID selector)
 		{
-			if (!m_table.TryGetValue(selector, out var list))
+			if (!m_table.TryGetValue(selector, out IList<RecipientInformation> list))
+			{
 				return new List<RecipientInformation>(0);
+			}
 
 			return new List<RecipientInformation>(list);
 		}

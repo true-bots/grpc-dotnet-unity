@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class ECNamedDomainParameters
 		: ECDomainParameters
 	{
-		private readonly DerObjectIdentifier name;
+		readonly DerObjectIdentifier name;
 
 		public DerObjectIdentifier Name
 		{

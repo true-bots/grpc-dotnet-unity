@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 	public class BcTlsCrypto
 		: AbstractTlsCrypto
 	{
-		private readonly SecureRandom m_entropySource;
+		readonly SecureRandom m_entropySource;
 
 		public BcTlsCrypto()
 			: this(CryptoServicesRegistrar.GetSecureRandom())
@@ -36,9 +36,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public BcTlsCrypto(SecureRandom entropySource)
 		{
 			if (entropySource == null)
+			{
 				throw new ArgumentNullException(nameof(entropySource));
+			}
 
-			this.m_entropySource = entropySource;
+			m_entropySource = entropySource;
 		}
 
 		internal virtual BcTlsSecret AdoptLocalSecret(byte[] data)

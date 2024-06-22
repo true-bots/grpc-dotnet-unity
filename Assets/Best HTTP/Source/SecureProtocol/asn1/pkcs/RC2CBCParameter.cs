@@ -20,7 +20,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				return new RC2CbcParameter((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public RC2CbcParameter(
@@ -33,11 +33,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			int parameterVersion,
 			byte[] iv)
 		{
-			this.version = new DerInteger(parameterVersion);
+			version = new DerInteger(parameterVersion);
 			this.iv = new DerOctetString(iv);
 		}
 
-		private RC2CbcParameter(
+		RC2CbcParameter(
 			Asn1Sequence seq)
 		{
 			if (seq.Count == 1)

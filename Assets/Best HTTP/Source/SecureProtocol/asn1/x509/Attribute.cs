@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class AttributeX509
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier attrType;
-		private readonly Asn1Set attrValues;
+		readonly DerObjectIdentifier attrType;
+		readonly Asn1Set attrValues;
 
 		/**
          * return an Attr object from the given object.
@@ -30,14 +30,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new AttributeX509((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private AttributeX509(
+		AttributeX509(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
 			attrType = DerObjectIdentifier.GetInstance(seq[0]);
 			attrValues = Asn1Set.GetInstance(seq[1]);

@@ -9,17 +9,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class KekRecipientInfo
 		: Asn1Encodable
 	{
-		private DerInteger version;
-		private KekIdentifier kekID;
-		private AlgorithmIdentifier keyEncryptionAlgorithm;
-		private Asn1OctetString encryptedKey;
+		DerInteger version;
+		KekIdentifier kekID;
+		AlgorithmIdentifier keyEncryptionAlgorithm;
+		Asn1OctetString encryptedKey;
 
 		public KekRecipientInfo(
 			KekIdentifier kekID,
 			AlgorithmIdentifier keyEncryptionAlgorithm,
 			Asn1OctetString encryptedKey)
 		{
-			this.version = new DerInteger(4);
+			version = new DerInteger(4);
 			this.kekID = kekID;
 			this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
 			this.encryptedKey = encryptedKey;
@@ -60,12 +60,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is KekRecipientInfo)
+			{
 				return (KekRecipientInfo)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new KekRecipientInfo((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid KekRecipientInfo: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid KekRecipientInfo: " + Platform.GetTypeName(obj));
 		}
 
 		public DerInteger Version

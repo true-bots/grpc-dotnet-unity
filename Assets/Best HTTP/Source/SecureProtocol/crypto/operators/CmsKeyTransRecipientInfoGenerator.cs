@@ -15,7 +15,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Operators
 		: KeyTransRecipientInfoGenerator
 	{
 		public CmsKeyTransRecipientInfoGenerator(X509Certificate recipCert, IKeyWrapper keyWrapper)
-			: base(new Asn1.Cms.IssuerAndSerialNumber(recipCert.IssuerDN, new DerInteger(recipCert.SerialNumber)), keyWrapper)
+			: base(new IssuerAndSerialNumber(recipCert.IssuerDN, new DerInteger(recipCert.SerialNumber)), keyWrapper)
 		{
 		}
 

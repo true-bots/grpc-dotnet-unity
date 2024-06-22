@@ -18,16 +18,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	*/
 	public class CompressedDataParser
 	{
-		private DerInteger _version;
-		private AlgorithmIdentifier _compressionAlgorithm;
-		private ContentInfoParser _encapContentInfo;
+		DerInteger _version;
+		AlgorithmIdentifier _compressionAlgorithm;
+		ContentInfoParser _encapContentInfo;
 
 		public CompressedDataParser(
 			Asn1SequenceParser seq)
 		{
-			this._version = (DerInteger)seq.ReadObject();
-			this._compressionAlgorithm = AlgorithmIdentifier.GetInstance(seq.ReadObject().ToAsn1Object());
-			this._encapContentInfo = new ContentInfoParser((Asn1SequenceParser)seq.ReadObject());
+			_version = (DerInteger)seq.ReadObject();
+			_compressionAlgorithm = AlgorithmIdentifier.GetInstance(seq.ReadObject().ToAsn1Object());
+			_encapContentInfo = new ContentInfoParser((Asn1SequenceParser)seq.ReadObject());
 		}
 
 		public DerInteger Version

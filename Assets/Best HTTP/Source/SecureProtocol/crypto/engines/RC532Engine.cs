@@ -20,12 +20,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/*
 		 * the number of rounds to perform
 		 */
-		private int _noRounds;
+		int _noRounds;
 
 		/*
 		 * the expanded key array of size 2*(rounds + 1)
 		 */
-		private int[] _S;
+		int[] _S;
 
 		/*
 		 * our "magic constants" for 32 32
@@ -36,10 +36,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		 * where e is the base of natural logarithms (2.718281828...)
 		 * and o is the golden ratio (1.61803398...)
 		 */
-		private static readonly int P32 = unchecked((int)0xb7e15163);
-		private static readonly int Q32 = unchecked((int)0x9e3779b9);
+		static readonly int P32 = unchecked((int)0xb7e15163);
+		static readonly int Q32 = unchecked((int)0x9e3779b9);
 
-		private bool forEncryption;
+		bool forEncryption;
 
 		/**
 		* Create an instance of the RC5 encryption algorithm
@@ -82,7 +82,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 			else
 			{
-				throw new ArgumentException("invalid parameter passed to RC532 init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				throw new ArgumentException("invalid parameter passed to RC532 init - " + Platform.GetTypeName(parameters));
 			}
 
 			this.forEncryption = forEncryption;
@@ -115,7 +115,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @param  key  the key to be used
 		*/
-		private void SetKey(byte[] key)
+		void SetKey(byte[] key)
 		{
 			//
 			// KEY EXPANSION:
@@ -147,7 +147,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			_S[0] = P32;
 			for (int i = 1; i < _S.Length; i++)
 			{
-				_S[i] = (_S[i - 1] + Q32);
+				_S[i] = _S[i - 1] + Q32;
 			}
 
 			//
@@ -213,7 +213,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             return 8;
         }
 #else
-		private int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			int A = (int)Pack.LE_To_UInt32(input, inOff) + _S[0];
 			int B = (int)Pack.LE_To_UInt32(input, inOff + 4) + _S[1];
@@ -230,7 +230,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return 8;
 		}
 
-		private int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			int A = (int)Pack.LE_To_UInt32(input, inOff);
 			int B = (int)Pack.LE_To_UInt32(input, inOff + 4);

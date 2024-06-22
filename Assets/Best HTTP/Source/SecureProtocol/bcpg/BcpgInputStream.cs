@@ -11,9 +11,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class BcpgInputStream
 		: BaseInputStream
 	{
-		private Stream m_in;
-		private bool next = false;
-		private int nextB;
+		Stream m_in;
+		bool next = false;
+		int nextB;
 
 		internal static BcpgInputStream Wrap(
 			Stream inStr)
@@ -26,10 +26,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			return new BcpgInputStream(inStr);
 		}
 
-		private BcpgInputStream(
+		BcpgInputStream(
 			Stream inputStream)
 		{
-			this.m_in = inputStream;
+			m_in = inputStream;
 		}
 
 		public override int ReadByte()
@@ -46,12 +46,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			if (!next)
+			{
 				return m_in.Read(buffer, offset, count);
+			}
 
 			Streams.ValidateBufferArguments(buffer, offset, count);
 
 			if (nextB < 0)
+			{
 				return 0;
+			}
 
 			buffer[offset] = (byte)nextB;
 			next = false;
@@ -81,7 +85,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public void ReadFully(byte[] buffer, int offset, int count)
 		{
 			if (Streams.ReadFully(this, buffer, offset, count) < count)
+			{
 				throw new EndOfStreamException();
+			}
 		}
 
 		public void ReadFully(byte[] buffer)
@@ -115,7 +121,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			}
 
 			if (nextB < 0)
+			{
 				return (PacketTag)nextB;
+			}
 
 			int maskB = nextB & 0x3f;
 			if ((nextB & 0x40) == 0) // old
@@ -128,7 +136,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 
 		public Packet ReadPacket()
 		{
-			int hdr = this.ReadByte();
+			int hdr = ReadByte();
 
 			if (hdr < 0)
 			{
@@ -149,7 +157,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			{
 				tag = (PacketTag)(hdr & 0x3f);
 
-				int l = this.ReadByte();
+				int l = ReadByte();
 
 				if (l < 192)
 				{
@@ -158,7 +166,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				else if (l <= 223)
 				{
 					int b = m_in.ReadByte();
-					bodyLen = ((l - 192) << 8) + (b) + 192;
+					bodyLen = ((l - 192) << 8) + b + 192;
 				}
 				else if (l == 255)
 				{
@@ -180,14 +188,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				switch (lengthType)
 				{
 					case 0:
-						bodyLen = this.ReadByte();
+						bodyLen = ReadByte();
 						break;
 					case 1:
-						bodyLen = (this.ReadByte() << 8) | this.ReadByte();
+						bodyLen = (ReadByte() << 8) | ReadByte();
 						break;
 					case 2:
-						bodyLen = (this.ReadByte() << 24) | (this.ReadByte() << 16)
-						                                  | (this.ReadByte() << 8) | this.ReadByte();
+						bodyLen = (ReadByte() << 24) | (ReadByte() << 16)
+						                             | (ReadByte() << 8) | ReadByte();
 						break;
 					case 3:
 						partial = true;
@@ -282,19 +290,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		/// A stream that overlays our input stream, allowing the user to only read a segment of it.
 		/// NB: dataLength will be negative if the segment length is in the upper range above 2**31.
 		/// </summary>
-		private class PartialInputStream
+		class PartialInputStream
 			: BaseInputStream
 		{
-			private BcpgInputStream m_in;
-			private bool partial;
-			private int dataLength;
+			BcpgInputStream m_in;
+			bool partial;
+			int dataLength;
 
 			internal PartialInputStream(
 				BcpgInputStream bcpgIn,
 				bool partial,
 				int dataLength)
 			{
-				this.m_in = bcpgIn;
+				m_in = bcpgIn;
 				this.partial = partial;
 				this.dataLength = dataLength;
 			}
@@ -327,10 +335,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				{
 					if (dataLength != 0)
 					{
-						int readLen = (dataLength > count || dataLength < 0) ? count : dataLength;
+						int readLen = dataLength > count || dataLength < 0 ? count : dataLength;
 						int len = m_in.Read(buffer, offset, readLen);
 						if (len < 1)
+						{
 							throw new EndOfStreamException("Premature end of stream in PartialInputStream");
+						}
 
 						dataLength -= len;
 						return len;
@@ -363,7 +373,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
             }
 #endif
 
-			private int ReadPartialDataLength()
+			int ReadPartialDataLength()
 			{
 				int l = m_in.ReadByte();
 
@@ -380,7 +390,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				}
 				else if (l <= 223)
 				{
-					dataLength = ((l - 192) << 8) + (m_in.ReadByte()) + 192;
+					dataLength = ((l - 192) << 8) + m_in.ReadByte() + 192;
 				}
 				else if (l == 255)
 				{

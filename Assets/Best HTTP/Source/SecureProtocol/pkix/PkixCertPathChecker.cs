@@ -95,7 +95,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		public virtual object Clone()
 		{
 			// TODO Check this
-			return base.MemberwiseClone();
+			return MemberwiseClone();
 		}
 	}
 }

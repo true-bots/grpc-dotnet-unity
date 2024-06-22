@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class TimeStampTokenEvidence
 		: Asn1Encodable
 	{
-		private TimeStampAndCrl[] timeStampAndCrls;
+		TimeStampAndCrl[] timeStampAndCrls;
 
 		public TimeStampTokenEvidence(TimeStampAndCrl[] timeStampAndCrls)
 		{
@@ -16,18 +16,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 
 		public TimeStampTokenEvidence(TimeStampAndCrl timeStampAndCrl)
 		{
-			this.timeStampAndCrls = new TimeStampAndCrl[] { timeStampAndCrl };
+			timeStampAndCrls = new TimeStampAndCrl[] { timeStampAndCrl };
 		}
 
-		private TimeStampTokenEvidence(Asn1Sequence seq)
+		TimeStampTokenEvidence(Asn1Sequence seq)
 		{
-			this.timeStampAndCrls = new TimeStampAndCrl[seq.Count];
+			timeStampAndCrls = new TimeStampAndCrl[seq.Count];
 
 			int count = 0;
 
 			foreach (Asn1Encodable ae in seq)
 			{
-				this.timeStampAndCrls[count++] = TimeStampAndCrl.GetInstance(ae.ToAsn1Object());
+				timeStampAndCrls[count++] = TimeStampAndCrl.GetInstance(ae.ToAsn1Object());
 			}
 		}
 
@@ -39,10 +39,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public static TimeStampTokenEvidence GetInstance(object obj)
 		{
 			if (obj is TimeStampTokenEvidence)
+			{
 				return (TimeStampTokenEvidence)obj;
+			}
 
 			if (obj != null)
+			{
 				return new TimeStampTokenEvidence(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}

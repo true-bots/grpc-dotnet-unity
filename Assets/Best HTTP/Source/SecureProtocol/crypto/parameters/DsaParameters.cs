@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class DsaParameters
 		: ICipherParameters
 	{
-		private readonly BigInteger p, q, g;
-		private readonly DsaValidationParameters validation;
+		readonly BigInteger p, q, g;
+		readonly DsaValidationParameters validation;
 
 		public DsaParameters(
 			BigInteger p,
@@ -26,16 +26,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			DsaValidationParameters parameters)
 		{
 			if (p == null)
+			{
 				throw new ArgumentNullException("p");
+			}
+
 			if (q == null)
+			{
 				throw new ArgumentNullException("q");
+			}
+
 			if (g == null)
+			{
 				throw new ArgumentNullException("g");
+			}
 
 			this.p = p;
 			this.q = q;
 			this.g = g;
-			this.validation = parameters;
+			validation = parameters;
 		}
 
 		public BigInteger P
@@ -62,12 +70,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			DsaParameters other = obj as DsaParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

@@ -15,9 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class RsaKeyPairGenerator
 		: IAsymmetricCipherKeyPairGenerator
 	{
-		private static readonly int[] SPECIAL_E_VALUES = new int[] { 3, 5, 17, 257, 65537 };
-		private static readonly int SPECIAL_E_HIGHEST = SPECIAL_E_VALUES[SPECIAL_E_VALUES.Length - 1];
-		private static readonly int SPECIAL_E_BITS = BigInteger.ValueOf(SPECIAL_E_HIGHEST).BitLength;
+		static readonly int[] SPECIAL_E_VALUES = new int[] { 3, 5, 17, 257, 65537 };
+		static readonly int SPECIAL_E_HIGHEST = SPECIAL_E_VALUES[SPECIAL_E_VALUES.Length - 1];
+		static readonly int SPECIAL_E_BITS = BigInteger.ValueOf(SPECIAL_E_HIGHEST).BitLength;
 
 		protected static readonly BigInteger One = BigInteger.One;
 		protected static readonly BigInteger DefaultPublicExponent = BigInteger.ValueOf(0x10001);
@@ -70,7 +70,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 					// p and q should not be too close together (or equal!)
 					BigInteger diff = q.Subtract(p).Abs();
 					if (diff.BitLength < mindiffbits)
+					{
 						continue;
+					}
 
 					//
 					// calculate the modulus
@@ -121,7 +123,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				BigInteger d = e.ModInverse(lcm);
 
 				if (d.BitLength <= qBitlength)
+				{
 					continue;
+				}
 
 				//
 				// calculate the CRT factors
@@ -142,20 +146,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		/// <returns>a prime p, with (p-1) relatively prime to e</returns>
 		protected virtual BigInteger ChooseRandomPrime(int bitlength, BigInteger e)
 		{
-			bool eIsKnownOddPrime = (e.BitLength <= SPECIAL_E_BITS) && Arrays.Contains(SPECIAL_E_VALUES, e.IntValue);
+			bool eIsKnownOddPrime = e.BitLength <= SPECIAL_E_BITS && Arrays.Contains(SPECIAL_E_VALUES, e.IntValue);
 
 			for (;;)
 			{
 				BigInteger p = new BigInteger(bitlength, 1, parameters.Random);
 
 				if (p.Mod(e).Equals(One))
+				{
 					continue;
+				}
 
 				if (!p.IsProbablePrime(parameters.Certainty, true))
+				{
 					continue;
+				}
 
 				if (!eIsKnownOddPrime && !e.Gcd(p.Subtract(One)).Equals(One))
+				{
 					continue;
+				}
 
 				return p;
 			}

@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public sealed class MgfParameters
 		: IDerivationParameters
 	{
-		private readonly byte[] m_seed;
+		readonly byte[] m_seed;
 
 		public MgfParameters(byte[] seed)
 			: this(seed, 0, seed.Length)
@@ -38,7 +38,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
         }
 #endif
 
-		public int SeedLength => m_seed.Length;
+		public int SeedLength
+		{
+			get { return m_seed.Length; }
+		}
 	}
 }
 #pragma warning restore

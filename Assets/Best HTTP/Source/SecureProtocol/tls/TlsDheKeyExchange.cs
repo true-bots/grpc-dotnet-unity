@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class TlsDheKeyExchange
 		: AbstractTlsKeyExchange
 	{
-		private static int CheckKeyExchange(int keyExchange)
+		static int CheckKeyExchange(int keyExchange)
 		{
 			switch (keyExchange)
 			{
@@ -39,11 +39,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 		}
 
-		private TlsDheKeyExchange(int keyExchange, TlsDHGroupVerifier dhGroupVerifier, TlsDHConfig dhConfig)
+		TlsDheKeyExchange(int keyExchange, TlsDHGroupVerifier dhGroupVerifier, TlsDHConfig dhConfig)
 			: base(CheckKeyExchange(keyExchange))
 		{
-			this.m_dhGroupVerifier = dhGroupVerifier;
-			this.m_dhConfig = dhConfig;
+			m_dhGroupVerifier = dhGroupVerifier;
+			m_dhConfig = dhConfig;
 		}
 
 		public override void SkipServerCredentials()
@@ -53,12 +53,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public override void ProcessServerCredentials(TlsCredentials serverCredentials)
 		{
-			this.m_serverCredentials = TlsUtilities.RequireSignerCredentials(serverCredentials);
+			m_serverCredentials = TlsUtilities.RequireSignerCredentials(serverCredentials);
 		}
 
 		public override void ProcessServerCertificate(Certificate serverCertificate)
 		{
-			this.m_serverCertificate = serverCertificate.GetCertificateAt(0);
+			m_serverCertificate = serverCertificate.GetCertificateAt(0);
 		}
 
 		public override bool RequiresServerKeyExchange
@@ -72,7 +72,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			TlsDHUtilities.WriteDHConfig(m_dhConfig, digestBuffer);
 
-			this.m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
+			m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
 
 			byte[] y = m_agreement.GenerateEphemeral();
 
@@ -88,13 +88,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			DigestInputBuffer digestBuffer = new DigestInputBuffer();
 			Stream teeIn = new TeeInputStream(input, digestBuffer);
 
-			this.m_dhConfig = TlsDHUtilities.ReceiveDHConfig(m_context, m_dhGroupVerifier, teeIn);
+			m_dhConfig = TlsDHUtilities.ReceiveDHConfig(m_context, m_dhGroupVerifier, teeIn);
 
 			byte[] y = TlsUtilities.ReadOpaque16(teeIn, 1);
 
 			TlsUtilities.VerifyServerKeyExchangeSignature(m_context, input, m_serverCertificate, null, digestBuffer);
 
-			this.m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
+			m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
 
 			m_agreement.ReceivePeerValue(y);
 		}

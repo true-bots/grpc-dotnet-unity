@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class TlsDHanonKeyExchange
 		: AbstractTlsKeyExchange
 	{
-		private static int CheckKeyExchange(int keyExchange)
+		static int CheckKeyExchange(int keyExchange)
 		{
 			switch (keyExchange)
 			{
@@ -36,11 +36,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 		}
 
-		private TlsDHanonKeyExchange(int keyExchange, TlsDHGroupVerifier dhGroupVerifier, TlsDHConfig dhConfig)
+		TlsDHanonKeyExchange(int keyExchange, TlsDHGroupVerifier dhGroupVerifier, TlsDHConfig dhConfig)
 			: base(CheckKeyExchange(keyExchange))
 		{
-			this.m_dhGroupVerifier = dhGroupVerifier;
-			this.m_dhConfig = dhConfig;
+			m_dhGroupVerifier = dhGroupVerifier;
+			m_dhConfig = dhConfig;
 		}
 
 		public override void SkipServerCredentials()
@@ -68,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			TlsDHUtilities.WriteDHConfig(m_dhConfig, buf);
 
-			this.m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
+			m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
 
 			byte[] y = m_agreement.GenerateEphemeral();
 
@@ -79,11 +79,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public override void ProcessServerKeyExchange(Stream input)
 		{
-			this.m_dhConfig = TlsDHUtilities.ReceiveDHConfig(m_context, m_dhGroupVerifier, input);
+			m_dhConfig = TlsDHUtilities.ReceiveDHConfig(m_context, m_dhGroupVerifier, input);
 
 			byte[] y = TlsUtilities.ReadOpaque16(input, 1);
 
-			this.m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
+			m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
 
 			m_agreement.ReceivePeerValue(y);
 		}

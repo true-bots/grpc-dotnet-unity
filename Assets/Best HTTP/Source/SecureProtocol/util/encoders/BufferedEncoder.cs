@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 		{
 			this.translator = translator;
 
-			if ((bufferSize % translator.GetEncodedBlockSize()) != 0)
+			if (bufferSize % translator.GetEncodedBlockSize() != 0)
 			{
 				throw new ArgumentException("buffer size not multiple of input block size");
 			}
@@ -97,7 +97,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 				inOff += gapLen;
 				outOff += resultLen;
 
-				int chunkSize = len - (len % Buffer.Length);
+				int chunkSize = len - len % Buffer.Length;
 
 				resultLen += translator.Encode(input, inOff, chunkSize, outBytes, outOff);
 

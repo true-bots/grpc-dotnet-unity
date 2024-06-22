@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace BestHTTP.SocketIO
 {
-	using BestHTTP.JSON;
+	using JSON;
 
 	/// <summary>
 	/// Helper class to parse and hold handshake information.
@@ -43,38 +43,43 @@ namespace BestHTTP.SocketIO
 			bool success = false;
 			Dictionary<string, object> dict = Json.Decode(str, ref success) as Dictionary<string, object>;
 			if (!success)
+			{
 				return false;
+			}
 
 			try
 			{
-				this.Sid = GetString(dict, "sid");
-				this.Upgrades = GetStringList(dict, "upgrades");
-				this.PingInterval = TimeSpan.FromMilliseconds(GetInt(dict, "pingInterval"));
-				this.PingTimeout = TimeSpan.FromMilliseconds(GetInt(dict, "pingTimeout"));
+				Sid = GetString(dict, "sid");
+				Upgrades = GetStringList(dict, "upgrades");
+				PingInterval = TimeSpan.FromMilliseconds(GetInt(dict, "pingInterval"));
+				PingTimeout = TimeSpan.FromMilliseconds(GetInt(dict, "pingTimeout"));
 			}
 			catch (Exception ex)
 			{
-				BestHTTP.HTTPManager.Logger.Exception("HandshakeData", "Parse", ex);
+				HTTPManager.Logger.Exception("HandshakeData", "Parse", ex);
 				return false;
 			}
 
 			return true;
 		}
 
-		private static object Get(Dictionary<string, object> from, string key)
+		static object Get(Dictionary<string, object> from, string key)
 		{
 			object value;
 			if (!from.TryGetValue(key, out value))
-				throw new System.Exception(string.Format("Can't get {0} from Handshake data!", key));
+			{
+				throw new Exception(string.Format("Can't get {0} from Handshake data!", key));
+			}
+
 			return value;
 		}
 
-		private static string GetString(Dictionary<string, object> from, string key)
+		static string GetString(Dictionary<string, object> from, string key)
 		{
 			return Get(from, key) as string;
 		}
 
-		private static List<string> GetStringList(Dictionary<string, object> from, string key)
+		static List<string> GetStringList(Dictionary<string, object> from, string key)
 		{
 			List<object> value = Get(from, key) as List<object>;
 
@@ -83,13 +88,15 @@ namespace BestHTTP.SocketIO
 			{
 				string str = value[i] as string;
 				if (str != null)
+				{
 					result.Add(str);
+				}
 			}
 
 			return result;
 		}
 
-		private static int GetInt(Dictionary<string, object> from, string key)
+		static int GetInt(Dictionary<string, object> from, string key)
 		{
 			return (int)(double)Get(from, key);
 		}

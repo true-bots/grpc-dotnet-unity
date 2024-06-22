@@ -17,15 +17,15 @@ namespace BestHTTP.Extensions
 
 		public bool IsOnTime(DateTime now)
 		{
-			return now >= this.Created + this.Interval;
+			return now >= Created + Interval;
 		}
 
 		public TimerData(TimeSpan interval, object context, Func<DateTime, object, bool> onTimer)
 		{
-			this.Created = DateTime.Now;
-			this.Interval = interval;
-			this.Context = context;
-			this.OnTimer = onTimer;
+			Created = DateTime.Now;
+			Interval = interval;
+			Context = context;
+			OnTimer = onTimer;
 		}
 
 		/// <summary>
@@ -33,19 +33,19 @@ namespace BestHTTP.Extensions
 		/// </summary>
 		public TimerData CreateNew()
 		{
-			return new TimerData(this.Interval, this.Context, this.OnTimer);
+			return new TimerData(Interval, Context, OnTimer);
 		}
 
 		public override string ToString()
 		{
-			return string.Format("[TimerData Created: {0}, Interval: {1}, IsOnTime: {2}]", this.Created.ToString(System.Globalization.CultureInfo.InvariantCulture),
-				this.Interval, this.IsOnTime(DateTime.Now));
+			return string.Format("[TimerData Created: {0}, Interval: {1}, IsOnTime: {2}]", Created.ToString(System.Globalization.CultureInfo.InvariantCulture),
+				Interval, IsOnTime(DateTime.Now));
 		}
 	}
 
 	public static class Timer
 	{
-		private static List<TimerData> Timers = new List<TimerData>();
+		static List<TimerData> Timers = new List<TimerData>();
 
 		public static void Add(TimerData timer)
 		{
@@ -55,7 +55,9 @@ namespace BestHTTP.Extensions
 		internal static void Process()
 		{
 			if (Timers.Count == 0)
+			{
 				return;
+			}
 
 			DateTime now = DateTime.Now;
 
@@ -68,9 +70,13 @@ namespace BestHTTP.Extensions
 					bool repeat = timer.OnTimer(now, timer.Context);
 
 					if (repeat)
+					{
 						Timers[i] = timer.CreateNew();
+					}
 					else
+					{
 						Timers.RemoveAt(i--);
+					}
 				}
 			}
 		}

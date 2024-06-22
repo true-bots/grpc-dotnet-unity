@@ -14,9 +14,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 	public class X9Curve
 		: Asn1Encodable
 	{
-		private readonly ECCurve curve;
-		private readonly byte[] seed;
-		private readonly DerObjectIdentifier fieldIdentifier;
+		readonly ECCurve curve;
+		readonly byte[] seed;
+		readonly DerObjectIdentifier fieldIdentifier;
 
 		public X9Curve(
 			ECCurve curve)
@@ -29,18 +29,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 			byte[] seed)
 		{
 			if (curve == null)
+			{
 				throw new ArgumentNullException("curve");
+			}
 
 			this.curve = curve;
 			this.seed = Arrays.Clone(seed);
 
 			if (ECAlgorithms.IsFpCurve(curve))
 			{
-				this.fieldIdentifier = X9ObjectIdentifiers.PrimeField;
+				fieldIdentifier = X9ObjectIdentifiers.PrimeField;
 			}
 			else if (ECAlgorithms.IsF2mCurve(curve))
 			{
-				this.fieldIdentifier = X9ObjectIdentifiers.CharacteristicTwoField;
+				fieldIdentifier = X9ObjectIdentifiers.CharacteristicTwoField;
 			}
 			else
 			{
@@ -55,11 +57,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 			Asn1Sequence seq)
 		{
 			if (fieldID == null)
+			{
 				throw new ArgumentNullException("fieldID");
-			if (seq == null)
-				throw new ArgumentNullException("seq");
+			}
 
-			this.fieldIdentifier = fieldID.Identifier;
+			if (seq == null)
+			{
+				throw new ArgumentNullException("seq");
+			}
+
+			fieldIdentifier = fieldID.Identifier;
 
 			if (fieldIdentifier.Equals(X9ObjectIdentifiers.PrimeField))
 			{

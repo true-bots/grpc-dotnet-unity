@@ -28,13 +28,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		const string Pkcs12 = "Pkcs12";
 		const string OpenSsl = "OpenSsl";
 
-		private static readonly IDictionary<string, string> Algorithms =
+		static readonly IDictionary<string, string> Algorithms =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly IDictionary<string, string> AlgorithmType =
+		static readonly IDictionary<string, string> AlgorithmType =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly IDictionary<string, DerObjectIdentifier> Oids =
+		static readonly IDictionary<string, DerObjectIdentifier> Oids =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
 		static PbeUtilities()
@@ -243,8 +243,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		/// <returns>A DerObjectIdentifier, null if the Oid is not available.</returns>
 		public static DerObjectIdentifier GetObjectIdentifier(string mechanism)
 		{
-			if (!Algorithms.TryGetValue(mechanism, out var algorithm))
+			if (!Algorithms.TryGetValue(mechanism, out string algorithm))
+			{
 				return null;
+			}
 
 			return CollectionUtilities.GetValueOrNull(Oids, algorithm);
 		}
@@ -256,48 +258,70 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 		public static bool IsPkcs12(string algorithm)
 		{
-			if (!Algorithms.TryGetValue(algorithm, out var mechanism))
+			if (!Algorithms.TryGetValue(algorithm, out string mechanism))
+			{
 				return false;
-			if (!AlgorithmType.TryGetValue(mechanism, out var algorithmType))
+			}
+
+			if (!AlgorithmType.TryGetValue(mechanism, out string algorithmType))
+			{
 				return false;
+			}
 
 			return Pkcs12.Equals(algorithmType);
 		}
 
 		public static bool IsPkcs5Scheme1(string algorithm)
 		{
-			if (!Algorithms.TryGetValue(algorithm, out var mechanism))
+			if (!Algorithms.TryGetValue(algorithm, out string mechanism))
+			{
 				return false;
-			if (!AlgorithmType.TryGetValue(mechanism, out var algorithmType))
+			}
+
+			if (!AlgorithmType.TryGetValue(mechanism, out string algorithmType))
+			{
 				return false;
+			}
 
 			return Pkcs5S1.Equals(algorithmType);
 		}
 
 		public static bool IsPkcs5Scheme2(string algorithm)
 		{
-			if (!Algorithms.TryGetValue(algorithm, out var mechanism))
+			if (!Algorithms.TryGetValue(algorithm, out string mechanism))
+			{
 				return false;
-			if (!AlgorithmType.TryGetValue(mechanism, out var algorithmType))
+			}
+
+			if (!AlgorithmType.TryGetValue(mechanism, out string algorithmType))
+			{
 				return false;
+			}
 
 			return Pkcs5S2.Equals(algorithmType);
 		}
 
 		public static bool IsOpenSsl(string algorithm)
 		{
-			if (!Algorithms.TryGetValue(algorithm, out var mechanism))
+			if (!Algorithms.TryGetValue(algorithm, out string mechanism))
+			{
 				return false;
-			if (!AlgorithmType.TryGetValue(mechanism, out var algorithmType))
+			}
+
+			if (!AlgorithmType.TryGetValue(mechanism, out string algorithmType))
+			{
 				return false;
+			}
 
 			return OpenSsl.Equals(algorithmType);
 		}
 
 		public static bool IsPbeAlgorithm(string algorithm)
 		{
-			if (!Algorithms.TryGetValue(algorithm, out var mechanism))
+			if (!Algorithms.TryGetValue(algorithm, out string mechanism))
+			{
 				return false;
+			}
 
 			return AlgorithmType.ContainsKey(mechanism);
 		}
@@ -479,7 +503,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 					}
 				}
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEwithSHA-1"))
+			else if (Platform.StartsWith(mechanism, "PBEwithSHA-1"))
 			{
 				PbeParametersGenerator generator = MakePbeGenerator(
 					AlgorithmType[mechanism], new Sha1Digest(), keyBytes, salt, iterationCount);
@@ -529,7 +553,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 					parameters = generator.GenerateDerivedParameters("RC2", 64, 64);
 				}
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEwithSHA-256"))
+			else if (Platform.StartsWith(mechanism, "PBEwithSHA-256"))
 			{
 				PbeParametersGenerator generator = MakePbeGenerator(
 					AlgorithmType[mechanism], new Sha256Digest(), keyBytes, salt, iterationCount);
@@ -547,7 +571,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 					parameters = generator.GenerateDerivedParameters("AES", 256, 128);
 				}
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEwithMD5"))
+			else if (Platform.StartsWith(mechanism, "PBEwithMD5"))
 			{
 				PbeParametersGenerator generator = MakePbeGenerator(
 					AlgorithmType[mechanism], new MD5Digest(), keyBytes, salt, iterationCount);
@@ -573,7 +597,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 					parameters = generator.GenerateDerivedParameters("AES", 256, 128);
 				}
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEwithMD2"))
+			else if (Platform.StartsWith(mechanism, "PBEwithMD2"))
 			{
 				PbeParametersGenerator generator = MakePbeGenerator(
 					AlgorithmType[mechanism], new MD2Digest(), keyBytes, salt, iterationCount);
@@ -586,7 +610,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 					parameters = generator.GenerateDerivedParameters("RC2", 64, 64);
 				}
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEwithHmac"))
+			else if (Platform.StartsWith(mechanism, "PBEwithHmac"))
 			{
 				string digestName = mechanism.Substring("PBEwithHmac".Length);
 				IDigest digest = DigestUtilities.GetDigest(digestName);
@@ -628,39 +652,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		{
 			string mechanism = CollectionUtilities.GetValueOrNull(Algorithms, algorithm);
 
-			if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEwithHmac"))
+			if (Platform.StartsWith(mechanism, "PBEwithHmac"))
 			{
 				string digestName = mechanism.Substring("PBEwithHmac".Length);
 
 				return MacUtilities.GetMac("HMAC/" + digestName);
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEwithMD2")
-			    || Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEwithMD5")
-			    || Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEwithSHA-1")
-			    || Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEwithSHA-256"))
+			if (Platform.StartsWith(mechanism, "PBEwithMD2")
+			    || Platform.StartsWith(mechanism, "PBEwithMD5")
+			    || Platform.StartsWith(mechanism, "PBEwithSHA-1")
+			    || Platform.StartsWith(mechanism, "PBEwithSHA-256"))
 			{
-				if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "AES-CBC-BC") || Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "AES-CBC-OPENSSL"))
+				if (Platform.EndsWith(mechanism, "AES-CBC-BC") || Platform.EndsWith(mechanism, "AES-CBC-OPENSSL"))
 				{
 					return CipherUtilities.GetCipher("AES/CBC");
 				}
 
-				if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "DES-CBC"))
+				if (Platform.EndsWith(mechanism, "DES-CBC"))
 				{
 					return CipherUtilities.GetCipher("DES/CBC");
 				}
 
-				if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "DESEDE-CBC"))
+				if (Platform.EndsWith(mechanism, "DESEDE-CBC"))
 				{
 					return CipherUtilities.GetCipher("DESEDE/CBC");
 				}
 
-				if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "RC2-CBC"))
+				if (Platform.EndsWith(mechanism, "RC2-CBC"))
 				{
 					return CipherUtilities.GetCipher("RC2/CBC");
 				}
 
-				if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "RC4"))
+				if (Platform.EndsWith(mechanism, "RC4"))
 				{
 					return CipherUtilities.GetCipher("RC4");
 				}
@@ -674,9 +698,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return CollectionUtilities.GetValueOrNull(Algorithms, oid.Id);
 		}
 
-		private static ICipherParameters FixDesParity(string mechanism, ICipherParameters parameters)
+		static ICipherParameters FixDesParity(string mechanism, ICipherParameters parameters)
 		{
-			if (!Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "DES-CBC") && !Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "DESEDE-CBC"))
+			if (!Platform.EndsWith(mechanism, "DES-CBC") && !Platform.EndsWith(mechanism, "DESEDE-CBC"))
 			{
 				return parameters;
 			}

@@ -7,20 +7,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class ContentInfo
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier contentType;
-		private readonly Asn1Encodable content;
+		readonly DerObjectIdentifier contentType;
+		readonly Asn1Encodable content;
 
 		public static ContentInfo GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
+
 			ContentInfo existing = obj as ContentInfo;
 			if (existing != null)
+			{
 				return existing;
+			}
+
 			return new ContentInfo(Asn1Sequence.GetInstance(obj));
 		}
 
-		private ContentInfo(
+		ContentInfo(
 			Asn1Sequence seq)
 		{
 			contentType = (DerObjectIdentifier)seq[0];

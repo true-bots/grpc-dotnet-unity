@@ -25,9 +25,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public static readonly int DEFAULT_ROUNDS = 20;
 
 		/** Constants */
-		private const int StateSize = 16; // 16, 32 bit ints = 64 bytes
+		const int StateSize = 16; // 16, 32 bit ints = 64 bytes
 
-		private readonly static uint[] TAU_SIGMA = Pack.LE_To_UInt32(Strings.ToAsciiByteArray("expand 16-byte k" + "expand 32-byte k"), 0, 8);
+		static readonly uint[] TAU_SIGMA = Pack.LE_To_UInt32(Strings.ToAsciiByteArray("expand 16-byte k" + "expand 32-byte k"), 0, 8);
 
 		internal void PackTauOrSigma(int keyLength, uint[] state, int stateOffset)
 		{
@@ -53,7 +53,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/*
 		 * internal counter
 		 */
-		private uint cW0, cW1, cW2;
+		uint cW0, cW1, cW2;
 
 		/// <summary>
 		/// Creates a 20 round Salsa20 engine.
@@ -89,17 +89,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			ParametersWithIV ivParams = parameters as ParametersWithIV;
 			if (ivParams == null)
+			{
 				throw new ArgumentException(AlgorithmName + " Init requires an IV", "parameters");
+			}
 
 			byte[] iv = ivParams.GetIV();
 			if (iv == null || iv.Length != NonceSize)
+			{
 				throw new ArgumentException(AlgorithmName + " requires exactly " + NonceSize + " bytes of IV");
+			}
 
 			ICipherParameters keyParam = ivParams.Parameters;
 			if (keyParam == null)
 			{
 				if (!initialised)
+				{
 					throw new InvalidOperationException(AlgorithmName + " KeyParameter can not be null for first initialisation");
+				}
 
 				SetKey(null, iv);
 			}
@@ -171,13 +177,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int outOff)
 		{
 			if (!initialised)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
 
 			Check.DataLength(inBytes, inOff, len, "input buffer too short");
 			Check.OutputLength(outBytes, outOff, len, "output buffer too short");
 
 			if (LimitExceeded((uint)len))
+			{
 				throw new MaxBytesExceededException("2^70 byte limit per IV would be exceeded; Change IV");
+			}
 
 			for (int i = 0; i < len; i++)
 			{
@@ -232,8 +242,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		{
 			if (keyBytes != null)
 			{
-				if ((keyBytes.Length != 16) && (keyBytes.Length != 32))
+				if (keyBytes.Length != 16 && keyBytes.Length != 32)
+				{
 					throw new ArgumentException(AlgorithmName + " requires 128 bit or 256 bit key");
+				}
 
 				int tsOff = (keyBytes.Length - 16) / 4;
 				engineState[0] = TAU_SIGMA[tsOff];
@@ -381,11 +393,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		internal static void SalsaCore(int rounds, uint[] input, uint[] output)
 		{
 			if (input.Length < 16)
+			{
 				throw new ArgumentException();
+			}
+
 			if (output.Length < 16)
+			{
 				throw new ArgumentException();
+			}
+
 			if (rounds % 2 != 0)
+			{
 				throw new ArgumentException("Number of rounds must be even");
+			}
 
 			uint x00 = input[0];
 			uint x01 = input[1];
@@ -478,7 +498,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 #if NETSTANDARD1_0_OR_GREATER || NETCOREAPP1_0_OR_GREATER || UNITY_2021_2_OR_NEWER
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-		private static void QuarterRound(ref uint a, ref uint b, ref uint c, ref uint d)
+		static void QuarterRound(ref uint a, ref uint b, ref uint c, ref uint d)
 		{
 			b ^= Integers.RotateLeft(a + d, 7);
 			c ^= Integers.RotateLeft(b + a, 9);

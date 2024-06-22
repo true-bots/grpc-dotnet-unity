@@ -23,27 +23,41 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			AsymmetricKeyParameter privateKey)
 		{
 			if (crypto == null)
+			{
 				throw new ArgumentNullException("crypto");
+			}
+
 			if (certificate == null)
+			{
 				throw new ArgumentNullException("certificate");
+			}
+
 			if (certificate.IsEmpty)
+			{
 				throw new ArgumentException("cannot be empty", "certificate");
+			}
+
 			if (privateKey == null)
+			{
 				throw new ArgumentNullException("privateKey");
+			}
+
 			if (!privateKey.IsPrivate)
+			{
 				throw new ArgumentException("must be private", "privateKey");
+			}
 
 			if (privateKey is RsaKeyParameters)
 			{
 			}
 			else
 			{
-				throw new ArgumentException("'privateKey' type not supported: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(privateKey));
+				throw new ArgumentException("'privateKey' type not supported: " + Platform.GetTypeName(privateKey));
 			}
 
-			this.m_crypto = crypto;
-			this.m_certificate = certificate;
-			this.m_privateKey = privateKey;
+			m_crypto = crypto;
+			m_certificate = certificate;
+			m_privateKey = privateKey;
 		}
 
 		public virtual Certificate Certificate

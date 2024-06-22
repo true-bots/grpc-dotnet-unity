@@ -8,13 +8,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 	/// <summary>Carrier class for context-related parameters needed for creating secrets and ciphers.</summary>
 	public class TlsCryptoParameters
 	{
-		private readonly TlsContext m_context;
+		readonly TlsContext m_context;
 
 		/// <summary>Base constructor.</summary>
 		/// <param name="context">the context for this parameters object.</param>
 		public TlsCryptoParameters(TlsContext context)
 		{
-			this.m_context = context;
+			m_context = context;
 		}
 
 		public SecurityParameters SecurityParameters

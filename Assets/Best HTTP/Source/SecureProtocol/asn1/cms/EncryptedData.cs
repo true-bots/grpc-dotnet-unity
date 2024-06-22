@@ -8,20 +8,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class EncryptedData
 		: Asn1Encodable
 	{
-		private readonly DerInteger version;
-		private readonly EncryptedContentInfo encryptedContentInfo;
-		private readonly Asn1Set unprotectedAttrs;
+		readonly DerInteger version;
+		readonly EncryptedContentInfo encryptedContentInfo;
+		readonly Asn1Set unprotectedAttrs;
 
 		public static EncryptedData GetInstance(
 			object obj)
 		{
 			if (obj is EncryptedData)
+			{
 				return (EncryptedData)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new EncryptedData((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid EncryptedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid EncryptedData: " + Platform.GetTypeName(obj));
 		}
 
 		public EncryptedData(
@@ -35,27 +39,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			Asn1Set unprotectedAttrs)
 		{
 			if (encInfo == null)
+			{
 				throw new ArgumentNullException("encInfo");
+			}
 
-			this.version = new DerInteger((unprotectedAttrs == null) ? 0 : 2);
-			this.encryptedContentInfo = encInfo;
+			version = new DerInteger(unprotectedAttrs == null ? 0 : 2);
+			encryptedContentInfo = encInfo;
 			this.unprotectedAttrs = unprotectedAttrs;
 		}
 
-		private EncryptedData(
+		EncryptedData(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
-			if (seq.Count < 2 || seq.Count > 3)
-				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
-			this.version = DerInteger.GetInstance(seq[0]);
-			this.encryptedContentInfo = EncryptedContentInfo.GetInstance(seq[1]);
+			if (seq.Count < 2 || seq.Count > 3)
+			{
+				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
+
+			version = DerInteger.GetInstance(seq[0]);
+			encryptedContentInfo = EncryptedContentInfo.GetInstance(seq[1]);
 
 			if (seq.Count > 2)
 			{
-				this.unprotectedAttrs = Asn1Set.GetInstance((Asn1TaggedObject)seq[2], false);
+				unprotectedAttrs = Asn1Set.GetInstance((Asn1TaggedObject)seq[2], false);
 			}
 		}
 

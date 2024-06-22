@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class RandomDsaKCalculator
 		: IDsaKCalculator
 	{
-		private BigInteger q;
-		private SecureRandom random;
+		BigInteger q;
+		SecureRandom random;
 
 		public virtual bool IsDeterministic
 		{
@@ -19,7 +19,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 		public virtual void Init(BigInteger n, SecureRandom random)
 		{
-			this.q = n;
+			q = n;
 			this.random = random;
 		}
 

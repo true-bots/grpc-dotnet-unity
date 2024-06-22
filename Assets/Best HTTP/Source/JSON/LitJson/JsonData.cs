@@ -25,18 +25,18 @@ namespace BestHTTP.JSON.LitJson
 	{
 		#region Fields
 
-		private IList<JsonData> inst_array;
-		private bool inst_boolean;
-		private double inst_double;
-		private int inst_int;
-		private long inst_long;
-		private IDictionary<string, JsonData> inst_object;
-		private string inst_string;
-		private string json;
-		private JsonType type;
+		IList<JsonData> inst_array;
+		bool inst_boolean;
+		double inst_double;
+		int inst_int;
+		long inst_long;
+		IDictionary<string, JsonData> inst_object;
+		string inst_string;
+		string json;
+		JsonType type;
 
 		// Used to implement the IOrderedDictionary interface
-		private IList<KeyValuePair<string, JsonData>> object_list;
+		IList<KeyValuePair<string, JsonData>> object_list;
 
 		#endregion
 
@@ -97,10 +97,10 @@ namespace BestHTTP.JSON.LitJson
 		/// </summary>
 		/// <param name="key">The key to locate in the json.</param>
 		/// <returns>true if the json contains an element that has the specified key; otherwise, false.</returns>
-		public Boolean ContainsKey(String key)
+		public bool ContainsKey(string key)
 		{
 			EnsureDictionary();
-			return this.inst_object.Keys.Contains(key);
+			return inst_object.Keys.Contains(key);
 		}
 
 		#endregion
@@ -238,9 +238,11 @@ namespace BestHTTP.JSON.LitJson
 
 			set
 			{
-				if (!(key is String))
+				if (!(key is string))
+				{
 					throw new ArgumentException(
 						"The key has to be a string");
+				}
 
 				JsonData data = ToJsonData(value);
 
@@ -327,7 +329,9 @@ namespace BestHTTP.JSON.LitJson
 					}
 				}
 				else
+				{
 					object_list.Add(entry);
+				}
 
 				inst_object[prop_name] = value;
 
@@ -342,7 +346,9 @@ namespace BestHTTP.JSON.LitJson
 				EnsureCollection();
 
 				if (type == JsonType.Array)
+				{
 					return inst_array[index];
+				}
 
 				return object_list[index].Value;
 			}
@@ -352,7 +358,9 @@ namespace BestHTTP.JSON.LitJson
 				EnsureCollection();
 
 				if (type == JsonType.Array)
+				{
 					inst_array[index] = value;
+				}
 				else
 				{
 					KeyValuePair<string, JsonData> entry = object_list[index];
@@ -402,35 +410,35 @@ namespace BestHTTP.JSON.LitJson
 
 		public JsonData(object obj)
 		{
-			if (obj is Boolean)
+			if (obj is bool)
 			{
 				type = JsonType.Boolean;
 				inst_boolean = (bool)obj;
 				return;
 			}
 
-			if (obj is Double)
+			if (obj is double)
 			{
 				type = JsonType.Double;
 				inst_double = (double)obj;
 				return;
 			}
 
-			if (obj is Int32)
+			if (obj is int)
 			{
 				type = JsonType.Int;
 				inst_int = (int)obj;
 				return;
 			}
 
-			if (obj is Int64)
+			if (obj is long)
 			{
 				type = JsonType.Long;
 				inst_long = (long)obj;
 				return;
 			}
 
-			if (obj is String)
+			if (obj is string)
 			{
 				type = JsonType.String;
 				inst_string = (string)obj;
@@ -452,27 +460,27 @@ namespace BestHTTP.JSON.LitJson
 
 		#region Implicit Conversions
 
-		public static implicit operator JsonData(Boolean data)
+		public static implicit operator JsonData(bool data)
 		{
 			return new JsonData(data);
 		}
 
-		public static implicit operator JsonData(Double data)
+		public static implicit operator JsonData(double data)
 		{
 			return new JsonData(data);
 		}
 
-		public static implicit operator JsonData(Int32 data)
+		public static implicit operator JsonData(int data)
 		{
 			return new JsonData(data);
 		}
 
-		public static implicit operator JsonData(Int64 data)
+		public static implicit operator JsonData(long data)
 		{
 			return new JsonData(data);
 		}
 
-		public static implicit operator JsonData(String data)
+		public static implicit operator JsonData(string data)
 		{
 			return new JsonData(data);
 		}
@@ -482,25 +490,29 @@ namespace BestHTTP.JSON.LitJson
 
 		#region Explicit Conversions
 
-		public static explicit operator Boolean(JsonData data)
+		public static explicit operator bool(JsonData data)
 		{
 			if (data.type != JsonType.Boolean)
+			{
 				throw new InvalidCastException(
 					"Instance of JsonData doesn't hold a double");
+			}
 
 			return data.inst_boolean;
 		}
 
-		public static explicit operator Double(JsonData data)
+		public static explicit operator double(JsonData data)
 		{
 			if (data.type != JsonType.Double)
+			{
 				throw new InvalidCastException(
 					"Instance of JsonData doesn't hold a double");
+			}
 
 			return data.inst_double;
 		}
 
-		public static explicit operator Int32(JsonData data)
+		public static explicit operator int(JsonData data)
 		{
 			if (data.type != JsonType.Int && data.type != JsonType.Long)
 			{
@@ -512,7 +524,7 @@ namespace BestHTTP.JSON.LitJson
 			return data.type == JsonType.Int ? data.inst_int : (int)data.inst_long;
 		}
 
-		public static explicit operator Int64(JsonData data)
+		public static explicit operator long(JsonData data)
 		{
 			if (data.type != JsonType.Long && data.type != JsonType.Int)
 			{
@@ -523,11 +535,13 @@ namespace BestHTTP.JSON.LitJson
 			return data.type == JsonType.Long ? data.inst_long : data.inst_int;
 		}
 
-		public static explicit operator String(JsonData data)
+		public static explicit operator string(JsonData data)
 		{
 			if (data.type != JsonType.String)
+			{
 				throw new InvalidCastException(
 					"Instance of JsonData doesn't hold a string");
+			}
 
 			return data.inst_string;
 		}
@@ -611,8 +625,10 @@ namespace BestHTTP.JSON.LitJson
 		bool IJsonWrapper.GetBoolean()
 		{
 			if (type != JsonType.Boolean)
+			{
 				throw new InvalidOperationException(
 					"JsonData instance doesn't hold a boolean");
+			}
 
 			return inst_boolean;
 		}
@@ -620,8 +636,10 @@ namespace BestHTTP.JSON.LitJson
 		double IJsonWrapper.GetDouble()
 		{
 			if (type != JsonType.Double)
+			{
 				throw new InvalidOperationException(
 					"JsonData instance doesn't hold a double");
+			}
 
 			return inst_double;
 		}
@@ -629,8 +647,10 @@ namespace BestHTTP.JSON.LitJson
 		int IJsonWrapper.GetInt()
 		{
 			if (type != JsonType.Int)
+			{
 				throw new InvalidOperationException(
 					"JsonData instance doesn't hold an int");
+			}
 
 			return inst_int;
 		}
@@ -638,8 +658,10 @@ namespace BestHTTP.JSON.LitJson
 		long IJsonWrapper.GetLong()
 		{
 			if (type != JsonType.Long)
+			{
 				throw new InvalidOperationException(
 					"JsonData instance doesn't hold a long");
+			}
 
 			return inst_long;
 		}
@@ -647,8 +669,10 @@ namespace BestHTTP.JSON.LitJson
 		string IJsonWrapper.GetString()
 		{
 			if (type != JsonType.String)
+			{
 				throw new InvalidOperationException(
 					"JsonData instance doesn't hold a string");
+			}
 
 			return inst_string;
 		}
@@ -781,26 +805,34 @@ namespace BestHTTP.JSON.LitJson
 
 		#region Private Methods
 
-		private ICollection EnsureCollection()
+		ICollection EnsureCollection()
 		{
 			if (type == JsonType.Array)
+			{
 				return (ICollection)inst_array;
+			}
 
 			if (type == JsonType.Object)
+			{
 				return (ICollection)inst_object;
+			}
 
 			throw new InvalidOperationException(
 				"The JsonData instance has to be initialized first");
 		}
 
-		private IDictionary EnsureDictionary()
+		IDictionary EnsureDictionary()
 		{
 			if (type == JsonType.Object)
+			{
 				return (IDictionary)inst_object;
+			}
 
 			if (type != JsonType.None)
+			{
 				throw new InvalidOperationException(
 					"Instance of JsonData is not a dictionary");
+			}
 
 			type = JsonType.Object;
 			inst_object = new Dictionary<string, JsonData>();
@@ -809,14 +841,18 @@ namespace BestHTTP.JSON.LitJson
 			return (IDictionary)inst_object;
 		}
 
-		private IList EnsureList()
+		IList EnsureList()
 		{
 			if (type == JsonType.Array)
+			{
 				return (IList)inst_array;
+			}
 
 			if (type != JsonType.None)
+			{
 				throw new InvalidOperationException(
 					"Instance of JsonData is not a list");
+			}
 
 			type = JsonType.Array;
 			inst_array = new List<JsonData>();
@@ -824,18 +860,22 @@ namespace BestHTTP.JSON.LitJson
 			return (IList)inst_array;
 		}
 
-		private JsonData ToJsonData(object obj)
+		JsonData ToJsonData(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is JsonData)
+			{
 				return (JsonData)obj;
+			}
 
 			return new JsonData(obj);
 		}
 
-		private static void WriteJson(IJsonWrapper obj, JsonWriter writer)
+		static void WriteJson(IJsonWrapper obj, JsonWriter writer)
 		{
 			if (obj == null)
 			{
@@ -877,7 +917,10 @@ namespace BestHTTP.JSON.LitJson
 			{
 				writer.WriteArrayStart();
 				foreach (object elem in (IList)obj)
+				{
 					WriteJson((JsonData)elem, writer);
+				}
+
 				writer.WriteArrayEnd();
 
 				return;
@@ -887,7 +930,7 @@ namespace BestHTTP.JSON.LitJson
 			{
 				writer.WriteObjectStart();
 
-				foreach (DictionaryEntry entry in ((IDictionary)obj))
+				foreach (DictionaryEntry entry in (IDictionary)obj)
 				{
 					writer.WritePropertyName((string)entry.Key);
 					WriteJson((JsonData)entry.Value, writer);
@@ -918,9 +961,13 @@ namespace BestHTTP.JSON.LitJson
 			{
 				JsonData value = null;
 				if (inst_object.TryGetValue((string)obj, out value))
+				{
 					return inst_object.Remove((string)obj) && object_list.Remove(new KeyValuePair<string, JsonData>((string)obj, value));
+				}
 				else
+				{
 					throw new KeyNotFoundException("The specified key was not found in the JsonData object.");
+				}
 			}
 
 			if (IsArray)
@@ -950,61 +997,69 @@ namespace BestHTTP.JSON.LitJson
 		public bool Equals(JsonData x)
 		{
 			if (x == null)
+			{
 				return false;
+			}
 
-			if (x.type != this.type)
+			if (x.type != type)
 			{
 				// further check to see if this is a long to int comparison
 				if ((x.type != JsonType.Int && x.type != JsonType.Long)
-				    || (this.type != JsonType.Int && this.type != JsonType.Long))
+				    || (type != JsonType.Int && type != JsonType.Long))
 				{
 					return false;
 				}
 			}
 
-			switch (this.type)
+			switch (type)
 			{
 				case JsonType.None:
 					return true;
 
 				case JsonType.Object:
-					return this.inst_object.Equals(x.inst_object);
+					return inst_object.Equals(x.inst_object);
 
 				case JsonType.Array:
-					return this.inst_array.Equals(x.inst_array);
+					return inst_array.Equals(x.inst_array);
 
 				case JsonType.String:
-					return this.inst_string.Equals(x.inst_string);
+					return inst_string.Equals(x.inst_string);
 
 				case JsonType.Int:
 				{
 					if (x.IsLong)
 					{
-						if (x.inst_long < Int32.MinValue || x.inst_long > Int32.MaxValue)
+						if (x.inst_long < int.MinValue || x.inst_long > int.MaxValue)
+						{
 							return false;
-						return this.inst_int.Equals((int)x.inst_long);
+						}
+
+						return inst_int.Equals((int)x.inst_long);
 					}
 
-					return this.inst_int.Equals(x.inst_int);
+					return inst_int.Equals(x.inst_int);
 				}
 
 				case JsonType.Long:
 				{
 					if (x.IsInt)
 					{
-						if (this.inst_long < Int32.MinValue || this.inst_long > Int32.MaxValue)
+						if (inst_long < int.MinValue || inst_long > int.MaxValue)
+						{
 							return false;
-						return x.inst_int.Equals((int)this.inst_long);
+						}
+
+						return x.inst_int.Equals((int)inst_long);
 					}
 
-					return this.inst_long.Equals(x.inst_long);
+					return inst_long.Equals(x.inst_long);
 				}
 
 				case JsonType.Double:
-					return this.inst_double.Equals(x.inst_double);
+					return inst_double.Equals(x.inst_double);
 
 				case JsonType.Boolean:
-					return this.inst_boolean.Equals(x.inst_boolean);
+					return inst_boolean.Equals(x.inst_boolean);
 			}
 
 			return false;
@@ -1018,7 +1073,9 @@ namespace BestHTTP.JSON.LitJson
 		public void SetJsonType(JsonType type)
 		{
 			if (this.type == type)
+			{
 				return;
+			}
 
 			switch (type)
 			{
@@ -1035,23 +1092,23 @@ namespace BestHTTP.JSON.LitJson
 					break;
 
 				case JsonType.String:
-					inst_string = default(String);
+					inst_string = default;
 					break;
 
 				case JsonType.Int:
-					inst_int = default(Int32);
+					inst_int = default;
 					break;
 
 				case JsonType.Long:
-					inst_long = default(Int64);
+					inst_long = default;
 					break;
 
 				case JsonType.Double:
-					inst_double = default(Double);
+					inst_double = default;
 					break;
 
 				case JsonType.Boolean:
-					inst_boolean = default(Boolean);
+					inst_boolean = default;
 					break;
 			}
 
@@ -1061,7 +1118,9 @@ namespace BestHTTP.JSON.LitJson
 		public string ToJson()
 		{
 			if (json != null)
+			{
 				return json;
+			}
 
 			StringWriter sw = new StringWriter();
 			JsonWriter writer = new JsonWriter(sw);
@@ -1115,7 +1174,7 @@ namespace BestHTTP.JSON.LitJson
 	}
 
 
-	internal class OrderedDictionaryEnumerator : IDictionaryEnumerator
+	class OrderedDictionaryEnumerator : IDictionaryEnumerator
 	{
 		IEnumerator<KeyValuePair<string, JsonData>> list_enumerator;
 

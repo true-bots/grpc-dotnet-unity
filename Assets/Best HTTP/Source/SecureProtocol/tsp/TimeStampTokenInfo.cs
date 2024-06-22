@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 {
 	public class TimeStampTokenInfo
 	{
-		private static TstInfo ParseTstInfo(byte[] tstInfoEncoding)
+		static TstInfo ParseTstInfo(byte[] tstInfoEncoding)
 		{
 			try
 			{
@@ -21,8 +21,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			}
 		}
 
-		private TstInfo tstInfo;
-		private DateTime genTime;
+		TstInfo tstInfo;
+		DateTime genTime;
 
 		public TimeStampTokenInfo(byte[] tstInfoEncoding)
 			: this(ParseTstInfo(tstInfoEncoding))
@@ -36,7 +36,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 			try
 			{
-				this.genTime = tstInfo.GenTime.ToDateTime();
+				genTime = tstInfo.GenTime.ToDateTime();
 			}
 			catch (Exception e)
 			{
@@ -63,9 +63,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		{
 			get
 			{
-				return this.Accuracy == null
+				return Accuracy == null
 					? null
-					: new GenTimeAccuracy(this.Accuracy);
+					: new GenTimeAccuracy(Accuracy);
 			}
 		}
 

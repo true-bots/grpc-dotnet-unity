@@ -13,17 +13,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class SignaturePacket
 		: ContainedPacket
 	{
-		private int version;
-		private int signatureType;
-		private long creationTime;
-		private long keyId;
-		private PublicKeyAlgorithmTag keyAlgorithm;
-		private HashAlgorithmTag hashAlgorithm;
-		private MPInteger[] signature;
-		private byte[] fingerprint;
-		private SignatureSubpacket[] hashedData;
-		private SignatureSubpacket[] unhashedData;
-		private byte[] signatureEncoding;
+		int version;
+		int signatureType;
+		long creationTime;
+		long keyId;
+		PublicKeyAlgorithmTag keyAlgorithm;
+		HashAlgorithmTag hashAlgorithm;
+		MPInteger[] signature;
+		byte[] fingerprint;
+		SignatureSubpacket[] hashedData;
+		SignatureSubpacket[] unhashedData;
+		byte[] signatureEncoding;
 
 		internal SignaturePacket(
 			BcpgInputStream bcpgIn)
@@ -68,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				SignatureSubpacketsParser sIn = new SignatureSubpacketsParser(
 					new MemoryStream(hashed, false));
 
-				var v = new List<SignatureSubpacket>();
+				List<SignatureSubpacket> v = new List<SignatureSubpacket>();
 
 				SignatureSubpacket sub;
 				while ((sub = sIn.ReadPacket()) != null)
@@ -78,7 +78,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 
 				hashedData = v.ToArray();
 
-				foreach (var p in hashedData)
+				foreach (SignatureSubpacket p in hashedData)
 				{
 					if (p is IssuerKeyId issuerKeyId)
 					{
@@ -106,7 +106,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 
 				unhashedData = v.ToArray();
 
-				foreach (var p in unhashedData)
+				foreach (SignatureSubpacket p in unhashedData)
 				{
 					if (p is IssuerKeyId issuerKeyId)
 					{
@@ -151,7 +151,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 					break;
 				default:
 					if (keyAlgorithm < PublicKeyAlgorithmTag.Experimental_1 || keyAlgorithm > PublicKeyAlgorithmTag.Experimental_11)
+					{
 						throw new IOException("unknown signature key algorithm: " + keyAlgorithm);
+					}
 
 					signature = null;
 					MemoryStream bOut = new MemoryStream();
@@ -276,7 +278,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				trailer[1] = (byte)(time >> 24);
 				trailer[2] = (byte)(time >> 16);
 				trailer[3] = (byte)(time >> 8);
-				trailer[4] = (byte)(time);
+				trailer[4] = (byte)time;
 				return trailer;
 			}
 
@@ -306,12 +308,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			sOut.WriteByte((byte)(hDataLength >> 24));
 			sOut.WriteByte((byte)(hDataLength >> 16));
 			sOut.WriteByte((byte)(hDataLength >> 8));
-			sOut.WriteByte((byte)(hDataLength));
+			sOut.WriteByte((byte)hDataLength);
 
 			// Reset position and fill in length
 			sOut.Position = lengthPosition;
 			sOut.WriteByte((byte)(dataLength >> 8));
-			sOut.WriteByte((byte)(dataLength));
+			sOut.WriteByte((byte)dataLength);
 
 			return sOut.ToArray();
 		}
@@ -383,7 +385,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public override void Encode(BcpgOutputStream bcpgOut)
 		{
 			MemoryStream bOut = new MemoryStream();
-			using (var pOut = new BcpgOutputStream(bOut))
+			using (BcpgOutputStream pOut = new BcpgOutputStream(bOut))
 			{
 				pOut.WriteByte((byte)version);
 
@@ -421,7 +423,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			bcpgOut.WritePacket(PacketTag.Signature, bOut.ToArray(), true);
 		}
 
-		private static void EncodeLengthAndData(
+		static void EncodeLengthAndData(
 			BcpgOutputStream pOut,
 			byte[] data)
 		{
@@ -429,7 +431,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			pOut.Write(data);
 		}
 
-		private static byte[] GetEncodedSubpackets(
+		static byte[] GetEncodedSubpackets(
 			SignatureSubpacket[] ps)
 		{
 			MemoryStream sOut = new MemoryStream();
@@ -442,7 +444,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			return sOut.ToArray();
 		}
 
-		private void SetCreationTime()
+		void SetCreationTime()
 		{
 			foreach (SignatureSubpacket p in hashedData)
 			{

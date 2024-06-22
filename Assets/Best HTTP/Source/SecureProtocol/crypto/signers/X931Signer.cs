@@ -21,13 +21,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class X931Signer
 		: ISigner
 	{
-		private IDigest digest;
-		private IAsymmetricBlockCipher cipher;
-		private RsaKeyParameters kParam;
+		IDigest digest;
+		IAsymmetricBlockCipher cipher;
+		RsaKeyParameters kParam;
 
-		private int trailer;
-		private int keyBits;
-		private byte[] block;
+		int trailer;
+		int keyBits;
+		byte[] block;
 
 		/**
 		 * Generate a signer with either implicit or explicit trailers for X9.31.
@@ -119,7 +119,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			return BigIntegers.AsUnsignedByteArray(size, t);
 		}
 
-		private void CreateSignatureBlock()
+		void CreateSignatureBlock()
 		{
 			int digSize = digest.GetDigestSize();
 

@@ -15,23 +15,23 @@ namespace BestHTTP.Examples
 	/// This sample demonstrates redirection capabilities. The server will redirect a few times the client before
 	/// routing it to the final endpoint.
 	/// </summary>
-	public sealed class RedirectSample : BestHTTP.Examples.Helpers.SampleBase
+	public sealed class RedirectSample : SampleBase
 	{
 #pragma warning disable 0649
 
-		[SerializeField] private string _path = "/redirect_sample";
+		[SerializeField] string _path = "/redirect_sample";
 
-		[SerializeField] private ScrollRect _scrollRect;
+		[SerializeField] ScrollRect _scrollRect;
 
-		[SerializeField] private RectTransform _contentRoot;
+		[SerializeField] RectTransform _contentRoot;
 
-		[SerializeField] private TextListItem _listItemPrefab;
+		[SerializeField] TextListItem _listItemPrefab;
 
-		[SerializeField] private int _maxListItemEntries = 100;
+		[SerializeField] int _maxListItemEntries = 100;
 
-		[SerializeField] private Button _connectButton;
+		[SerializeField] Button _connectButton;
 
-		[SerializeField] private Button _closeButton;
+		[SerializeField] Button _closeButton;
 
 #pragma warning restore
 
@@ -86,7 +86,7 @@ namespace BestHTTP.Examples
 #endif
 
 			// Crete the HubConnection
-			hub = new HubConnection(new Uri(base.sampleSelector.BaseURL + this._path), protocol);
+			hub = new HubConnection(new Uri(sampleSelector.BaseURL + _path), protocol);
 			hub.AuthenticationProvider = new RedirectLoggerAccessTokenAuthenticator(hub);
 
 			// Subscribe to hub events
@@ -118,7 +118,7 @@ namespace BestHTTP.Examples
 			}
 		}
 
-		private void Hub_Redirected(HubConnection hub, Uri oldUri, Uri newUri)
+		void Hub_Redirected(HubConnection hub, Uri oldUri, Uri newUri)
 		{
 			AddText(string.Format("Hub connection redirected to '<color=green>{0}</color>'!", hub.Uri));
 		}
@@ -126,7 +126,7 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This callback is called when the plugin is connected to the server successfully. Messages can be sent to the server after this point.
 		/// </summary>
-		private void Hub_OnConnected(HubConnection hub)
+		void Hub_OnConnected(HubConnection hub)
 		{
 			AddText(string.Format("Hub Connected with <color=green>{0}</color> transport using the <color=green>{1}</color> encoder.",
 				hub.Transport.TransportType.ToString(), hub.Protocol.Name));
@@ -141,7 +141,7 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This is called when the hub is closed after a StartClose() call.
 		/// </summary>
-		private void Hub_OnClosed(HubConnection hub)
+		void Hub_OnClosed(HubConnection hub)
 		{
 			AddText("Hub Closed");
 			SetButtons(true, false);
@@ -150,24 +150,28 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// Called when an unrecoverable error happen. After this event the hub will not send or receive any messages.
 		/// </summary>
-		private void Hub_OnError(HubConnection hub, string error)
+		void Hub_OnError(HubConnection hub, string error)
 		{
 			AddText(string.Format("Hub Error: <color=red>{0}</color>", error));
 			SetButtons(true, false);
 		}
 
-		private void SetButtons(bool connect, bool close)
+		void SetButtons(bool connect, bool close)
 		{
-			if (this._connectButton != null)
-				this._connectButton.interactable = connect;
+			if (_connectButton != null)
+			{
+				_connectButton.interactable = connect;
+			}
 
-			if (this._closeButton != null)
-				this._closeButton.interactable = close;
+			if (_closeButton != null)
+			{
+				_closeButton.interactable = close;
+			}
 		}
 
-		private void AddText(string text)
+		void AddText(string text)
 		{
-			GUIHelper.AddText(this._listItemPrefab, this._contentRoot, text, this._maxListItemEntries, this._scrollRect);
+			GUIHelper.AddText(_listItemPrefab, _contentRoot, text, _maxListItemEntries, _scrollRect);
 		}
 	}
 
@@ -194,11 +198,11 @@ namespace BestHTTP.Examples
 
 #pragma warning restore 0067
 
-		private HubConnection _connection;
+		HubConnection _connection;
 
 		public RedirectLoggerAccessTokenAuthenticator(HubConnection connection)
 		{
-			this._connection = connection;
+			_connection = connection;
 		}
 
 		/// <summary>
@@ -211,25 +215,29 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// Prepares the request by adding two headers to it
 		/// </summary>
-		public void PrepareRequest(BestHTTP.HTTPRequest request)
+		public void PrepareRequest(HTTPRequest request)
 		{
 			request.SetHeader("x-redirect-count", _connection.RedirectCount.ToString());
 
 			if (HTTPProtocolFactory.GetProtocolFromUri(request.CurrentUri) == SupportedProtocols.HTTP)
+			{
 				request.Uri = PrepareUri(request.Uri);
+			}
 		}
 
 		public Uri PrepareUri(Uri uri)
 		{
-			if (this._connection.NegotiationResult != null && !string.IsNullOrEmpty(this._connection.NegotiationResult.AccessToken))
+			if (_connection.NegotiationResult != null && !string.IsNullOrEmpty(_connection.NegotiationResult.AccessToken))
 			{
 				string query = string.IsNullOrEmpty(uri.Query) ? "?" : uri.Query + "&";
 				UriBuilder uriBuilder = new UriBuilder(uri.Scheme, uri.Host, uri.Port, uri.AbsolutePath,
-					query + "access_token=" + this._connection.NegotiationResult.AccessToken);
+					query + "access_token=" + _connection.NegotiationResult.AccessToken);
 				return uriBuilder.Uri;
 			}
 			else
+			{
 				return uri;
+			}
 		}
 
 		public void Cancel()

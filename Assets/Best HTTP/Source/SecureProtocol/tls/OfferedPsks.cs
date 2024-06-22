@@ -20,10 +20,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			internal BindersConfig(TlsPsk[] psks, short[] pskKeyExchangeModes, TlsSecret[] earlySecrets,
 				int bindersSize)
 			{
-				this.m_psks = psks;
-				this.m_pskKeyExchangeModes = pskKeyExchangeModes;
-				this.m_earlySecrets = earlySecrets;
-				this.m_bindersSize = bindersSize;
+				m_psks = psks;
+				m_pskKeyExchangeModes = pskKeyExchangeModes;
+				m_earlySecrets = earlySecrets;
+				m_bindersSize = bindersSize;
 			}
 		}
 
@@ -36,34 +36,42 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			internal SelectedConfig(int index, TlsPsk psk, short[] pskKeyExchangeModes, TlsSecret earlySecret)
 			{
-				this.m_index = index;
-				this.m_psk = psk;
-				this.m_pskKeyExchangeModes = pskKeyExchangeModes;
-				this.m_earlySecret = earlySecret;
+				m_index = index;
+				m_psk = psk;
+				m_pskKeyExchangeModes = pskKeyExchangeModes;
+				m_earlySecret = earlySecret;
 			}
 		}
 
-		private readonly IList<PskIdentity> m_identities;
-		private readonly IList<byte[]> m_binders;
-		private readonly int m_bindersSize;
+		readonly IList<PskIdentity> m_identities;
+		readonly IList<byte[]> m_binders;
+		readonly int m_bindersSize;
 
 		public OfferedPsks(IList<PskIdentity> identities)
 			: this(identities, null, -1)
 		{
 		}
 
-		private OfferedPsks(IList<PskIdentity> identities, IList<byte[]> binders, int bindersSize)
+		OfferedPsks(IList<PskIdentity> identities, IList<byte[]> binders, int bindersSize)
 		{
 			if (null == identities || identities.Count < 1)
+			{
 				throw new ArgumentException("cannot be null or empty", "identities");
-			if (null != binders && identities.Count != binders.Count)
-				throw new ArgumentException("must be the same length as 'identities' (or null)", "binders");
-			if ((null != binders) != (bindersSize >= 0))
-				throw new ArgumentException("must be >= 0 iff 'binders' are present", "bindersSize");
+			}
 
-			this.m_identities = identities;
-			this.m_binders = binders;
-			this.m_bindersSize = bindersSize;
+			if (null != binders && identities.Count != binders.Count)
+			{
+				throw new ArgumentException("must be the same length as 'identities' (or null)", "binders");
+			}
+
+			if (null != binders != bindersSize >= 0)
+			{
+				throw new ArgumentException("must be >= 0 iff 'binders' are present", "bindersSize");
+			}
+
+			m_identities = identities;
+			m_binders = binders;
+			m_bindersSize = bindersSize;
 		}
 
 		public IList<byte[]> Binders
@@ -86,7 +94,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			for (int i = 0, count = m_identities.Count; i < count; ++i)
 			{
 				if (pskIdentity.Equals(m_identities[i]))
+				{
 					return i;
+				}
 			}
 
 			return -1;
@@ -165,7 +175,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 
 			if (expectedLengthOfBindersList != lengthOfBindersList)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 		}
 
 		/// <exception cref="IOException"/>
@@ -189,11 +201,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <exception cref="IOException"/>
 		public static OfferedPsks Parse(Stream input)
 		{
-			var identities = new List<PskIdentity>();
+			List<PskIdentity> identities = new List<PskIdentity>();
 			{
 				int totalLengthIdentities = TlsUtilities.ReadUint16(input);
 				if (totalLengthIdentities < 7)
+				{
 					throw new TlsFatalAlert(AlertDescription.decode_error);
+				}
 
 				byte[] identitiesData = TlsUtilities.ReadFully(totalLengthIdentities, input);
 				MemoryStream buf = new MemoryStream(identitiesData, false);
@@ -204,11 +218,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				} while (buf.Position < buf.Length);
 			}
 
-			var binders = new List<byte[]>();
+			List<byte[]> binders = new List<byte[]>();
 			int totalLengthBinders = TlsUtilities.ReadUint16(input);
 			{
 				if (totalLengthBinders < 33)
+				{
 					throw new TlsFatalAlert(AlertDescription.decode_error);
+				}
 
 				byte[] bindersData = TlsUtilities.ReadFully(totalLengthBinders, input);
 				MemoryStream buf = new MemoryStream(bindersData, false);

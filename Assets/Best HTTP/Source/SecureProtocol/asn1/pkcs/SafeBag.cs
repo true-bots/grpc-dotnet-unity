@@ -11,23 +11,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		public static SafeBag GetInstance(object obj)
 		{
 			if (obj is SafeBag)
+			{
 				return (SafeBag)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new SafeBag(Asn1Sequence.GetInstance(obj));
 		}
 
-		private readonly DerObjectIdentifier bagID;
-		private readonly Asn1Object bagValue;
-		private readonly Asn1Set bagAttributes;
+		readonly DerObjectIdentifier bagID;
+		readonly Asn1Object bagValue;
+		readonly Asn1Set bagAttributes;
 
 		public SafeBag(
 			DerObjectIdentifier oid,
 			Asn1Object obj)
 		{
-			this.bagID = oid;
-			this.bagValue = obj;
-			this.bagAttributes = null;
+			bagID = oid;
+			bagValue = obj;
+			bagAttributes = null;
 		}
 
 		public SafeBag(
@@ -35,18 +41,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			Asn1Object obj,
 			Asn1Set bagAttributes)
 		{
-			this.bagID = oid;
-			this.bagValue = obj;
+			bagID = oid;
+			bagValue = obj;
 			this.bagAttributes = bagAttributes;
 		}
 
-		private SafeBag(Asn1Sequence seq)
+		SafeBag(Asn1Sequence seq)
 		{
-			this.bagID = (DerObjectIdentifier)seq[0];
-			this.bagValue = ((DerTaggedObject)seq[1]).GetObject();
+			bagID = (DerObjectIdentifier)seq[0];
+			bagValue = ((DerTaggedObject)seq[1]).GetObject();
 			if (seq.Count == 3)
 			{
-				this.bagAttributes = (Asn1Set)seq[2];
+				bagAttributes = (Asn1Set)seq[2];
 			}
 		}
 

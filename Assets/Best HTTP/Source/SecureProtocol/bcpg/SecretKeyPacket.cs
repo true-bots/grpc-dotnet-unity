@@ -14,12 +14,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public const int UsageChecksum = 0xff;
 		public const int UsageSha1 = 0xfe;
 
-		private PublicKeyPacket pubKeyPacket;
-		private readonly byte[] secKeyData;
-		private int s2kUsage;
-		private SymmetricKeyAlgorithmTag encAlgorithm;
-		private S2k s2k;
-		private byte[] iv;
+		PublicKeyPacket pubKeyPacket;
+		readonly byte[] secKeyData;
+		int s2kUsage;
+		SymmetricKeyAlgorithmTag encAlgorithm;
+		S2k s2k;
+		byte[] iv;
 
 		internal SecretKeyPacket(
 			BcpgInputStream bcpgIn)
@@ -49,7 +49,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			{
 				if (s2kUsage != 0)
 				{
-					if (((int)encAlgorithm) < 7)
+					if ((int)encAlgorithm < 7)
 					{
 						iv = new byte[8];
 					}
@@ -77,11 +77,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 
 			if (encAlgorithm != SymmetricKeyAlgorithmTag.Null)
 			{
-				this.s2kUsage = UsageChecksum;
+				s2kUsage = UsageChecksum;
 			}
 			else
 			{
-				this.s2kUsage = UsageNone;
+				s2kUsage = UsageNone;
 			}
 
 			this.s2k = s2k;

@@ -4,7 +4,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 {
 	public sealed class TeleTrusTObjectIdentifiers
 	{
-		private TeleTrusTObjectIdentifiers()
+		TeleTrusTObjectIdentifiers()
 		{
 		}
 

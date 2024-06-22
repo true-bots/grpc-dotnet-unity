@@ -12,15 +12,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	{
 		public sealed class Builder
 		{
-			private int m_cipherSuite = -1;
-			private Certificate m_localCertificate = null;
-			private TlsSecret m_masterSecret = null;
-			private ProtocolVersion m_negotiatedVersion;
-			private Certificate m_peerCertificate = null;
-			private byte[] m_pskIdentity = null;
-			private byte[] m_srpIdentity = null;
-			private byte[] m_encodedServerExtensions = null;
-			private bool m_extendedMasterSecret = false;
+			int m_cipherSuite = -1;
+			Certificate m_localCertificate = null;
+			TlsSecret m_masterSecret = null;
+			ProtocolVersion m_negotiatedVersion;
+			Certificate m_peerCertificate = null;
+			byte[] m_pskIdentity = null;
+			byte[] m_srpIdentity = null;
+			byte[] m_encodedServerExtensions = null;
+			bool m_extendedMasterSecret = false;
 
 			public Builder()
 			{
@@ -36,49 +36,49 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			public Builder SetCipherSuite(int cipherSuite)
 			{
-				this.m_cipherSuite = cipherSuite;
+				m_cipherSuite = cipherSuite;
 				return this;
 			}
 
 			public Builder SetExtendedMasterSecret(bool extendedMasterSecret)
 			{
-				this.m_extendedMasterSecret = extendedMasterSecret;
+				m_extendedMasterSecret = extendedMasterSecret;
 				return this;
 			}
 
 			public Builder SetLocalCertificate(Certificate localCertificate)
 			{
-				this.m_localCertificate = localCertificate;
+				m_localCertificate = localCertificate;
 				return this;
 			}
 
 			public Builder SetMasterSecret(TlsSecret masterSecret)
 			{
-				this.m_masterSecret = masterSecret;
+				m_masterSecret = masterSecret;
 				return this;
 			}
 
 			public Builder SetNegotiatedVersion(ProtocolVersion negotiatedVersion)
 			{
-				this.m_negotiatedVersion = negotiatedVersion;
+				m_negotiatedVersion = negotiatedVersion;
 				return this;
 			}
 
 			public Builder SetPeerCertificate(Certificate peerCertificate)
 			{
-				this.m_peerCertificate = peerCertificate;
+				m_peerCertificate = peerCertificate;
 				return this;
 			}
 
 			public Builder SetPskIdentity(byte[] pskIdentity)
 			{
-				this.m_pskIdentity = pskIdentity;
+				m_pskIdentity = pskIdentity;
 				return this;
 			}
 
 			public Builder SetSrpIdentity(byte[] srpIdentity)
 			{
-				this.m_srpIdentity = srpIdentity;
+				m_srpIdentity = srpIdentity;
 				return this;
 			}
 
@@ -87,48 +87,50 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				if (serverExtensions == null || serverExtensions.Count < 1)
 				{
-					this.m_encodedServerExtensions = null;
+					m_encodedServerExtensions = null;
 				}
 				else
 				{
 					MemoryStream buf = new MemoryStream();
 					TlsProtocol.WriteExtensions(buf, serverExtensions);
-					this.m_encodedServerExtensions = buf.ToArray();
+					m_encodedServerExtensions = buf.ToArray();
 				}
 
 				return this;
 			}
 
-			private void Validate(bool condition, string parameter)
+			void Validate(bool condition, string parameter)
 			{
 				if (!condition)
+				{
 					throw new InvalidOperationException("Required session parameter '" + parameter + "' not configured");
+				}
 			}
 		}
 
-		private readonly int m_cipherSuite;
-		private readonly Certificate m_localCertificate;
-		private readonly TlsSecret m_masterSecret;
-		private readonly ProtocolVersion m_negotiatedVersion;
-		private readonly Certificate m_peerCertificate;
-		private readonly byte[] m_pskIdentity;
-		private readonly byte[] m_srpIdentity;
-		private readonly byte[] m_encodedServerExtensions;
-		private readonly bool m_extendedMasterSecret;
+		readonly int m_cipherSuite;
+		readonly Certificate m_localCertificate;
+		readonly TlsSecret m_masterSecret;
+		readonly ProtocolVersion m_negotiatedVersion;
+		readonly Certificate m_peerCertificate;
+		readonly byte[] m_pskIdentity;
+		readonly byte[] m_srpIdentity;
+		readonly byte[] m_encodedServerExtensions;
+		readonly bool m_extendedMasterSecret;
 
-		private SessionParameters(int cipherSuite, Certificate localCertificate, TlsSecret masterSecret,
+		SessionParameters(int cipherSuite, Certificate localCertificate, TlsSecret masterSecret,
 			ProtocolVersion negotiatedVersion, Certificate peerCertificate, byte[] pskIdentity, byte[] srpIdentity,
 			byte[] encodedServerExtensions, bool extendedMasterSecret)
 		{
-			this.m_cipherSuite = cipherSuite;
-			this.m_localCertificate = localCertificate;
-			this.m_masterSecret = masterSecret;
-			this.m_negotiatedVersion = negotiatedVersion;
-			this.m_peerCertificate = peerCertificate;
-			this.m_pskIdentity = Arrays.Clone(pskIdentity);
-			this.m_srpIdentity = Arrays.Clone(srpIdentity);
-			this.m_encodedServerExtensions = encodedServerExtensions;
-			this.m_extendedMasterSecret = extendedMasterSecret;
+			m_cipherSuite = cipherSuite;
+			m_localCertificate = localCertificate;
+			m_masterSecret = masterSecret;
+			m_negotiatedVersion = negotiatedVersion;
+			m_peerCertificate = peerCertificate;
+			m_pskIdentity = Arrays.Clone(pskIdentity);
+			m_srpIdentity = Arrays.Clone(srpIdentity);
+			m_encodedServerExtensions = encodedServerExtensions;
+			m_extendedMasterSecret = extendedMasterSecret;
 		}
 
 		public int CipherSuite
@@ -184,7 +186,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public IDictionary<int, byte[]> ReadServerExtensions()
 		{
 			if (m_encodedServerExtensions == null)
+			{
 				return null;
+			}
 
 			return TlsProtocol.ReadExtensions(new MemoryStream(m_encodedServerExtensions, false));
 		}

@@ -113,7 +113,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 			};
 		}
 
-		private static BigInteger CalculateHashForZeroKnowledgeProof(BigInteger g, BigInteger gr, BigInteger gx,
+		static BigInteger CalculateHashForZeroKnowledgeProof(BigInteger g, BigInteger gr, BigInteger gx,
 			string participantId, IDigest digest)
 		{
 			digest.Reset();
@@ -138,7 +138,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		public static void ValidateGx4(BigInteger gx4)
 		{
 			if (gx4.Equals(One))
+			{
 				throw new CryptoException("g^x validation failed.  g^x should not be 1.");
+			}
 		}
 
 		/// <summary>
@@ -154,7 +156,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		public static void ValidateGa(BigInteger ga)
 		{
 			if (ga.Equals(One))
+			{
 				throw new CryptoException("ga is equal to 1.  It should not be.  The chances of this happening are on the order of 2^160 for a 160-bit q.  Try again.");
+			}
 		}
 
 		/// <summary>
@@ -244,7 +248,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		public static void ValidateNotNull(object obj, string description)
 		{
 			if (obj == null)
+			{
 				throw new ArgumentNullException(description);
+			}
 		}
 
 		/// <summary>
@@ -293,7 +299,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		/// 
 		/// MacKey = H(K || "JPAKE_KC")
 		/// </summary>
-		private static byte[] CalculateMacKey(BigInteger keyingMaterial, IDigest digest)
+		static byte[] CalculateMacKey(BigInteger keyingMaterial, IDigest digest)
 		{
 			digest.Reset();
 
@@ -334,56 +340,56 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 			}
 		}
 
-		private static void UpdateDigest(IDigest digest, BigInteger bigInteger)
+		static void UpdateDigest(IDigest digest, BigInteger bigInteger)
 		{
 			UpdateDigest(digest, BigIntegers.AsUnsignedByteArray(bigInteger));
 		}
 
-		private static void UpdateDigest(IDigest digest, string str)
+		static void UpdateDigest(IDigest digest, string str)
 		{
 			UpdateDigest(digest, Encoding.UTF8.GetBytes(str));
 		}
 
-		private static void UpdateDigest(IDigest digest, byte[] bytes)
+		static void UpdateDigest(IDigest digest, byte[] bytes)
 		{
 			digest.BlockUpdate(bytes, 0, bytes.Length);
 			Arrays.Fill(bytes, (byte)0);
 		}
 
-		private static void UpdateDigestIncludingSize(IDigest digest, BigInteger bigInteger)
+		static void UpdateDigestIncludingSize(IDigest digest, BigInteger bigInteger)
 		{
 			UpdateDigestIncludingSize(digest, BigIntegers.AsUnsignedByteArray(bigInteger));
 		}
 
-		private static void UpdateDigestIncludingSize(IDigest digest, string str)
+		static void UpdateDigestIncludingSize(IDigest digest, string str)
 		{
 			UpdateDigestIncludingSize(digest, Encoding.UTF8.GetBytes(str));
 		}
 
-		private static void UpdateDigestIncludingSize(IDigest digest, byte[] bytes)
+		static void UpdateDigestIncludingSize(IDigest digest, byte[] bytes)
 		{
 			digest.BlockUpdate(IntToByteArray(bytes.Length), 0, 4);
 			digest.BlockUpdate(bytes, 0, bytes.Length);
 			Arrays.Fill(bytes, (byte)0);
 		}
 
-		private static void UpdateMac(IMac mac, BigInteger bigInteger)
+		static void UpdateMac(IMac mac, BigInteger bigInteger)
 		{
 			UpdateMac(mac, BigIntegers.AsUnsignedByteArray(bigInteger));
 		}
 
-		private static void UpdateMac(IMac mac, string str)
+		static void UpdateMac(IMac mac, string str)
 		{
 			UpdateMac(mac, Encoding.UTF8.GetBytes(str));
 		}
 
-		private static void UpdateMac(IMac mac, byte[] bytes)
+		static void UpdateMac(IMac mac, byte[] bytes)
 		{
 			mac.BlockUpdate(bytes, 0, bytes.Length);
 			Arrays.Fill(bytes, (byte)0);
 		}
 
-		private static byte[] IntToByteArray(int value)
+		static byte[] IntToByteArray(int value)
 		{
 			return Pack.UInt32_To_BE((uint)value);
 		}

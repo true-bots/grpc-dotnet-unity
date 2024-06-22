@@ -11,14 +11,14 @@ namespace BestHTTP.Connections.TLS.Crypto
 	/**
 	* implements Cipher-Block-Chaining (CBC) mode on top of a simple cipher.
 	*/
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	public sealed class FastCbcBlockCipher
 		: IBlockCipherMode
 	{
-		private byte[] IV, cbcV, cbcNextV;
-		private int blockSize;
-		private IBlockCipher cipher;
-		private bool encrypting;
+		byte[] IV, cbcV, cbcNextV;
+		int blockSize;
+		IBlockCipher cipher;
+		bool encrypting;
 
 		/**
 		* Basic constructor.
@@ -29,11 +29,11 @@ namespace BestHTTP.Connections.TLS.Crypto
 			IBlockCipher cipher)
 		{
 			this.cipher = cipher;
-			this.blockSize = cipher.GetBlockSize();
+			blockSize = cipher.GetBlockSize();
 
-			this.IV = new byte[blockSize];
-			this.cbcV = new byte[blockSize];
-			this.cbcNextV = new byte[blockSize];
+			IV = new byte[blockSize];
+			cbcV = new byte[blockSize];
+			cbcNextV = new byte[blockSize];
 		}
 
 		/**
@@ -41,7 +41,10 @@ namespace BestHTTP.Connections.TLS.Crypto
 		*
 		* @return the underlying block cipher that we are wrapping.
 		*/
-		public IBlockCipher UnderlyingCipher => cipher;
+		public IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		/**
 		* Initialise the cipher and, possibly, the initialisation vector (IV).
@@ -55,16 +58,18 @@ namespace BestHTTP.Connections.TLS.Crypto
 		*/
 		public void Init(bool forEncryption, ICipherParameters parameters)
 		{
-			bool oldEncrypting = this.encrypting;
+			bool oldEncrypting = encrypting;
 
-			this.encrypting = forEncryption;
+			encrypting = forEncryption;
 
 			if (parameters is ParametersWithIV ivParam)
 			{
 				byte[] iv = ivParam.GetIV();
 
 				if (iv.Length != blockSize)
+				{
 					throw new ArgumentException("initialisation vector must be the same length as block size");
+				}
 
 				Array.Copy(iv, 0, IV, 0, iv.Length);
 
@@ -180,7 +185,7 @@ namespace BestHTTP.Connections.TLS.Crypto
             return length;
         }
 #else
-		private int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			Check.DataLength(input, inOff, blockSize, "input buffer too short");
 			Check.OutputLength(outBytes, outOff, blockSize, "output buffer too short");
@@ -197,7 +202,7 @@ namespace BestHTTP.Connections.TLS.Crypto
 			return length;
 		}
 
-		private int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			Check.DataLength(input, inOff, blockSize, "input buffer too short");
 			Check.OutputLength(outBytes, outOff, blockSize, "output buffer too short");

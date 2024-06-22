@@ -10,11 +10,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class PublicKeyPacket
 		: ContainedPacket //, PublicKeyAlgorithmTag
 	{
-		private int version;
-		private long time;
-		private int validDays;
-		private PublicKeyAlgorithmTag algorithm;
-		private IBcpgKey key;
+		int version;
+		long time;
+		int validDays;
+		PublicKeyAlgorithmTag algorithm;
+		IBcpgKey key;
 
 		internal PublicKeyPacket(
 			BcpgInputStream bcpgIn)
@@ -65,7 +65,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			DateTime time,
 			IBcpgKey key)
 		{
-			this.version = 4;
+			version = 4;
 			this.time = DateTimeUtilities.DateTimeToUnixMs(time) / 1000L;
 			this.algorithm = algorithm;
 			this.key = key;

@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 	public sealed class X448Agreement
 		: IRawAgreement
 	{
-		private X448PrivateKeyParameters m_privateKey;
+		X448PrivateKeyParameters m_privateKey;
 
 		public void Init(ICipherParameters parameters)
 		{

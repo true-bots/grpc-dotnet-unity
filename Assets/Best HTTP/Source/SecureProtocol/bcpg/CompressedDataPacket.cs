@@ -8,13 +8,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class CompressedDataPacket
 		: InputStreamPacket
 	{
-		private readonly CompressionAlgorithmTag algorithm;
+		readonly CompressionAlgorithmTag algorithm;
 
 		internal CompressedDataPacket(
 			BcpgInputStream bcpgIn)
 			: base(bcpgIn)
 		{
-			this.algorithm = (CompressionAlgorithmTag)bcpgIn.ReadByte();
+			algorithm = (CompressionAlgorithmTag)bcpgIn.ReadByte();
 		}
 
 		/// <summary>The algorithm tag value.</summary>

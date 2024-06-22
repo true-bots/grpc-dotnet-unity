@@ -4,6 +4,7 @@ using BestHTTP.PlatformSupport.Memory;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace BestHTTP.Connections.HTTP2
 {
@@ -25,33 +26,37 @@ namespace BestHTTP.Connections.HTTP2
 		protected List<HTTP2FrameHeaderAndPayload> frames = new List<HTTP2FrameHeaderAndPayload>();
 		protected int currentFrameIdx = -1;
 		protected byte[] data;
-		protected UInt32 dataOffset;
-		protected UInt32 maxOffset;
+		protected uint dataOffset;
+		protected uint maxOffset;
 
 		public abstract void AddFrame(HTTP2FrameHeaderAndPayload frame);
 		protected abstract long CalculateDataLengthForFrame(HTTP2FrameHeaderAndPayload frame);
 
 		public virtual int Read(byte[] buffer, int offset, int count)
 		{
-			if (this.dataOffset >= this.maxOffset && !AdvanceFrame())
+			if (dataOffset >= maxOffset && !AdvanceFrame())
+			{
 				return -1;
+			}
 
 			int readCount = 0;
 
 			while (count > 0)
 			{
-				long copyCount = Math.Min(count, this.maxOffset - this.dataOffset);
+				long copyCount = Math.Min(count, maxOffset - dataOffset);
 
-				Array.Copy(this.data, this.dataOffset, buffer, offset + readCount, copyCount);
+				Array.Copy(data, dataOffset, buffer, offset + readCount, copyCount);
 
 				count -= (int)copyCount;
 				readCount += (int)copyCount;
 
-				this.dataOffset += (UInt32)copyCount;
-				this.Position += copyCount;
+				dataOffset += (uint)copyCount;
+				Position += copyCount;
 
-				if (this.dataOffset >= this.maxOffset && !AdvanceFrame())
+				if (dataOffset >= maxOffset && !AdvanceFrame())
+				{
 					break;
+				}
 			}
 
 			return readCount;
@@ -59,12 +64,14 @@ namespace BestHTTP.Connections.HTTP2
 
 		public virtual int ReadByte()
 		{
-			if (this.dataOffset >= this.maxOffset && !AdvanceFrame())
+			if (dataOffset >= maxOffset && !AdvanceFrame())
+			{
 				return -1;
+			}
 
-			byte data = this.data[this.dataOffset];
-			this.dataOffset++;
-			this.Position++;
+			byte data = this.data[dataOffset];
+			dataOffset++;
+			Position++;
 
 			return data;
 		}
@@ -73,20 +80,23 @@ namespace BestHTTP.Connections.HTTP2
 
 		public virtual void Dispose()
 		{
-			for (int i = 0; i < this.frames.Count; ++i)
+			for (int i = 0; i < frames.Count; ++i)
 				//if (this.frames[i].Payload != null && !this.frames[i].DontUseMemPool)
-				BufferPool.Release(this.frames[i].Payload);
-			this.frames.Clear();
+			{
+				BufferPool.Release(frames[i].Payload);
+			}
+
+			frames.Clear();
 		}
 
 		public override string ToString()
 		{
-			var sb = PlatformSupport.Text.StringBuilderPool.Get(this.frames.Count + 2);
+			StringBuilder sb = PlatformSupport.Text.StringBuilderPool.Get(frames.Count + 2);
 			sb.Append("[CommonFrameView ");
 
-			for (int i = 0; i < this.frames.Count; ++i)
+			for (int i = 0; i < frames.Count; ++i)
 			{
-				sb.AppendFormat("{0} Payload: {1}\n", this.frames[i], this.frames[i].PayloadAsHex());
+				sb.AppendFormat("{0} Payload: {1}\n", frames[i], frames[i].PayloadAsHex());
 			}
 
 			sb.Append("]");
@@ -100,13 +110,17 @@ namespace BestHTTP.Connections.HTTP2
 		public override void AddFrame(HTTP2FrameHeaderAndPayload frame)
 		{
 			if (frame.Type != HTTP2FrameTypes.HEADERS && frame.Type != HTTP2FrameTypes.CONTINUATION)
+			{
 				throw new ArgumentException("HeaderFrameView - Unexpected frame type: " + frame.Type);
+			}
 
-			this.frames.Add(frame);
-			this.Length += CalculateDataLengthForFrame(frame);
+			frames.Add(frame);
+			Length += CalculateDataLengthForFrame(frame);
 
-			if (this.currentFrameIdx == -1)
+			if (currentFrameIdx == -1)
+			{
 				AdvanceFrame();
+			}
 		}
 
 		protected override long CalculateDataLengthForFrame(HTTP2FrameHeaderAndPayload frame)
@@ -125,25 +139,27 @@ namespace BestHTTP.Connections.HTTP2
 
 		protected override bool AdvanceFrame()
 		{
-			if (this.currentFrameIdx >= this.frames.Count - 1)
+			if (currentFrameIdx >= frames.Count - 1)
+			{
 				return false;
+			}
 
-			this.currentFrameIdx++;
-			HTTP2FrameHeaderAndPayload frame = this.frames[this.currentFrameIdx];
+			currentFrameIdx++;
+			HTTP2FrameHeaderAndPayload frame = frames[currentFrameIdx];
 
-			this.data = frame.Payload;
+			data = frame.Payload;
 
 			switch (frame.Type)
 			{
 				case HTTP2FrameTypes.HEADERS:
-					var header = HTTP2FrameHelper.ReadHeadersFrame(frame);
-					this.dataOffset = header.HeaderBlockFragmentIdx;
-					this.maxOffset = this.dataOffset + header.HeaderBlockFragmentLength;
+					HTTP2HeadersFrame header = HTTP2FrameHelper.ReadHeadersFrame(frame);
+					dataOffset = header.HeaderBlockFragmentIdx;
+					maxOffset = dataOffset + header.HeaderBlockFragmentLength;
 					break;
 
 				case HTTP2FrameTypes.CONTINUATION:
-					this.dataOffset = 0;
-					this.maxOffset = frame.PayloadLength;
+					dataOffset = 0;
+					maxOffset = frame.PayloadLength;
 					break;
 			}
 
@@ -156,10 +172,12 @@ namespace BestHTTP.Connections.HTTP2
 		public override void AddFrame(HTTP2FrameHeaderAndPayload frame)
 		{
 			if (frame.Type != HTTP2FrameTypes.DATA)
+			{
 				throw new ArgumentException("HeaderFrameView - Unexpected frame type: " + frame.Type);
+			}
 
-			this.frames.Add(frame);
-			this.Length += CalculateDataLengthForFrame(frame);
+			frames.Add(frame);
+			Length += CalculateDataLengthForFrame(frame);
 		}
 
 		protected override long CalculateDataLengthForFrame(HTTP2FrameHeaderAndPayload frame)
@@ -169,16 +187,18 @@ namespace BestHTTP.Connections.HTTP2
 
 		protected override bool AdvanceFrame()
 		{
-			if (this.currentFrameIdx >= this.frames.Count - 1)
+			if (currentFrameIdx >= frames.Count - 1)
+			{
 				return false;
+			}
 
-			this.currentFrameIdx++;
-			HTTP2FrameHeaderAndPayload frame = this.frames[this.currentFrameIdx];
+			currentFrameIdx++;
+			HTTP2FrameHeaderAndPayload frame = frames[currentFrameIdx];
 			HTTP2DataFrame dataFrame = HTTP2FrameHelper.ReadDataFrame(frame);
 
-			this.data = frame.Payload;
-			this.dataOffset = dataFrame.DataIdx;
-			this.maxOffset = dataFrame.DataIdx + dataFrame.DataLength;
+			data = frame.Payload;
+			dataOffset = dataFrame.DataIdx;
+			maxOffset = dataFrame.DataIdx + dataFrame.DataLength;
 
 			return true;
 		}
@@ -203,16 +223,16 @@ namespace BestHTTP.Connections.HTTP2
 
 		public override long Length
 		{
-			get { return this.view.Length; }
+			get { return view.Length; }
 		}
 
 		public override long Position
 		{
-			get { return this.view.Position; }
+			get { return view.Position; }
 			set { throw new NotSupportedException(); }
 		}
 
-		private IFrameDataView view;
+		IFrameDataView view;
 
 		public FramesAsStreamView(IFrameDataView view)
 		{
@@ -221,23 +241,23 @@ namespace BestHTTP.Connections.HTTP2
 
 		public void AddFrame(HTTP2FrameHeaderAndPayload frame)
 		{
-			this.view.AddFrame(frame);
+			view.AddFrame(frame);
 		}
 
 		public override int ReadByte()
 		{
-			return this.view.ReadByte();
+			return view.ReadByte();
 		}
 
 		public override int Read(byte[] buffer, int offset, int count)
 		{
-			return this.view.Read(buffer, offset, count);
+			return view.Read(buffer, offset, count);
 		}
 
 		public override void Close()
 		{
 			base.Close();
-			this.view.Dispose();
+			view.Dispose();
 		}
 
 		public override void Flush()
@@ -261,7 +281,7 @@ namespace BestHTTP.Connections.HTTP2
 
 		public override string ToString()
 		{
-			return this.view.ToString();
+			return view.ToString();
 		}
 	}
 }

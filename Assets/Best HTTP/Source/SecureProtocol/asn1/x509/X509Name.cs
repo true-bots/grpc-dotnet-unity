@@ -203,21 +203,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 			get
 			{
-				lock (defaultReverse) return defaultReverse[0];
+				lock (defaultReverse)
+				{
+					return defaultReverse[0];
+				}
 			}
 			set
 			{
-				lock (defaultReverse) defaultReverse[0] = value;
+				lock (defaultReverse)
+				{
+					defaultReverse[0] = value;
+				}
 			}
 		}
 
-		private static readonly bool[] defaultReverse = { false };
+		static readonly bool[] defaultReverse = { false };
 
 		/**
 		* default look up table translating OID values into their common symbols following
 		* the convention in RFC 2253 with a few extras
 		*/
-		private static readonly IDictionary<DerObjectIdentifier, string> DefaultSymbolsInternal =
+		static readonly IDictionary<DerObjectIdentifier, string> DefaultSymbolsInternal =
 			new Dictionary<DerObjectIdentifier, string>();
 
 		public static readonly IDictionary<DerObjectIdentifier, string> DefaultSymbols =
@@ -226,7 +232,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		/**
 		 * look up table translating OID values into their common symbols following the convention in RFC 2253
 		 */
-		private static readonly IDictionary<DerObjectIdentifier, string> RFC2253SymbolsInternal =
+		static readonly IDictionary<DerObjectIdentifier, string> RFC2253SymbolsInternal =
 			new Dictionary<DerObjectIdentifier, string>();
 
 		public static readonly IDictionary<DerObjectIdentifier, string> RFC2253Symbols =
@@ -236,7 +242,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * look up table translating OID values into their common symbols following the convention in RFC 1779
 		 *
 		 */
-		private static readonly IDictionary<DerObjectIdentifier, string> RFC1779SymbolsInternal =
+		static readonly IDictionary<DerObjectIdentifier, string> RFC1779SymbolsInternal =
 			new Dictionary<DerObjectIdentifier, string>();
 
 		public static readonly IDictionary<DerObjectIdentifier, string> RFC1779Symbols =
@@ -245,7 +251,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		/**
 		* look up table translating common symbols into their OIDS.
 		*/
-		private static readonly IDictionary<string, DerObjectIdentifier> DefaultLookupInternal =
+		static readonly IDictionary<string, DerObjectIdentifier> DefaultLookupInternal =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
 		public static readonly IDictionary<string, DerObjectIdentifier> DefaultLookup =
@@ -337,12 +343,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			DefaultLookupInternal.Add("telephonenumber", TelephoneNumber);
 		}
 
-		private readonly List<DerObjectIdentifier> ordering = new List<DerObjectIdentifier>();
-		private readonly X509NameEntryConverter converter;
+		readonly List<DerObjectIdentifier> ordering = new List<DerObjectIdentifier>();
+		readonly X509NameEntryConverter converter;
 
-		private IList<string> values = new List<string>();
-		private IList<bool> added = new List<bool>();
-		private Asn1Sequence seq;
+		IList<string> values = new List<string>();
+		IList<bool> added = new List<bool>();
+		Asn1Sequence seq;
 
 		/**
 		* Return a X509Name based on the passed in tagged object.
@@ -362,9 +368,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj is X509Name)
+			{
 				return (X509Name)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new X509Name(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -390,7 +402,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 					Asn1Sequence s = Asn1Sequence.GetInstance(asn1Set[i].ToAsn1Object());
 
 					if (s.Count != 2)
+					{
 						throw new ArgumentException("badly sized pair");
+					}
 
 					ordering.Add(DerObjectIdentifier.GetInstance(s[0].ToAsn1Object()));
 
@@ -454,8 +468,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 			foreach (DerObjectIdentifier oid in ordering)
 			{
-				if (!attributes.TryGetValue(oid, out var attribute))
+				if (!attributes.TryGetValue(oid, out string attribute))
+				{
 					throw new ArgumentException("No attribute for object id - " + oid + " - passed to distinguished name");
+				}
 
 				//object attribute = attributes[oid];
 				//if (attribute == null)
@@ -464,8 +480,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				//}
 
 				this.ordering.Add(oid);
-				this.added.Add(false);
-				this.values.Add(attribute); // copy the hash table
+				added.Add(false);
+				values.Add(attribute); // copy the hash table
 			}
 		}
 
@@ -488,13 +504,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			this.converter = converter;
 
 			if (oids.Count != values.Count)
+			{
 				throw new ArgumentException("'oids' must be same length as 'values'.");
+			}
 
 			for (int i = 0; i < oids.Count; i++)
 			{
-				this.ordering.Add(oids[i]);
+				ordering.Add(oids[i]);
 				this.values.Add(values[i]);
-				this.added.Add(false);
+				added.Add(false);
 			}
 		}
 
@@ -559,16 +577,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 		}
 
-		private DerObjectIdentifier DecodeOid(string name, IDictionary<string, DerObjectIdentifier> lookup)
+		DerObjectIdentifier DecodeOid(string name, IDictionary<string, DerObjectIdentifier> lookup)
 		{
 			if (name.StartsWith("OID.", StringComparison.OrdinalIgnoreCase))
+			{
 				return new DerObjectIdentifier(name.Substring("OID.".Length));
+			}
 
 			if (name[0] >= '0' && name[0] <= '9')
+			{
 				return new DerObjectIdentifier(name);
+			}
 
-			if (lookup.TryGetValue(name, out var oid))
+			if (lookup.TryGetValue(name, out DerObjectIdentifier oid))
+			{
 				return oid;
+			}
 
 			throw new ArgumentException("Unknown object id - " + name + " - passed to distinguished name");
 		}
@@ -598,7 +622,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				int index = token.IndexOf('=');
 
 				if (index == -1)
+				{
 					throw new ArgumentException("badly formated directory string");
+				}
 
 				string name = token.Substring(0, index);
 				string value = token.Substring(index + 1);
@@ -609,9 +635,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 					X509NameTokenizer vTok = new X509NameTokenizer(value, '+');
 					string v = vTok.NextToken();
 
-					this.ordering.Add(oid);
-					this.values.Add(v);
-					this.added.Add(false);
+					ordering.Add(oid);
+					values.Add(v);
+					added.Add(false);
 
 					while (vTok.HasMoreTokens())
 					{
@@ -620,16 +646,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 						string nm = sv.Substring(0, ndx);
 						string vl = sv.Substring(ndx + 1);
-						this.ordering.Add(DecodeOid(nm, lookup));
-						this.values.Add(vl);
-						this.added.Add(true);
+						ordering.Add(DecodeOid(nm, lookup));
+						values.Add(vl);
+						added.Add(true);
 					}
 				}
 				else
 				{
-					this.ordering.Add(oid);
-					this.values.Add(value);
-					this.added.Add(false);
+					ordering.Add(oid);
+					values.Add(value);
+					added.Add(false);
 				}
 			}
 
@@ -638,28 +664,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 //				this.ordering.Reverse();
 //				this.values.Reverse();
 //				this.added.Reverse();
-				var o = new List<DerObjectIdentifier>();
-				var v = new List<string>();
-				var a = new List<bool>();
+				List<DerObjectIdentifier> o = new List<DerObjectIdentifier>();
+				List<string> v = new List<string>();
+				List<bool> a = new List<bool>();
 				int count = 1;
 
-				for (int i = 0; i < this.ordering.Count; i++)
+				for (int i = 0; i < ordering.Count; i++)
 				{
-					if (!((bool)this.added[i]))
+					if (!(bool)added[i])
 					{
 						count = 0;
 					}
 
 					int index = count++;
 
-					o.Insert(index, this.ordering[i]);
-					v.Insert(index, this.values[i]);
-					a.Insert(index, this.added[i]);
+					o.Insert(index, ordering[i]);
+					v.Insert(index, values[i]);
+					a.Insert(index, added[i]);
 				}
 
-				this.ordering = o;
-				this.values = v;
-				this.added = a;
+				ordering = o;
+				values = v;
+				added = a;
 			}
 		}
 
@@ -686,7 +712,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 */
 		public IList<string> GetValueList(DerObjectIdentifier oid)
 		{
-			var v = new List<string>();
+			List<string> v = new List<string>();
 			for (int i = 0; i != values.Count; i++)
 			{
 				if (null == oid || oid.Equals(ordering[i]))
@@ -718,7 +744,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 					string str = (string)values[i];
 
 					if (lstOid == null
-					    || ((bool)this.added[i]))
+					    || (bool)added[i])
 					{
 					}
 					else
@@ -751,18 +777,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			bool inOrder)
 		{
 			if (!inOrder)
-				return this.Equivalent(other);
+			{
+				return Equivalent(other);
+			}
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			if (other == this)
+			{
 				return true;
+			}
 
 			int orderingSize = ordering.Count;
 
 			if (orderingSize != other.ordering.Count)
+			{
 				return false;
+			}
 
 			for (int i = 0; i < orderingSize; i++)
 			{
@@ -770,13 +804,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				DerObjectIdentifier oOid = (DerObjectIdentifier)other.ordering[i];
 
 				if (!oid.Equals(oOid))
+				{
 					return false;
+				}
 
 				string val = (string)values[i];
 				string oVal = (string)other.values[i];
 
 				if (!EquivalentStrings(val, oVal))
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -789,10 +827,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			X509Name other)
 		{
 			if (other == null)
+			{
 				return false;
+			}
 
 			if (other == this)
+			{
 				return true;
+			}
 
 			int orderingSize = ordering.Count;
 
@@ -854,7 +896,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return true;
 		}
 
-		private static bool EquivalentStrings(string s1, string s2)
+		static bool EquivalentStrings(string s1, string s2)
 		{
 			string v1 = Canonicalize(s1);
 			string v2 = Canonicalize(s2);
@@ -865,13 +907,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				v2 = StripInternalSpaces(v2);
 
 				if (!v1.Equals(v2))
+				{
 					return false;
+				}
 			}
 
 			return true;
 		}
 
-		private static string Canonicalize(string s)
+		static string Canonicalize(string s)
 		{
 			string v = s.ToLowerInvariant().Trim();
 
@@ -891,7 +935,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return v;
 		}
 
-		private static Asn1Object DecodeObject(string v)
+		static Asn1Object DecodeObject(string v)
 		{
 			try
 			{
@@ -903,7 +947,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			}
 		}
 
-		private static string StripInternalSpaces(string str)
+		static string StripInternalSpaces(string str)
 		{
 			StringBuilder res = new StringBuilder();
 
@@ -928,10 +972,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return res.ToString();
 		}
 
-		private void AppendValue(StringBuilder buf, IDictionary<DerObjectIdentifier, string> oidSymbols,
+		void AppendValue(StringBuilder buf, IDictionary<DerObjectIdentifier, string> oidSymbols,
 			DerObjectIdentifier oid, string val)
 		{
-			if (oidSymbols.TryGetValue(oid, out var sym))
+			if (oidSymbols.TryGetValue(oid, out string sym))
 			{
 				buf.Append(sym);
 			}
@@ -955,14 +999,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 			while (index != end)
 			{
-				if ((buf[index] == ',')
-				    || (buf[index] == '"')
-				    || (buf[index] == '\\')
-				    || (buf[index] == '+')
-				    || (buf[index] == '=')
-				    || (buf[index] == '<')
-				    || (buf[index] == '>')
-				    || (buf[index] == ';'))
+				if (buf[index] == ','
+				    || buf[index] == '"'
+				    || buf[index] == '\\'
+				    || buf[index] == '+'
+				    || buf[index] == '='
+				    || buf[index] == '<'
+				    || buf[index] == '>'
+				    || buf[index] == ';')
 				{
 					buf.Insert(index++, "\\");
 					end++;
@@ -986,7 +1030,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		*/
 		public string ToString(bool reverse, IDictionary<DerObjectIdentifier, string> oidSymbols)
 		{
-			var components = new List<StringBuilder>();
+			List<StringBuilder> components = new List<StringBuilder>();
 
 			StringBuilder ava = null;
 

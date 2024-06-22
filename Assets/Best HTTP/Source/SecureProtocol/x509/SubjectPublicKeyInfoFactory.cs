@@ -32,9 +32,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			AsymmetricKeyParameter publicKey)
 		{
 			if (publicKey == null)
+			{
 				throw new ArgumentNullException("publicKey");
+			}
+
 			if (publicKey.IsPrivate)
+			{
 				throw new ArgumentException("Private key passed - public key expected.", "publicKey");
+			}
 
 			if (publicKey is ElGamalPublicKeyParameters)
 			{
@@ -99,7 +104,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 					BigInteger bX = _key.Q.AffineXCoord.ToBigInteger();
 					BigInteger bY = _key.Q.AffineYCoord.ToBigInteger();
-					bool is512 = (bX.BitLength > 256);
+					bool is512 = bX.BitLength > 256;
 
 					Gost3410PublicKeyAlgParameters parameters = new Gost3410PublicKeyAlgParameters(
 						gostParams.PublicKeyParamSet,
@@ -134,7 +139,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				if (_key.AlgorithmName == "ECGOST3410")
 				{
 					if (_key.PublicKeyParamSet == null)
+					{
 						throw new NotImplementedException("Not a CryptoPro parameter set");
+					}
 
 					ECPoint q = _key.Q.Normalize();
 					BigInteger bX = q.AffineXCoord.ToBigInteger();
@@ -183,7 +190,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				Gost3410PublicKeyParameters _key = (Gost3410PublicKeyParameters)publicKey;
 
 				if (_key.PublicKeyParamSet == null)
+				{
 					throw new NotImplementedException("Not a CryptoPro parameter set");
+				}
 
 				byte[] keyEnc = _key.Y.ToByteArrayUnsigned();
 				byte[] keyBytes = new byte[keyEnc.Length];
@@ -231,10 +240,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				return new SubjectPublicKeyInfo(new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), key.GetEncoded());
 			}
 
-			throw new ArgumentException("Class provided no convertible: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(publicKey));
+			throw new ArgumentException("Class provided no convertible: " + Platform.GetTypeName(publicKey));
 		}
 
-		private static void ExtractBytes(
+		static void ExtractBytes(
 			byte[] encKey,
 			int offset,
 			BigInteger bI)
@@ -249,7 +258,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		}
 
 
-		private static void ExtractBytes(byte[] encKey, int size, int offSet, BigInteger bI)
+		static void ExtractBytes(byte[] encKey, int size, int offSet, BigInteger bI)
 		{
 			byte[] val = bI.ToByteArray();
 			if (val.Length < size)

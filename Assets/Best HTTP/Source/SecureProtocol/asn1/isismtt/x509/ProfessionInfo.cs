@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -139,21 +140,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		public static readonly DerObjectIdentifier Patentanwalt = new DerObjectIdentifier(
 			NamingAuthority.IdIsisMttATNamingAuthoritiesRechtWirtschaftSteuern + ".19");
 
-		private readonly NamingAuthority namingAuthority;
-		private readonly Asn1Sequence professionItems;
-		private readonly Asn1Sequence professionOids;
-		private readonly string registrationNumber;
-		private readonly Asn1OctetString addProfessionInfo;
+		readonly NamingAuthority namingAuthority;
+		readonly Asn1Sequence professionItems;
+		readonly Asn1Sequence professionOids;
+		readonly string registrationNumber;
+		readonly Asn1OctetString addProfessionInfo;
 
 		public static ProfessionInfo GetInstance(object obj)
 		{
 			if (obj == null || obj is ProfessionInfo)
+			{
 				return (ProfessionInfo)obj;
+			}
 
 			if (obj is Asn1Sequence seq)
+			{
 				return new ProfessionInfo(seq);
+			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -173,12 +178,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		*
 		* @param seq The ASN.1 sequence.
 		*/
-		private ProfessionInfo(Asn1Sequence seq)
+		ProfessionInfo(Asn1Sequence seq)
 		{
 			if (seq.Count > 5)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
 			e.MoveNext();
 			Asn1Encodable o = e.Current;
@@ -186,7 +193,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 			if (o is Asn1TaggedObject ato)
 			{
 				if (ato.TagNo != 0)
+				{
 					throw new ArgumentException("Bad tag number: " + ato.TagNo);
+				}
 
 				namingAuthority = NamingAuthority.GetInstance(ato, true);
 				e.MoveNext();
@@ -212,7 +221,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				}
 				else
 				{
-					throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+					throw new ArgumentException("Bad object encountered: " + Platform.GetTypeName(o));
 				}
 			}
 
@@ -229,7 +238,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				}
 				else
 				{
-					throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+					throw new ArgumentException("Bad object encountered: " + Platform.GetTypeName(o));
 				}
 			}
 
@@ -242,7 +251,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				}
 				else
 				{
-					throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+					throw new ArgumentException("Bad object encountered: " + Platform.GetTypeName(o));
 				}
 			}
 		}

@@ -68,52 +68,52 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 
 		// Unique identifier of this participant.
 		// The two participants in the exchange must NOT share the same id.
-		private string participantId;
+		string participantId;
 
 		// Shared secret.  This only contains the secret between construction
 		// and the call to CalculateKeyingMaterial().
 		//
 		// i.e. When CalculateKeyingMaterial() is called, this buffer overwritten with 0's,
 		// and the field is set to null.
-		private char[] password;
+		char[] password;
 
 		// Digest to use during calculations.
-		private IDigest digest;
+		IDigest digest;
 
 		// Source of secure random data.
-		private readonly SecureRandom random;
+		readonly SecureRandom random;
 
-		private readonly BigInteger p;
-		private readonly BigInteger q;
-		private readonly BigInteger g;
+		readonly BigInteger p;
+		readonly BigInteger q;
+		readonly BigInteger g;
 
 		// The participantId of the other participant in this exchange.
-		private string partnerParticipantId;
+		string partnerParticipantId;
 
 		// Alice's x1 or Bob's x3.
-		private BigInteger x1;
+		BigInteger x1;
 
 		// Alice's x2 or Bob's x4.
-		private BigInteger x2;
+		BigInteger x2;
 
 		// Alice's g^x1 or Bob's g^x3.
-		private BigInteger gx1;
+		BigInteger gx1;
 
 		// Alice's g^x2 or Bob's g^x4.
-		private BigInteger gx2;
+		BigInteger gx2;
 
 		// Alice's g^x3 or Bob's g^x1.
-		private BigInteger gx3;
+		BigInteger gx3;
 
 		// Alice's g^x4 or Bob's g^x2.
-		private BigInteger gx4;
+		BigInteger gx4;
 
 		// Alice's B or Bob's A.
-		private BigInteger b;
+		BigInteger b;
 
 		// The current state.
 		// See the <tt>STATE_*</tt> constants for possible values.
-		private int state;
+		int state;
 
 		/// <summary>
 		/// Convenience constructor for a new JPakeParticipant that uses
@@ -183,7 +183,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 			JPakeUtilities.ValidateNotNull(random, "random");
 
 			if (password.Length == 0)
+			{
 				throw new ArgumentException("Password must not be empty.");
+			}
 
 			this.participantId = participantId;
 
@@ -200,14 +202,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 			this.password = new char[password.Length];
 			Array.Copy(password, this.password, password.Length);
 
-			this.p = group.P;
-			this.q = group.Q;
-			this.g = group.G;
+			p = group.P;
+			q = group.Q;
+			g = group.G;
 
 			this.digest = digest;
 			this.random = random;
 
-			this.state = STATE_INITIALIZED;
+			state = STATE_INITIALIZED;
 		}
 
 		/// <summary>
@@ -227,18 +229,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		/// </summary>
 		public virtual JPakeRound1Payload CreateRound1PayloadToSend()
 		{
-			if (this.state >= STATE_ROUND_1_CREATED)
-				throw new InvalidOperationException("Round 1 payload already created for " + this.participantId);
+			if (state >= STATE_ROUND_1_CREATED)
+			{
+				throw new InvalidOperationException("Round 1 payload already created for " + participantId);
+			}
 
-			this.x1 = JPakeUtilities.GenerateX1(q, random);
-			this.x2 = JPakeUtilities.GenerateX2(q, random);
+			x1 = JPakeUtilities.GenerateX1(q, random);
+			x2 = JPakeUtilities.GenerateX2(q, random);
 
-			this.gx1 = JPakeUtilities.CalculateGx(p, g, x1);
-			this.gx2 = JPakeUtilities.CalculateGx(p, g, x2);
+			gx1 = JPakeUtilities.CalculateGx(p, g, x1);
+			gx2 = JPakeUtilities.CalculateGx(p, g, x2);
 			BigInteger[] knowledgeProofForX1 = JPakeUtilities.CalculateZeroKnowledgeProof(p, q, g, gx1, x1, participantId, digest, random);
 			BigInteger[] knowledgeProofForX2 = JPakeUtilities.CalculateZeroKnowledgeProof(p, q, g, gx2, x2, participantId, digest, random);
 
-			this.state = STATE_ROUND_1_CREATED;
+			state = STATE_ROUND_1_CREATED;
 
 			return new JPakeRound1Payload(participantId, gx1, gx2, knowledgeProofForX1, knowledgeProofForX2);
 		}
@@ -255,12 +259,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		/// </summary>
 		public virtual void ValidateRound1PayloadReceived(JPakeRound1Payload round1PayloadReceived)
 		{
-			if (this.state >= STATE_ROUND_1_VALIDATED)
-				throw new InvalidOperationException("Validation already attempted for round 1 payload for " + this.participantId);
+			if (state >= STATE_ROUND_1_VALIDATED)
+			{
+				throw new InvalidOperationException("Validation already attempted for round 1 payload for " + participantId);
+			}
 
-			this.partnerParticipantId = round1PayloadReceived.ParticipantId;
-			this.gx3 = round1PayloadReceived.Gx1;
-			this.gx4 = round1PayloadReceived.Gx2;
+			partnerParticipantId = round1PayloadReceived.ParticipantId;
+			gx3 = round1PayloadReceived.Gx1;
+			gx4 = round1PayloadReceived.Gx2;
 
 			BigInteger[] knowledgeProofForX3 = round1PayloadReceived.KnowledgeProofForX1;
 			BigInteger[] knowledgeProofForX4 = round1PayloadReceived.KnowledgeProofForX2;
@@ -269,7 +275,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 			JPakeUtilities.ValidateGx4(gx4);
 			JPakeUtilities.ValidateZeroKnowledgeProof(p, q, g, gx3, knowledgeProofForX3, round1PayloadReceived.ParticipantId, digest);
 			JPakeUtilities.ValidateZeroKnowledgeProof(p, q, g, gx4, knowledgeProofForX4, round1PayloadReceived.ParticipantId, digest);
-			this.state = STATE_ROUND_1_VALIDATED;
+			state = STATE_ROUND_1_VALIDATED;
 		}
 
 		/// <summary>
@@ -283,10 +289,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		/// </summary>
 		public virtual JPakeRound2Payload CreateRound2PayloadToSend()
 		{
-			if (this.state >= STATE_ROUND_2_CREATED)
-				throw new InvalidOperationException("Round 2 payload already created for " + this.participantId);
-			if (this.state < STATE_ROUND_1_VALIDATED)
-				throw new InvalidOperationException("Round 1 payload must be validated prior to creating round 2 payload for " + this.participantId);
+			if (state >= STATE_ROUND_2_CREATED)
+			{
+				throw new InvalidOperationException("Round 2 payload already created for " + participantId);
+			}
+
+			if (state < STATE_ROUND_1_VALIDATED)
+			{
+				throw new InvalidOperationException("Round 1 payload must be validated prior to creating round 2 payload for " + participantId);
+			}
 
 			BigInteger gA = JPakeUtilities.CalculateGA(p, gx1, gx3, gx4);
 			BigInteger s = JPakeUtilities.CalculateS(password);
@@ -294,7 +305,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 			BigInteger A = JPakeUtilities.CalculateA(p, q, gA, x2s);
 			BigInteger[] knowledgeProofForX2s = JPakeUtilities.CalculateZeroKnowledgeProof(p, q, gA, A, x2s, participantId, digest, random);
 
-			this.state = STATE_ROUND_2_CREATED;
+			state = STATE_ROUND_2_CREATED;
 
 			return new JPakeRound2Payload(participantId, A, knowledgeProofForX2s);
 		}
@@ -314,21 +325,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		/// </summary>
 		public virtual void ValidateRound2PayloadReceived(JPakeRound2Payload round2PayloadReceived)
 		{
-			if (this.state >= STATE_ROUND_2_VALIDATED)
-				throw new InvalidOperationException("Validation already attempted for round 2 payload for " + this.participantId);
-			if (this.state < STATE_ROUND_1_VALIDATED)
-				throw new InvalidOperationException("Round 1 payload must be validated prior to validation round 2 payload for " + this.participantId);
+			if (state >= STATE_ROUND_2_VALIDATED)
+			{
+				throw new InvalidOperationException("Validation already attempted for round 2 payload for " + participantId);
+			}
+
+			if (state < STATE_ROUND_1_VALIDATED)
+			{
+				throw new InvalidOperationException("Round 1 payload must be validated prior to validation round 2 payload for " + participantId);
+			}
 
 			BigInteger gB = JPakeUtilities.CalculateGA(p, gx3, gx1, gx2);
-			this.b = round2PayloadReceived.A;
+			b = round2PayloadReceived.A;
 			BigInteger[] knowledgeProofForX4s = round2PayloadReceived.KnowledgeProofForX2s;
 
 			JPakeUtilities.ValidateParticipantIdsDiffer(participantId, round2PayloadReceived.ParticipantId);
-			JPakeUtilities.ValidateParticipantIdsEqual(this.partnerParticipantId, round2PayloadReceived.ParticipantId);
+			JPakeUtilities.ValidateParticipantIdsEqual(partnerParticipantId, round2PayloadReceived.ParticipantId);
 			JPakeUtilities.ValidateGa(gB);
 			JPakeUtilities.ValidateZeroKnowledgeProof(p, q, gB, b, knowledgeProofForX4s, round2PayloadReceived.ParticipantId, digest);
 
-			this.state = STATE_ROUND_2_VALIDATED;
+			state = STATE_ROUND_2_VALIDATED;
 		}
 
 		/// <summary>
@@ -358,17 +374,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		/// </summary>
 		public virtual BigInteger CalculateKeyingMaterial()
 		{
-			if (this.state >= STATE_KEY_CALCULATED)
+			if (state >= STATE_KEY_CALCULATED)
+			{
 				throw new InvalidOperationException("Key already calculated for " + participantId);
-			if (this.state < STATE_ROUND_2_VALIDATED)
+			}
+
+			if (state < STATE_ROUND_2_VALIDATED)
+			{
 				throw new InvalidOperationException("Round 2 payload must be validated prior to creating key for " + participantId);
+			}
 
 			BigInteger s = JPakeUtilities.CalculateS(password);
 
 			// Clear the password array from memory, since we don't need it anymore.
 			// Also set the field to null as a flag to indicate that the key has already been calculated.
 			Array.Clear(password, 0, password.Length);
-			this.password = null;
+			password = null;
 
 			BigInteger keyingMaterial = JPakeUtilities.CalculateKeyingMaterial(p, q, gx4, x2, s, b);
 
@@ -378,13 +399,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 			// 
 			// If the ephemeral private keys x1 and x2 are leaked,
 			// the attacker might be able to brute-force the password.
-			this.x1 = null;
-			this.x2 = null;
-			this.b = null;
+			x1 = null;
+			x2 = null;
+			b = null;
 
 			// Do not clear gx* yet, since those are needed by round 3.
 
-			this.state = STATE_KEY_CALCULATED;
+			state = STATE_KEY_CALCULATED;
 
 			return keyingMaterial;
 		}
@@ -401,22 +422,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		/// <param name="keyingMaterial">The keying material as returned from CalculateKeyingMaterial().</param> 
 		public virtual JPakeRound3Payload CreateRound3PayloadToSend(BigInteger keyingMaterial)
 		{
-			if (this.state >= STATE_ROUND_3_CREATED)
-				throw new InvalidOperationException("Round 3 payload already created for " + this.participantId);
-			if (this.state < STATE_KEY_CALCULATED)
-				throw new InvalidOperationException("Keying material must be calculated prior to creating round 3 payload for " + this.participantId);
+			if (state >= STATE_ROUND_3_CREATED)
+			{
+				throw new InvalidOperationException("Round 3 payload already created for " + participantId);
+			}
+
+			if (state < STATE_KEY_CALCULATED)
+			{
+				throw new InvalidOperationException("Keying material must be calculated prior to creating round 3 payload for " + participantId);
+			}
 
 			BigInteger macTag = JPakeUtilities.CalculateMacTag(
-				this.participantId,
-				this.partnerParticipantId,
-				this.gx1,
-				this.gx2,
-				this.gx3,
-				this.gx4,
+				participantId,
+				partnerParticipantId,
+				gx1,
+				gx2,
+				gx3,
+				gx4,
 				keyingMaterial,
-				this.digest);
+				digest);
 
-			this.state = STATE_ROUND_3_CREATED;
+			state = STATE_ROUND_3_CREATED;
 
 			return new JPakeRound3Payload(participantId, macTag);
 		}
@@ -435,32 +461,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		/// <param name="keyingMaterial">The keying material as returned from CalculateKeyingMaterial().</param> 
 		public virtual void ValidateRound3PayloadReceived(JPakeRound3Payload round3PayloadReceived, BigInteger keyingMaterial)
 		{
-			if (this.state >= STATE_ROUND_3_VALIDATED)
-				throw new InvalidOperationException("Validation already attempted for round 3 payload for " + this.participantId);
-			if (this.state < STATE_KEY_CALCULATED)
-				throw new InvalidOperationException("Keying material must be calculated prior to validating round 3 payload for " + this.participantId);
+			if (state >= STATE_ROUND_3_VALIDATED)
+			{
+				throw new InvalidOperationException("Validation already attempted for round 3 payload for " + participantId);
+			}
+
+			if (state < STATE_KEY_CALCULATED)
+			{
+				throw new InvalidOperationException("Keying material must be calculated prior to validating round 3 payload for " + participantId);
+			}
 
 			JPakeUtilities.ValidateParticipantIdsDiffer(participantId, round3PayloadReceived.ParticipantId);
-			JPakeUtilities.ValidateParticipantIdsEqual(this.partnerParticipantId, round3PayloadReceived.ParticipantId);
+			JPakeUtilities.ValidateParticipantIdsEqual(partnerParticipantId, round3PayloadReceived.ParticipantId);
 
 			JPakeUtilities.ValidateMacTag(
-				this.participantId,
-				this.partnerParticipantId,
-				this.gx1,
-				this.gx2,
-				this.gx3,
-				this.gx4,
+				participantId,
+				partnerParticipantId,
+				gx1,
+				gx2,
+				gx3,
+				gx4,
 				keyingMaterial,
-				this.digest,
+				digest,
 				round3PayloadReceived.MacTag);
 
 			// Clear the rest of the fields.
-			this.gx1 = null;
-			this.gx2 = null;
-			this.gx3 = null;
-			this.gx4 = null;
+			gx1 = null;
+			gx2 = null;
+			gx3 = null;
+			gx4 = null;
 
-			this.state = STATE_ROUND_3_VALIDATED;
+			state = STATE_ROUND_3_VALIDATED;
 		}
 	}
 }

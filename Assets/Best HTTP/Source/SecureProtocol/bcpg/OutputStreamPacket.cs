@@ -7,13 +7,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 {
 	public abstract class OutputStreamPacket
 	{
-		private readonly BcpgOutputStream bcpgOut;
+		readonly BcpgOutputStream bcpgOut;
 
 		internal OutputStreamPacket(
 			BcpgOutputStream bcpgOut)
 		{
 			if (bcpgOut == null)
+			{
 				throw new ArgumentNullException("bcpgOut");
+			}
 
 			this.bcpgOut = bcpgOut;
 		}

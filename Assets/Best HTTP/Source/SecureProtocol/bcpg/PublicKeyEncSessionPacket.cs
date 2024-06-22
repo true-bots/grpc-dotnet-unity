@@ -12,10 +12,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class PublicKeyEncSessionPacket
 		: ContainedPacket //, PublicKeyAlgorithmTag
 	{
-		private int version;
-		private long keyId;
-		private PublicKeyAlgorithmTag algorithm;
-		private byte[][] data;
+		int version;
+		long keyId;
+		PublicKeyAlgorithmTag algorithm;
+		byte[][] data;
 
 		internal PublicKeyEncSessionPacket(
 			BcpgInputStream bcpgIn)
@@ -46,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 					data = new byte[][]
 					{
 						p.GetEncoded(),
-						g.GetEncoded(),
+						g.GetEncoded()
 					};
 					break;
 				case PublicKeyAlgorithmTag.ECDH:
@@ -62,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			PublicKeyAlgorithmTag algorithm,
 			byte[][] data)
 		{
-			this.version = 3;
+			version = 3;
 			this.keyId = keyId;
 			this.algorithm = algorithm;
 			this.data = new byte[data.Length][];
@@ -95,7 +95,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public override void Encode(BcpgOutputStream bcpgOut)
 		{
 			MemoryStream bOut = new MemoryStream();
-			using (var pOut = new BcpgOutputStream(bOut))
+			using (BcpgOutputStream pOut = new BcpgOutputStream(bOut))
 			{
 				pOut.WriteByte((byte)version);
 				pOut.WriteLong(keyId);

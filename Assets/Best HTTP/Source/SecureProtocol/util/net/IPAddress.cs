@@ -58,11 +58,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			return false;
 		}
 
-		private static bool unsafeIsValidIPv4(
+		static bool unsafeIsValidIPv4(
 			string address)
 		{
 			if (address.Length == 0)
+			{
 				return false;
+			}
 
 			int octets = 0;
 			string temp = address + ".";
@@ -73,13 +75,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			       && (pos = temp.IndexOf('.', start)) > start)
 			{
 				if (octets == 4)
+				{
 					return false;
+				}
 
 				string octetStr = temp.Substring(start, pos - start);
 				int octet = int.Parse(octetStr);
 
 				if (octet < 0 || octet > 255)
+				{
 					return false;
+				}
 
 				start = pos + 1;
 				octets++;
@@ -94,8 +100,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			int index = address.IndexOf('/');
 			string mask = address.Substring(index + 1);
 
-			return (index > 0) && IsValidIPv4(address.Substring(0, index))
-			                   && (IsValidIPv4(mask) || IsMaskValue(mask, 32));
+			return index > 0 && IsValidIPv4(address.Substring(0, index))
+			                 && (IsValidIPv4(mask) || IsMaskValue(mask, 32));
 		}
 
 		public static bool IsValidIPv6WithNetmask(
@@ -104,11 +110,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			int index = address.IndexOf('/');
 			string mask = address.Substring(index + 1);
 
-			return (index > 0) && (IsValidIPv6(address.Substring(0, index))
-			                       && (IsValidIPv6(mask) || IsMaskValue(mask, 128)));
+			return index > 0 && IsValidIPv6(address.Substring(0, index))
+			                 && (IsValidIPv6(mask) || IsMaskValue(mask, 128));
 		}
 
-		private static bool IsMaskValue(
+		static bool IsMaskValue(
 			string component,
 			int size)
 		{
@@ -151,7 +157,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 			return false;
 		}
 
-		private static bool unsafeIsValidIPv6(
+		static bool unsafeIsValidIPv6(
 			string address)
 		{
 			if (address.Length == 0)
@@ -177,7 +183,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 				{
 					string value = temp.Substring(start, pos - start);
 
-					if (pos == (temp.Length - 1) && value.IndexOf('.') > 0)
+					if (pos == temp.Length - 1 && value.IndexOf('.') > 0)
 					{
 						if (!IsValidIPv4(value))
 						{
@@ -192,7 +198,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Net
 						int octet = int.Parse(octetStr, NumberStyles.AllowHexSpecifier);
 
 						if (octet < 0 || octet > 0xffff)
+						{
 							return false;
+						}
 					}
 				}
 				else

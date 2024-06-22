@@ -9,14 +9,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class ResponseData
 		: Asn1Encodable
 	{
-		private static readonly DerInteger V1 = new DerInteger(0);
+		static readonly DerInteger V1 = new DerInteger(0);
 
-		private readonly bool versionPresent;
-		private readonly DerInteger version;
-		private readonly ResponderID responderID;
-		private readonly Asn1GeneralizedTime producedAt;
-		private readonly Asn1Sequence responses;
-		private readonly X509Extensions responseExtensions;
+		readonly bool versionPresent;
+		readonly DerInteger version;
+		readonly ResponderID responderID;
+		readonly Asn1GeneralizedTime producedAt;
+		readonly Asn1Sequence responses;
+		readonly X509Extensions responseExtensions;
 
 		public static ResponseData GetInstance(
 			Asn1TaggedObject obj,
@@ -38,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new ResponseData((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public ResponseData(
@@ -64,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 		{
 		}
 
-		private ResponseData(
+		ResponseData(
 			Asn1Sequence seq)
 		{
 			int index = 0;
@@ -76,27 +76,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 
 				if (o.TagNo == 0)
 				{
-					this.versionPresent = true;
-					this.version = DerInteger.GetInstance(o, true);
+					versionPresent = true;
+					version = DerInteger.GetInstance(o, true);
 					index++;
 				}
 				else
 				{
-					this.version = V1;
+					version = V1;
 				}
 			}
 			else
 			{
-				this.version = V1;
+				version = V1;
 			}
 
-			this.responderID = ResponderID.GetInstance(seq[index++]);
-			this.producedAt = (Asn1GeneralizedTime)seq[index++];
-			this.responses = (Asn1Sequence)seq[index++];
+			responderID = ResponderID.GetInstance(seq[index++]);
+			producedAt = (Asn1GeneralizedTime)seq[index++];
+			responses = (Asn1Sequence)seq[index++];
 
 			if (seq.Count > index)
 			{
-				this.responseExtensions = X509Extensions.GetInstance(
+				responseExtensions = X509Extensions.GetInstance(
 					(Asn1TaggedObject)seq[index], true);
 			}
 		}

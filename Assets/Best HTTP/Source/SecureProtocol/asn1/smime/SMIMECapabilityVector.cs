@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Smime
 	 */
 	public class SmimeCapabilityVector
 	{
-		private readonly Asn1EncodableVector capabilities = new Asn1EncodableVector();
+		readonly Asn1EncodableVector capabilities = new Asn1EncodableVector();
 
 		public void AddCapability(
 			DerObjectIdentifier capability)

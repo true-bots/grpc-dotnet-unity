@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public class BerOctetStringParser
 		: Asn1OctetStringParser
 	{
-		private readonly Asn1StreamParser _parser;
+		readonly Asn1StreamParser _parser;
 
 		internal BerOctetStringParser(Asn1StreamParser parser)
 		{

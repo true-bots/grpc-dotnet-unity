@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 {
 	public class GenTimeAccuracy
 	{
-		private Accuracy accuracy;
+		Accuracy accuracy;
 
 		public GenTimeAccuracy(
 			Accuracy accuracy)
@@ -30,7 +30,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			get { return GetTimeComponent(accuracy.Micros); }
 		}
 
-		private int GetTimeComponent(
+		int GetTimeComponent(
 			DerInteger time)
 		{
 			return time == null ? 0 : time.IntValueExact;

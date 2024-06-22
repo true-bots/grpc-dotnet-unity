@@ -12,12 +12,12 @@ namespace BestHTTP.SocketIO3
 
 		public Error(string msg)
 		{
-			this.message = msg;
+			message = msg;
 		}
 
 		public override string ToString()
 		{
-			return this.message;
+			return message;
 		}
 	}
 }

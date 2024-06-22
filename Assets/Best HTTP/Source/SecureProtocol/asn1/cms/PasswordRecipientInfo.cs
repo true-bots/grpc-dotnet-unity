@@ -9,16 +9,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class PasswordRecipientInfo
 		: Asn1Encodable
 	{
-		private readonly DerInteger version;
-		private readonly AlgorithmIdentifier keyDerivationAlgorithm;
-		private readonly AlgorithmIdentifier keyEncryptionAlgorithm;
-		private readonly Asn1OctetString encryptedKey;
+		readonly DerInteger version;
+		readonly AlgorithmIdentifier keyDerivationAlgorithm;
+		readonly AlgorithmIdentifier keyEncryptionAlgorithm;
+		readonly Asn1OctetString encryptedKey;
 
 		public PasswordRecipientInfo(
 			AlgorithmIdentifier keyEncryptionAlgorithm,
 			Asn1OctetString encryptedKey)
 		{
-			this.version = new DerInteger(0);
+			version = new DerInteger(0);
 			this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
 			this.encryptedKey = encryptedKey;
 		}
@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			AlgorithmIdentifier keyEncryptionAlgorithm,
 			Asn1OctetString encryptedKey)
 		{
-			this.version = new DerInteger(0);
+			version = new DerInteger(0);
 			this.keyDerivationAlgorithm = keyDerivationAlgorithm;
 			this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
 			this.encryptedKey = encryptedKey;
@@ -78,12 +78,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is PasswordRecipientInfo)
+			{
 				return (PasswordRecipientInfo)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new PasswordRecipientInfo((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid PasswordRecipientInfo: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid PasswordRecipientInfo: " + Platform.GetTypeName(obj));
 		}
 
 		public DerInteger Version

@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class ResponderID
 		: Asn1Encodable, IAsn1Choice
 	{
-		private readonly Asn1Encodable id;
+		readonly Asn1Encodable id;
 
 		public static ResponderID GetInstance(
 			object obj)
@@ -43,7 +43,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			Asn1OctetString id)
 		{
 			if (id == null)
+			{
 				throw new ArgumentNullException("id");
+			}
 
 			this.id = id;
 		}
@@ -52,7 +54,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			X509Name id)
 		{
 			if (id == null)
+			{
 				throw new ArgumentNullException("id");
+			}
 
 			this.id = id;
 		}

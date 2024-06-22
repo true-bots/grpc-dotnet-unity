@@ -15,9 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 	/// </summary>
 	public class Pkcs8EncryptedPrivateKeyInfo
 	{
-		private EncryptedPrivateKeyInfo encryptedPrivateKeyInfo;
+		EncryptedPrivateKeyInfo encryptedPrivateKeyInfo;
 
-		private static EncryptedPrivateKeyInfo parseBytes(byte[] pkcs8Encoding)
+		static EncryptedPrivateKeyInfo parseBytes(byte[] pkcs8Encoding)
 		{
 			try
 			{
@@ -92,7 +92,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				ICipher encIn = decryptorBuilder.BuildCipher(new MemoryInputStream(encryptedPrivateKeyInfo.GetEncryptedData()));
 
 				byte[] data;
-				using (var strm = encIn.Stream)
+				using (Stream strm = encIn.Stream)
 				{
 					data = Streams.ReadAll(encIn.Stream);
 				}

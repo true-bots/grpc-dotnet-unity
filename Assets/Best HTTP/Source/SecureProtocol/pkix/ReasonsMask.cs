@@ -9,9 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 	/// This class helps to handle CRL revocation reasons mask. Each CRL handles a
 	/// certain set of revocation reasons.
 	/// </summary>
-	internal class ReasonsMask
+	class ReasonsMask
 	{
-		private int _reasons;
+		int _reasons;
 
 		/// <summary>
 		/// Constructs are reason mask with the reasons.
@@ -83,7 +83,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		internal bool HasNewReasons(
 			ReasonsMask mask)
 		{
-			return ((_reasons | mask.Reasons.IntValue ^ _reasons) != 0);
+			return (_reasons | (mask.Reasons.IntValue ^ _reasons)) != 0;
 		}
 
 		/// <summary>

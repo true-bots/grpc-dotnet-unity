@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	/// <remarks>Basic type for a PGP Signature sub-packet.</remarks>
 	public class SignatureSubpacket
 	{
-		private readonly SignatureSubpacketTag type;
-		private readonly bool critical;
-		private readonly bool isLongLength;
+		readonly SignatureSubpacketTag type;
+		readonly bool critical;
+		readonly bool isLongLength;
 		internal byte[] data;
 
 		protected internal SignatureSubpacket(
@@ -102,15 +102,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public override bool Equals(object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			SignatureSubpacket other = obj as SignatureSubpacket;
 			if (null == other)
+			{
 				return false;
+			}
 
-			return this.type == other.type
-			       && this.critical == other.critical
-			       && Arrays.AreEqual(this.data, other.data);
+			return type == other.type
+			       && critical == other.critical
+			       && Arrays.AreEqual(data, other.data);
 		}
 	}
 }

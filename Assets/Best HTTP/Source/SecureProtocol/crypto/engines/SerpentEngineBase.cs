@@ -34,10 +34,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual void Init(bool encrypting, ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
-				throw new ArgumentException("invalid parameter passed to " + AlgorithmName + " init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			{
+				throw new ArgumentException("invalid parameter passed to " + AlgorithmName + " init - " + Platform.GetTypeName(parameters));
+			}
 
 			this.encrypting = encrypting;
-			this.wKey = MakeWorkingKey(((KeyParameter)parameters).GetKey());
+			wKey = MakeWorkingKey(((KeyParameter)parameters).GetKey());
 		}
 
 		public virtual string AlgorithmName
@@ -66,7 +68,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (wKey == null)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
 
 			Check.DataLength(input, inOff, BlockSize, "input buffer too short");
 			Check.OutputLength(output, outOff, BlockSize, "output buffer too short");
@@ -152,8 +156,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int t7 = a ^ (b & t1);
 			X2 = t4 ^ (c | t7);
 			int t12 = X3 & (t3 ^ t7);
-			X1 = (~t3) ^ t12;
-			X0 = t12 ^ (~t7);
+			X1 = ~t3 ^ t12;
+			X0 = t12 ^ ~t7;
 		}
 
 		/**
@@ -169,7 +173,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int t8 = t1 ^ (d & t2);
 			X1 = t4 ^ (X2 & t8);
 			X3 = (a & t4) ^ (t5 | X1);
-			X0 = X3 ^ (t5 ^ t8);
+			X0 = X3 ^ t5 ^ t8;
 		}
 
 		/**
@@ -177,7 +181,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*/
 		protected void Sb1(int a, int b, int c, int d)
 		{
-			int t2 = b ^ (~a);
+			int t2 = b ^ ~a;
 			int t5 = c ^ (a | t2);
 			X2 = d ^ t5;
 			int t7 = b ^ (d | t2);
@@ -220,7 +224,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int t7 = b & t6;
 			X3 = t5 ^ t7;
 			X2 = a ^ ((d | t7) & (X0 | t5));
-			X1 = (t2 ^ X3) ^ (X2 ^ (d | t1));
+			X1 = t2 ^ X3 ^ X2 ^ (d | t1);
 		}
 
 		/**
@@ -241,7 +245,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int t11 = ~t4;
 			int t12 = X0 | X3;
 			X1 = t11 ^ t12;
-			X2 = (d & t11) ^ (t3 ^ t12);
+			X2 = (d & t11) ^ t3 ^ t12;
 		}
 
 		/**
@@ -262,7 +266,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			X0 = t1 ^ t10;
 			int t12 = X2 & X0;
 			X1 = t9 ^ t12;
-			X3 = (b | d) ^ (t4 ^ t12);
+			X3 = (b | d) ^ t4 ^ t12;
 		}
 
 		/**
@@ -283,7 +287,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int t11 = t1 ^ t9;
 			int t12 = X0 & t11;
 			X3 = t4 ^ t12;
-			X1 = X3 ^ (X0 ^ t11);
+			X1 = X3 ^ X0 ^ t11;
 		}
 
 		/**
@@ -303,7 +307,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int t10 = t1 ^ t6;
 			int t11 = t4 & t10;
 			X2 = t9 ^ t11;
-			X1 = (a ^ t3) ^ (t10 & X2);
+			X1 = a ^ t3 ^ (t10 & X2);
 		}
 
 		/**
@@ -323,7 +327,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int t10 = X1 | t7;
 			int t11 = d ^ t10;
 			X0 = X3 ^ t11;
-			X2 = (t3 & t11) ^ (X1 ^ t7);
+			X2 = (t3 & t11) ^ X1 ^ t7;
 		}
 
 		/**
@@ -344,7 +348,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int t11 = t2 | t7;
 			int t12 = t3 ^ t10;
 			X2 = t11 ^ t12;
-			X3 = (b ^ t7) ^ (X1 & t12);
+			X3 = b ^ t7 ^ (X1 & t12);
 		}
 
 		/**
@@ -384,7 +388,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			X2 = t3 ^ t9;
 			int t11 = t5 ^ t8;
 			X0 = X2 ^ t11;
-			X3 = (~t5) ^ (t3 & t11);
+			X3 = ~t5 ^ (t3 & t11);
 		}
 
 		/**
@@ -404,7 +408,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			X3 = t5 ^ t9;
 			int t11 = b | X3;
 			X0 = t8 ^ t11;
-			X2 = (d & t1) ^ (t3 ^ t11);
+			X2 = (d & t1) ^ t3 ^ t11;
 		}
 
 		/**
@@ -425,7 +429,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int t11 = t4 ^ t8;
 			int t12 = X3 & t11;
 			X2 = t3 ^ t12;
-			X0 = (~t11) ^ (X3 & X2);
+			X0 = ~t11 ^ (X3 & X2);
 		}
 
 		/**
@@ -440,8 +444,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int t7 = b ^ t4;
 			int t9 = t7 | (X3 ^ t6);
 			X1 = a ^ t9;
-			X0 = (c ^ t7) ^ (d | X1);
-			X2 = (t3 ^ X1) ^ (X0 ^ (a & X3));
+			X0 = c ^ t7 ^ (d | X1);
+			X2 = t3 ^ X1 ^ X0 ^ (a & X3);
 		}
 
 		/**
@@ -452,7 +456,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int x0 = Integers.RotateLeft(X0, 13);
 			int x2 = Integers.RotateLeft(X2, 3);
 			int x1 = X1 ^ x0 ^ x2;
-			int x3 = X3 ^ x2 ^ x0 << 3;
+			int x3 = X3 ^ x2 ^ (x0 << 3);
 
 			X1 = Integers.RotateLeft(x1, 1);
 			X3 = Integers.RotateLeft(x3, 7);
@@ -469,7 +473,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int x0 = Integers.RotateRight(X0, 5) ^ X1 ^ X3;
 			int x3 = Integers.RotateRight(X3, 7);
 			int x1 = Integers.RotateRight(X1, 1);
-			X3 = x3 ^ x2 ^ x0 << 3;
+			X3 = x3 ^ x2 ^ (x0 << 3);
 			X1 = x1 ^ x0 ^ x2;
 			X2 = Integers.RotateRight(x2, 3);
 			X0 = Integers.RotateRight(x0, 13);

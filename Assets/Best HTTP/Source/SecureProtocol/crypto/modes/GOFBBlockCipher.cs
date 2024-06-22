@@ -12,12 +12,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class GOfbBlockCipher
 		: IBlockCipherMode
 	{
-		private byte[] IV;
-		private byte[] ofbV;
-		private byte[] ofbOutV;
+		byte[] IV;
+		byte[] ofbV;
+		byte[] ofbOutV;
 
-		private readonly int blockSize;
-		private readonly IBlockCipher cipher;
+		readonly int blockSize;
+		readonly IBlockCipher cipher;
 
 		bool firstStep = true;
 		int N3;
@@ -35,16 +35,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			IBlockCipher cipher)
 		{
 			this.cipher = cipher;
-			this.blockSize = cipher.GetBlockSize();
+			blockSize = cipher.GetBlockSize();
 
 			if (blockSize != 8)
 			{
 				throw new ArgumentException("GCTR only for 64 bit block ciphers");
 			}
 
-			this.IV = new byte[cipher.GetBlockSize()];
-			this.ofbV = new byte[cipher.GetBlockSize()];
-			this.ofbOutV = new byte[cipher.GetBlockSize()];
+			IV = new byte[cipher.GetBlockSize()];
+			ofbV = new byte[cipher.GetBlockSize()];
+			ofbOutV = new byte[cipher.GetBlockSize()];
 		}
 
 		/**
@@ -52,7 +52,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		*
 		* @return the underlying block cipher that we are wrapping.
 		*/
-		public IBlockCipher UnderlyingCipher => cipher;
+		public IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		/**
 		* Initialise the cipher and, possibly, the initialisation vector (IV).

@@ -8,13 +8,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class NestedMessageContent
 		: PkiMessages
 	{
-		public static new NestedMessageContent GetInstance(object obj)
+		public new static NestedMessageContent GetInstance(object obj)
 		{
 			if (obj is NestedMessageContent nestedMessageContent)
+			{
 				return nestedMessageContent;
+			}
 
 			if (obj != null)
+			{
 				return new NestedMessageContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}

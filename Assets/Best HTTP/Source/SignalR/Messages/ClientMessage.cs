@@ -29,7 +29,7 @@ namespace BestHTTP.SignalR.Messages
 		/// <summary>
 		/// Unique id on the client of this message
 		/// </summary>
-		public readonly UInt64 CallIdx;
+		public readonly ulong CallIdx;
 
 		/// <summary>
 		/// The delegate that will be called when the server will sends a result of this method call.
@@ -49,7 +49,7 @@ namespace BestHTTP.SignalR.Messages
 		public ClientMessage(Hub hub,
 			string method,
 			object[] args,
-			UInt64 callIdx,
+			ulong callIdx,
 			OnMethodResultDelegate resultCallback,
 			OnMethodFailedDelegate resultErrorCallback,
 			OnMethodProgressDelegate progressCallback)

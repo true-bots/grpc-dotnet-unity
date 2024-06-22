@@ -34,7 +34,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				for (int i = 0; i < versions.Length; ++i)
 				{
 					if (version.Equals(versions[i]))
+					{
 						return true;
+					}
 				}
 			}
 
@@ -142,7 +144,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static bool IsSupportedTlsVersionClient(ProtocolVersion version)
 		{
 			if (null == version)
+			{
 				return false;
+			}
 
 			int fullVersion = version.FullVersion;
 
@@ -153,7 +157,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static bool IsSupportedTlsVersionServer(ProtocolVersion version)
 		{
 			if (null == version)
+			{
 				return false;
+			}
 
 			int fullVersion = version.FullVersion;
 
@@ -161,21 +167,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			       && fullVersion <= SERVER_LATEST_SUPPORTED_TLS.FullVersion;
 		}
 
-		private readonly int version;
-		private readonly string name;
+		readonly int version;
+		readonly string name;
 
-		private ProtocolVersion(int v, string name)
+		ProtocolVersion(int v, string name)
 		{
-			this.version = v & 0xFFFF;
+			version = v & 0xFFFF;
 			this.name = name;
 		}
 
 		public ProtocolVersion[] DownTo(ProtocolVersion min)
 		{
 			if (!IsEqualOrLaterVersionOf(min))
+			{
 				throw new ArgumentException("must be an equal or earlier version of this one", "min");
+			}
 
-			var result = new List<ProtocolVersion>();
+			List<ProtocolVersion> result = new List<ProtocolVersion>();
 			result.Add(this);
 
 			ProtocolVersion current = this;
@@ -305,7 +313,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public bool IsEarlierVersionOf(ProtocolVersion version)
 		{
 			if (null == version || MajorVersion != version.MajorVersion)
+			{
 				return false;
+			}
 
 			int diffMinorVersion = MinorVersion - version.MinorVersion;
 			return IsDtls ? diffMinorVersion > 0 : diffMinorVersion < 0;
@@ -314,7 +324,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public bool IsEqualOrEarlierVersionOf(ProtocolVersion version)
 		{
 			if (null == version || MajorVersion != version.MajorVersion)
+			{
 				return false;
+			}
 
 			int diffMinorVersion = MinorVersion - version.MinorVersion;
 			return IsDtls ? diffMinorVersion >= 0 : diffMinorVersion <= 0;
@@ -323,7 +335,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public bool IsEqualOrLaterVersionOf(ProtocolVersion version)
 		{
 			if (null == version || MajorVersion != version.MajorVersion)
+			{
 				return false;
+			}
 
 			int diffMinorVersion = MinorVersion - version.MinorVersion;
 			return IsDtls ? diffMinorVersion <= 0 : diffMinorVersion >= 0;
@@ -332,7 +346,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public bool IsLaterVersionOf(ProtocolVersion version)
 		{
 			if (null == version || MajorVersion != version.MajorVersion)
+			{
 				return false;
+			}
 
 			int diffMinorVersion = MinorVersion - version.MinorVersion;
 			return IsDtls ? diffMinorVersion < 0 : diffMinorVersion > 0;
@@ -345,7 +361,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public bool Equals(ProtocolVersion other)
 		{
-			return other != null && this.version == other.version;
+			return other != null && version == other.version;
 		}
 
 		public override int GetHashCode()
@@ -408,13 +424,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return name;
 		}
 
-		private static void CheckUint8(int versionOctet)
+		static void CheckUint8(int versionOctet)
 		{
 			if (!TlsUtilities.IsValidUint8(versionOctet))
+			{
 				throw new ArgumentException("not a valid octet", "versionOctet");
+			}
 		}
 
-		private static ProtocolVersion GetUnknownVersion(int major, int minor, string prefix)
+		static ProtocolVersion GetUnknownVersion(int major, int minor, string prefix)
 		{
 			CheckUint8(major);
 			CheckUint8(minor);

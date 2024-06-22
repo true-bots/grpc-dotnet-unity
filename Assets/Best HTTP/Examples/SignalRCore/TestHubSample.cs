@@ -25,22 +25,22 @@ namespace BestHTTP.Examples
 
 	// Server side of this example can be found here:
 	// https://github.com/Benedicht/BestHTTP_DemoSite/blob/master/BestHTTP_DemoSite/Hubs/TestHub.cs
-	public class TestHubSample : BestHTTP.Examples.Helpers.SampleBase
+	public class TestHubSample : SampleBase
 	{
 #pragma warning disable 0649
-		[SerializeField] private string _path = "/TestHub";
+		[SerializeField] string _path = "/TestHub";
 
-		[SerializeField] private ScrollRect _scrollRect;
+		[SerializeField] ScrollRect _scrollRect;
 
-		[SerializeField] private RectTransform _contentRoot;
+		[SerializeField] RectTransform _contentRoot;
 
-		[SerializeField] private TextListItem _listItemPrefab;
+		[SerializeField] TextListItem _listItemPrefab;
 
-		[SerializeField] private int _maxListItemEntries = 100;
+		[SerializeField] int _maxListItemEntries = 100;
 
-		[SerializeField] private Button _connectButton;
+		[SerializeField] Button _connectButton;
 
-		[SerializeField] private Button _closeButton;
+		[SerializeField] Button _closeButton;
 
 #pragma warning restore
 
@@ -57,7 +57,9 @@ namespace BestHTTP.Examples
 		void OnDestroy()
 		{
 			if (hub != null)
+			{
 				hub.StartClose();
+			}
 		}
 
 		/// <summary>
@@ -93,7 +95,7 @@ namespace BestHTTP.Examples
 #endif
 
 			// Crete the HubConnection
-			hub = new HubConnection(new Uri(base.sampleSelector.BaseURL + this._path), protocol);
+			hub = new HubConnection(new Uri(sampleSelector.BaseURL + _path), protocol);
 
 			// Optionally add an authenticator
 			//hub.AuthenticationProvider = new BestHTTP.SignalRCore.Authentication.HeaderAuthenticator("<generated jwt token goes here>");
@@ -127,9 +129,9 @@ namespace BestHTTP.Examples
 		/// </summary>
 		public void OnCloseButton()
 		{
-			if (this.hub != null)
+			if (hub != null)
 			{
-				this.hub.StartClose();
+				hub.StartClose();
 
 				AddText("StartClose called");
 				SetButtons(false, false);
@@ -140,7 +142,7 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This callback is called when the plugin is connected to the server successfully. Messages can be sent to the server after this point.
 		/// </summary>
-		private void Hub_OnConnected(HubConnection hub)
+		void Hub_OnConnected(HubConnection hub)
 		{
 			SetButtons(false, true);
 			AddText(string.Format("Hub Connected with <color=green>{0}</color> transport using the <color=green>{1}</color> encoder.",
@@ -193,7 +195,7 @@ namespace BestHTTP.Examples
 				.OnError(error => AddText(string.Format("'<color=green>ObservableCounter(10, 1000)</color>' error: '<color=red>{0}</color>'", error)).AddLeftPadding(20));
 
 			// A stream request can be cancelled any time.
-			var controller = hub.GetDownStreamController<int>("ChannelCounter", 10, 1000);
+			DownStreamItemController<int> controller = hub.GetDownStreamController<int>("ChannelCounter", 10, 1000);
 
 			controller.OnItem(result =>
 					AddText(string.Format("'<color=green>ChannelCounter(10, 1000)</color>' OnItem: '<color=yellow>{0}</color>'", result)).AddLeftPadding(20))
@@ -213,7 +215,7 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This is called when the hub is closed after a StartClose() call.
 		/// </summary>
-		private void Hub_OnClosed(HubConnection hub)
+		void Hub_OnClosed(HubConnection hub)
 		{
 			SetButtons(true, false);
 			AddText("Hub Closed");
@@ -222,24 +224,28 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// Called when an unrecoverable error happen. After this event the hub will not send or receive any messages.
 		/// </summary>
-		private void Hub_OnError(HubConnection hub, string error)
+		void Hub_OnError(HubConnection hub, string error)
 		{
 			SetButtons(true, false);
 			AddText(string.Format("Hub Error: <color=red>{0}</color>", error));
 		}
 
-		private void SetButtons(bool connect, bool close)
+		void SetButtons(bool connect, bool close)
 		{
-			if (this._connectButton != null)
-				this._connectButton.interactable = connect;
+			if (_connectButton != null)
+			{
+				_connectButton.interactable = connect;
+			}
 
-			if (this._closeButton != null)
-				this._closeButton.interactable = close;
+			if (_closeButton != null)
+			{
+				_closeButton.interactable = close;
+			}
 		}
 
-		private TextListItem AddText(string text)
+		TextListItem AddText(string text)
 		{
-			return GUIHelper.AddText(this._listItemPrefab, this._contentRoot, text, this._maxListItemEntries, this._scrollRect);
+			return GUIHelper.AddText(_listItemPrefab, _contentRoot, text, _maxListItemEntries, _scrollRect);
 		}
 	}
 }

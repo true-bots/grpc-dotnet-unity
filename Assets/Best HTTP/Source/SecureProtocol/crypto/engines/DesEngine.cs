@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	{
 		internal const int BLOCK_SIZE = 8;
 
-		private int[] workingKey;
+		int[] workingKey;
 
 		public virtual int[] GetWorkingKey()
 		{
@@ -33,7 +33,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter keyParameter))
-				throw new ArgumentException("invalid parameter passed to DES init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			{
+				throw new ArgumentException("invalid parameter passed to DES init - " + Platform.GetTypeName(parameters));
+			}
 
 			workingKey = GenerateWorkingKey(forEncryption, keyParameter.GetKey());
 		}
@@ -51,7 +53,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (workingKey == null)
+			{
 				throw new InvalidOperationException("DES engine not initialised");
+			}
 
 			Check.DataLength(input, inOff, BLOCK_SIZE, "input buffer too short");
 			Check.OutputLength(output, outOff, BLOCK_SIZE, "output buffer too short");
@@ -100,12 +104,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 //            0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10,
 //            0x89,0xab,0xcd,0xef,0x01,0x23,0x45,0x67
 //        };
-		private static readonly short[] bytebit =
+		static readonly short[] bytebit =
 		{
 			128, 64, 32, 16, 8, 4, 2, 1
 		};
 
-		private static readonly int[] bigbyte =
+		static readonly int[] bigbyte =
 		{
 			0x800000, 0x400000, 0x200000, 0x100000,
 			0x80000, 0x40000, 0x20000, 0x10000,
@@ -118,7 +122,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/*
 		 * Use the key schedule specified in the Standard (ANSI X3.92-1981).
 		 */
-		private static readonly byte[] pc1 =
+		static readonly byte[] pc1 =
 		{
 			56, 48, 40, 32, 24, 16, 8, 0, 57, 49, 41, 33, 25, 17,
 			9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51, 43, 35,
@@ -126,13 +130,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			13, 5, 60, 52, 44, 36, 28, 20, 12, 4, 27, 19, 11, 3
 		};
 
-		private static readonly byte[] totrot =
+		static readonly byte[] totrot =
 		{
 			1, 2, 4, 6, 8, 10, 12, 14,
 			15, 17, 19, 21, 23, 25, 27, 28
 		};
 
-		private static readonly byte[] pc2 =
+		static readonly byte[] pc2 =
 		{
 			13, 16, 10, 23, 0, 4, 2, 27, 14, 5, 20, 9,
 			22, 18, 11, 3, 25, 7, 15, 6, 26, 19, 12, 1,
@@ -140,7 +144,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			43, 48, 38, 55, 33, 52, 45, 41, 49, 35, 28, 31
 		};
 
-		private static readonly uint[] SP1 =
+		static readonly uint[] SP1 =
 		{
 			0x01010400, 0x00000000, 0x00010000, 0x01010404,
 			0x01010004, 0x00010404, 0x00000004, 0x00010000,
@@ -160,7 +164,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x00010004, 0x00010400, 0x00000000, 0x01010004
 		};
 
-		private static readonly uint[] SP2 =
+		static readonly uint[] SP2 =
 		{
 			0x80108020, 0x80008000, 0x00008000, 0x00108020,
 			0x00100000, 0x00000020, 0x80100020, 0x80008020,
@@ -180,7 +184,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x80000000, 0x80100020, 0x80108020, 0x00108000
 		};
 
-		private static readonly uint[] SP3 =
+		static readonly uint[] SP3 =
 		{
 			0x00000208, 0x08020200, 0x00000000, 0x08020008,
 			0x08000200, 0x00000000, 0x00020208, 0x08000200,
@@ -200,7 +204,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x00020208, 0x00000008, 0x08020008, 0x00020200
 		};
 
-		private static readonly uint[] SP4 =
+		static readonly uint[] SP4 =
 		{
 			0x00802001, 0x00002081, 0x00002081, 0x00000080,
 			0x00802080, 0x00800081, 0x00800001, 0x00002001,
@@ -220,7 +224,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x00000080, 0x00800000, 0x00002000, 0x00802080
 		};
 
-		private static readonly uint[] SP5 =
+		static readonly uint[] SP5 =
 		{
 			0x00000100, 0x02080100, 0x02080000, 0x42000100,
 			0x00080000, 0x00000100, 0x40000000, 0x02080000,
@@ -240,7 +244,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x00000000, 0x40080000, 0x02080100, 0x40000100
 		};
 
-		private static readonly uint[] SP6 =
+		static readonly uint[] SP6 =
 		{
 			0x20000010, 0x20400000, 0x00004000, 0x20404010,
 			0x20400000, 0x00000010, 0x20404010, 0x00400000,
@@ -260,7 +264,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x20404000, 0x20000000, 0x00400010, 0x20004010
 		};
 
-		private static readonly uint[] SP7 =
+		static readonly uint[] SP7 =
 		{
 			0x00200000, 0x04200002, 0x04000802, 0x00000000,
 			0x00000800, 0x04000802, 0x00200802, 0x04200800,
@@ -280,7 +284,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x04000002, 0x04000800, 0x00000800, 0x00200002
 		};
 
-		private static readonly uint[] SP8 =
+		static readonly uint[] SP8 =
 		{
 			0x10001040, 0x00001000, 0x00040000, 0x10041040,
 			0x10000000, 0x10001040, 0x00000040, 0x10000000,
@@ -319,7 +323,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				int l = pc1[j];
 
-				pc1m[j] = ((key[(uint)l >> 3] & bytebit[l & 07]) != 0);
+				pc1m[j] = (key[(uint)l >> 3] & bytebit[l & 07]) != 0;
 			}
 
 			for (int i = 0; i < 16; i++)
@@ -410,16 +414,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			work = ((left >> 4) ^ right) & 0x0f0f0f0f;
 			right ^= work;
-			left ^= (work << 4);
+			left ^= work << 4;
 			work = ((left >> 16) ^ right) & 0x0000ffff;
 			right ^= work;
-			left ^= (work << 16);
+			left ^= work << 16;
 			work = ((right >> 2) ^ left) & 0x33333333;
 			left ^= work;
-			right ^= (work << 2);
+			right ^= work << 2;
 			work = ((right >> 8) ^ left) & 0x00ff00ff;
 			left ^= work;
-			right ^= (work << 8);
+			right ^= work << 8;
 			right = (right << 1) | (right >> 31);
 			work = (left ^ right) & 0xaaaaaaaa;
 			left ^= work;
@@ -463,16 +467,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			left = (left << 31) | (left >> 1);
 			work = ((left >> 8) ^ right) & 0x00ff00ff;
 			right ^= work;
-			left ^= (work << 8);
+			left ^= work << 8;
 			work = ((left >> 2) ^ right) & 0x33333333;
 			right ^= work;
-			left ^= (work << 2);
+			left ^= work << 2;
 			work = ((right >> 16) ^ left) & 0x0000ffff;
 			left ^= work;
-			right ^= (work << 16);
+			right ^= work << 16;
 			work = ((right >> 4) ^ left) & 0x0f0f0f0f;
 			left ^= work;
-			right ^= (work << 4);
+			right ^= work << 4;
 
 			hi32 = right;
 			lo32 = left;

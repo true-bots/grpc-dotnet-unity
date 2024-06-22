@@ -7,11 +7,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
 	public sealed class Srp6GroupParameters
 	{
-		private readonly BigInteger n, g;
+		readonly BigInteger n, g;
 
 		public Srp6GroupParameters(BigInteger N, BigInteger g)
 		{
-			this.n = N;
+			n = N;
 			this.g = g;
 		}
 

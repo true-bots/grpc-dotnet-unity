@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class SimpleAttributeTableGenerator
 		: CmsAttributeTableGenerator
 	{
-		private readonly AttributeTable attributes;
+		readonly AttributeTable attributes;
 
 		public SimpleAttributeTableGenerator(
 			AttributeTable attributes)

@@ -21,7 +21,7 @@ using System.Reflection;
 
 namespace BestHTTP.JSON.LitJson
 {
-	internal struct PropertyMetadata
+	struct PropertyMetadata
 	{
 		public MemberInfo Info;
 		public bool IsField;
@@ -29,11 +29,11 @@ namespace BestHTTP.JSON.LitJson
 	}
 
 
-	internal struct ArrayMetadata
+	struct ArrayMetadata
 	{
-		private Type element_type;
-		private bool is_array;
-		private bool is_list;
+		Type element_type;
+		bool is_array;
+		bool is_list;
 
 
 		public Type ElementType
@@ -41,7 +41,9 @@ namespace BestHTTP.JSON.LitJson
 			get
 			{
 				if (element_type == null)
+				{
 					return typeof(JsonData);
+				}
 
 				return element_type;
 			}
@@ -63,12 +65,12 @@ namespace BestHTTP.JSON.LitJson
 	}
 
 
-	internal struct ObjectMetadata
+	struct ObjectMetadata
 	{
-		private Type element_type;
-		private bool is_dictionary;
+		Type element_type;
+		bool is_dictionary;
 
-		private IDictionary<string, PropertyMetadata> properties;
+		IDictionary<string, PropertyMetadata> properties;
 
 
 		public Type ElementType
@@ -76,7 +78,9 @@ namespace BestHTTP.JSON.LitJson
 			get
 			{
 				if (element_type == null)
+				{
 					return typeof(JsonData);
+				}
 
 				return element_type;
 			}
@@ -98,11 +102,11 @@ namespace BestHTTP.JSON.LitJson
 	}
 
 
-	internal delegate void ExporterFunc(object obj, JsonWriter writer);
+	delegate void ExporterFunc(object obj, JsonWriter writer);
 
 	public delegate void ExporterFunc<T>(T obj, JsonWriter writer);
 
-	internal delegate object ImporterFunc(object input);
+	delegate object ImporterFunc(object input);
 
 	public delegate TValue ImporterFunc<TJson, TValue>(TJson input);
 
@@ -113,37 +117,37 @@ namespace BestHTTP.JSON.LitJson
 	{
 		#region Fields
 
-		private static readonly int max_nesting_depth;
+		static readonly int max_nesting_depth;
 
-		private static readonly IFormatProvider datetime_format;
+		static readonly IFormatProvider datetime_format;
 
-		private static readonly IDictionary<Type, ExporterFunc> base_exporters_table;
-		private static readonly IDictionary<Type, ExporterFunc> custom_exporters_table;
+		static readonly IDictionary<Type, ExporterFunc> base_exporters_table;
+		static readonly IDictionary<Type, ExporterFunc> custom_exporters_table;
 
-		private static readonly IDictionary<Type,
+		static readonly IDictionary<Type,
 			IDictionary<Type, ImporterFunc>> base_importers_table;
 
-		private static readonly IDictionary<Type,
+		static readonly IDictionary<Type,
 			IDictionary<Type, ImporterFunc>> custom_importers_table;
 
-		private static readonly IDictionary<Type, ArrayMetadata> array_metadata;
-		private static readonly object array_metadata_lock = new Object();
+		static readonly IDictionary<Type, ArrayMetadata> array_metadata;
+		static readonly object array_metadata_lock = new object();
 
-		private static readonly IDictionary<Type,
+		static readonly IDictionary<Type,
 			IDictionary<Type, MethodInfo>> conv_ops;
 
-		private static readonly object conv_ops_lock = new Object();
+		static readonly object conv_ops_lock = new object();
 
-		private static readonly IDictionary<Type, ObjectMetadata> object_metadata;
-		private static readonly object object_metadata_lock = new Object();
+		static readonly IDictionary<Type, ObjectMetadata> object_metadata;
+		static readonly object object_metadata_lock = new object();
 
-		private static readonly IDictionary<Type,
+		static readonly IDictionary<Type,
 			IList<PropertyMetadata>> type_properties;
 
-		private static readonly object type_properties_lock = new Object();
+		static readonly object type_properties_lock = new object();
 
-		private static readonly JsonWriter static_writer;
-		private static readonly object static_writer_lock = new Object();
+		static readonly JsonWriter static_writer;
+		static readonly object static_writer_lock = new object();
 
 		#endregion
 
@@ -180,7 +184,7 @@ namespace BestHTTP.JSON.LitJson
 
 		#region Private Helper Mehtods
 
-		private static bool HasInterface(Type type, string name)
+		static bool HasInterface(Type type, string name)
 		{
 #if NETFX_CORE
             foreach (Type type1 in IntrospectionExtensions.GetTypeInfo(type).ImplementedInterfaces)
@@ -220,30 +224,40 @@ namespace BestHTTP.JSON.LitJson
 
 		#region Private Methods
 
-		private static void AddArrayMetadata(Type type)
+		static void AddArrayMetadata(Type type)
 		{
 			if (array_metadata.ContainsKey(type))
+			{
 				return;
+			}
 
 			ArrayMetadata data = new ArrayMetadata();
 
 			data.IsArray = type.IsArray;
 
 			if (HasInterface(type, "System.Collections.IList"))
+			{
 				data.IsList = true;
+			}
 
 			foreach (PropertyInfo p_info in GetPublicInstanceProperties(type))
 			{
 				if (p_info.Name != "Item")
+				{
 					continue;
+				}
 
 				ParameterInfo[] parameters = p_info.GetIndexParameters();
 
 				if (parameters.Length != 1)
+				{
 					continue;
+				}
 
 				if (parameters[0].ParameterType == typeof(int))
+				{
 					data.ElementType = p_info.PropertyType;
+				}
 			}
 
 			lock (array_metadata_lock)
@@ -259,15 +273,19 @@ namespace BestHTTP.JSON.LitJson
 			}
 		}
 
-		private static void AddObjectMetadata(Type type)
+		static void AddObjectMetadata(Type type)
 		{
 			if (object_metadata.ContainsKey(type))
+			{
 				return;
+			}
 
 			ObjectMetadata data = new ObjectMetadata();
 
 			if (HasInterface(type, "System.Collections.IDictionary"))
+			{
 				data.IsDictionary = true;
+			}
 
 			data.Properties = new Dictionary<string, PropertyMetadata>(StringComparer.OrdinalIgnoreCase);
 
@@ -278,10 +296,14 @@ namespace BestHTTP.JSON.LitJson
 					ParameterInfo[] parameters = p_info.GetIndexParameters();
 
 					if (parameters.Length != 1)
+					{
 						continue;
+					}
 
 					if (parameters[0].ParameterType == typeof(string))
+					{
 						data.ElementType = p_info.PropertyType;
+					}
 
 					continue;
 				}
@@ -307,7 +329,9 @@ namespace BestHTTP.JSON.LitJson
 				p_data.Type = f_info.FieldType;
 
 				if (!data.Properties.ContainsKey(f_info.Name))
+				{
 					data.Properties.Add(f_info.Name, p_data);
+				}
 			}
 
 			lock (object_metadata_lock)
@@ -323,17 +347,21 @@ namespace BestHTTP.JSON.LitJson
 			}
 		}
 
-		private static void AddTypeProperties(Type type)
+		static void AddTypeProperties(Type type)
 		{
 			if (type_properties.ContainsKey(type))
+			{
 				return;
+			}
 
 			IList<PropertyMetadata> props = new List<PropertyMetadata>();
 
 			foreach (PropertyInfo p_info in GetPublicInstanceProperties(type))
 			{
 				if (p_info.Name == "Item")
+				{
 					continue;
+				}
 
 				PropertyMetadata p_data = new PropertyMetadata();
 				p_data.Info = p_info;
@@ -369,16 +397,20 @@ namespace BestHTTP.JSON.LitJson
 			}
 		}
 
-		private static MethodInfo GetConvOp(Type t1, Type t2)
+		static MethodInfo GetConvOp(Type t1, Type t2)
 		{
 			lock (conv_ops_lock)
 			{
 				if (!conv_ops.ContainsKey(t1))
+				{
 					conv_ops.Add(t1, new Dictionary<Type, MethodInfo>());
+				}
 			}
 
 			if (conv_ops[t1].ContainsKey(t2))
+			{
 				return conv_ops[t1][t2];
+			}
 
 			MethodInfo op =
 #if NETFX_CORE
@@ -402,12 +434,14 @@ namespace BestHTTP.JSON.LitJson
 			return op;
 		}
 
-		private static object ReadValue(Type inst_type, JsonReader reader)
+		static object ReadValue(Type inst_type, JsonReader reader)
 		{
 			reader.Read();
 
 			if (reader.Token == JsonToken.ArrayEnd)
+			{
 				return null;
+			}
 
 			Type underlying_type = Nullable.GetUnderlyingType(inst_type);
 			Type value_type = underlying_type ?? inst_type;
@@ -419,9 +453,11 @@ namespace BestHTTP.JSON.LitJson
 #else
 				if (inst_type.IsClass || underlying_type != null)
 #endif
+				{
 					return null;
+				}
 
-				throw new JsonException(String.Format(
+				throw new JsonException(string.Format(
 					"Can't assign null to an instance of type {0}",
 					inst_type));
 			}
@@ -439,7 +475,9 @@ namespace BestHTTP.JSON.LitJson
 #else
 				if (value_type.IsAssignableFrom(json_type))
 #endif
+				{
 					return reader.Value;
+				}
 
 				// If there's a custom importer that fits, use it
 				if (custom_importers_table.ContainsKey(json_type) &&
@@ -469,17 +507,21 @@ namespace BestHTTP.JSON.LitJson
 #else
 				if (value_type.IsEnum)
 #endif
+				{
 					return Enum.ToObject(value_type, reader.Value);
+				}
 
 				// Try using an implicit conversion operator
 				MethodInfo conv_op = GetConvOp(value_type, json_type);
 
 				if (conv_op != null)
+				{
 					return conv_op.Invoke(null,
 						new object[] { reader.Value });
+				}
 
 				// No luck
-				throw new JsonException(String.Format(
+				throw new JsonException(string.Format(
 					"Can't assign value '{0}' (type {1}) to type {2}",
 					reader.Value, json_type, inst_type));
 			}
@@ -489,15 +531,19 @@ namespace BestHTTP.JSON.LitJson
 			if (reader.Token == JsonToken.ArrayStart)
 			{
 				if (inst_type.FullName == "System.Object")
+				{
 					inst_type = typeof(object[]);
+				}
 
 				AddArrayMetadata(inst_type);
 				ArrayMetadata t_data = array_metadata[inst_type];
 
 				if (!t_data.IsArray && !t_data.IsList)
-					throw new JsonException(String.Format(
+				{
+					throw new JsonException(string.Format(
 						"Type {0} can't act as an array",
 						inst_type));
+				}
 
 				IList list;
 				Type elem_type;
@@ -509,7 +555,7 @@ namespace BestHTTP.JSON.LitJson
 				}
 				else
 				{
-					list = new System.Collections.Generic.List<object>();
+					list = new List<object>();
 					elem_type = inst_type.GetElementType();
 				}
 
@@ -519,7 +565,9 @@ namespace BestHTTP.JSON.LitJson
 				{
 					object item = ReadValue(elem_type, reader);
 					if (item == null && reader.Token == JsonToken.ArrayEnd)
+					{
 						break;
+					}
 
 					list.Add(item);
 				}
@@ -530,15 +578,21 @@ namespace BestHTTP.JSON.LitJson
 					instance = Array.CreateInstance(elem_type, n);
 
 					for (int i = 0; i < n; i++)
+					{
 						((Array)instance).SetValue(list[i], i);
+					}
 				}
 				else
+				{
 					instance = list;
+				}
 			}
 			else if (reader.Token == JsonToken.ObjectStart)
 			{
-				if (inst_type == typeof(System.Object))
+				if (inst_type == typeof(object))
+				{
 					value_type = inst_type = typeof(Dictionary<string, object>);
+				}
 
 				AddObjectMetadata(value_type);
 				ObjectMetadata t_data = object_metadata[value_type];
@@ -550,7 +604,9 @@ namespace BestHTTP.JSON.LitJson
 					reader.Read();
 
 					if (reader.Token == JsonToken.ObjectEnd)
+					{
 						break;
+					}
 
 					string property = (string)reader.Value;
 
@@ -570,12 +626,16 @@ namespace BestHTTP.JSON.LitJson
 								(PropertyInfo)prop_data.Info;
 
 							if (p_info.CanWrite)
+							{
 								p_info.SetValue(
 									instance,
 									ReadValue(prop_data.Type, reader),
 									null);
+							}
 							else
+							{
 								ReadValue(prop_data.Type, reader);
+							}
 						}
 					}
 					else
@@ -584,7 +644,7 @@ namespace BestHTTP.JSON.LitJson
 						{
 							if (!reader.SkipNonMembers)
 							{
-								throw new JsonException(String.Format(
+								throw new JsonException(string.Format(
 									"The type {0} doesn't have the " +
 									"property '{1}'",
 									inst_type, property));
@@ -606,14 +666,16 @@ namespace BestHTTP.JSON.LitJson
 			return instance;
 		}
 
-		private static IJsonWrapper ReadValue(WrapperFactory factory,
+		static IJsonWrapper ReadValue(WrapperFactory factory,
 			JsonReader reader)
 		{
 			reader.Read();
 
 			if (reader.Token == JsonToken.ArrayEnd ||
 			    reader.Token == JsonToken.Null)
+			{
 				return null;
+			}
 
 			IJsonWrapper instance = factory();
 
@@ -655,7 +717,9 @@ namespace BestHTTP.JSON.LitJson
 				{
 					IJsonWrapper item = ReadValue(factory, reader);
 					if (item == null && reader.Token == JsonToken.ArrayEnd)
+					{
 						break;
+					}
 
 					((IList)instance).Add(item);
 				}
@@ -669,7 +733,9 @@ namespace BestHTTP.JSON.LitJson
 					reader.Read();
 
 					if (reader.Token == JsonToken.ObjectEnd)
+					{
 						break;
+					}
 
 					string property = (string)reader.Value;
 
@@ -681,13 +747,13 @@ namespace BestHTTP.JSON.LitJson
 			return instance;
 		}
 
-		private static void ReadSkip(JsonReader reader)
+		static void ReadSkip(JsonReader reader)
 		{
 			ToWrapper(
 				delegate { return new JsonMockWrapper(); }, reader);
 		}
 
-		private static void RegisterBaseExporters()
+		static void RegisterBaseExporters()
 		{
 			base_exporters_table[typeof(byte)] =
 				delegate(object obj, JsonWriter writer) { writer.Write(Convert.ToInt32((byte)obj)); };
@@ -724,7 +790,7 @@ namespace BestHTTP.JSON.LitJson
 				delegate(object obj, JsonWriter writer) { writer.Write(((DateTimeOffset)obj).ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz", datetime_format)); };
 		}
 
-		private static void RegisterBaseImporters()
+		static void RegisterBaseImporters()
 		{
 			ImporterFunc importer;
 
@@ -789,25 +855,29 @@ namespace BestHTTP.JSON.LitJson
 				typeof(DateTimeOffset), importer);
 		}
 
-		private static void RegisterImporter(
+		static void RegisterImporter(
 			IDictionary<Type, IDictionary<Type, ImporterFunc>> table,
 			Type json_type, Type value_type, ImporterFunc importer)
 		{
 			if (!table.ContainsKey(json_type))
+			{
 				table.Add(json_type, new Dictionary<Type, ImporterFunc>());
+			}
 
 			table[json_type][value_type] = importer;
 		}
 
-		private static void WriteValue(object obj, JsonWriter writer,
+		static void WriteValue(object obj, JsonWriter writer,
 			bool writer_is_private,
 			int depth)
 		{
 			if (depth > max_nesting_depth)
+			{
 				throw new JsonException(
-					String.Format("Max allowed object depth reached while " +
+					string.Format("Max allowed object depth reached while " +
 					              "trying to export from type {0}",
 						obj.GetType()));
+			}
 
 			if (obj == null)
 			{
@@ -818,44 +888,48 @@ namespace BestHTTP.JSON.LitJson
 			if (obj is IJsonWrapper)
 			{
 				if (writer_is_private)
+				{
 					writer.TextWriter.Write(((IJsonWrapper)obj).ToJson());
+				}
 				else
+				{
 					((IJsonWrapper)obj).ToJson(writer);
+				}
 
 				return;
 			}
 
-			if (obj is String)
+			if (obj is string)
 			{
 				writer.Write((string)obj);
 				return;
 			}
 
-			if (obj is Double)
+			if (obj is double)
 			{
 				writer.Write((double)obj);
 				return;
 			}
 
-			if (obj is Single)
+			if (obj is float)
 			{
 				writer.Write((float)obj);
 				return;
 			}
 
-			if (obj is Int32)
+			if (obj is int)
 			{
 				writer.Write((int)obj);
 				return;
 			}
 
-			if (obj is Boolean)
+			if (obj is bool)
 			{
 				writer.Write((bool)obj);
 				return;
 			}
 
-			if (obj is Int64)
+			if (obj is long)
 			{
 				writer.Write((long)obj);
 				return;
@@ -866,7 +940,9 @@ namespace BestHTTP.JSON.LitJson
 				writer.WriteArrayStart();
 
 				foreach (object elem in (Array)obj)
+				{
 					WriteValue(elem, writer, writer_is_private, depth + 1);
+				}
 
 				writer.WriteArrayEnd();
 
@@ -877,19 +953,22 @@ namespace BestHTTP.JSON.LitJson
 			{
 				writer.WriteArrayStart();
 				foreach (object elem in (IList)obj)
+				{
 					WriteValue(elem, writer, writer_is_private, depth + 1);
+				}
+
 				writer.WriteArrayEnd();
 
 				return;
 			}
 
-			var iDictionary = obj as IDictionary;
+			IDictionary iDictionary = obj as IDictionary;
 			if (iDictionary != null)
 			{
 				writer.WriteObjectStart();
 				foreach (DictionaryEntry entity in iDictionary)
 				{
-					var propertyName = entity.Key as string ?? Convert.ToString(entity.Key, CultureInfo.InvariantCulture);
+					string propertyName = entity.Key as string ?? Convert.ToString(entity.Key, CultureInfo.InvariantCulture);
 					writer.WritePropertyName(propertyName);
 					WriteValue(entity.Value, writer, writer_is_private,
 						depth + 1);
@@ -928,9 +1007,13 @@ namespace BestHTTP.JSON.LitJson
 				if (e_type == typeof(long)
 				    || e_type == typeof(uint)
 				    || e_type == typeof(ulong))
+				{
 					writer.Write((ulong)obj);
+				}
 				else
+				{
 					writer.Write((int)obj);
+				}
 
 				return;
 			}

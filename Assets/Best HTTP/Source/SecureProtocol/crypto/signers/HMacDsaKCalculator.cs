@@ -15,11 +15,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class HMacDsaKCalculator
 		: IDsaKCalculator
 	{
-		private readonly HMac hMac;
-		private readonly byte[] K;
-		private readonly byte[] V;
+		readonly HMac hMac;
+		readonly byte[] K;
+		readonly byte[] V;
 
-		private BigInteger n;
+		BigInteger n;
 
 		/**
 		 * Base constructor.
@@ -28,9 +28,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		 */
 		public HMacDsaKCalculator(IDigest digest)
 		{
-			this.hMac = new HMac(digest);
-			this.V = new byte[hMac.GetMacSize()];
-			this.K = new byte[hMac.GetMacSize()];
+			hMac = new HMac(digest);
+			V = new byte[hMac.GetMacSize()];
+			K = new byte[hMac.GetMacSize()];
 		}
 
 		public virtual bool IsDeterministic
@@ -123,7 +123,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				BigInteger k = BitsToInt(t);
 
 				if (k.SignValue > 0 && k.CompareTo(n) < 0)
+				{
 					return k;
+				}
 
 				hMac.BlockUpdate(V, 0, V.Length);
 				hMac.Update(0x00);
@@ -151,7 +153,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		{
 		}
 
-		private BigInteger BitsToInt(byte[] t)
+		BigInteger BitsToInt(byte[] t)
 		{
 			BigInteger v = new BigInteger(1, t);
 

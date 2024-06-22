@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class TrustPacket
 		: ContainedPacket
 	{
-		private readonly byte[] levelAndTrustAmount;
+		readonly byte[] levelAndTrustAmount;
 
 		public TrustPacket(
 			BcpgInputStream bcpgIn)
@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public TrustPacket(
 			int trustCode)
 		{
-			this.levelAndTrustAmount = new byte[] { (byte)trustCode };
+			levelAndTrustAmount = new byte[] { (byte)trustCode };
 		}
 
 		public byte[] GetLevelAndTrustAmount()

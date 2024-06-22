@@ -23,42 +23,44 @@ namespace BestHTTP.SignalRCore
 
 		public FutureState state
 		{
-			get { return this.future.state; }
+			get { return future.state; }
 		}
 
 		public TResult value
 		{
-			get { return this.future.value; }
+			get { return future.value; }
 		}
 
 		public Exception error
 		{
-			get { return this.future.error; }
+			get { return future.error; }
 		}
 
 		public bool IsCanceled { get; private set; }
 
 		public DownStreamItemController(HubConnection hub, long iId, IFuture<TResult> future)
 		{
-			this.hubConnection = hub;
-			this.invocationId = iId;
+			hubConnection = hub;
+			invocationId = iId;
 			this.future = future;
 		}
 
 		public void Cancel()
 		{
-			if (this.IsCanceled)
+			if (IsCanceled)
+			{
 				return;
+			}
 
-			this.IsCanceled = true;
+			IsCanceled = true;
 
 			Message message = new Message
 			{
 				type = MessageTypes.CancelInvocation,
-				invocationId = this.invocationId.ToString()
+				invocationId = invocationId.ToString()
 			};
 
-			this.hubConnection.SendMessage(message);
+			hubConnection.SendMessage(message);
 		}
 
 		public void Dispose()
@@ -69,22 +71,22 @@ namespace BestHTTP.SignalRCore
 
 		public IFuture<TResult> OnItem(FutureValueCallback<TResult> callback)
 		{
-			return this.future.OnItem(callback);
+			return future.OnItem(callback);
 		}
 
 		public IFuture<TResult> OnSuccess(FutureValueCallback<TResult> callback)
 		{
-			return this.future.OnSuccess(callback);
+			return future.OnSuccess(callback);
 		}
 
 		public IFuture<TResult> OnError(FutureErrorCallback callback)
 		{
-			return this.future.OnError(callback);
+			return future.OnError(callback);
 		}
 
 		public IFuture<TResult> OnComplete(FutureCallback<TResult> callback)
 		{
-			return this.future.OnComplete(callback);
+			return future.OnComplete(callback);
 		}
 	}
 
@@ -93,53 +95,55 @@ namespace BestHTTP.SignalRCore
 		public readonly long invocationId;
 		public readonly string[] streamingIds;
 		public readonly HubConnection hubConnection;
-		public readonly Futures.IFuture<TResult> future;
+		public readonly IFuture<TResult> future;
 
 		public string[] StreamingIDs
 		{
-			get { return this.streamingIds; }
+			get { return streamingIds; }
 		}
 
 		public HubConnection Hub
 		{
-			get { return this.hubConnection; }
+			get { return hubConnection; }
 		}
 
 		public FutureState state
 		{
-			get { return this.future.state; }
+			get { return future.state; }
 		}
 
 		public TResult value
 		{
-			get { return this.future.value; }
+			get { return future.value; }
 		}
 
 		public Exception error
 		{
-			get { return this.future.error; }
+			get { return future.error; }
 		}
 
 		public bool IsFinished { get; private set; }
 
 		public bool IsCanceled { get; private set; }
 
-		private object[] streams;
+		object[] streams;
 
 		public UpStreamItemController(HubConnection hub, long iId, string[] sIds, IFuture<TResult> future)
 		{
-			this.hubConnection = hub;
-			this.invocationId = iId;
-			this.streamingIds = sIds;
-			this.streams = new object[this.streamingIds.Length];
+			hubConnection = hub;
+			invocationId = iId;
+			streamingIds = sIds;
+			streams = new object[streamingIds.Length];
 			this.future = future;
 		}
 
 		public UploadChannel<TResult, T> GetUploadChannel<T>(int paramIdx)
 		{
-			var stream = this.streams[paramIdx] as UploadChannel<TResult, T>;
+			UploadChannel<TResult, T> stream = streams[paramIdx] as UploadChannel<TResult, T>;
 			if (stream == null)
-				this.streams[paramIdx] = stream = new UploadChannel<TResult, T>(this, paramIdx);
+			{
+				streams[paramIdx] = stream = new UploadChannel<TResult, T>(this, paramIdx);
+			}
 
 			return stream;
 		}
@@ -147,59 +151,65 @@ namespace BestHTTP.SignalRCore
 		public void UploadParam<T>(string streamId, T item)
 		{
 			if (streamId == null)
+			{
 				return;
+			}
 
-			var message = new Message
+			Message message = new Message
 			{
 				type = MessageTypes.StreamItem,
 				invocationId = streamId.ToString(),
-				item = item,
+				item = item
 			};
 
-			this.hubConnection.SendMessage(message);
+			hubConnection.SendMessage(message);
 		}
 
 		public void Finish()
 		{
-			if (!this.IsFinished)
+			if (!IsFinished)
 			{
-				this.IsFinished = true;
+				IsFinished = true;
 
-				for (int i = 0; i < this.streamingIds.Length; ++i)
-					if (this.streamingIds[i] != null)
+				for (int i = 0; i < streamingIds.Length; ++i)
+				{
+					if (streamingIds[i] != null)
 					{
-						var message = new Message
+						Message message = new Message
 						{
 							type = MessageTypes.Completion,
-							invocationId = this.streamingIds[i].ToString()
+							invocationId = streamingIds[i].ToString()
 						};
 
-						this.hubConnection.SendMessage(message);
+						hubConnection.SendMessage(message);
 					}
+				}
 			}
 		}
 
 		public void Cancel()
 		{
-			if (!this.IsFinished && !this.IsCanceled)
+			if (!IsFinished && !IsCanceled)
 			{
-				this.IsCanceled = true;
+				IsCanceled = true;
 
-				var message = new Message
+				Message message = new Message
 				{
 					type = MessageTypes.CancelInvocation,
-					invocationId = this.invocationId.ToString(),
+					invocationId = invocationId.ToString()
 				};
 
-				this.hubConnection.SendMessage(message);
+				hubConnection.SendMessage(message);
 
 				// Zero out the streaming ids, disabling any future message sending
-				Array.Clear(this.streamingIds, 0, this.streamingIds.Length);
+				Array.Clear(streamingIds, 0, streamingIds.Length);
 
 				// If it's also a down-stream, set it canceled.
-				var itemContainer = (this.future.value as StreamItemContainer<TResult>);
+				StreamItemContainer<TResult> itemContainer = future.value as StreamItemContainer<TResult>;
 				if (itemContainer != null)
+				{
 					itemContainer.IsCanceled = true;
+				}
 			}
 		}
 
@@ -212,22 +222,22 @@ namespace BestHTTP.SignalRCore
 
 		public IFuture<TResult> OnItem(FutureValueCallback<TResult> callback)
 		{
-			return this.future.OnItem(callback);
+			return future.OnItem(callback);
 		}
 
 		public IFuture<TResult> OnSuccess(FutureValueCallback<TResult> callback)
 		{
-			return this.future.OnSuccess(callback);
+			return future.OnSuccess(callback);
 		}
 
 		public IFuture<TResult> OnError(FutureErrorCallback callback)
 		{
-			return this.future.OnError(callback);
+			return future.OnError(callback);
 		}
 
 		public IFuture<TResult> OnComplete(FutureCallback<TResult> callback)
 		{
-			return this.future.OnComplete(callback);
+			return future.OnComplete(callback);
 		}
 	}
 
@@ -252,11 +262,13 @@ namespace BestHTTP.SignalRCore
 		/// </summary>
 		public bool IsFinished
 		{
-			get { return this.Controller.StreamingIDs[this.ParamIdx] == null; }
+			get { return Controller.StreamingIDs[ParamIdx] == null; }
 			private set
 			{
 				if (value)
-					this.Controller.StreamingIDs[this.ParamIdx] = null;
+				{
+					Controller.StreamingIDs[ParamIdx] = null;
+				}
 			}
 		}
 
@@ -265,13 +277,13 @@ namespace BestHTTP.SignalRCore
 		/// </summary>
 		public string StreamingId
 		{
-			get { return this.Controller.StreamingIDs[this.ParamIdx]; }
+			get { return Controller.StreamingIDs[ParamIdx]; }
 		}
 
 		internal UploadChannel(IUPloadItemController<TResult> ctrl, int paramIdx)
 		{
-			this.Controller = ctrl;
-			this.ParamIdx = paramIdx;
+			Controller = ctrl;
+			ParamIdx = paramIdx;
 		}
 
 		/// <summary>
@@ -279,9 +291,11 @@ namespace BestHTTP.SignalRCore
 		/// </summary>
 		public void Upload(T item)
 		{
-			string streamId = this.StreamingId;
+			string streamId = StreamingId;
 			if (streamId != null)
-				this.Controller.UploadParam(streamId, item);
+			{
+				Controller.UploadParam(streamId, item);
+			}
 		}
 
 		/// <summary>
@@ -289,10 +303,10 @@ namespace BestHTTP.SignalRCore
 		/// </summary>
 		public void Cancel()
 		{
-			if (!this.IsFinished)
+			if (!IsFinished)
 			{
 				// Cancel all upload stream, cancel will also set streaming ids to 0.
-				this.Controller.Cancel();
+				Controller.Cancel();
 			}
 		}
 
@@ -301,29 +315,32 @@ namespace BestHTTP.SignalRCore
 		/// </summary>
 		public void Finish()
 		{
-			if (!this.IsFinished)
+			if (!IsFinished)
 			{
-				string streamId = this.StreamingId;
+				string streamId = StreamingId;
 				if (streamId != null)
 				{
 					// this will set the streaming id to 0
-					this.IsFinished = true;
+					IsFinished = true;
 
-					var message = new Message
+					Message message = new Message
 					{
 						type = MessageTypes.Completion,
 						invocationId = streamId.ToString()
 					};
 
-					this.Controller.Hub.SendMessage(message);
+					Controller.Hub.SendMessage(message);
 				}
 			}
 		}
 
 		void IDisposable.Dispose()
 		{
-			if (!this.IsFinished)
+			if (!IsFinished)
+			{
 				Finish();
+			}
+
 			GC.SuppressFinalize(this);
 		}
 	}

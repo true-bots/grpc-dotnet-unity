@@ -19,11 +19,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.BC
 	public class LinkedCertificate
 		: Asn1Encodable
 	{
-		private readonly DigestInfo mDigest;
-		private readonly GeneralName mCertLocation;
+		readonly DigestInfo mDigest;
+		readonly GeneralName mCertLocation;
 
-		private X509Name mCertIssuer;
-		private GeneralNames mCACerts;
+		X509Name mCertIssuer;
+		GeneralNames mCACerts;
 
 		public LinkedCertificate(DigestInfo digest, GeneralName certLocation)
 			: this(digest, certLocation, null, null)
@@ -32,16 +32,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.BC
 
 		public LinkedCertificate(DigestInfo digest, GeneralName certLocation, X509Name certIssuer, GeneralNames caCerts)
 		{
-			this.mDigest = digest;
-			this.mCertLocation = certLocation;
-			this.mCertIssuer = certIssuer;
-			this.mCACerts = caCerts;
+			mDigest = digest;
+			mCertLocation = certLocation;
+			mCertIssuer = certIssuer;
+			mCACerts = caCerts;
 		}
 
-		private LinkedCertificate(Asn1Sequence seq)
+		LinkedCertificate(Asn1Sequence seq)
 		{
-			this.mDigest = DigestInfo.GetInstance(seq[0]);
-			this.mCertLocation = GeneralName.GetInstance(seq[1]);
+			mDigest = DigestInfo.GetInstance(seq[0]);
+			mCertLocation = GeneralName.GetInstance(seq[1]);
 
 			for (int i = 2; i < seq.Count; ++i)
 			{
@@ -50,10 +50,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.BC
 				switch (tagged.TagNo)
 				{
 					case 0:
-						this.mCertIssuer = X509Name.GetInstance(tagged, false);
+						mCertIssuer = X509Name.GetInstance(tagged, false);
 						break;
 					case 1:
-						this.mCACerts = GeneralNames.GetInstance(tagged, false);
+						mCACerts = GeneralNames.GetInstance(tagged, false);
 						break;
 					default:
 						throw new ArgumentException("unknown tag in tagged field");
@@ -64,9 +64,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.BC
 		public static LinkedCertificate GetInstance(object obj)
 		{
 			if (obj is LinkedCertificate)
+			{
 				return (LinkedCertificate)obj;
+			}
+
 			if (obj != null)
+			{
 				return new LinkedCertificate(Asn1Sequence.GetInstance(obj));
+			}
+
 			return null;
 		}
 

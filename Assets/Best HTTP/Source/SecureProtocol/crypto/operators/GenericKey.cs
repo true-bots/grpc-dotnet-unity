@@ -7,12 +7,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 {
 	public class GenericKey
 	{
-		private readonly AlgorithmIdentifier algorithmIdentifier;
-		private readonly object representation;
+		readonly AlgorithmIdentifier algorithmIdentifier;
+		readonly object representation;
 
 		public GenericKey(object representation)
 		{
-			this.algorithmIdentifier = null;
+			algorithmIdentifier = null;
 			this.representation = representation;
 		}
 

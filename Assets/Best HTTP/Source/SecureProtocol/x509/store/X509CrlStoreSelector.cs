@@ -16,18 +16,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 	{
 		// TODO Missing criteria?
 
-		private X509Certificate certificateChecking;
-		private DateTime? dateAndTime;
-		private IList<X509Name> issuers;
-		private BigInteger maxCrlNumber;
-		private BigInteger minCrlNumber;
+		X509Certificate certificateChecking;
+		DateTime? dateAndTime;
+		IList<X509Name> issuers;
+		BigInteger maxCrlNumber;
+		BigInteger minCrlNumber;
 
-		private X509V2AttributeCertificate attrCertChecking;
-		private bool completeCrlEnabled;
-		private bool deltaCrlIndicatorEnabled;
-		private byte[] issuingDistributionPoint;
-		private bool issuingDistributionPointEnabled;
-		private BigInteger maxBaseCrlNumber;
+		X509V2AttributeCertificate attrCertChecking;
+		bool completeCrlEnabled;
+		bool deltaCrlIndicatorEnabled;
+		byte[] issuingDistributionPoint;
+		bool issuingDistributionPointEnabled;
+		BigInteger maxBaseCrlNumber;
 
 		public X509CrlStoreSelector()
 		{
@@ -36,18 +36,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public X509CrlStoreSelector(
 			X509CrlStoreSelector o)
 		{
-			this.certificateChecking = o.CertificateChecking;
-			this.dateAndTime = o.DateAndTime;
-			this.issuers = o.Issuers;
-			this.maxCrlNumber = o.MaxCrlNumber;
-			this.minCrlNumber = o.MinCrlNumber;
+			certificateChecking = o.CertificateChecking;
+			dateAndTime = o.DateAndTime;
+			issuers = o.Issuers;
+			maxCrlNumber = o.MaxCrlNumber;
+			minCrlNumber = o.MinCrlNumber;
 
-			this.deltaCrlIndicatorEnabled = o.DeltaCrlIndicatorEnabled;
-			this.completeCrlEnabled = o.CompleteCrlEnabled;
-			this.maxBaseCrlNumber = o.MaxBaseCrlNumber;
-			this.attrCertChecking = o.AttrCertChecking;
-			this.issuingDistributionPointEnabled = o.IssuingDistributionPointEnabled;
-			this.issuingDistributionPoint = o.IssuingDistributionPoint;
+			deltaCrlIndicatorEnabled = o.DeltaCrlIndicatorEnabled;
+			completeCrlEnabled = o.CompleteCrlEnabled;
+			maxBaseCrlNumber = o.MaxBaseCrlNumber;
+			attrCertChecking = o.AttrCertChecking;
+			issuingDistributionPointEnabled = o.IssuingDistributionPointEnabled;
+			issuingDistributionPoint = o.IssuingDistributionPoint;
 		}
 
 		public virtual object Clone()
@@ -102,7 +102,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public X509V2AttributeCertificate AttrCertChecking
 		{
 			get { return attrCertChecking; }
-			set { this.attrCertChecking = value; }
+			set { attrCertChecking = value; }
 		}
 
 		/**
@@ -114,7 +114,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public bool CompleteCrlEnabled
 		{
 			get { return completeCrlEnabled; }
-			set { this.completeCrlEnabled = value; }
+			set { completeCrlEnabled = value; }
 		}
 
 		/**
@@ -127,7 +127,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public bool DeltaCrlIndicatorEnabled
 		{
 			get { return deltaCrlIndicatorEnabled; }
-			set { this.deltaCrlIndicatorEnabled = value; }
+			set { deltaCrlIndicatorEnabled = value; }
 		}
 
 		/**
@@ -151,7 +151,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public byte[] IssuingDistributionPoint
 		{
 			get { return Arrays.Clone(issuingDistributionPoint); }
-			set { this.issuingDistributionPoint = Arrays.Clone(value); }
+			set { issuingDistributionPoint = Arrays.Clone(value); }
 		}
 
 		/**
@@ -166,7 +166,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public bool IssuingDistributionPointEnabled
 		{
 			get { return issuingDistributionPointEnabled; }
-			set { this.issuingDistributionPointEnabled = value; }
+			set { issuingDistributionPointEnabled = value; }
 		}
 
 		/**
@@ -178,13 +178,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public BigInteger MaxBaseCrlNumber
 		{
 			get { return maxBaseCrlNumber; }
-			set { this.maxBaseCrlNumber = value; }
+			set { maxBaseCrlNumber = value; }
 		}
 
 		public virtual bool Match(X509Crl c)
 		{
 			if (c == null)
+			{
 				return false;
+			}
 
 			if (dateAndTime != null)
 			{
@@ -193,7 +195,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 				DateTime? nu = c.NextUpdate;
 
 				if (dt.CompareTo(tu) < 0 || nu == null || dt.CompareTo(nu.Value) >= 0)
+				{
 					return false;
+				}
 			}
 
 			if (issuers != null)
@@ -212,23 +216,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 				}
 
 				if (!found)
+				{
 					return false;
+				}
 			}
 
 			if (maxCrlNumber != null || minCrlNumber != null)
 			{
 				Asn1OctetString extVal = c.GetExtensionValue(X509Extensions.CrlNumber);
 				if (extVal == null)
+				{
 					return false;
+				}
 
-				BigInteger cn = CrlNumber.GetInstance(
+				BigInteger cn = DerInteger.GetInstance(
 					X509ExtensionUtilities.FromExtensionValue(extVal)).PositiveValue;
 
 				if (maxCrlNumber != null && cn.CompareTo(maxCrlNumber) > 0)
+				{
 					return false;
+				}
 
 				if (minCrlNumber != null && cn.CompareTo(minCrlNumber) < 0)
+				{
 					return false;
+				}
 			}
 
 			DerInteger dci = null;
@@ -248,15 +260,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 			if (dci == null)
 			{
 				if (DeltaCrlIndicatorEnabled)
+				{
 					return false;
+				}
 			}
 			else
 			{
 				if (CompleteCrlEnabled)
+				{
 					return false;
+				}
 
 				if (maxBaseCrlNumber != null && dci.PositiveValue.CompareTo(maxBaseCrlNumber) > 0)
+				{
 					return false;
+				}
 			}
 
 			if (issuingDistributionPointEnabled)
@@ -265,12 +283,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 				if (issuingDistributionPoint == null)
 				{
 					if (idp != null)
+					{
 						return false;
+					}
 				}
 				else
 				{
 					if (!Arrays.AreEqual(idp.GetOctets(), issuingDistributionPoint))
+					{
 						return false;
+					}
 				}
 			}
 

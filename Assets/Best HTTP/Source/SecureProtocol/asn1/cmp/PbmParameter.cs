@@ -28,20 +28,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static PbmParameter GetInstance(object obj)
 		{
 			if (obj is PbmParameter pbmParameter)
+			{
 				return pbmParameter;
+			}
 
 			if (obj != null)
+			{
 				return new PbmParameter(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly Asn1OctetString m_salt;
-		private readonly AlgorithmIdentifier m_owf;
-		private readonly DerInteger m_iterationCount;
-		private readonly AlgorithmIdentifier m_mac;
+		readonly Asn1OctetString m_salt;
+		readonly AlgorithmIdentifier m_owf;
+		readonly DerInteger m_iterationCount;
+		readonly AlgorithmIdentifier m_mac;
 
-		private PbmParameter(Asn1Sequence seq)
+		PbmParameter(Asn1Sequence seq)
 		{
 			m_salt = Asn1OctetString.GetInstance(seq[0]);
 			m_owf = AlgorithmIdentifier.GetInstance(seq[1]);
@@ -63,13 +67,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_mac = mac;
 		}
 
-		public virtual DerInteger IterationCount => m_iterationCount;
+		public virtual DerInteger IterationCount
+		{
+			get { return m_iterationCount; }
+		}
 
-		public virtual AlgorithmIdentifier Mac => m_mac;
+		public virtual AlgorithmIdentifier Mac
+		{
+			get { return m_mac; }
+		}
 
-		public virtual AlgorithmIdentifier Owf => m_owf;
+		public virtual AlgorithmIdentifier Owf
+		{
+			get { return m_owf; }
+		}
 
-		public virtual Asn1OctetString Salt => m_salt;
+		public virtual Asn1OctetString Salt
+		{
+			get { return m_salt; }
+		}
 
 		/**
 		 * <pre>

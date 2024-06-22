@@ -21,7 +21,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 		/// <param name="explicitNG">(N, g) as a BigInteger array (N=[0], g=[1]).</param>
 		public void SetExplicitNG(BigInteger[] explicitNG)
 		{
-			this.m_explicitNG = (BigInteger[])explicitNG.Clone();
+			m_explicitNG = (BigInteger[])explicitNG.Clone();
 		}
 	}
 }

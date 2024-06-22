@@ -34,10 +34,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 	*
 	* @author <a href="mailto:keiron@aftexsw.com">Keiron Liddle</a>
 	*/
-	internal class CRC
+	class CRC
 	{
 		// Values are byte-reversed
-		private static readonly uint[] Crc32Table =
+		static readonly uint[] Crc32Table =
 		{
 			0x00000000, 0xB71DC104, 0x6E3B8209, 0xD926430D,
 			0xDC760413, 0x6B6BC517, 0xB24D861A, 0x0550471E,
@@ -102,10 +102,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			0x09FDB889, 0xBEE0798D, 0x67C63A80, 0xD0DBFB84,
 			0xD58BBC9A, 0x62967D9E, 0xBBB03E93, 0x0CADFF97,
 			0xB110B0AF, 0x060D71AB, 0xDF2B32A6, 0x6836F3A2,
-			0x6D66B4BC, 0xDA7B75B8, 0x035D36B5, 0xB440F7B1,
+			0x6D66B4BC, 0xDA7B75B8, 0x035D36B5, 0xB440F7B1
 		};
 
-		private uint m_value = 0U;
+		uint m_value = 0U;
 
 		internal void Initialise()
 		{
@@ -126,8 +126,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 		{
 			Debug.Assert(runLength >= 4);
 
-			uint inCh2 = (uint)inCh << 8 | inCh;
-			uint inCh4 = inCh2 << 16 | inCh2;
+			uint inCh2 = ((uint)inCh << 8) | inCh;
+			uint inCh4 = (inCh2 << 16) | inCh2;
 
 			do
 			{

@@ -11,10 +11,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 {
 	class PemParser
 	{
-		private readonly string _header1;
-		private readonly string _header2;
-		private readonly string _footer1;
-		private readonly string _footer2;
+		readonly string _header1;
+		readonly string _header2;
+		readonly string _footer1;
+		readonly string _footer2;
 
 		internal PemParser(
 			string type)
@@ -25,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			_footer2 = "-----END X509 " + type + "-----";
 		}
 
-		private string ReadLine(
+		string ReadLine(
 			Stream inStream)
 		{
 			int c;
@@ -33,7 +33,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			do
 			{
-				while (((c = inStream.ReadByte()) != '\r') && c != '\n' && (c >= 0))
+				while ((c = inStream.ReadByte()) != '\r' && c != '\n' && c >= 0)
 				{
 					if (c == '\r')
 					{
@@ -60,7 +60,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			while ((line = ReadLine(inStream)) != null)
 			{
-				if (Org.BouncyCastle.Utilities.Platform.StartsWith(line, _header1) || Org.BouncyCastle.Utilities.Platform.StartsWith(line, _header2))
+				if (Platform.StartsWith(line, _header1) || Platform.StartsWith(line, _header2))
 				{
 					break;
 				}
@@ -68,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			while ((line = ReadLine(inStream)) != null)
 			{
-				if (Org.BouncyCastle.Utilities.Platform.StartsWith(line, _footer1) || Org.BouncyCastle.Utilities.Platform.StartsWith(line, _footer2))
+				if (Platform.StartsWith(line, _footer1) || Platform.StartsWith(line, _footer2))
 				{
 					break;
 				}

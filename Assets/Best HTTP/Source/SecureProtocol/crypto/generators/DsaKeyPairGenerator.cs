@@ -19,20 +19,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class DsaKeyPairGenerator
 		: IAsymmetricCipherKeyPairGenerator
 	{
-		private static readonly BigInteger One = BigInteger.One;
+		static readonly BigInteger One = BigInteger.One;
 
-		private DsaKeyGenerationParameters param;
+		DsaKeyGenerationParameters param;
 
 		public void Init(
 			KeyGenerationParameters parameters)
 		{
 			if (parameters == null)
+			{
 				throw new ArgumentNullException("parameters");
+			}
 
 			// Note: If we start accepting instances of KeyGenerationParameters,
 			// must apply constraint checking on strength (see DsaParametersGenerator.Init)
 
-			this.param = (DsaKeyGenerationParameters)parameters;
+			param = (DsaKeyGenerationParameters)parameters;
 		}
 
 		public AsymmetricCipherKeyPair GenerateKeyPair()
@@ -47,7 +49,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				new DsaPrivateKeyParameters(x, dsaParams));
 		}
 
-		private static BigInteger GeneratePrivateKey(BigInteger q, SecureRandom random)
+		static BigInteger GeneratePrivateKey(BigInteger q, SecureRandom random)
 		{
 			// B.1.2 Key Pair Generation by Testing Candidates
 			int minWeight = q.BitLength >> 2;
@@ -65,7 +67,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			}
 		}
 
-		private static BigInteger CalculatePublicKey(BigInteger p, BigInteger g, BigInteger x)
+		static BigInteger CalculatePublicKey(BigInteger p, BigInteger g, BigInteger x)
 		{
 			return g.ModPow(x, p);
 		}

@@ -14,11 +14,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class SicBlockCipher
 		: IBlockCipherMode
 	{
-		private readonly IBlockCipher cipher;
-		private readonly int blockSize;
-		private readonly byte[] counter;
-		private readonly byte[] counterOut;
-		private byte[] IV;
+		readonly IBlockCipher cipher;
+		readonly int blockSize;
+		readonly byte[] counter;
+		readonly byte[] counterOut;
+		byte[] IV;
 
 		/**
 		* Basic constructor.
@@ -28,10 +28,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		public SicBlockCipher(IBlockCipher cipher)
 		{
 			this.cipher = cipher;
-			this.blockSize = cipher.GetBlockSize();
-			this.counter = new byte[blockSize];
-			this.counterOut = new byte[blockSize];
-			this.IV = new byte[blockSize];
+			blockSize = cipher.GetBlockSize();
+			counter = new byte[blockSize];
+			counterOut = new byte[blockSize];
+			IV = new byte[blockSize];
 		}
 
 		/**
@@ -39,7 +39,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		*
 		* @return the underlying block cipher that we are wrapping.
 		*/
-		public IBlockCipher UnderlyingCipher => cipher;
+		public IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		public virtual void Init(
 			bool forEncryption, //ignored by this CTR mode
@@ -47,16 +50,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		{
 			ParametersWithIV ivParam = parameters as ParametersWithIV;
 			if (ivParam == null)
+			{
 				throw new ArgumentException("CTR/SIC mode requires ParametersWithIV", "parameters");
+			}
 
-			this.IV = Arrays.Clone(ivParam.GetIV());
+			IV = Arrays.Clone(ivParam.GetIV());
 
 			if (blockSize < IV.Length)
+			{
 				throw new ArgumentException("CTR/SIC mode requires IV no greater than: " + blockSize + " bytes.");
+			}
 
 			int maxCounterSize = System.Math.Min(8, blockSize / 2);
 			if (blockSize - IV.Length > maxCounterSize)
+			{
 				throw new ArgumentException("CTR/SIC mode requires IV of at least: " + (blockSize - maxCounterSize) + " bytes.");
+			}
 
 			// if null it's an IV changed only.
 			if (ivParam.Parameters != null)

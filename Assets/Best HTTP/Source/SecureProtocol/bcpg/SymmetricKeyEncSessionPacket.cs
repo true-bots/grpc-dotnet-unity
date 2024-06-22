@@ -11,10 +11,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class SymmetricKeyEncSessionPacket
 		: ContainedPacket
 	{
-		private int version;
-		private SymmetricKeyAlgorithmTag encAlgorithm;
-		private S2k s2k;
-		private readonly byte[] secKeyData;
+		int version;
+		SymmetricKeyAlgorithmTag encAlgorithm;
+		S2k s2k;
+		readonly byte[] secKeyData;
 
 		public SymmetricKeyEncSessionPacket(
 			BcpgInputStream bcpgIn)
@@ -32,7 +32,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			S2k s2k,
 			byte[] secKeyData)
 		{
-			this.version = 4;
+			version = 4;
 			this.encAlgorithm = encAlgorithm;
 			this.s2k = s2k;
 			this.secKeyData = secKeyData;
@@ -73,7 +73,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public override void Encode(BcpgOutputStream bcpgOut)
 		{
 			MemoryStream bOut = new MemoryStream();
-			using (var pOut = new BcpgOutputStream(bOut))
+			using (BcpgOutputStream pOut = new BcpgOutputStream(bOut))
 			{
 				pOut.Write((byte)version, (byte)encAlgorithm);
 				pOut.WriteObject(s2k);

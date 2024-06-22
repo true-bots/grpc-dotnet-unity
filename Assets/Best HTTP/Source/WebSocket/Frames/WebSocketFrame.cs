@@ -6,6 +6,7 @@ using BestHTTP.PlatformSupport.Memory;
 using System.Runtime.CompilerServices;
 using BestHTTP.PlatformSupport.IL2CPP;
 using BestHTTP.Logger;
+using BestHTTP.WebSocket.Extensions;
 
 #if BESTHTTP_WITH_BURST
 using Unity.Burst;
@@ -50,106 +51,110 @@ namespace BestHTTP.WebSocket.Frames
 		}
 
 		public WebSocketFrame(WebSocket webSocket, WebSocketFrameTypes type, BufferSegment data, bool isFinal, bool useExtensions)
-			: this(webSocket, type, data, isFinal, useExtensions, copyData: true)
+			: this(webSocket, type, data, isFinal, useExtensions, true)
 		{
 		}
 
 		public WebSocketFrame(WebSocket webSocket, WebSocketFrameTypes type, BufferSegment data, bool isFinal, bool useExtensions, bool copyData)
 		{
-			this.Type = type;
-			this.IsFinal = isFinal;
-			this.Websocket = webSocket;
-			this.UseExtensions = useExtensions;
+			Type = type;
+			IsFinal = isFinal;
+			Websocket = webSocket;
+			UseExtensions = useExtensions;
 
-			this.Data = data;
+			Data = data;
 
-			if (this.Data.Data != null)
+			if (Data.Data != null)
 			{
 				if (copyData)
 				{
-					var from = this.Data;
+					BufferSegment from = Data;
 
-					var buffer = BufferPool.Get(this.Data.Count, true);
-					this.Data = new BufferSegment(buffer, 0, this.Data.Count);
+					byte[] buffer = BufferPool.Get(Data.Count, true);
+					Data = new BufferSegment(buffer, 0, Data.Count);
 
-					Array.Copy(from.Data, (int)from.Offset, this.Data.Data, this.Data.Offset, this.Data.Count);
+					Array.Copy(from.Data, (int)from.Offset, Data.Data, Data.Offset, Data.Count);
 				}
 			}
 			else
-				this.Data = BufferSegment.Empty;
+			{
+				Data = BufferSegment.Empty;
+			}
 
 			// First byte: Final Bit + Rsv flags + OpCode
 			byte finalBit = (byte)(IsFinal ? 0x80 : 0x0);
-			this.Header = (byte)(finalBit | (byte)Type);
+			Header = (byte)(finalBit | (byte)Type);
 		}
 
 		public override string ToString()
 		{
 			return string.Format("[WebSocketFrame Type: {0}, IsFinal: {1}, Header: {2:X2}, Data: {3}, UseExtensions: {4}]",
-				this.Type, this.IsFinal, this.Header, this.Data, this.UseExtensions);
+				Type, IsFinal, Header, Data, UseExtensions);
 		}
 
 		public void WriteTo(Action<BufferSegment, BufferSegment> callback, uint maxFragmentSize, bool mask, LoggingContext context)
 		{
 			DoExtensions();
 
-			if (HTTPManager.Logger.Level <= Logger.Loglevels.All)
+			if (HTTPManager.Logger.Level <= Loglevels.All)
+			{
 				HTTPManager.Logger.Verbose("WebSocketFrame", "WriteTo - Frame: " + ToString(), context);
+			}
 
-			if ((this.Type == WebSocketFrameTypes.Binary || this.Type == WebSocketFrameTypes.Text) && this.Data.Count > maxFragmentSize)
+			if ((Type == WebSocketFrameTypes.Binary || Type == WebSocketFrameTypes.Text) && Data.Count > maxFragmentSize)
 			{
 				FragmentAndSend(callback, maxFragmentSize, mask, context);
 			}
 			else
 			{
-				WriteFragment(callback, this.Type, this.Header, this.Data, mask, context);
+				WriteFragment(callback, Type, Header, Data, mask, context);
 			}
 		}
 
-		private void DoExtensions()
+		void DoExtensions()
 		{
-			if (this.UseExtensions && this.Websocket != null && this.Websocket.Extensions != null)
+			if (UseExtensions && Websocket != null && Websocket.Extensions != null)
 			{
-				for (int i = 0; i < this.Websocket.Extensions.Length; ++i)
+				for (int i = 0; i < Websocket.Extensions.Length; ++i)
 				{
-					var ext = this.Websocket.Extensions[i];
+					IExtension ext = Websocket.Extensions[i];
 					if (ext != null)
 					{
-						this.Header |= ext.GetFrameHeader(this, this.Header);
+						Header |= ext.GetFrameHeader(this, Header);
 						BufferSegment newData = ext.Encode(this);
 
-						if (newData != this.Data)
+						if (newData != Data)
 						{
-							BufferPool.Release(this.Data);
+							BufferPool.Release(Data);
 
-							this.Data = newData;
+							Data = newData;
 						}
 					}
 				}
 			}
 		}
 
-		private void FragmentAndSend(Action<BufferSegment, BufferSegment> callback, uint maxFragmentSize, bool mask, LoggingContext context)
+		void FragmentAndSend(Action<BufferSegment, BufferSegment> callback, uint maxFragmentSize, bool mask, LoggingContext context)
 		{
-			int pos = this.Data.Offset;
-			int endPos = this.Data.Offset + this.Data.Count;
+			int pos = Data.Offset;
+			int endPos = Data.Offset + Data.Count;
 
 			while (pos < endPos)
 			{
 				int chunkLength = Math.Min((int)maxFragmentSize, endPos - pos);
 
-				WriteFragment(callback: callback,
-					Type: pos == this.Data.Offset ? this.Type : WebSocketFrameTypes.Continuation,
-					IsFinal: pos + chunkLength >= this.Data.Count,
-					Data: this.Data.Slice((int)pos, (int)chunkLength),
-					mask: mask,
-					context: context);
+				WriteFragment(callback,
+					pos == Data.Offset ? Type : WebSocketFrameTypes.Continuation,
+					pos + chunkLength >= Data.Count,
+					Data.Slice((int)pos, (int)chunkLength),
+					mask,
+					context);
 
 				pos += chunkLength;
 			}
 		}
 
-		private static void WriteFragment(Action<BufferSegment, BufferSegment> callback, WebSocketFrameTypes Type, bool IsFinal, BufferSegment Data, bool mask,
+		static void WriteFragment(Action<BufferSegment, BufferSegment> callback, WebSocketFrameTypes Type, bool IsFinal, BufferSegment Data, bool mask,
 			LoggingContext context)
 		{
 			// First byte: Final Bit + Rsv flags + OpCode
@@ -159,7 +164,7 @@ namespace BestHTTP.WebSocket.Frames
 			WriteFragment(callback, Type, Header, Data, mask, context);
 		}
 
-		private static unsafe void WriteFragment(Action<BufferSegment, BufferSegment> callback, WebSocketFrameTypes Type, byte Header, BufferSegment Data, bool mask,
+		static unsafe void WriteFragment(Action<BufferSegment, BufferSegment> callback, WebSocketFrameTypes Type, byte Header, BufferSegment Data, bool mask,
 			LoggingContext context)
 		{
 			// For the complete documentation for this section see:
@@ -179,18 +184,18 @@ namespace BestHTTP.WebSocket.Frames
 			{
 				wsHeader[pos++] = (byte)(0x80 | (byte)Data.Count);
 			}
-			else if (Data.Count < UInt16.MaxValue)
+			else if (Data.Count < ushort.MaxValue)
 			{
 				wsHeader[pos++] = (byte)(0x80 | 126);
-				var count = (UInt16)Data.Count;
+				ushort count = (ushort)Data.Count;
 				wsHeader[pos++] = (byte)(count >> 8);
-				wsHeader[pos++] = (byte)(count);
+				wsHeader[pos++] = (byte)count;
 			}
 			else
 			{
 				wsHeader[pos++] = (byte)(0x80 | 127);
 
-				var count = (UInt64)Data.Count;
+				ulong count = (ulong)Data.Count;
 				wsHeader[pos++] = (byte)(count >> 56);
 				wsHeader[pos++] = (byte)(count >> 48);
 				wsHeader[pos++] = (byte)(count >> 40);
@@ -198,7 +203,7 @@ namespace BestHTTP.WebSocket.Frames
 				wsHeader[pos++] = (byte)(count >> 24);
 				wsHeader[pos++] = (byte)(count >> 16);
 				wsHeader[pos++] = (byte)(count >> 8);
-				wsHeader[pos++] = (byte)(count);
+				wsHeader[pos++] = (byte)count;
 			}
 
 			if (Data != BufferSegment.Empty)
@@ -212,7 +217,7 @@ namespace BestHTTP.WebSocket.Frames
 				wsHeader[pos++] = (byte)(hash >> 24);
 				wsHeader[pos++] = (byte)(hash >> 16);
 				wsHeader[pos++] = (byte)(hash >> 8);
-				wsHeader[pos++] = (byte)(hash);
+				wsHeader[pos++] = (byte)hash;
 
 				// Do the masking.
 				if (mask)
@@ -237,10 +242,12 @@ namespace BestHTTP.WebSocket.Frames
 				wsHeader[pos++] = 0;
 			}
 
-			var header = wsHeader.AsBuffer(pos);
+			BufferSegment header = wsHeader.AsBuffer(pos);
 
-			if (HTTPManager.Logger.Level <= Logger.Loglevels.All)
+			if (HTTPManager.Logger.Level <= Loglevels.All)
+			{
 				HTTPManager.Logger.Verbose("WebSocketFrame", string.Format("WriteFragment -  Header: {0}, data chunk: {1}", header.ToString(), Data.ToString()), context);
+			}
 
 			callback(header, Data);
 		}
@@ -249,7 +256,7 @@ namespace BestHTTP.WebSocket.Frames
 #if BESTHTTP_WITH_BURST
         [BurstCompile(CompileSynchronously = true)]
 #endif
-		public unsafe static void ApplyMask(
+		public static unsafe void ApplyMask(
 #if BESTHTTP_WITH_BURST
             [NoAlias]
 #endif
@@ -337,7 +344,7 @@ namespace BestHTTP.WebSocket.Frames
 				ulong* ulpData = (ulong*)(pData + DataOffset);
 
 				// duplicate the mask to fill up a whole ulong.
-				ulong ulmask = (((ulong)umask << 32) | umask);
+				ulong ulmask = ((ulong)umask << 32) | umask;
 
 				while (targetOffset - DataOffset >= 8)
 				{
@@ -350,7 +357,9 @@ namespace BestHTTP.WebSocket.Frames
 
 			// process remaining bytes (0..7)
 			for (int i = DataOffset; i < targetOffset; ++i)
+			{
 				pData[i] = (byte)(pData[i] ^ pmask[(i - DataOffset) % 4]);
+			}
 		}
 	}
 }

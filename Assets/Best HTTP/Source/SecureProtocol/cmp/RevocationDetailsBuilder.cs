@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 {
 	public sealed class RevocationDetailsBuilder
 	{
-		private readonly CertTemplateBuilder m_templateBuilder = new CertTemplateBuilder();
+		readonly CertTemplateBuilder m_templateBuilder = new CertTemplateBuilder();
 
 		public RevocationDetailsBuilder SetPublicKey(SubjectPublicKeyInfo publicKey)
 		{

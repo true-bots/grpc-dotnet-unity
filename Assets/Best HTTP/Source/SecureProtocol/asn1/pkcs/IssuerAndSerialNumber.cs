@@ -10,8 +10,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class IssuerAndSerialNumber
 		: Asn1Encodable
 	{
-		private readonly X509Name name;
-		private readonly DerInteger certSerialNumber;
+		readonly X509Name name;
+		readonly DerInteger certSerialNumber;
 
 		public static IssuerAndSerialNumber GetInstance(
 			object obj)
@@ -26,17 +26,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				return new IssuerAndSerialNumber((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private IssuerAndSerialNumber(
+		IssuerAndSerialNumber(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
-			this.name = X509Name.GetInstance(seq[0]);
-			this.certSerialNumber = DerInteger.GetInstance(seq[1]);
+			name = X509Name.GetInstance(seq[0]);
+			certSerialNumber = DerInteger.GetInstance(seq[1]);
 		}
 
 		public IssuerAndSerialNumber(

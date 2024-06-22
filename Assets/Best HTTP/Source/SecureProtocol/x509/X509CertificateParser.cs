@@ -20,13 +20,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	 */
 	public class X509CertificateParser
 	{
-		private static readonly PemParser PemCertParser = new PemParser("CERTIFICATE");
+		static readonly PemParser PemCertParser = new PemParser("CERTIFICATE");
 
-		private Asn1Set sData;
-		private int sDataObjectCount;
-		private Stream currentStream;
+		Asn1Set sData;
+		int sDataObjectCount;
+		Stream currentStream;
 
-		private X509Certificate ReadDerCertificate(Asn1InputStream dIn)
+		X509Certificate ReadDerCertificate(Asn1InputStream dIn)
 		{
 			Asn1Sequence seq = (Asn1Sequence)dIn.ReadObject();
 
@@ -44,14 +44,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			return new X509Certificate(X509CertificateStructure.GetInstance(seq));
 		}
 
-		private X509Certificate ReadPemCertificate(Stream inStream)
+		X509Certificate ReadPemCertificate(Stream inStream)
 		{
 			Asn1Sequence seq = PemCertParser.ReadPemObject(inStream);
 
 			return seq == null ? null : new X509Certificate(X509CertificateStructure.GetInstance(seq));
 		}
 
-		private X509Certificate GetCertificate()
+		X509Certificate GetCertificate()
 		{
 			if (sData != null)
 			{
@@ -60,7 +60,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 					object obj = sData[sDataObjectCount++];
 
 					if (obj is Asn1Sequence)
+					{
 						return new X509Certificate(X509CertificateStructure.GetInstance(obj));
+					}
 				}
 			}
 
@@ -92,9 +94,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		public X509Certificate ReadCertificate(Stream inStream)
 		{
 			if (inStream == null)
+			{
 				throw new ArgumentNullException("inStream");
+			}
+
 			if (!inStream.CanRead)
+			{
 				throw new ArgumentException("inStream must be read-able", "inStream");
+			}
 
 			if (currentStream == null)
 			{
@@ -114,7 +121,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				if (sData != null)
 				{
 					if (sDataObjectCount != sData.Count)
+					{
 						return GetCertificate();
+					}
 
 					sData = null;
 					sDataObjectCount = 0;
@@ -123,7 +132,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 				int tag = inStream.ReadByte();
 				if (tag < 0)
+				{
 					return null;
+				}
 
 				if (inStream.CanSeek)
 				{
@@ -137,7 +148,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				}
 
 				if (tag != 0x30) // assume ascii PEM encoded.
+				{
 					return ReadPemCertificate(inStream);
+				}
 
 				return ReadDerCertificate(new Asn1InputStream(inStream));
 			}

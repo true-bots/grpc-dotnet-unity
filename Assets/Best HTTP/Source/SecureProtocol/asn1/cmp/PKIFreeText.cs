@@ -10,10 +10,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static PkiFreeText GetInstance(object obj)
 		{
 			if (obj is PkiFreeText pkiFreeText)
+			{
 				return pkiFreeText;
+			}
 
 			if (obj != null)
+			{
 				return new PkiFreeText(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
@@ -27,10 +31,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 
 		internal PkiFreeText(Asn1Sequence seq)
 		{
-			foreach (var element in seq)
+			foreach (Asn1Encodable element in seq)
 			{
 				if (!(element is DerUtf8String))
+				{
 					throw new ArgumentException("attempt to insert non UTF8 STRING into PkiFreeText");
+				}
 			}
 
 			m_strings = seq;
@@ -62,7 +68,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_strings = new DerSequence(v);
 		}
 
-		public virtual int Count => m_strings.Count;
+		public virtual int Count
+		{
+			get { return m_strings.Count; }
+		}
 
 		/**
 		 * Return the UTF8STRING at index.

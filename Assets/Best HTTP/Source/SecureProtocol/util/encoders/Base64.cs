@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 {
 	public sealed class Base64
 	{
-		private Base64()
+		Base64()
 		{
 		}
 

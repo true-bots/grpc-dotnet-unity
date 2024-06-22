@@ -23,13 +23,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 {
 	public static class GeneratorUtilities
 	{
-		private static readonly IDictionary<string, string> KgAlgorithms =
+		static readonly IDictionary<string, string> KgAlgorithms =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly IDictionary<string, string> KpgAlgorithms =
+		static readonly IDictionary<string, string> KpgAlgorithms =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly IDictionary<string, int> DefaultKeySizes =
+		static readonly IDictionary<string, int> DefaultKeySizes =
 			new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
 		static GeneratorUtilities()
@@ -265,7 +265,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			AddDefaultKeySizeEntries(1024, "THREEFISH-1024");
 		}
 
-		private static void AddDefaultKeySizeEntries(int size, params string[] algorithms)
+		static void AddDefaultKeySizeEntries(int size, params string[] algorithms)
 		{
 			foreach (string algorithm in algorithms)
 			{
@@ -273,7 +273,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 		}
 
-		private static void AddKgAlgorithm(string canonicalName, params object[] aliases)
+		static void AddKgAlgorithm(string canonicalName, params object[] aliases)
 		{
 			KgAlgorithms[canonicalName] = canonicalName;
 
@@ -283,7 +283,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 		}
 
-		private static void AddKpgAlgorithm(string canonicalName, params object[] aliases)
+		static void AddKpgAlgorithm(string canonicalName, params object[] aliases)
 		{
 			KpgAlgorithms[canonicalName] = canonicalName;
 
@@ -293,7 +293,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 		}
 
-		private static void AddHMacKeyGenerator(string algorithm, params object[] aliases)
+		static void AddHMacKeyGenerator(string algorithm, params object[] aliases)
 		{
 			string mainName = "HMAC" + algorithm;
 
@@ -329,18 +329,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			string canonicalName = GetCanonicalKeyGeneratorAlgorithm(algorithm);
 
 			if (canonicalName == null)
+			{
 				throw new SecurityUtilityException("KeyGenerator " + algorithm + " not recognised.");
+			}
 
 			int defaultKeySize = FindDefaultKeySize(canonicalName);
 			if (defaultKeySize == -1)
+			{
 				throw new SecurityUtilityException("KeyGenerator " + algorithm
 				                                                   + " (" + canonicalName + ") not supported.");
+			}
 
 			if (canonicalName == "DES")
+			{
 				return new DesKeyGenerator(defaultKeySize);
+			}
 
 			if (canonicalName == "DESEDE" || canonicalName == "DESEDE3")
+			{
 				return new DesEdeKeyGenerator(defaultKeySize);
+			}
 
 			return new CipherKeyGenerator(defaultKeySize);
 		}
@@ -355,38 +363,60 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			string canonicalName = GetCanonicalKeyPairGeneratorAlgorithm(algorithm);
 
 			if (canonicalName == null)
+			{
 				throw new SecurityUtilityException("KeyPairGenerator " + algorithm + " not recognised.");
+			}
 
 			if (canonicalName == "DH")
+			{
 				return new DHKeyPairGenerator();
+			}
 
 			if (canonicalName == "DSA")
+			{
 				return new DsaKeyPairGenerator();
+			}
 
 			// "EC", "ECDH", "ECDHC", "ECDSA", "ECGOST3410", "ECGOST3410-2012", "ECMQV"
-			if (Org.BouncyCastle.Utilities.Platform.StartsWith(canonicalName, "EC"))
+			if (Platform.StartsWith(canonicalName, "EC"))
+			{
 				return new ECKeyPairGenerator(canonicalName);
+			}
 
 			if (canonicalName == "Ed25519")
+			{
 				return new Ed25519KeyPairGenerator();
+			}
 
 			if (canonicalName == "Ed448")
+			{
 				return new Ed448KeyPairGenerator();
+			}
 
 			if (canonicalName == "ELGAMAL")
+			{
 				return new ElGamalKeyPairGenerator();
+			}
 
 			if (canonicalName == "GOST3410")
+			{
 				return new Gost3410KeyPairGenerator();
+			}
 
 			if (canonicalName == "RSA" || canonicalName == "RSASSA-PSS")
+			{
 				return new RsaKeyPairGenerator();
+			}
 
 			if (canonicalName == "X25519")
+			{
 				return new X25519KeyPairGenerator();
+			}
 
 			if (canonicalName == "X448")
+			{
 				return new X448KeyPairGenerator();
+			}
 
 			throw new SecurityUtilityException("KeyPairGenerator " + algorithm
 			                                                       + " (" + canonicalName + ") not supported.");
@@ -402,17 +432,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			string canonicalName = GetCanonicalKeyGeneratorAlgorithm(algorithm);
 
 			if (canonicalName == null)
+			{
 				throw new SecurityUtilityException("KeyGenerator " + algorithm + " not recognised.");
+			}
 
 			int defaultKeySize = FindDefaultKeySize(canonicalName);
 			if (defaultKeySize == -1)
+			{
 				throw new SecurityUtilityException("KeyGenerator " + algorithm
 				                                                   + " (" + canonicalName + ") not supported.");
+			}
 
 			return defaultKeySize;
 		}
 
-		private static int FindDefaultKeySize(string canonicalName)
+		static int FindDefaultKeySize(string canonicalName)
 		{
 			return DefaultKeySizes.TryGetValue(canonicalName, out int keySize) ? keySize : -1;
 		}

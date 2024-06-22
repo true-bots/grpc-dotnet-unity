@@ -25,11 +25,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class GeneralSubtree
 		: Asn1Encodable
 	{
-		private readonly GeneralName baseName;
-		private readonly DerInteger minimum;
-		private readonly DerInteger maximum;
+		readonly GeneralName baseName;
+		readonly DerInteger minimum;
+		readonly DerInteger maximum;
 
-		private GeneralSubtree(
+		GeneralSubtree(
 			Asn1Sequence seq)
 		{
 			baseName = GeneralName.GetInstance(seq[0]);
@@ -60,14 +60,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 					{
 						Asn1TaggedObject oMin = Asn1TaggedObject.GetInstance(seq[1]);
 						if (oMin.TagNo != 0)
+						{
 							throw new ArgumentException("Bad tag number for 'minimum': " + oMin.TagNo);
+						}
+
 						minimum = DerInteger.GetInstance(oMin, false);
 					}
 
 					{
 						Asn1TaggedObject oMax = Asn1TaggedObject.GetInstance(seq[2]);
 						if (oMax.TagNo != 1)
+						{
 							throw new ArgumentException("Bad tag number for 'maximum': " + oMax.TagNo);
+						}
+
 						maximum = DerInteger.GetInstance(oMax, false);
 					}
 

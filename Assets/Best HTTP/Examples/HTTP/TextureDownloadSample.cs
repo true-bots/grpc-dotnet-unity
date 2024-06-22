@@ -6,57 +6,60 @@ using BestHTTP;
 
 namespace BestHTTP.Examples.HTTP
 {
-	public sealed class TextureDownloadSample : BestHTTP.Examples.Helpers.SampleBase
+	public sealed class TextureDownloadSample : Helpers.SampleBase
 	{
 #pragma warning disable 0649
 		[Header("Texture Download Example")] [Tooltip("The URL of the server that will serve the image resources")] [SerializeField]
-		private string _path = "/images/Demo/";
+		string _path = "/images/Demo/";
 
 		[Tooltip("The downloadable images")] [SerializeField]
-		private string[] _imageNames = new string[9] { "One.png", "Two.png", "Three.png", "Four.png", "Five.png", "Six.png", "Seven.png", "Eight.png", "Nine.png" };
+		string[] _imageNames = new string[9] { "One.png", "Two.png", "Three.png", "Four.png", "Five.png", "Six.png", "Seven.png", "Eight.png", "Nine.png" };
 
-		[SerializeField] private RawImage[] _images = new RawImage[0];
+		[SerializeField] RawImage[] _images = new RawImage[0];
 
-		[SerializeField] private Text _maxConnectionPerServerLabel;
+		[SerializeField] Text _maxConnectionPerServerLabel;
 
-		[SerializeField] private Text _cacheLabel;
+		[SerializeField] Text _cacheLabel;
 
 #pragma warning restore
 
-		private byte savedMaxConnectionPerServer;
+		byte savedMaxConnectionPerServer;
 
 #if !BESTHTTP_DISABLE_CACHING
-		private bool allDownloadedFromLocalCache;
+		bool allDownloadedFromLocalCache;
 #endif
 
-		private List<HTTPRequest> activeRequests = new List<HTTPRequest>();
+		List<HTTPRequest> activeRequests = new List<HTTPRequest>();
 
 		protected override void Start()
 		{
 			base.Start();
 
-			this.savedMaxConnectionPerServer = HTTPManager.MaxConnectionPerServer;
+			savedMaxConnectionPerServer = HTTPManager.MaxConnectionPerServer;
 
 			// Set a well observable value
 			// This is how many concurrent requests can be made to a server
 			HTTPManager.MaxConnectionPerServer = 1;
 
-			this._maxConnectionPerServerLabel.text = HTTPManager.MaxConnectionPerServer.ToString();
+			_maxConnectionPerServerLabel.text = HTTPManager.MaxConnectionPerServer.ToString();
 		}
 
 		void OnDestroy()
 		{
 			// Set back to its defualt value.
-			HTTPManager.MaxConnectionPerServer = this.savedMaxConnectionPerServer;
-			foreach (var request in this.activeRequests)
+			HTTPManager.MaxConnectionPerServer = savedMaxConnectionPerServer;
+			foreach (HTTPRequest request in activeRequests)
+			{
 				request.Abort();
-			this.activeRequests.Clear();
+			}
+
+			activeRequests.Clear();
 		}
 
 		public void OnMaxConnectionPerServerChanged(float value)
 		{
 			HTTPManager.MaxConnectionPerServer = (byte)Mathf.RoundToInt(value);
-			this._maxConnectionPerServerLabel.text = HTTPManager.MaxConnectionPerServer.ToString();
+			_maxConnectionPerServerLabel.text = HTTPManager.MaxConnectionPerServer.ToString();
 		}
 
 		public void DownloadImages()
@@ -69,21 +72,21 @@ namespace BestHTTP.Examples.HTTP
 			for (int i = 0; i < _imageNames.Length; ++i)
 			{
 				// Set a blank placeholder texture, overriding previously downloaded texture
-				this._images[i].texture = null;
+				_images[i].texture = null;
 
 				// Construct the request
-				var request = new HTTPRequest(new Uri(this.sampleSelector.BaseURL + this._path + this._imageNames[i]), ImageDownloaded);
+				HTTPRequest request = new HTTPRequest(new Uri(sampleSelector.BaseURL + _path + _imageNames[i]), ImageDownloaded);
 
 				// Set the Tag property, we can use it as a general storage bound to the request
-				request.Tag = this._images[i];
+				request.Tag = _images[i];
 
 				// Send out the request
 				request.Send();
 
-				this.activeRequests.Add(request);
+				activeRequests.Add(request);
 			}
 
-			this._cacheLabel.text = string.Empty;
+			_cacheLabel.text = string.Empty;
 		}
 
 		/// <summary>
@@ -119,7 +122,7 @@ namespace BestHTTP.Examples.HTTP
 				// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 				case HTTPRequestStates.Error:
 					Debug.LogError("Request Finished with Error! " +
-					               (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception"));
+					               (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception"));
 					break;
 
 				// The request aborted, initiated by the user.
@@ -138,15 +141,19 @@ namespace BestHTTP.Examples.HTTP
 					break;
 			}
 
-			this.activeRequests.Remove(req);
-			if (this.activeRequests.Count == 0)
+			activeRequests.Remove(req);
+			if (activeRequests.Count == 0)
 			{
 #if !BESTHTTP_DISABLE_CACHING
-				if (this.allDownloadedFromLocalCache)
-					this._cacheLabel.text = "All images loaded from local cache!";
+				if (allDownloadedFromLocalCache)
+				{
+					_cacheLabel.text = "All images loaded from local cache!";
+				}
 				else
 #endif
-					this._cacheLabel.text = string.Empty;
+				{
+					_cacheLabel.text = string.Empty;
+				}
 			}
 		}
 	}

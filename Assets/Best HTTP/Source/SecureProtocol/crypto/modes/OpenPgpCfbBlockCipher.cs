@@ -17,15 +17,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class OpenPgpCfbBlockCipher
 		: IBlockCipherMode
 	{
-		private byte[] IV;
-		private byte[] FR;
-		private byte[] FRE;
+		byte[] IV;
+		byte[] FR;
+		byte[] FRE;
 
-		private readonly IBlockCipher cipher;
-		private readonly int blockSize;
+		readonly IBlockCipher cipher;
+		readonly int blockSize;
 
-		private int count;
-		private bool forEncryption;
+		int count;
+		bool forEncryption;
 
 		/**
         * Basic constructor.
@@ -38,10 +38,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		{
 			this.cipher = cipher;
 
-			this.blockSize = cipher.GetBlockSize();
-			this.IV = new byte[blockSize];
-			this.FR = new byte[blockSize];
-			this.FRE = new byte[blockSize];
+			blockSize = cipher.GetBlockSize();
+			IV = new byte[blockSize];
+			FR = new byte[blockSize];
+			FRE = new byte[blockSize];
 		}
 
 		/**
@@ -49,7 +49,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		*
 		* @return the underlying block cipher that we are wrapping.
 		*/
-		public IBlockCipher UnderlyingCipher => cipher;
+		public IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		/**
         * return the algorithm name and mode.
@@ -157,7 +160,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         * @param blockOff offset in the current block
         * @returns the encrypted byte
         */
-		private byte EncryptByte(byte data, int blockOff)
+		byte EncryptByte(byte data, int blockOff)
 		{
 			return (byte)(FRE[blockOff] ^ data);
 		}
@@ -283,7 +286,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
             return blockSize;
         }
 #else
-		private int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			Check.DataLength(input, inOff, blockSize, "input buffer too short");
 			Check.OutputLength(outBytes, outOff, blockSize, "output buffer too short");
@@ -337,7 +340,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			return blockSize;
 		}
 
-		private int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			Check.DataLength(input, inOff, blockSize, "input buffer too short");
 			Check.OutputLength(outBytes, outOff, blockSize, "output buffer too short");

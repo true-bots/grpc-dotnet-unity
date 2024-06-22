@@ -14,10 +14,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 {
 	public class CertificateStatus
 	{
-		private static readonly DefaultSignatureAlgorithmIdentifierFinder sigAlgFinder = new DefaultSignatureAlgorithmIdentifierFinder();
+		static readonly DefaultSignatureAlgorithmIdentifierFinder sigAlgFinder = new DefaultSignatureAlgorithmIdentifierFinder();
 
-		private readonly DefaultDigestAlgorithmIdentifierFinder digestAlgFinder;
-		private readonly CertStatus certStatus;
+		readonly DefaultDigestAlgorithmIdentifierFinder digestAlgFinder;
+		readonly CertStatus certStatus;
 
 		public CertificateStatus(DefaultDigestAlgorithmIdentifierFinder digestAlgFinder, CertStatus certStatus)
 		{
@@ -25,15 +25,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 			this.certStatus = certStatus;
 		}
 
-		public virtual PkiStatusInfo StatusInfo => certStatus.StatusInfo;
+		public virtual PkiStatusInfo StatusInfo
+		{
+			get { return certStatus.StatusInfo; }
+		}
 
-		public virtual BigInteger CertRequestID => certStatus.CertReqID.Value;
+		public virtual BigInteger CertRequestID
+		{
+			get { return certStatus.CertReqID.Value; }
+		}
 
 		public virtual bool IsVerified(X509Certificate cert)
 		{
 			AlgorithmIdentifier digAlg = digestAlgFinder.Find(sigAlgFinder.Find(cert.SigAlgName));
 			if (null == digAlg)
+			{
 				throw new CmpException("cannot find algorithm for digest from signature " + cert.SigAlgName);
+			}
 
 			byte[] digest = DigestUtilities.CalculateDigest(digAlg.Algorithm, cert.GetEncoded());
 

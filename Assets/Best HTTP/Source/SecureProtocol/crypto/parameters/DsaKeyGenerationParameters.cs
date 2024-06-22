@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class DsaKeyGenerationParameters
 		: KeyGenerationParameters
 	{
-		private readonly DsaParameters parameters;
+		readonly DsaParameters parameters;
 
 		public DsaKeyGenerationParameters(
 			SecureRandom random,

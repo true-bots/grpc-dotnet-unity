@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	*/
 	public class UserAttributeSubpacketsParser
 	{
-		private readonly Stream input;
+		readonly Stream input;
 
 		public UserAttributeSubpacketsParser(
 			Stream input)
@@ -24,7 +24,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		{
 			int l = input.ReadByte();
 			if (l < 0)
+			{
 				return null;
+			}
 
 			int bodyLen = 0;
 			bool longLength = false;
@@ -34,7 +36,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			}
 			else if (l <= 223)
 			{
-				bodyLen = ((l - 192) << 8) + (input.ReadByte()) + 192;
+				bodyLen = ((l - 192) << 8) + input.ReadByte() + 192;
 			}
 			else if (l == 255)
 			{
@@ -49,11 +51,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 
 			int tag = input.ReadByte();
 			if (tag < 0)
+			{
 				throw new EndOfStreamException("unexpected EOF reading user attribute sub packet");
+			}
 
 			byte[] data = new byte[bodyLen - 1];
 			if (Streams.ReadFully(input, data) < data.Length)
+			{
 				throw new EndOfStreamException();
+			}
 
 			UserAttributeSubpacketTag type = (UserAttributeSubpacketTag)tag;
 			switch (type)

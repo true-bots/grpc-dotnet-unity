@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class Attribute
 		: Asn1Encodable
 	{
-		private DerObjectIdentifier attrType;
-		private Asn1Set attrValues;
+		DerObjectIdentifier attrType;
+		Asn1Set attrValues;
 
 		/**
         * return an Attribute object from the given object.
@@ -21,12 +21,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is Attribute)
+			{
 				return (Attribute)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new Attribute((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public Attribute(

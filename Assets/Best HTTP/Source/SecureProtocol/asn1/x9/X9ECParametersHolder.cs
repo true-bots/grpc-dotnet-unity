@@ -6,8 +6,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 {
 	public abstract class X9ECParametersHolder
 	{
-		private ECCurve m_curve;
-		private X9ECParameters m_parameters;
+		ECCurve m_curve;
+		X9ECParameters m_parameters;
 
 		public ECCurve Curve
 		{

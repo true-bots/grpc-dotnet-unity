@@ -65,7 +65,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				BigInteger y = dhPublicKey.Y.Value;
 
 				if (IsPkcsDHParam(seq))
+				{
 					return ReadPkcsDHParam(algOid, y, seq);
+				}
 
 				DHDomainParameters dhParams = DHDomainParameters.GetInstance(seq);
 
@@ -159,7 +161,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 				X9ECParameters ecP = ECGost3410NamedCurves.GetByOid(publicKeyParamSet);
 				if (ecP == null)
+				{
 					return null;
+				}
 
 				Asn1OctetString key;
 				try
@@ -176,7 +180,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 				byte[] keyEnc = key.GetOctets();
 				if (keyEnc.Length != keySize)
+				{
 					throw new ArgumentException("invalid length for GOST3410_2001 public key");
+				}
 
 				byte[] x9Encoding = new byte[1 + keySize];
 				x9Encoding[0] = 0x04;
@@ -262,7 +268,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 				byte[] keyEnc = key.GetOctets();
 				if (keyEnc.Length != keySize)
+				{
 					throw new ArgumentException("invalid length for GOST3410_2012 public key");
+				}
 
 				byte[] x9Encoding = new byte[1 + keySize];
 				x9Encoding[0] = 0x04;
@@ -282,7 +290,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 		}
 
-		private static byte[] GetRawKey(SubjectPublicKeyInfo keyInfo)
+		static byte[] GetRawKey(SubjectPublicKeyInfo keyInfo)
 		{
 			/*
 			 * TODO[RFC 8422]
@@ -291,13 +299,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return keyInfo.PublicKeyData.GetOctets();
 		}
 
-		private static bool IsPkcsDHParam(Asn1Sequence seq)
+		static bool IsPkcsDHParam(Asn1Sequence seq)
 		{
 			if (seq.Count == 2)
+			{
 				return true;
+			}
 
 			if (seq.Count > 3)
+			{
 				return false;
+			}
 
 			DerInteger l = DerInteger.GetInstance(seq[2]);
 			DerInteger p = DerInteger.GetInstance(seq[0]);
@@ -305,7 +317,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return l.Value.CompareTo(BigInteger.ValueOf(p.Value.BitLength)) <= 0;
 		}
 
-		private static DHPublicKeyParameters ReadPkcsDHParam(DerObjectIdentifier algOid,
+		static DHPublicKeyParameters ReadPkcsDHParam(DerObjectIdentifier algOid,
 			BigInteger y, Asn1Sequence seq)
 		{
 			DHParameter para = new DHParameter(seq);

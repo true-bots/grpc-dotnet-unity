@@ -11,17 +11,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static RevReqContent GetInstance(object obj)
 		{
 			if (obj is RevReqContent revReqContent)
+			{
 				return revReqContent;
+			}
 
 			if (obj != null)
+			{
 				return new RevReqContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly Asn1Sequence m_content;
+		readonly Asn1Sequence m_content;
 
-		private RevReqContent(Asn1Sequence seq)
+		RevReqContent(Asn1Sequence seq)
 		{
 			m_content = seq;
 		}

@@ -14,8 +14,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	 */
 	public class NaccacheSternPrivateKeyParameters : NaccacheSternKeyParameters
 	{
-		private readonly BigInteger phiN;
-		private readonly IList<BigInteger> smallPrimes;
+		readonly BigInteger phiN;
+		readonly IList<BigInteger> smallPrimes;
 
 		/**
 		 * Constructs a NaccacheSternPrivateKey

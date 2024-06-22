@@ -15,30 +15,30 @@ namespace BestHTTP.Examples
 	/// This sample demonstrates redirection capabilities. The server will redirect a few times the client before
 	/// routing it to the final endpoint.
 	/// </summary>
-	public sealed class UploadHubSample : BestHTTP.Examples.Helpers.SampleBase
+	public sealed class UploadHubSample : SampleBase
 	{
 #pragma warning disable 0649
 
-		[SerializeField] private string _path = "/uploading";
+		[SerializeField] string _path = "/uploading";
 
-		[SerializeField] private ScrollRect _scrollRect;
+		[SerializeField] ScrollRect _scrollRect;
 
-		[SerializeField] private RectTransform _contentRoot;
+		[SerializeField] RectTransform _contentRoot;
 
-		[SerializeField] private TextListItem _listItemPrefab;
+		[SerializeField] TextListItem _listItemPrefab;
 
-		[SerializeField] private int _maxListItemEntries = 100;
+		[SerializeField] int _maxListItemEntries = 100;
 
-		[SerializeField] private Button _connectButton;
+		[SerializeField] Button _connectButton;
 
-		[SerializeField] private Button _closeButton;
+		[SerializeField] Button _closeButton;
 
-		[SerializeField] private float _yieldWaitTime = 0.1f;
+		[SerializeField] float _yieldWaitTime = 0.1f;
 
 #pragma warning restore
 
 		// Instance of the HubConnection
-		private HubConnection hub;
+		HubConnection hub;
 
 		protected override void Start()
 		{
@@ -85,7 +85,7 @@ namespace BestHTTP.Examples
 #endif
 
 			// Crete the HubConnection
-			hub = new HubConnection(new Uri(this.sampleSelector.BaseURL + this._path), protocol);
+			hub = new HubConnection(new Uri(sampleSelector.BaseURL + _path), protocol);
 
 			// Subscribe to hub events
 			hub.OnConnected += Hub_OnConnected;
@@ -107,16 +107,16 @@ namespace BestHTTP.Examples
 
 		public void OnCloseButton()
 		{
-			if (this.hub != null)
+			if (hub != null)
 			{
-				this.hub.StartClose();
+				hub.StartClose();
 
 				AddText("StartClose called");
 				SetButtons(false, false);
 			}
 		}
 
-		private void Hub_Redirected(HubConnection hub, Uri oldUri, Uri newUri)
+		void Hub_Redirected(HubConnection hub, Uri oldUri, Uri newUri)
 		{
 			AddText(string.Format("Hub connection redirected to '<color=green>{0}</color>'!", hub.Uri));
 		}
@@ -124,7 +124,7 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This callback is called when the plugin is connected to the server successfully. Messages can be sent to the server after this point.
 		/// </summary>
-		private void Hub_OnConnected(HubConnection hub)
+		void Hub_OnConnected(HubConnection hub)
 		{
 			AddText(string.Format("Hub Connected with <color=green>{0}</color> transport using the <color=green>{1}</color> encoder.",
 				hub.Transport.TransportType.ToString(), hub.Protocol.Name));
@@ -134,11 +134,11 @@ namespace BestHTTP.Examples
 			SetButtons(false, true);
 		}
 
-		private IEnumerator UploadWord()
+		IEnumerator UploadWord()
 		{
 			AddText("<color=green>UploadWord</color>:");
 
-			var controller = hub.GetUpStreamController<string, string>("UploadWord");
+			UpStreamItemController<string> controller = hub.GetUpStreamController<string, string>("UploadWord");
 			controller.OnSuccess(result =>
 			{
 				AddText(string.Format("UploadWord completed, result: '<color=yellow>{0}</color>'", result))
@@ -176,10 +176,10 @@ namespace BestHTTP.Examples
 			yield return new WaitForSeconds(_yieldWaitTime);
 		}
 
-		private IEnumerator ScoreTracker()
+		IEnumerator ScoreTracker()
 		{
 			AddText("<color=green>ScoreTracker</color>:");
-			var controller = hub.GetUpStreamController<string, int, int>("ScoreTracker");
+			UpStreamItemController<string> controller = hub.GetUpStreamController<string, int, int>("ScoreTracker");
 
 			controller.OnSuccess(result =>
 			{
@@ -212,11 +212,11 @@ namespace BestHTTP.Examples
 			yield return new WaitForSeconds(_yieldWaitTime);
 		}
 
-		private IEnumerator ScoreTrackerWithParameterChannels()
+		IEnumerator ScoreTrackerWithParameterChannels()
 		{
 			AddText("<color=green>ScoreTracker using upload channels</color>:");
 
-			using (var controller = hub.GetUpStreamController<string, int, int>("ScoreTracker"))
+			using (UpStreamItemController<string> controller = hub.GetUpStreamController<string, int, int>("ScoreTracker"))
 			{
 				controller.OnSuccess(result =>
 				{
@@ -232,7 +232,7 @@ namespace BestHTTP.Examples
 				// While the server's ScoreTracker has two parameters, we can upload those parameters separately
 				// So here we 
 
-				using (var player1param = controller.GetUploadChannel<int>(0))
+				using (UploadChannel<string, int> player1param = controller.GetUploadChannel<int>(0))
 				{
 					for (int i = 0; i < numScores; i++)
 					{
@@ -248,7 +248,7 @@ namespace BestHTTP.Examples
 
 				AddText("");
 
-				using (var player2param = controller.GetUploadChannel<int>(1))
+				using (UploadChannel<string, int> player2param = controller.GetUploadChannel<int>(1))
 				{
 					for (int i = 0; i < numScores; i++)
 					{
@@ -269,10 +269,10 @@ namespace BestHTTP.Examples
 			yield return new WaitForSeconds(_yieldWaitTime);
 		}
 
-		private IEnumerator StreamEcho()
+		IEnumerator StreamEcho()
 		{
 			AddText("<color=green>StreamEcho</color>:");
-			using (var controller = hub.GetUpAndDownStreamController<string, string>("StreamEcho"))
+			using (UpStreamItemController<string> controller = hub.GetUpAndDownStreamController<string, string>("StreamEcho"))
 			{
 				controller.OnSuccess(result =>
 				{
@@ -313,11 +313,11 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This is basically the same as the previous StreamEcho, but it's streaming a complex object (Person
 		/// </summary>
-		private IEnumerator PersonEcho()
+		IEnumerator PersonEcho()
 		{
 			AddText("<color=green>PersonEcho</color>:");
 
-			using (var controller = hub.GetUpAndDownStreamController<Person, Person>("PersonEcho"))
+			using (UpStreamItemController<Person> controller = hub.GetUpAndDownStreamController<Person, Person>("PersonEcho"))
 			{
 				controller.OnSuccess(result =>
 				{
@@ -362,7 +362,7 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This is called when the hub is closed after a StartClose() call.
 		/// </summary>
-		private void Hub_OnClosed(HubConnection hub)
+		void Hub_OnClosed(HubConnection hub)
 		{
 			AddText("Hub Closed");
 
@@ -372,25 +372,29 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// Called when an unrecoverable error happen. After this event the hub will not send or receive any messages.
 		/// </summary>
-		private void Hub_OnError(HubConnection hub, string error)
+		void Hub_OnError(HubConnection hub, string error)
 		{
 			AddText(string.Format("Hub Error: <color=red>{0}</color>", error));
 
 			SetButtons(true, false);
 		}
 
-		private void SetButtons(bool connect, bool close)
+		void SetButtons(bool connect, bool close)
 		{
-			if (this._connectButton != null)
-				this._connectButton.interactable = connect;
+			if (_connectButton != null)
+			{
+				_connectButton.interactable = connect;
+			}
 
-			if (this._closeButton != null)
-				this._closeButton.interactable = close;
+			if (_closeButton != null)
+			{
+				_closeButton.interactable = close;
+			}
 		}
 
-		private TextListItem AddText(string text)
+		TextListItem AddText(string text)
 		{
-			return GUIHelper.AddText(this._listItemPrefab, this._contentRoot, text, this._maxListItemEntries, this._scrollRect);
+			return GUIHelper.AddText(_listItemPrefab, _contentRoot, text, _maxListItemEntries, _scrollRect);
 		}
 	}
 }

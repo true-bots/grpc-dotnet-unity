@@ -20,11 +20,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	*/
 	public class AuthEnvelopedDataParser
 	{
-		private Asn1SequenceParser seq;
-		private DerInteger version;
-		private IAsn1Convertible nextObject;
-		private bool originatorInfoCalled;
-		private bool isData;
+		Asn1SequenceParser seq;
+		DerInteger version;
+		IAsn1Convertible nextObject;
+		bool originatorInfoCalled;
+		bool isData;
 
 		public AuthEnvelopedDataParser(
 			Asn1SequenceParser seq)
@@ -32,9 +32,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			this.seq = seq;
 
 			// "It MUST be set to 0."
-			this.version = (DerInteger)seq.ReadObject();
+			version = (DerInteger)seq.ReadObject();
 			if (!version.HasValue(0))
+			{
 				throw new Asn1ParsingException("AuthEnvelopedData version number must be 0");
+			}
 		}
 
 		public DerInteger Version
@@ -115,7 +117,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 
 			// "The authAttrs MUST be present if the content type carried in EncryptedContentInfo is not id-data."
 			if (!isData)
+			{
 				throw new Asn1ParsingException("authAttrs must be present with non-data content");
+			}
 
 			return null;
 		}

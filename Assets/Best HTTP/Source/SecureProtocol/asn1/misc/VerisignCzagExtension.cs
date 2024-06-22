@@ -14,7 +14,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Misc
 
 		public override string ToString()
 		{
-			return "VerisignCzagExtension: " + this.GetString();
+			return "VerisignCzagExtension: " + GetString();
 		}
 	}
 }

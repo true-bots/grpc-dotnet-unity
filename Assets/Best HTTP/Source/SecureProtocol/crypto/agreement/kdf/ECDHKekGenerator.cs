@@ -15,11 +15,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Kdf
 	public sealed class ECDHKekGenerator
 		: IDerivationFunction
 	{
-		private readonly IDerivationFunction m_kdf;
+		readonly IDerivationFunction m_kdf;
 
-		private DerObjectIdentifier algorithm;
-		private int keySize;
-		private byte[] z;
+		DerObjectIdentifier algorithm;
+		int keySize;
+		byte[] z;
 
 		public ECDHKekGenerator(IDigest digest)
 		{
@@ -30,12 +30,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Kdf
 		{
 			DHKdfParameters parameters = (DHKdfParameters)param;
 
-			this.algorithm = parameters.Algorithm;
-			this.keySize = parameters.KeySize;
-			this.z = parameters.GetZ(); // TODO Clone?
+			algorithm = parameters.Algorithm;
+			keySize = parameters.KeySize;
+			z = parameters.GetZ(); // TODO Clone?
 		}
 
-		public IDigest Digest => m_kdf.Digest;
+		public IDigest Digest
+		{
+			get { return m_kdf.Digest; }
+		}
 
 		public int GenerateBytes(byte[] outBytes, int outOff, int length)
 		{

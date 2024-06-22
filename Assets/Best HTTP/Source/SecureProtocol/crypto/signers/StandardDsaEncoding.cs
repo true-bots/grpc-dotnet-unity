@@ -22,7 +22,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 				byte[] expectedEncoding = Encode(n, r, s);
 				if (Arrays.AreEqual(expectedEncoding, encoding))
+				{
 					return new BigInteger[] { r, s };
+				}
 			}
 
 			throw new ArgumentException("Malformed signature", "encoding");
@@ -39,7 +41,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		protected virtual BigInteger CheckValue(BigInteger n, BigInteger x)
 		{
 			if (x.SignValue < 0 || (null != n && x.CompareTo(n) >= 0))
+			{
 				throw new ArgumentException("Value out of range", "x");
+			}
 
 			return x;
 		}

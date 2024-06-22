@@ -46,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 	public class OcspReq
 		: X509ExtensionBase
 	{
-		private OcspRequest req;
+		OcspRequest req;
 
 		public OcspReq(
 			OcspRequest req)
@@ -66,12 +66,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		{
 		}
 
-		private OcspReq(
+		OcspReq(
 			Asn1InputStream aIn)
 		{
 			try
 			{
-				this.req = OcspRequest.GetInstance(aIn.ReadObject());
+				req = OcspRequest.GetInstance(aIn.ReadObject());
 			}
 			catch (ArgumentException e)
 			{
@@ -140,8 +140,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		{
 			get
 			{
-				if (!this.IsSigned)
+				if (!IsSigned)
+				{
 					return null;
+				}
 
 				return req.OptionalSignature.SignatureAlgorithm.Algorithm.Id;
 			}
@@ -149,17 +151,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 		public byte[] GetSignature()
 		{
-			if (!this.IsSigned)
+			if (!IsSigned)
+			{
 				return null;
+			}
 
 			return req.OptionalSignature.GetSignatureOctets();
 		}
 
-		private List<X509Certificate> GetCertList()
+		List<X509Certificate> GetCertList()
 		{
 			// load the certificates if we have any
 
-			var result = new List<X509Certificate>();
+			List<X509Certificate> result = new List<X509Certificate>();
 
 			Asn1Sequence certs = req.OptionalSignature.Certs;
 			if (certs != null)
@@ -178,10 +182,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 		public X509Certificate[] GetCerts()
 		{
-			if (!this.IsSigned)
+			if (!IsSigned)
+			{
 				return null;
+			}
 
-			return this.GetCertList().ToArray();
+			return GetCertList().ToArray();
 		}
 
 		/**
@@ -193,10 +199,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		 */
 		public IStore<X509Certificate> GetCertificates()
 		{
-			if (!this.IsSigned)
+			if (!IsSigned)
+			{
 				return null;
+			}
 
-			return CollectionUtilities.CreateStore(this.GetCertList());
+			return CollectionUtilities.CreateStore(GetCertList());
 		}
 
 		/**
@@ -215,12 +223,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		public bool Verify(
 			AsymmetricKeyParameter publicKey)
 		{
-			if (!this.IsSigned)
+			if (!IsSigned)
+			{
 				throw new OcspException("attempt to Verify signature on unsigned object");
+			}
 
 			try
 			{
-				ISigner signature = SignerUtilities.GetSigner(this.SignatureAlgOid);
+				ISigner signature = SignerUtilities.GetSigner(SignatureAlgOid);
 
 				signature.Init(false, publicKey);
 
@@ -228,7 +238,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 				signature.BlockUpdate(encoded, 0, encoded.Length);
 
-				return signature.VerifySignature(this.GetSignature());
+				return signature.VerifySignature(GetSignature());
 			}
 			catch (Exception e)
 			{

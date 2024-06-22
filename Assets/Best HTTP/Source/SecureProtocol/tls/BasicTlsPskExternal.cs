@@ -20,9 +20,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public BasicTlsPskExternal(byte[] identity, TlsSecret key, int prfAlgorithm)
 		{
-			this.m_identity = Arrays.Clone(identity);
-			this.m_key = key;
-			this.m_prfAlgorithm = prfAlgorithm;
+			m_identity = Arrays.Clone(identity);
+			m_key = key;
+			m_prfAlgorithm = prfAlgorithm;
 		}
 
 		public virtual byte[] Identity

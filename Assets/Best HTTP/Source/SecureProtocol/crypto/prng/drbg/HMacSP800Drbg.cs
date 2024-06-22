@@ -12,16 +12,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 	public sealed class HMacSP800Drbg
 		: ISP80090Drbg
 	{
-		private readonly static long RESEED_MAX = 1L << (48 - 1);
-		private readonly static int MAX_BITS_REQUEST = 1 << (19 - 1);
+		static readonly long RESEED_MAX = 1L << (48 - 1);
+		static readonly int MAX_BITS_REQUEST = 1 << (19 - 1);
 
-		private readonly byte[] mK;
-		private readonly byte[] mV;
-		private readonly IEntropySource mEntropySource;
-		private readonly IMac mHMac;
-		private readonly int mSecurityStrength;
+		readonly byte[] mK;
+		readonly byte[] mV;
+		readonly IEntropySource mEntropySource;
+		readonly IMac mHMac;
+		readonly int mSecurityStrength;
 
-		private long mReseedCounter;
+		long mReseedCounter;
 
 		/**
 		 * Construct a SP800-90A Hash DRBG.
@@ -38,9 +38,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			byte[] personalizationString, byte[] nonce)
 		{
 			if (securityStrength > DrbgUtilities.GetMaxSecurityStrength(hMac))
+			{
 				throw new ArgumentException("Requested security strength is not supported by the derivation function");
+			}
+
 			if (entropySource.EntropySize < securityStrength)
+			{
 				throw new ArgumentException("Not enough entropy for security strength required");
+			}
 
 			mHMac = hMac;
 			mSecurityStrength = securityStrength;
@@ -87,7 +92,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
             mHMac.DoFinal(mV);
         }
 #else
-		private void hmac_DRBG_Update(byte[] seedMaterial)
+		void hmac_DRBG_Update(byte[] seedMaterial)
 		{
 			hmac_DRBG_Update_Func(seedMaterial, 0x00);
 			if (seedMaterial != null)
@@ -96,7 +101,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			}
 		}
 
-		private void hmac_DRBG_Update_Func(byte[] seedMaterial, byte vValue)
+		void hmac_DRBG_Update_Func(byte[] seedMaterial, byte vValue)
 		{
 			mHMac.Init(new KeyParameter(mK));
 
@@ -147,10 +152,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			int numberOfBits = outputLen * 8;
 
 			if (numberOfBits > MAX_BITS_REQUEST)
+			{
 				throw new ArgumentException("Number of bits per request limited to " + MAX_BITS_REQUEST, "output");
+			}
 
 			if (mReseedCounter > RESEED_MAX)
+			{
 				return -1;
+			}
 
 			if (predictionResistant)
 			{
@@ -184,7 +193,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 				mHMac.BlockUpdate(mV, 0, mV.Length);
 				mHMac.DoFinal(mV, 0);
 
-				Array.Copy(mV, 0, rv, m * mV.Length, rv.Length - (m * mV.Length));
+				Array.Copy(mV, 0, rv, m * mV.Length, rv.Length - m * mV.Length);
 			}
 
 			hmac_DRBG_Update(additionalInput);
@@ -322,11 +331,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
         }
 #endif
 
-		private byte[] GetEntropy()
+		byte[] GetEntropy()
 		{
 			byte[] entropy = mEntropySource.GetEntropy();
 			if (entropy.Length < (mSecurityStrength + 7) / 8)
+			{
 				throw new InvalidOperationException("Insufficient entropy provided by entropy source");
+			}
+
 			return entropy;
 		}
 

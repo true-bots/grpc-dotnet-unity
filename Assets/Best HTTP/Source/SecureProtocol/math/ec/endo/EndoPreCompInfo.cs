@@ -15,13 +15,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Endo
 		public virtual ECEndomorphism Endomorphism
 		{
 			get { return m_endomorphism; }
-			set { this.m_endomorphism = value; }
+			set { m_endomorphism = value; }
 		}
 
 		public virtual ECPoint MappedPoint
 		{
 			get { return m_mappedPoint; }
-			set { this.m_mappedPoint = value; }
+			set { m_mappedPoint = value; }
 		}
 	}
 }

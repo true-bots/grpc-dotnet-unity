@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class UserAttributeSubpacket
 	{
 		internal readonly UserAttributeSubpacketTag type;
-		private readonly bool longLength; // we preserve this as not everyone encodes length properly.
+		readonly bool longLength; // we preserve this as not everyone encodes length properly.
 		protected readonly byte[] data;
 
 		protected internal UserAttributeSubpacket(UserAttributeSubpacketTag type, byte[] data)
@@ -23,7 +23,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		protected internal UserAttributeSubpacket(UserAttributeSubpacketTag type, bool forceLongLength, byte[] data)
 		{
 			this.type = type;
-			this.longLength = forceLongLength;
+			longLength = forceLongLength;
 			this.data = data;
 		}
 
@@ -72,12 +72,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			UserAttributeSubpacket other = obj as UserAttributeSubpacket;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return type == other.type
 			       && Arrays.AreEqual(data, other.data);

@@ -36,14 +36,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
 				return new MonetaryValue(Asn1Sequence.GetInstance(obj));
 			}
 
-			throw new ArgumentException("unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private MonetaryValue(
+		MonetaryValue(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 3)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
 			currency = Iso4217CurrencyCode.GetInstance(seq[0]);
 			amount = DerInteger.GetInstance(seq[1]);

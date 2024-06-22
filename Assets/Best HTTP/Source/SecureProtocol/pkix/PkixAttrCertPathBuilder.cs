@@ -42,16 +42,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			}
 
 			if (targets.Count == 0)
+			{
 				throw new PkixCertPathBuilderException("No attribute certificate found matching targetConstraints.");
+			}
 
 			PkixCertPathBuilderResult result = null;
 
 			// check all potential target certificates
-			foreach (var target in targets)
+			foreach (X509V2AttributeCertificate target in targets)
 			{
 				X509CertStoreSelector certSelector = new X509CertStoreSelector();
 				X509Name[] principals = target.Issuer.GetPrincipals();
-				var issuers = new HashSet<X509Certificate>();
+				HashSet<X509Certificate> issuers = new HashSet<X509Certificate>();
 				for (int i = 0; i < principals.Length; i++)
 				{
 					// TODO Replace loop with a single multiprincipal selector (or don't even use selector)
@@ -70,35 +72,45 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				}
 
 				if (issuers.Count < 1)
+				{
 					throw new PkixCertPathBuilderException("Public key certificate for attribute certificate cannot be found.");
+				}
 
-				var certPathList = new List<X509Certificate>();
+				List<X509Certificate> certPathList = new List<X509Certificate>();
 
 				foreach (X509Certificate issuer in issuers)
 				{
 					result = Build(target, issuer, pkixParams, certPathList);
 
 					if (result != null)
+					{
 						break;
+					}
 				}
 
 				if (result != null)
+				{
 					break;
+				}
 			}
 
 			if (result == null && certPathException != null)
+			{
 				throw new PkixCertPathBuilderException("Possible certificate chain could not be validated.",
 					certPathException);
+			}
 
 			if (result == null && certPathException == null)
+			{
 				throw new PkixCertPathBuilderException("Unable to find certificate chain.");
+			}
 
 			return result;
 		}
 
-		private Exception certPathException;
+		Exception certPathException;
 
-		private PkixCertPathBuilderResult Build(
+		PkixCertPathBuilderResult Build(
 			X509V2AttributeCertificate attrCert,
 			X509Certificate tbvCert,
 			PkixBuilderParameters pkixParams,
@@ -108,18 +120,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			// into a cycle in the
 			// PKI graph.
 			if (tbvPath.Contains(tbvCert))
+			{
 				return null;
+			}
 
 			// step out, the certificate is not allowed to appear in a certification
 			// chain
 			if (pkixParams.GetExcludedCerts().Contains(tbvCert))
+			{
 				return null;
+			}
 
 			// test if certificate path exceeds maximum length
 			if (pkixParams.MaxPathLength != -1)
 			{
 				if (tbvPath.Count - 1 > pkixParams.MaxPathLength)
+				{
 					return null;
+				}
 			}
 
 			tbvPath.Add(tbvCert);
@@ -173,18 +191,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					}
 
 					if (issuers.Count < 1)
+					{
 						throw new Exception("No issuer certificate for certificate in certification path found.");
+					}
 
 					foreach (X509Certificate issuer in issuers)
 					{
 						// if untrusted self signed certificate continue
 						if (PkixCertPathValidatorUtilities.IsSelfIssued(issuer))
+						{
 							continue;
+						}
 
 						builderResult = Build(attrCert, issuer, pkixParams, tbvPath);
 
 						if (builderResult != null)
+						{
 							break;
+						}
 					}
 				}
 			}
@@ -205,9 +229,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			ISelector<X509V2AttributeCertificate> attrCertSelector,
 			IList<IStore<X509V2AttributeCertificate>> attrCertStores)
 		{
-			var attrCerts = new HashSet<X509V2AttributeCertificate>();
+			HashSet<X509V2AttributeCertificate> attrCerts = new HashSet<X509V2AttributeCertificate>();
 
-			foreach (var attrCertStore in attrCertStores)
+			foreach (IStore<X509V2AttributeCertificate> attrCertStore in attrCertStores)
 			{
 				try
 				{

@@ -21,19 +21,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static ErrorMsgContent GetInstance(object obj)
 		{
 			if (obj is ErrorMsgContent errorMsgContent)
+			{
 				return errorMsgContent;
+			}
 
 			if (obj != null)
+			{
 				return new ErrorMsgContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly PkiStatusInfo m_pkiStatusInfo;
-		private readonly DerInteger m_errorCode;
-		private readonly PkiFreeText m_errorDetails;
+		readonly PkiStatusInfo m_pkiStatusInfo;
+		readonly DerInteger m_errorCode;
+		readonly PkiFreeText m_errorDetails;
 
-		private ErrorMsgContent(Asn1Sequence seq)
+		ErrorMsgContent(Asn1Sequence seq)
 		{
 			m_pkiStatusInfo = PkiStatusInfo.GetInstance(seq[0]);
 
@@ -62,18 +66,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			PkiFreeText errorDetails)
 		{
 			if (pkiStatusInfo == null)
+			{
 				throw new ArgumentNullException(nameof(pkiStatusInfo));
+			}
 
 			m_pkiStatusInfo = pkiStatusInfo;
 			m_errorCode = errorCode;
 			m_errorDetails = errorDetails;
 		}
 
-		public virtual PkiStatusInfo PkiStatusInfo => m_pkiStatusInfo;
+		public virtual PkiStatusInfo PkiStatusInfo
+		{
+			get { return m_pkiStatusInfo; }
+		}
 
-		public virtual DerInteger ErrorCode => m_errorCode;
+		public virtual DerInteger ErrorCode
+		{
+			get { return m_errorCode; }
+		}
 
-		public virtual PkiFreeText ErrorDetails => m_errorDetails;
+		public virtual PkiFreeText ErrorDetails
+		{
+			get { return m_errorDetails; }
+		}
 
 		/**
 		 * <pre>

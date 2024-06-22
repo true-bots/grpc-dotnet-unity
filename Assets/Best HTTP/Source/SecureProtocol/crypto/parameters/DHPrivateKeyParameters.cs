@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class DHPrivateKeyParameters
 		: DHKeyParameters
 	{
-		private readonly BigInteger x;
+		readonly BigInteger x;
 
 		public DHPrivateKeyParameters(
 			BigInteger x,
@@ -37,12 +37,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			DHPrivateKeyParameters other = obj as DHPrivateKeyParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

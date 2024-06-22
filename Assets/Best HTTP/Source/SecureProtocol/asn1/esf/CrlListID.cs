@@ -18,34 +18,43 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class CrlListID
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence crls;
+		readonly Asn1Sequence crls;
 
 		public static CrlListID GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is CrlListID)
+			{
 				return (CrlListID)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CrlListID((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'CrlListID' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
-		private CrlListID(
+		CrlListID(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
+			}
+
 			if (seq.Count != 1)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
-			this.crls = (Asn1Sequence)seq[0].ToAsn1Object();
+			crls = (Asn1Sequence)seq[0].ToAsn1Object();
 
-			foreach (Asn1Encodable ae in this.crls)
+			foreach (Asn1Encodable ae in crls)
 			{
 				CrlValidatedID.GetInstance(ae.ToAsn1Object());
 			}
@@ -55,7 +64,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			params CrlValidatedID[] crls)
 		{
 			if (crls == null)
+			{
 				throw new ArgumentNullException("crls");
+			}
 
 			this.crls = new DerSequence(crls);
 		}
@@ -64,7 +75,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			IEnumerable<CrlValidatedID> crls)
 		{
 			if (crls == null)
+			{
 				throw new ArgumentNullException("crls");
+			}
 
 			this.crls = new DerSequence(
 				Asn1EncodableVector.FromEnumerable(crls));

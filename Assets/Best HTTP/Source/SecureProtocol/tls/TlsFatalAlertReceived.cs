@@ -15,7 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			: base(Tls.AlertDescription.GetText(alertDescription))
 		{
 			if (!TlsUtilities.IsValidUint8(alertDescription))
+			{
 				throw new ArgumentOutOfRangeException(nameof(alertDescription));
+			}
 
 			m_alertDescription = (byte)alertDescription;
 		}

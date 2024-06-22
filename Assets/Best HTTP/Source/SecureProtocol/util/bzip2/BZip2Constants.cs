@@ -43,7 +43,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 		public const int N_GROUPS = 6;
 		public const int G_SIZE = 50;
 		public const int N_ITERS = 4;
-		public const int MAX_SELECTORS = 2 + (900000 / G_SIZE);
+		public const int MAX_SELECTORS = 2 + 900000 / G_SIZE;
 		public const int NUM_OVERSHOOT_BYTES = 20;
 	}
 }

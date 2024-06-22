@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -26,19 +27,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 	public class Admissions
 		: Asn1Encodable
 	{
-		private readonly GeneralName admissionAuthority;
-		private readonly NamingAuthority namingAuthority;
-		private readonly Asn1Sequence professionInfos;
+		readonly GeneralName admissionAuthority;
+		readonly NamingAuthority namingAuthority;
+		readonly Asn1Sequence professionInfos;
 
 		public static Admissions GetInstance(object obj)
 		{
 			if (obj == null || obj is Admissions)
+			{
 				return (Admissions)obj;
+			}
 
 			if (obj is Asn1Sequence seq)
+			{
 				return new Admissions(seq);
+			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -57,12 +62,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		*
 		* @param seq The ASN.1 sequence.
 		*/
-		private Admissions(Asn1Sequence seq)
+		Admissions(Asn1Sequence seq)
 		{
 			if (seq.Count > 3)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
 			e.MoveNext();
 			Asn1Encodable o = e.Current;
@@ -102,7 +109,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 			professionInfos = Asn1Sequence.GetInstance(o);
 			if (e.MoveNext())
 			{
-				throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(e.Current));
+				throw new ArgumentException("Bad object encountered: " + Platform.GetTypeName(e.Current));
 			}
 		}
 

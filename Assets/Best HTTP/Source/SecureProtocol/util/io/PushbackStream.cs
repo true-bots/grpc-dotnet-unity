@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 	public class PushbackStream
 		: FilterStream
 	{
-		private int m_buf = -1;
+		int m_buf = -1;
 
 		public PushbackStream(Stream s)
 			: base(s)
@@ -35,7 +35,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 			if (m_buf != -1)
 			{
 				if (count < 1)
+				{
 					return 0;
+				}
 
 				buffer[offset] = (byte)m_buf;
 				m_buf = -1;
@@ -77,7 +79,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 		public virtual void Unread(int b)
 		{
 			if (m_buf != -1)
+			{
 				throw new InvalidOperationException("Can only push back one byte");
+			}
 
 			m_buf = b & 0xFF;
 		}

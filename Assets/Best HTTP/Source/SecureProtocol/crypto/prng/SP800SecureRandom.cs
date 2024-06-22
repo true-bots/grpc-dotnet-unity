@@ -9,21 +9,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 	public class SP800SecureRandom
 		: SecureRandom
 	{
-		private readonly IDrbgProvider mDrbgProvider;
-		private readonly bool mPredictionResistant;
-		private readonly SecureRandom mRandomSource;
-		private readonly IEntropySource mEntropySource;
+		readonly IDrbgProvider mDrbgProvider;
+		readonly bool mPredictionResistant;
+		readonly SecureRandom mRandomSource;
+		readonly IEntropySource mEntropySource;
 
-		private ISP80090Drbg mDrbg;
+		ISP80090Drbg mDrbg;
 
 		internal SP800SecureRandom(SecureRandom randomSource, IEntropySource entropySource, IDrbgProvider drbgProvider,
 			bool predictionResistant)
 			: base(null)
 		{
-			this.mRandomSource = randomSource;
-			this.mEntropySource = entropySource;
-			this.mDrbgProvider = drbgProvider;
-			this.mPredictionResistant = predictionResistant;
+			mRandomSource = randomSource;
+			mEntropySource = entropySource;
+			mDrbgProvider = drbgProvider;
+			mPredictionResistant = predictionResistant;
 		}
 
 		public override void SetSeed(byte[] seed)
@@ -32,7 +32,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 			{
 				if (mRandomSource != null)
 				{
-					this.mRandomSource.SetSeed(seed);
+					mRandomSource.SetSeed(seed);
 				}
 			}
 		}
@@ -57,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 				// this will happen when SecureRandom() is created
 				if (mRandomSource != null)
 				{
-					this.mRandomSource.SetSeed(seed);
+					mRandomSource.SetSeed(seed);
 				}
 			}
 		}

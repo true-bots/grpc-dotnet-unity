@@ -31,16 +31,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		public static byte[] Generate(byte[] P, byte[] S, int N, int r, int p, int dkLen)
 		{
 			if (P == null)
+			{
 				throw new ArgumentNullException("Passphrase P must be provided.");
+			}
+
 			if (S == null)
+			{
 				throw new ArgumentNullException("Salt S must be provided.");
+			}
+
 			if (N <= 1 || !IsPowerOf2(N))
+			{
 				throw new ArgumentException("Cost parameter N must be > 1 and a power of 2.");
+			}
+
 			// Only value of r that cost (as an int) could be exceeded for is 1
 			if (r == 1 && N >= 65536)
+			{
 				throw new ArgumentException("Cost parameter N must be > 1 and < 65536.");
+			}
+
 			if (r < 1)
+			{
 				throw new ArgumentException("Block size r must be >= 1.");
+			}
+
 			int maxParallel = int.MaxValue / (128 * r * 8);
 			if (p < 1 || p > maxParallel)
 			{
@@ -49,12 +64,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			}
 
 			if (dkLen < 1)
+			{
 				throw new ArgumentException("Generated key length dkLen must be >= 1.");
+			}
 
 			return MFcrypt(P, S, N, r, p, dkLen);
 		}
 
-		private static byte[] MFcrypt(byte[] P, byte[] S, int N, int r, int p, int dkLen)
+		static byte[] MFcrypt(byte[] P, byte[] S, int N, int r, int p, int dkLen)
 		{
 			int MFLenBytes = r * 128;
 			byte[] bytes = SingleIterationPBKDF2(P, S, p * MFLenBytes);
@@ -73,7 +90,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				 * larger than 32KiB, except that the minimum chunk size is 2 * r * 32.
 				 */
 				int d = 0, total = N * r;
-				while ((N - d) > 2 && total > (1 << 10))
+				while (N - d > 2 && total > 1 << 10)
 				{
 					++d;
 					total >>= 1;
@@ -96,7 +113,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			}
 		}
 
-		private static byte[] SingleIterationPBKDF2(byte[] P, byte[] S, int dkLen)
+		static byte[] SingleIterationPBKDF2(byte[] P, byte[] S, int dkLen)
 		{
 			PbeParametersGenerator pGen = new Pkcs5S2ParametersGenerator(new Sha256Digest());
 			pGen.Init(P, S, 1);
@@ -173,7 +190,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
             }
         }
 #else
-		private static void SMix(uint[] B, int BOff, int N, int d, int r)
+		static void SMix(uint[] B, int BOff, int N, int d, int r)
 		{
 			int powN = Integers.NumberOfTrailingZeros(N);
 			int blocksPerChunk = N >> d;
@@ -228,7 +245,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			}
 		}
 
-		private static void BlockMix(uint[] B, uint[] X1, uint[] Y, int r)
+		static void BlockMix(uint[] B, uint[] X1, uint[] Y, int r)
 		{
 			Array.Copy(B, B.Length - 16, X1, 0, 16);
 
@@ -247,7 +264,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		}
 #endif
 
-		private static void Clear(Array array)
+		static void Clear(Array array)
 		{
 			if (array != null)
 			{
@@ -255,7 +272,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			}
 		}
 
-		private static void ClearAll(params Array[] arrays)
+		static void ClearAll(params Array[] arrays)
 		{
 			foreach (Array array in arrays)
 			{
@@ -264,7 +281,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		}
 
 		// note: we know X is non-zero
-		private static bool IsPowerOf2(int x)
+		static bool IsPowerOf2(int x)
 		{
 			Debug.Assert(x != 0);
 

@@ -63,31 +63,40 @@ namespace BestHTTP.SignalRCore
 		public JsonProtocol(IEncoder encoder)
 		{
 			if (encoder == null)
+			{
 				throw new ArgumentNullException("encoder");
+			}
 
-			this.Encoder = encoder;
+			Encoder = encoder;
 		}
 
 		public void ParseMessages(BufferSegment segment, ref List<Message> messages)
 		{
 			if (segment.Data == null || segment.Count == 0)
+			{
 				return;
+			}
 
 			int from = segment.Offset;
-			int separatorIdx = Array.IndexOf<byte>(segment.Data, (byte)JsonProtocol.Separator, from);
+			int separatorIdx = Array.IndexOf<byte>(segment.Data, (byte)Separator, from);
 			if (separatorIdx == -1)
+			{
 				throw new Exception("Missing separator in data! Segment: " + segment.ToString());
+			}
 
 			while (separatorIdx != -1)
 			{
 				if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+				{
 					HTTPManager.Logger.Verbose("JsonProtocol", "ParseMessages - " + System.Text.Encoding.UTF8.GetString(segment.Data, from, separatorIdx - from));
-				var message = this.Encoder.DecodeAs<Message>(new BufferSegment(segment.Data, from, separatorIdx - from));
+				}
+
+				Message message = Encoder.DecodeAs<Message>(new BufferSegment(segment.Data, from, separatorIdx - from));
 
 				messages.Add(message);
 
 				from = separatorIdx + 1;
-				separatorIdx = Array.IndexOf<byte>(segment.Data, (byte)JsonProtocol.Separator, from);
+				separatorIdx = Array.IndexOf<byte>(segment.Data, (byte)Separator, from);
 			}
 		}
 
@@ -100,7 +109,7 @@ namespace BestHTTP.SignalRCore
 			switch (message.type)
 			{
 				case MessageTypes.StreamItem:
-					result = this.Encoder.Encode<StreamItemMessage>(new StreamItemMessage()
+					result = Encoder.Encode<StreamItemMessage>(new StreamItemMessage()
 					{
 						type = message.type,
 						invocationId = message.invocationId,
@@ -111,7 +120,7 @@ namespace BestHTTP.SignalRCore
 				case MessageTypes.Completion:
 					if (!string.IsNullOrEmpty(message.error))
 					{
-						result = this.Encoder.Encode<CompletionWithError>(new CompletionWithError()
+						result = Encoder.Encode<CompletionWithError>(new CompletionWithError()
 						{
 							type = MessageTypes.Completion,
 							invocationId = message.invocationId,
@@ -120,7 +129,7 @@ namespace BestHTTP.SignalRCore
 					}
 					else if (message.result != null)
 					{
-						result = this.Encoder.Encode<CompletionWithResult>(new CompletionWithResult()
+						result = Encoder.Encode<CompletionWithResult>(new CompletionWithResult()
 						{
 							type = MessageTypes.Completion,
 							invocationId = message.invocationId,
@@ -128,11 +137,13 @@ namespace BestHTTP.SignalRCore
 						});
 					}
 					else
-						result = this.Encoder.Encode<Completion>(new Completion()
+					{
+						result = Encoder.Encode<Completion>(new Completion()
 						{
 							type = MessageTypes.Completion,
 							invocationId = message.invocationId
 						});
+					}
 
 					break;
 
@@ -140,7 +151,7 @@ namespace BestHTTP.SignalRCore
 				case MessageTypes.StreamInvocation:
 					if (message.streamIds != null)
 					{
-						result = this.Encoder.Encode<UploadInvocationMessage>(new UploadInvocationMessage()
+						result = Encoder.Encode<UploadInvocationMessage>(new UploadInvocationMessage()
 						{
 							type = message.type,
 							invocationId = message.invocationId,
@@ -152,7 +163,7 @@ namespace BestHTTP.SignalRCore
 					}
 					else
 					{
-						result = this.Encoder.Encode<InvocationMessage>(new InvocationMessage()
+						result = Encoder.Encode<InvocationMessage>(new InvocationMessage()
 						{
 							type = message.type,
 							invocationId = message.invocationId,
@@ -165,7 +176,7 @@ namespace BestHTTP.SignalRCore
 					break;
 
 				case MessageTypes.CancelInvocation:
-					result = this.Encoder.Encode<CancelInvocationMessage>(new CancelInvocationMessage()
+					result = Encoder.Encode<CancelInvocationMessage>(new CancelInvocationMessage()
 					{
 						invocationId = message.invocationId
 					});
@@ -180,7 +191,7 @@ namespace BestHTTP.SignalRCore
 				case MessageTypes.Close:
 					if (!string.IsNullOrEmpty(message.error))
 					{
-						result = this.Encoder.Encode<CloseWithErrorMessage>(new CloseWithErrorMessage() { error = message.error });
+						result = Encoder.Encode<CloseWithErrorMessage>(new CloseWithErrorMessage() { error = message.error });
 					}
 					else
 					{
@@ -193,32 +204,40 @@ namespace BestHTTP.SignalRCore
 			}
 
 			if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+			{
 				HTTPManager.Logger.Verbose("JsonProtocol", "EncodeMessage - json: " + System.Text.Encoding.UTF8.GetString(result.Data, 0, result.Count - 1));
+			}
 
 			return result;
 		}
 
-		private BufferSegment EncodeKnown(string json)
+		BufferSegment EncodeKnown(string json)
 		{
 			int len = System.Text.Encoding.UTF8.GetByteCount(json);
 			byte[] buffer = BufferPool.Get(len + 1, true);
 			System.Text.Encoding.UTF8.GetBytes(json, 0, json.Length, buffer, 0);
-			buffer[len] = (byte)JsonProtocol.Separator;
+			buffer[len] = (byte)Separator;
 			return new BufferSegment(buffer, 0, len + 1);
 		}
 
 		public object[] GetRealArguments(Type[] argTypes, object[] arguments)
 		{
 			if (arguments == null || arguments.Length == 0)
+			{
 				return null;
+			}
 
 			if (argTypes.Length > arguments.Length)
+			{
 				throw new Exception(string.Format("argType.Length({0}) < arguments.length({1})", argTypes.Length, arguments.Length));
+			}
 
 			object[] realArgs = new object[arguments.Length];
 
 			for (int i = 0; i < arguments.Length; ++i)
+			{
 				realArgs[i] = ConvertTo(argTypes[i], arguments[i]);
+			}
 
 			return realArgs;
 		}
@@ -226,7 +245,9 @@ namespace BestHTTP.SignalRCore
 		public object ConvertTo(Type toType, object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 #if NETFX_CORE
             TypeInfo typeInfo = toType.GetTypeInfo();
@@ -237,27 +258,35 @@ namespace BestHTTP.SignalRCore
 #else
 			if (toType.IsEnum)
 #endif
+			{
 				return Enum.Parse(toType, obj.ToString(), true);
+			}
 
 #if NETFX_CORE
             if (typeInfo.IsPrimitive)
 #else
 			if (toType.IsPrimitive)
 #endif
+			{
 				return Convert.ChangeType(obj, toType);
+			}
 
 			if (toType == typeof(string))
+			{
 				return obj.ToString();
+			}
 
 #if NETFX_CORE
             if (typeInfo.IsGenericType && toType.Name == "Nullable`1")
                 return Convert.ChangeType(obj, toType.GenericTypeArguments[0]);
 #else
 			if (toType.IsGenericType && toType.Name == "Nullable`1")
+			{
 				return Convert.ChangeType(obj, toType.GetGenericArguments()[0]);
+			}
 #endif
 
-			return this.Encoder.ConvertTo(toType, obj);
+			return Encoder.ConvertTo(toType, obj);
 		}
 
 		/// <summary>

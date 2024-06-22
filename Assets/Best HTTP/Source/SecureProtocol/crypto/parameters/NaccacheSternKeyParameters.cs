@@ -13,8 +13,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	 */
 	public class NaccacheSternKeyParameters : AsymmetricKeyParameter
 	{
-		private readonly BigInteger g, n;
-		private readonly int lowerSigmaBound;
+		readonly BigInteger g, n;
+		readonly int lowerSigmaBound;
 
 		/**
 		 * @param privateKey

@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace Mochineko.gRPC.NET.Editor
 {
-	internal static class GRPCSettings
+	static class GRPCSettings
 	{
 		internal static string ProtocPath { get; private set; } = string.Empty;
-		private const string protocPathKey = "Mochineko.gRPC.NET.Editor.ProtocPath";
+		const string protocPathKey = "Mochineko.gRPC.NET.Editor.ProtocPath";
 		internal static string GrpcCsharpPluginPath { get; private set; } = string.Empty;
-		private const string grpcCsharpPluginPathKey = "Mochineko.gRPC.NET.Editor.GrpcCsharpPluginPath";
+		const string grpcCsharpPluginPathKey = "Mochineko.gRPC.NET.Editor.GrpcCsharpPluginPath";
 
 		[SettingsProvider]
 		public static SettingsProvider CreateSettingsProvider()
@@ -18,12 +18,12 @@ namespace Mochineko.gRPC.NET.Editor
 			ProtocPath = EditorPrefs.GetString(protocPathKey);
 			GrpcCsharpPluginPath = EditorPrefs.GetString(grpcCsharpPluginPathKey);
 
-			var provider = new SettingsProvider("Preferences/", SettingsScope.User)
+			SettingsProvider? provider = new SettingsProvider("Preferences/", SettingsScope.User)
 			{
 				label = "gRPC.NET",
 				guiHandler = _ =>
 				{
-					using (var changeScope = new EditorGUI.ChangeCheckScope())
+					using (EditorGUI.ChangeCheckScope? changeScope = new EditorGUI.ChangeCheckScope())
 					{
 						if (GUILayout.Button("Select protoc.exe Path ..."))
 						{

@@ -10,9 +10,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class LiteralDataPacket
 		: InputStreamPacket
 	{
-		private int format;
-		private byte[] fileName;
-		private long modDate;
+		int format;
+		byte[] fileName;
+		long modDate;
 
 		internal LiteralDataPacket(
 			BcpgInputStream bcpgIn)
@@ -26,7 +26,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			{
 				int ch = bcpgIn.ReadByte();
 				if (ch < 0)
+				{
 					throw new IOException("literal data truncated in header");
+				}
 
 				fileName[i] = (byte)ch;
 			}

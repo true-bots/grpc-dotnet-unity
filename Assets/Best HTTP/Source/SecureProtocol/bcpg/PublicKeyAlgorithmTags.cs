@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		Experimental_8 = 107,
 		Experimental_9 = 108,
 		Experimental_10 = 109,
-		Experimental_11 = 110,
+		Experimental_11 = 110
 	}
 }
 #pragma warning restore

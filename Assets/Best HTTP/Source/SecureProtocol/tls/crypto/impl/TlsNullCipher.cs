@@ -16,7 +16,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 		public TlsNullCipher(TlsCryptoParameters cryptoParams, TlsHmac clientMac, TlsHmac serverMac)
 		{
 			if (TlsImplUtilities.IsTlsV13(cryptoParams))
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			m_cryptoParams = cryptoParams;
 
@@ -43,18 +45,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 			pos += serverMac.MacLength;
 
 			if (pos != keyBlockSize)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 #endif
 
 			if (cryptoParams.IsServer)
 			{
-				this.m_writeMac = new TlsSuiteHmac(cryptoParams, serverMac);
-				this.m_readMac = new TlsSuiteHmac(cryptoParams, clientMac);
+				m_writeMac = new TlsSuiteHmac(cryptoParams, serverMac);
+				m_readMac = new TlsSuiteHmac(cryptoParams, clientMac);
 			}
 			else
 			{
-				this.m_writeMac = new TlsSuiteHmac(cryptoParams, clientMac);
-				this.m_readMac = new TlsSuiteHmac(cryptoParams, serverMac);
+				m_writeMac = new TlsSuiteHmac(cryptoParams, clientMac);
+				m_readMac = new TlsSuiteHmac(cryptoParams, serverMac);
 			}
 		}
 
@@ -100,7 +104,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 		{
 			int macSize = m_readMac.Size;
 			if (len < macSize)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			int macInputLen = len - macSize;
 
@@ -108,7 +114,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 
 			bool badMac = !TlsUtilities.ConstantTimeAreEqual(macSize, expectedMac, 0, ciphertext, offset + macInputLen);
 			if (badMac)
+			{
 				throw new TlsFatalAlert(AlertDescription.bad_record_mac);
+			}
 
 			return new TlsDecodeResult(ciphertext, offset, macInputLen, recordType);
 		}

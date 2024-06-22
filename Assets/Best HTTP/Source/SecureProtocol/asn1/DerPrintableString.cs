@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerPrintableString), Asn1Tags.PrintableString)
+			Meta() : base(typeof(DerPrintableString), Asn1Tags.PrintableString)
 			{
 			}
 
@@ -34,16 +34,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerPrintableString GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerPrintableString derPrintableString)
+			{
 				return derPrintableString;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerPrintableString converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -57,7 +63,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj));
 		}
 
 		/**
@@ -72,7 +78,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (DerPrintableString)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly byte[] m_contents;
+		readonly byte[] m_contents;
 
 		public DerPrintableString(string str)
 			: this(str, false)
@@ -90,9 +96,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public DerPrintableString(string str, bool validate)
 		{
 			if (str == null)
+			{
 				throw new ArgumentNullException("str");
+			}
+
 			if (validate && !IsPrintableString(str))
+			{
 				throw new ArgumentException("string contains illegal characters", "str");
+			}
 
 			m_contents = Strings.ToAsciiByteArray(str);
 		}
@@ -105,7 +116,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal DerPrintableString(byte[] contents, bool clone)
 		{
 			if (null == contents)
+			{
 				throw new ArgumentNullException("contents");
+			}
 
 			m_contents = clone ? Arrays.Clone(contents) : contents;
 		}
@@ -135,7 +148,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			DerPrintableString that = asn1Object as DerPrintableString;
 			return null != that
-			       && Arrays.AreEqual(this.m_contents, that.m_contents);
+			       && Arrays.AreEqual(m_contents, that.m_contents);
 		}
 
 		protected override int Asn1GetHashCode()
@@ -154,12 +167,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			foreach (char ch in str)
 			{
 				if (ch > 0x007f)
+				{
 					return false;
+				}
 
 				if (char.IsLetterOrDigit(ch))
+				{
 					continue;
+				}
 
-//				if (char.IsPunctuation(ch))
+				//				if (char.IsPunctuation(ch))
 //					continue;
 
 				switch (ch)

@@ -18,11 +18,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	public class X509V2AttributeCertificate
 		: X509ExtensionBase
 	{
-		private readonly AttributeCertificate cert;
-		private readonly DateTime notBefore;
-		private readonly DateTime notAfter;
+		readonly AttributeCertificate cert;
+		readonly DateTime notBefore;
+		readonly DateTime notAfter;
 
-		private static AttributeCertificate GetObject(Stream input)
+		static AttributeCertificate GetObject(Stream input)
 		{
 			try
 			{
@@ -56,8 +56,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			try
 			{
-				this.notAfter = cert.ACInfo.AttrCertValidityPeriod.NotAfterTime.ToDateTime();
-				this.notBefore = cert.ACInfo.AttrCertValidityPeriod.NotBeforeTime.ToDateTime();
+				notAfter = cert.ACInfo.AttrCertValidityPeriod.NotAfterTime.ToDateTime();
+				notBefore = cert.ACInfo.AttrCertValidityPeriod.NotBeforeTime.ToDateTime();
 			}
 			catch (Exception e)
 			{
@@ -134,16 +134,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 		public virtual void CheckValidity()
 		{
-			this.CheckValidity(DateTime.UtcNow);
+			CheckValidity(DateTime.UtcNow);
 		}
 
 		public virtual void CheckValidity(
 			DateTime date)
 		{
 			if (date.CompareTo(NotAfter) > 0)
+			{
 				throw new CertificateExpiredException("certificate expired on " + NotAfter);
+			}
+
 			if (date.CompareTo(NotBefore) < 0)
+			{
 				throw new CertificateNotYetValidException("certificate not valid until " + NotBefore);
+			}
 		}
 
 		public virtual AlgorithmIdentifier SignatureAlgorithm
@@ -179,15 +184,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		{
 			// TODO Compare IsAlgIDEqual in X509Certificate.CheckSignature
 			if (!cert.SignatureAlgorithm.Equals(cert.ACInfo.Signature))
+			{
 				throw new CertificateException("Signature algorithm in certificate info not same as outer certificate");
+			}
 
 			IStreamCalculator<IVerifier> streamCalculator = verifier.CreateCalculator();
 
 			try
 			{
-				byte[] b = this.cert.ACInfo.GetEncoded();
+				byte[] b = cert.ACInfo.GetEncoded();
 
-				using (var stream = streamCalculator.Stream)
+				using (Stream stream = streamCalculator.Stream)
 				{
 					stream.Write(b, 0, b.Length);
 				}
@@ -197,8 +204,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				throw new SignatureException("Exception encoding certificate info object", e);
 			}
 
-			if (!streamCalculator.GetResult().IsVerified(this.GetSignature()))
+			if (!streamCalculator.GetResult().IsVerified(GetSignature()))
+			{
 				throw new InvalidKeyException("Public key presented not for certificate signature");
+			}
 		}
 
 		public virtual byte[] GetEncoded()
@@ -228,7 +237,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			string oid)
 		{
 			Asn1Sequence seq = cert.ACInfo.Attributes;
-			var list = new List<X509Attribute>();
+			List<X509Attribute> list = new List<X509Attribute>();
 
 			for (int i = 0; i != seq.Count; i++)
 			{
@@ -250,12 +259,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		public override bool Equals(object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			X509V2AttributeCertificate other = obj as X509V2AttributeCertificate;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return cert.Equals(other.cert);
 

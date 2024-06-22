@@ -12,9 +12,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class SeedEngine
 		: IBlockCipher
 	{
-		private const int BlockSize = 16;
+		const int BlockSize = 16;
 
-		private static readonly uint[] SS0 =
+		static readonly uint[] SS0 =
 		{
 			0x2989a1a8, 0x05858184, 0x16c6d2d4, 0x13c3d3d0, 0x14445054, 0x1d0d111c, 0x2c8ca0ac, 0x25052124,
 			0x1d4d515c, 0x03434340, 0x18081018, 0x1e0e121c, 0x11415150, 0x3cccf0fc, 0x0acac2c8, 0x23436360,
@@ -50,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x28c8e0e8, 0x1b0b1318, 0x05050104, 0x39497178, 0x10809090, 0x2a4a6268, 0x2a0a2228, 0x1a8a9298
 		};
 
-		private static readonly uint[] SS1 =
+		static readonly uint[] SS1 =
 		{
 			0x38380830, 0xe828c8e0, 0x2c2d0d21, 0xa42686a2, 0xcc0fcfc3, 0xdc1eced2, 0xb03383b3, 0xb83888b0,
 			0xac2f8fa3, 0x60204060, 0x54154551, 0xc407c7c3, 0x44044440, 0x6c2f4f63, 0x682b4b63, 0x581b4b53,
@@ -86,7 +86,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0xd819c9d1, 0x4c0c4c40, 0x80038383, 0x8c0f8f83, 0xcc0ecec2, 0x383b0b33, 0x480a4a42, 0xb43787b3
 		};
 
-		private static readonly uint[] SS2 =
+		static readonly uint[] SS2 =
 		{
 			0xa1a82989, 0x81840585, 0xd2d416c6, 0xd3d013c3, 0x50541444, 0x111c1d0d, 0xa0ac2c8c, 0x21242505,
 			0x515c1d4d, 0x43400343, 0x10181808, 0x121c1e0e, 0x51501141, 0xf0fc3ccc, 0xc2c80aca, 0x63602343,
@@ -122,7 +122,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0xe0e828c8, 0x13181b0b, 0x01040505, 0x71783949, 0x90901080, 0x62682a4a, 0x22282a0a, 0x92981a8a
 		};
 
-		private static readonly uint[] SS3 =
+		static readonly uint[] SS3 =
 		{
 			0x08303838, 0xc8e0e828, 0x0d212c2d, 0x86a2a426, 0xcfc3cc0f, 0xced2dc1e, 0x83b3b033, 0x88b0b838,
 			0x8fa3ac2f, 0x40606020, 0x45515415, 0xc7c3c407, 0x44404404, 0x4f636c2f, 0x4b63682b, 0x4b53581b,
@@ -158,7 +158,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0xc9d1d819, 0x4c404c0c, 0x83838003, 0x8f838c0f, 0xcec2cc0e, 0x0b33383b, 0x4a42480a, 0x87b3b437
 		};
 
-		private static readonly uint[] KC =
+		static readonly uint[] KC =
 		{
 			0x9e3779b9, 0x3c6ef373, 0x78dde6e6, 0xf1bbcdcc,
 			0xe3779b99, 0xc6ef3733, 0x8dde6e67, 0x1bbcdccf,
@@ -166,8 +166,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x779b99e3, 0xef3733c6, 0xde6e678d, 0xbcdccf1b
 		};
 
-		private int[] wKey;
-		private bool forEncryption;
+		int[] wKey;
+		bool forEncryption;
 
 		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
@@ -188,7 +188,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
 		{
 			if (wKey == null)
+			{
 				throw new InvalidOperationException("SEED engine not initialised");
+			}
 
 			Check.DataLength(inBuf, inOff, BlockSize, "input buffer too short");
 			Check.OutputLength(outBuf, outOff, BlockSize, "output buffer too short");
@@ -202,7 +204,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					long nl = r;
 
-					r = l ^ F(wKey[2 * i], wKey[(2 * i) + 1], r);
+					r = l ^ F(wKey[2 * i], wKey[2 * i + 1], r);
 					l = nl;
 				}
 			}
@@ -212,7 +214,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					long nl = r;
 
-					r = l ^ F(wKey[2 * i], wKey[(2 * i) + 1], r);
+					r = l ^ F(wKey[2 * i], wKey[2 * i + 1], r);
 					l = nl;
 				}
 			}
@@ -263,10 +265,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 #endif
 
-		private int[] CreateWorkingKey(byte[] inKey)
+		int[] CreateWorkingKey(byte[] inKey)
 		{
 			if (inKey.Length != 16)
+			{
 				throw new ArgumentException("key size must be 128 bits");
+			}
 
 			int[] key = new int[32];
 			long lower = (long)Pack.BE_To_UInt64(inKey, 0);
@@ -299,37 +303,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return key;
 		}
 
-		private int extractW1(
+		int extractW1(
 			long lVal)
 		{
 			return (int)lVal;
 		}
 
-		private int extractW0(
+		int extractW0(
 			long lVal)
 		{
 			return (int)(lVal >> 32);
 		}
 
-		private long rotateLeft8(
+		long rotateLeft8(
 			long x)
 		{
-			return (x << 8) | ((long)((ulong)x >> 56));
+			return (x << 8) | (long)((ulong)x >> 56);
 		}
 
-		private long rotateRight8(
+		long rotateRight8(
 			long x)
 		{
-			return ((long)((ulong)x >> 8)) | (x << 56);
+			return (long)((ulong)x >> 8) | (x << 56);
 		}
 
-		private int G(
+		int G(
 			int x)
 		{
 			return (int)(SS0[x & 0xff] ^ SS1[(x >> 8) & 0xff] ^ SS2[(x >> 16) & 0xff] ^ SS3[(x >> 24) & 0xff]);
 		}
 
-		private long F(
+		long F(
 			int ki0,
 			int ki1,
 			long r)
@@ -342,22 +346,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return ((long)rd0 << 32) | (rd1 & 0xffffffffL);
 		}
 
-		private int phaseCalc1(
+		int phaseCalc1(
 			int r0,
 			int ki0,
 			int r1,
 			int ki1)
 		{
-			return G(G((r0 ^ ki0) ^ (r1 ^ ki1)) + (r0 ^ ki0));
+			return G(G(r0 ^ ki0 ^ r1 ^ ki1) + (r0 ^ ki0));
 		}
 
-		private int phaseCalc2(
+		int phaseCalc2(
 			int r0,
 			int ki0,
 			int r1,
 			int ki1)
 		{
-			return G(phaseCalc1(r0, ki0, r1, ki1) + G((r0 ^ ki0) ^ (r1 ^ ki1)));
+			return G(phaseCalc1(r0, ki0, r1, ki1) + G(r0 ^ ki0 ^ r1 ^ ki1));
 		}
 	}
 }

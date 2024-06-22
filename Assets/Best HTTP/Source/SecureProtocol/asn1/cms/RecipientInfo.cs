@@ -50,15 +50,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object o)
 		{
 			if (o == null || o is RecipientInfo)
+			{
 				return (RecipientInfo)o;
+			}
 
 			if (o is Asn1Sequence)
+			{
 				return new RecipientInfo((Asn1Sequence)o);
+			}
 
 			if (o is Asn1TaggedObject)
+			{
 				return new RecipientInfo((Asn1TaggedObject)o);
+			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(o));
 		}
 
 		public DerInteger Version
@@ -120,7 +126,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			}
 		}
 
-		private KekRecipientInfo GetKekInfo(
+		KekRecipientInfo GetKekInfo(
 			Asn1TaggedObject o)
 		{
 			// For compatibility with erroneous version, we don't always pass 'false' here

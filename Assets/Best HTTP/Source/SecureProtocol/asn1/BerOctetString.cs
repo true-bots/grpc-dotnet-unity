@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public class BerOctetString
 		: DerOctetString
 	{
-		private const int DefaultSegmentLimit = 1000;
+		const int DefaultSegmentLimit = 1000;
 
 		public static BerOctetString FromSequence(Asn1Sequence seq)
 		{
@@ -54,8 +54,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private readonly int segmentLimit;
-		private readonly Asn1OctetString[] elements;
+		readonly int segmentLimit;
+		readonly Asn1OctetString[] elements;
 
 		public BerOctetString(byte[] contents)
 			: this(contents, DefaultSegmentLimit)
@@ -77,7 +77,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 		}
 
-		private BerOctetString(byte[] contents, Asn1OctetString[] elements, int segmentLimit)
+		BerOctetString(byte[] contents, Asn1OctetString[] elements, int segmentLimit)
 			: base(contents)
 		{
 			this.elements = elements;
@@ -87,10 +87,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncoding(int encoding)
 		{
 			if (Asn1OutputStream.EncodingBer != encoding)
+			{
 				return base.GetEncoding(encoding);
+			}
 
 			if (null == elements)
+			{
 				return new PrimitiveEncoding(Asn1Tags.Universal, Asn1Tags.OctetString, contents);
+			}
 
 			return new ConstructedILEncoding(Asn1Tags.Universal, Asn1Tags.OctetString,
 				Asn1OutputStream.GetContentsEncodings(encoding, elements));
@@ -99,10 +103,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncodingImplicit(int encoding, int tagClass, int tagNo)
 		{
 			if (Asn1OutputStream.EncodingBer != encoding)
+			{
 				return base.GetEncodingImplicit(encoding, tagClass, tagNo);
+			}
 
 			if (null == elements)
+			{
 				return new PrimitiveEncoding(tagClass, tagNo, contents);
+			}
 
 			return new ConstructedILEncoding(tagClass, tagNo,
 				Asn1OutputStream.GetContentsEncodings(encoding, elements));

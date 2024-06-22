@@ -40,9 +40,9 @@ namespace BestHTTP.Proxies.Autodetect
 #endif
 		};
 
-		private IProxyDetector[] _proxyDetectors;
-		private ProxyDetectionMode _detectionMode;
-		private bool _attached;
+		IProxyDetector[] _proxyDetectors;
+		ProxyDetectionMode _detectionMode;
+		bool _attached;
 
 		public ProxyDetector()
 			: this(ProxyDetectionMode.CacheFirstFound, GetDefaultDetectors())
@@ -56,21 +56,23 @@ namespace BestHTTP.Proxies.Autodetect
 
 		public ProxyDetector(ProxyDetectionMode detectionMode, IProxyDetector[] proxyDetectors)
 		{
-			this._detectionMode = detectionMode;
-			this._proxyDetectors = proxyDetectors;
+			_detectionMode = detectionMode;
+			_proxyDetectors = proxyDetectors;
 
-			if (this._proxyDetectors != null)
+			if (_proxyDetectors != null)
+			{
 				Reattach();
+			}
 		}
 
 		public void Reattach()
 		{
-			HTTPManager.Logger.Information(nameof(ProxyDetector), $"{nameof(Reattach)}({this._attached})");
+			HTTPManager.Logger.Information(nameof(ProxyDetector), $"{nameof(Reattach)}({_attached})");
 
-			if (!this._attached)
+			if (!_attached)
 			{
 				RequestEventHelper.OnEvent += OnRequestEvent;
-				this._attached = true;
+				_attached = true;
 			}
 		}
 
@@ -79,16 +81,16 @@ namespace BestHTTP.Proxies.Autodetect
 		/// </summary>
 		public void Detach()
 		{
-			HTTPManager.Logger.Information(nameof(ProxyDetector), $"{nameof(Detach)}({this._attached})");
+			HTTPManager.Logger.Information(nameof(ProxyDetector), $"{nameof(Detach)}({_attached})");
 
-			if (this._attached)
+			if (_attached)
 			{
 				RequestEventHelper.OnEvent -= OnRequestEvent;
-				this._attached = false;
+				_attached = false;
 			}
 		}
 
-		private void OnRequestEvent(RequestEventInfo @event)
+		void OnRequestEvent(RequestEventInfo @event)
 		{
 			// The Resend event is raised for every request when it's queued up (sent or redirected).
 			if (@event.Event == RequestEvents.Resend && @event.SourceRequest.Proxy == null)
@@ -99,22 +101,28 @@ namespace BestHTTP.Proxies.Autodetect
 
 				try
 				{
-					foreach (var detector in this._proxyDetectors)
+					foreach (IProxyDetector detector in _proxyDetectors)
 					{
 						if (detector == null)
+						{
 							continue;
+						}
 
 						if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+						{
 							HTTPManager.Logger.Verbose(nameof(ProxyDetector), $"Calling {detector.GetType().Name}'s GetProxy", @event.SourceRequest.Context);
+						}
 
-						var proxy = detector.GetProxy(@event.SourceRequest);
+						Proxy proxy = detector.GetProxy(@event.SourceRequest);
 						if (proxy != null && proxy.UseProxyForAddress(uri))
 						{
 							if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+							{
 								HTTPManager.Logger.Verbose(nameof(ProxyDetector), $"[{detector.GetType().Name}] Proxy found: {proxy.Address} ",
 									@event.SourceRequest.Context);
+							}
 
-							switch (this._detectionMode)
+							switch (_detectionMode)
 							{
 								case ProxyDetectionMode.Continouos:
 									@event.SourceRequest.Proxy = proxy;
@@ -137,8 +145,10 @@ namespace BestHTTP.Proxies.Autodetect
 				}
 				catch (Exception ex)
 				{
-					if (HTTPManager.Logger.Level == BestHTTP.Logger.Loglevels.All)
+					if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+					{
 						HTTPManager.Logger.Exception(nameof(ProxyDetector), $"GetProxyFor({@event.SourceRequest.CurrentUri})", ex, @event.SourceRequest.Context);
+					}
 				}
 			}
 		}

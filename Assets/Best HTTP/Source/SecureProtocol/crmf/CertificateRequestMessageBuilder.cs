@@ -12,24 +12,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 {
 	public class CertificateRequestMessageBuilder
 	{
-		private readonly BigInteger _certReqId;
-		private X509ExtensionsGenerator _extGenerator;
-		private CertTemplateBuilder _templateBuilder;
-		private IList<IControl> m_controls = new List<IControl>();
-		private ISignatureFactory _popSigner;
-		private PKMacBuilder _pkMacBuilder;
-		private char[] _password;
-		private GeneralName _sender;
-		private int _popoType = ProofOfPossession.TYPE_KEY_ENCIPHERMENT;
-		private PopoPrivKey _popoPrivKey;
-		private Asn1Null _popRaVerified;
-		private PKMacValue _agreeMac;
+		readonly BigInteger _certReqId;
+		X509ExtensionsGenerator _extGenerator;
+		CertTemplateBuilder _templateBuilder;
+		IList<IControl> m_controls = new List<IControl>();
+		ISignatureFactory _popSigner;
+		PKMacBuilder _pkMacBuilder;
+		char[] _password;
+		GeneralName _sender;
+		int _popoType = ProofOfPossession.TYPE_KEY_ENCIPHERMENT;
+		PopoPrivKey _popoPrivKey;
+		Asn1Null _popRaVerified;
+		PKMacValue _agreeMac;
 
 		public CertificateRequestMessageBuilder(BigInteger certReqId)
 		{
-			this._certReqId = certReqId;
-			this._extGenerator = new X509ExtensionsGenerator();
-			this._templateBuilder = new CertTemplateBuilder();
+			_certReqId = certReqId;
+			_extGenerator = new X509ExtensionsGenerator();
+			_templateBuilder = new CertTemplateBuilder();
 		}
 
 		public CertificateRequestMessageBuilder SetPublicKey(SubjectPublicKeyInfo publicKeyInfo)
@@ -105,7 +105,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 				throw new InvalidOperationException("only one proof of possession is allowed.");
 			}
 
-			this._popSigner = popoSignatureFactory;
+			_popSigner = popoSignatureFactory;
 
 			return this;
 		}
@@ -117,8 +117,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 				throw new InvalidOperationException("only one proof of possession is allowed.");
 			}
 
-			this._popoType = ProofOfPossession.TYPE_KEY_ENCIPHERMENT;
-			this._popoPrivKey = new PopoPrivKey(msg);
+			_popoType = ProofOfPossession.TYPE_KEY_ENCIPHERMENT;
+			_popoPrivKey = new PopoPrivKey(msg);
 
 			return this;
 		}
@@ -136,8 +136,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 				throw new ArgumentException("type must be ProofOfPossession.TYPE_KEY_ENCIPHERMENT || ProofOfPossession.TYPE_KEY_AGREEMENT");
 			}
 
-			this._popoType = type;
-			this._popoPrivKey = new PopoPrivKey(msg);
+			_popoType = type;
+			_popoPrivKey = new PopoPrivKey(msg);
 			return this;
 		}
 
@@ -148,7 +148,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 				throw new InvalidOperationException("only one proof of possession allowed");
 			}
 
-			this._agreeMac = macValue;
+			_agreeMac = macValue;
 			return this;
 		}
 
@@ -159,15 +159,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 				throw new InvalidOperationException("only one proof of possession allowed");
 			}
 
-			this._popRaVerified = DerNull.Instance;
+			_popRaVerified = DerNull.Instance;
 
 			return this;
 		}
 
 		public CertificateRequestMessageBuilder SetAuthInfoPKMAC(PKMacBuilder pkmacFactory, char[] password)
 		{
-			this._pkMacBuilder = pkmacFactory;
-			this._password = password;
+			_pkMacBuilder = pkmacFactory;
+			_password = password;
 
 			return this;
 		}
@@ -179,17 +179,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 
 		public CertificateRequestMessageBuilder SetAuthInfoSender(GeneralName sender)
 		{
-			this._sender = sender;
+			_sender = sender;
 			return this;
 		}
 
 		public CertificateRequestMessage Build()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(new DerInteger(this._certReqId));
+			Asn1EncodableVector v = new Asn1EncodableVector(new DerInteger(_certReqId));
 
-			if (!this._extGenerator.IsEmpty)
+			if (!_extGenerator.IsEmpty)
 			{
-				this._templateBuilder.SetExtensions(_extGenerator.Generate());
+				_templateBuilder.SetExtensions(_extGenerator.Generate());
 			}
 
 			v.Add(_templateBuilder.Build());
@@ -198,7 +198,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 			{
 				Asn1EncodableVector controlV = new Asn1EncodableVector();
 
-				foreach (var control in m_controls)
+				foreach (IControl control in m_controls)
 				{
 					controlV.Add(new AttributeTypeAndValue(control.Type, control.Value));
 				}
@@ -257,7 +257,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 			return new CertificateRequestMessage(CertReqMsg.GetInstance(new DerSequence(v)));
 		}
 
-		private static Time CreateTime(DateTime? dateTime)
+		static Time CreateTime(DateTime? dateTime)
 		{
 			return dateTime == null ? null : new Time(dateTime.Value);
 		}

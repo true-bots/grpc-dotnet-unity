@@ -123,18 +123,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			new int[] { 1213, 1217, 1223 },
 			new int[] { 1229, 1231, 1237 },
 			new int[] { 1249, 1259, 1277 },
-			new int[] { 1279, 1283, 1289 },
+			new int[] { 1279, 1283, 1289 }
 		};
 
 		internal static readonly int[] primeProducts;
 
-		private const long IMASK = 0xFFFFFFFFL;
-		private const ulong UIMASK = 0xFFFFFFFFUL;
+		const long IMASK = 0xFFFFFFFFL;
+		const ulong UIMASK = 0xFFFFFFFFUL;
 
-		private static readonly int[] ZeroMagnitude = new int[0];
-		private static readonly byte[] ZeroEncoding = new byte[0];
+		static readonly int[] ZeroMagnitude = new int[0];
+		static readonly byte[] ZeroEncoding = new byte[0];
 
-		private static readonly BigInteger[] SMALL_CONSTANTS = new BigInteger[17];
+		static readonly BigInteger[] SMALL_CONSTANTS = new BigInteger[17];
 		public static readonly BigInteger Zero;
 		public static readonly BigInteger One;
 		public static readonly BigInteger Two;
@@ -143,7 +143,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public static readonly BigInteger Ten;
 
 #if !NETCOREAPP3_0_OR_GREATER
-		private readonly static byte[] BitLengthTable =
+		static readonly byte[] BitLengthTable =
 		{
 			0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4,
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
@@ -165,19 +165,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 #endif
 
 		// TODO Parse radix-2 64 bits at a time and radix-8 63 bits at a time
-		private const int chunk2 = 1, chunk8 = 1, chunk10 = 19, chunk16 = 16;
-		private static readonly BigInteger radix2, radix2E, radix8, radix8E, radix10, radix10E, radix16, radix16E;
+		const int chunk2 = 1, chunk8 = 1, chunk10 = 19, chunk16 = 16;
+		static readonly BigInteger radix2, radix2E, radix8, radix8E, radix10, radix10E, radix16, radix16E;
 
 		/*
 		 * These are the threshold bit-lengths (of an exponent) where we increase the window size.
 		 * They are calculated according to the expected savings in multiplications.
 		 * Some squares will also be saved on average, but we offset these against the extra storage costs.
 		 */
-		private static readonly int[] ExpWindowThresholds = { 7, 25, 81, 241, 673, 1793, 4609, int.MaxValue };
+		static readonly int[] ExpWindowThresholds = { 7, 25, 81, 241, 673, 1793, 4609, int.MaxValue };
 
-		private const int BitsPerByte = 8;
-		private const int BitsPerInt = 32;
-		private const int BytesPerInt = 4;
+		const int BitsPerByte = 8;
+		const int BitsPerInt = 32;
+		const int BytesPerInt = 4;
 
 		static BigInteger()
 		{
@@ -224,20 +224,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			}
 		}
 
-		private int[] magnitude; // array of ints with [0] being the most significant
-		private int sign; // -1 means -ve; +1 means +ve; 0 means 0;
+		int[] magnitude; // array of ints with [0] being the most significant
+		int sign; // -1 means -ve; +1 means +ve; 0 means 0;
 
-		[NonSerialized] private int nBits = -1; // cache BitCount() value
-		[NonSerialized] private int nBitLength = -1; // cache BitLength() value
+		[NonSerialized] int nBits = -1; // cache BitCount() value
+		[NonSerialized] int nBitLength = -1; // cache BitLength() value
 
 		[OnDeserialized]
-		private void OnDeserialized(StreamingContext context)
+		void OnDeserialized(StreamingContext context)
 		{
-			this.nBits = -1;
-			this.nBitLength = -1;
+			nBits = -1;
+			nBitLength = -1;
 		}
 
-		private static int GetByteLength(int nBits)
+		static int GetByteLength(int nBits)
 		{
 			return (nBits + BitsPerByte - 1) / BitsPerByte;
 		}
@@ -247,7 +247,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return new BigInteger(sizeInBits, SecureRandom.ArbitraryRandom);
 		}
 
-		private BigInteger(
+		BigInteger(
 			int signum,
 			int[] mag,
 			bool checkMag)
@@ -262,29 +262,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 
 				if (i == mag.Length)
 				{
-					this.sign = 0;
-					this.magnitude = ZeroMagnitude;
+					sign = 0;
+					magnitude = ZeroMagnitude;
 				}
 				else
 				{
-					this.sign = signum;
+					sign = signum;
 
 					if (i == 0)
 					{
-						this.magnitude = mag;
+						magnitude = mag;
 					}
 					else
 					{
 						// strip leading 0 words
-						this.magnitude = new int[mag.Length - i];
-						Array.Copy(mag, i, this.magnitude, 0, this.magnitude.Length);
+						magnitude = new int[mag.Length - i];
+						Array.Copy(mag, i, magnitude, 0, magnitude.Length);
 					}
 				}
 			}
 			else
 			{
-				this.sign = signum;
-				this.magnitude = mag;
+				sign = signum;
+				magnitude = mag;
 			}
 		}
 
@@ -299,7 +299,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			int radix)
 		{
 			if (str.Length == 0)
+			{
 				throw new FormatException("Zero length BigInteger");
+			}
 
 			NumberStyles style;
 			int chunk;
@@ -347,7 +349,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			if (str[0] == '-')
 			{
 				if (str.Length == 1)
+				{
 					throw new FormatException("Zero length BigInteger");
+				}
 
 				sign = -1;
 				index = 1;
@@ -391,7 +395,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 						case 2:
 							// TODO Need this because we are parsing in radix 10 above
 							if (i >= 2)
+							{
 								throw new FormatException("Bad character in radix 2 string: " + s);
+							}
 
 							// TODO Parse 64 bits at a time
 							b = b.ShiftLeft(1);
@@ -399,7 +405,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 						case 8:
 							// TODO Need this because we are parsing in radix 10 above
 							if (i >= 8)
+							{
 								throw new FormatException("Bad character in radix 8 string: " + s);
+							}
 
 							// TODO Parse 63 bits at a time
 							b = b.ShiftLeft(3);
@@ -486,24 +494,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			int length)
 		{
 			if (length == 0)
+			{
 				throw new FormatException("Zero length BigInteger");
+			}
 
 			// TODO Move this processing into MakeMagnitude (provide sign argument)
 			if ((sbyte)bytes[offset] < 0)
 			{
-				this.sign = -1;
+				sign = -1;
 
 				int end = offset + length;
 
 				int iBval;
 				// strip leading sign bytes
-				for (iBval = offset; iBval < end && ((sbyte)bytes[iBval] == -1); iBval++)
+				for (iBval = offset; iBval < end && (sbyte)bytes[iBval] == -1; iBval++)
 				{
 				}
 
 				if (iBval >= end)
 				{
-					this.magnitude = One.magnitude;
+					magnitude = One.magnitude;
 				}
 				else
 				{
@@ -532,23 +542,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 
 					inverse[index]++;
 
-					this.magnitude = MakeMagnitude(inverse);
+					magnitude = MakeMagnitude(inverse);
 				}
 			}
 			else
 			{
 				// strip leading zero bytes and return magnitude bytes
-				this.magnitude = MakeMagnitude(bytes, offset, length);
-				this.sign = this.magnitude.Length > 0 ? 1 : 0;
+				magnitude = MakeMagnitude(bytes, offset, length);
+				sign = magnitude.Length > 0 ? 1 : 0;
 			}
 		}
 
-		private static int[] MakeMagnitude(byte[] bytes)
+		static int[] MakeMagnitude(byte[] bytes)
 		{
 			return MakeMagnitude(bytes, 0, bytes.Length);
 		}
 
-		private static int[] MakeMagnitude(byte[] bytes, int offset, int length)
+		static int[] MakeMagnitude(byte[] bytes, int offset, int length)
 		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return MakeMagnitude(bytes.AsSpan(offset, length));
@@ -562,7 +572,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			}
 
 			if (firstSignificant >= end)
+			{
 				return ZeroMagnitude;
+			}
 
 			int nInts = (end - firstSignificant + 3) / BytesPerInt;
 			int bCount = (end - firstSignificant) % BytesPerInt;
@@ -572,7 +584,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			}
 
 			if (nInts < 1)
+			{
 				return ZeroMagnitude;
+			}
 
 			int[] mag = new int[nInts];
 
@@ -660,18 +674,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public BigInteger(int sign, byte[] bytes, int offset, int length)
 		{
 			if (sign < -1 || sign > 1)
+			{
 				throw new FormatException("Invalid sign value");
+			}
 
 			if (sign == 0)
 			{
 				this.sign = 0;
-				this.magnitude = ZeroMagnitude;
+				magnitude = ZeroMagnitude;
 			}
 			else
 			{
 				// copy bytes
-				this.magnitude = MakeMagnitude(bytes, offset, length);
-				this.sign = this.magnitude.Length < 1 ? 0 : sign;
+				magnitude = MakeMagnitude(bytes, offset, length);
+				this.sign = magnitude.Length < 1 ? 0 : sign;
 			}
 		}
 
@@ -700,15 +716,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			Random random)
 		{
 			if (sizeInBits < 0)
+			{
 				throw new ArgumentException("sizeInBits must be non-negative");
+			}
 
-			this.nBits = -1;
-			this.nBitLength = -1;
+			nBits = -1;
+			nBitLength = -1;
 
 			if (sizeInBits == 0)
 			{
-				this.sign = 0;
-				this.magnitude = ZeroMagnitude;
+				sign = 0;
+				magnitude = ZeroMagnitude;
 				return;
 			}
 
@@ -727,8 +745,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			int xBits = BitsPerByte * nBytes - sizeInBits;
 			b[0] &= (byte)(255U >> xBits);
 
-			this.magnitude = MakeMagnitude(b);
-			this.sign = this.magnitude.Length < 1 ? 0 : 1;
+			magnitude = MakeMagnitude(b);
+			sign = magnitude.Length < 1 ? 0 : 1;
 		}
 
 		public BigInteger(
@@ -737,14 +755,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			Random random)
 		{
 			if (bitLength < 2)
+			{
 				throw new ArithmeticException("bitLength < 2");
+			}
 
-			this.sign = 1;
-			this.nBitLength = bitLength;
+			sign = 1;
+			nBitLength = bitLength;
 
 			if (bitLength == 2)
 			{
-				this.magnitude = random.Next(2) == 0
+				magnitude = random.Next(2) == 0
 					? Two.magnitude
 					: Three.magnitude;
 				return;
@@ -777,21 +797,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				// ensure the trailing bit is 1 (i.e. must be odd)
 				b[nBytes - 1] |= 1;
 
-				this.magnitude = MakeMagnitude(b);
-				this.nBits = -1;
+				magnitude = MakeMagnitude(b);
+				nBits = -1;
 
 				if (certainty < 1)
+				{
 					break;
+				}
 
 				if (CheckProbablePrime(certainty, random, true))
-					break;
-
-				for (int j = 1; j < (magnitude.Length - 1); ++j)
 				{
-					this.magnitude[j] ^= random.Next();
+					break;
+				}
+
+				for (int j = 1; j < magnitude.Length - 1; ++j)
+				{
+					magnitude[j] ^= random.Next();
 
 					if (CheckProbablePrime(certainty, random, true))
+					{
 						return;
+					}
 				}
 			}
 		}
@@ -804,7 +830,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		/**
 		 * return a = a + b - b preserved.
 		 */
-		private static int[] AddMagnitudes(
+		static int[] AddMagnitudes(
 			int[] a,
 			int[] b)
 		{
@@ -814,7 +840,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 
 			while (vI >= 0)
 			{
-				m += ((long)(uint)a[tI] + (long)(uint)b[vI--]);
+				m += (long)(uint)a[tI] + (long)(uint)b[vI--];
 				a[tI--] = (int)m;
 				m = (long)((ulong)m >> 32);
 			}
@@ -832,16 +858,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public BigInteger Add(
 			BigInteger value)
 		{
-			if (this.sign == 0)
+			if (sign == 0)
+			{
 				return value;
+			}
 
-			if (this.sign != value.sign)
+			if (sign != value.sign)
 			{
 				if (value.sign == 0)
+				{
 					return this;
+				}
 
 				if (value.sign < 0)
+				{
 					return Subtract(value.Negate());
+				}
 
 				return value.Subtract(Negate());
 			}
@@ -849,25 +881,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return AddToMagnitude(value.magnitude);
 		}
 
-		private BigInteger AddToMagnitude(
+		BigInteger AddToMagnitude(
 			int[] magToAdd)
 		{
 			int[] big, small;
-			if (this.magnitude.Length < magToAdd.Length)
+			if (magnitude.Length < magToAdd.Length)
 			{
 				big = magToAdd;
-				small = this.magnitude;
+				small = magnitude;
 			}
 			else
 			{
-				big = this.magnitude;
+				big = magnitude;
 				small = magToAdd;
 			}
 
 			// Conservatively avoid over-allocation when no overflow possible
 			uint limit = uint.MaxValue;
 			if (big.Length == small.Length)
+			{
 				limit -= (uint)small[0];
+			}
 
 			bool possibleOverflow = (uint)big[0] >= limit;
 
@@ -884,19 +918,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 
 			bigCopy = AddMagnitudes(bigCopy, small);
 
-			return new BigInteger(this.sign, bigCopy, possibleOverflow);
+			return new BigInteger(sign, bigCopy, possibleOverflow);
 		}
 
 		public BigInteger And(
 			BigInteger value)
 		{
-			if (this.sign == 0 || value.sign == 0)
+			if (sign == 0 || value.sign == 0)
 			{
 				return Zero;
 			}
 
-			int[] aMag = this.sign > 0
-				? this.magnitude
+			int[] aMag = sign > 0
+				? magnitude
 				: Add(One).magnitude;
 
 			int[] bMag = value.sign > 0
@@ -915,7 +949,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				int aWord = i >= aStart ? aMag[i - aStart] : 0;
 				int bWord = i >= bStart ? bMag[i - bStart] : 0;
 
-				if (this.sign < 0)
+				if (sign < 0)
 				{
 					aWord = ~aWord;
 				}
@@ -986,35 +1020,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			u = u - ((u >> 1) & 0x55555555);
 			u = (u & 0x33333333) + ((u >> 2) & 0x33333333);
 			u = (u + (u >> 4)) & 0x0f0f0f0f;
-			u += (u >> 8);
-			u += (u >> 16);
+			u += u >> 8;
+			u += u >> 16;
 			u &= 0x3f;
 			return (int)u;
 #endif
 		}
 
-		private static int CalcBitLength(int sign, int indx, int[] mag)
+		static int CalcBitLength(int sign, int indx, int[] mag)
 		{
 			for (;;)
 			{
 				if (indx >= mag.Length)
+				{
 					return 0;
+				}
 
 				if (mag[indx] != 0)
+				{
 					break;
+				}
 
 				++indx;
 			}
 
 			// bit length for everything after the first int
-			int bitLength = 32 * ((mag.Length - indx) - 1);
+			int bitLength = 32 * (mag.Length - indx - 1);
 
 			// and determine bitlength of first int
 			int firstMag = mag[indx];
 			bitLength += BitLen(firstMag);
 
 			// Check for negative powers of two
-			if (sign < 0 && ((firstMag & -firstMag) == firstMag))
+			if (sign < 0 && (firstMag & -firstMag) == firstMag)
 			{
 				do
 				{
@@ -1044,7 +1082,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			}
 		}
 
-		private static int BitLen(byte b)
+		static int BitLen(byte b)
 		{
 #if NETCOREAPP3_0_OR_GREATER
             return 32 - BitOperations.LeadingZeroCount((uint)b);
@@ -1053,7 +1091,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 #endif
 		}
 
-		private static int BitLen(int w)
+		static int BitLen(int w)
 		{
 #if NETCOREAPP3_0_OR_GREATER
             return 32 - BitOperations.LeadingZeroCount((uint)w);
@@ -1061,18 +1099,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			uint v = (uint)w;
 			uint t = v >> 24;
 			if (t != 0)
+			{
 				return 24 + BitLengthTable[t];
+			}
+
 			t = v >> 16;
 			if (t != 0)
+			{
 				return 16 + BitLengthTable[t];
+			}
+
 			t = v >> 8;
 			if (t != 0)
+			{
 				return 8 + BitLengthTable[t];
+			}
+
 			return BitLengthTable[v];
 #endif
 		}
 
-		private bool QuickPow2Check()
+		bool QuickPow2Check()
 		{
 			return sign > 0 && nBits == 1;
 		}
@@ -1080,7 +1127,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public int CompareTo(BigInteger other)
 		{
 			if (other == null)
+			{
 				return 1;
+			}
 
 			return sign < other.sign
 				? -1
@@ -1095,7 +1144,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		 * unsigned comparison on two arrays - note the arrays may
 		 * start with leading zeros.
 		 */
-		private static int CompareTo(
+		static int CompareTo(
 			int xIndx,
 			int[] x,
 			int yIndx,
@@ -1114,13 +1163,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return CompareNoLeadingZeroes(xIndx, x, yIndx, y);
 		}
 
-		private static int CompareNoLeadingZeroes(
+		static int CompareNoLeadingZeroes(
 			int xIndx,
 			int[] x,
 			int yIndx,
 			int[] y)
 		{
-			int diff = (x.Length - y.Length) - (xIndx - yIndx);
+			int diff = x.Length - y.Length - (xIndx - yIndx);
 
 			if (diff != 0)
 			{
@@ -1135,7 +1184,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				uint v2 = (uint)y[yIndx++];
 
 				if (v1 != v2)
+				{
 					return v1 < v2 ? -1 : 1;
+				}
 			}
 
 			return 0;
@@ -1145,7 +1196,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		 * return z = x / y - done in place (z value preserved, x contains the
 		 * remainder)
 		 */
-		private int[] Divide(
+		int[] Divide(
 			int[] x,
 			int[] y)
 		{
@@ -1209,7 +1260,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 						while (x[xStart] == 0)
 						{
 							if (++xStart == x.Length)
+							{
 								return count;
+							}
 						}
 
 						//xBitLength = CalcBitLength(xStart, x);
@@ -1218,12 +1271,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 						if (xBitLength <= yBitLength)
 						{
 							if (xBitLength < yBitLength)
+							{
 								return count;
+							}
 
 							xyCmp = CompareNoLeadingZeroes(xStart, x, yStart, y);
 
 							if (xyCmp <= 0)
+							{
 								break;
+							}
 						}
 					}
 
@@ -1235,7 +1292,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 						uint firstC = (uint)c[cStart] >> 1;
 						uint firstX = (uint)x[xStart];
 						if (firstC > firstX)
+						{
 							++shift;
+						}
 					}
 
 					if (shift < 2)
@@ -1281,27 +1340,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			BigInteger val)
 		{
 			if (val.sign == 0)
+			{
 				throw new ArithmeticException("Division by zero error");
+			}
 
 			if (sign == 0)
+			{
 				return Zero;
+			}
 
 			if (val.QuickPow2Check()) // val is power of two
 			{
-				BigInteger result = this.Abs().ShiftRight(val.Abs().BitLength - 1);
-				return val.sign == this.sign ? result : result.Negate();
+				BigInteger result = Abs().ShiftRight(val.Abs().BitLength - 1);
+				return val.sign == sign ? result : result.Negate();
 			}
 
-			int[] mag = (int[])this.magnitude.Clone();
+			int[] mag = (int[])magnitude.Clone();
 
-			return new BigInteger(this.sign * val.sign, Divide(mag, val.magnitude), true);
+			return new BigInteger(sign * val.sign, Divide(mag, val.magnitude), true);
 		}
 
 		public BigInteger[] DivideAndRemainder(
 			BigInteger val)
 		{
 			if (val.sign == 0)
+			{
 				throw new ArithmeticException("Division by zero error");
+			}
 
 			BigInteger[] biggies = new BigInteger[2];
 
@@ -1313,19 +1378,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			else if (val.QuickPow2Check()) // val is power of two
 			{
 				int e = val.Abs().BitLength - 1;
-				BigInteger quotient = this.Abs().ShiftRight(e);
-				int[] remainder = this.LastNBits(e);
+				BigInteger quotient = Abs().ShiftRight(e);
+				int[] remainder = LastNBits(e);
 
-				biggies[0] = val.sign == this.sign ? quotient : quotient.Negate();
-				biggies[1] = new BigInteger(this.sign, remainder, true);
+				biggies[0] = val.sign == sign ? quotient : quotient.Negate();
+				biggies[1] = new BigInteger(sign, remainder, true);
 			}
 			else
 			{
-				int[] remainder = (int[])this.magnitude.Clone();
+				int[] remainder = (int[])magnitude.Clone();
 				int[] quotient = Divide(remainder, val.magnitude);
 
-				biggies[0] = new BigInteger(this.sign * val.sign, quotient, true);
-				biggies[1] = new BigInteger(this.sign, remainder, true);
+				biggies[0] = new BigInteger(sign * val.sign, quotient, true);
+				biggies[1] = new BigInteger(sign, remainder, true);
 			}
 
 			return biggies;
@@ -1334,9 +1399,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public override bool Equals(object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
+
 			if (!(obj is BigInteger biggie))
+			{
 				return false;
+			}
 
 			return sign == biggie.sign && IsEqualMagnitude(biggie);
 		}
@@ -1344,22 +1414,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public bool Equals(BigInteger other)
 		{
 			if (other == this)
+			{
 				return true;
+			}
+
 			if (other == null)
+			{
 				return false;
+			}
 
 			return sign == other.sign && IsEqualMagnitude(other);
 		}
 
-		private bool IsEqualMagnitude(BigInteger x)
+		bool IsEqualMagnitude(BigInteger x)
 		{
 			int[] xMag = x.magnitude;
 			if (magnitude.Length != x.magnitude.Length)
+			{
 				return false;
+			}
+
 			for (int i = 0; i < magnitude.Length; i++)
 			{
 				if (magnitude[i] != x.magnitude[i])
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -1369,10 +1449,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			BigInteger value)
 		{
 			if (value.sign == 0)
+			{
 				return Abs();
+			}
 
 			if (sign == 0)
+			{
 				return value.Abs();
+			}
 
 			BigInteger r;
 			BigInteger u = this;
@@ -1405,13 +1489,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		}
 
 		// TODO Make public?
-		private BigInteger Inc()
+		BigInteger Inc()
 		{
-			if (this.sign == 0)
+			if (sign == 0)
+			{
 				return One;
+			}
 
-			if (this.sign < 0)
-				return new BigInteger(-1, doSubBigLil(this.magnitude, One.magnitude), true);
+			if (sign < 0)
+			{
+				return new BigInteger(-1, doSubBigLil(magnitude, One.magnitude), true);
+			}
 
 			return AddToMagnitude(One.magnitude);
 		}
@@ -1421,7 +1509,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			get
 			{
 				if (sign == 0)
+				{
 					return 0;
+				}
 
 				int n = magnitude.Length;
 
@@ -1436,7 +1526,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			get
 			{
 				if (BitLength > 31)
+				{
 					throw new ArithmeticException("BigInteger out of int range");
+				}
 
 				return IntValue;
 			}
@@ -1455,20 +1547,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		internal bool IsProbablePrime(int certainty, bool randomlySelected)
 		{
 			if (certainty <= 0)
+			{
 				return true;
+			}
 
 			BigInteger n = Abs();
 
 			if (!n.TestBit(0))
+			{
 				return n.Equals(Two);
+			}
 
 			if (n.Equals(One))
+			{
 				return false;
+			}
 
 			return n.CheckProbablePrime(certainty, SecureRandom.ArbitraryRandom, randomlySelected);
 		}
 
-		private bool CheckProbablePrime(int certainty, Random random, bool randomlySelected)
+		bool CheckProbablePrime(int certainty, Random random, bool randomlySelected)
 		{
 			Debug.Assert(certainty > 0);
 			Debug.Assert(CompareTo(Two) > 0);
@@ -1528,7 +1626,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			Debug.Assert(bits > 2);
 			Debug.Assert(TestBit(0));
 
-			int iterations = ((certainty - 1) / 2) + 1;
+			int iterations = (certainty - 1) / 2 + 1;
 			if (randomlySelected)
 			{
 				int itersFor100Cert = bits >= 1024 ? 4
@@ -1575,12 +1673,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 					while (!y.Equals(minusMontRadix))
 					{
 						if (++j == s)
+						{
 							return false;
+						}
 
 						y = ModPowMonty(y, Two, n, false);
 
 						if (y.Equals(montRadix))
+						{
 							return false;
+						}
 					}
 				}
 			} while (--iterations > 0);
@@ -1682,7 +1784,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			get
 			{
 				if (sign == 0)
+				{
 					return 0;
+				}
 
 				int n = magnitude.Length;
 
@@ -1701,7 +1805,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			get
 			{
 				if (BitLength > 63)
+				{
 					throw new ArithmeticException("BigInteger out of long range");
+				}
 
 				return LongValue;
 			}
@@ -1723,18 +1829,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			BigInteger m)
 		{
 			if (m.sign < 1)
+			{
 				throw new ArithmeticException("Modulus must be positive");
+			}
 
 			BigInteger biggie = Remainder(m);
 
-			return (biggie.sign >= 0 ? biggie : biggie.Add(m));
+			return biggie.sign >= 0 ? biggie : biggie.Add(m);
 		}
 
 		public BigInteger ModInverse(
 			BigInteger m)
 		{
 			if (m.sign < 1)
+			{
 				throw new ArithmeticException("Modulus must be positive");
+			}
 
 			// TODO Too slow at the moment
 //			// "Fast Key Exchange with Elliptic Curve Systems" R.Schoeppel
@@ -1779,12 +1889,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				return ModInversePow2(m);
 			}
 
-			BigInteger d = this.Remainder(m);
+			BigInteger d = Remainder(m);
 			BigInteger x;
 			BigInteger gcd = ExtEuclid(d, m, out x);
 
 			if (!gcd.Equals(One))
+			{
 				throw new ArithmeticException("Numbers not relatively prime.");
+			}
 
 			if (x.sign < 0)
 			{
@@ -1794,7 +1906,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return x;
 		}
 
-		private BigInteger ModInversePow2(BigInteger m)
+		BigInteger ModInversePow2(BigInteger m)
 		{
 			Debug.Assert(m.SignValue > 0);
 			Debug.Assert(m.BitCount == 1);
@@ -1809,14 +1921,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			long inv64 = (long)Raw.Mod.Inverse64((ulong)LongValue);
 			if (pow < 64)
 			{
-				inv64 &= ((1L << pow) - 1);
+				inv64 &= (1L << pow) - 1;
 			}
 
 			BigInteger x = ValueOf(inv64);
 
 			if (pow > 64)
 			{
-				BigInteger d = this.Remainder(m);
+				BigInteger d = Remainder(m);
 				int bitsCorrect = 64;
 
 				do
@@ -1851,7 +1963,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		 * @param u1Out      the return object for the u1 value
 		 * @return     The greatest common divisor of a and b
 		 */
-		private static BigInteger ExtEuclid(BigInteger a, BigInteger b, out BigInteger u1Out)
+		static BigInteger ExtEuclid(BigInteger a, BigInteger b, out BigInteger u1Out)
 		{
 			BigInteger u1 = One, v1 = Zero;
 			BigInteger u3 = a, v3 = b;
@@ -1868,7 +1980,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 					u1 = v1;
 
 					if (v3.sign <= 0)
+					{
 						break;
+					}
 
 					v1 = oldU1.Subtract(v1.Multiply(q[0]));
 				}
@@ -1879,7 +1993,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return u3;
 		}
 
-		private static void ZeroOut(
+		static void ZeroOut(
 			int[] x)
 		{
 			Array.Clear(x, 0, x.Length);
@@ -1888,22 +2002,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public BigInteger ModPow(BigInteger e, BigInteger m)
 		{
 			if (m.sign < 1)
+			{
 				throw new ArithmeticException("Modulus must be positive");
+			}
 
 			if (m.Equals(One))
+			{
 				return Zero;
+			}
 
 			if (e.sign == 0)
+			{
 				return One;
+			}
 
 			if (sign == 0)
+			{
 				return Zero;
+			}
 
 			bool negExp = e.sign < 0;
 			if (negExp)
+			{
 				e = e.Negate();
+			}
 
-			BigInteger result = this.Mod(m);
+			BigInteger result = Mod(m);
 			if (!e.Equals(One))
 			{
 				if ((m.magnitude[m.magnitude.Length - 1] & 1) == 0)
@@ -1917,12 +2041,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			}
 
 			if (negExp)
+			{
 				result = result.ModInverse(m);
+			}
 
 			return result;
 		}
 
-		private static BigInteger ModPowBarrett(BigInteger b, BigInteger e, BigInteger m)
+		static BigInteger ModPowBarrett(BigInteger b, BigInteger e, BigInteger m)
 		{
 			int k = m.magnitude.Length;
 			BigInteger mr = One.ShiftLeft((k + 1) << 5);
@@ -1987,11 +2113,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return y;
 		}
 
-		private static BigInteger ReduceBarrett(BigInteger x, BigInteger m, BigInteger mr, BigInteger yu)
+		static BigInteger ReduceBarrett(BigInteger x, BigInteger m, BigInteger mr, BigInteger yu)
 		{
 			int xLen = x.BitLength, mLen = m.BitLength;
 			if (xLen < mLen)
+			{
 				return x;
+			}
 
 			if (xLen - mLen > 1)
 			{
@@ -2020,7 +2148,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return x;
 		}
 
-		private static BigInteger ModPowMonty(BigInteger b, BigInteger e, BigInteger m, bool convert)
+		static BigInteger ModPowMonty(BigInteger b, BigInteger e, BigInteger m, bool convert)
 		{
 			int n = m.magnitude.Length;
 			int powR = 32 * n;
@@ -2122,7 +2250,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return new BigInteger(1, yVal, true);
 		}
 
-		private static int[] GetWindowList(int[] mag, int extraBits)
+		static int[] GetWindowList(int[] mag, int extraBits)
 		{
 			int v = mag[0];
 			Debug.Assert(v != 0);
@@ -2176,7 +2304,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return result;
 		}
 
-		private static int CreateWindowEntry(int mult, int zeroes)
+		static int CreateWindowEntry(int mult, int zeroes)
 		{
 			Debug.Assert(mult > 0);
 
@@ -2198,7 +2326,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		/**
 		 * return w with w = x * x - w is assumed to have enough space.
 		 */
-		private static int[] Square(
+		static int[] Square(
 			int[] w,
 			int[] x)
 		{
@@ -2236,7 +2364,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				}
 				else
 				{
-					Debug.Assert((c >> 32) == 0);
+					Debug.Assert(c >> 32 == 0);
 				}
 
 				wBase += i;
@@ -2253,7 +2381,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			}
 			else
 			{
-				Debug.Assert((c >> 32) == 0);
+				Debug.Assert(c >> 32 == 0);
 			}
 
 			return w;
@@ -2262,12 +2390,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		/**
 		 * return x with x = y * z - x is assumed to have enough space.
 		 */
-		private static int[] Multiply(int[] x, int[] y, int[] z)
+		static int[] Multiply(int[] x, int[] y, int[] z)
 		{
 			int i = z.Length;
 
 			if (i < 1)
+			{
 				return x;
+			}
 
 			int xBase = x.Length - y.Length;
 
@@ -2306,9 +2436,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		/**
 		 * Calculate mQuote = -m^(-1) mod b with b = 2^32 (32 = word size)
 		 */
-		private int GetMQuote()
+		int GetMQuote()
 		{
-			Debug.Assert(this.sign > 0);
+			Debug.Assert(sign > 0);
 
 			int d = -magnitude[magnitude.Length - 1];
 
@@ -2317,7 +2447,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return (int)Raw.Mod.Inverse32((uint)d);
 		}
 
-		private static void MontgomeryReduce(int[] x, int[] m, uint mDash) // mDash = -m^(-1) mod b
+		static void MontgomeryReduce(int[] x, int[] m, uint mDash) // mDash = -m^(-1) mod b
 		{
 			// NOTE: Not a general purpose reduction (which would allow x up to twice the bitlength of m)
 			Debug.Assert(x.Length == m.Length);
@@ -2363,7 +2493,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		 * <br/>
 		 * NOTE: the indices of x, y, m, a different in HAC and in Java
 		 */
-		private static void MultiplyMonty(int[] a, int[] x, int[] y, int[] m, uint mDash, bool smallMontyModulus)
+		static void MultiplyMonty(int[] a, int[] x, int[] y, int[] m, uint mDash, bool smallMontyModulus)
 			// mDash = -m^(-1) mod b
 		{
 			int n = m.Length;
@@ -2441,7 +2571,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			Array.Copy(a, 1, x, 0, n);
 		}
 
-		private static void SquareMonty(int[] a, int[] x, int[] m, uint mDash, bool smallMontyModulus)
+		static void SquareMonty(int[] a, int[] x, int[] m, uint mDash, bool smallMontyModulus)
 			// mDash = -m^(-1) mod b
 		{
 			int n = m.Length;
@@ -2531,7 +2661,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			Array.Copy(a, 1, x, 0, n);
 		}
 
-		private static uint MultiplyMontyNIsOne(uint x, uint y, uint m, uint mDash)
+		static uint MultiplyMontyNIsOne(uint x, uint y, uint m, uint mDash)
 		{
 			ulong carry = (ulong)x * y;
 			uint t = (uint)carry * mDash;
@@ -2553,27 +2683,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			BigInteger val)
 		{
 			if (val == this)
+			{
 				return Square();
+			}
 
 			if ((sign & val.sign) == 0)
+			{
 				return Zero;
+			}
 
 			if (val.QuickPow2Check()) // val is power of two
 			{
-				BigInteger result = this.ShiftLeft(val.Abs().BitLength - 1);
+				BigInteger result = ShiftLeft(val.Abs().BitLength - 1);
 				return val.sign > 0 ? result : result.Negate();
 			}
 
-			if (this.QuickPow2Check()) // this is power of two
+			if (QuickPow2Check()) // this is power of two
 			{
-				BigInteger result = val.ShiftLeft(this.Abs().BitLength - 1);
-				return this.sign > 0 ? result : result.Negate();
+				BigInteger result = val.ShiftLeft(Abs().BitLength - 1);
+				return sign > 0 ? result : result.Negate();
 			}
 
 			int resLength = magnitude.Length + val.magnitude.Length;
 			int[] res = new int[resLength];
 
-			Multiply(res, this.magnitude, val.magnitude);
+			Multiply(res, magnitude, val.magnitude);
 
 			int resSign = sign ^ val.sign ^ 1;
 			return new BigInteger(resSign, res, true);
@@ -2582,12 +2716,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public BigInteger Square()
 		{
 			if (sign == 0)
+			{
 				return Zero;
-			if (this.QuickPow2Check())
+			}
+
+			if (QuickPow2Check())
+			{
 				return ShiftLeft(Abs().BitLength - 1);
+			}
+
 			int resLength = magnitude.Length << 1;
 			if ((uint)magnitude[0] >> 16 == 0)
+			{
 				--resLength;
+			}
+
 			int[] res = new int[resLength];
 			Square(res, magnitude);
 			return new BigInteger(1, res, false);
@@ -2596,7 +2739,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public BigInteger Negate()
 		{
 			if (sign == 0)
+			{
 				return this;
+			}
 
 			return new BigInteger(-sign, magnitude, false);
 		}
@@ -2604,10 +2749,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public BigInteger NextProbablePrime()
 		{
 			if (sign < 0)
+			{
 				throw new ArithmeticException("Cannot be called on value < 0");
+			}
 
 			if (CompareTo(Two) < 0)
+			{
 				return Two;
+			}
 
 			BigInteger n = Inc().SetBit(0);
 
@@ -2629,7 +2778,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			if (exp <= 0)
 			{
 				if (exp < 0)
+				{
 					throw new ArithmeticException("Negative exponent");
+				}
 
 				return One;
 			}
@@ -2661,7 +2812,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				}
 
 				exp >>= 1;
-				if (exp == 0) break;
+				if (exp == 0)
+				{
+					break;
+				}
+
 				z = z.Multiply(z);
 			}
 
@@ -2675,7 +2830,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return new BigInteger(bitLength, 100, random);
 		}
 
-		private int Remainder(
+		int Remainder(
 			int m)
 		{
 			Debug.Assert(m > 0);
@@ -2684,7 +2839,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			for (int pos = 0; pos < magnitude.Length; ++pos)
 			{
 				long posVal = (uint)magnitude[pos];
-				acc = (acc << 32 | posVal) % m;
+				acc = ((acc << 32) | posVal) % m;
 			}
 
 			return (int)acc;
@@ -2693,7 +2848,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		/**
 		 * return x = x % y - done in place (y value preserved)
 		 */
-		private static int[] Remainder(
+		static int[] Remainder(
 			int[] x,
 			int[] y)
 		{
@@ -2745,7 +2900,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 						while (x[xStart] == 0)
 						{
 							if (++xStart == x.Length)
+							{
 								return x;
+							}
 						}
 
 						//xBitLength = CalcBitLength(xStart, x);
@@ -2754,12 +2911,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 						if (xBitLength <= yBitLength)
 						{
 							if (xBitLength < yBitLength)
+							{
 								return x;
+							}
 
 							xyCmp = CompareNoLeadingZeroes(xStart, x, yStart, y);
 
 							if (xyCmp <= 0)
+							{
 								break;
+							}
 						}
 					}
 
@@ -2771,7 +2932,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 						uint firstC = (uint)c[cStart] >> 1;
 						uint firstX = (uint)x[xStart];
 						if (firstC > firstX)
+						{
 							++shift;
+						}
 					}
 
 					if (shift < 2)
@@ -2805,10 +2968,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			BigInteger n)
 		{
 			if (n.sign == 0)
+			{
 				throw new ArithmeticException("Division by zero error");
+			}
 
-			if (this.sign == 0)
+			if (sign == 0)
+			{
 				return Zero;
+			}
 
 			// For small values, use fast remainder method
 			if (n.magnitude.Length == 1)
@@ -2818,7 +2985,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				if (val > 0)
 				{
 					if (val == 1)
+					{
 						return Zero;
+					}
 
 					// TODO Make this func work on uint, and handle val == 1?
 					int rem = Remainder(val);
@@ -2830,7 +2999,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			}
 
 			if (CompareNoLeadingZeroes(0, magnitude, 0, n.magnitude) < 0)
+			{
 				return this;
+			}
 
 			int[] result;
 			if (n.QuickPow2Check()) // n is power of two
@@ -2840,24 +3011,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			}
 			else
 			{
-				result = (int[])this.magnitude.Clone();
+				result = (int[])magnitude.Clone();
 				result = Remainder(result, n.magnitude);
 			}
 
 			return new BigInteger(sign, result, true);
 		}
 
-		private int[] LastNBits(
+		int[] LastNBits(
 			int n)
 		{
 			if (n < 1)
+			{
 				return ZeroMagnitude;
+			}
 
 			int numWords = (n + BitsPerInt - 1) / BitsPerInt;
-			numWords = System.Math.Min(numWords, this.magnitude.Length);
+			numWords = System.Math.Min(numWords, magnitude.Length);
 			int[] result = new int[numWords];
 
-			Array.Copy(this.magnitude, this.magnitude.Length - numWords, result, 0, numWords);
+			Array.Copy(magnitude, magnitude.Length - numWords, result, 0, numWords);
 
 			int excessBits = (numWords << 5) - n;
 			if (excessBits > 0)
@@ -2868,23 +3041,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return result;
 		}
 
-		private BigInteger DivideWords(int w)
+		BigInteger DivideWords(int w)
 		{
 			Debug.Assert(w >= 0);
 			int n = magnitude.Length;
 			if (w >= n)
+			{
 				return Zero;
+			}
+
 			int[] mag = new int[n - w];
 			Array.Copy(magnitude, 0, mag, 0, n - w);
 			return new BigInteger(sign, mag, false);
 		}
 
-		private BigInteger RemainderWords(int w)
+		BigInteger RemainderWords(int w)
 		{
 			Debug.Assert(w >= 0);
 			int n = magnitude.Length;
 			if (w >= n)
+			{
 				return this;
+			}
+
 			int[] mag = new int[w];
 			Array.Copy(magnitude, n - w, mag, 0, w);
 			return new BigInteger(sign, mag, false);
@@ -2893,7 +3072,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		/**
 		 * do a left shift - this returns a new array.
 		 */
-		private static int[] ShiftLeft(
+		static int[] ShiftLeft(
 			int[] mag,
 			int n)
 		{
@@ -2938,7 +3117,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return newMag;
 		}
 
-		private static int ShiftLeftOneInPlace(int[] x, int carry)
+		static int ShiftLeftOneInPlace(int[] x, int carry)
 		{
 			Debug.Assert(carry == 0 || carry == 1);
 			int pos = x.Length;
@@ -2956,26 +3135,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			int n)
 		{
 			if (sign == 0 || magnitude.Length == 0)
+			{
 				return Zero;
+			}
 
 			if (n == 0)
+			{
 				return this;
+			}
 
 			if (n < 0)
+			{
 				return ShiftRight(-n);
+			}
 
 			BigInteger result = new BigInteger(sign, ShiftLeft(magnitude, n), true);
 
-			if (this.nBits != -1)
+			if (nBits != -1)
 			{
 				result.nBits = sign > 0
-					? this.nBits
-					: this.nBits + n;
+					? nBits
+					: nBits + n;
 			}
 
-			if (this.nBitLength != -1)
+			if (nBitLength != -1)
 			{
-				result.nBitLength = this.nBitLength + n;
+				result.nBitLength = nBitLength + n;
 			}
 
 			return result;
@@ -2984,7 +3169,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		/**
 		 * do a right shift - this does it in place.
 		 */
-		private static void ShiftRightInPlace(
+		static void ShiftRightInPlace(
 			int start,
 			int[] mag,
 			int n)
@@ -2995,7 +3180,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 
 			if (nInts != start)
 			{
-				int delta = (nInts - start);
+				int delta = nInts - start;
 
 				for (int i = magEnd; i >= nInts; i--)
 				{
@@ -3028,7 +3213,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		/**
 		 * do a right shift by one - this does it in place.
 		 */
-		private static void ShiftRightOneInPlace(
+		static void ShiftRightOneInPlace(
 			int start,
 			int[] mag)
 		{
@@ -3038,7 +3223,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			while (--i > start)
 			{
 				int next = mag[i - 1];
-				mag[i] = ((int)((uint)m >> 1)) | (next << 31);
+				mag[i] = (int)((uint)m >> 1) | (next << 31);
 				m = next;
 			}
 
@@ -3049,15 +3234,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			int n)
 		{
 			if (n == 0)
+			{
 				return this;
+			}
 
 			if (n < 0)
+			{
 				return ShiftLeft(-n);
+			}
 
 			if (n >= BitLength)
-				return (this.sign < 0 ? One.Negate() : Zero);
+			{
+				return sign < 0 ? One.Negate() : Zero;
+			}
 
-//			int[] res = (int[]) this.magnitude.Clone();
+			//			int[] res = (int[]) this.magnitude.Clone();
 //
 //			ShiftRightInPlace(0, res, n);
 //
@@ -3071,27 +3262,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 
 			if (numBits == 0)
 			{
-				Array.Copy(this.magnitude, 0, res, 0, res.Length);
+				Array.Copy(magnitude, 0, res, 0, res.Length);
 			}
 			else
 			{
 				int numBits2 = 32 - numBits;
 
-				int magPos = this.magnitude.Length - 1 - numInts;
+				int magPos = magnitude.Length - 1 - numInts;
 				for (int i = resultLength - 1; i >= 0; --i)
 				{
-					res[i] = (int)((uint)this.magnitude[magPos--] >> numBits);
+					res[i] = (int)((uint)magnitude[magPos--] >> numBits);
 
 					if (magPos >= 0)
 					{
-						res[i] |= this.magnitude[magPos] << numBits2;
+						res[i] |= magnitude[magPos] << numBits2;
 					}
 				}
 			}
 
 			Debug.Assert(res[0] != 0);
 
-			return new BigInteger(this.sign, res, false);
+			return new BigInteger(sign, res, false);
 		}
 
 		public int SignValue
@@ -3102,7 +3293,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		/**
 		 * returns x = x - y - we assume x is >= y
 		 */
-		private static int[] Subtract(
+		static int[] Subtract(
 			int xStart,
 			int[] x,
 			int yStart,
@@ -3139,17 +3330,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			BigInteger n)
 		{
 			if (n.sign == 0)
+			{
 				return this;
+			}
 
-			if (this.sign == 0)
+			if (sign == 0)
+			{
 				return n.Negate();
+			}
 
-			if (this.sign != n.sign)
+			if (sign != n.sign)
+			{
 				return Add(n.Negate());
+			}
 
 			int compare = CompareNoLeadingZeroes(0, magnitude, 0, n.magnitude);
 			if (compare == 0)
+			{
 				return Zero;
+			}
 
 			BigInteger bigun, lilun;
 			if (compare < 0)
@@ -3163,10 +3362,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				lilun = n;
 			}
 
-			return new BigInteger(this.sign * compare, doSubBigLil(bigun.magnitude, lilun.magnitude), true);
+			return new BigInteger(sign * compare, doSubBigLil(bigun.magnitude, lilun.magnitude), true);
 		}
 
-		private static int[] doSubBigLil(
+		static int[] doSubBigLil(
 			int[] bigMag,
 			int[] lilMag)
 		{
@@ -3209,12 +3408,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
         }
 #endif
 
-		private byte[] ToByteArray(bool unsigned)
+		byte[] ToByteArray(bool unsigned)
 		{
 			if (sign == 0)
+			{
 				return unsigned ? ZeroEncoding : new byte[1];
+			}
 
-			int nBits = (unsigned && sign > 0)
+			int nBits = unsigned && sign > 0
 				? BitLength
 				: BitLength + 1;
 
@@ -3248,11 +3449,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 
 				while (magIndex > 1)
 				{
-					uint mag = ~((uint)magnitude[--magIndex]);
+					uint mag = ~(uint)magnitude[--magIndex];
 
 					if (carry)
 					{
-						carry = (++mag == uint.MinValue);
+						carry = ++mag == uint.MinValue;
 					}
 
 					bytesIndex -= 4;
@@ -3386,10 +3587,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 
 			// NB: Can only happen to internally managed instances
 			if (magnitude == null)
+			{
 				return "null";
+			}
 
 			if (sign == 0)
+			{
 				return "0";
+			}
 
 
 			// NOTE: This *should* be unnecessary, since the magnitude *should* never have leading zero digits
@@ -3432,9 +3637,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				case 8:
 				{
 					int mask = (1 << 30) - 1;
-					BigInteger u = this.Abs();
+					BigInteger u = Abs();
 					int bits = u.BitLength;
-					var S = new List<string>();
+					List<string> S = new List<string>();
 					while (bits > 30)
 					{
 						S.Add(Convert.ToString(u.IntValue & mask, 8));
@@ -3465,7 +3670,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				//default:
 				case 10:
 				{
-					BigInteger q = this.Abs();
+					BigInteger q = Abs();
 					if (q.BitLength < 64)
 					{
 						sb.Append(Convert.ToString(q.LongValue, radix));
@@ -3473,7 +3678,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 					}
 
 					// TODO Could cache the moduli for each radix (soft reference?)
-					var moduli = new List<BigInteger>();
+					List<BigInteger> moduli = new List<BigInteger>();
 					BigInteger R = ValueOf(radix);
 					while (R.CompareTo(q) <= 0)
 					{
@@ -3493,7 +3698,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return sb.ToString();
 		}
 
-		private static void ToString(StringBuilder sb, int radix, IList<BigInteger> moduli, int scale, BigInteger pos)
+		static void ToString(StringBuilder sb, int radix, IList<BigInteger> moduli, int scale, BigInteger pos)
 		{
 			if (pos.BitLength < 64)
 			{
@@ -3516,7 +3721,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			ToString(sb, radix, moduli, scale, qr[1]);
 		}
 
-		private static void AppendZeroExtendedString(StringBuilder sb, string s, int minLength)
+		static void AppendZeroExtendedString(StringBuilder sb, string s, int minLength)
 		{
 			for (int len = s.Length; len < minLength; ++len)
 			{
@@ -3526,14 +3731,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			sb.Append(s);
 		}
 
-		private static BigInteger CreateUValueOf(
+		static BigInteger CreateUValueOf(
 			ulong value)
 		{
 			int msw = (int)(value >> 32);
 			int lsw = (int)value;
 
 			if (msw != 0)
+			{
 				return new BigInteger(1, new int[] { msw, lsw }, false);
+			}
 
 			if (lsw != 0)
 			{
@@ -3550,13 +3757,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return Zero;
 		}
 
-		private static BigInteger CreateValueOf(
+		static BigInteger CreateValueOf(
 			long value)
 		{
 			if (value < 0)
 			{
 				if (value == long.MinValue)
+				{
 					return CreateValueOf(~value).Not();
+				}
 
 				return CreateValueOf(-value).Negate();
 			}
@@ -3577,13 +3786,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 
 		public int GetLowestSetBit()
 		{
-			if (this.sign == 0)
+			if (sign == 0)
+			{
 				return -1;
+			}
 
 			return GetLowestSetBitMaskFirst(-1);
 		}
 
-		private int GetLowestSetBitMaskFirst(int firstWordMask)
+		int GetLowestSetBitMaskFirst(int firstWordMask)
 		{
 			int w = magnitude.Length, offset = 0;
 
@@ -3619,14 +3830,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			int n)
 		{
 			if (n < 0)
+			{
 				throw new ArithmeticException("Bit position must not be negative");
+			}
 
 			if (sign < 0)
+			{
 				return !Not().TestBit(n);
+			}
 
 			int wordNum = n / 32;
 			if (wordNum >= magnitude.Length)
+			{
 				return false;
+			}
 
 			int word = magnitude[magnitude.Length - 1 - wordNum];
 			return ((word >> (n % 32)) & 1) > 0;
@@ -3635,14 +3852,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public BigInteger Or(
 			BigInteger value)
 		{
-			if (this.sign == 0)
+			if (sign == 0)
+			{
 				return value;
+			}
 
 			if (value.sign == 0)
+			{
 				return this;
+			}
 
-			int[] aMag = this.sign > 0
-				? this.magnitude
+			int[] aMag = sign > 0
+				? magnitude
 				: Add(One).magnitude;
 
 			int[] bMag = value.sign > 0
@@ -3661,7 +3882,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				int aWord = i >= aStart ? aMag[i - aStart] : 0;
 				int bWord = i >= bStart ? bMag[i - bStart] : 0;
 
-				if (this.sign < 0)
+				if (sign < 0)
 				{
 					aWord = ~aWord;
 				}
@@ -3693,14 +3914,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public BigInteger Xor(
 			BigInteger value)
 		{
-			if (this.sign == 0)
+			if (sign == 0)
+			{
 				return value;
+			}
 
 			if (value.sign == 0)
+			{
 				return this;
+			}
 
-			int[] aMag = this.sign > 0
-				? this.magnitude
+			int[] aMag = sign > 0
+				? magnitude
 				: Add(One).magnitude;
 
 			int[] bMag = value.sign > 0
@@ -3720,7 +3945,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				int aWord = i >= aStart ? aMag[i - aStart] : 0;
 				int bWord = i >= bStart ? bMag[i - bStart] : 0;
 
-				if (this.sign < 0)
+				if (sign < 0)
 				{
 					aWord = ~aWord;
 				}
@@ -3753,14 +3978,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			int n)
 		{
 			if (n < 0)
+			{
 				throw new ArithmeticException("Bit address less than zero");
+			}
 
 			if (TestBit(n))
+			{
 				return this;
+			}
 
 			// TODO Handle negative values and zero
-			if (sign > 0 && n < (BitLength - 1))
+			if (sign > 0 && n < BitLength - 1)
+			{
 				return FlipExistingBit(n);
+			}
 
 			return Or(One.ShiftLeft(n));
 		}
@@ -3769,14 +4000,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			int n)
 		{
 			if (n < 0)
+			{
 				throw new ArithmeticException("Bit address less than zero");
+			}
 
 			if (!TestBit(n))
+			{
 				return this;
+			}
 
 			// TODO Handle negative values
-			if (sign > 0 && n < (BitLength - 1))
+			if (sign > 0 && n < BitLength - 1)
+			{
 				return FlipExistingBit(n);
+			}
 
 			return AndNot(One.ShiftLeft(n));
 		}
@@ -3785,25 +4022,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			int n)
 		{
 			if (n < 0)
+			{
 				throw new ArithmeticException("Bit address less than zero");
+			}
 
 			// TODO Handle negative values and zero
-			if (sign > 0 && n < (BitLength - 1))
+			if (sign > 0 && n < BitLength - 1)
+			{
 				return FlipExistingBit(n);
+			}
 
 			return Xor(One.ShiftLeft(n));
 		}
 
-		private BigInteger FlipExistingBit(
+		BigInteger FlipExistingBit(
 			int n)
 		{
 			Debug.Assert(sign > 0);
 			Debug.Assert(n >= 0);
 			Debug.Assert(n < BitLength - 1);
 
-			int[] mag = (int[])this.magnitude.Clone();
-			mag[mag.Length - 1 - (n >> 5)] ^= (1 << (n & 31)); // Flip bit
-			return new BigInteger(this.sign, mag, false);
+			int[] mag = (int[])magnitude.Clone();
+			mag[mag.Length - 1 - (n >> 5)] ^= 1 << (n & 31); // Flip bit
+			return new BigInteger(sign, mag, false);
 		}
 	}
 }

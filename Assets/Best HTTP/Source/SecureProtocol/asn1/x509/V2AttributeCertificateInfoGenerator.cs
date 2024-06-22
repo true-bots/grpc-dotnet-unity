@@ -38,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public V2AttributeCertificateInfoGenerator()
 		{
-			this.version = new DerInteger(1);
+			version = new DerInteger(1);
 			attributes = new Asn1EncodableVector();
 		}
 
@@ -107,9 +107,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public AttributeCertificateInfo GenerateAttributeCertificateInfo()
 		{
-			if ((serialNumber == null) || (signature == null)
-			                           || (issuer == null) || (startDate == null) || (endDate == null)
-			                           || (holder == null) || (attributes == null))
+			if (serialNumber == null || signature == null
+			                         || issuer == null || startDate == null || endDate == null
+			                         || holder == null || attributes == null)
 			{
 				throw new InvalidOperationException("not all mandatory fields set in V2 AttributeCertificateInfo generator");
 			}

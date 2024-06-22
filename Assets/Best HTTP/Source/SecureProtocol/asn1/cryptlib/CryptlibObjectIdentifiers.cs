@@ -2,7 +2,7 @@
 #pragma warning disable
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cryptlib
 {
-	internal class CryptlibObjectIdentifiers
+	class CryptlibObjectIdentifiers
 	{
 		internal static readonly DerObjectIdentifier cryptlib = new DerObjectIdentifier("1.3.6.1.4.1.3029");
 

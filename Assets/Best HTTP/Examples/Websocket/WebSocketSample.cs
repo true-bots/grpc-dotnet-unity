@@ -7,26 +7,26 @@ using UnityEngine.UI;
 
 namespace BestHTTP.Examples.Websockets
 {
-	public class WebSocketSample : BestHTTP.Examples.Helpers.SampleBase
+	public class WebSocketSample : SampleBase
 	{
 #pragma warning disable 0649
 
 		[SerializeField] [Tooltip("The WebSocket address to connect")]
-		private string address = "wss://besthttpwebgldemo.azurewebsites.net/ws";
+		string address = "wss://besthttpwebgldemo.azurewebsites.net/ws";
 
-		[SerializeField] private InputField _input;
+		[SerializeField] InputField _input;
 
-		[SerializeField] private ScrollRect _scrollRect;
+		[SerializeField] ScrollRect _scrollRect;
 
-		[SerializeField] private RectTransform _contentRoot;
+		[SerializeField] RectTransform _contentRoot;
 
-		[SerializeField] private TextListItem _listItemPrefab;
+		[SerializeField] TextListItem _listItemPrefab;
 
-		[SerializeField] private int _maxListItemEntries = 100;
+		[SerializeField] int _maxListItemEntries = 100;
 
-		[SerializeField] private Button _connectButton;
+		[SerializeField] Button _connectButton;
 
-		[SerializeField] private Button _closeButton;
+		[SerializeField] Button _closeButton;
 
 #pragma warning restore
 
@@ -40,68 +40,72 @@ namespace BestHTTP.Examples.Websockets
 			base.Start();
 
 			SetButtons(true, false);
-			this._input.interactable = false;
+			_input.interactable = false;
 		}
 
 		void OnDestroy()
 		{
-			if (this.webSocket != null)
+			if (webSocket != null)
 			{
-				this.webSocket.Close();
-				this.webSocket = null;
+				webSocket.Close();
+				webSocket = null;
 			}
 		}
 
 		public void OnConnectButton()
 		{
 			// Create the WebSocket instance
-			this.webSocket = new WebSocket.WebSocket(new Uri(address));
+			webSocket = new WebSocket.WebSocket(new Uri(address));
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-			this.webSocket.StartPingThread = true;
+			webSocket.StartPingThread = true;
 
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
 			if (HTTPManager.Proxy != null)
-				this.webSocket.OnInternalRequestCreated = (ws, internalRequest) =>
+			{
+				webSocket.OnInternalRequestCreated = (ws, internalRequest) =>
 					internalRequest.Proxy = new HTTPProxy(HTTPManager.Proxy.Address, HTTPManager.Proxy.Credentials, false);
+			}
 #endif
 #endif
 
 			// Subscribe to the WS events
-			this.webSocket.OnOpen += OnOpen;
-			this.webSocket.OnMessage += OnMessageReceived;
-			this.webSocket.OnClosed += OnClosed;
-			this.webSocket.OnError += OnError;
+			webSocket.OnOpen += OnOpen;
+			webSocket.OnMessage += OnMessageReceived;
+			webSocket.OnClosed += OnClosed;
+			webSocket.OnError += OnError;
 
 			// Start connecting to the server
-			this.webSocket.Open();
+			webSocket.Open();
 
 			AddText("Connecting...");
 
 			SetButtons(false, true);
-			this._input.interactable = false;
+			_input.interactable = false;
 		}
 
 		public void OnCloseButton()
 		{
 			AddText("Closing!");
 			// Close the connection
-			this.webSocket.Close(1000, "Bye!");
+			webSocket.Close(1000, "Bye!");
 
 			SetButtons(false, false);
-			this._input.interactable = false;
+			_input.interactable = false;
 		}
 
 		public void OnInputField(string textToSend)
 		{
 			if ((!Input.GetKeyDown(KeyCode.KeypadEnter) && !Input.GetKeyDown(KeyCode.Return)) || string.IsNullOrEmpty(textToSend))
+			{
 				return;
+			}
 
 			AddText(string.Format("Sending message: <color=green>{0}</color>", textToSend))
 				.AddLeftPadding(20);
 
 			// Send message to the server
-			this.webSocket.Send(textToSend);
+			webSocket.Send(textToSend);
 		}
 
 		#region WebSocket Event Handlers
@@ -113,7 +117,7 @@ namespace BestHTTP.Examples.Websockets
 		{
 			AddText("WebSocket Open!");
 
-			this._input.interactable = true;
+			_input.interactable = true;
 		}
 
 		/// <summary>
@@ -128,7 +132,7 @@ namespace BestHTTP.Examples.Websockets
 		/// <summary>
 		/// Called when the web socket closed
 		/// </summary>
-		void OnClosed(WebSocket.WebSocket ws, UInt16 code, string message)
+		void OnClosed(WebSocket.WebSocket ws, ushort code, string message)
 		{
 			AddText(string.Format("WebSocket closed! Code: {0} Message: {1}", code, message));
 
@@ -151,18 +155,22 @@ namespace BestHTTP.Examples.Websockets
 
 		#endregion
 
-		private void SetButtons(bool connect, bool close)
+		void SetButtons(bool connect, bool close)
 		{
-			if (this._connectButton != null)
-				this._connectButton.interactable = connect;
+			if (_connectButton != null)
+			{
+				_connectButton.interactable = connect;
+			}
 
-			if (this._closeButton != null)
-				this._closeButton.interactable = close;
+			if (_closeButton != null)
+			{
+				_closeButton.interactable = close;
+			}
 		}
 
-		private TextListItem AddText(string text)
+		TextListItem AddText(string text)
 		{
-			return GUIHelper.AddText(this._listItemPrefab, this._contentRoot, text, this._maxListItemEntries, this._scrollRect);
+			return GUIHelper.AddText(_listItemPrefab, _contentRoot, text, _maxListItemEntries, _scrollRect);
 		}
 	}
 }

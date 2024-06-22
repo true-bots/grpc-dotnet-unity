@@ -43,14 +43,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public static ECDomainParameters GetDomainParameters(int namedGroup)
 		{
 			if (!NamedGroup.RefersToASpecificCurve(namedGroup))
+			{
 				return null;
+			}
 
 			// Parameters are lazily created the first time a particular curve is accessed
 
 			string curveName = NamedGroup.GetCurveName(namedGroup);
 			X9ECParameters ecP = ECKeyPairGenerator.FindECCurveByName(curveName);
 			if (ecP == null)
+			{
 				return null;
+			}
 
 			// It's a bit inefficient to do this conversion every time
 			return new ECDomainParameters(ecP.Curve, ecP.G, ecP.N, ecP.H, ecP.GetSeed());
@@ -62,9 +66,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 
 		public BcTlsECDomain(BcTlsCrypto crypto, TlsECConfig ecConfig)
 		{
-			this.m_crypto = crypto;
-			this.m_config = ecConfig;
-			this.m_domainParameters = GetDomainParameters(ecConfig);
+			m_crypto = crypto;
+			m_config = ecConfig;
+			m_domainParameters = GetDomainParameters(ecConfig);
 		}
 
 		public virtual BcTlsSecret CalculateECDHAgreement(ECPrivateKeyParameters privateKey,

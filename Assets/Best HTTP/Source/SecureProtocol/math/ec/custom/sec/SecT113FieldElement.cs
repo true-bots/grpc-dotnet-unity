@@ -6,7 +6,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecT113FieldElement
+	class SecT113FieldElement
 		: AbstractF2mFieldElement
 	{
 		protected internal readonly ulong[] x;
@@ -14,14 +14,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public SecT113FieldElement(BigInteger x)
 		{
 			if (x == null || x.SignValue < 0 || x.BitLength > 113)
+			{
 				throw new ArgumentException("value invalid for SecT113FieldElement", "x");
+			}
 
 			this.x = SecT113Field.FromBigInteger(x);
 		}
 
 		public SecT113FieldElement()
 		{
-			this.x = Nat128.Create64();
+			x = Nat128.Create64();
 		}
 
 		protected internal SecT113FieldElement(ulong[] x)
@@ -144,7 +146,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public override ECFieldElement SquarePow(int pow)
 		{
 			if (pow < 1)
+			{
 				return this;
+			}
 
 			ulong[] z = Nat128.Create64();
 			SecT113Field.SquareN(x, pow, z);
@@ -220,9 +224,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public virtual bool Equals(SecT113FieldElement other)
 		{
 			if (this == other)
+			{
 				return true;
+			}
+
 			if (null == other)
+			{
 				return false;
+			}
+
 			return Nat128.Eq64(x, other.x);
 		}
 

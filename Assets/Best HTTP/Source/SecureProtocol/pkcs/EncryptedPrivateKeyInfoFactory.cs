@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 {
 	public sealed class EncryptedPrivateKeyInfoFactory
 	{
-		private EncryptedPrivateKeyInfoFactory()
+		EncryptedPrivateKeyInfoFactory()
 		{
 		}
 
@@ -48,7 +48,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		{
 			IBufferedCipher cipher = PbeUtilities.CreateEngine(algorithm) as IBufferedCipher;
 			if (cipher == null)
+			{
 				throw new Exception("Unknown encryption algorithm: " + algorithm);
+			}
 
 			Asn1Encodable pbeParameters = PbeUtilities.GenerateAlgorithmParameters(
 				algorithm, salt, iterationCount);
@@ -87,7 +89,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		{
 			IBufferedCipher cipher = CipherUtilities.GetCipher(cipherAlgorithm) as IBufferedCipher;
 			if (cipher == null)
+			{
 				throw new Exception("Unknown encryption algorithm: " + cipherAlgorithm);
+			}
 
 			Asn1Encodable pbeParameters = PbeUtilities.GenerateAlgorithmParameters(
 				cipherAlgorithm, prfAlgorithm, salt, iterationCount, random);

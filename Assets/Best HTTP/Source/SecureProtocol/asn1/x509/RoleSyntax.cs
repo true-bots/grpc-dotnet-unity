@@ -18,8 +18,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class RoleSyntax
 		: Asn1Encodable
 	{
-		private readonly GeneralNames roleAuthority;
-		private readonly GeneralName roleName;
+		readonly GeneralNames roleAuthority;
+		readonly GeneralName roleName;
 
 		/**
 		 * RoleSyntax factory method.
@@ -36,10 +36,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj is RoleSyntax)
+			{
 				return (RoleSyntax)obj;
+			}
 
 			if (obj != null)
+			{
 				return new RoleSyntax(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
@@ -85,7 +89,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public RoleSyntax(
 			string roleName)
 			: this(new GeneralName(GeneralName.UniformResourceIdentifier,
-				(roleName == null) ? "" : roleName))
+				roleName == null ? "" : roleName))
 		{
 		}
 
@@ -96,7 +100,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		* @param seq    an instance of <code>Asn1Sequence</code> that holds
 		* the encoded elements used to build this <code>RoleSyntax</code>.
 		*/
-		private RoleSyntax(
+		RoleSyntax(
 			Asn1Sequence seq)
 		{
 			if (seq.Count < 1 || seq.Count > 2)
@@ -128,7 +132,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		*/
 		public GeneralNames RoleAuthority
 		{
-			get { return this.roleAuthority; }
+			get { return roleAuthority; }
 		}
 
 		/**
@@ -138,7 +142,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		*/
 		public GeneralName RoleName
 		{
-			get { return this.roleName; }
+			get { return roleName; }
 		}
 
 		/**
@@ -148,7 +152,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		*/
 		public string GetRoleNameAsString()
 		{
-			return ((IAsn1String)this.roleName.Name).GetString();
+			return ((IAsn1String)roleName.Name).GetString();
 		}
 
 		/**
@@ -202,16 +206,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public override string ToString()
 		{
-			StringBuilder buff = new StringBuilder("Name: " + this.GetRoleNameAsString() +
+			StringBuilder buff = new StringBuilder("Name: " + GetRoleNameAsString() +
 			                                       " - Auth: ");
 
-			if (this.roleAuthority == null || roleAuthority.GetNames().Length == 0)
+			if (roleAuthority == null || roleAuthority.GetNames().Length == 0)
 			{
 				buff.Append("N/A");
 			}
 			else
 			{
-				string[] names = this.GetRoleAuthorityAsString();
+				string[] names = GetRoleAuthorityAsString();
 				buff.Append('[').Append(names[0]);
 				for (int i = 1; i < names.Length; i++)
 				{

@@ -93,7 +93,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
             return Encode(buf.AsSpan(off, len), outStream);
 #else
 			if (len < 0)
+			{
 				return 0;
+			}
 
 			byte[] tmp = new byte[72];
 			int remaining = len;
@@ -126,7 +128,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
         }
 #endif
 
-		private static bool Ignore(char c)
+		static bool Ignore(char c)
 		{
 			return c == '\n' || c == '\r' || c == '\t' || c == ' ';
 		}
@@ -151,7 +153,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 			while (end > off)
 			{
 				if (!Ignore((char)data[end - 1]))
+				{
 					break;
+				}
 
 				end--;
 			}
@@ -174,7 +178,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 				b2 = decodingTable[data[i++]];
 
 				if ((b1 | b2) >= 0x80)
+				{
 					throw new IOException("invalid characters encountered in Hex data");
+				}
 
 				buf[bufOff++] = (byte)((b1 << 4) | b2);
 
@@ -274,7 +280,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 			while (end > 0)
 			{
 				if (!Ignore(data[end - 1]))
+				{
 					break;
+				}
 
 				end--;
 			}
@@ -297,7 +305,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 				b2 = decodingTable[data[i++]];
 
 				if ((b1 | b2) >= 0x80)
+				{
 					throw new IOException("invalid characters encountered in Hex data");
+				}
 
 				buf[bufOff++] = (byte)((b1 << 4) | b2);
 
@@ -329,11 +339,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 		internal byte[] DecodeStrict(string str, int off, int len)
 		{
 			if (null == str)
+			{
 				throw new ArgumentNullException("str");
-			if (off < 0 || len < 0 || off > (str.Length - len))
+			}
+
+			if (off < 0 || len < 0 || off > str.Length - len)
+			{
 				throw new IndexOutOfRangeException("invalid offset and/or length specified");
+			}
+
 			if (0 != (len & 1))
+			{
 				throw new ArgumentException("a hexadecimal encoding must have an even number of characters", "len");
+			}
 
 			int resultLen = len >> 1;
 			byte[] result = new byte[resultLen];
@@ -345,7 +363,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 				byte b2 = decodingTable[str[strPos++]];
 
 				if ((b1 | b2) >= 0x80)
+				{
 					throw new IOException("invalid characters encountered in Hex data");
+				}
 
 				result[i] = (byte)((b1 << 4) | b2);
 			}

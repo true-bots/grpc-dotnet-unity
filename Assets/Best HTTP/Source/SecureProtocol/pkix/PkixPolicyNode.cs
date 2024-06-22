@@ -25,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		public virtual int Depth
 		{
-			get { return this.mDepth; }
+			get { return mDepth; }
 		}
 
 		public virtual IEnumerable<PkixPolicyNode> Children
@@ -35,18 +35,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		public virtual bool IsCritical
 		{
-			get { return this.mCritical; }
-			set { this.mCritical = value; }
+			get { return mCritical; }
+			set { mCritical = value; }
 		}
 
 		public virtual ISet<PolicyQualifierInfo> PolicyQualifiers
 		{
-			get { return new HashSet<PolicyQualifierInfo>(this.mPolicyQualifiers); }
+			get { return new HashSet<PolicyQualifierInfo>(mPolicyQualifiers); }
 		}
 
 		public virtual string ValidPolicy
 		{
-			get { return this.mValidPolicy; }
+			get { return mValidPolicy; }
 		}
 
 		public virtual bool HasChildren
@@ -56,14 +56,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		public virtual ISet<string> ExpectedPolicies
 		{
-			get { return new HashSet<string>(this.mExpectedPolicies); }
-			set { this.mExpectedPolicies = new HashSet<string>(value); }
+			get { return new HashSet<string>(mExpectedPolicies); }
+			set { mExpectedPolicies = new HashSet<string>(value); }
 		}
 
 		public virtual PkixPolicyNode Parent
 		{
-			get { return this.mParent; }
-			set { this.mParent = value; }
+			get { return mParent; }
+			set { mParent = value; }
 		}
 
 		/// Constructors
@@ -78,19 +78,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		{
 			if (children == null)
 			{
-				this.mChildren = new List<PkixPolicyNode>();
+				mChildren = new List<PkixPolicyNode>();
 			}
 			else
 			{
-				this.mChildren = new List<PkixPolicyNode>(children);
+				mChildren = new List<PkixPolicyNode>(children);
 			}
 
-			this.mDepth = depth;
-			this.mExpectedPolicies = expectedPolicies;
-			this.mParent = parent;
-			this.mPolicyQualifiers = policyQualifiers;
-			this.mValidPolicy = validPolicy;
-			this.mCritical = critical;
+			mDepth = depth;
+			mExpectedPolicies = expectedPolicies;
+			mParent = parent;
+			mPolicyQualifiers = policyQualifiers;
+			mValidPolicy = validPolicy;
+			mCritical = critical;
 		}
 
 		public virtual void AddChild(

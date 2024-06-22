@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
 	public class AttributeTable
 	{
-		private readonly Dictionary<DerObjectIdentifier, object> m_attributes;
+		readonly Dictionary<DerObjectIdentifier, object> m_attributes;
 
 		public AttributeTable(IDictionary<DerObjectIdentifier, object> attrs)
 		{
@@ -39,7 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		{
 		}
 
-		private void AddAttribute(Attribute a)
+		void AddAttribute(Attribute a)
 		{
 			DerObjectIdentifier oid = a.AttrType;
 
@@ -57,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 
 			if (existingValue is Attribute existingAttr)
 			{
-				var newList = new List<Attribute>();
+				List<Attribute> newList = new List<Attribute>();
 				newList.Add(existingAttr);
 				newList.Add(a);
 				m_attributes[oid] = newList;
@@ -73,13 +73,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			get
 			{
 				if (!m_attributes.TryGetValue(oid, out object existingValue))
+				{
 					return null;
+				}
 
 				if (existingValue is IList<Attribute> existingList)
+				{
 					return existingList[0];
+				}
 
 				if (existingValue is Attribute existingAttr)
+				{
 					return existingAttr;
+				}
 
 				throw new InvalidOperationException();
 			}
@@ -100,7 +106,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			{
 				if (existingValue is IList<Attribute> existingList)
 				{
-					foreach (var attr in existingList)
+					foreach (Attribute attr in existingList)
 					{
 						v.Add(attr);
 					}
@@ -183,9 +189,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public AttributeTable Add(params Attribute[] attributes)
 		{
 			if (attributes == null || attributes.Length < 1)
+			{
 				return this;
+			}
 
-			var newTable = new AttributeTable(m_attributes);
+			AttributeTable newTable = new AttributeTable(m_attributes);
 			foreach (Attribute attribute in attributes)
 			{
 				newTable.AddAttribute(attribute);

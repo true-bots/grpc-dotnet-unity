@@ -14,61 +14,63 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		// all field lengths are in bytes, not in bits as specified by the standard
 
 		// fields set by the constructor
-		private readonly IMac prf;
-		private readonly int h;
+		readonly IMac prf;
+		readonly int h;
 
 		// fields set by init
-		private byte[] fixedInputData;
+		byte[] fixedInputData;
 
-		private int maxSizeExcl;
+		int maxSizeExcl;
 
 		// ios is i defined as an octet string (the binary representation)
-		private byte[] ios;
-		private byte[] iv;
-		private bool useCounter;
+		byte[] ios;
+		byte[] iv;
+		bool useCounter;
 
 		// operational
-		private int generatedBytes;
+		int generatedBytes;
 
 		// k is used as buffer for all K(i) values
-		private byte[] k;
+		byte[] k;
 
 		public KdfFeedbackBytesGenerator(IMac prf)
 		{
 			this.prf = prf;
-			this.h = prf.GetMacSize();
-			this.k = new byte[h];
+			h = prf.GetMacSize();
+			k = new byte[h];
 		}
 
 		public void Init(IDerivationParameters parameters)
 		{
 			if (!(parameters is KdfFeedbackParameters feedbackParams))
+			{
 				throw new ArgumentException("Wrong type of arguments given");
+			}
 
 			// --- init mac based PRF ---
 
-			this.prf.Init(new KeyParameter(feedbackParams.Ki));
+			prf.Init(new KeyParameter(feedbackParams.Ki));
 
 			// --- set arguments ---
 
-			this.fixedInputData = feedbackParams.FixedInputData;
+			fixedInputData = feedbackParams.FixedInputData;
 
 			int r = feedbackParams.R;
-			this.ios = new byte[r / 8];
+			ios = new byte[r / 8];
 
 			if (feedbackParams.UseCounter)
 			{
 				// this is more conservative than the spec
 				BigInteger maxSize = BigInteger.One.ShiftLeft(r).Multiply(BigInteger.ValueOf(h));
-				this.maxSizeExcl = maxSize.BitLength > 31 ? int.MaxValue : maxSize.IntValueExact;
+				maxSizeExcl = maxSize.BitLength > 31 ? int.MaxValue : maxSize.IntValueExact;
 			}
 			else
 			{
-				this.maxSizeExcl = int.MaxValue;
+				maxSizeExcl = int.MaxValue;
 			}
 
-			this.iv = feedbackParams.Iv;
-			this.useCounter = feedbackParams.UseCounter;
+			iv = feedbackParams.Iv;
+			useCounter = feedbackParams.UseCounter;
 
 			// --- set operational state ---
 
@@ -86,7 +88,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
             return GenerateBytes(output.AsSpan(outOff, length));
 #else
 			if (generatedBytes >= maxSizeExcl - length)
+			{
 				throw new DataLengthException("Current KDFCTR may only be used for " + maxSizeExcl + " bytes");
+			}
 
 			int toGenerate = length;
 			int posInK = generatedBytes % h;
@@ -144,7 +148,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
         }
 #endif
 
-		private void GenerateNext()
+		void GenerateNext()
 		{
 			// TODO enable IV
 			if (generatedBytes == 0)
@@ -189,7 +193,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			prf.DoFinal(k, 0);
 		}
 
-		public IMac Mac => prf;
+		public IMac Mac
+		{
+			get { return prf; }
+		}
 	}
 }
 #pragma warning restore

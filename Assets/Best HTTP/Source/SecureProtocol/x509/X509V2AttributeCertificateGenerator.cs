@@ -15,9 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	/// <remarks>Class to produce an X.509 Version 2 AttributeCertificate.</remarks>
 	public class X509V2AttributeCertificateGenerator
 	{
-		private readonly X509ExtensionsGenerator extGenerator = new X509ExtensionsGenerator();
+		readonly X509ExtensionsGenerator extGenerator = new X509ExtensionsGenerator();
 
-		private V2AttributeCertificateInfoGenerator acInfoGen;
+		V2AttributeCertificateInfoGenerator acInfoGen;
 
 		public X509V2AttributeCertificateGenerator()
 		{
@@ -109,7 +109,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		/// <returns>An <see cref="X509V2AttributeCertificate"/>.</returns>
 		public X509V2AttributeCertificate Generate(ISignatureFactory signatureFactory)
 		{
-			var sigAlgID = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
+			AlgorithmIdentifier sigAlgID = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
 
 			acInfoGen.SetSignature(sigAlgID);
 
@@ -126,7 +126,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				acInfo.EncodeTo(sigStream, Asn1Encodable.Der);
 			}
 
-			var signature = streamCalculator.GetResult().Collect();
+			byte[] signature = streamCalculator.GetResult().Collect();
 
 			return new X509V2AttributeCertificate(
 				new AttributeCertificate(acInfo, sigAlgID, new DerBitString(signature)));

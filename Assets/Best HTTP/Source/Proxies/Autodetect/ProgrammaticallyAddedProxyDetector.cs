@@ -8,7 +8,10 @@ namespace BestHTTP.Proxies.Autodetect
 	/// </summary>
 	public sealed class ProgrammaticallyAddedProxyDetector : IProxyDetector
 	{
-		Proxy IProxyDetector.GetProxy(HTTPRequest request) => HTTPManager.Proxy;
+		Proxy IProxyDetector.GetProxy(HTTPRequest request)
+		{
+			return HTTPManager.Proxy;
+		}
 	}
 }
 #endif

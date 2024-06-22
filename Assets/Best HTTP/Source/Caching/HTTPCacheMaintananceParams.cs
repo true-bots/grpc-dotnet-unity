@@ -18,8 +18,8 @@ namespace BestHTTP.Caching
 
 		public HTTPCacheMaintananceParams(TimeSpan deleteOlder, ulong maxCacheSize)
 		{
-			this.DeleteOlder = deleteOlder;
-			this.MaxCacheSize = maxCacheSize;
+			DeleteOlder = deleteOlder;
+			MaxCacheSize = maxCacheSize;
 		}
 	}
 }

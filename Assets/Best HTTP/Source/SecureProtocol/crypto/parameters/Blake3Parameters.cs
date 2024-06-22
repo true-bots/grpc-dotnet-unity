@@ -9,10 +9,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public sealed class Blake3Parameters
 		: ICipherParameters
 	{
-		private const int KeyLen = 32;
+		const int KeyLen = 32;
 
-		private byte[] m_theKey;
-		private byte[] m_theContext;
+		byte[] m_theKey;
+		byte[] m_theContext;
 
 		/// <summary>Create a key parameter.</summary>
 		/// <param name="pContext">the context</param>
@@ -20,7 +20,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		public static Blake3Parameters Context(byte[] pContext)
 		{
 			if (pContext == null)
+			{
 				throw new ArgumentNullException(nameof(pContext));
+			}
 
 			Blake3Parameters myParams = new Blake3Parameters();
 			myParams.m_theContext = Arrays.Clone(pContext);
@@ -33,9 +35,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		public static Blake3Parameters Key(byte[] pKey)
 		{
 			if (pKey == null)
+			{
 				throw new ArgumentNullException(nameof(pKey));
+			}
+
 			if (pKey.Length != KeyLen)
+			{
 				throw new ArgumentException("Invalid key length", nameof(pKey));
+			}
 
 			Blake3Parameters myParams = new Blake3Parameters();
 			myParams.m_theKey = Arrays.Clone(pKey);
@@ -44,7 +51,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 
 		/// <summary>Obtain the key.</summary>
 		/// <returns>the key</returns>
-		public byte[] GetKey() => Arrays.Clone(m_theKey);
+		public byte[] GetKey()
+		{
+			return Arrays.Clone(m_theKey);
+		}
 
 		/// <summary>Clear the key bytes.</summary>
 		public void ClearKey()
@@ -54,7 +64,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 
 		/// <summary>Obtain the salt.</summary>
 		/// <returns>the salt</returns>
-		public byte[] GetContext() => Arrays.Clone(m_theContext);
+		public byte[] GetContext()
+		{
+			return Arrays.Clone(m_theContext);
+		}
 	}
 }
 #pragma warning restore

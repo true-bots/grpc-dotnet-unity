@@ -13,12 +13,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 {
 	public sealed class CertificateConfirmationContentBuilder
 	{
-		private static readonly DefaultSignatureAlgorithmIdentifierFinder SigAlgFinder =
+		static readonly DefaultSignatureAlgorithmIdentifierFinder SigAlgFinder =
 			new DefaultSignatureAlgorithmIdentifierFinder();
 
-		private readonly DefaultDigestAlgorithmIdentifierFinder m_digestAlgFinder;
-		private readonly IList<X509Certificate> m_acceptedCerts = new List<X509Certificate>();
-		private readonly IList<BigInteger> m_acceptedReqIDs = new List<BigInteger>();
+		readonly DefaultDigestAlgorithmIdentifierFinder m_digestAlgFinder;
+		readonly IList<X509Certificate> m_acceptedCerts = new List<X509Certificate>();
+		readonly IList<BigInteger> m_acceptedReqIDs = new List<BigInteger>();
 
 		public CertificateConfirmationContentBuilder()
 			: this(new DefaultDigestAlgorithmIdentifierFinder())
@@ -27,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 
 		public CertificateConfirmationContentBuilder(DefaultDigestAlgorithmIdentifierFinder digestAlgFinder)
 		{
-			this.m_digestAlgFinder = digestAlgFinder;
+			m_digestAlgFinder = digestAlgFinder;
 		}
 
 		public CertificateConfirmationContentBuilder AddAcceptedCertificate(X509Certificate certHolder,
@@ -48,11 +48,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 
 				AlgorithmIdentifier algorithmIdentifier = SigAlgFinder.Find(cert.SigAlgName);
 				if (null == algorithmIdentifier)
+				{
 					throw new CmpException("cannot find algorithm identifier for signature name");
+				}
 
 				AlgorithmIdentifier digAlg = m_digestAlgFinder.Find(algorithmIdentifier);
 				if (null == digAlg)
+				{
 					throw new CmpException("cannot find algorithm for digest from signature");
+				}
 
 				byte[] digest = DigestUtilities.CalculateDigest(digAlg.Algorithm, cert.GetEncoded());
 

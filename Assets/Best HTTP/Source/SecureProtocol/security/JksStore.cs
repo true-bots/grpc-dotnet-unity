@@ -20,15 +20,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 {
 	public class JksStore
 	{
-		private static readonly int Magic = unchecked((int)0xFEEDFEED);
+		static readonly int Magic = unchecked((int)0xFEEDFEED);
 
-		private static readonly AlgorithmIdentifier JksObfuscationAlg = new AlgorithmIdentifier(
+		static readonly AlgorithmIdentifier JksObfuscationAlg = new AlgorithmIdentifier(
 			new DerObjectIdentifier("1.3.6.1.4.1.42.2.17.1.1"), DerNull.Instance);
 
-		private readonly Dictionary<string, JksTrustedCertEntry> m_certificateEntries =
+		readonly Dictionary<string, JksTrustedCertEntry> m_certificateEntries =
 			new Dictionary<string, JksTrustedCertEntry>(StringComparer.OrdinalIgnoreCase);
 
-		private readonly Dictionary<string, JksKeyEntry> m_keyEntries =
+		readonly Dictionary<string, JksKeyEntry> m_keyEntries =
 			new Dictionary<string, JksKeyEntry>(StringComparer.OrdinalIgnoreCase);
 
 		public JksStore()
@@ -38,7 +38,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		/// <exception cref="IOException"/>
 		public bool Probe(Stream stream)
 		{
-			using (var br = new BinaryReader(stream))
+			using (BinaryReader br = new BinaryReader(stream))
+			{
 				try
 				{
 					return Magic == BinaryReaders.ReadInt32BigEndian(br);
@@ -47,21 +48,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				{
 					return false;
 				}
+			}
 		}
 
 		/// <exception cref="IOException"/>
 		public AsymmetricKeyParameter GetKey(string alias, char[] password)
 		{
 			if (alias == null)
+			{
 				throw new ArgumentNullException(nameof(alias));
+			}
+
 			if (password == null)
+			{
 				throw new ArgumentNullException(nameof(password));
+			}
 
 			if (!m_keyEntries.TryGetValue(alias, out JksKeyEntry keyEntry))
+			{
 				return null;
+			}
 
 			if (!JksObfuscationAlg.Equals(keyEntry.keyData.EncryptionAlgorithm))
+			{
 				throw new IOException("unknown encryption algorithm");
+			}
 
 			byte[] encryptedData = keyEntry.keyData.GetEncryptedData();
 
@@ -84,19 +95,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			byte[] checksum = GetKeyChecksum(digest, password, pkcs8Key);
 
 			if (!Arrays.ConstantTimeAreEqual(20, encryptedData, pkcs8Len + 20, checksum, 0))
+			{
 				throw new IOException("cannot recover key");
+			}
 
 			return PrivateKeyFactory.CreateKey(pkcs8Key);
 		}
 
-		private byte[] GetKeyChecksum(IDigest digest, char[] password, byte[] pkcs8Key)
+		byte[] GetKeyChecksum(IDigest digest, char[] password, byte[] pkcs8Key)
 		{
 			AddPassword(digest, password);
 
 			return DigestUtilities.DoFinal(digest, pkcs8Key);
 		}
 
-		private byte[] CalculateKeyStream(IDigest digest, char[] password, byte[] salt, int count)
+		byte[] CalculateKeyStream(IDigest digest, char[] password, byte[] salt, int count)
 		{
 			byte[] keyStream = new byte[count];
 			byte[] hash = Arrays.CopyOf(salt, 20);
@@ -119,30 +132,40 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 		public X509Certificate[] GetCertificateChain(string alias)
 		{
-			if (m_keyEntries.TryGetValue(alias, out var keyEntry))
+			if (m_keyEntries.TryGetValue(alias, out JksKeyEntry keyEntry))
+			{
 				return CloneChain(keyEntry.chain);
+			}
 
 			return null;
 		}
 
 		public X509Certificate GetCertificate(string alias)
 		{
-			if (m_certificateEntries.TryGetValue(alias, out var certEntry))
+			if (m_certificateEntries.TryGetValue(alias, out JksTrustedCertEntry certEntry))
+			{
 				return certEntry.cert;
+			}
 
-			if (m_keyEntries.TryGetValue(alias, out var keyEntry))
+			if (m_keyEntries.TryGetValue(alias, out JksKeyEntry keyEntry))
+			{
 				return keyEntry.chain?[0];
+			}
 
 			return null;
 		}
 
 		public DateTime? GetCreationDate(string alias)
 		{
-			if (m_certificateEntries.TryGetValue(alias, out var certEntry))
+			if (m_certificateEntries.TryGetValue(alias, out JksTrustedCertEntry certEntry))
+			{
 				return certEntry.date;
+			}
 
-			if (m_keyEntries.TryGetValue(alias, out var keyEntry))
+			if (m_keyEntries.TryGetValue(alias, out JksKeyEntry keyEntry))
+			{
 				return keyEntry.date;
+			}
 
 			return null;
 		}
@@ -153,7 +176,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			alias = ConvertAlias(alias);
 
 			if (ContainsAlias(alias))
+			{
 				throw new IOException("alias [" + alias + "] already in use");
+			}
 
 			byte[] pkcs8Key = PrivateKeyInfoFactory.CreatePrivateKeyInfo(key).GetEncoded();
 			byte[] protectedKey = new byte[pkcs8Key.Length + 40];
@@ -176,7 +201,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 			try
 			{
-				var epki = new EncryptedPrivateKeyInfo(JksObfuscationAlg, protectedKey);
+				EncryptedPrivateKeyInfo epki = new EncryptedPrivateKeyInfo(JksObfuscationAlg, protectedKey);
 				m_keyEntries.Add(alias, new JksKeyEntry(DateTime.UtcNow, epki.GetEncoded(), CloneChain(chain)));
 			}
 			catch (Exception e)
@@ -191,7 +216,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			alias = ConvertAlias(alias);
 
 			if (ContainsAlias(alias))
+			{
 				throw new IOException("alias [" + alias + "] already in use");
+			}
 
 			m_keyEntries.Add(alias, new JksKeyEntry(DateTime.UtcNow, key, CloneChain(chain)));
 		}
@@ -202,7 +229,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			alias = ConvertAlias(alias);
 
 			if (ContainsAlias(alias))
+			{
 				throw new IOException("alias [" + alias + "] already in use");
+			}
 
 			m_certificateEntries.Add(alias, new JksTrustedCertEntry(DateTime.UtcNow, cert));
 		}
@@ -219,7 +248,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		{
 			get
 			{
-				var aliases = new HashSet<string>(m_certificateEntries.Keys);
+				HashSet<string> aliases = new HashSet<string>(m_certificateEntries.Keys);
 				aliases.UnionWith(m_keyEntries.Keys);
 				return CollectionUtilities.Proxy(aliases);
 			}
@@ -247,10 +276,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 		public string GetCertificateAlias(X509Certificate cert)
 		{
-			foreach (var entry in m_certificateEntries)
+			foreach (KeyValuePair<string, JksTrustedCertEntry> entry in m_certificateEntries)
 			{
 				if (entry.Value.cert.Equals(cert))
+				{
 					return entry.Key;
+				}
 			}
 
 			return null;
@@ -260,9 +291,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public void Save(Stream stream, char[] password)
 		{
 			if (stream == null)
+			{
 				throw new ArgumentNullException(nameof(stream));
+			}
+
 			if (password == null)
+			{
 				throw new ArgumentNullException(nameof(password));
+			}
 
 			IDigest checksumDigest = CreateChecksumDigest(password);
 			BinaryWriter bw = new BinaryWriter(new DigestStream(stream, null, checksumDigest));
@@ -272,7 +308,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 			BinaryWriters.WriteInt32BigEndian(bw, Count);
 
-			foreach (var entry in m_keyEntries)
+			foreach (KeyValuePair<string, JksKeyEntry> entry in m_keyEntries)
 			{
 				string alias = entry.Key;
 				JksKeyEntry keyEntry = entry.Value;
@@ -291,7 +327,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				}
 			}
 
-			foreach (var entry in m_certificateEntries)
+			foreach (KeyValuePair<string, JksTrustedCertEntry> entry in m_certificateEntries)
 			{
 				string alias = entry.Key;
 				JksTrustedCertEntry certEntry = entry.Value;
@@ -311,12 +347,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public void Load(Stream stream, char[] password)
 		{
 			if (stream == null)
+			{
 				throw new ArgumentNullException(nameof(stream));
+			}
 
 			m_certificateEntries.Clear();
 			m_keyEntries.Clear();
 
-			using (var storeStream = ValidateStream(stream, password))
+			using (ErasableByteStream storeStream = ValidateStream(stream, password))
 			{
 				BinaryReader br = new BinaryReader(storeStream);
 
@@ -324,7 +362,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				int storeVersion = BinaryReaders.ReadInt32BigEndian(br);
 
 				if (!(magic == Magic && (storeVersion == 1 || storeVersion == 2)))
+				{
 					throw new IOException("Invalid keystore format");
+				}
 
 				int numEntries = BinaryReaders.ReadInt32BigEndian(br);
 
@@ -347,7 +387,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 							X509Certificate[] chain = null;
 							if (chainLength > 0)
 							{
-								var certs = new List<X509Certificate>(System.Math.Min(10, chainLength));
+								List<X509Certificate> certs = new List<X509Certificate>(System.Math.Min(10, chainLength));
 								for (int certNo = 0; certNo != chainLength; certNo++)
 								{
 									certs.Add(ReadTypedCertificate(br, storeVersion));
@@ -375,7 +415,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				}
 
 				if (storeStream.Position != storeStream.Length)
+				{
 					throw new IOException("password incorrect or store tampered with");
+				}
 			}
 		}
 
@@ -391,7 +433,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		 * @return Either the passed in input stream or a new input stream.
 		 */
 		/// <exception cref="IOException"/>
-		private ErasableByteStream ValidateStream(Stream inputStream, char[] password)
+		ErasableByteStream ValidateStream(Stream inputStream, char[] password)
 		{
 			byte[] rawStore = Streams.ReadAll(inputStream);
 			int checksumPos = rawStore.Length - 20;
@@ -410,7 +452,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return new ErasableByteStream(rawStore, 0, checksumPos);
 		}
 
-		private static void AddPassword(IDigest digest, char[] password)
+		static void AddPassword(IDigest digest, char[] password)
 		{
 			// Encoding.BigEndianUnicode
 			for (int i = 0; i < password.Length; ++i)
@@ -420,24 +462,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 		}
 
-		private static byte[] CalculateChecksum(char[] password, byte[] buffer, int offset, int length)
+		static byte[] CalculateChecksum(char[] password, byte[] buffer, int offset, int length)
 		{
 			IDigest checksumDigest = CreateChecksumDigest(password);
 			checksumDigest.BlockUpdate(buffer, offset, length);
 			return DigestUtilities.DoFinal(checksumDigest);
 		}
 
-		private static X509Certificate[] CloneChain(X509Certificate[] chain)
+		static X509Certificate[] CloneChain(X509Certificate[] chain)
 		{
 			return (X509Certificate[])chain?.Clone();
 		}
 
-		private static string ConvertAlias(string alias)
+		static string ConvertAlias(string alias)
 		{
 			return alias.ToLowerInvariant();
 		}
 
-		private static IDigest CreateChecksumDigest(char[] password)
+		static IDigest CreateChecksumDigest(char[] password)
 		{
 			IDigest digest = DigestUtilities.GetDigest("SHA-1");
 			AddPassword(digest, password);
@@ -452,31 +494,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return digest;
 		}
 
-		private static byte[] ReadBufferWithInt16Length(BinaryReader br)
+		static byte[] ReadBufferWithInt16Length(BinaryReader br)
 		{
 			int length = BinaryReaders.ReadInt16BigEndian(br);
 			return BinaryReaders.ReadBytesFully(br, length);
 		}
 
-		private static byte[] ReadBufferWithInt32Length(BinaryReader br)
+		static byte[] ReadBufferWithInt32Length(BinaryReader br)
 		{
 			int length = BinaryReaders.ReadInt32BigEndian(br);
 			return BinaryReaders.ReadBytesFully(br, length);
 		}
 
-		private static DateTime ReadDateTime(BinaryReader br)
+		static DateTime ReadDateTime(BinaryReader br)
 		{
 			long unixMS = BinaryReaders.ReadInt64BigEndian(br);
 			return DateTimeUtilities.UnixMsToDateTime(unixMS);
 		}
 
-		private static X509Certificate ReadTypedCertificate(BinaryReader br, int storeVersion)
+		static X509Certificate ReadTypedCertificate(BinaryReader br, int storeVersion)
 		{
 			if (storeVersion == 2)
 			{
 				string certFormat = ReadUtf(br);
 				if ("X.509" != certFormat)
+				{
 					throw new IOException("Unsupported certificate format: " + certFormat);
+				}
 			}
 
 			byte[] certData = ReadBufferWithInt32Length(br);
@@ -490,7 +534,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 		}
 
-		private static string ReadUtf(BinaryReader br)
+		static string ReadUtf(BinaryReader br)
 		{
 			byte[] utfBytes = ReadBufferWithInt16Length(br);
 
@@ -502,37 +546,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			{
 				byte utfByte = utfBytes[i];
 				if (utfByte == 0 || (utfByte & 0x80) != 0)
+				{
 					throw new NotSupportedException("Currently missing support for modified UTF-8 encoding in JKS");
+				}
 			}
 
 			return Encoding.UTF8.GetString(utfBytes);
 		}
 
-		private static void WriteBufferWithInt16Length(BinaryWriter bw, byte[] buffer)
+		static void WriteBufferWithInt16Length(BinaryWriter bw, byte[] buffer)
 		{
 			BinaryWriters.WriteInt16BigEndian(bw, Convert.ToInt16(buffer.Length));
 			bw.Write(buffer);
 		}
 
-		private static void WriteBufferWithInt32Length(BinaryWriter bw, byte[] buffer)
+		static void WriteBufferWithInt32Length(BinaryWriter bw, byte[] buffer)
 		{
 			BinaryWriters.WriteInt32BigEndian(bw, buffer.Length);
 			bw.Write(buffer);
 		}
 
-		private static void WriteDateTime(BinaryWriter bw, DateTime dateTime)
+		static void WriteDateTime(BinaryWriter bw, DateTime dateTime)
 		{
 			long unixMS = DateTimeUtilities.DateTimeToUnixMs(dateTime);
 			BinaryWriters.WriteInt64BigEndian(bw, unixMS);
 		}
 
-		private static void WriteTypedCertificate(BinaryWriter bw, X509Certificate cert)
+		static void WriteTypedCertificate(BinaryWriter bw, X509Certificate cert)
 		{
 			WriteUtf(bw, "X.509");
 			WriteBufferWithInt32Length(bw, cert.GetEncoded());
 		}
 
-		private static void WriteUtf(BinaryWriter bw, string s)
+		static void WriteUtf(BinaryWriter bw, string s)
 		{
 			byte[] utfBytes = Encoding.UTF8.GetBytes(s);
 
@@ -544,7 +590,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			{
 				byte utfByte = utfBytes[i];
 				if (utfByte == 0 || (utfByte & 0x80) != 0)
+				{
 					throw new NotSupportedException("Currently missing support for modified UTF-8 encoding in JKS");
+				}
 			}
 
 			WriteBufferWithInt16Length(bw, utfBytes);
@@ -553,7 +601,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		/**
 		 * JksTrustedCertEntry is a internal container for the certificate entry.
 		 */
-		private sealed class JksTrustedCertEntry
+		sealed class JksTrustedCertEntry
 		{
 			internal readonly DateTime date;
 			internal readonly X509Certificate cert;
@@ -565,7 +613,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 		}
 
-		private sealed class JksKeyEntry
+		sealed class JksKeyEntry
 		{
 			internal readonly DateTime date;
 			internal readonly EncryptedPrivateKeyInfo keyData;
@@ -579,7 +627,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 		}
 
-		private sealed class ErasableByteStream
+		sealed class ErasableByteStream
 			: MemoryStream
 		{
 			internal ErasableByteStream(byte[] buffer, int index, int count)

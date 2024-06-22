@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class RsaEngine
 		: IAsymmetricBlockCipher
 	{
-		private readonly IRsa core;
+		readonly IRsa core;
 
 		public RsaEngine()
 			: this(new RsaCoreEngine())
@@ -20,7 +20,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		public RsaEngine(IRsa rsa)
 		{
-			this.core = rsa;
+			core = rsa;
 		}
 
 		public virtual string AlgorithmName

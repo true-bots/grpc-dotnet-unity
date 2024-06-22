@@ -14,12 +14,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public const int agreeMAC = 3;
 		public const int encryptedKey = 4;
 
-		private readonly int tagNo;
-		private readonly Asn1Encodable obj;
+		readonly int tagNo;
+		readonly Asn1Encodable obj;
 
-		private PopoPrivKey(Asn1TaggedObject obj)
+		PopoPrivKey(Asn1TaggedObject obj)
 		{
-			this.tagNo = obj.TagNo;
+			tagNo = obj.TagNo;
 
 			switch (tagNo)
 			{
@@ -50,8 +50,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 
 		public PopoPrivKey(SubsequentMessage msg)
 		{
-			this.tagNo = subsequentMessage;
-			this.obj = msg;
+			tagNo = subsequentMessage;
+			obj = msg;
 		}
 
 		public virtual int Type

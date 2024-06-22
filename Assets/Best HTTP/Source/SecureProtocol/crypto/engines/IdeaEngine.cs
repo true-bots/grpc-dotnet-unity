@@ -23,8 +23,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class IdeaEngine
 		: IBlockCipher
 	{
-		private const int BLOCK_SIZE = 8;
-		private int[] workingKey;
+		const int BLOCK_SIZE = 8;
+		int[] workingKey;
 
 		/**
 		* standard constructor.
@@ -46,7 +46,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
-				throw new ArgumentException("invalid parameter passed to IDEA init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			{
+				throw new ArgumentException("invalid parameter passed to IDEA init - " + Platform.GetTypeName(parameters));
+			}
 
 			workingKey = GenerateWorkingKey(forEncryption,
 				((KeyParameter)parameters).GetKey());
@@ -65,7 +67,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (workingKey == null)
+			{
 				throw new InvalidOperationException("IDEA engine not initialised");
+			}
 
 			Check.DataLength(input, inOff, BLOCK_SIZE, "input buffer too short");
 			Check.OutputLength(output, outOff, BLOCK_SIZE, "output buffer too short");
@@ -92,8 +96,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         }
 #endif
 
-		private static readonly int MASK = 0xffff;
-		private static readonly int BASE = 0x10001;
+		static readonly int MASK = 0xffff;
+		static readonly int BASE = 0x10001;
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private int BytesToWord(ReadOnlySpan<byte> input)
@@ -107,12 +111,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             output[1] = (byte)word;
         }
 #else
-		private int BytesToWord(byte[] input, int inOff)
+		int BytesToWord(byte[] input, int inOff)
 		{
 			return ((input[inOff] << 8) & 0xff00) + (input[inOff + 1] & 0xff);
 		}
 
-		private void WordToBytes(int word, byte[] outBytes, int outOff)
+		void WordToBytes(int word, byte[] outBytes, int outOff)
 		{
 			outBytes[outOff] = (byte)((uint)word >> 8);
 			outBytes[outOff + 1] = (byte)word;
@@ -128,24 +132,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @param y the y value
 		* @return x = x * y
 		*/
-		private int Mul(
+		int Mul(
 			int x,
 			int y)
 		{
 			if (x == 0)
 			{
-				x = (BASE - y);
+				x = BASE - y;
 			}
 			else if (y == 0)
 			{
-				x = (BASE - x);
+				x = BASE - x;
 			}
 			else
 			{
 				int p = x * y;
 				y = p & MASK;
 				x = (int)((uint)p >> 16);
-				x = y - x + ((y < x) ? 1 : 0);
+				x = y - x + (y < x ? 1 : 0);
 			}
 
 			return x & MASK;
@@ -188,7 +192,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             WordToBytes(Mul(x3, workingKey[keyOff]), output[6..]);
         }
 #else
-		private void IdeaFunc(int[] workingKey, byte[] input, int inOff, byte[] outBytes, int outOff)
+		void IdeaFunc(int[] workingKey, byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			int x0 = BytesToWord(input, inOff);
 			int x1 = BytesToWord(input, inOff + 2);
@@ -232,7 +236,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* is calculated by rotating the previous 16 bytes by 25 bits to the left,
 		* and so on until the subkey is completed.
 		*/
-		private int[] ExpandKey(byte[] uKey)
+		int[] ExpandKey(byte[] uKey)
 		{
 			int[] key = new int[52];
 			if (uKey.Length < 16)
@@ -255,15 +259,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				if ((i & 7) < 6)
 				{
-					key[i] = ((key[i - 7] & 127) << 9 | key[i - 6] >> 7) & MASK;
+					key[i] = (((key[i - 7] & 127) << 9) | (key[i - 6] >> 7)) & MASK;
 				}
 				else if ((i & 7) == 6)
 				{
-					key[i] = ((key[i - 7] & 127) << 9 | key[i - 14] >> 7) & MASK;
+					key[i] = (((key[i - 7] & 127) << 9) | (key[i - 14] >> 7)) & MASK;
 				}
 				else
 				{
-					key[i] = ((key[i - 15] & 127) << 9 | key[i - 14] >> 7) & MASK;
+					key[i] = (((key[i - 15] & 127) << 9) | (key[i - 14] >> 7)) & MASK;
 				}
 			}
 
@@ -277,7 +281,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* i.e. x * MulInv(x) == 1 (modulo BASE)
 		* </p>
 		*/
-		private int MulInv(
+		int MulInv(
 			int x)
 		{
 			int t0, t1, q, y;
@@ -294,7 +298,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			{
 				q = x / y;
 				x = x % y;
-				t0 = (t0 + (t1 * q)) & MASK;
+				t0 = (t0 + t1 * q) & MASK;
 				if (x == 1)
 				{
 					return t0;
@@ -302,7 +306,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 				q = y / x;
 				y = y % x;
-				t1 = (t1 + (t0 * q)) & MASK;
+				t1 = (t1 + t0 * q) & MASK;
 			}
 
 			return (1 - t1) & MASK;
@@ -324,7 +328,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* The function to invert the encryption subkey to the decryption subkey.
 		* It also involves the multiplicative inverse and the additive inverse functions.
 		*/
-		private int[] InvertKey(
+		int[] InvertKey(
 			int[] inKey)
 		{
 			int t1, t2, t3, t4;
@@ -374,7 +378,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return key;
 		}
 
-		private int[] GenerateWorkingKey(
+		int[] GenerateWorkingKey(
 			bool forEncryption,
 			byte[] userKey)
 		{

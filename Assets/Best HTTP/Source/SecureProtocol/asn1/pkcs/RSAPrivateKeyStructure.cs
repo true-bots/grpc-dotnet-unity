@@ -8,14 +8,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class RsaPrivateKeyStructure
 		: Asn1Encodable
 	{
-		private readonly BigInteger modulus;
-		private readonly BigInteger publicExponent;
-		private readonly BigInteger privateExponent;
-		private readonly BigInteger prime1;
-		private readonly BigInteger prime2;
-		private readonly BigInteger exponent1;
-		private readonly BigInteger exponent2;
-		private readonly BigInteger coefficient;
+		readonly BigInteger modulus;
+		readonly BigInteger publicExponent;
+		readonly BigInteger privateExponent;
+		readonly BigInteger prime1;
+		readonly BigInteger prime2;
+		readonly BigInteger exponent1;
+		readonly BigInteger exponent2;
+		readonly BigInteger coefficient;
 
 		public static RsaPrivateKeyStructure GetInstance(Asn1TaggedObject obj, bool isExplicit)
 		{
@@ -25,9 +25,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		public static RsaPrivateKeyStructure GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
+
 			if (obj is RsaPrivateKeyStructure)
+			{
 				return (RsaPrivateKeyStructure)obj;
+			}
+
 			return new RsaPrivateKeyStructure(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -51,11 +57,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			this.coefficient = coefficient;
 		}
 
-		private RsaPrivateKeyStructure(Asn1Sequence seq)
+		RsaPrivateKeyStructure(Asn1Sequence seq)
 		{
 			BigInteger version = ((DerInteger)seq[0]).Value;
 			if (version.IntValue != 0)
+			{
 				throw new ArgumentException("wrong version for RSA private key");
+			}
 
 			modulus = ((DerInteger)seq[1]).Value;
 			publicExponent = ((DerInteger)seq[2]).Value;

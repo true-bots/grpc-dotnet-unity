@@ -16,14 +16,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class SM2Signer
 		: ISigner
 	{
-		private readonly IDsaKCalculator kCalculator = new RandomDsaKCalculator();
-		private readonly IDigest digest;
-		private readonly IDsaEncoding encoding;
+		readonly IDsaKCalculator kCalculator = new RandomDsaKCalculator();
+		readonly IDigest digest;
+		readonly IDsaEncoding encoding;
 
-		private ECDomainParameters ecParams;
-		private ECPoint pubPoint;
-		private ECKeyParameters ecKey;
-		private byte[] z;
+		ECDomainParameters ecParams;
+		ECPoint pubPoint;
+		ECKeyParameters ecKey;
+		byte[] z;
 
 		public SM2Signer()
 			: this(StandardDsaEncoding.Instance, new SM3Digest())
@@ -62,7 +62,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				userID = ((ParametersWithID)parameters).GetID();
 
 				if (userID.Length >= 8192)
+				{
 					throw new ArgumentException("SM2 user ID must be less than 2^16 bits long");
+				}
 			}
 			else
 			{
@@ -188,18 +190,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			}
 		}
 
-		private bool VerifySignature(BigInteger r, BigInteger s)
+		bool VerifySignature(BigInteger r, BigInteger s)
 		{
 			BigInteger n = ecParams.N;
 
 			// 5.3.1 Draft RFC:  SM2 Public Key Algorithms
 			// B1
 			if (r.CompareTo(BigInteger.One) < 0 || r.CompareTo(n) >= 0)
+			{
 				return false;
+			}
 
 			// B2
 			if (s.CompareTo(BigInteger.One) < 0 || s.CompareTo(n) >= 0)
+			{
 				return false;
+			}
 
 			// B3
 			byte[] eHash = DigestUtilities.DoFinal(digest);
@@ -210,19 +216,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			// B5
 			BigInteger t = r.Add(s).Mod(n);
 			if (t.SignValue == 0)
+			{
 				return false;
+			}
 
 			// B6
 			ECPoint q = ((ECPublicKeyParameters)ecKey).Q;
 			ECPoint x1y1 = ECAlgorithms.SumOfTwoMultiplies(ecParams.G, s, q, t).Normalize();
 			if (x1y1.IsInfinity)
+			{
 				return false;
+			}
 
 			// B7
 			return r.Equals(e.Add(x1y1.AffineXCoord.ToBigInteger()).Mod(n));
 		}
 
-		private byte[] GetZ(byte[] userID)
+		byte[] GetZ(byte[] userID)
 		{
 			AddUserID(digest, userID);
 
@@ -236,7 +246,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			return DigestUtilities.DoFinal(digest);
 		}
 
-		private void AddUserID(IDigest digest, byte[] userID)
+		void AddUserID(IDigest digest, byte[] userID)
 		{
 			int len = userID.Length * 8;
 			digest.Update((byte)(len >> 8));
@@ -244,7 +254,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			digest.BlockUpdate(userID, 0, userID.Length);
 		}
 
-		private void AddFieldElement(IDigest digest, ECFieldElement v)
+		void AddFieldElement(IDigest digest, ECFieldElement v)
 		{
 			byte[] p = v.GetEncoded();
 			digest.BlockUpdate(p, 0, p.Length);

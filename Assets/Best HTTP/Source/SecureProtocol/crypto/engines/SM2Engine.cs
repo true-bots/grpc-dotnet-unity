@@ -23,14 +23,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			C1C3C2
 		}
 
-		private readonly IDigest mDigest;
-		private readonly Mode mMode;
+		readonly IDigest mDigest;
+		readonly Mode mMode;
 
-		private bool mForEncryption;
-		private ECKeyParameters mECKey;
-		private ECDomainParameters mECParams;
-		private int mCurveLength;
-		private SecureRandom mRandom;
+		bool mForEncryption;
+		ECKeyParameters mECKey;
+		ECDomainParameters mECParams;
+		int mCurveLength;
+		SecureRandom mRandom;
 
 		public SM2Engine()
 			: this(new SM3Digest())
@@ -55,7 +55,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		public virtual void Init(bool forEncryption, ICipherParameters param)
 		{
-			this.mForEncryption = forEncryption;
+			mForEncryption = forEncryption;
 
 			if (forEncryption)
 			{
@@ -66,7 +66,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 				ECPoint s = ((ECPublicKeyParameters)mECKey).Q.Multiply(mECParams.H);
 				if (s.IsInfinity)
+				{
 					throw new ArgumentException("invalid key: [h]Q at infinity");
+				}
 
 				mRandom = rParam.Random;
 			}
@@ -81,8 +83,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		public virtual byte[] ProcessBlock(byte[] input, int inOff, int inLen)
 		{
-			if ((inOff + inLen) > input.Length || inLen == 0)
+			if (inOff + inLen > input.Length || inLen == 0)
+			{
 				throw new DataLengthException("input buffer too short");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return ProcessBlock(input.AsSpan(inOff, inLen));
@@ -238,7 +242,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             return true;
         }
 #else
-		private byte[] Encrypt(byte[] input, int inOff, int inLen)
+		byte[] Encrypt(byte[] input, int inOff, int inLen)
 		{
 			byte[] c2 = new byte[inLen];
 
@@ -275,7 +279,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private byte[] Decrypt(byte[] input, int inOff, int inLen)
+		byte[] Decrypt(byte[] input, int inOff, int inLen)
 		{
 			byte[] c1 = new byte[mCurveLength * 2 + 1];
 
@@ -285,7 +289,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			ECPoint s = c1P.Multiply(mECParams.H);
 			if (s.IsInfinity)
+			{
 				throw new InvalidCipherTextException("[h]C1 at infinity");
+			}
 
 			c1P = c1P.Multiply(((ECPrivateKeyParameters)mECKey).D).Normalize();
 
@@ -337,19 +343,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return c2;
 		}
 
-		private bool NotEncrypted(byte[] encData, byte[] input, int inOff)
+		bool NotEncrypted(byte[] encData, byte[] input, int inOff)
 		{
 			for (int i = 0; i != encData.Length; i++)
 			{
 				if (encData[i] != input[inOff + i])
+				{
 					return false;
+				}
 			}
 
 			return true;
 		}
 #endif
 
-		private void Kdf(IDigest digest, ECPoint c1, byte[] encData)
+		void Kdf(IDigest digest, ECPoint c1, byte[] encData)
 		{
 			int digestSize = digest.GetDigestSize();
 			int bufSize = System.Math.Max(4, digestSize);
@@ -412,7 +420,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             }
         }
 #else
-		private void Xor(byte[] data, byte[] kdfOut, int dOff, int dRemaining)
+		void Xor(byte[] data, byte[] kdfOut, int dOff, int dRemaining)
 		{
 			for (int i = 0; i != dRemaining; i++)
 			{
@@ -421,7 +429,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 #endif
 
-		private BigInteger NextK()
+		BigInteger NextK()
 		{
 			int qBitLength = mECParams.N.BitLength;
 
@@ -434,7 +442,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return k;
 		}
 
-		private void AddFieldElement(IDigest digest, ECFieldElement v)
+		void AddFieldElement(IDigest digest, ECFieldElement v)
 		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             int encodedLength = v.GetEncodedLength();

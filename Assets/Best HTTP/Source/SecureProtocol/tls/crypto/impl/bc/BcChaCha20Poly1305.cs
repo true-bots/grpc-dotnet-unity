@@ -11,18 +11,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 	public sealed class BcChaCha20Poly1305
 		: TlsAeadCipherImpl
 	{
-		private static readonly byte[] Zeroes = new byte[15];
+		static readonly byte[] Zeroes = new byte[15];
 
-		private readonly ChaCha7539Engine m_cipher = new ChaCha7539Engine();
-		private readonly Poly1305 m_mac = new Poly1305();
+		readonly ChaCha7539Engine m_cipher = new ChaCha7539Engine();
+		readonly Poly1305 m_mac = new Poly1305();
 
-		private readonly bool m_isEncrypting;
+		readonly bool m_isEncrypting;
 
-		private int m_additionalDataLength;
+		int m_additionalDataLength;
 
 		public BcChaCha20Poly1305(bool isEncrypting)
 		{
-			this.m_isEncrypting = isEncrypting;
+			m_isEncrypting = isEncrypting;
 		}
 
 		public int DoFinal(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset)
@@ -35,7 +35,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 				int outputLength = inputLength;
 
 				if (ciphertextLength != outputLength)
+				{
 					throw new InvalidOperationException();
+				}
 
 				UpdateMac(output, outputOffset, ciphertextLength);
 
@@ -62,13 +64,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 
 				bool badMac = !TlsUtilities.ConstantTimeAreEqual(16, expectedMac, 0, input, inputOffset + ciphertextLength);
 				if (badMac)
+				{
 					throw new TlsFatalAlert(AlertDescription.bad_record_mac);
+				}
 
 				m_cipher.DoFinal(input, inputOffset, ciphertextLength, output, outputOffset);
 				int outputLength = ciphertextLength;
 
 				if (ciphertextLength != outputLength)
+				{
 					throw new InvalidOperationException();
+				}
 
 				return ciphertextLength;
 			}
@@ -82,17 +88,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public void Init(byte[] nonce, int macSize, byte[] additionalData)
 		{
 			if (nonce == null || nonce.Length != 12 || macSize != 16)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			m_cipher.Init(m_isEncrypting, new ParametersWithIV(null, nonce));
 			InitMac();
 			if (additionalData == null)
 			{
-				this.m_additionalDataLength = 0;
+				m_additionalDataLength = 0;
 			}
 			else
 			{
-				this.m_additionalDataLength = additionalData.Length;
+				m_additionalDataLength = additionalData.Length;
 				UpdateMac(additionalData, 0, additionalData.Length);
 			}
 		}
@@ -117,7 +125,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
         }
 #endif
 
-		private void InitMac()
+		void InitMac()
 		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             Span<byte> firstBlock = stackalloc byte[64];
@@ -132,7 +140,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 #endif
 		}
 
-		private void UpdateMac(byte[] buf, int off, int len)
+		void UpdateMac(byte[] buf, int off, int len)
 		{
 			m_mac.BlockUpdate(buf, off, len);
 

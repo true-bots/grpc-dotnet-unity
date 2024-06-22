@@ -23,13 +23,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 			return new Asn1DigestFactory(DigestUtilities.GetDigest(oid), oid);
 		}
 
-		private readonly IDigest mDigest;
-		private readonly DerObjectIdentifier mOid;
+		readonly IDigest mDigest;
+		readonly DerObjectIdentifier mOid;
 
 		public Asn1DigestFactory(IDigest digest, DerObjectIdentifier oid)
 		{
-			this.mDigest = digest;
-			this.mOid = oid;
+			mDigest = digest;
+			mOid = oid;
 		}
 
 		public virtual object AlgorithmDetails
@@ -48,14 +48,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 		}
 	}
 
-	internal class DfDigestStream
+	class DfDigestStream
 		: IStreamCalculator<SimpleBlockResult>
 	{
-		private readonly DigestSink mStream;
+		readonly DigestSink mStream;
 
 		public DfDigestStream(IDigest digest)
 		{
-			this.mStream = new DigestSink(digest);
+			mStream = new DigestSink(digest);
 		}
 
 		public Stream Stream

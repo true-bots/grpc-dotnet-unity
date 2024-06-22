@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(Asn1GeneralizedTime), Asn1Tags.GeneralizedTime)
+			Meta() : base(typeof(Asn1GeneralizedTime), Asn1Tags.GeneralizedTime)
 			{
 			}
 
@@ -29,16 +29,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1GeneralizedTime GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is Asn1GeneralizedTime asn1GeneralizedTime)
+			{
 				return asn1GeneralizedTime;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is Asn1GeneralizedTime converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -52,7 +58,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), nameof(obj));
 		}
 
 		public static Asn1GeneralizedTime GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
@@ -60,9 +66,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (Asn1GeneralizedTime)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly string m_timeString;
-		private readonly bool m_timeStringCanonical;
-		private readonly DateTime m_dateTime;
+		readonly string m_timeString;
+		readonly bool m_timeStringCanonical;
+		readonly DateTime m_dateTime;
 
 		public Asn1GeneralizedTime(string timeString)
 		{
@@ -95,7 +101,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 		}
 
-		public string TimeString => m_timeString;
+		public string TimeString
+		{
+			get { return m_timeString; }
+		}
 
 		public DateTime ToDateTime()
 		{
@@ -105,7 +114,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal byte[] GetContents(int encoding)
 		{
 			if (encoding == Asn1OutputStream.EncodingDer && !m_timeStringCanonical)
+			{
 				return Encoding.ASCII.GetBytes(ToStringCanonical(m_dateTime));
+			}
 
 			return Encoding.ASCII.GetBytes(m_timeString);
 		}
@@ -123,11 +134,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		protected override bool Asn1Equals(Asn1Object asn1Object)
 		{
 			if (!(asn1Object is Asn1GeneralizedTime that))
+			{
 				return false;
+			}
 
 			// TODO Performance
 			return Arrays.AreEqual(
-				this.GetContents(Asn1OutputStream.EncodingDer),
+				GetContents(Asn1OutputStream.EncodingDer),
 				that.GetContents(Asn1OutputStream.EncodingDer));
 		}
 
@@ -135,7 +148,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			// TODO Performance
 			return Arrays.GetHashCode(
-				this.GetContents(Asn1OutputStream.EncodingDer));
+				GetContents(Asn1OutputStream.EncodingDer));
 		}
 
 		internal static Asn1GeneralizedTime CreatePrimitive(byte[] contents)
@@ -143,14 +156,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return new Asn1GeneralizedTime(contents);
 		}
 
-		private static DateTime FromString(string s)
+		static DateTime FromString(string s)
 		{
 			if (s.Length < 10)
+			{
 				throw new FormatException();
+			}
 
 			s = s.Replace(',', '.');
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(s, "Z"))
+			if (Platform.EndsWith(s, "Z"))
 			{
 				switch (s.Length)
 				{
@@ -231,34 +246,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			throw new FormatException();
 		}
 
-		private static int IndexOfSign(string s, int startIndex)
+		static int IndexOfSign(string s, int startIndex)
 		{
-			int index = Org.BouncyCastle.Utilities.Platform.IndexOf(s, '+', startIndex);
+			int index = Platform.IndexOf(s, '+', startIndex);
 			if (index < 0)
 			{
-				index = Org.BouncyCastle.Utilities.Platform.IndexOf(s, '-', startIndex);
+				index = Platform.IndexOf(s, '-', startIndex);
 			}
 
 			return index;
 		}
 
-		private static DateTime ParseLocal(string s, string format)
+		static DateTime ParseLocal(string s, string format)
 		{
 			return DateTime.ParseExact(s, format, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeLocal);
 		}
 
-		private static DateTime ParseTimeZone(string s, string format)
+		static DateTime ParseTimeZone(string s, string format)
 		{
 			return DateTime.ParseExact(s, format, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AdjustToUniversal);
 		}
 
-		private static DateTime ParseUtc(string s, string format)
+		static DateTime ParseUtc(string s, string format)
 		{
 			return DateTime.ParseExact(s, format, DateTimeFormatInfo.InvariantInfo,
 				DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal);
 		}
 
-		private static string ToStringCanonical(DateTime dateTime)
+		static string ToStringCanonical(DateTime dateTime)
 		{
 			return dateTime.ToUniversalTime().ToString(@"yyyyMMddHHmmss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo);
 		}

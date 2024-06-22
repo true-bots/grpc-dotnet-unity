@@ -15,8 +15,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Endo
 			BigInteger b1 = CalculateB(k, p.G1, bits);
 			BigInteger b2 = CalculateB(k, p.G2, bits);
 
-			BigInteger a = k.Subtract((b1.Multiply(p.V1A)).Add(b2.Multiply(p.V2A)));
-			BigInteger b = (b1.Multiply(p.V1B)).Add(b2.Multiply(p.V2B)).Negate();
+			BigInteger a = k.Subtract(b1.Multiply(p.V1A).Add(b2.Multiply(p.V2A)));
+			BigInteger b = b1.Multiply(p.V1B).Add(b2.Multiply(p.V2B)).Negate();
 
 			return new BigInteger[] { a, b };
 		}
@@ -28,9 +28,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Endo
 			return precomp.MappedPoint;
 		}
 
-		private static BigInteger CalculateB(BigInteger k, BigInteger g, int t)
+		static BigInteger CalculateB(BigInteger k, BigInteger g, int t)
 		{
-			bool negative = (g.SignValue < 0);
+			bool negative = g.SignValue < 0;
 			BigInteger b = k.Multiply(g.Abs());
 			bool extra = b.TestBit(t - 1);
 			b = b.ShiftRight(t);
@@ -42,16 +42,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Endo
 			return negative ? b.Negate() : b;
 		}
 
-		private class MapPointCallback
+		class MapPointCallback
 			: IPreCompCallback
 		{
-			private readonly ECEndomorphism m_endomorphism;
-			private readonly ECPoint m_point;
+			readonly ECEndomorphism m_endomorphism;
+			readonly ECPoint m_point;
 
 			internal MapPointCallback(ECEndomorphism endomorphism, ECPoint point)
 			{
-				this.m_endomorphism = endomorphism;
-				this.m_point = point;
+				m_endomorphism = endomorphism;
+				m_point = point;
 			}
 
 			public PreCompInfo Precompute(PreCompInfo existing)
@@ -59,7 +59,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Endo
 				EndoPreCompInfo existingEndo = existing as EndoPreCompInfo;
 
 				if (CheckExisting(existingEndo, m_endomorphism))
+				{
 					return existingEndo;
+				}
 
 				ECPoint mappedPoint = m_endomorphism.PointMap.Map(m_point);
 
@@ -69,7 +71,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Endo
 				return result;
 			}
 
-			private bool CheckExisting(EndoPreCompInfo existingEndo, ECEndomorphism endomorphism)
+			bool CheckExisting(EndoPreCompInfo existingEndo, ECEndomorphism endomorphism)
 			{
 				return null != existingEndo
 				       && existingEndo.Endomorphism == endomorphism

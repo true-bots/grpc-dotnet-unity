@@ -11,18 +11,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class UserIdPacket
 		: ContainedPacket
 	{
-		private readonly byte[] idData;
+		readonly byte[] idData;
 
 		public UserIdPacket(
 			BcpgInputStream bcpgIn)
 		{
-			this.idData = bcpgIn.ReadAll();
+			idData = bcpgIn.ReadAll();
 		}
 
 		public UserIdPacket(
 			string id)
 		{
-			this.idData = Encoding.UTF8.GetBytes(id);
+			idData = Encoding.UTF8.GetBytes(id);
 		}
 
 		public string GetId()

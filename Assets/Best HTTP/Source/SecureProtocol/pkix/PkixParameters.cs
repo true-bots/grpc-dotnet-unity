@@ -37,33 +37,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		*/
 		public const int ChainValidityModel = 1;
 
-		private HashSet<TrustAnchor> trustAnchors;
-		private DateTime? date;
-		private List<PkixCertPathChecker> m_checkers;
-		private bool revocationEnabled = true;
+		HashSet<TrustAnchor> trustAnchors;
+		DateTime? date;
+		List<PkixCertPathChecker> m_checkers;
+		bool revocationEnabled = true;
 
-		private HashSet<string> initialPolicies;
+		HashSet<string> initialPolicies;
 
 		//private bool checkOnlyEECertificateCrl = false;
-		private bool explicitPolicyRequired = false;
-		private bool anyPolicyInhibited = false;
-		private bool policyMappingInhibited = false;
-		private bool policyQualifiersRejected = true;
+		bool explicitPolicyRequired = false;
+		bool anyPolicyInhibited = false;
+		bool policyMappingInhibited = false;
+		bool policyQualifiersRejected = true;
 
-		private List<IStore<X509V2AttributeCertificate>> m_storesAttrCert;
-		private List<IStore<X509Certificate>> m_storesCert;
-		private List<IStore<X509Crl>> m_storesCrl;
+		List<IStore<X509V2AttributeCertificate>> m_storesAttrCert;
+		List<IStore<X509Certificate>> m_storesCert;
+		List<IStore<X509Crl>> m_storesCrl;
 
-		private ISelector<X509V2AttributeCertificate> m_targetConstraintsAttrCert;
-		private ISelector<X509Certificate> m_targetConstraintsCert;
+		ISelector<X509V2AttributeCertificate> m_targetConstraintsAttrCert;
+		ISelector<X509Certificate> m_targetConstraintsCert;
 
-		private bool additionalLocationsEnabled;
-		private ISet<TrustAnchor> trustedACIssuers;
-		private ISet<string> necessaryACAttributes;
-		private ISet<string> prohibitedACAttributes;
-		private ISet<PkixAttrCertChecker> attrCertCheckers;
-		private int validityModel = PkixValidityModel;
-		private bool useDeltas = false;
+		bool additionalLocationsEnabled;
+		ISet<TrustAnchor> trustedACIssuers;
+		ISet<string> necessaryACAttributes;
+		ISet<string> prohibitedACAttributes;
+		ISet<PkixAttrCertChecker> attrCertCheckers;
+		int validityModel = PkixValidityModel;
+		bool useDeltas = false;
 
 		/**
 		 * Creates an instance of PKIXParameters with the specified Set of
@@ -87,15 +87,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		{
 			SetTrustAnchors(trustAnchors);
 
-			this.initialPolicies = new HashSet<string>();
-			this.m_checkers = new List<PkixCertPathChecker>();
-			this.m_storesAttrCert = new List<IStore<X509V2AttributeCertificate>>();
-			this.m_storesCert = new List<IStore<X509Certificate>>();
-			this.m_storesCrl = new List<IStore<X509Crl>>();
-			this.trustedACIssuers = new HashSet<TrustAnchor>();
-			this.necessaryACAttributes = new HashSet<string>();
-			this.prohibitedACAttributes = new HashSet<string>();
-			this.attrCertCheckers = new HashSet<PkixAttrCertChecker>();
+			initialPolicies = new HashSet<string>();
+			m_checkers = new List<PkixCertPathChecker>();
+			m_storesAttrCert = new List<IStore<X509V2AttributeCertificate>>();
+			m_storesCert = new List<IStore<X509Certificate>>();
+			m_storesCrl = new List<IStore<X509Crl>>();
+			trustedACIssuers = new HashSet<TrustAnchor>();
+			necessaryACAttributes = new HashSet<string>();
+			prohibitedACAttributes = new HashSet<string>();
+			attrCertCheckers = new HashSet<PkixAttrCertChecker>();
 		}
 
 //		// TODO implement for other keystores (see Java build)?
@@ -149,25 +149,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		public virtual bool IsExplicitPolicyRequired
 		{
 			get { return explicitPolicyRequired; }
-			set { this.explicitPolicyRequired = value; }
+			set { explicitPolicyRequired = value; }
 		}
 
 		public virtual bool IsAnyPolicyInhibited
 		{
 			get { return anyPolicyInhibited; }
-			set { this.anyPolicyInhibited = value; }
+			set { anyPolicyInhibited = value; }
 		}
 
 		public virtual bool IsPolicyMappingInhibited
 		{
 			get { return policyMappingInhibited; }
-			set { this.policyMappingInhibited = value; }
+			set { policyMappingInhibited = value; }
 		}
 
 		public virtual bool IsPolicyQualifiersRejected
 		{
 			get { return policyQualifiersRejected; }
-			set { this.policyQualifiersRejected = value; }
+			set { policyQualifiersRejected = value; }
 		}
 
 		//public bool IsCheckOnlyEECertificateCrl
@@ -178,14 +178,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		public virtual DateTime? Date
 		{
-			get { return this.date; }
-			set { this.date = value; }
+			get { return date; }
+			set { date = value; }
 		}
 
 		// Returns a Set of the most-trusted CAs.
 		public virtual ISet<TrustAnchor> GetTrustAnchors()
 		{
-			return new HashSet<TrustAnchor>(this.trustAnchors);
+			return new HashSet<TrustAnchor>(trustAnchors);
 		}
 
 		// Sets the set of most-trusted CAs.
@@ -193,12 +193,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		public virtual void SetTrustAnchors(ISet<TrustAnchor> tas)
 		{
 			if (tas == null)
+			{
 				throw new ArgumentNullException("value");
+			}
+
 			if (tas.Count < 1)
+			{
 				throw new ArgumentException("non-empty set required", "value");
+			}
 
 			// Explicit copy to enforce type-safety
-			this.trustAnchors = new HashSet<TrustAnchor>();
+			trustAnchors = new HashSet<TrustAnchor>();
 			foreach (TrustAnchor ta in tas)
 			{
 				if (ta != null)
@@ -254,7 +259,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		*/
 		public virtual void SetTargetConstraintsAttrCert(ISelector<X509V2AttributeCertificate> targetConstraintsAttrCert)
 		{
-			this.m_targetConstraintsAttrCert = (ISelector<X509V2AttributeCertificate>)targetConstraintsAttrCert?.Clone();
+			m_targetConstraintsAttrCert = (ISelector<X509V2AttributeCertificate>)targetConstraintsAttrCert?.Clone();
 		}
 
 		/**
@@ -311,7 +316,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		{
 			// TODO Can it really be null?
 			if (initialPolicies == null)
+			{
 				return new HashSet<string>();
+			}
 
 			return new HashSet<string>(initialPolicies);
 		}
@@ -393,7 +400,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 			if (checkers != null)
 			{
-				foreach (var checker in checkers)
+				foreach (PkixCertPathChecker checker in checkers)
 				{
 					m_checkers.Add((PkixCertPathChecker)checker.Clone());
 				}
@@ -411,8 +418,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		 */
 		public virtual IList<PkixCertPathChecker> GetCertPathCheckers()
 		{
-			var result = new List<PkixCertPathChecker>(m_checkers.Count);
-			foreach (var checker in m_checkers)
+			List<PkixCertPathChecker> result = new List<PkixCertPathChecker>(m_checkers.Count);
+			foreach (PkixCertPathChecker checker in m_checkers)
 			{
 				result.Add((PkixCertPathChecker)checker.Clone());
 			}

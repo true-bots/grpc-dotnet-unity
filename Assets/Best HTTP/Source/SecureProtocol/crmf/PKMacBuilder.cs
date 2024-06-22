@@ -15,10 +15,10 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 {
-	internal class PKMacStreamCalculator
+	class PKMacStreamCalculator
 		: IStreamCalculator<DefaultPKMacResult>
 	{
-		private readonly MacSink _stream;
+		readonly MacSink _stream;
 
 		public PKMacStreamCalculator(IMac mac)
 		{
@@ -36,11 +36,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 		}
 	}
 
-	internal class PKMacFactory
+	class PKMacFactory
 		: IMacFactory
 	{
 		protected readonly PbmParameter parameters;
-		private readonly byte[] key;
+		readonly byte[] key;
 
 		public PKMacFactory(byte[] key, PbmParameter parameters)
 		{
@@ -61,10 +61,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 		}
 	}
 
-	internal class DefaultPKMacResult
+	class DefaultPKMacResult
 		: IBlockResult
 	{
-		private readonly IMac mac;
+		readonly IMac mac;
 
 		public DefaultPKMacResult(IMac mac)
 		{
@@ -97,14 +97,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 
 	public class PKMacBuilder
 	{
-		private AlgorithmIdentifier owf;
-		private AlgorithmIdentifier mac;
-		private IPKMacPrimitivesProvider provider;
-		private SecureRandom random;
-		private PbmParameter parameters;
-		private int iterationCount;
-		private int saltLength = 20;
-		private int maxIterations;
+		AlgorithmIdentifier owf;
+		AlgorithmIdentifier mac;
+		IPKMacPrimitivesProvider provider;
+		SecureRandom random;
+		PbmParameter parameters;
+		int iterationCount;
+		int saltLength = 20;
+		int maxIterations;
 
 		/// <summary>
 		/// Default, IterationCount = 1000, OIW=IdSha1, Mac=HmacSHA1
@@ -146,12 +146,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 			this.maxIterations = maxIterations;
 		}
 
-		private PKMacBuilder(AlgorithmIdentifier digestAlgorithmIdentifier, int iterationCount, AlgorithmIdentifier macAlgorithmIdentifier,
+		PKMacBuilder(AlgorithmIdentifier digestAlgorithmIdentifier, int iterationCount, AlgorithmIdentifier macAlgorithmIdentifier,
 			IPKMacPrimitivesProvider provider)
 		{
 			this.iterationCount = iterationCount;
-			this.mac = macAlgorithmIdentifier;
-			this.owf = digestAlgorithmIdentifier;
+			mac = macAlgorithmIdentifier;
+			owf = digestAlgorithmIdentifier;
 			this.provider = provider;
 		}
 
@@ -164,7 +164,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 		public PKMacBuilder SetSaltLength(int saltLength)
 		{
 			if (saltLength < 8)
+			{
 				throw new ArgumentException("salt length must be at least 8 bytes");
+			}
 
 			this.saltLength = saltLength;
 
@@ -180,7 +182,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 		public PKMacBuilder SetIterationCount(int iterationCount)
 		{
 			if (iterationCount < 100)
+			{
 				throw new ArgumentException("iteration count must be at least 100");
+			}
 
 			CheckIterationCountCeiling(iterationCount);
 
@@ -223,24 +227,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 		public IMacFactory Build(char[] password)
 		{
 			if (parameters != null)
+			{
 				return GenCalculator(parameters, password);
+			}
 
 			byte[] salt = new byte[saltLength];
 
-			this.random = CryptoServicesRegistrar.GetSecureRandom(random);
+			random = CryptoServicesRegistrar.GetSecureRandom(random);
 
 			random.NextBytes(salt);
 
 			return GenCalculator(new PbmParameter(salt, owf, iterationCount, mac), password);
 		}
 
-		private void CheckIterationCountCeiling(int iterationCount)
+		void CheckIterationCountCeiling(int iterationCount)
 		{
 			if (maxIterations > 0 && iterationCount > maxIterations)
+			{
 				throw new ArgumentException("iteration count exceeds limit (" + iterationCount + " > " + maxIterations + ")");
+			}
 		}
 
-		private IMacFactory GenCalculator(PbmParameter parameters, char[] password)
+		IMacFactory GenCalculator(PbmParameter parameters, char[] password)
 		{
 			// From RFC 4211
 			//

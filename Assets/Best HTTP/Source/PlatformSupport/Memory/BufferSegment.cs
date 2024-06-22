@@ -12,10 +12,10 @@ using System.Runtime.CompilerServices;
 
 namespace BestHTTP.PlatformSupport.Memory
 {
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	public struct BufferSegment
 	{
-		private const int ToStringMaxDumpLength = 128;
+		const int ToStringMaxDumpLength = 128;
 
 		public static readonly BufferSegment Empty = new BufferSegment(null, 0, 0);
 
@@ -25,40 +25,42 @@ namespace BestHTTP.PlatformSupport.Memory
 
 		public BufferSegment(byte[] data, int offset, int count)
 		{
-			this.Data = data;
-			this.Offset = offset;
-			this.Count = count;
+			Data = data;
+			Offset = offset;
+			Count = count;
 		}
 
 		public BufferSegment Slice(int newOffset)
 		{
-			int diff = newOffset - this.Offset;
-			return new BufferSegment(this.Data, newOffset, this.Count - diff);
+			int diff = newOffset - Offset;
+			return new BufferSegment(Data, newOffset, Count - diff);
 		}
 
 		public BufferSegment Slice(int offset, int count)
 		{
-			return new BufferSegment(this.Data, offset, count);
+			return new BufferSegment(Data, offset, count);
 		}
 
 		public override bool Equals(object obj)
 		{
 			if (obj == null || !(obj is BufferSegment))
+			{
 				return false;
+			}
 
 			return Equals((BufferSegment)obj);
 		}
 
 		public bool Equals(BufferSegment other)
 		{
-			return this.Data == other.Data &&
-			       this.Offset == other.Offset &&
-			       this.Count == other.Count;
+			return Data == other.Data &&
+			       Offset == other.Offset &&
+			       Count == other.Count;
 		}
 
 		public override int GetHashCode()
 		{
-			return (this.Data != null ? this.Data.GetHashCode() : 0) * 21 + this.Offset + this.Count;
+			return (Data != null ? Data.GetHashCode() : 0) * 21 + Offset + Count;
 		}
 
 		public static bool operator==(BufferSegment left, BufferSegment right)
@@ -73,22 +75,26 @@ namespace BestHTTP.PlatformSupport.Memory
 
 		public override string ToString()
 		{
-			var sb = StringBuilderPool.Get(this.Count + 5);
+			StringBuilder sb = StringBuilderPool.Get(Count + 5);
 			sb.Append("[BufferSegment ");
-			sb.AppendFormat("Offset: {0:N0} ", this.Offset);
-			sb.AppendFormat("Count: {0:N0} ", this.Count);
+			sb.AppendFormat("Offset: {0:N0} ", Offset);
+			sb.AppendFormat("Count: {0:N0} ", Count);
 			sb.Append("Data: [");
 
-			if (this.Count > 0)
+			if (Count > 0)
 			{
-				if (this.Count <= ToStringMaxDumpLength)
+				if (Count <= ToStringMaxDumpLength)
 				{
-					sb.AppendFormat("{0:X2}", this.Data[this.Offset]);
-					for (int i = 1; i < this.Count; ++i)
-						sb.AppendFormat(", {0:X2}", this.Data[this.Offset + i]);
+					sb.AppendFormat("{0:X2}", Data[Offset]);
+					for (int i = 1; i < Count; ++i)
+					{
+						sb.AppendFormat(", {0:X2}", Data[Offset + i]);
+					}
 				}
 				else
+				{
 					sb.Append("...");
+				}
 			}
 
 			sb.Append("]]");

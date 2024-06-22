@@ -15,9 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		public static readonly int KeySize = Ed448.SecretKeySize;
 		public static readonly int SignatureSize = Ed448.SignatureSize;
 
-		private readonly byte[] data = new byte[KeySize];
+		readonly byte[] data = new byte[KeySize];
 
-		private Ed448PublicKeyParameters cachedPublicKey;
+		Ed448PublicKeyParameters cachedPublicKey;
 
 		public Ed448PrivateKeyParameters(SecureRandom random)
 			: base(true)
@@ -51,7 +51,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(true)
 		{
 			if (KeySize != Streams.ReadFully(input, data))
+			{
 				throw new EndOfStreamException("EOF encountered in middle of Ed448 private key");
+			}
 		}
 
 		public void Encode(byte[] buf, int off)
@@ -110,7 +112,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 				case Ed448.Algorithm.Ed448ph:
 				{
 					if (Ed448.PrehashSize != msgLen)
+					{
 						throw new ArgumentException("msgLen");
+					}
 
 					Ed448.SignPrehash(data, 0, pk, 0, ctx, msg, msgOff, sig, sigOff);
 					break;
@@ -122,10 +126,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			}
 		}
 
-		private static byte[] Validate(byte[] buf)
+		static byte[] Validate(byte[] buf)
 		{
 			if (buf.Length != KeySize)
+			{
 				throw new ArgumentException("must have length " + KeySize, nameof(buf));
+			}
 
 			return buf;
 		}

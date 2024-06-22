@@ -10,21 +10,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class KMac
 		: IMac, IXof
 	{
-		private static readonly byte[] padding = new byte[100];
+		static readonly byte[] padding = new byte[100];
 
-		private readonly CShakeDigest cshake;
-		private readonly int bitLength;
-		private readonly int outputLength;
+		readonly CShakeDigest cshake;
+		readonly int bitLength;
+		readonly int outputLength;
 
-		private byte[] key;
-		private bool initialised;
-		private bool firstOutput;
+		byte[] key;
+		bool initialised;
+		bool firstOutput;
 
 		public KMac(int bitLength, byte[] S)
 		{
-			this.cshake = new CShakeDigest(bitLength, Strings.ToAsciiByteArray("KMAC"), S);
+			cshake = new CShakeDigest(bitLength, Strings.ToAsciiByteArray("KMAC"), S);
 			this.bitLength = bitLength;
-			this.outputLength = bitLength * 2 / 8;
+			outputLength = bitLength * 2 / 8;
 		}
 
 		public string AlgorithmName
@@ -35,7 +35,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public void BlockUpdate(byte[] input, int inOff, int len)
 		{
 			if (!initialised)
+			{
 				throw new InvalidOperationException("KMAC not initialized");
+			}
 
 			cshake.BlockUpdate(input, inOff, len);
 		}
@@ -55,7 +57,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			if (firstOutput)
 			{
 				if (!initialised)
+				{
 					throw new InvalidOperationException("KMAC not initialized");
+				}
 
 				byte[] encOut = XofUtilities.RightEncode(GetMacSize() * 8);
 
@@ -95,7 +99,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			if (firstOutput)
 			{
 				if (!initialised)
+				{
 					throw new InvalidOperationException("KMAC not initialized");
+				}
 
 				byte[] encOut = XofUtilities.RightEncode(outLen * 8);
 
@@ -135,7 +141,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			if (firstOutput)
 			{
 				if (!initialised)
+				{
 					throw new InvalidOperationException("KMAC not initialized");
+				}
 
 				byte[] encOut = XofUtilities.RightEncode(0);
 
@@ -184,8 +192,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public void Init(ICipherParameters parameters)
 		{
 			KeyParameter kParam = (KeyParameter)parameters;
-			this.key = Arrays.Clone(kParam.GetKey());
-			this.initialised = true;
+			key = Arrays.Clone(kParam.GetKey());
+			initialised = true;
 			Reset();
 		}
 
@@ -208,14 +216,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			firstOutput = true;
 		}
 
-		private void bytePad(byte[] X, int w)
+		void bytePad(byte[] X, int w)
 		{
 			byte[] bytes = XofUtilities.LeftEncode(w);
 			BlockUpdate(bytes, 0, bytes.Length);
 			byte[] encX = encode(X);
 			BlockUpdate(encX, 0, encX.Length);
 
-			int required = w - ((bytes.Length + encX.Length) % w);
+			int required = w - (bytes.Length + encX.Length) % w;
 
 			if (required > 0 && required != w)
 			{
@@ -229,7 +237,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			}
 		}
 
-		private static byte[] encode(byte[] X)
+		static byte[] encode(byte[] X)
 		{
 			return Arrays.Concatenate(XofUtilities.LeftEncode(X.Length * 8), X);
 		}
@@ -237,7 +245,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public void Update(byte input)
 		{
 			if (!initialised)
+			{
 				throw new InvalidOperationException("KMAC not initialized");
+			}
 
 			cshake.Update(input);
 		}

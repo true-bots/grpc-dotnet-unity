@@ -14,9 +14,9 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 {
-	internal class X509SignatureUtilities
+	class X509SignatureUtilities
 	{
-		private static readonly Asn1Null derNull = DerNull.Instance;
+		static readonly Asn1Null derNull = DerNull.Instance;
 
 		internal static void SetSignatureParameters(
 			ISigner signature,
@@ -85,7 +85,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		 * Return the digest algorithm using one of the standard JCA string
 		 * representations rather than the algorithm identifier (if possible).
 		 */
-		private static string GetDigestAlgName(
+		static string GetDigestAlgName(
 			DerObjectIdentifier digestAlgOID)
 		{
 			if (PkcsObjectIdentifiers.MD5.Equals(digestAlgOID))

@@ -47,7 +47,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 				ECPoint[] table = digit < 0 ? preCompNeg : preComp;
 
 				// Optimization can only be used for values in the lower half of the table
-				if ((n << 2) < (1 << width))
+				if (n << 2 < 1 << width)
 				{
 					int highest = 32 - Integers.NumberOfLeadingZeros(n);
 
@@ -55,7 +55,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 					int scale = width - highest;
 					int lowBits = n ^ (1 << (highest - 1));
 
-					int i1 = ((1 << (width - 1)) - 1);
+					int i1 = (1 << (width - 1)) - 1;
 					int i2 = (lowBits << scale) + 1;
 					R = table[i1 >> 1].Add(table[i2 >> 1]);
 

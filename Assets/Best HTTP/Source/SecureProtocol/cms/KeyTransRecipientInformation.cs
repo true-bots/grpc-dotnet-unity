@@ -23,7 +23,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class KeyTransRecipientInformation
 		: RecipientInformation
 	{
-		private KeyTransRecipientInfo info;
+		KeyTransRecipientInfo info;
 
 		internal KeyTransRecipientInformation(
 			KeyTransRecipientInfo info,
@@ -31,7 +31,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			: base(info.KeyEncryptionAlgorithm, secureReadable)
 		{
 			this.info = info;
-			this.rid = new RecipientID();
+			rid = new RecipientID();
 
 			RecipientIdentifier r = info.RecipientIdentifier;
 
@@ -57,18 +57,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			}
 		}
 
-		private string GetExchangeEncryptionAlgorithmName(
+		string GetExchangeEncryptionAlgorithmName(
 			AlgorithmIdentifier algo)
 		{
 			DerObjectIdentifier oid = algo.Algorithm;
 
-			if (Asn1Pkcs.PkcsObjectIdentifiers.RsaEncryption.Equals(oid))
+			if (PkcsObjectIdentifiers.RsaEncryption.Equals(oid))
 			{
 				return "RSA//PKCS1Padding";
 			}
-			else if (Asn1Pkcs.PkcsObjectIdentifiers.IdRsaesOaep.Equals(oid))
+			else if (PkcsObjectIdentifiers.IdRsaesOaep.Equals(oid))
 			{
-				Asn1Pkcs.RsaesOaepParameters rsaParams = Asn1Pkcs.RsaesOaepParameters.GetInstance(algo.Parameters);
+				RsaesOaepParameters rsaParams = RsaesOaepParameters.GetInstance(algo.Parameters);
 				return "RSA//OAEPWITH" + DigestUtilities.GetAlgorithmName(rsaParams.HashAlgorithm.Algorithm) + "ANDMGF1Padding";
 			}
 

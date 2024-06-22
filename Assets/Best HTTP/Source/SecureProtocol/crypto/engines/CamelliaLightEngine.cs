@@ -12,17 +12,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class CamelliaLightEngine
 		: IBlockCipher
 	{
-		private const int BLOCK_SIZE = 16;
+		const int BLOCK_SIZE = 16;
 
 //		private const int MASK8 = 0xff;
-		private bool initialised;
-		private bool _keyis128;
+		bool initialised;
+		bool _keyis128;
 
-		private uint[] subkey = new uint[24 * 4];
-		private uint[] kw = new uint[4 * 2]; // for whitening
-		private uint[] ke = new uint[6 * 2]; // for FL and FL^(-1)
+		uint[] subkey = new uint[24 * 4];
+		uint[] kw = new uint[4 * 2]; // for whitening
+		uint[] ke = new uint[6 * 2]; // for FL and FL^(-1)
 
-		private static readonly uint[] SIGMA =
+		static readonly uint[] SIGMA =
 		{
 			0xa09e667f, 0x3bcc908b,
 			0xb67ae858, 0x4caa73b2,
@@ -37,7 +37,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		 * S-box data
 		 *
 		 */
-		private static readonly byte[] SBOX1 =
+		static readonly byte[] SBOX1 =
 		{
 			(byte)112, (byte)130, (byte)44, (byte)236,
 			(byte)179, (byte)39, (byte)192, (byte)229,
@@ -105,17 +105,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			(byte)119, (byte)199, (byte)128, (byte)158
 		};
 
-		private static uint rightRotate(uint x, int s)
+		static uint rightRotate(uint x, int s)
 		{
-			return ((x >> s) + (x << (32 - s)));
+			return (x >> s) + (x << (32 - s));
 		}
 
-		private static uint leftRotate(uint x, int s)
+		static uint leftRotate(uint x, int s)
 		{
 			return (x << s) + (x >> (32 - s));
 		}
 
-		private static void roldq(int rot, uint[] ki, int ioff, uint[] ko, int ooff)
+		static void roldq(int rot, uint[] ki, int ioff, uint[] ko, int ooff)
 		{
 			ko[0 + ooff] = (ki[0 + ioff] << rot) | (ki[1 + ioff] >> (32 - rot));
 			ko[1 + ooff] = (ki[1 + ioff] << rot) | (ki[2 + ioff] >> (32 - rot));
@@ -127,7 +127,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ki[3 + ioff] = ko[3 + ooff];
 		}
 
-		private static void decroldq(int rot, uint[] ki, int ioff, uint[] ko, int ooff)
+		static void decroldq(int rot, uint[] ki, int ioff, uint[] ko, int ooff)
 		{
 			ko[2 + ooff] = (ki[0 + ioff] << rot) | (ki[1 + ioff] >> (32 - rot));
 			ko[3 + ooff] = (ki[1 + ioff] << rot) | (ki[2 + ioff] >> (32 - rot));
@@ -139,7 +139,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ki[3 + ioff] = ko[1 + ooff];
 		}
 
-		private static void roldqo32(int rot, uint[] ki, int ioff, uint[] ko, int ooff)
+		static void roldqo32(int rot, uint[] ki, int ioff, uint[] ko, int ooff)
 		{
 			ko[0 + ooff] = (ki[1 + ioff] << (rot - 32)) | (ki[2 + ioff] >> (64 - rot));
 			ko[1 + ooff] = (ki[2 + ioff] << (rot - 32)) | (ki[3 + ioff] >> (64 - rot));
@@ -151,7 +151,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ki[3 + ioff] = ko[3 + ooff];
 		}
 
-		private static void decroldqo32(int rot, uint[] ki, int ioff, uint[] ko, int ooff)
+		static void decroldqo32(int rot, uint[] ki, int ioff, uint[] ko, int ooff)
 		{
 			ko[2 + ooff] = (ki[1 + ioff] << (rot - 32)) | (ki[2 + ioff] >> (64 - rot));
 			ko[3 + ooff] = (ki[2 + ioff] << (rot - 32)) | (ki[3 + ioff] >> (64 - rot));
@@ -163,41 +163,41 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ki[3 + ioff] = ko[1 + ooff];
 		}
 
-		private byte lRot8(byte v, int rot)
+		byte lRot8(byte v, int rot)
 		{
 			return (byte)(((uint)v << rot) | ((uint)v >> (8 - rot)));
 		}
 
-		private uint sbox2(int x)
+		uint sbox2(int x)
 		{
 			return (uint)lRot8(SBOX1[x], 1);
 		}
 
-		private uint sbox3(int x)
+		uint sbox3(int x)
 		{
 			return (uint)lRot8(SBOX1[x], 7);
 		}
 
-		private uint sbox4(int x)
+		uint sbox4(int x)
 		{
 			return (uint)SBOX1[lRot8((byte)x, 1)];
 		}
 
-		private void camelliaF2(uint[] s, uint[] skey, int keyoff)
+		void camelliaF2(uint[] s, uint[] skey, int keyoff)
 		{
 			uint t1, t2, u, v;
 
 			t1 = s[0] ^ skey[0 + keyoff];
 			u = sbox4((byte)t1);
-			u |= (sbox3((byte)(t1 >> 8)) << 8);
-			u |= (sbox2((byte)(t1 >> 16)) << 16);
-			u |= ((uint)(SBOX1[(byte)(t1 >> 24)]) << 24);
+			u |= sbox3((byte)(t1 >> 8)) << 8;
+			u |= sbox2((byte)(t1 >> 16)) << 16;
+			u |= (uint)SBOX1[(byte)(t1 >> 24)] << 24;
 
 			t2 = s[1] ^ skey[1 + keyoff];
 			v = (uint)SBOX1[(byte)t2];
-			v |= (sbox4((byte)(t2 >> 8)) << 8);
-			v |= (sbox3((byte)(t2 >> 16)) << 16);
-			v |= (sbox2((byte)(t2 >> 24)) << 24);
+			v |= sbox4((byte)(t2 >> 8)) << 8;
+			v |= sbox3((byte)(t2 >> 16)) << 16;
+			v |= sbox2((byte)(t2 >> 24)) << 24;
 
 			v = leftRotate(v, 8);
 			u ^= v;
@@ -210,7 +210,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			u = sbox4((byte)t1);
 			u |= sbox3((byte)(t1 >> 8)) << 8;
 			u |= sbox2((byte)(t1 >> 16)) << 16;
-			u |= ((uint)SBOX1[(byte)(t1 >> 24)]) << 24;
+			u |= (uint)SBOX1[(byte)(t1 >> 24)] << 24;
 
 			t2 = s[3] ^ skey[3 + keyoff];
 			v = (uint)SBOX1[(byte)t2];
@@ -226,7 +226,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			s[1] ^= leftRotate(u, 8);
 		}
 
-		private void camelliaFLs(uint[] s, uint[] fkey, int keyoff)
+		void camelliaFLs(uint[] s, uint[] fkey, int keyoff)
 		{
 			s[1] ^= leftRotate(s[0] & fkey[0 + keyoff], 1);
 			s[0] ^= fkey[1 + keyoff] | s[1];
@@ -235,7 +235,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			s[3] ^= leftRotate(fkey[2 + keyoff] & s[2], 1);
 		}
 
-		private void setKey(bool forEncryption, byte[] key)
+		void setKey(bool forEncryption, byte[] key)
 		{
 			uint[] k = new uint[8];
 			uint[] ka = new uint[4];
@@ -489,13 +489,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return BLOCK_SIZE;
 		}
 #else
-		private int ProcessBlock128(byte[] input, int inOff, byte[] output, int outOff)
+		int ProcessBlock128(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			uint[] state = new uint[4];
 
 			for (int i = 0; i < 4; i++)
 			{
-				state[i] = Pack.BE_To_UInt32(input, inOff + (i * 4)) ^ kw[i];
+				state[i] = Pack.BE_To_UInt32(input, inOff + i * 4) ^ kw[i];
 			}
 
 			camelliaF2(state, subkey, 0);
@@ -518,13 +518,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return BLOCK_SIZE;
 		}
 
-		private int ProcessBlock192or256(byte[] input, int inOff, byte[] output, int outOff)
+		int ProcessBlock192or256(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			uint[] state = new uint[4];
 
 			for (int i = 0; i < 4; i++)
 			{
-				state[i] = Pack.BE_To_UInt32(input, inOff + (i * 4)) ^ kw[i];
+				state[i] = Pack.BE_To_UInt32(input, inOff + i * 4) ^ kw[i];
 			}
 
 			camelliaF2(state, subkey, 0);
@@ -572,7 +572,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
+			{
 				throw new ArgumentException("only simple KeyParameter expected.");
+			}
 
 			setKey(forEncryption, ((KeyParameter)parameters).GetKey());
 
@@ -582,7 +584,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (!initialised)
+			{
 				throw new InvalidOperationException("Camellia engine not initialised");
+			}
 
 			Check.DataLength(input, inOff, BLOCK_SIZE, "input buffer too short");
 			Check.OutputLength(output, outOff, BLOCK_SIZE, "output buffer too short");

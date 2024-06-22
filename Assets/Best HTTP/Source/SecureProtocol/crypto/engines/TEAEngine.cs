@@ -13,21 +13,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class TeaEngine
 		: IBlockCipher
 	{
-		private const int
+		const int
 			rounds = 32,
 			block_size = 8;
 //			key_size	= 16,
 
-		private const uint
+		const uint
 			delta = 0x9E3779B9,
 			d_sum = 0xC6EF3720; // sum on decrypt
 
 		/*
 		 * the expanded key array of 4 subkeys
 		 */
-		private uint _a, _b, _c, _d;
-		private bool _initialised;
-		private bool _forEncryption;
+		uint _a, _b, _c, _d;
+		bool _initialised;
+		bool _forEncryption;
 
 		/**
 		* Create an instance of the TEA encryption algorithm
@@ -61,7 +61,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (!(parameters is KeyParameter keyParameter))
 			{
 				throw new ArgumentException("invalid parameter passed to TEA init - "
-				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Platform.GetTypeName(parameters));
 			}
 
 			_forEncryption = forEncryption;
@@ -73,7 +73,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			if (!_initialised)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
 
 			Check.DataLength(inBytes, inOff, block_size, "input buffer too short");
 			Check.OutputLength(outBytes, outOff, block_size, "output buffer too short");
@@ -109,7 +111,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @param  key  the key to be used
 		*/
-		private void SetKey(byte[] key)
+		void SetKey(byte[] key)
 		{
 			_a = Pack.BE_To_UInt32(key, 0);
 			_b = Pack.BE_To_UInt32(key, 4);
@@ -160,7 +162,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return block_size;
 		}
 #else
-		private int EncryptBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
+		int EncryptBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			// Pack bytes into integers
 			uint v0 = Pack.BE_To_UInt32(inBytes, inOff);
@@ -181,7 +183,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return block_size;
 		}
 
-		private int DecryptBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
+		int DecryptBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			// Pack bytes into integers
 			uint v0 = Pack.BE_To_UInt32(inBytes, inOff);

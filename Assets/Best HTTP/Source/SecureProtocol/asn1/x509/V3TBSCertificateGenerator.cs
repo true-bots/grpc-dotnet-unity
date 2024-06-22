@@ -33,9 +33,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		internal SubjectPublicKeyInfo subjectPublicKeyInfo;
 		internal X509Extensions extensions;
 
-		private bool altNamePresentAndCritical;
-		private DerBitString issuerUniqueID;
-		private DerBitString subjectUniqueID;
+		bool altNamePresentAndCritical;
+		DerBitString issuerUniqueID;
+		DerBitString subjectUniqueID;
 
 		public V3TbsCertificateGenerator()
 		{
@@ -92,19 +92,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public void SetIssuerUniqueID(
 			DerBitString uniqueID)
 		{
-			this.issuerUniqueID = uniqueID;
+			issuerUniqueID = uniqueID;
 		}
 
 		public void SetSubjectUniqueID(
 			DerBitString uniqueID)
 		{
-			this.subjectUniqueID = uniqueID;
+			subjectUniqueID = uniqueID;
 		}
 
 		public void SetSubjectPublicKeyInfo(
 			SubjectPublicKeyInfo pubKeyInfo)
 		{
-			this.subjectPublicKeyInfo = pubKeyInfo;
+			subjectPublicKeyInfo = pubKeyInfo;
 		}
 
 		public void SetExtensions(
@@ -125,10 +125,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public TbsCertificateStructure GenerateTbsCertificate()
 		{
-			if ((serialNumber == null) || (signature == null)
-			                           || (issuer == null) || (startDate == null) || (endDate == null)
-			                           || (subject == null && !altNamePresentAndCritical)
-			                           || (subjectPublicKeyInfo == null))
+			if (serialNumber == null || signature == null
+			                         || issuer == null || startDate == null || endDate == null
+			                         || (subject == null && !altNamePresentAndCritical)
+			                         || subjectPublicKeyInfo == null)
 			{
 				throw new InvalidOperationException("not all mandatory fields set in V3 TBScertificate generator");
 			}

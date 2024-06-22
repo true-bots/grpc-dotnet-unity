@@ -6,11 +6,11 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal class CounterSignatureDigestCalculator
+	class CounterSignatureDigestCalculator
 		: IDigestCalculator
 	{
-		private readonly string alg;
-		private readonly byte[] data;
+		readonly string alg;
+		readonly byte[] data;
 
 		internal CounterSignatureDigestCalculator(
 			string alg,

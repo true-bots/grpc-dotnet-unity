@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 {
-	internal static class Pack
+	static class Pack
 	{
 		internal static void UInt16_To_BE(ushort n, byte[] bs)
 		{
@@ -73,7 +73,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return BinaryPrimitives.ReadUInt16BigEndian(bs.AsSpan(off));
 #else
-			uint n = (uint)bs[off] << 8
+			uint n = ((uint)bs[off] << 8)
 			         | bs[off + 1];
 			return (ushort)n;
 #endif
@@ -92,7 +92,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 		internal static ushort[] BE_To_UInt16(byte[] bs, int off, int len)
 		{
 			if ((len & 1) != 0)
+			{
 				throw new ArgumentException("must be a multiple of 2", "len");
+			}
 
 			ushort[] ns = new ushort[len / 2];
 			for (int i = 0; i < len; i += 2)
@@ -164,9 +166,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return BinaryPrimitives.ReadUInt32BigEndian(bs);
 #else
-			return (uint)bs[0] << 24
-			       | (uint)bs[1] << 16
-			       | (uint)bs[2] << 8
+			return ((uint)bs[0] << 24)
+			       | ((uint)bs[1] << 16)
+			       | ((uint)bs[2] << 8)
 			       | bs[3];
 #endif
 		}
@@ -176,9 +178,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return BinaryPrimitives.ReadUInt32BigEndian(bs.AsSpan(off));
 #else
-			return (uint)bs[off] << 24
-			       | (uint)bs[off + 1] << 16
-			       | (uint)bs[off + 2] << 8
+			return ((uint)bs[off] << 24)
+			       | ((uint)bs[off + 1] << 16)
+			       | ((uint)bs[off + 2] << 8)
 			       | bs[off + 3];
 #endif
 		}
@@ -354,7 +356,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
             return BinaryPrimitives.ReadUInt16LittleEndian(bs);
 #else
 			uint n = bs[0]
-			         | (uint)bs[1] << 8;
+			         | ((uint)bs[1] << 8);
 			return (ushort)n;
 #endif
 		}
@@ -365,7 +367,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
             return BinaryPrimitives.ReadUInt16LittleEndian(bs.AsSpan(off));
 #else
 			uint n = bs[off]
-			         | (uint)bs[off + 1] << 8;
+			         | ((uint)bs[off + 1] << 8);
 			return (ushort)n;
 #endif
 		}
@@ -430,8 +432,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 		internal static uint LE_To_UInt24(byte[] bs, int off)
 		{
 			return bs[off]
-			       | (uint)bs[off + 1] << 8
-			       | (uint)bs[off + 2] << 16;
+			       | ((uint)bs[off + 1] << 8)
+			       | ((uint)bs[off + 2] << 16);
 		}
 
 		internal static uint LE_To_UInt32(byte[] bs)
@@ -440,9 +442,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
             return BinaryPrimitives.ReadUInt32LittleEndian(bs);
 #else
 			return bs[0]
-			       | (uint)bs[1] << 8
-			       | (uint)bs[2] << 16
-			       | (uint)bs[3] << 24;
+			       | ((uint)bs[1] << 8)
+			       | ((uint)bs[2] << 16)
+			       | ((uint)bs[3] << 24);
 #endif
 		}
 
@@ -453,9 +455,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
             return BinaryPrimitives.ReadUInt32LittleEndian(bs.AsSpan(off));
 #else
 			return bs[off]
-			       | (uint)bs[off + 1] << 8
-			       | (uint)bs[off + 2] << 16
-			       | (uint)bs[off + 3] << 24;
+			       | ((uint)bs[off + 1] << 8)
+			       | ((uint)bs[off + 2] << 16)
+			       | ((uint)bs[off + 3] << 24);
 #endif
 		}
 

@@ -6,18 +6,18 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 {
-	internal sealed class BcTlsBlockCipherImpl
+	sealed class BcTlsBlockCipherImpl
 		: TlsBlockCipherImpl
 	{
-		private readonly bool m_isEncrypting;
-		private readonly IBlockCipher m_cipher;
+		readonly bool m_isEncrypting;
+		readonly IBlockCipher m_cipher;
 
-		private KeyParameter key;
+		KeyParameter key;
 
 		internal BcTlsBlockCipherImpl(IBlockCipher cipher, bool isEncrypting)
 		{
-			this.m_cipher = cipher;
-			this.m_isEncrypting = isEncrypting;
+			m_cipher = cipher;
+			m_isEncrypting = isEncrypting;
 		}
 
 		public void SetKey(byte[] key, int keyOff, int keyLen)

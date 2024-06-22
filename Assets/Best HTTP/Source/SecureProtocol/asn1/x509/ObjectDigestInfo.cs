@@ -61,7 +61,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new ObjectDigestInfo((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static ObjectDigestInfo GetInstance(
@@ -102,7 +102,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			this.objectDigest = new DerBitString(objectDigest);
 		}
 
-		private ObjectDigestInfo(
+		ObjectDigestInfo(
 			Asn1Sequence seq)
 		{
 			if (seq.Count > 4 || seq.Count < 3)

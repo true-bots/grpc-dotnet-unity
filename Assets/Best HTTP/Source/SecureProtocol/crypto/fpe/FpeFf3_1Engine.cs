@@ -28,12 +28,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 		public override void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			this.forEncryption = forEncryption;
-			this.fpeParameters = (FpeParameters)parameters;
+			fpeParameters = (FpeParameters)parameters;
 
 			baseCipher.Init(!fpeParameters.UseInverseFunction, new KeyParameter(Arrays.Reverse(fpeParameters.Key.GetKey())));
 
 			if (fpeParameters.GetTweak().Length != 7)
+			{
 				throw new ArgumentException("tweak should be 56 bits");
+			}
 		}
 
 		protected override int EncryptBlock(byte[] inBuf, int inOff, int length, byte[] outBuf, int outOff)
@@ -43,7 +45,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			if (fpeParameters.Radix > 256)
 			{
 				if ((length & 1) != 0)
+				{
 					throw new ArgumentException("input must be an even number of bytes for a wide radix");
+				}
 
 				ushort[] u16In = Pack.BE_To_UInt16(inBuf, inOff, length);
 				ushort[] u16Out = SP80038G.EncryptFF3_1w(baseCipher, fpeParameters.Radix, fpeParameters.GetTweak(),
@@ -67,7 +71,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			if (fpeParameters.Radix > 256)
 			{
 				if ((length & 1) != 0)
+				{
 					throw new ArgumentException("input must be an even number of bytes for a wide radix");
+				}
 
 				ushort[] u16In = Pack.BE_To_UInt16(inBuf, inOff, length);
 				ushort[] u16Out = SP80038G.DecryptFF3_1w(baseCipher, fpeParameters.Radix, fpeParameters.GetTweak(),

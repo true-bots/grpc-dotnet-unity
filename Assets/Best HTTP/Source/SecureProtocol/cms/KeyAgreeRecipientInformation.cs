@@ -24,8 +24,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class KeyAgreeRecipientInformation
 		: RecipientInformation
 	{
-		private KeyAgreeRecipientInfo info;
-		private Asn1OctetString encryptedKey;
+		KeyAgreeRecipientInfo info;
+		Asn1OctetString encryptedKey;
 
 		internal static void ReadRecipientInfo(IList<RecipientInformation> infos, KeyAgreeRecipientInfo info,
 			CmsSecureReadable secureReadable)
@@ -38,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 					RecipientID rid = new RecipientID();
 
-					Asn1.Cms.KeyAgreeRecipientIdentifier karid = id.Identifier;
+					KeyAgreeRecipientIdentifier karid = id.Identifier;
 
 					Asn1.Cms.IssuerAndSerialNumber iAndSN = karid.IssuerAndSerialNumber;
 					if (iAndSN != null)
@@ -48,7 +48,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					}
 					else
 					{
-						Asn1.Cms.RecipientKeyIdentifier rKeyID = karid.RKeyID;
+						RecipientKeyIdentifier rKeyID = karid.RKeyID;
 
 						// Note: 'date' and 'other' fields of RecipientKeyIdentifier appear to be only informational 
 
@@ -77,7 +77,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			this.encryptedKey = encryptedKey;
 		}
 
-		private AsymmetricKeyParameter GetSenderPublicKey(
+		AsymmetricKeyParameter GetSenderPublicKey(
 			AsymmetricKeyParameter receiverPrivateKey,
 			OriginatorIdentifierOrKey originator)
 		{
@@ -105,7 +105,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return GetPublicKeyFromOriginatorID(origID);
 		}
 
-		private AsymmetricKeyParameter GetPublicKeyFromOriginatorPublicKey(
+		AsymmetricKeyParameter GetPublicKeyFromOriginatorPublicKey(
 			AsymmetricKeyParameter receiverPrivateKey,
 			OriginatorPublicKey originatorPublicKey)
 		{
@@ -116,7 +116,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return PublicKeyFactory.CreateKey(pubInfo);
 		}
 
-		private AsymmetricKeyParameter GetPublicKeyFromOriginatorID(
+		AsymmetricKeyParameter GetPublicKeyFromOriginatorID(
 			OriginatorID origID)
 		{
 			// TODO Support all alternatives for OriginatorIdentifierOrKey
@@ -124,7 +124,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			throw new CmsException("No support for 'originator' as IssuerAndSerialNumber or SubjectKeyIdentifier");
 		}
 
-		private KeyParameter CalculateAgreedWrapKey(
+		KeyParameter CalculateAgreedWrapKey(
 			string wrapAlg,
 			AsymmetricKeyParameter senderPublicKey,
 			AsymmetricKeyParameter receiverPrivateKey)
@@ -161,7 +161,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return ParameterUtilities.CreateKeyParameter(wrapAlg, wrapKeyBytes);
 		}
 
-		private KeyParameter UnwrapSessionKey(
+		KeyParameter UnwrapSessionKey(
 			string wrapAlg,
 			KeyParameter agreedKey)
 		{
@@ -210,10 +210,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			ICipherParameters key)
 		{
 			if (!(key is AsymmetricKeyParameter receiverPrivateKey))
+			{
 				throw new ArgumentException("KeyAgreement requires asymmetric key", "key");
+			}
 
 			if (!receiverPrivateKey.IsPrivate)
+			{
 				throw new ArgumentException("Expected private key", "key");
+			}
 
 			KeyParameter sKey = GetSessionKey(receiverPrivateKey);
 

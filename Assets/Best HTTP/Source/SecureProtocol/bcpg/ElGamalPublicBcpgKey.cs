@@ -14,9 +14,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public ElGamalPublicBcpgKey(
 			BcpgInputStream bcpgIn)
 		{
-			this.p = new MPInteger(bcpgIn);
-			this.g = new MPInteger(bcpgIn);
-			this.y = new MPInteger(bcpgIn);
+			p = new MPInteger(bcpgIn);
+			g = new MPInteger(bcpgIn);
+			y = new MPInteger(bcpgIn);
 		}
 
 		public ElGamalPublicBcpgKey(

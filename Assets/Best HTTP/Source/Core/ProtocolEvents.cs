@@ -18,7 +18,7 @@ namespace BestHTTP.Core
 
 		public ProtocolEventInfo(IProtocol source)
 		{
-			this.Source = source;
+			Source = source;
 		}
 
 		public override string ToString()
@@ -29,8 +29,8 @@ namespace BestHTTP.Core
 
 	public static class ProtocolEventHelper
 	{
-		private static ConcurrentQueue<ProtocolEventInfo> protocolEvents = new ConcurrentQueue<ProtocolEventInfo>();
-		private static List<IProtocol> ActiveProtocols = new List<IProtocol>(2);
+		static ConcurrentQueue<ProtocolEventInfo> protocolEvents = new ConcurrentQueue<ProtocolEventInfo>();
+		static List<IProtocol> ActiveProtocols = new List<IProtocol>(2);
 
 #pragma warning disable 0649
 		public static Action<ProtocolEventInfo> OnEvent;
@@ -39,7 +39,9 @@ namespace BestHTTP.Core
 		public static void EnqueueProtocolEvent(ProtocolEventInfo @event)
 		{
 			if (HTTPManager.Logger.Level == Loglevels.All)
+			{
 				HTTPManager.Logger.Information("ProtocolEventHelper", "Enqueue protocol event: " + @event.ToString(), @event.Source.LoggingContext);
+			}
 
 			protocolEvents.Enqueue(@event);
 		}
@@ -55,7 +57,9 @@ namespace BestHTTP.Core
 			while (protocolEvents.TryDequeue(out protocolEvent))
 			{
 				if (HTTPManager.Logger.Level == Loglevels.All)
+				{
 					HTTPManager.Logger.Information("ProtocolEventHelper", "Processing protocol event: " + protocolEvent.ToString(), protocolEvent.Source.LoggingContext);
+				}
 
 				if (OnEvent != null)
 				{
@@ -95,7 +99,7 @@ namespace BestHTTP.Core
 		{
 			for (int i = 0; i < ActiveProtocols.Count; ++i)
 			{
-				var protocol = ActiveProtocols[i];
+				IProtocol protocol = ActiveProtocols[i];
 
 				protocol.CancellationRequested();
 			}

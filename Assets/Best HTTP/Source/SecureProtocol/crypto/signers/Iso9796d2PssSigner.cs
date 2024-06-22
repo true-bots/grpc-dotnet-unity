@@ -25,26 +25,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			return recoveredMessage;
 		}
 
-		private IDigest digest;
-		private IAsymmetricBlockCipher cipher;
+		IDigest digest;
+		IAsymmetricBlockCipher cipher;
 
-		private SecureRandom random;
-		private byte[] standardSalt;
+		SecureRandom random;
+		byte[] standardSalt;
 
-		private int hLen;
-		private int trailer;
-		private int keyBits;
-		private byte[] block;
-		private byte[] mBuf;
-		private int messageLength;
-		private readonly int saltLength;
-		private bool fullMessage;
-		private byte[] recoveredMessage;
+		int hLen;
+		int trailer;
+		int keyBits;
+		byte[] block;
+		byte[] mBuf;
+		int messageLength;
+		readonly int saltLength;
+		bool fullMessage;
+		byte[] recoveredMessage;
 
-		private byte[] preSig;
-		private byte[] preBlock;
-		private int preMStart;
-		private int preTLength;
+		byte[] preSig;
+		byte[] preBlock;
+		int preMStart;
+		int preTLength;
 
 		/// <summary>
 		/// Generate a signer with either implicit or explicit trailers for ISO9796-2, scheme 2 or 3.
@@ -61,7 +61,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		{
 			this.cipher = cipher;
 			this.digest = digest;
-			this.hLen = digest.GetDigestSize();
+			hLen = digest.GetDigestSize();
 			this.saltLength = saltLength;
 
 			if (isImplicit)
@@ -125,13 +125,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			else if (parameters is ParametersWithSalt withSalt)
 			{
 				if (!forSigning)
+				{
 					throw new ArgumentException("ParametersWithSalt only valid for signing", nameof(parameters));
+				}
 
 				kParam = (RsaKeyParameters)withSalt.Parameters;
 				standardSalt = withSalt.GetSalt();
 
 				if (standardSalt.Length != saltLength)
+				{
 					throw new ArgumentException("Fixed salt is of wrong length");
+				}
 			}
 			else
 			{
@@ -162,7 +166,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		}
 
 		/// <summary> compare two byte arrays - constant time.</summary>
-		private bool IsSameAs(byte[] a, byte[] b)
+		bool IsSameAs(byte[] a, byte[] b)
 		{
 			if (messageLength != b.Length)
 			{
@@ -183,7 +187,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		}
 
 		/// <summary> clear possible sensitive data</summary>
-		private void ClearBlock(
+		void ClearBlock(
 			byte[] block)
 		{
 			Array.Clear(block, 0, block.Length);
@@ -217,10 +221,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				int sigTrail = ((block[block.Length - 2] & 0xFF) << 8) | (block[block.Length - 1] & 0xFF);
 
 				if (IsoTrailers.NoTrailerAvailable(digest))
+				{
 					throw new ArgumentException("unrecognised hash in signature");
+				}
 
 				if (sigTrail != IsoTrailers.GetTrailer(digest))
+				{
 					throw new InvalidOperationException("signer initialised with wrong digest for trailer " + sigTrail);
+				}
 
 				tLength = 2;
 			}
@@ -250,7 +258,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			while (mStart < block.Length)
 			{
 				if (block[mStart++] == 0x01)
+				{
 					break;
+				}
 			}
 
 			if (mStart >= block.Length)
@@ -258,7 +268,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				ClearBlock(block);
 			}
 
-			fullMessage = (mStart > 1);
+			fullMessage = mStart > 1;
 
 			recoveredMessage = new byte[dbMask.Length - mStart - saltLength];
 
@@ -294,7 +304,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			{
 				while (inLen > 0 && messageLength < mBuf.Length)
 				{
-					this.Update(input[inOff]);
+					Update(input[inOff]);
 					inOff++;
 					inLen--;
 				}
@@ -391,7 +401,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 			int off = block.Length - messageLength - salt.Length - hLen - tLength - 1;
 
-			block[off] = (byte)(0x01);
+			block[off] = (byte)0x01;
 
 			Array.Copy(mBuf, 0, block, off + 1, messageLength);
 			Array.Copy(salt, 0, block, off + 1 + messageLength, salt.Length);
@@ -414,7 +424,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				block[block.Length - 1] = (byte)trailer;
 			}
 
-			block[0] &= (byte)(0x7f);
+			block[0] &= (byte)0x7f;
 
 			byte[] b = cipher.ProcessBlock(block, 0, block.Length);
 
@@ -550,7 +560,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 		/// <summary> int to octet string.</summary>
 		/// <summary> int to octet string.</summary>
-		private void ItoOSP(
+		void ItoOSP(
 			int i,
 			byte[] sp)
 		{
@@ -561,7 +571,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		}
 
 		/// <summary> long to octet string.</summary>
-		private void LtoOSP(long l, byte[] sp)
+		void LtoOSP(long l, byte[] sp)
 		{
 			sp[0] = (byte)((ulong)l >> 56);
 			sp[1] = (byte)((ulong)l >> 48);
@@ -574,7 +584,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		}
 
 		/// <summary> mask generator function, as described in Pkcs1v2.</summary>
-		private byte[] MaskGeneratorFunction1(
+		byte[] MaskGeneratorFunction1(
 			byte[] Z,
 			int zOff,
 			int zLen,
@@ -596,9 +606,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				digest.DoFinal(hashBuf, 0);
 
 				Array.Copy(hashBuf, 0, mask, counter * hLen, hLen);
-			} while (++counter < (length / hLen));
+			} while (++counter < length / hLen);
 
-			if ((counter * hLen) < length)
+			if (counter * hLen < length)
 			{
 				ItoOSP(counter, C);
 
@@ -606,7 +616,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				digest.BlockUpdate(C, 0, C.Length);
 				digest.DoFinal(hashBuf, 0);
 
-				Array.Copy(hashBuf, 0, mask, counter * hLen, mask.Length - (counter * hLen));
+				Array.Copy(hashBuf, 0, mask, counter * hLen, mask.Length - counter * hLen);
 			}
 
 			return mask;

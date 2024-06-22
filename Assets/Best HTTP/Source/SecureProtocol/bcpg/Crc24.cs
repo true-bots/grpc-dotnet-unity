@@ -6,10 +6,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 {
 	public class Crc24
 	{
-		private const int Crc24Init = 0x0b704ce;
-		private const int Crc24Poly = 0x1864cfb;
+		const int Crc24Init = 0x0b704ce;
+		const int Crc24Poly = 0x1864cfb;
 
-		private int crc = Crc24Init;
+		int crc = Crc24Init;
 
 		public Crc24()
 		{

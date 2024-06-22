@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	public class X509Attribute
 		: Asn1Encodable
 	{
-		private readonly AttributeX509 attr;
+		readonly AttributeX509 attr;
 
 		/**
 		 * @param at an object representing an attribute.
@@ -20,7 +20,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		internal X509Attribute(
 			Asn1Encodable at)
 		{
-			this.attr = AttributeX509.GetInstance(at);
+			attr = AttributeX509.GetInstance(at);
 		}
 
 		/**
@@ -34,7 +34,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			string oid,
 			Asn1Encodable value)
 		{
-			this.attr = new AttributeX509(new DerObjectIdentifier(oid), new DerSet(value));
+			attr = new AttributeX509(new DerObjectIdentifier(oid), new DerSet(value));
 		}
 
 		/**
@@ -48,7 +48,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			string oid,
 			Asn1EncodableVector value)
 		{
-			this.attr = new AttributeX509(new DerObjectIdentifier(oid), new DerSet(value));
+			attr = new AttributeX509(new DerObjectIdentifier(oid), new DerSet(value));
 		}
 
 		public string Oid

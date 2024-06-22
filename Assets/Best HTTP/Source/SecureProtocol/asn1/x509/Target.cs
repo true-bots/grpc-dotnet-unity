@@ -30,8 +30,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			Group = 1
 		};
 
-		private readonly GeneralName targetName;
-		private readonly GeneralName targetGroup;
+		readonly GeneralName targetName;
+		readonly GeneralName targetGroup;
 
 		/**
 		* Creates an instance of a Target from the given object.
@@ -56,7 +56,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new Target((Asn1TaggedObject)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -65,7 +65,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * @param tagObj The tagged object.
 		 * @throws ArgumentException if the encoding is wrong.
 		 */
-		private Target(
+		Target(
 			Asn1TaggedObject tagObj)
 		{
 			switch ((Choice)tagObj.TagNo)

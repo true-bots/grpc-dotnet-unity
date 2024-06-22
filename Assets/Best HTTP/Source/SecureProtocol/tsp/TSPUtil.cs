@@ -23,8 +23,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 {
 	public class TspUtil
 	{
-		private static readonly Dictionary<string, int> DigestLengths = new Dictionary<string, int>();
-		private static readonly Dictionary<string, string> DigestNames = new Dictionary<string, string>();
+		static readonly Dictionary<string, int> DigestLengths = new Dictionary<string, int>();
+		static readonly Dictionary<string, string> DigestNames = new Dictionary<string, string>();
 
 		static TspUtil()
 		{
@@ -79,7 +79,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		public static IList<TimeStampToken> GetSignatureTimestamps(
 			SignerInformation signerInfo)
 		{
-			var timestamps = new List<TimeStampToken>();
+			List<TimeStampToken> timestamps = new List<TimeStampToken>();
 
 			Asn1.Cms.AttributeTable unsignedAttrs = signerInfo.UnsignedAttributes;
 			if (unsignedAttrs != null)
@@ -101,7 +101,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 								signerInfo.GetSignature());
 
 							if (!Arrays.ConstantTimeAreEqual(expectedDigest, tstInfo.GetMessageImprintDigest()))
+							{
 								throw new TspValidationException("Incorrect digest in message imprint");
+							}
 
 							timestamps.Add(timeStampToken);
 						}
@@ -132,14 +134,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			X509Certificate cert)
 		{
 			if (cert.Version != 3)
+			{
 				throw new ArgumentException("Certificate must have an ExtendedKeyUsage extension.");
+			}
 
 			Asn1OctetString ext = cert.GetExtensionValue(X509Extensions.ExtendedKeyUsage);
 			if (ext == null)
+			{
 				throw new TspValidationException("Certificate must have an ExtendedKeyUsage extension.");
+			}
 
 			if (!cert.GetCriticalExtensionOids().Contains(X509Extensions.ExtendedKeyUsage.Id))
+			{
 				throw new TspValidationException("Certificate must have an ExtendedKeyUsage extension marked as critical.");
+			}
 
 			try
 			{
@@ -147,7 +155,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 					Asn1Object.FromByteArray(ext.GetOctets()));
 
 				if (!extKey.HasKeyPurposeId(KeyPurposeID.id_kp_timeStamping) || extKey.Count != 1)
+				{
 					throw new TspValidationException("ExtendedKeyUsage not solely time stamping.");
+				}
 			}
 			catch (IOException)
 			{
@@ -167,7 +177,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		internal static int GetDigestLength(string digestAlgOid)
 		{
 			if (!DigestLengths.TryGetValue(digestAlgOid, out int length))
+			{
 				throw new TspException("digest algorithm cannot be found.");
+			}
 
 			return length;
 		}

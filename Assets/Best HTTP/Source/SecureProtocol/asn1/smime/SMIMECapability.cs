@@ -25,8 +25,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Smime
 		public static readonly DerObjectIdentifier DesEde3Cbc = PkcsObjectIdentifiers.DesEde3Cbc;
 		public static readonly DerObjectIdentifier RC2Cbc = PkcsObjectIdentifiers.RC2Cbc;
 
-		private DerObjectIdentifier capabilityID;
-		private Asn1Object parameters;
+		DerObjectIdentifier capabilityID;
+		Asn1Object parameters;
 
 		public SmimeCapability(
 			Asn1Sequence seq)
@@ -44,7 +44,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Smime
 			Asn1Encodable parameters)
 		{
 			if (capabilityID == null)
+			{
 				throw new ArgumentNullException("capabilityID");
+			}
 
 			this.capabilityID = capabilityID;
 

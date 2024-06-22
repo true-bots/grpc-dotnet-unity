@@ -37,7 +37,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/// </summary>
 		public const int SKEIN_1024 = SkeinEngine.SKEIN_1024;
 
-		private readonly SkeinEngine engine;
+		readonly SkeinEngine engine;
 
 		/// <summary>
 		/// Constructs a Skein digest with an internal state size and output size.
@@ -48,13 +48,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		///                      bytes.</param>
 		public SkeinDigest(int stateSizeBits, int digestSizeBits)
 		{
-			this.engine = new SkeinEngine(stateSizeBits, digestSizeBits);
+			engine = new SkeinEngine(stateSizeBits, digestSizeBits);
 			Init(null);
 		}
 
 		public SkeinDigest(SkeinDigest digest)
 		{
-			this.engine = new SkeinEngine(digest.engine);
+			engine = new SkeinEngine(digest.engine);
 		}
 
 		public void Reset(IMemoable other)
@@ -70,7 +70,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 		public string AlgorithmName
 		{
-			get { return "Skein-" + (engine.BlockSize * 8) + "-" + (engine.OutputSize * 8); }
+			get { return "Skein-" + engine.BlockSize * 8 + "-" + engine.OutputSize * 8; }
 		}
 
 		public int GetDigestSize()

@@ -6,24 +6,29 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-	internal sealed class DtlsEpoch
+	sealed class DtlsEpoch
 	{
-		private readonly DtlsReplayWindow m_replayWindow = new DtlsReplayWindow();
+		readonly DtlsReplayWindow m_replayWindow = new DtlsReplayWindow();
 
-		private readonly int m_epoch;
-		private readonly TlsCipher m_cipher;
+		readonly int m_epoch;
+		readonly TlsCipher m_cipher;
 
-		private long m_sequenceNumber = 0;
+		long m_sequenceNumber = 0;
 
 		internal DtlsEpoch(int epoch, TlsCipher cipher)
 		{
 			if (epoch < 0)
+			{
 				throw new ArgumentException("must be >= 0", "epoch");
-			if (cipher == null)
-				throw new ArgumentNullException("cipher");
+			}
 
-			this.m_epoch = epoch;
-			this.m_cipher = cipher;
+			if (cipher == null)
+			{
+				throw new ArgumentNullException("cipher");
+			}
+
+			m_epoch = epoch;
+			m_cipher = cipher;
 		}
 
 		/// <exception cref="IOException"/>
@@ -31,8 +36,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			lock (this)
 			{
-				if (m_sequenceNumber >= (1L << 48))
+				if (m_sequenceNumber >= 1L << 48)
+				{
 					throw new TlsFatalAlert(AlertDescription.internal_error);
+				}
 
 				return m_sequenceNumber++;
 			}
@@ -57,11 +64,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			get
 			{
-				lock (this) return m_sequenceNumber;
+				lock (this)
+				{
+					return m_sequenceNumber;
+				}
 			}
 			set
 			{
-				lock (this) this.m_sequenceNumber = value;
+				lock (this)
+				{
+					m_sequenceNumber = value;
+				}
 			}
 		}
 	}

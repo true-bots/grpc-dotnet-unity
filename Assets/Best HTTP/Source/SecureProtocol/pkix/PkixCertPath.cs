@@ -81,12 +81,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 	{
 		internal static readonly List<string> m_encodings = new List<string> { "PkiPath", "PEM", "PKCS7" };
 
-		private readonly IList<X509Certificate> m_certificates;
+		readonly IList<X509Certificate> m_certificates;
 
-		private static IList<X509Certificate> SortCerts(IList<X509Certificate> certs)
+		static IList<X509Certificate> SortCerts(IList<X509Certificate> certs)
 		{
 			if (certs.Count < 2)
+			{
 				return certs;
+			}
 
 			X509Name issuer = certs[0].IssuerDN;
 			bool okay = true;
@@ -107,11 +109,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			}
 
 			if (okay)
+			{
 				return certs;
+			}
 
 			// find end-entity cert
-			var retList = new List<X509Certificate>(certs.Count);
-			var orig = new List<X509Certificate>(certs);
+			List<X509Certificate> retList = new List<X509Certificate>(certs.Count);
+			List<X509Certificate> orig = new List<X509Certificate>(certs);
 
 			for (int i = 0; i < certs.Count; i++)
 			{
@@ -137,7 +141,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 			// can only have one end entity cert - something's wrong, give up.
 			if (retList.Count > 1)
+			{
 				return orig;
+			}
 
 			for (int i = 0; i != retList.Count; i++)
 			{
@@ -157,7 +163,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 			// make sure all certificates are accounted for.
 			if (certs.Count > 0)
+			{
 				return orig;
+			}
 
 			return retList;
 		}
@@ -192,7 +200,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			IList<X509Certificate> certs;
 			try
 			{
-				if (Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase("PkiPath", encoding))
+				if (Platform.EqualsIgnoreCase("PkiPath", encoding))
 				{
 					Asn1InputStream derInStream = new Asn1InputStream(inStream);
 					Asn1Object derObject = derInStream.ReadObject();
@@ -213,8 +221,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						certs.Insert(0, new X509CertificateParser().ReadCertificate(certInStream));
 					}
 				}
-				else if (Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase("PEM", encoding) ||
-				         Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase("PKCS7", encoding))
+				else if (Platform.EqualsIgnoreCase("PEM", encoding) ||
+				         Platform.EqualsIgnoreCase("PKCS7", encoding))
 				{
 					certs = new X509CertificateParser().ReadCertificates(inStream);
 				}
@@ -266,26 +274,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		public override bool Equals(object obj)
 		{
 			if (this == obj)
+			{
 				return true;
+			}
 
 			if (!(obj is PkixCertPath that))
+			{
 				return false;
+			}
 
-			var thisCerts = this.Certificates;
-			var thatCerts = that.Certificates;
+			IList<X509Certificate> thisCerts = Certificates;
+			IList<X509Certificate> thatCerts = that.Certificates;
 
 			if (thisCerts.Count != thatCerts.Count)
+			{
 				return false;
+			}
 
-			var e1 = thisCerts.GetEnumerator();
-			var e2 = thatCerts.GetEnumerator();
+			IEnumerator<X509Certificate> e1 = thisCerts.GetEnumerator();
+			IEnumerator<X509Certificate> e2 = thatCerts.GetEnumerator();
 
 			while (e1.MoveNext())
 			{
 				e2.MoveNext();
 
 				if (!Equals(e1.Current, e2.Current))
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -320,7 +336,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		 */
 		public virtual byte[] GetEncoded(string encoding)
 		{
-			if (Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase(encoding, "PkiPath"))
+			if (Platform.EqualsIgnoreCase(encoding, "PkiPath"))
 			{
 				Asn1EncodableVector v = new Asn1EncodableVector(m_certificates.Count);
 				for (int i = m_certificates.Count - 1; i >= 0; i--)
@@ -330,12 +346,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 				return ToDerEncoded(new DerSequence(v));
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase(encoding, "PKCS7"))
+			else if (Platform.EqualsIgnoreCase(encoding, "PKCS7"))
 			{
 				ContentInfo encInfo = new ContentInfo(PkcsObjectIdentifiers.Data, null);
 
 				Asn1EncodableVector v = new Asn1EncodableVector(m_certificates.Count);
-				foreach (var cert in m_certificates)
+				foreach (X509Certificate cert in m_certificates)
 				{
 					v.Add(ToAsn1Object(cert));
 				}
@@ -350,15 +366,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 				return ToDerEncoded(new ContentInfo(PkcsObjectIdentifiers.SignedData, sd));
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase(encoding, "PEM"))
+			else if (Platform.EqualsIgnoreCase(encoding, "PEM"))
 			{
 				MemoryStream bOut = new MemoryStream();
 
 				try
 				{
-					using (var pWrt = new PemWriter(new StreamWriter(bOut)))
+					using (PemWriter pWrt = new PemWriter(new StreamWriter(bOut)))
 					{
-						foreach (var cert in m_certificates)
+						foreach (X509Certificate cert in m_certificates)
 						{
 							pWrt.WriteObject(cert);
 						}
@@ -393,7 +409,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		 *
 		 * @return the DERObject
 		 **/
-		private Asn1Object ToAsn1Object(X509Certificate cert)
+		Asn1Object ToAsn1Object(X509Certificate cert)
 		{
 			try
 			{
@@ -405,7 +421,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			}
 		}
 
-		private byte[] ToDerEncoded(Asn1Encodable obj)
+		byte[] ToDerEncoded(Asn1Encodable obj)
 		{
 			try
 			{

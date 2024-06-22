@@ -19,8 +19,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		protected ECPublicBcpgKey(
 			BcpgInputStream bcpgIn)
 		{
-			this.oid = DerObjectIdentifier.GetInstance(Asn1Object.FromByteArray(ReadBytesOfEncodedLength(bcpgIn)));
-			this.point = new MPInteger(bcpgIn).Value;
+			oid = DerObjectIdentifier.GetInstance(Asn1Object.FromByteArray(ReadBytesOfEncodedLength(bcpgIn)));
+			point = new MPInteger(bcpgIn).Value;
 		}
 
 		protected ECPublicBcpgKey(
@@ -35,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			DerObjectIdentifier oid,
 			BigInteger encodedPoint)
 		{
-			this.point = encodedPoint;
+			point = encodedPoint;
 			this.oid = oid;
 		}
 
@@ -83,11 +83,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		{
 			int length = bcpgIn.ReadByte();
 			if (length < 0)
+			{
 				throw new EndOfStreamException();
+			}
+
 			if (length == 0 || length == 0xFF)
+			{
 				throw new IOException("future extensions not yet implemented");
+			}
+
 			if (length > 127)
+			{
 				throw new IOException("unsupported OID");
+			}
 
 			byte[] buffer = new byte[length + 2];
 			bcpgIn.ReadFully(buffer, 2, buffer.Length - 2);

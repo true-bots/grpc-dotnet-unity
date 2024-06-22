@@ -33,13 +33,13 @@ namespace BestHTTP
 		public AsyncHTTPException(int statusCode, string message, string content)
 			: base(message)
 		{
-			this.StatusCode = statusCode;
-			this.Content = content;
+			StatusCode = statusCode;
+			Content = content;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("StatusCode: {0}, Message: {1}, Content: {2}, StackTrace: {3}", this.StatusCode, this.Message, this.Content, this.StackTrace);
+			return string.Format("StatusCode: {0}, Message: {1}, Content: {2}, StackTrace: {3}", StatusCode, Message, Content, StackTrace);
 		}
 	}
 
@@ -59,7 +59,7 @@ namespace BestHTTP
 					// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 					case HTTPRequestStates.Error:
 						VerboseLogging(request,
-							"Request Finished with Error! " + (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception"));
+							"Request Finished with Error! " + (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception"));
 
 						tcs.TrySetException(CreateException("No Exception", null, req.Exception));
 						break;
@@ -97,15 +97,20 @@ namespace BestHTTP
 					// The request finished without any problem.
 					case HTTPRequestStates.Finished:
 						if (resp.IsSuccess)
+						{
 							tcs.TrySetResult(resp.DataAsText);
+						}
 						else
+						{
 							tcs.TrySetException(CreateException("Request finished Successfully, but the server sent an error.", resp));
+						}
+
 						break;
 
 					// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 					case HTTPRequestStates.Error:
 						VerboseLogging(request,
-							"Request Finished with Error! " + (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception"));
+							"Request Finished with Error! " + (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception"));
 
 						tcs.TrySetException(CreateException("No Exception", null, req.Exception));
 						break;
@@ -143,15 +148,20 @@ namespace BestHTTP
 					// The request finished without any problem.
 					case HTTPRequestStates.Finished:
 						if (resp.IsSuccess)
+						{
 							tcs.TrySetResult(resp.DataAsTexture2D);
+						}
 						else
+						{
 							tcs.TrySetException(CreateException("Request finished Successfully, but the server sent an error.", resp));
+						}
+
 						break;
 
 					// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 					case HTTPRequestStates.Error:
 						VerboseLogging(request,
-							"Request Finished with Error! " + (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception"));
+							"Request Finished with Error! " + (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception"));
 
 						tcs.TrySetException(CreateException("No Exception", null, req.Exception));
 						break;
@@ -189,15 +199,20 @@ namespace BestHTTP
 					// The request finished without any problem.
 					case HTTPRequestStates.Finished:
 						if (resp.IsSuccess)
+						{
 							tcs.TrySetResult(resp.Data);
+						}
 						else
+						{
 							tcs.TrySetException(CreateException("Request finished Successfully, but the server sent an error.", resp));
+						}
+
 						break;
 
 					// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 					case HTTPRequestStates.Error:
 						VerboseLogging(request,
-							"Request Finished with Error! " + (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception"));
+							"Request Finished with Error! " + (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception"));
 
 						tcs.TrySetException(CreateException("No Exception", null, req.Exception));
 						break;
@@ -231,21 +246,29 @@ namespace BestHTTP
 		{
 			HTTPManager.Setup();
 
-			var tcs = new TaskCompletionSource<T>();
+			TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
 
 			request.Callback = (req, resp) =>
 			{
 				if (token.IsCancellationRequested)
+				{
 					tcs.SetCanceled();
+				}
 				else
+				{
 					callback(req, resp, tcs);
+				}
 			};
 
 			if (token.CanBeCanceled)
+			{
 				token.Register((state) => (state as HTTPRequest)?.Abort(), request);
+			}
 
 			if (request.State == HTTPRequestStates.Initial)
+			{
 				request.Send();
+			}
 
 			return tcs.Task;
 		}
@@ -260,11 +283,17 @@ namespace BestHTTP
 		public static Exception CreateException(string errorMessage, HTTPResponse resp = null, Exception ex = null)
 		{
 			if (resp != null)
+			{
 				return new AsyncHTTPException(resp.StatusCode, resp.Message, resp.DataAsText);
+			}
 			else if (ex != null)
+			{
 				return new AsyncHTTPException(ex.Message, ex);
+			}
 			else
+			{
 				return new AsyncHTTPException(errorMessage);
+			}
 		}
 	}
 }

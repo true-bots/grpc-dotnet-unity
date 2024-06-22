@@ -53,7 +53,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 //			Parsers.Add("PRIVATE KEY", new PrivateKeyParser(provider));
 		}
 
-		private readonly IPasswordFinder pFinder;
+		readonly IPasswordFinder pFinder;
 
 		/**
 		* Create a new PemReader
@@ -85,14 +85,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			PemObject obj = ReadPemObject();
 
 			if (obj == null)
+			{
 				return null;
+			}
 
 			// TODO Follow Java build and map to parser objects?
 //			if (parsers.Contains(obj.Type))
 //				return ((PemObjectParser)parsers[obj.Type]).ParseObject(obj);
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(obj.Type, "PRIVATE KEY"))
+			if (Platform.EndsWith(obj.Type, "PRIVATE KEY"))
+			{
 				return ReadPrivateKey(obj);
+			}
 
 			switch (obj.Type)
 			{
@@ -121,7 +125,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			}
 		}
 
-		private AsymmetricKeyParameter ReadRsaPublicKey(PemObject pemObject)
+		AsymmetricKeyParameter ReadRsaPublicKey(PemObject pemObject)
 		{
 			RsaPublicKeyStructure rsaPubStructure = RsaPublicKeyStructure.GetInstance(
 				Asn1Object.FromByteArray(pemObject.Content));
@@ -132,7 +136,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 				rsaPubStructure.PublicExponent);
 		}
 
-		private AsymmetricKeyParameter ReadPublicKey(PemObject pemObject)
+		AsymmetricKeyParameter ReadPublicKey(PemObject pemObject)
 		{
 			return PublicKeyFactory.CreateKey(pemObject.Content);
 		}
@@ -143,7 +147,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		* @return the X509Certificate
 		* @throws IOException if an I/O error occured
 		*/
-		private X509Certificate ReadCertificate(PemObject pemObject)
+		X509Certificate ReadCertificate(PemObject pemObject)
 		{
 			try
 			{
@@ -161,7 +165,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		* @return the X509Certificate
 		* @throws IOException if an I/O error occured
 		*/
-		private X509Crl ReadCrl(PemObject pemObject)
+		X509Crl ReadCrl(PemObject pemObject)
 		{
 			try
 			{
@@ -179,7 +183,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		* @return the certificate request.
 		* @throws IOException if an I/O error occured
 		*/
-		private Pkcs10CertificationRequest ReadCertificateRequest(PemObject pemObject)
+		Pkcs10CertificationRequest ReadCertificateRequest(PemObject pemObject)
 		{
 			try
 			{
@@ -197,7 +201,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		* @return the X509 Attribute Certificate
 		* @throws IOException if an I/O error occured
 		*/
-		private X509V2AttributeCertificate ReadAttributeCertificate(PemObject pemObject)
+		X509V2AttributeCertificate ReadAttributeCertificate(PemObject pemObject)
 		{
 			return new X509V2AttributeCertificate(pemObject.Content);
 		}
@@ -210,7 +214,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		* @throws IOException if an I/O error occured
 		*/
 		// TODO Consider returning Asn1.Pkcs.ContentInfo
-		private Asn1.Cms.ContentInfo ReadPkcs7(PemObject pemObject)
+		Asn1.Cms.ContentInfo ReadPkcs7(PemObject pemObject)
 		{
 			try
 			{
@@ -226,17 +230,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		/**
 		* Read a Key Pair
 		*/
-		private object ReadPrivateKey(PemObject pemObject)
+		object ReadPrivateKey(PemObject pemObject)
 		{
 			//
 			// extract the key
 			//
-			Debug.Assert(Org.BouncyCastle.Utilities.Platform.EndsWith(pemObject.Type, "PRIVATE KEY"));
+			Debug.Assert(Platform.EndsWith(pemObject.Type, "PRIVATE KEY"));
 
 			string type = pemObject.Type.Substring(0, pemObject.Type.Length - "PRIVATE KEY".Length).Trim();
 			byte[] keyBytes = pemObject.Content;
 
-			var fields = new Dictionary<string, string>();
+			Dictionary<string, string> fields = new Dictionary<string, string>();
 			foreach (PemHeader header in pemObject.Headers)
 			{
 				fields[header.Name] = header.Value;
@@ -247,14 +251,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			if (procType == "4,ENCRYPTED")
 			{
 				if (pFinder == null)
+				{
 					throw new PasswordException("No password finder specified, but a password is required");
+				}
 
 				char[] password = pFinder.GetPassword();
 				if (password == null)
+				{
 					throw new PasswordException("Password is null, but a password is required");
+				}
 
-				if (!fields.TryGetValue("DEK-Info", out var dekInfo))
+				if (!fields.TryGetValue("DEK-Info", out string dekInfo))
+				{
 					throw new PemException("missing DEK-info");
+				}
 
 				string[] tknz = dekInfo.Split(',');
 
@@ -274,7 +284,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 					case "RSA":
 					{
 						if (seq.Count != 9)
+						{
 							throw new PemException("malformed sequence in RSA private key");
+						}
 
 						RsaPrivateKeyStructure rsa = RsaPrivateKeyStructure.GetInstance(seq);
 
@@ -290,7 +302,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 					case "DSA":
 					{
 						if (seq.Count != 6)
+						{
 							throw new PemException("malformed sequence in DSA private key");
+						}
 
 						// TODO Create an ASN1 object somewhere for this?
 						//DerInteger v = (DerInteger)seq[0];
@@ -341,7 +355,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 						char[] password = pFinder.GetPassword();
 
 						if (password == null)
+						{
 							throw new PasswordException("Password is null, but a password is required");
+						}
 
 						return PrivateKeyFactory.DecryptKey(password, EncryptedPrivateKeyInfo.GetInstance(seq));
 					}
@@ -378,11 +394,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 //			return GetCurveParameters(oid.Id);
 //		}
 
-		private static X9ECParameters GetCurveParameters(string name)
+		static X9ECParameters GetCurveParameters(string name)
 		{
 			X9ECParameters ecP = ECKeyPairGenerator.FindECCurveByName(name);
 			if (ecP == null)
+			{
 				throw new Exception("unknown curve name: " + name);
+			}
 
 			return ecP;
 		}

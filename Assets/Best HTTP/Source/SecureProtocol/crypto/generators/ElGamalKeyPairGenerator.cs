@@ -15,12 +15,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class ElGamalKeyPairGenerator
 		: IAsymmetricCipherKeyPairGenerator
 	{
-		private ElGamalKeyGenerationParameters param;
+		ElGamalKeyGenerationParameters param;
 
 		public void Init(
 			KeyGenerationParameters parameters)
 		{
-			this.param = (ElGamalKeyGenerationParameters)parameters;
+			param = (ElGamalKeyGenerationParameters)parameters;
 		}
 
 		public AsymmetricCipherKeyPair GenerateKeyPair()

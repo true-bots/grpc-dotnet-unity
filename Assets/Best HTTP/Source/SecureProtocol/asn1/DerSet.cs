@@ -73,10 +73,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				Asn1OutputStream.GetContentsEncodings(Asn1OutputStream.EncodingDer, GetSortedElements()));
 		}
 
-		private Asn1Encodable[] GetSortedElements()
+		Asn1Encodable[] GetSortedElements()
 		{
 			if (isSorted)
+			{
 				return elements;
+			}
 
 			int count = elements.Length;
 			Asn1Object[] asn1Objects = new Asn1Object[count];

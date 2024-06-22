@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerVideotexString), Asn1Tags.VideotexString)
+			Meta() : base(typeof(DerVideotexString), Asn1Tags.VideotexString)
 			{
 			}
 
@@ -33,16 +33,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerVideotexString GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerVideotexString derVideotexString)
+			{
 				return derVideotexString;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerVideotexString converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -56,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -72,7 +78,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (DerVideotexString)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly byte[] m_contents;
+		readonly byte[] m_contents;
 
 		public DerVideotexString(byte[] contents)
 			: this(contents, true)
@@ -82,7 +88,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal DerVideotexString(byte[] contents, bool clone)
 		{
 			if (null == contents)
+			{
 				throw new ArgumentNullException("contents");
+			}
 
 			m_contents = clone ? Arrays.Clone(contents) : contents;
 		}
@@ -111,7 +119,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			DerVideotexString that = asn1Object as DerVideotexString;
 			return null != that
-			       && Arrays.AreEqual(this.m_contents, that.m_contents);
+			       && Arrays.AreEqual(m_contents, that.m_contents);
 		}
 
 		protected override int Asn1GetHashCode()

@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class NaccacheSternKeyPairGenerator
 		: IAsymmetricCipherKeyPairGenerator
 	{
-		private static readonly int[] smallPrimes =
+		static readonly int[] smallPrimes =
 		{
 			3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67,
 			71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149,
@@ -27,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			541, 547, 557
 		};
 
-		private NaccacheSternKeyGenerationParameters param;
+		NaccacheSternKeyGenerationParameters param;
 
 		/*
 		 * (non-Javadoc)
@@ -36,7 +36,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 */
 		public void Init(KeyGenerationParameters parameters)
 		{
-			this.param = (NaccacheSternKeyGenerationParameters)parameters;
+			param = (NaccacheSternKeyGenerationParameters)parameters;
 		}
 
 		/*
@@ -50,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			SecureRandom rand = param.Random;
 			int certainty = param.Certainty;
 
-			var smallPrimes = FindFirstPrimes(param.CountSmallPrimes);
+			IList<BigInteger> smallPrimes = FindFirstPrimes(param.CountSmallPrimes);
 
 			smallPrimes = PermuteList(smallPrimes, rand);
 
@@ -98,19 +98,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				p = _p.Multiply(_2au).Add(BigInteger.One);
 
 				if (!p.IsProbablePrime(certainty, true))
+				{
 					continue;
+				}
 
 				for (;;)
 				{
 					_q = GeneratePrime(24, certainty, rand);
 
 					if (_p.Equals(_q))
+					{
 						continue;
+					}
 
 					q = _q.Multiply(_2bv).Add(BigInteger.One);
 
 					if (q.IsProbablePrime(certainty, true))
+					{
 						break;
+					}
 				}
 
 				if (!sigma.Gcd(_p.Multiply(_q)).Equals(BigInteger.One))
@@ -135,7 +141,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			for (;;)
 			{
 				// TODO After the first loop, just regenerate one randomly-selected gPart each time?
-				var gParts = new List<BigInteger>();
+				List<BigInteger> gParts = new List<BigInteger>();
 				for (int ind = 0; ind != smallPrimes.Count; ind++)
 				{
 					BigInteger i = smallPrimes[ind];
@@ -214,7 +220,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				new NaccacheSternPrivateKeyParameters(g, n, sigma.BitLength, smallPrimes, phi_n));
 		}
 
-		private static BigInteger GeneratePrime(int bitLength, int certainty, SecureRandom rand)
+		static BigInteger GeneratePrime(int bitLength, int certainty, SecureRandom rand)
 		{
 			return new BigInteger(bitLength, certainty, rand);
 		}
@@ -229,13 +235,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 *            the source of Randomness for permutation
 		 * @return a new IList with the permuted elements.
 		 */
-		private static IList<T> PermuteList<T>(IList<T> arr, SecureRandom rand)
+		static IList<T> PermuteList<T>(IList<T> arr, SecureRandom rand)
 		{
 			// TODO Create a utility method for generating permutation of first 'n' integers
 
-			var retval = new List<T>(arr.Count);
+			List<T> retval = new List<T>(arr.Count);
 
-			foreach (var element in arr)
+			foreach (T element in arr)
 			{
 				int index = rand.Next(retval.Count + 1);
 				retval.Insert(index, element);
@@ -251,9 +257,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 *            the number of primes to find
 		 * @return a vector containing the found primes as Integer
 		 */
-		private static IList<BigInteger> FindFirstPrimes(int count)
+		static IList<BigInteger> FindFirstPrimes(int count)
 		{
-			var primes = new List<BigInteger>(count);
+			List<BigInteger> primes = new List<BigInteger>(count);
 
 			for (int i = 0; i != count; i++)
 			{

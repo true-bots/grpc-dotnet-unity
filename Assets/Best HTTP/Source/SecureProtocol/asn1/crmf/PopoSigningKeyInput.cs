@@ -9,11 +9,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class PopoSigningKeyInput
 		: Asn1Encodable
 	{
-		private readonly GeneralName sender;
-		private readonly PKMacValue publicKeyMac;
-		private readonly SubjectPublicKeyInfo publicKey;
+		readonly GeneralName sender;
+		readonly PKMacValue publicKeyMac;
+		readonly SubjectPublicKeyInfo publicKey;
 
-		private PopoSigningKeyInput(Asn1Sequence seq)
+		PopoSigningKeyInput(Asn1Sequence seq)
 		{
 			Asn1Encodable authInfo = (Asn1Encodable)seq[0];
 
@@ -38,12 +38,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static PopoSigningKeyInput GetInstance(object obj)
 		{
 			if (obj is PopoSigningKeyInput)
+			{
 				return (PopoSigningKeyInput)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new PopoSigningKeyInput((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/** Creates a new PopoSigningKeyInput with sender name as authInfo. */
@@ -52,7 +56,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 			SubjectPublicKeyInfo spki)
 		{
 			this.sender = sender;
-			this.publicKey = spki;
+			publicKey = spki;
 		}
 
 		/** Creates a new PopoSigningKeyInput using password-based MAC. */
@@ -60,8 +64,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 			PKMacValue pkmac,
 			SubjectPublicKeyInfo spki)
 		{
-			this.publicKeyMac = pkmac;
-			this.publicKey = spki;
+			publicKeyMac = pkmac;
+			publicKey = spki;
 		}
 
 		/** Returns the sender field, or null if authInfo is publicKeyMac */

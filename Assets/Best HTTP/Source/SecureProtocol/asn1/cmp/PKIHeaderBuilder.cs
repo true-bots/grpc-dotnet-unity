@@ -7,18 +7,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 {
 	public class PkiHeaderBuilder
 	{
-		private DerInteger pvno;
-		private GeneralName sender;
-		private GeneralName recipient;
-		private Asn1GeneralizedTime messageTime;
-		private AlgorithmIdentifier protectionAlg;
-		private Asn1OctetString senderKID; // KeyIdentifier
-		private Asn1OctetString recipKID; // KeyIdentifier
-		private Asn1OctetString transactionID;
-		private Asn1OctetString senderNonce;
-		private Asn1OctetString recipNonce;
-		private PkiFreeText freeText;
-		private Asn1Sequence generalInfo;
+		DerInteger pvno;
+		GeneralName sender;
+		GeneralName recipient;
+		Asn1GeneralizedTime messageTime;
+		AlgorithmIdentifier protectionAlg;
+		Asn1OctetString senderKID; // KeyIdentifier
+		Asn1OctetString recipKID; // KeyIdentifier
+		Asn1OctetString transactionID;
+		Asn1OctetString senderNonce;
+		Asn1OctetString recipNonce;
+		PkiFreeText freeText;
+		Asn1Sequence generalInfo;
 
 		public PkiHeaderBuilder(
 			int pvno,
@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		{
 		}
 
-		private PkiHeaderBuilder(
+		PkiHeaderBuilder(
 			DerInteger pvno,
 			GeneralName sender,
 			GeneralName recipient)
@@ -127,13 +127,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			return this;
 		}
 
-		private static Asn1Sequence MakeGeneralInfoSeq(
+		static Asn1Sequence MakeGeneralInfoSeq(
 			InfoTypeAndValue generalInfo)
 		{
 			return new DerSequence(generalInfo);
 		}
 
-		private static Asn1Sequence MakeGeneralInfoSeq(
+		static Asn1Sequence MakeGeneralInfoSeq(
 			InfoTypeAndValue[] generalInfos)
 		{
 			Asn1Sequence genInfoSeq = null;
@@ -215,7 +215,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			return PkiHeader.GetInstance(new DerSequence(v));
 		}
 
-		private void AddOptional(Asn1EncodableVector v, int tagNo, Asn1Encodable obj)
+		void AddOptional(Asn1EncodableVector v, int tagNo, Asn1Encodable obj)
 		{
 			if (obj != null)
 			{

@@ -6,9 +6,9 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 {
-	internal class DrbgUtilities
+	class DrbgUtilities
 	{
-		private static readonly IDictionary<string, int> MaxSecurityStrengths =
+		static readonly IDictionary<string, int> MaxSecurityStrengths =
 			new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
 		static DrbgUtilities()
@@ -97,7 +97,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			// do a left shift to get rid of excess bits.
 			if (seedLength % 8 != 0)
 			{
-				int shift = 8 - (seedLength % 8);
+				int shift = 8 - seedLength % 8;
 				uint carry = 0;
 
 				for (int i = 0; i != outputLength; i++)

@@ -25,17 +25,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
 	public class DefaultSignatureAlgorithmIdentifierFinder
 	{
-		private static readonly IDictionary<string, DerObjectIdentifier> m_algorithms =
+		static readonly IDictionary<string, DerObjectIdentifier> m_algorithms =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly HashSet<DerObjectIdentifier> noParams = new HashSet<DerObjectIdentifier>();
+		static readonly HashSet<DerObjectIdentifier> noParams = new HashSet<DerObjectIdentifier>();
 
-		private static readonly IDictionary<string, Asn1Encodable> m_params =
+		static readonly IDictionary<string, Asn1Encodable> m_params =
 			new Dictionary<string, Asn1Encodable>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly HashSet<DerObjectIdentifier> pkcs15RsaEncryption = new HashSet<DerObjectIdentifier>();
+		static readonly HashSet<DerObjectIdentifier> pkcs15RsaEncryption = new HashSet<DerObjectIdentifier>();
 
-		private static readonly IDictionary<DerObjectIdentifier, DerObjectIdentifier> m_digestOids =
+		static readonly IDictionary<DerObjectIdentifier, DerObjectIdentifier> m_digestOids =
 			new Dictionary<DerObjectIdentifier, DerObjectIdentifier>();
 
 		//private static readonly DerObjectIdentifier ENCRYPTION_RSA = PkcsObjectIdentifiers.RsaEncryption;
@@ -312,20 +312,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			m_digestOids[GMObjectIdentifiers.sm2sign_with_sm3] = GMObjectIdentifiers.sm3;
 		}
 
-		private static AlgorithmIdentifier Generate(string signatureAlgorithm)
+		static AlgorithmIdentifier Generate(string signatureAlgorithm)
 		{
 			AlgorithmIdentifier sigAlgId;
 			//AlgorithmIdentifier encAlgId;
 			//AlgorithmIdentifier digAlgId;
 
-			if (!m_algorithms.TryGetValue(signatureAlgorithm, out var sigOid))
+			if (!m_algorithms.TryGetValue(signatureAlgorithm, out DerObjectIdentifier sigOid))
+			{
 				throw new ArgumentException("Unknown signature type requested: " + signatureAlgorithm);
+			}
 
 			if (noParams.Contains(sigOid))
 			{
 				sigAlgId = new AlgorithmIdentifier(sigOid);
 			}
-			else if (m_params.TryGetValue(signatureAlgorithm, out var explicitParameters))
+			else if (m_params.TryGetValue(signatureAlgorithm, out Asn1Encodable explicitParameters))
 			{
 				sigAlgId = new AlgorithmIdentifier(sigOid, explicitParameters);
 			}
@@ -355,7 +357,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return sigAlgId;
 		}
 
-		private static RsassaPssParameters CreatePssParams(AlgorithmIdentifier hashAlgId, int saltSize)
+		static RsassaPssParameters CreatePssParams(AlgorithmIdentifier hashAlgId, int saltSize)
 		{
 			return new RsassaPssParameters(
 				hashAlgId,
@@ -372,10 +374,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 	public class DefaultDigestAlgorithmIdentifierFinder
 	{
-		private static readonly IDictionary<DerObjectIdentifier, DerObjectIdentifier> m_digestOids =
+		static readonly IDictionary<DerObjectIdentifier, DerObjectIdentifier> m_digestOids =
 			new Dictionary<DerObjectIdentifier, DerObjectIdentifier>();
 
-		private static readonly IDictionary<string, DerObjectIdentifier> m_digestNameToOids =
+		static readonly IDictionary<string, DerObjectIdentifier> m_digestNameToOids =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
 		static DefaultDigestAlgorithmIdentifierFinder()
@@ -537,15 +539,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		protected CmsSignedGenerator(SecureRandom random)
 		{
 			if (random == null)
+			{
 				throw new ArgumentNullException(nameof(random));
+			}
 
 			m_random = random;
 		}
 
-		internal protected virtual IDictionary<CmsAttributeTableParameter, object> GetBaseParameters(
+		protected internal virtual IDictionary<CmsAttributeTableParameter, object> GetBaseParameters(
 			DerObjectIdentifier contentType, AlgorithmIdentifier digAlgId, byte[] hash)
 		{
-			var param = new Dictionary<CmsAttributeTableParameter, object>();
+			Dictionary<CmsAttributeTableParameter, object> param = new Dictionary<CmsAttributeTableParameter, object>();
 
 			if (contentType != null)
 			{
@@ -558,7 +562,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return param;
 		}
 
-		internal protected virtual Asn1Set GetAttributeSet(
+		protected internal virtual Asn1Set GetAttributeSet(
 			Asn1.Cms.AttributeTable attr)
 		{
 			return attr == null
@@ -641,13 +645,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		public bool UseDerForCerts
 		{
 			get { return _useDerForCerts; }
-			set { this._useDerForCerts = value; }
+			set { _useDerForCerts = value; }
 		}
 
 		public bool UseDerForCrls
 		{
 			get { return _useDerForCrls; }
-			set { this._useDerForCrls = value; }
+			set { _useDerForCrls = value; }
 		}
 
 		internal virtual void AddSignerCallback(

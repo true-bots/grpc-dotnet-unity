@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 {
 	public static class Streams
 	{
-		private const int BufferSize = 4096;
+		const int BufferSize = 4096;
 
 		public static void Drain(Stream inStr)
 		{
@@ -50,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 		/// <exception cref="IOException"></exception>
 		public static long PipeAllLimited(Stream inStr, long limit, Stream outStr)
 		{
-			var limited = new LimitedInputStream(inStr, limit);
+			LimitedInputStream limited = new LimitedInputStream(inStr, limit);
 			limited.CopyTo(outStr, BufferSize);
 			return limit - limited.CurrentLimit;
 		}
@@ -86,7 +86,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 			{
 				int numRead = inStr.Read(buf, off + totalRead, len - totalRead);
 				if (numRead < 1)
+				{
 					break;
+				}
+
 				totalRead += numRead;
 			}
 
@@ -111,20 +114,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 		public static void ValidateBufferArguments(byte[] buffer, int offset, int count)
 		{
 			if (buffer == null)
+			{
 				throw new ArgumentNullException("buffer");
+			}
+
 			int available = buffer.Length - offset;
 			if ((offset | available) < 0)
+			{
 				throw new ArgumentOutOfRangeException("offset");
+			}
+
 			int remaining = available - count;
 			if ((count | remaining) < 0)
+			{
 				throw new ArgumentOutOfRangeException("count");
+			}
 		}
 
 		/// <exception cref="IOException"></exception>
 		public static int WriteBufTo(MemoryStream buf, byte[] output, int offset)
 		{
 #if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER || UNITY_2021_2_OR_NEWER
-			if (buf.TryGetBuffer(out var buffer))
+			if (buf.TryGetBuffer(out ArraySegment<byte> buffer))
 			{
 				buffer.CopyTo(output, offset);
 				return buffer.Count;

@@ -170,10 +170,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 */
 		public static readonly DerObjectIdentifier ExpiredCertsOnCrl = new DerObjectIdentifier("2.5.29.60");
 
-		private readonly Dictionary<DerObjectIdentifier, X509Extension> m_extensions =
+		readonly Dictionary<DerObjectIdentifier, X509Extension> m_extensions =
 			new Dictionary<DerObjectIdentifier, X509Extension>();
 
-		private readonly List<DerObjectIdentifier> m_ordering;
+		readonly List<DerObjectIdentifier> m_ordering;
 
 		public static X509Extension GetExtension(X509Extensions extensions, DerObjectIdentifier oid)
 		{
@@ -208,7 +208,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return GetInstance(((Asn1TaggedObject)obj).GetObject());
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -216,7 +216,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
          *
          * the extensions are a list of constructed sequences, either with (Oid, OctetString) or (Oid, Boolean, OctetString)
          */
-		private X509Extensions(Asn1Sequence seq)
+		X509Extensions(Asn1Sequence seq)
 		{
 			m_ordering = new List<DerObjectIdentifier>();
 
@@ -225,7 +225,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				Asn1Sequence s = Asn1Sequence.GetInstance(ae.ToAsn1Object());
 
 				if (s.Count < 2 || s.Count > 3)
+				{
 					throw new ArgumentException("Bad sequence size: " + s.Count);
+				}
 
 				DerObjectIdentifier oid = DerObjectIdentifier.GetInstance(s[0].ToAsn1Object());
 
@@ -235,7 +237,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				Asn1OctetString octets = Asn1OctetString.GetInstance(s[s.Count - 1].ToAsn1Object());
 
 				if (m_extensions.ContainsKey(oid))
+				{
 					throw new ArgumentException("repeated extension found: " + oid);
+				}
 
 				m_extensions.Add(oid, new X509Extension(isCritical, octets));
 				m_ordering.Add(oid);
@@ -355,12 +359,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public bool Equivalent(X509Extensions other)
 		{
 			if (m_extensions.Count != other.m_extensions.Count)
+			{
 				return false;
+			}
 
-			foreach (var entry in m_extensions)
+			foreach (KeyValuePair<DerObjectIdentifier, X509Extension> entry in m_extensions)
 			{
 				if (!entry.Value.Equals(other.GetExtension(entry.Key)))
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -381,9 +389,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return GetExtensionOids(true);
 		}
 
-		private DerObjectIdentifier[] GetExtensionOids(bool isCritical)
+		DerObjectIdentifier[] GetExtensionOids(bool isCritical)
 		{
-			var oids = new List<DerObjectIdentifier>();
+			List<DerObjectIdentifier> oids = new List<DerObjectIdentifier>();
 
 			foreach (DerObjectIdentifier oid in m_ordering)
 			{

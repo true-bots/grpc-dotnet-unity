@@ -17,11 +17,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static BasicConstraints GetInstance(object obj)
 		{
 			if (obj is BasicConstraints)
+			{
 				return (BasicConstraints)obj;
+			}
+
 			if (obj is X509Extension)
+			{
 				return GetInstance(X509Extension.ConvertValueToObject((X509Extension)obj));
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new BasicConstraints(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -30,29 +39,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return GetInstance(X509Extensions.GetExtensionParsedValue(extensions, X509Extensions.BasicConstraints));
 		}
 
-		private readonly DerBoolean cA;
-		private readonly DerInteger pathLenConstraint;
+		readonly DerBoolean cA;
+		readonly DerInteger pathLenConstraint;
 
-		private BasicConstraints(
+		BasicConstraints(
 			Asn1Sequence seq)
 		{
 			if (seq.Count > 0)
 			{
 				if (seq[0] is DerBoolean)
 				{
-					this.cA = DerBoolean.GetInstance(seq[0]);
+					cA = DerBoolean.GetInstance(seq[0]);
 				}
 				else
 				{
-					this.pathLenConstraint = DerInteger.GetInstance(seq[0]);
+					pathLenConstraint = DerInteger.GetInstance(seq[0]);
 				}
 
 				if (seq.Count > 1)
 				{
-					if (this.cA == null)
+					if (cA == null)
+					{
 						throw new ArgumentException("wrong sequence in constructor", "seq");
+					}
 
-					this.pathLenConstraint = DerInteger.GetInstance(seq[1]);
+					pathLenConstraint = DerInteger.GetInstance(seq[1]);
 				}
 			}
 		}
@@ -74,7 +85,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public BasicConstraints(
 			int pathLenConstraint)
 		{
-			this.cA = DerBoolean.True;
+			cA = DerBoolean.True;
 			this.pathLenConstraint = new DerInteger(pathLenConstraint);
 		}
 
@@ -109,10 +120,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 			if (pathLenConstraint == null)
 			{
-				return "BasicConstraints: isCa(" + this.IsCA() + ")";
+				return "BasicConstraints: isCa(" + IsCA() + ")";
 			}
 
-			return "BasicConstraints: isCa(" + this.IsCA() + "), pathLenConstraint = " + pathLenConstraint.Value;
+			return "BasicConstraints: isCa(" + IsCA() + "), pathLenConstraint = " + pathLenConstraint.Value;
 		}
 	}
 }

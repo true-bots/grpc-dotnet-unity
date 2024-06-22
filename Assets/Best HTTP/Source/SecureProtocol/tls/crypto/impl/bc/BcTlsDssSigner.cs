@@ -25,9 +25,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public override byte[] GenerateRawSignature(SignatureAndHashAlgorithm algorithm, byte[] hash)
 		{
 			if (algorithm != null && algorithm.Signature != SignatureAlgorithm)
+			{
 				throw new InvalidOperationException("Invalid algorithm: " + algorithm);
+			}
 
-			int cryptoHashAlgorithm = (null == algorithm)
+			int cryptoHashAlgorithm = null == algorithm
 				? CryptoHashAlgorithm.sha1
 				: TlsCryptoUtilities.GetHash(algorithm.Hash);
 

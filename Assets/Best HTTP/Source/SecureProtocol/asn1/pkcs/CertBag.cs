@@ -10,22 +10,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		public static CertBag GetInstance(object obj)
 		{
 			if (obj is CertBag)
+			{
 				return (CertBag)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new CertBag(Asn1Sequence.GetInstance(obj));
 		}
 
-		private readonly DerObjectIdentifier certID;
-		private readonly Asn1Object certValue;
+		readonly DerObjectIdentifier certID;
+		readonly Asn1Object certValue;
 
-		private CertBag(Asn1Sequence seq)
+		CertBag(Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
-			this.certID = DerObjectIdentifier.GetInstance(seq[0]);
-			this.certValue = Asn1TaggedObject.GetInstance(seq[1]).GetObject();
+			certID = DerObjectIdentifier.GetInstance(seq[0]);
+			certValue = Asn1TaggedObject.GetInstance(seq[1]).GetObject();
 		}
 
 		public CertBag(

@@ -11,12 +11,12 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecT131Field
+	class SecT131Field
 	{
-		private const ulong M03 = ulong.MaxValue >> 61;
-		private const ulong M44 = ulong.MaxValue >> 20;
+		const ulong M03 = ulong.MaxValue >> 61;
+		const ulong M44 = ulong.MaxValue >> 20;
 
-		private static readonly ulong[] ROOT_Z = new ulong[] { 0x26BC4D789AF13523UL, 0x26BC4D789AF135E2UL, 0x6UL };
+		static readonly ulong[] ROOT_Z = new ulong[] { 0x26BC4D789AF13523UL, 0x26BC4D789AF135E2UL, 0x6UL };
 
 		public static void Add(ulong[] x, ulong[] y, ulong[] z)
 		{
@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			z[2] = x[2];
 		}
 
-		private static void AddTo(ulong[] x, ulong[] z)
+		static void AddTo(ulong[] x, ulong[] z)
 		{
 			z[0] ^= x[0];
 			z[1] ^= x[1];
@@ -71,7 +71,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public static void Invert(ulong[] x, ulong[] z)
 		{
 			if (Nat192.IsZero64(x))
+			{
 				throw new InvalidOperationException();
+			}
 
 			// Itoh-Tsujii inversion
 
@@ -117,11 +119,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 
 			x1 ^= (x4 << 61) ^ (x4 << 63);
 			x2 ^= (x4 >> 3) ^ (x4 >> 1) ^ x4 ^ (x4 << 5);
-			x3 ^= (x4 >> 59);
+			x3 ^= x4 >> 59;
 
 			x0 ^= (x3 << 61) ^ (x3 << 63);
 			x1 ^= (x3 >> 3) ^ (x3 >> 1) ^ x3 ^ (x3 << 5);
-			x2 ^= (x3 >> 59);
+			x2 ^= x3 >> 59;
 
 			ulong t = x2 >> 3;
 			z[0] = x0 ^ t ^ (t << 2) ^ (t << 3) ^ (t << 8);
@@ -133,7 +135,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		{
 			ulong z2 = z[zOff + 2], t = z2 >> 3;
 			z[zOff] ^= t ^ (t << 2) ^ (t << 3) ^ (t << 8);
-			z[zOff + 1] ^= (t >> 56);
+			z[zOff + 1] ^= t >> 56;
 			z[zOff + 2] = z2 & M03;
 		}
 
@@ -194,7 +196,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			                   ^ (z4 << 48);
 			zz[3] = (z3 >> 60) ^ (z5 << 28)
 			                   ^ (z4 >> 16);
-			zz[4] = (z5 >> 36);
+			zz[4] = z5 >> 36;
 			zz[5] = 0;
 		}
 
@@ -279,9 +281,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			ulong w2 = u2 ^ v2;
 
 			// Propagate carries
-			w1 ^= (w0 >> 44);
+			w1 ^= w0 >> 44;
 			w0 &= M44;
-			w2 ^= (w1 >> 44);
+			w2 ^= w1 >> 44;
 			w1 &= M44;
 
 			Debug.Assert((w0 & 1UL) == 0);
@@ -290,36 +292,36 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 
 			w0 = (w0 >> 1) ^ ((w1 & 1UL) << 43);
 			w1 = (w1 >> 1) ^ ((w2 & 1UL) << 43);
-			w2 = (w2 >> 1);
+			w2 = w2 >> 1;
 
 			// Divide W by (t + 1)
 
-			w0 ^= (w0 << 1);
-			w0 ^= (w0 << 2);
-			w0 ^= (w0 << 4);
-			w0 ^= (w0 << 8);
-			w0 ^= (w0 << 16);
-			w0 ^= (w0 << 32);
+			w0 ^= w0 << 1;
+			w0 ^= w0 << 2;
+			w0 ^= w0 << 4;
+			w0 ^= w0 << 8;
+			w0 ^= w0 << 16;
+			w0 ^= w0 << 32;
 
 			w0 &= M44;
-			w1 ^= (w0 >> 43);
+			w1 ^= w0 >> 43;
 
-			w1 ^= (w1 << 1);
-			w1 ^= (w1 << 2);
-			w1 ^= (w1 << 4);
-			w1 ^= (w1 << 8);
-			w1 ^= (w1 << 16);
-			w1 ^= (w1 << 32);
+			w1 ^= w1 << 1;
+			w1 ^= w1 << 2;
+			w1 ^= w1 << 4;
+			w1 ^= w1 << 8;
+			w1 ^= w1 << 16;
+			w1 ^= w1 << 32;
 
 			w1 &= M44;
-			w2 ^= (w1 >> 43);
+			w2 ^= w1 >> 43;
 
-			w2 ^= (w2 << 1);
-			w2 ^= (w2 << 2);
-			w2 ^= (w2 << 4);
-			w2 ^= (w2 << 8);
-			w2 ^= (w2 << 16);
-			w2 ^= (w2 << 32);
+			w2 ^= w2 << 1;
+			w2 ^= w2 << 2;
+			w2 ^= w2 << 4;
+			w2 ^= w2 << 8;
+			w2 ^= w2 << 16;
+			w2 ^= w2 << 32;
 
 			Debug.Assert(w2 >> 42 == 0);
 
@@ -351,21 +353,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			ulong g,
 				h = 0,
 				l = u[j & 7]
-				    ^ u[(j >> 3) & 7] << 3
-				    ^ u[(j >> 6) & 7] << 6
-				    ^ u[(j >> 9) & 7] << 9
-				    ^ u[(j >> 12) & 7] << 12;
+				    ^ (u[(j >> 3) & 7] << 3)
+				    ^ (u[(j >> 6) & 7] << 6)
+				    ^ (u[(j >> 9) & 7] << 9)
+				    ^ (u[(j >> 12) & 7] << 12);
 			int k = 30;
 			do
 			{
 				j = (uint)(x >> k);
 				g = u[j & 7]
-				    ^ u[(j >> 3) & 7] << 3
-				    ^ u[(j >> 6) & 7] << 6
-				    ^ u[(j >> 9) & 7] << 9
-				    ^ u[(j >> 12) & 7] << 12;
-				l ^= (g << k);
-				h ^= (g >> -k);
+				    ^ (u[(j >> 3) & 7] << 3)
+				    ^ (u[(j >> 6) & 7] << 6)
+				    ^ (u[(j >> 9) & 7] << 9)
+				    ^ (u[(j >> 12) & 7] << 12);
+				l ^= g << k;
+				h ^= g >> -k;
 			} while ((k -= 15) > 0);
 
 			Debug.Assert(h >> 25 == 0);

@@ -13,24 +13,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 {
 	public class ProofOfPossessionSigningKeyBuilder
 	{
-		private CertRequest _certRequest;
-		private SubjectPublicKeyInfo _pubKeyInfo;
-		private GeneralName _name;
-		private PKMacValue _publicKeyMAC;
+		CertRequest _certRequest;
+		SubjectPublicKeyInfo _pubKeyInfo;
+		GeneralName _name;
+		PKMacValue _publicKeyMAC;
 
 		public ProofOfPossessionSigningKeyBuilder(CertRequest certRequest)
 		{
-			this._certRequest = certRequest;
+			_certRequest = certRequest;
 		}
 
 		public ProofOfPossessionSigningKeyBuilder(SubjectPublicKeyInfo pubKeyInfo)
 		{
-			this._pubKeyInfo = pubKeyInfo;
+			_pubKeyInfo = pubKeyInfo;
 		}
 
 		public ProofOfPossessionSigningKeyBuilder SetSender(GeneralName name)
 		{
-			this._name = name;
+			_name = name;
 
 			return this;
 		}
@@ -42,12 +42,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 			byte[] d = _pubKeyInfo.GetDerEncoded();
 
 			IStreamCalculator<IBlockResult> calc = fact.CreateCalculator();
-			using (var stream = calc.Stream)
+			using (Stream stream = calc.Stream)
 			{
 				stream.Write(d, 0, d.Length);
 			}
 
-			this._publicKeyMAC = new PKMacValue(
+			_publicKeyMAC = new PKMacValue(
 				(AlgorithmIdentifier)fact.AlgorithmDetails,
 				new DerBitString(calc.GetResult().Collect()));
 
@@ -83,7 +83,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 				}
 			}
 
-			var signature = calc.GetResult().Collect();
+			byte[] signature = calc.GetResult().Collect();
 
 			return new PopoSigningKey(popo, (AlgorithmIdentifier)signer.AlgorithmDetails, new DerBitString(signature));
 		}

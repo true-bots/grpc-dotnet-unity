@@ -16,8 +16,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	/// </remarks>
 	public class X509CertificatePair
 	{
-		private readonly X509Certificate forward;
-		private readonly X509Certificate reverse;
+		readonly X509Certificate forward;
+		readonly X509Certificate reverse;
 
 		/// <summary>Constructor</summary>
 		/// <param name="forward">Certificate from the other CA to this CA.</param>
@@ -37,12 +37,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		{
 			if (pair.Forward != null)
 			{
-				this.forward = new X509Certificate(pair.Forward);
+				forward = new X509Certificate(pair.Forward);
 			}
 
 			if (pair.Reverse != null)
 			{
-				this.reverse = new X509Certificate(pair.Reverse);
+				reverse = new X509Certificate(pair.Reverse);
 			}
 		}
 
@@ -58,7 +58,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 						Asn1Object.FromByteArray(forward.GetEncoded()));
 
 					if (f == null)
+					{
 						throw new CertificateEncodingException("unable to get encoding for forward");
+					}
 				}
 
 				if (reverse != null)
@@ -67,7 +69,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 						Asn1Object.FromByteArray(reverse.GetEncoded()));
 
 					if (r == null)
+					{
 						throw new CertificateEncodingException("unable to get encoding for reverse");
+					}
 				}
 
 				return new CertificatePair(f, r).GetDerEncoded();
@@ -96,15 +100,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			X509CertificatePair other = obj as X509CertificatePair;
 
 			if (other == null)
+			{
 				return false;
+			}
 
-			return Org.BouncyCastle.Utilities.Platform.Equals(this.forward, other.forward)
-			       && Org.BouncyCastle.Utilities.Platform.Equals(this.reverse, other.reverse);
+			return Org.BouncyCastle.Utilities.Platform.Equals(forward, other.forward)
+			       && Org.BouncyCastle.Utilities.Platform.Equals(reverse, other.reverse);
 		}
 
 		public override int GetHashCode()

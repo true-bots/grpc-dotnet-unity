@@ -11,9 +11,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Endo
 
 		public GlvTypeAParameters(BigInteger i, BigInteger lambda, ScalarSplitParameters splitParams)
 		{
-			this.m_i = i;
-			this.m_lambda = lambda;
-			this.m_splitParams = splitParams;
+			m_i = i;
+			m_lambda = lambda;
+			m_splitParams = splitParams;
 		}
 
 		public virtual BigInteger I

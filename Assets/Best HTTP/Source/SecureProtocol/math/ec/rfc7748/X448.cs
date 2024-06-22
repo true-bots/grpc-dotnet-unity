@@ -15,8 +15,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 		public const int PointSize = 56;
 		public const int ScalarSize = 56;
 
-		private const uint C_A = 156326;
-		private const uint C_A24 = (C_A + 2) / 4;
+		const uint C_A = 156326;
+		const uint C_A24 = (C_A + 2) / 4;
 
 		//private static readonly uint[] Sqrt156324 = { 0x0551B193U, 0x07A21E17U, 0x0E635AD3U, 0x00812ABBU, 0x025B3F99U, 0x01605224U,
 		//    0x0AF8CB32U, 0x0D2E7D68U, 0x06BA50FDU, 0x08E55693U, 0x0CB08EB4U, 0x02ABEBC1U, 0x051BA0BBU, 0x02F8812EU, 0x0829B611U,
@@ -57,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
             n[13] |= 0x80000000U;
         }
 #else
-		private static uint Decode32(byte[] bs, int off)
+		static uint Decode32(byte[] bs, int off)
 		{
 			uint n = bs[off];
 			n |= (uint)bs[++off] << 8;
@@ -66,7 +66,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			return n;
 		}
 
-		private static void DecodeScalar(byte[] k, int kOff, uint[] n)
+		static void DecodeScalar(byte[] k, int kOff, uint[] n)
 		{
 			for (int i = 0; i < 14; ++i)
 			{
@@ -81,7 +81,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 		public static void GeneratePrivateKey(SecureRandom random, byte[] k)
 		{
 			if (k.Length != ScalarSize)
+			{
 				throw new ArgumentException(nameof(k));
+			}
 
 			random.NextBytes(k);
 
@@ -114,7 +116,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void PointDouble(uint[] x, uint[] z)
+		static void PointDouble(uint[] x, uint[] z)
 		{
 			uint[] a = F.Create();
 			uint[] b = F.Create();

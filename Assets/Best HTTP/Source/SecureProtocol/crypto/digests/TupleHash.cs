@@ -15,13 +15,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class TupleHash
 		: IXof, IDigest
 	{
-		private static readonly byte[] N_TUPLE_HASH = Strings.ToByteArray("TupleHash");
+		static readonly byte[] N_TUPLE_HASH = Strings.ToByteArray("TupleHash");
 
-		private readonly CShakeDigest cshake;
-		private readonly int bitLength;
-		private readonly int outputLength;
+		readonly CShakeDigest cshake;
+		readonly int bitLength;
+		readonly int outputLength;
 
-		private bool firstOutput;
+		bool firstOutput;
 
 		/**
 		 * Base constructor.
@@ -36,19 +36,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 		public TupleHash(int bitLength, byte[] S, int outputSize)
 		{
-			this.cshake = new CShakeDigest(bitLength, N_TUPLE_HASH, S);
+			cshake = new CShakeDigest(bitLength, N_TUPLE_HASH, S);
 			this.bitLength = bitLength;
-			this.outputLength = (outputSize + 7) / 8;
+			outputLength = (outputSize + 7) / 8;
 
 			Reset();
 		}
 
 		public TupleHash(TupleHash original)
 		{
-			this.cshake = new CShakeDigest(original.cshake);
-			this.bitLength = cshake.fixedOutputLength;
-			this.outputLength = bitLength * 2 / 8;
-			this.firstOutput = original.firstOutput;
+			cshake = new CShakeDigest(original.cshake);
+			bitLength = cshake.fixedOutputLength;
+			outputLength = bitLength * 2 / 8;
+			firstOutput = original.firstOutput;
 		}
 
 		public virtual string AlgorithmName
@@ -78,7 +78,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			cshake.BlockUpdate(bytes, 0, bytes.Length);
 		}
 
-		private void WrapUp(int outputSize)
+		void WrapUp(int outputSize)
 		{
 			byte[] encOut = XofUtilities.RightEncode(outputSize * 8);
 

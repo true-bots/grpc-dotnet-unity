@@ -10,9 +10,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class GenericSigner
 		: ISigner
 	{
-		private readonly IAsymmetricBlockCipher engine;
-		private readonly IDigest digest;
-		private bool forSigning;
+		readonly IAsymmetricBlockCipher engine;
+		readonly IDigest digest;
+		bool forSigning;
 
 		public GenericSigner(
 			IAsymmetricBlockCipher engine,
@@ -50,10 +50,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			}
 
 			if (forSigning && !k.IsPrivate)
+			{
 				throw new InvalidKeyException("Signing requires private key.");
+			}
 
 			if (!forSigning && k.IsPrivate)
+			{
 				throw new InvalidKeyException("Verification requires public key.");
+			}
 
 			Reset();
 
@@ -80,7 +84,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual byte[] GenerateSignature()
 		{
 			if (!forSigning)
+			{
 				throw new InvalidOperationException("GenericSigner not initialised for signature generation.");
+			}
 
 			byte[] hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
@@ -91,7 +97,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual bool VerifySignature(byte[] signature)
 		{
 			if (forSigning)
+			{
 				throw new InvalidOperationException("GenericSigner not initialised for verification");
+			}
 
 			byte[] hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);

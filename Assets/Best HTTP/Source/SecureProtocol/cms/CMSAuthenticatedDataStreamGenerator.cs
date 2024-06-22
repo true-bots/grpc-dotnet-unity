@@ -40,8 +40,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		// TODO Add support
 //		private object              _originatorInfo = null;
 //		private object              _unprotectedAttributes = null;
-		private int _bufferSize;
-		private bool _berEncodeRecipientSet;
+		int _bufferSize;
+		bool _berEncodeRecipientSet;
 
 		public CmsAuthenticatedDataStreamGenerator()
 		{
@@ -79,7 +79,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		* object using the given provider and the passed in key generator.
 		* @throws java.io.IOException
 		*/
-		private Stream Open(
+		Stream Open(
 			Stream outStr,
 			string macOid,
 			CipherKeyGenerator keyGen)
@@ -210,14 +210,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return Open(outStr, encryptionOid, keyGen);
 		}
 
-		private class CmsAuthenticatedDataOutputStream
+		class CmsAuthenticatedDataOutputStream
 			: BaseOutputStream
 		{
-			private readonly Stream macStream;
-			private readonly IMac mac;
-			private readonly BerSequenceGenerator cGen;
-			private readonly BerSequenceGenerator authGen;
-			private readonly BerSequenceGenerator eiGen;
+			readonly Stream macStream;
+			readonly IMac mac;
+			readonly BerSequenceGenerator cGen;
+			readonly BerSequenceGenerator authGen;
+			readonly BerSequenceGenerator eiGen;
 
 			public CmsAuthenticatedDataOutputStream(
 				Stream macStream,

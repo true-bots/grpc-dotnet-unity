@@ -11,11 +11,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class SM2KeyExchangePrivateParameters
 		: ICipherParameters
 	{
-		private readonly bool mInitiator;
-		private readonly ECPrivateKeyParameters mStaticPrivateKey;
-		private readonly ECPoint mStaticPublicPoint;
-		private readonly ECPrivateKeyParameters mEphemeralPrivateKey;
-		private readonly ECPoint mEphemeralPublicPoint;
+		readonly bool mInitiator;
+		readonly ECPrivateKeyParameters mStaticPrivateKey;
+		readonly ECPoint mStaticPublicPoint;
+		readonly ECPrivateKeyParameters mEphemeralPrivateKey;
+		readonly ECPoint mEphemeralPublicPoint;
 
 		public SM2KeyExchangePrivateParameters(
 			bool initiator,
@@ -23,21 +23,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			ECPrivateKeyParameters ephemeralPrivateKey)
 		{
 			if (staticPrivateKey == null)
+			{
 				throw new ArgumentNullException("staticPrivateKey");
+			}
+
 			if (ephemeralPrivateKey == null)
+			{
 				throw new ArgumentNullException("ephemeralPrivateKey");
+			}
 
 			ECDomainParameters parameters = staticPrivateKey.Parameters;
 			if (!parameters.Equals(ephemeralPrivateKey.Parameters))
+			{
 				throw new ArgumentException("Static and ephemeral private keys have different domain parameters");
+			}
 
 			ECMultiplier m = new FixedPointCombMultiplier();
 
-			this.mInitiator = initiator;
-			this.mStaticPrivateKey = staticPrivateKey;
-			this.mStaticPublicPoint = m.Multiply(parameters.G, staticPrivateKey.D).Normalize();
-			this.mEphemeralPrivateKey = ephemeralPrivateKey;
-			this.mEphemeralPublicPoint = m.Multiply(parameters.G, ephemeralPrivateKey.D).Normalize();
+			mInitiator = initiator;
+			mStaticPrivateKey = staticPrivateKey;
+			mStaticPublicPoint = m.Multiply(parameters.G, staticPrivateKey.D).Normalize();
+			mEphemeralPrivateKey = ephemeralPrivateKey;
+			mEphemeralPublicPoint = m.Multiply(parameters.G, ephemeralPrivateKey.D).Normalize();
 		}
 
 		public virtual bool IsInitiator

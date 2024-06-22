@@ -27,47 +27,49 @@ namespace BestHTTP.Core
 
 		public int QueuedRequests
 		{
-			get { return this.Queue.Count; }
+			get { return Queue.Count; }
 		}
 
 		public LoggingContext Context { get; private set; }
 
-		private List<ConnectionBase> Connections = new List<ConnectionBase>();
-		private List<HTTPRequest> Queue = new List<HTTPRequest>();
+		List<ConnectionBase> Connections = new List<ConnectionBase>();
+		List<HTTPRequest> Queue = new List<HTTPRequest>();
 
 		public HostConnection(HostDefinition host, string variantId)
 		{
-			this.Host = host;
-			this.VariantId = variantId;
+			Host = host;
+			VariantId = variantId;
 
-			this.Context = new LoggingContext(this);
-			this.Context.Add("Host", this.Host.Host);
-			this.Context.Add("VariantId", this.VariantId);
+			Context = new LoggingContext(this);
+			Context.Add("Host", Host.Host);
+			Context.Add("VariantId", VariantId);
 		}
 
 		internal void AddProtocol(HostProtocolSupport protocolSupport)
 		{
-			this.LastProtocolSupportUpdate = DateTime.UtcNow;
+			LastProtocolSupportUpdate = DateTime.UtcNow;
 
-			var oldProtocol = this.ProtocolSupport;
+			HostProtocolSupport oldProtocol = ProtocolSupport;
 
 			if (oldProtocol != protocolSupport)
 			{
-				this.ProtocolSupport = protocolSupport;
+				ProtocolSupport = protocolSupport;
 
 				HTTPManager.Logger.Information(typeof(HostConnection).Name,
-					string.Format("AddProtocol({0}) - changing from {1} to {2}", this.VariantId, oldProtocol, protocolSupport), this.Context);
+					string.Format("AddProtocol({0}) - changing from {1} to {2}", VariantId, oldProtocol, protocolSupport), Context);
 
 				HostManager.Save();
 			}
 
 			if (protocolSupport == HostProtocolSupport.HTTP2)
+			{
 				TryToSendQueuedRequests();
+			}
 		}
 
 		internal HostConnection Send(HTTPRequest request)
 		{
-			var conn = GetNextAvailable(request);
+			ConnectionBase conn = GetNextAvailable(request);
 
 			if (conn != null)
 			{
@@ -81,7 +83,7 @@ namespace BestHTTP.Core
 			else
 			{
 				// If no free connection found and creation prohibited, we will put back to the queue
-				this.Queue.Add(request);
+				Queue.Add(request);
 			}
 
 			return this;
@@ -101,7 +103,7 @@ namespace BestHTTP.Core
 				{
 					if (!conn.TestConnection())
 					{
-						HTTPManager.Logger.Verbose("HostConnection", "GetNextAvailable - TestConnection returned false!", this.Context, request.Context, conn.Context);
+						HTTPManager.Logger.Verbose("HostConnection", "GetNextAvailable - TestConnection returned false!", Context, request.Context, conn.Context);
 
 						RemoveConnectionImpl(conn, HTTPConnectionStates.Closed);
 						continue;
@@ -109,7 +111,7 @@ namespace BestHTTP.Core
 
 					HTTPManager.Logger.Verbose("HostConnection",
 						string.Format("GetNextAvailable - returning with connection. state: {0}, CanProcessMultiple: {1}", conn.State, conn.CanProcessMultiple),
-						this.Context, request.Context, conn.Context);
+						Context, request.Context, conn.Context);
 					return conn;
 				}
 
@@ -120,7 +122,7 @@ namespace BestHTTP.Core
 			{
 				HTTPManager.Logger.Verbose("HostConnection",
 					string.Format("GetNextAvailable - activeConnections({0}) >= HTTPManager.MaxConnectionPerServer({1})", activeConnections,
-						HTTPManager.MaxConnectionPerServer), this.Context, request.Context);
+						HTTPManager.MaxConnectionPerServer), Context, request.Context);
 				return null;
 			}
 
@@ -132,7 +134,9 @@ namespace BestHTTP.Core
             conn = new WebGLConnection(key);
 #else
 			if (request.CurrentUri.IsFile)
+			{
 				conn = new FileConnection(key);
+			}
 			else
 			{
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL
@@ -140,17 +144,17 @@ namespace BestHTTP.Core
 				// If we send out multiple requests at once it will execute the first and delay the others. 
 				// While it will decrease performance initially, it will prevent the creation of TCP connections
 				//  that will be unused after their first request processing if the server supports HTTP/2.
-				if (activeConnections >= 1 && (this.ProtocolSupport == HostProtocolSupport.Unknown || this.ProtocolSupport == HostProtocolSupport.HTTP2))
+				if (activeConnections >= 1 && (ProtocolSupport == HostProtocolSupport.Unknown || ProtocolSupport == HostProtocolSupport.HTTP2))
 				{
 					HTTPManager.Logger.Verbose("HostConnection",
 						string.Format("GetNextAvailable - waiting for protocol support message. activeConnections: {0}, ProtocolSupport: {1} ", activeConnections,
-							this.ProtocolSupport), this.Context, request.Context);
+							ProtocolSupport), Context, request.Context);
 					return null;
 				}
 #endif
 
 				conn = new HTTPConnection(key);
-				HTTPManager.Logger.Verbose("HostConnection", string.Format("GetNextAvailable - creating new connection, key: {0} ", key), this.Context, request.Context,
+				HTTPManager.Logger.Verbose("HostConnection", string.Format("GetNextAvailable - creating new connection, key: {0} ", key), Context, request.Context,
 					conn.Context);
 			}
 #endif
@@ -163,21 +167,23 @@ namespace BestHTTP.Core
 		{
 			conn.State = HTTPConnectionStates.Free;
 
-			BestHTTP.Extensions.Timer.Add(new TimerData(TimeSpan.FromSeconds(1), conn, CloseConnectionAfterInactivity));
+			Timer.Add(new TimerData(TimeSpan.FromSeconds(1), conn, CloseConnectionAfterInactivity));
 
 			return this;
 		}
 
-		private bool RemoveConnectionImpl(ConnectionBase conn, HTTPConnectionStates setState)
+		bool RemoveConnectionImpl(ConnectionBase conn, HTTPConnectionStates setState)
 		{
 			conn.State = setState;
 			conn.Dispose();
 
-			bool found = this.Connections.Remove(conn);
+			bool found = Connections.Remove(conn);
 
 			if (!found)
+			{
 				HTTPManager.Logger.Information(typeof(HostConnection).Name, string.Format("RemoveConnection - Couldn't find connection! key: {0}", conn.ServerAddress),
-					this.Context, conn.Context);
+					Context, conn.Context);
+			}
 
 			return found;
 		}
@@ -191,10 +197,10 @@ namespace BestHTTP.Core
 
 		internal HostConnection TryToSendQueuedRequests()
 		{
-			while (this.Queue.Count > 0 && GetNextAvailable(this.Queue[0]) != null)
+			while (Queue.Count > 0 && GetNextAvailable(Queue[0]) != null)
 			{
-				Send(this.Queue[0]);
-				this.Queue.RemoveAt(0);
+				Send(Queue[0]);
+				Queue.RemoveAt(0);
 			}
 
 			return this;
@@ -202,12 +208,12 @@ namespace BestHTTP.Core
 
 		public ConnectionBase Find(Predicate<ConnectionBase> match)
 		{
-			return this.Connections.Find(match);
+			return Connections.Find(match);
 		}
 
-		private bool CloseConnectionAfterInactivity(DateTime now, object context)
+		bool CloseConnectionAfterInactivity(DateTime now, object context)
 		{
-			var conn = context as ConnectionBase;
+			ConnectionBase conn = context as ConnectionBase;
 
 			bool closeConnection = conn.State == HTTPConnectionStates.Free && now - conn.LastProcessTime >= conn.KeepAliveTime;
 			if (closeConnection)
@@ -215,7 +221,7 @@ namespace BestHTTP.Core
 				HTTPManager.Logger.Information(typeof(HostConnection).Name, string.Format(
 					"CloseConnectionAfterInactivity - [{0}] Closing! State: {1}, Now: {2}, LastProcessTime: {3}, KeepAliveTime: {4}",
 					conn.ToString(), conn.State, now.ToString(System.Globalization.CultureInfo.InvariantCulture),
-					conn.LastProcessTime.ToString(System.Globalization.CultureInfo.InvariantCulture), conn.KeepAliveTime), this.Context, conn.Context);
+					conn.LastProcessTime.ToString(System.Globalization.CultureInfo.InvariantCulture), conn.KeepAliveTime), Context, conn.Context);
 
 				RemoveConnection(conn, HTTPConnectionStates.Closed);
 				return false;
@@ -227,22 +233,26 @@ namespace BestHTTP.Core
 
 		public void RemoveAllIdleConnections()
 		{
-			for (int i = 0; i < this.Connections.Count; i++)
-				if (this.Connections[i].State == HTTPConnectionStates.Free)
+			for (int i = 0; i < Connections.Count; i++)
+			{
+				if (Connections[i].State == HTTPConnectionStates.Free)
 				{
-					int countBefore = this.Connections.Count;
-					RemoveConnection(this.Connections[i], HTTPConnectionStates.Closed);
+					int countBefore = Connections.Count;
+					RemoveConnection(Connections[i], HTTPConnectionStates.Closed);
 
-					if (countBefore != this.Connections.Count)
+					if (countBefore != Connections.Count)
+					{
 						i--;
+					}
 				}
+			}
 		}
 
 		internal void Shutdown()
 		{
-			this.Queue.Clear();
+			Queue.Clear();
 
-			foreach (var conn in this.Connections)
+			foreach (ConnectionBase conn in Connections)
 			{
 				// Swallow any exceptions, we are quitting anyway.
 				try
@@ -258,26 +268,28 @@ namespace BestHTTP.Core
 
 		internal void SaveTo(System.IO.BinaryWriter bw)
 		{
-			bw.Write(this.LastProtocolSupportUpdate.ToBinary());
-			bw.Write((byte)this.ProtocolSupport);
+			bw.Write(LastProtocolSupportUpdate.ToBinary());
+			bw.Write((byte)ProtocolSupport);
 		}
 
 		internal void LoadFrom(int version, System.IO.BinaryReader br)
 		{
-			this.LastProtocolSupportUpdate = DateTime.FromBinary(br.ReadInt64());
-			this.ProtocolSupport = (HostProtocolSupport)br.ReadByte();
+			LastProtocolSupportUpdate = DateTime.FromBinary(br.ReadInt64());
+			ProtocolSupport = (HostProtocolSupport)br.ReadByte();
 
-			if (DateTime.UtcNow - this.LastProtocolSupportUpdate >= TimeSpan.FromDays(1))
+			if (DateTime.UtcNow - LastProtocolSupportUpdate >= TimeSpan.FromDays(1))
 			{
 				HTTPManager.Logger.Verbose("HostConnection",
 					string.Format("LoadFrom - Too Old! LastProtocolSupportUpdate: {0}, ProtocolSupport: {1}",
-						this.LastProtocolSupportUpdate.ToString(System.Globalization.CultureInfo.InvariantCulture), this.ProtocolSupport), this.Context);
-				this.ProtocolSupport = HostProtocolSupport.Unknown;
+						LastProtocolSupportUpdate.ToString(System.Globalization.CultureInfo.InvariantCulture), ProtocolSupport), Context);
+				ProtocolSupport = HostProtocolSupport.Unknown;
 			}
 			else
+			{
 				HTTPManager.Logger.Verbose("HostConnection",
 					string.Format("LoadFrom - LastProtocolSupportUpdate: {0}, ProtocolSupport: {1}",
-						this.LastProtocolSupportUpdate.ToString(System.Globalization.CultureInfo.InvariantCulture), this.ProtocolSupport), this.Context);
+						LastProtocolSupportUpdate.ToString(System.Globalization.CultureInfo.InvariantCulture), ProtocolSupport), Context);
+			}
 		}
 	}
 }

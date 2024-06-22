@@ -26,15 +26,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 	public class BasicOcspResp
 		: X509ExtensionBase
 	{
-		private readonly BasicOcspResponse resp;
-		private readonly ResponseData data;
+		readonly BasicOcspResponse resp;
+
+		readonly ResponseData data;
 //		private readonly X509Certificate[]	chain;
 
 		public BasicOcspResp(
 			BasicOcspResponse resp)
 		{
 			this.resp = resp;
-			this.data = resp.TbsResponseData;
+			data = resp.TbsResponseData;
 		}
 
 		/// <returns>The DER encoding of the tbsResponseData field.</returns>
@@ -107,11 +108,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			return resp.GetSignatureOctets();
 		}
 
-		private List<X509Certificate> GetCertList()
+		List<X509Certificate> GetCertList()
 		{
 			// load the certificates if we have any
 
-			var result = new List<X509Certificate>();
+			List<X509Certificate> result = new List<X509Certificate>();
 
 			Asn1Sequence certs = resp.Certs;
 			if (certs != null)
@@ -137,7 +138,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		/// <exception cref="OcspException">In the event of an encoding error.</exception>
 		public IStore<X509Certificate> GetCertificates()
 		{
-			return CollectionUtilities.CreateStore(this.GetCertList());
+			return CollectionUtilities.CreateStore(GetCertList());
 		}
 
 		/// <summary>
@@ -148,12 +149,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		{
 			try
 			{
-				ISigner signature = SignerUtilities.GetSigner(this.SignatureAlgName);
+				ISigner signature = SignerUtilities.GetSigner(SignatureAlgName);
 				signature.Init(false, publicKey);
 				byte[] bs = data.GetDerEncoded();
 				signature.BlockUpdate(bs, 0, bs.Length);
 
-				return signature.VerifySignature(this.GetSignature());
+				return signature.VerifySignature(GetSignature());
 			}
 			catch (Exception e)
 			{
@@ -171,12 +172,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			BasicOcspResp other = obj as BasicOcspResp;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return resp.Equals(other.resp);
 		}

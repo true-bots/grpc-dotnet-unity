@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
 using System;
 using System.IO;
+using System.Net;
 using System.Text;
 using BestHTTP.Authentication;
 using BestHTTP.Extensions;
@@ -9,7 +10,7 @@ using BestHTTP.PlatformSupport.Text;
 
 namespace BestHTTP
 {
-	internal enum SOCKSVersions : byte
+	enum SOCKSVersions : byte
 	{
 		Unknown = 0x00,
 		V5 = 0x05
@@ -25,7 +26,7 @@ namespace BestHTTP
 	///     o  X'80' to X'FE' RESERVED FOR PRIVATE METHODS
 	///     o  X'FF' NO ACCEPTABLE METHODS
 	/// </summary>
-	internal enum SOCKSMethods : byte
+	enum SOCKSMethods : byte
 	{
 		NoAuthenticationRequired = 0x00,
 		GSSAPI = 0x01,
@@ -33,7 +34,7 @@ namespace BestHTTP
 		NoAcceptableMethods = 0xFF
 	}
 
-	internal enum SOCKSReplies : byte
+	enum SOCKSReplies : byte
 	{
 		Succeeded = 0x00,
 		GeneralSOCKSServerFailure = 0x01,
@@ -46,7 +47,7 @@ namespace BestHTTP
 		AddressTypeNotSupported = 0x08
 	}
 
-	internal enum SOCKSAddressTypes
+	enum SOCKSAddressTypes
 	{
 		IPV4 = 0x00,
 		DomainName = 0x03,
@@ -72,7 +73,7 @@ namespace BestHTTP
 
 		internal override void Connect(Stream stream, HTTPRequest request)
 		{
-			var buffer = BufferPool.Get(1024, true);
+			byte[] buffer = BufferPool.Get(1024, true);
 			try
 			{
 				int count = 0;
@@ -93,7 +94,7 @@ namespace BestHTTP
 				//
 
 				buffer[count++] = (byte)SOCKSVersions.V5;
-				if (this.Credentials != null)
+				if (Credentials != null)
 				{
 					buffer[count++] = 0x02; // method count
 					buffer[count++] = (byte)SOCKSMethods.UsernameAndPassword;
@@ -106,8 +107,10 @@ namespace BestHTTP
 				}
 
 				if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+				{
 					HTTPManager.Logger.Information("SOCKSProxy",
 						string.Format("Sending method negotiation - count: {0} buffer: {1} ", count.ToString(), BufferToHexStr(buffer, count)), request.Context);
+				}
 
 				// Write negotiation
 				stream.Write(buffer, 0, count);
@@ -115,8 +118,10 @@ namespace BestHTTP
 				count = stream.Read(buffer, 0, buffer.Length);
 
 				if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+				{
 					HTTPManager.Logger.Information("SOCKSProxy",
 						string.Format("Negotiation response - count: {0} buffer: {1} ", count.ToString(), BufferToHexStr(buffer, count)), request.Context);
+				}
 
 				//   The server selects from one of the methods given in METHODS, and
 				//   sends a METHOD selection message:
@@ -149,11 +154,17 @@ namespace BestHTTP
 				//  2.) Version must be 5
 				//  3.) Preferred method must NOT be 0xFF
 				if (count != 2)
+				{
 					throw new Exception(string.Format("SOCKS Proxy - Expected read count: 2! count: {0} buffer: {1}" + count.ToString(), BufferToHexStr(buffer, count)));
+				}
 				else if (version != SOCKSVersions.V5)
+				{
 					throw new Exception("SOCKS Proxy - Expected version: 5, received version: " + buffer[0].ToString("X2"));
+				}
 				else if (method == SOCKSMethods.NoAcceptableMethods)
+				{
 					throw new Exception("SOCKS Proxy - Received 'NO ACCEPTABLE METHODS' (0xFF)");
+				}
 				else
 				{
 					HTTPManager.Logger.Information("SOCKSProxy", "Method negotiation over. Method: " + method.ToString(), request.Context);
@@ -164,10 +175,15 @@ namespace BestHTTP
 							break;
 
 						case SOCKSMethods.UsernameAndPassword:
-							if (this.Credentials.UserName.Length > 255)
-								throw new Exception(string.Format("SOCKS Proxy - Credentials.UserName too long! {0} > 255", this.Credentials.UserName.Length.ToString()));
-							if (this.Credentials.Password.Length > 255)
-								throw new Exception(string.Format("SOCKS Proxy - Credentials.Password too long! {0} > 255", this.Credentials.Password.Length.ToString()));
+							if (Credentials.UserName.Length > 255)
+							{
+								throw new Exception(string.Format("SOCKS Proxy - Credentials.UserName too long! {0} > 255", Credentials.UserName.Length.ToString()));
+							}
+
+							if (Credentials.Password.Length > 255)
+							{
+								throw new Exception(string.Format("SOCKS Proxy - Credentials.Password too long! {0} > 255", Credentials.Password.Length.ToString()));
+							}
 
 							// https://tools.ietf.org/html/rfc1929 : Username/Password Authentication for SOCKS V5
 							//   Once the SOCKS V5 server has started, and the client has selected the
@@ -185,13 +201,15 @@ namespace BestHTTP
 							count = 0;
 							buffer[count++] = 0x01; // version of sub negotiation
 
-							WriteString(buffer, ref count, this.Credentials.UserName);
-							WriteString(buffer, ref count, this.Credentials.Password);
+							WriteString(buffer, ref count, Credentials.UserName);
+							WriteString(buffer, ref count, Credentials.Password);
 
 							if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+							{
 								HTTPManager.Logger.Information("SOCKSProxy",
 									string.Format("Sending username and password sub-negotiation - count: {0} buffer: {1} ", count.ToString(),
 										BufferToHexStr(buffer, count)), request.Context);
+							}
 
 							// Write negotiation
 							stream.Write(buffer, 0, count);
@@ -199,9 +217,11 @@ namespace BestHTTP
 							count = stream.Read(buffer, 0, buffer.Length);
 
 							if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+							{
 								HTTPManager.Logger.Information("SOCKSProxy",
 									string.Format("Username and password sub-negotiation response - count: {0} buffer: {1} ", count.ToString(),
 										BufferToHexStr(buffer, count)), request.Context);
+							}
 
 							//   The server verifies the supplied UNAME and PASSWD, and sends the
 							//   following response:
@@ -218,10 +238,14 @@ namespace BestHTTP
 							bool success = buffer[1] == 0;
 
 							if (count != 2)
+							{
 								throw new Exception(string.Format("SOCKS Proxy - Expected read count: 2! count: {0} buffer: {1}" + count.ToString(),
 									BufferToHexStr(buffer, count)));
+							}
 							else if (!success)
+							{
 								throw new Exception("SOCKS proxy: username+password authentication failed!");
+							}
 
 							HTTPManager.Logger.Information("SOCKSProxy", "Authenticated!", request.Context);
 							break;
@@ -268,8 +292,8 @@ namespace BestHTTP
 					bool isIPV4 = Extensions.Extensions.IsIpV4AddressValid(request.CurrentUri.Host);
 					buffer[count++] = isIPV4 ? (byte)SOCKSAddressTypes.IPV4 : (byte)SOCKSAddressTypes.IPv6;
 
-					var ipAddress = System.Net.IPAddress.Parse(request.CurrentUri.Host);
-					var ipBytes = ipAddress.GetAddressBytes();
+					IPAddress ipAddress = System.Net.IPAddress.Parse(request.CurrentUri.Host);
+					byte[] ipBytes = ipAddress.GetAddressBytes();
 					WriteBytes(buffer, ref count, ipBytes); // destination address
 				}
 				else
@@ -286,15 +310,19 @@ namespace BestHTTP
 				buffer[count++] = (byte)(request.CurrentUri.Port & 0xFF);
 
 				if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+				{
 					HTTPManager.Logger.Information("SOCKSProxy",
 						string.Format("Sending connect request - count: {0} buffer: {1} ", count.ToString(), BufferToHexStr(buffer, count)), request.Context);
+				}
 
 				stream.Write(buffer, 0, count);
 				count = stream.Read(buffer, 0, buffer.Length);
 
 				if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+				{
 					HTTPManager.Logger.Information("SOCKSProxy",
 						string.Format("Connect response - count: {0} buffer: {1} ", count.ToString(), BufferToHexStr(buffer, count)), request.Context);
+				}
 
 				//   The SOCKS request information is sent by the client as soon as it has
 				//   established a connection to the SOCKS server, and completed the
@@ -335,11 +363,15 @@ namespace BestHTTP
 
 				// at least 10 bytes expected as a result
 				if (count < 10)
+				{
 					throw new Exception(string.Format(
 						"SOCKS proxy: not enough data returned by the server. Expected count is at least 10 bytes, server returned {0} bytes! content: {1}",
 						count.ToString(), BufferToHexStr(buffer, count)));
+				}
 				else if (reply != SOCKSReplies.Succeeded)
+				{
 					throw new Exception("SOCKS proxy error: " + reply.ToString());
+				}
 
 				HTTPManager.Logger.Information("SOCKSProxy", "Connected!", request.Context);
 			}
@@ -349,12 +381,14 @@ namespace BestHTTP
 			}
 		}
 
-		private void WriteString(byte[] buffer, ref int count, string str)
+		void WriteString(byte[] buffer, ref int count, string str)
 		{
 			// Get the bytes
 			int byteCount = Encoding.UTF8.GetByteCount(str);
 			if (byteCount > 255)
+			{
 				throw new Exception(string.Format("SOCKS Proxy - String is too large ({0}) to fit in 255 bytes!", byteCount.ToString()));
+			}
 
 			// number of bytes
 			buffer[count++] = (byte)byteCount;
@@ -365,17 +399,20 @@ namespace BestHTTP
 			count += byteCount;
 		}
 
-		private void WriteBytes(byte[] buffer, ref int count, byte[] bytes)
+		void WriteBytes(byte[] buffer, ref int count, byte[] bytes)
 		{
 			Array.Copy(bytes, 0, buffer, count, bytes.Length);
 			count += bytes.Length;
 		}
 
-		private string BufferToHexStr(byte[] buffer, int count)
+		string BufferToHexStr(byte[] buffer, int count)
 		{
 			StringBuilder sb = StringBuilderPool.Get(count * 2); //new StringBuilder(count * 2);
 			for (int i = 0; i < count; ++i)
+			{
 				sb.AppendFormat("0x{0} ", buffer[i].ToString("X2"));
+			}
+
 			return StringBuilderPool.ReleaseAndGrab(sb);
 		}
 	}

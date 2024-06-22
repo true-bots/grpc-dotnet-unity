@@ -10,56 +10,61 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public sealed class KdfCounterBytesGenerator
 		: IMacDerivationFunction
 	{
-		private readonly IMac prf;
-		private readonly int h;
+		readonly IMac prf;
+		readonly int h;
 
-		private byte[] fixedInputDataCtrPrefix;
-		private byte[] fixedInputData_afterCtr;
+		byte[] fixedInputDataCtrPrefix;
+		byte[] fixedInputData_afterCtr;
 
-		private int maxSizeExcl;
+		int maxSizeExcl;
 
 		// ios is i defined as an octet string (the binary representation)
-		private byte[] ios;
+		byte[] ios;
 
 		// operational
-		private int generatedBytes;
+		int generatedBytes;
 
 		// k is used as buffer for all K(i) values
-		private byte[] k;
+		byte[] k;
 
 		public KdfCounterBytesGenerator(IMac prf)
 		{
 			this.prf = prf;
-			this.h = prf.GetMacSize();
-			this.k = new byte[h];
+			h = prf.GetMacSize();
+			k = new byte[h];
 		}
 
 		public void Init(IDerivationParameters param)
 		{
 			if (!(param is KdfCounterParameters kdfParams))
+			{
 				throw new ArgumentException("Wrong type of arguments given");
+			}
 
 			// --- init mac based PRF ---
 
-			this.prf.Init(new KeyParameter(kdfParams.Ki));
+			prf.Init(new KeyParameter(kdfParams.Ki));
 
 			// --- set arguments ---
 
-			this.fixedInputDataCtrPrefix = kdfParams.FixedInputDataCounterPrefix;
-			this.fixedInputData_afterCtr = kdfParams.FixedInputDataCounterSuffix;
+			fixedInputDataCtrPrefix = kdfParams.FixedInputDataCounterPrefix;
+			fixedInputData_afterCtr = kdfParams.FixedInputDataCounterSuffix;
 
 			int r = kdfParams.R;
-			this.ios = new byte[r / 8];
+			ios = new byte[r / 8];
 
 			BigInteger maxSize = BigInteger.One.ShiftLeft(r).Multiply(BigInteger.ValueOf(h));
-			this.maxSizeExcl = maxSize.BitLength > 31 ? int.MaxValue : maxSize.IntValueExact;
+			maxSizeExcl = maxSize.BitLength > 31 ? int.MaxValue : maxSize.IntValueExact;
 
 			// --- set operational state ---
 
 			generatedBytes = 0;
 		}
 
-		public IMac Mac => prf;
+		public IMac Mac
+		{
+			get { return prf; }
+		}
 
 		public IDigest Digest
 		{
@@ -72,7 +77,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
             return GenerateBytes(output.AsSpan(outOff, length));
 #else
 			if (generatedBytes >= maxSizeExcl - length)
+			{
 				throw new DataLengthException("Current KDFCTR may only be used for " + maxSizeExcl + " bytes");
+			}
 
 			int toGenerate = length;
 			int posInK = generatedBytes % h;
@@ -130,7 +137,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
         }
 #endif
 
-		private void GenerateNext()
+		void GenerateNext()
 		{
 			int i = generatedBytes / h + 1;
 

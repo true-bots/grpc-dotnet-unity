@@ -13,12 +13,14 @@ namespace BestHTTP.PlatformSupport.Threading
 		{
 			try
 			{
-				System.Threading.Thread.CurrentThread.Name = name;
+				Thread.CurrentThread.Name = name;
 			}
 			catch (Exception ex)
 			{
 				if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+				{
 					HTTPManager.Logger.Exception("ThreadedRunner", "SetThreadName", ex);
+				}
 			}
 		}
 
@@ -29,7 +31,7 @@ namespace BestHTTP.PlatformSupport.Threading
             Windows.System.Threading.ThreadPool.RunAsync(_ => job(param));
 #pragma warning restore 4014
 #elif NET_STANDARD_2_0
-			var _task = new Task(() => job(param));
+			Task _task = new Task(() => job(param));
 			_task.ConfigureAwait(false);
 			_task.Start();
 #else
@@ -44,7 +46,7 @@ namespace BestHTTP.PlatformSupport.Threading
             Windows.System.Threading.ThreadPool.RunAsync((param) => job(param1, param2));
 #pragma warning restore 4014
 #elif NET_STANDARD_2_0
-			var _task = new Task(() => job(param1, param2));
+			Task _task = new Task(() => job(param1, param2));
 			_task.ConfigureAwait(false);
 			_task.Start();
 #else
@@ -59,7 +61,7 @@ namespace BestHTTP.PlatformSupport.Threading
             Windows.System.Threading.ThreadPool.RunAsync((param) => job(param1, param2, param3));
 #pragma warning restore 4014
 #elif NET_STANDARD_2_0
-			var _task = new Task(() => job(param1, param2, param3));
+			Task _task = new Task(() => job(param1, param2, param3));
 			_task.ConfigureAwait(false);
 			_task.Start();
 #else
@@ -74,7 +76,7 @@ namespace BestHTTP.PlatformSupport.Threading
             Windows.System.Threading.ThreadPool.RunAsync((param) => job(param1, param2, param3, param4));
 #pragma warning restore 4014
 #elif NET_STANDARD_2_0
-			var _task = new Task(() => job(param1, param2, param3, param4));
+			Task _task = new Task(() => job(param1, param2, param3, param4));
 			_task.ConfigureAwait(false);
 			_task.Start();
 #else
@@ -89,7 +91,7 @@ namespace BestHTTP.PlatformSupport.Threading
             Windows.System.Threading.ThreadPool.RunAsync((param) => job());
 #pragma warning restore 4014
 #elif NET_STANDARD_2_0
-			var _task = new Task(() => job());
+			Task _task = new Task(() => job());
 			_task.ConfigureAwait(false);
 			_task.Start();
 #else
@@ -104,7 +106,7 @@ namespace BestHTTP.PlatformSupport.Threading
             Windows.System.Threading.ThreadPool.RunAsync((param) => job());
 #pragma warning restore 4014
 #elif NET_STANDARD_2_0
-			var _task = new Task(() => job(), TaskCreationOptions.LongRunning);
+			Task _task = new Task(() => job(), TaskCreationOptions.LongRunning);
 			_task.ConfigureAwait(false);
 			_task.Start();
 #else

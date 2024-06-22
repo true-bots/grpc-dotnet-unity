@@ -5,18 +5,18 @@ using System.Collections.Generic;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-	internal sealed class DtlsReassembler
+	sealed class DtlsReassembler
 	{
-		private readonly short m_msg_type;
-		private readonly byte[] m_body;
+		readonly short m_msg_type;
+		readonly byte[] m_body;
 
-		private readonly List<Range> m_missing = new List<Range>();
+		readonly List<Range> m_missing = new List<Range>();
 
 		internal DtlsReassembler(short msg_type, int length)
 		{
-			this.m_msg_type = msg_type;
-			this.m_body = new byte[length];
-			this.m_missing.Add(new Range(0, length));
+			m_msg_type = msg_type;
+			m_body = new byte[length];
+			m_missing.Add(new Range(0, length));
 		}
 
 		internal short MsgType
@@ -35,7 +35,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			int fragment_end = fragment_offset + fragment_length;
 
 			if (m_msg_type != msg_type || m_body.Length != length || fragment_end > length)
+			{
 				return;
+			}
 
 			if (fragment_length == 0)
 			{
@@ -56,7 +58,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				Range range = (Range)m_missing[i];
 				if (range.Start >= fragment_end)
+				{
 					break;
+				}
 
 				if (range.End > fragment_offset)
 				{
@@ -96,26 +100,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			m_missing.Add(new Range(0, m_body.Length));
 		}
 
-		private sealed class Range
+		sealed class Range
 		{
-			private int m_start, m_end;
+			int m_start, m_end;
 
 			internal Range(int start, int end)
 			{
-				this.m_start = start;
-				this.m_end = end;
+				m_start = start;
+				m_end = end;
 			}
 
 			public int Start
 			{
 				get { return m_start; }
-				set { this.m_start = value; }
+				set { m_start = value; }
 			}
 
 			public int End
 			{
 				get { return m_end; }
-				set { this.m_end = value; }
+				set { m_end = value; }
 			}
 		}
 	}

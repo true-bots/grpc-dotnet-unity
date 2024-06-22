@@ -16,9 +16,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class ECNRSigner
 		: IDsa
 	{
-		private bool forSigning;
-		private ECKeyParameters key;
-		private SecureRandom random;
+		bool forSigning;
+		ECKeyParameters key;
+		SecureRandom random;
 
 		public virtual string AlgorithmName
 		{
@@ -33,25 +33,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			{
 				if (parameters is ParametersWithRandom rParam)
 				{
-					this.random = rParam.Random;
+					random = rParam.Random;
 					parameters = rParam.Parameters;
 				}
 				else
 				{
-					this.random = CryptoServicesRegistrar.GetSecureRandom();
+					random = CryptoServicesRegistrar.GetSecureRandom();
 				}
 
 				if (!(parameters is ECPrivateKeyParameters))
+				{
 					throw new InvalidKeyException("EC private key required for signing");
+				}
 
-				this.key = (ECPrivateKeyParameters)parameters;
+				key = (ECPrivateKeyParameters)parameters;
 			}
 			else
 			{
 				if (!(parameters is ECPublicKeyParameters))
+				{
 					throw new InvalidKeyException("EC public key required for verification");
+				}
 
-				this.key = (ECPublicKeyParameters)parameters;
+				key = (ECPublicKeyParameters)parameters;
 			}
 		}
 
@@ -73,7 +77,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual BigInteger[] GenerateSignature(
 			byte[] message)
 		{
-			if (!this.forSigning)
+			if (!forSigning)
 			{
 				// not properly initilaized... deal with it
 				throw new InvalidOperationException("not initialised for signing");
@@ -102,7 +106,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				// the same EC parameters
 				ECKeyPairGenerator keyGen = new ECKeyPairGenerator();
 
-				keyGen.Init(new ECKeyGenerationParameters(privKey.Parameters, this.random));
+				keyGen.Init(new ECKeyGenerationParameters(privKey.Parameters, random));
 
 				tempPair = keyGen.GenerateKeyPair();
 
@@ -140,7 +144,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			BigInteger r,
 			BigInteger s)
 		{
-			if (this.forSigning)
+			if (forSigning)
 			{
 				// not properly initilaized... deal with it
 				throw new InvalidOperationException("not initialised for verifying");
@@ -178,7 +182,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			ECPoint P = ECAlgorithms.SumOfTwoMultiplies(G, s, W, r).Normalize();
 
 			if (P.IsInfinity)
+			{
 				return false;
+			}
 
 			BigInteger x = P.AffineXCoord.ToBigInteger();
 			BigInteger t = r.Subtract(x).Mod(n);

@@ -9,17 +9,17 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-	internal abstract class AbstractTlsContext
+	abstract class AbstractTlsContext
 		: TlsContext
 	{
-		private static long counter = DateTime.UtcNow.Ticks;
+		static long counter = DateTime.UtcNow.Ticks;
 
-		private static long NextCounterValue()
+		static long NextCounterValue()
 		{
 			return Interlocked.Increment(ref counter);
 		}
 
-		private static TlsNonceGenerator CreateNonceGenerator(TlsCrypto crypto, int connectionEnd)
+		static TlsNonceGenerator CreateNonceGenerator(TlsCrypto crypto, int connectionEnd)
 		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             Span<byte> additionalSeedMaterial = stackalloc byte[16];
@@ -36,23 +36,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return crypto.CreateNonceGenerator(additionalSeedMaterial);
 		}
 
-		private readonly TlsCrypto m_crypto;
-		private readonly int m_connectionEnd;
-		private readonly TlsNonceGenerator m_nonceGenerator;
+		readonly TlsCrypto m_crypto;
+		readonly int m_connectionEnd;
+		readonly TlsNonceGenerator m_nonceGenerator;
 
-		private SecurityParameters m_securityParameters = null;
-		private ProtocolVersion[] m_clientSupportedVersions = null;
-		private ProtocolVersion m_clientVersion = null;
-		private ProtocolVersion m_rsaPreMasterSecretVersion = null;
-		private TlsSession m_session = null;
-		private object m_userObject = null;
-		private bool m_connected = false;
+		SecurityParameters m_securityParameters = null;
+		ProtocolVersion[] m_clientSupportedVersions = null;
+		ProtocolVersion m_clientVersion = null;
+		ProtocolVersion m_rsaPreMasterSecretVersion = null;
+		TlsSession m_session = null;
+		object m_userObject = null;
+		bool m_connected = false;
 
 		internal AbstractTlsContext(TlsCrypto crypto, int connectionEnd)
 		{
-			this.m_crypto = crypto;
-			this.m_connectionEnd = connectionEnd;
-			this.m_nonceGenerator = CreateNonceGenerator(crypto, connectionEnd);
+			m_crypto = crypto;
+			m_connectionEnd = connectionEnd;
+			m_nonceGenerator = CreateNonceGenerator(crypto, connectionEnd);
 		}
 
 		/// <exception cref="IOException"/>
@@ -63,20 +63,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				//if (null != m_securityParameters)
 				//    throw new TlsFatalAlert(AlertDescription.internal_error, "Handshake already started");
 
-				var tmp = this.m_securityParameters;
+				SecurityParameters tmp = m_securityParameters;
 
 				m_securityParameters = new SecurityParameters();
 				m_securityParameters.m_entity = m_connectionEnd;
 
 				if (tmp != null)
 				{
-					this.m_securityParameters.IsRenegotiating = true;
-					this.m_securityParameters.m_secureRenegotiation = tmp.m_secureRenegotiation;
-					this.m_securityParameters.m_negotiatedVersion = tmp.m_negotiatedVersion;
+					m_securityParameters.IsRenegotiating = true;
+					m_securityParameters.m_secureRenegotiation = tmp.m_secureRenegotiation;
+					m_securityParameters.m_negotiatedVersion = tmp.m_negotiatedVersion;
 
-					this.m_securityParameters.m_localVerifyData = tmp.m_localVerifyData;
-					this.m_securityParameters.m_peerVerifyData = tmp.m_peerVerifyData;
-					this.m_securityParameters.PreRenegotiatingServerCert = tmp.m_peerCertificate;
+					m_securityParameters.m_localVerifyData = tmp.m_localVerifyData;
+					m_securityParameters.m_peerVerifyData = tmp.m_peerVerifyData;
+					m_securityParameters.PreRenegotiatingServerCert = tmp.m_peerCertificate;
 				}
 			}
 
@@ -89,10 +89,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			lock (this)
 			{
 				if (null == m_securityParameters)
+				{
 					throw new TlsFatalAlert(AlertDescription.internal_error);
+				}
 
-				this.m_session = session;
-				this.m_connected = true;
+				m_session = session;
+				m_connected = true;
 			}
 
 			peer.NotifyHandshakeComplete();
@@ -102,7 +104,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			get
 			{
-				lock (this) return m_connected;
+				lock (this)
+				{
+					return m_connected;
+				}
 			}
 		}
 
@@ -110,7 +115,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			get
 			{
-				lock (this) return !m_connected && null != m_securityParameters;
+				lock (this)
+				{
+					return !m_connected && null != m_securityParameters;
+				}
 			}
 		}
 
@@ -128,7 +136,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			get
 			{
-				lock (this) return m_securityParameters;
+				lock (this)
+				{
+					return m_securityParameters;
+				}
 			}
 		}
 
@@ -141,7 +152,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		internal void SetClientSupportedVersions(ProtocolVersion[] clientSupportedVersions)
 		{
-			this.m_clientSupportedVersions = clientSupportedVersions;
+			m_clientSupportedVersions = clientSupportedVersions;
 		}
 
 		public virtual ProtocolVersion ClientVersion
@@ -151,7 +162,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		internal void SetClientVersion(ProtocolVersion clientVersion)
 		{
-			this.m_clientVersion = clientVersion;
+			m_clientVersion = clientVersion;
 		}
 
 		public virtual ProtocolVersion RsaPreMasterSecretVersion
@@ -161,7 +172,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		internal void SetRsaPreMasterSecretVersion(ProtocolVersion rsaPreMasterSecretVersion)
 		{
-			this.m_rsaPreMasterSecretVersion = rsaPreMasterSecretVersion;
+			m_rsaPreMasterSecretVersion = rsaPreMasterSecretVersion;
 		}
 
 		public virtual ProtocolVersion ServerVersion
@@ -175,7 +186,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				TlsSession session = Session;
 				if (session == null || !session.IsResumable)
+				{
 					return null;
+				}
 
 				return session;
 			}
@@ -189,21 +202,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual object UserObject
 		{
 			get { return m_userObject; }
-			set { this.m_userObject = value; }
+			set { m_userObject = value; }
 		}
 
 		public virtual byte[] ExportChannelBinding(int channelBinding)
 		{
 			if (!IsConnected)
+			{
 				throw new InvalidOperationException("Export of channel bindings unavailable before handshake completion");
+			}
 
 			SecurityParameters securityParameters = SecurityParameters;
 
 			if (ChannelBinding.tls_exporter == channelBinding)
+			{
 				return ExportKeyingMaterial("EXPORTER-Channel-Binding", TlsUtilities.EmptyBytes, 32);
+			}
 
 			if (TlsUtilities.IsTlsV13(securityParameters.NegotiatedVersion))
+			{
 				return null;
+			}
 
 			switch (channelBinding)
 			{
@@ -229,7 +248,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			// TODO[tls13] Ensure early_exporter_master_secret is available suitably early!
 			if (!IsConnected)
+			{
 				throw new InvalidOperationException("Export of early key material only available during handshake");
+			}
 
 			SecurityParameters sp = SecurityParameters;
 
@@ -240,7 +261,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual byte[] ExportKeyingMaterial(string asciiLabel, byte[] context, int length)
 		{
 			if (!IsConnected)
+			{
 				throw new InvalidOperationException("Export of key material unavailable before handshake completion");
+			}
 
 			/*
 			 * TODO[tls13] Introduce a TlsExporter interface? Avoid calculating (early) exporter
@@ -314,8 +337,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		protected virtual TlsSecret CheckExportSecret(TlsSecret secret)
 		{
 			if (null == secret)
+			{
 				throw new InvalidOperationException(
 					"Export of key material only available from NotifyHandshakeComplete()");
+			}
 
 			return secret;
 		}

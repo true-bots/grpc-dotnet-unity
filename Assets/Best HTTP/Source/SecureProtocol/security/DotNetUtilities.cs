@@ -70,7 +70,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 		public static DsaPublicKeyParameters GetDsaPublicKey(DSAParameters dp)
 		{
-			DsaValidationParameters validationParameters = (dp.Seed != null)
+			DsaValidationParameters validationParameters = dp.Seed != null
 				? new DsaValidationParameters(dp.Seed, dp.Counter)
 				: null;
 
@@ -112,7 +112,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		{
 			X9ECParameters x9 = GetX9ECParameters(ec.Curve);
 			if (x9 == null)
+			{
 				throw new NotSupportedException("Unrecognized curve");
+			}
 
 			return new ECPublicKeyParameters(
 				algorithm,
@@ -120,22 +122,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				new ECDomainParameters(x9));
 		}
 
-		private static Math.EC.ECPoint GetECPoint(Math.EC.ECCurve curve, ECPoint point)
+		static Math.EC.ECPoint GetECPoint(Math.EC.ECCurve curve, ECPoint point)
 		{
 			return curve.CreatePoint(new BigInteger(1, point.X), new BigInteger(1, point.Y));
 		}
 
-		private static X9ECParameters GetX9ECParameters(ECCurve curve)
+		static X9ECParameters GetX9ECParameters(ECCurve curve)
 		{
 			if (!curve.IsNamed)
+			{
 				throw new NotSupportedException("Only named curves are supported");
+			}
 
 			Oid oid = curve.Oid;
 			if (oid != null)
 			{
 				string oidValue = oid.Value;
 				if (oidValue != null)
+				{
 					return ECKeyPairGenerator.FindECCurveByOid(new DerObjectIdentifier(oidValue));
+				}
 			}
 
 			return null;
@@ -181,15 +187,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public static AsymmetricCipherKeyPair GetKeyPair(AsymmetricAlgorithm privateKey)
 		{
 			if (privateKey is DSA dsa)
+			{
 				return GetDsaKeyPair(dsa);
+			}
 
 #if NETCOREAPP1_0_OR_GREATER || NET47_OR_GREATER || NETSTANDARD1_6_OR_GREATER || UNITY_2021_2_OR_NEWER
 			if (privateKey is ECDsa ecDsa)
+			{
 				return GetECDsaKeyPair(ecDsa);
+			}
 #endif
 
 			if (privateKey is RSA rsa)
+			{
 				return GetRsaKeyPair(rsa);
+			}
 
 			throw new ArgumentException("Unsupported algorithm specified", nameof(privateKey));
 		}
@@ -249,9 +261,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			RSAParameters rp = new RSAParameters();
 			rp.Modulus = rsaKey.Modulus.ToByteArrayUnsigned();
 			if (rsaKey.IsPrivate)
+			{
 				rp.D = ConvertRSAParametersField(rsaKey.Exponent, rp.Modulus.Length);
+			}
 			else
+			{
 				rp.Exponent = rsaKey.Exponent.ToByteArrayUnsigned();
+			}
+
 			return rp;
 		}
 
@@ -283,7 +300,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return rp;
 		}
 
-		private static byte[] ConvertRSAParametersField(BigInteger n, int size)
+		static byte[] ConvertRSAParametersField(BigInteger n, int size)
 		{
 			return BigIntegers.AsUnsignedByteArray(size, n);
 		}
@@ -303,7 +320,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 #if NET5_0_OR_GREATER
         [SupportedOSPlatform("windows")]
 #endif
-		private static RSACryptoServiceProvider CreateRSAProvider(RSAParameters rp)
+		static RSACryptoServiceProvider CreateRSAProvider(RSAParameters rp)
 		{
 			CspParameters csp = new CspParameters();
 			csp.KeyContainerName = string.Format("BouncyCastle-{0}", Guid.NewGuid());
@@ -313,7 +330,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 #if NET5_0_OR_GREATER
         [SupportedOSPlatform("windows")]
 #endif
-		private static RSACryptoServiceProvider CreateRSAProvider(RSAParameters rp, CspParameters csp)
+		static RSACryptoServiceProvider CreateRSAProvider(RSAParameters rp, CspParameters csp)
 		{
 			RSACryptoServiceProvider rsaCsp = new RSACryptoServiceProvider(csp);
 			rsaCsp.ImportParameters(rp);

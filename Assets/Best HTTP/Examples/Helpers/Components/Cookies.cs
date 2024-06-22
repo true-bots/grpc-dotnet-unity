@@ -2,6 +2,7 @@ using BestHTTP.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BestHTTP.Cookies;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,40 +11,42 @@ namespace BestHTTP.Examples.Helpers.Components
 	public class Cookies : MonoBehaviour
 	{
 #pragma warning disable 0649, 0169
-		[SerializeField] private Text _count;
+		[SerializeField] Text _count;
 
-		[SerializeField] private Text _size;
+		[SerializeField] Text _size;
 
-		[SerializeField] private Button _clear;
+		[SerializeField] Button _clear;
 #pragma warning restore
 
-		private void Start()
+		void Start()
 		{
 			PluginEventHelper.OnEvent += OnPluginEvent;
 			UpdateLabels();
 		}
 
-		private void OnDestroy()
+		void OnDestroy()
 		{
 			PluginEventHelper.OnEvent -= OnPluginEvent;
 		}
 
-		private void OnPluginEvent(PluginEventInfo @event)
+		void OnPluginEvent(PluginEventInfo @event)
 		{
 #if !BESTHTTP_DISABLE_COOKIES
 			if (@event.Event == PluginEvents.SaveCookieLibrary)
+			{
 				UpdateLabels();
+			}
 #endif
 		}
 
-		private void UpdateLabels()
+		void UpdateLabels()
 		{
 #if !BESTHTTP_DISABLE_COOKIES
-			var cookies = BestHTTP.Cookies.CookieJar.GetAll();
-			var size = cookies.Sum(c => c.GuessSize());
+			List<Cookie> cookies = BestHTTP.Cookies.CookieJar.GetAll();
+			long size = cookies.Sum(c => c.GuessSize());
 
-			this._count.text = cookies.Count.ToString("N0");
-			this._size.text = size.ToString("N0");
+			_count.text = cookies.Count.ToString("N0");
+			_size.text = size.ToString("N0");
 #else
             this._count.text = "0";
             this._size.text = "0";

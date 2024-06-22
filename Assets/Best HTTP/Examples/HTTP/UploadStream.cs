@@ -46,11 +46,14 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// true if we are read all data from the read buffer
 		/// </summary>
-		private bool IsReadBufferEmpty
+		bool IsReadBufferEmpty
 		{
 			get
 			{
-				lock (locker) return ReadBuffer.Position == ReadBuffer.Length;
+				lock (locker)
+				{
+					return ReadBuffer.Position == ReadBuffer.Length;
+				}
 			}
 		}
 
@@ -61,14 +64,14 @@ namespace BestHTTP.Examples
 		public UploadStream(string name)
 			: this()
 		{
-			this.Name = name;
+			Name = name;
 		}
 
 		public UploadStream()
 		{
-			this.ReadBuffer = new MemoryStream();
-			this.WriteBuffer = new MemoryStream();
-			this.Name = string.Empty;
+			ReadBuffer = new MemoryStream();
+			WriteBuffer = new MemoryStream();
+			Name = string.Empty;
 		}
 
 		#endregion
@@ -85,15 +88,19 @@ namespace BestHTTP.Examples
 				{
 					// Is there any data in the write buffer? If so, switch the buffers
 					if (WriteBuffer.Length > 0)
+					{
 						SwitchBuffers();
+					}
 					else
 					{
-						HTTPManager.Logger.Information("UploadStream", string.Format("{0} - Read - End Of Stream", this.Name));
+						HTTPManager.Logger.Information("UploadStream", string.Format("{0} - Read - End Of Stream", Name));
 						return -1;
 					}
 				}
 				else
+				{
 					return ReadBuffer.Read(buffer, offset, count);
+				}
 			}
 
 			// There are no more data in the read buffer? Wait for it.
@@ -102,14 +109,20 @@ namespace BestHTTP.Examples
 				ARE.WaitOne();
 
 				lock (locker)
+				{
 					if (IsReadBufferEmpty && WriteBuffer.Length > 0)
+					{
 						SwitchBuffers();
+					}
+				}
 			}
 
 			int read = -1;
 
 			lock (locker)
+			{
 				read = ReadBuffer.Read(buffer, offset, count);
+			}
 
 			return read;
 		}
@@ -117,7 +130,9 @@ namespace BestHTTP.Examples
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			if (noMoreData)
-				throw new System.ArgumentException("noMoreData already set!");
+			{
+				throw new ArgumentException("noMoreData already set!");
+			}
 
 			lock (locker)
 			{
@@ -142,7 +157,7 @@ namespace BestHTTP.Examples
 		{
 			if (disposing)
 			{
-				HTTPManager.Logger.Information("UploadStream", string.Format("{0} - Dispose", this.Name));
+				HTTPManager.Logger.Information("UploadStream", string.Format("{0} - Dispose", Name));
 
 				ReadBuffer.Dispose();
 				ReadBuffer = null;
@@ -168,16 +183,18 @@ namespace BestHTTP.Examples
 		public void Finish()
 		{
 			if (noMoreData)
-				throw new System.ArgumentException("noMoreData already set!");
+			{
+				throw new ArgumentException("noMoreData already set!");
+			}
 
-			HTTPManager.Logger.Information("UploadStream", string.Format("{0} - Finish", this.Name));
+			HTTPManager.Logger.Information("UploadStream", string.Format("{0} - Finish", Name));
 
 			noMoreData = true;
 
 			ARE.Set();
 		}
 
-		private bool SwitchBuffers()
+		bool SwitchBuffers()
 		{
 			// Switch the buffers only when all data are consumed from our read buffer
 			lock (locker)

@@ -7,12 +7,12 @@ namespace BestHTTP.Decompression
 	public sealed class BrotliDecompressor : IDecompressor
 	{
 #if (NET_STANDARD_2_1 || UNITY_2021_2_OR_NEWER) && (!(ENABLE_MONO && UNITY_ANDROID) || (!UNITY_WEBGL || UNITY_EDITOR))
-		private BufferPoolMemoryStream decompressorInputStream;
-		private BufferPoolMemoryStream decompressorOutputStream;
-		private System.IO.Compression.BrotliStream decompressorStream;
+		BufferPoolMemoryStream decompressorInputStream;
+		BufferPoolMemoryStream decompressorOutputStream;
+		System.IO.Compression.BrotliStream decompressorStream;
 #endif
 
-		private int MinLengthToDecompress = 256;
+		int MinLengthToDecompress = 256;
 
 		public static bool IsSupported()
 		{
@@ -26,20 +26,26 @@ namespace BestHTTP.Decompression
 
 		public BrotliDecompressor(int minLengthToDecompress)
 		{
-			this.MinLengthToDecompress = minLengthToDecompress;
+			MinLengthToDecompress = minLengthToDecompress;
 		}
 
 		public DecompressedData Decompress(byte[] data, int offset, int count, bool forceDecompress = false, bool dataCanBeLarger = false)
 		{
 #if (NET_STANDARD_2_1 || UNITY_2021_2_OR_NEWER) && (!(ENABLE_MONO && UNITY_ANDROID) || (!UNITY_WEBGL || UNITY_EDITOR))
 			if (decompressorInputStream == null)
+			{
 				decompressorInputStream = new BufferPoolMemoryStream(count);
+			}
 
 			if (data != null)
+			{
 				decompressorInputStream.Write(data, offset, count);
+			}
 
 			if (!forceDecompress && decompressorInputStream.Length < MinLengthToDecompress)
+			{
 				return new DecompressedData(null, 0);
+			}
 
 			decompressorInputStream.Position = 0;
 
@@ -51,7 +57,10 @@ namespace BestHTTP.Decompression
 			}
 
 			if (decompressorOutputStream == null)
+			{
 				decompressorOutputStream = new BufferPoolMemoryStream();
+			}
+
 			decompressorOutputStream.SetLength(0);
 
 			byte[] copyBuffer = BufferPool.Get(1024, true);
@@ -68,7 +77,9 @@ namespace BestHTTP.Decompression
 
 			// If no read is done (returned with any data) don't zero out the input stream, as it would delete any not yet used data.
 			if (sumReadCount > 0)
+			{
 				decompressorStream.SetLength(0);
+			}
 
 			byte[] result = decompressorOutputStream.ToArray(dataCanBeLarger);
 
@@ -81,8 +92,8 @@ namespace BestHTTP.Decompression
 		public void Dispose()
 		{
 #if (NET_STANDARD_2_1 || UNITY_2021_2_OR_NEWER) && (!(ENABLE_MONO && UNITY_ANDROID) || (!UNITY_WEBGL || UNITY_EDITOR))
-			this.decompressorStream?.Dispose();
-			this.decompressorStream = null;
+			decompressorStream?.Dispose();
+			decompressorStream = null;
 #endif
 		}
 	}

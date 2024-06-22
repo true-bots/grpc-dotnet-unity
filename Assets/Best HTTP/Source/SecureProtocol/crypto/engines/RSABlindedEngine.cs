@@ -14,10 +14,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class RsaBlindedEngine
 		: IAsymmetricBlockCipher
 	{
-		private readonly IRsa core;
+		readonly IRsa core;
 
-		private RsaKeyParameters key;
-		private SecureRandom random;
+		RsaKeyParameters key;
+		SecureRandom random;
 
 		public RsaBlindedEngine()
 			: this(new RsaCoreEngine())
@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		public RsaBlindedEngine(IRsa rsa)
 		{
-			this.core = rsa;
+			core = rsa;
 		}
 
 		public virtual string AlgorithmName
@@ -46,28 +46,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			if (param is ParametersWithRandom rParam)
 			{
-				this.key = (RsaKeyParameters)rParam.Parameters;
+				key = (RsaKeyParameters)rParam.Parameters;
 
 				if (key is RsaPrivateCrtKeyParameters)
 				{
-					this.random = rParam.Random;
+					random = rParam.Random;
 				}
 				else
 				{
-					this.random = null;
+					random = null;
 				}
 			}
 			else
 			{
-				this.key = (RsaKeyParameters)param;
+				key = (RsaKeyParameters)param;
 
 				if (key is RsaPrivateCrtKeyParameters)
 				{
-					this.random = CryptoServicesRegistrar.GetSecureRandom();
+					random = CryptoServicesRegistrar.GetSecureRandom();
 				}
 				else
 				{
-					this.random = null;
+					random = null;
 				}
 			}
 		}
@@ -111,7 +111,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int inLen)
 		{
 			if (key == null)
+			{
 				throw new InvalidOperationException("RSA engine not initialised");
+			}
 
 			BigInteger input = core.ConvertInput(inBuf, inOff, inLen);
 
@@ -134,7 +136,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 					// defence against Arjen Lenstra�s CRT attack
 					if (!input.Equals(result.ModPow(e, m)))
+					{
 						throw new InvalidOperationException("RSA engine faulty decryption/signing detected");
+					}
 				}
 				else
 				{

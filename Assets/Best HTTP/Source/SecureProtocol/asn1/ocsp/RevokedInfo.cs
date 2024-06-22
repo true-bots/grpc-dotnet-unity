@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class RevokedInfo
 		: Asn1Encodable
 	{
-		private readonly Asn1GeneralizedTime revocationTime;
-		private readonly CrlReason revocationReason;
+		readonly Asn1GeneralizedTime revocationTime;
+		readonly CrlReason revocationReason;
 
 		public static RevokedInfo GetInstance(
 			Asn1TaggedObject obj,
@@ -32,7 +32,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new RevokedInfo((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public RevokedInfo(
@@ -46,20 +46,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			CrlReason revocationReason)
 		{
 			if (revocationTime == null)
+			{
 				throw new ArgumentNullException("revocationTime");
+			}
 
 			this.revocationTime = revocationTime;
 			this.revocationReason = revocationReason;
 		}
 
-		private RevokedInfo(
+		RevokedInfo(
 			Asn1Sequence seq)
 		{
-			this.revocationTime = (Asn1GeneralizedTime)seq[0];
+			revocationTime = (Asn1GeneralizedTime)seq[0];
 
 			if (seq.Count > 1)
 			{
-				this.revocationReason = new CrlReason(
+				revocationReason = new CrlReason(
 					DerEnumerated.GetInstance((Asn1TaggedObject)seq[1], true));
 			}
 		}

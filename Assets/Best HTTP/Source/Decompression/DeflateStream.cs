@@ -387,13 +387,17 @@ namespace BestHTTP.Decompression.Zlib
 		/// </summary>
 		/// <remarks> See the ZLIB documentation for the meaning of the flush behavior.
 		/// </remarks>
-		virtual public FlushType FlushMode
+		public virtual FlushType FlushMode
 		{
-			get { return (this._baseStream._flushMode); }
+			get { return _baseStream._flushMode; }
 			set
 			{
-				if (_disposed) throw new ObjectDisposedException("DeflateStream");
-				this._baseStream._flushMode = value;
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("DeflateStream");
+				}
+
+				_baseStream._flushMode = value;
 			}
 		}
 
@@ -416,15 +420,25 @@ namespace BestHTTP.Decompression.Zlib
 		/// </remarks>
 		public int BufferSize
 		{
-			get { return this._baseStream._bufferSize; }
+			get { return _baseStream._bufferSize; }
 			set
 			{
-				if (_disposed) throw new ObjectDisposedException("DeflateStream");
-				if (this._baseStream._workingBuffer != null)
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("DeflateStream");
+				}
+
+				if (_baseStream._workingBuffer != null)
+				{
 					throw new ZlibException("The working buffer is already set.");
+				}
+
 				if (value < ZlibConstants.WorkingBufferSizeMin)
-					throw new ZlibException(String.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
-				this._baseStream._bufferSize = value;
+				{
+					throw new ZlibException(string.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
+				}
+
+				_baseStream._bufferSize = value;
 			}
 		}
 
@@ -438,24 +452,28 @@ namespace BestHTTP.Decompression.Zlib
 		/// </remarks>
 		public CompressionStrategy Strategy
 		{
-			get { return this._baseStream.Strategy; }
+			get { return _baseStream.Strategy; }
 			set
 			{
-				if (_disposed) throw new ObjectDisposedException("DeflateStream");
-				this._baseStream.Strategy = value;
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("DeflateStream");
+				}
+
+				_baseStream.Strategy = value;
 			}
 		}
 
 		/// <summary> Returns the total number of bytes input so far.</summary>
-		virtual public long TotalIn
+		public virtual long TotalIn
 		{
-			get { return this._baseStream._z.TotalBytesIn; }
+			get { return _baseStream._z.TotalBytesIn; }
 		}
 
 		/// <summary> Returns the total number of bytes output so far.</summary>
-		virtual public long TotalOut
+		public virtual long TotalOut
 		{
-			get { return this._baseStream._z.TotalBytesOut; }
+			get { return _baseStream._z.TotalBytesOut; }
 		}
 
 		#endregion
@@ -492,8 +510,11 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				if (!_disposed)
 				{
-					if (disposing && (this._baseStream != null))
-						this._baseStream.Close();
+					if (disposing && _baseStream != null)
+					{
+						_baseStream.Close();
+					}
+
 					_disposed = true;
 				}
 			}
@@ -514,7 +535,11 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			get
 			{
-				if (_disposed) throw new ObjectDisposedException("DeflateStream");
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("DeflateStream");
+				}
+
 				return _baseStream._stream.CanRead;
 			}
 		}
@@ -541,7 +566,11 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			get
 			{
-				if (_disposed) throw new ObjectDisposedException("DeflateStream");
+				if (_disposed)
+				{
+					throw new ObjectDisposedException("DeflateStream");
+				}
+
 				return _baseStream._stream.CanWrite;
 			}
 		}
@@ -551,7 +580,11 @@ namespace BestHTTP.Decompression.Zlib
 		/// </summary>
 		public override void Flush()
 		{
-			if (_disposed) throw new ObjectDisposedException("DeflateStream");
+			if (_disposed)
+			{
+				throw new ObjectDisposedException("DeflateStream");
+			}
+
 			_baseStream.Flush();
 		}
 
@@ -578,10 +611,16 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			get
 			{
-				if (this._baseStream._streamMode == BestHTTP.Decompression.Zlib.ZlibBaseStream.StreamMode.Writer)
-					return this._baseStream._z.TotalBytesOut;
-				if (this._baseStream._streamMode == BestHTTP.Decompression.Zlib.ZlibBaseStream.StreamMode.Reader)
-					return this._baseStream._z.TotalBytesIn;
+				if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Writer)
+				{
+					return _baseStream._z.TotalBytesOut;
+				}
+
+				if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Reader)
+				{
+					return _baseStream._z.TotalBytesIn;
+				}
+
 				return 0;
 			}
 			set { throw new NotImplementedException(); }
@@ -615,7 +654,11 @@ namespace BestHTTP.Decompression.Zlib
 		/// <returns>the number of bytes actually read</returns>
 		public override int Read(byte[] buffer, int offset, int count)
 		{
-			if (_disposed) throw new ObjectDisposedException("DeflateStream");
+			if (_disposed)
+			{
+				throw new ObjectDisposedException("DeflateStream");
+			}
+
 			return _baseStream.Read(buffer, offset, count);
 		}
 
@@ -670,7 +713,11 @@ namespace BestHTTP.Decompression.Zlib
 		/// <param name="count">the number of bytes to write.</param>
 		public override void Write(byte[] buffer, int offset, int count)
 		{
-			if (_disposed) throw new ObjectDisposedException("DeflateStream");
+			if (_disposed)
+			{
+				throw new ObjectDisposedException("DeflateStream");
+			}
+
 			_baseStream.Write(buffer, offset, count);
 		}
 

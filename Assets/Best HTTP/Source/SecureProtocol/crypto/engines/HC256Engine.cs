@@ -24,55 +24,59 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class HC256Engine
 		: IStreamCipher
 	{
-		private uint[] p = new uint[1024];
-		private uint[] q = new uint[1024];
-		private uint cnt = 0;
+		uint[] p = new uint[1024];
+		uint[] q = new uint[1024];
+		uint cnt = 0;
 
-		private uint Step()
+		uint Step()
 		{
 			uint j = cnt & 0x3FF;
 			uint ret;
 			if (cnt < 1024)
 			{
-				uint x = p[(j - 3 & 0x3FF)];
-				uint y = p[(j - 1023 & 0x3FF)];
-				p[j] += p[(j - 10 & 0x3FF)]
+				uint x = p[(j - 3) & 0x3FF];
+				uint y = p[(j - 1023) & 0x3FF];
+				p[j] += p[(j - 10) & 0x3FF]
 				        + (RotateRight(x, 10) ^ RotateRight(y, 23))
-				        + q[((x ^ y) & 0x3FF)];
+				        + q[(x ^ y) & 0x3FF];
 
-				x = p[(j - 12 & 0x3FF)];
+				x = p[(j - 12) & 0x3FF];
 				ret = (q[x & 0xFF] + q[((x >> 8) & 0xFF) + 256]
 				                   + q[((x >> 16) & 0xFF) + 512] + q[((x >> 24) & 0xFF) + 768])
 				      ^ p[j];
 			}
 			else
 			{
-				uint x = q[(j - 3 & 0x3FF)];
-				uint y = q[(j - 1023 & 0x3FF)];
-				q[j] += q[(j - 10 & 0x3FF)]
+				uint x = q[(j - 3) & 0x3FF];
+				uint y = q[(j - 1023) & 0x3FF];
+				q[j] += q[(j - 10) & 0x3FF]
 				        + (RotateRight(x, 10) ^ RotateRight(y, 23))
-				        + p[((x ^ y) & 0x3FF)];
+				        + p[(x ^ y) & 0x3FF];
 
-				x = q[(j - 12 & 0x3FF)];
+				x = q[(j - 12) & 0x3FF];
 				ret = (p[x & 0xFF] + p[((x >> 8) & 0xFF) + 256]
 				                   + p[((x >> 16) & 0xFF) + 512] + p[((x >> 24) & 0xFF) + 768])
 				      ^ q[j];
 			}
 
-			cnt = cnt + 1 & 0x7FF;
+			cnt = (cnt + 1) & 0x7FF;
 			return ret;
 		}
 
-		private byte[] key, iv;
-		private bool initialised;
+		byte[] key, iv;
+		bool initialised;
 
-		private void Init()
+		void Init()
 		{
 			if (key.Length != 32 && key.Length != 16)
+			{
 				throw new ArgumentException("The key must be 128/256 bits long");
+			}
 
 			if (iv.Length < 16)
+			{
 				throw new ArgumentException("The IV must be at least 128 bits long");
+			}
 
 			if (key.Length != 32)
 			{
@@ -101,12 +105,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			for (int i = 0; i < 32; i++)
 			{
-				w[i >> 2] |= ((uint)key[i] << (8 * (i & 0x3)));
+				w[i >> 2] |= (uint)key[i] << (8 * (i & 0x3));
 			}
 
 			for (int i = 0; i < 32; i++)
 			{
-				w[(i >> 2) + 8] |= ((uint)iv[i] << (8 * (i & 0x3)));
+				w[(i >> 2) + 8] |= (uint)iv[i] << (8 * (i & 0x3));
 			}
 
 			for (uint i = 16; i < 2560; i++)
@@ -168,17 +172,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			else
 			{
 				throw new ArgumentException(
-					"Invalid parameter passed to HC256 init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters),
+					"Invalid parameter passed to HC256 init - " + Platform.GetTypeName(parameters),
 					"parameters");
 			}
 
 			initialised = true;
 		}
 
-		private byte[] buf = new byte[4];
-		private int idx = 0;
+		byte[] buf = new byte[4];
+		int idx = 0;
 
-		private byte GetByte()
+		byte GetByte()
 		{
 			if (idx == 0)
 			{
@@ -186,7 +190,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			byte ret = buf[idx];
-			idx = idx + 1 & 0x3;
+			idx = (idx + 1) & 0x3;
 			return ret;
 		}
 
@@ -198,7 +202,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int outOff)
 		{
 			if (!initialised)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
 
 			Check.DataLength(input, inOff, len, "input buffer too short");
 			Check.OutputLength(output, outOff, len, "output buffer too short");
@@ -234,7 +240,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return (byte)(input ^ GetByte());
 		}
 
-		private static uint RotateRight(uint x, int bits)
+		static uint RotateRight(uint x, int bits)
 		{
 			return (x >> bits) | (x << -bits);
 		}

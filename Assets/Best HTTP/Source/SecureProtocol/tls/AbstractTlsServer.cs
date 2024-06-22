@@ -125,7 +125,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <exception cref="IOException"/>
 		protected virtual bool SelectCipherSuite(int cipherSuite)
 		{
-			this.m_selectedCipherSuite = cipherSuite;
+			m_selectedCipherSuite = cipherSuite;
 			return true;
 		}
 
@@ -133,14 +133,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			int[] clientSupportedGroups = m_context.SecurityParameters.ClientSupportedGroups;
 			if (clientSupportedGroups == null)
+			{
 				return SelectDHDefault(minimumFiniteFieldBits);
+			}
 
 			// Try to find a supported named group of the required size from the client's list.
 			for (int i = 0; i < clientSupportedGroups.Length; ++i)
 			{
 				int namedGroup = clientSupportedGroups[i];
 				if (NamedGroup.GetFiniteFieldBits(namedGroup) >= minimumFiniteFieldBits)
+				{
 					return namedGroup;
+				}
 			}
 
 			return -1;
@@ -160,14 +164,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			int[] clientSupportedGroups = m_context.SecurityParameters.ClientSupportedGroups;
 			if (clientSupportedGroups == null)
+			{
 				return SelectECDHDefault(minimumCurveBits);
+			}
 
 			// Try to find a supported named group of the required size from the client's list.
 			for (int i = 0; i < clientSupportedGroups.Length; ++i)
 			{
 				int namedGroup = clientSupportedGroups[i];
 				if (NamedGroup.GetCurveBits(namedGroup) >= minimumCurveBits)
+				{
 					return namedGroup;
+				}
 			}
 
 			return -1;
@@ -185,11 +193,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			IList<ProtocolName> serverProtocolNames = GetProtocolNames();
 			if (null == serverProtocolNames || serverProtocolNames.Count < 1)
+			{
 				return null;
+			}
 
 			ProtocolName result = SelectProtocolName(m_clientProtocolNames, serverProtocolNames);
 			if (null == result)
+			{
 				throw new TlsFatalAlert(AlertDescription.no_application_protocol);
+			}
 
 			return result;
 		}
@@ -200,7 +212,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			foreach (ProtocolName serverProtocolName in serverProtocolNames)
 			{
 				if (clientProtocolNames.Contains(serverProtocolName))
+				{
 					return serverProtocolName;
+				}
 			}
 
 			return null;
@@ -223,10 +237,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public virtual void Init(TlsServerContext context)
 		{
-			this.m_context = context;
+			m_context = context;
 
-			this.m_protocolVersions = GetSupportedVersions();
-			this.m_cipherSuites = GetSupportedCipherSuites();
+			m_protocolVersions = GetSupportedVersions();
+			m_cipherSuites = GetSupportedCipherSuites();
 		}
 
 		public override ProtocolVersion[] GetProtocolVersions()
@@ -243,16 +257,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			base.NotifyHandshakeBeginning();
 
-			this.m_offeredCipherSuites = null;
-			this.m_clientExtensions = null;
-			this.m_encryptThenMACOffered = false;
-			this.m_maxFragmentLengthOffered = 0;
-			this.m_truncatedHMacOffered = false;
-			this.m_clientSentECPointFormats = false;
-			this.m_certificateStatusRequest = null;
-			this.m_selectedCipherSuite = -1;
-			this.m_selectedProtocolName = null;
-			this.m_serverExtensions.Clear();
+			m_offeredCipherSuites = null;
+			m_clientExtensions = null;
+			m_encryptThenMACOffered = false;
+			m_maxFragmentLengthOffered = 0;
+			m_truncatedHMacOffered = false;
+			m_clientSentECPointFormats = false;
+			m_certificateStatusRequest = null;
+			m_selectedCipherSuite = -1;
+			m_selectedProtocolName = null;
+			m_serverExtensions.Clear();
 		}
 
 		public virtual TlsSession GetSessionToResume(byte[] sessionID)
@@ -314,42 +328,44 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public virtual void NotifyOfferedCipherSuites(int[] offeredCipherSuites)
 		{
-			this.m_offeredCipherSuites = offeredCipherSuites;
+			m_offeredCipherSuites = offeredCipherSuites;
 		}
 
 		public virtual void ProcessClientExtensions(IDictionary<int, byte[]> clientExtensions)
 		{
-			this.m_clientExtensions = clientExtensions;
+			m_clientExtensions = clientExtensions;
 
 			if (null != clientExtensions)
 			{
-				this.m_clientProtocolNames = TlsExtensionsUtilities.GetAlpnExtensionClient(clientExtensions);
+				m_clientProtocolNames = TlsExtensionsUtilities.GetAlpnExtensionClient(clientExtensions);
 
 				if (ShouldSelectProtocolNameEarly())
 				{
 					if (null != m_clientProtocolNames && m_clientProtocolNames.Count > 0)
 					{
-						this.m_selectedProtocolName = SelectProtocolName();
+						m_selectedProtocolName = SelectProtocolName();
 					}
 				}
 
 				// TODO[tls13] Don't need these if we have negotiated (D)TLS 1.3+
 				{
-					this.m_encryptThenMACOffered = TlsExtensionsUtilities.HasEncryptThenMacExtension(clientExtensions);
-					this.m_truncatedHMacOffered = TlsExtensionsUtilities.HasTruncatedHmacExtension(clientExtensions);
-					this.m_statusRequestV2 = TlsExtensionsUtilities.GetStatusRequestV2Extension(clientExtensions);
-					this.m_trustedCAKeys = TlsExtensionsUtilities.GetTrustedCAKeysExtensionClient(clientExtensions);
+					m_encryptThenMACOffered = TlsExtensionsUtilities.HasEncryptThenMacExtension(clientExtensions);
+					m_truncatedHMacOffered = TlsExtensionsUtilities.HasTruncatedHmacExtension(clientExtensions);
+					m_statusRequestV2 = TlsExtensionsUtilities.GetStatusRequestV2Extension(clientExtensions);
+					m_trustedCAKeys = TlsExtensionsUtilities.GetTrustedCAKeysExtensionClient(clientExtensions);
 
 					// We only support uncompressed format, this is just to validate the extension, and note its presence.
-					this.m_clientSentECPointFormats =
+					m_clientSentECPointFormats =
 						null != TlsExtensionsUtilities.GetSupportedPointFormatsExtension(clientExtensions);
 				}
 
-				this.m_certificateStatusRequest = TlsExtensionsUtilities.GetStatusRequestExtension(clientExtensions);
+				m_certificateStatusRequest = TlsExtensionsUtilities.GetStatusRequestExtension(clientExtensions);
 
-				this.m_maxFragmentLengthOffered = TlsExtensionsUtilities.GetMaxFragmentLengthExtension(clientExtensions);
+				m_maxFragmentLengthOffered = TlsExtensionsUtilities.GetMaxFragmentLengthExtension(clientExtensions);
 				if (m_maxFragmentLengthOffered >= 0 && !MaxFragmentLength.IsValid(m_maxFragmentLengthOffered))
+				{
 					throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+				}
 			}
 		}
 
@@ -361,7 +377,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			foreach (ProtocolVersion clientVersion in clientVersions)
 			{
 				if (ProtocolVersion.Contains(serverVersions, clientVersion))
+				{
 					return clientVersion;
+				}
 			}
 
 			throw new TlsFatalAlert(AlertDescription.protocol_version);
@@ -400,7 +418,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				 * somewhat inelegant but is a compromise designed to minimize changes to the original
 				 * cipher suite design.
 				 */
-				var sigAlgs = TlsUtilities.GetUsableSignatureAlgorithms(securityParameters.ClientSigAlgs);
+				IList<short> sigAlgs = TlsUtilities.GetUsableSignatureAlgorithms(securityParameters.ClientSigAlgs);
 
 				/*
 				 * RFC 4429 5.1. A server that receives a ClientHello containing one or both of these
@@ -487,7 +505,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					 */
 					TlsExtensionsUtilities.AddEmptyExtensionData(m_serverExtensions, ExtensionType.status_request_v2);
 				}
-				else if (null != this.m_certificateStatusRequest && AllowCertificateStatus())
+				else if (null != m_certificateStatusRequest && AllowCertificateStatus())
 				{
 					/*
 					 * RFC 6066 8. If a server returns a "CertificateStatus" message, then the server MUST
@@ -577,7 +595,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				if (null != m_clientProtocolNames && m_clientProtocolNames.Count > 0)
 				{
-					this.m_selectedProtocolName = SelectProtocolName();
+					m_selectedProtocolName = SelectProtocolName();
 				}
 			}
 
@@ -640,7 +658,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual void ProcessClientSupplementalData(IList<SupplementalDataEntry> clientSupplementalData)
 		{
 			if (clientSupplementalData != null)
+			{
 				throw new TlsFatalAlert(AlertDescription.unexpected_message);
+			}
 		}
 
 		public virtual void NotifyClientCertificate(Certificate clientCertificate)

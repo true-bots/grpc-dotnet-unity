@@ -116,8 +116,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 	public class AdmissionSyntax
 		: Asn1Encodable
 	{
-		private readonly GeneralName admissionAuthority;
-		private readonly Asn1Sequence contentsOfAdmissions;
+		readonly GeneralName admissionAuthority;
+		readonly Asn1Sequence contentsOfAdmissions;
 
 		public static AdmissionSyntax GetInstance(
 			object obj)
@@ -132,7 +132,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				return new AdmissionSyntax((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -173,17 +173,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		*
 		* @param seq The ASN.1 sequence.
 		*/
-		private AdmissionSyntax(
+		AdmissionSyntax(
 			Asn1Sequence seq)
 		{
 			switch (seq.Count)
 			{
 				case 1:
-					this.contentsOfAdmissions = DerSequence.GetInstance(seq[0]);
+					contentsOfAdmissions = Asn1Sequence.GetInstance(seq[0]);
 					break;
 				case 2:
 					admissionAuthority = GeneralName.GetInstance(seq[0]);
-					contentsOfAdmissions = DerSequence.GetInstance(seq[1]);
+					contentsOfAdmissions = Asn1Sequence.GetInstance(seq[1]);
 					break;
 				default:
 					throw new ArgumentException("Bad sequence size: " + seq.Count);

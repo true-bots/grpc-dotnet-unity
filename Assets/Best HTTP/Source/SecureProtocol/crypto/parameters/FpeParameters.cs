@@ -9,10 +9,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public sealed class FpeParameters
 		: ICipherParameters
 	{
-		private readonly KeyParameter key;
-		private readonly int radix;
-		private readonly byte[] tweak;
-		private readonly bool useInverse;
+		readonly KeyParameter key;
+		readonly int radix;
+		readonly byte[] tweak;
+		readonly bool useInverse;
 
 		public FpeParameters(KeyParameter key, int radix, byte[] tweak) : this(key, radix, tweak, false)
 		{

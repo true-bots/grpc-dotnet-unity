@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 	public class Exportable
 		: SignatureSubpacket
 	{
-		private static byte[] BooleanToByteArray(bool val)
+		static byte[] BooleanToByteArray(bool val)
 		{
 			return new byte[1] { Convert.ToByte(val) };
 		}

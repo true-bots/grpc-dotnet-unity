@@ -17,13 +17,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 	* result of a multiplication of two <code>SimpleBigDecimal</code>s returns a
 	* <code>SimpleBigDecimal</code> with double scale.
 	*/
-	internal class SimpleBigDecimal
+	class SimpleBigDecimal
 		//	: Number
 	{
 		//	private static final long serialVersionUID = 1L;
 
-		private readonly BigInteger bigInt;
-		private readonly int scale;
+		readonly BigInteger bigInt;
+		readonly int scale;
 
 		/**
 		* Returns a <code>SimpleBigDecimal</code> representing the same numerical
@@ -49,31 +49,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 		public SimpleBigDecimal(BigInteger bigInt, int scale)
 		{
 			if (scale < 0)
+			{
 				throw new ArgumentException("scale may not be negative");
+			}
 
 			this.bigInt = bigInt;
 			this.scale = scale;
 		}
 
-		private SimpleBigDecimal(SimpleBigDecimal limBigDec)
+		SimpleBigDecimal(SimpleBigDecimal limBigDec)
 		{
 			bigInt = limBigDec.bigInt;
 			scale = limBigDec.scale;
 		}
 
-		private void CheckScale(SimpleBigDecimal b)
+		void CheckScale(SimpleBigDecimal b)
 		{
 			if (scale != b.scale)
+			{
 				throw new ArgumentException("Only SimpleBigDecimal of same scale allowed in arithmetic operations");
+			}
 		}
 
 		public SimpleBigDecimal AdjustScale(int newScale)
 		{
 			if (newScale < 0)
+			{
 				throw new ArgumentException("scale may not be negative");
+			}
 
 			if (newScale == scale)
+			{
 				return this;
+			}
 
 			return new SimpleBigDecimal(bigInt.ShiftLeft(newScale - scale), newScale);
 		}
@@ -182,7 +190,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 		public override string ToString()
 		{
 			if (scale == 0)
+			{
 				return bigInt.ToString();
+			}
 
 			BigInteger floorBigInt = Floor();
 
@@ -192,7 +202,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 				fract = BigInteger.One.ShiftLeft(scale).Subtract(fract);
 			}
 
-			if ((floorBigInt.SignValue == -1) && (!(fract.Equals(BigInteger.Zero))))
+			if (floorBigInt.SignValue == -1 && !fract.Equals(BigInteger.Zero))
 			{
 				floorBigInt = floorBigInt.Add(BigInteger.One);
 			}
@@ -226,12 +236,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 			object obj)
 		{
 			if (this == obj)
+			{
 				return true;
+			}
 
 			SimpleBigDecimal other = obj as SimpleBigDecimal;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return bigInt.Equals(other.bigInt)
 			       && scale == other.scale;

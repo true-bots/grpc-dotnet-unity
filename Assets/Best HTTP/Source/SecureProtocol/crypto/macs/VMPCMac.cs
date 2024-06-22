@@ -8,18 +8,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class VmpcMac
 		: IMac
 	{
-		private byte g;
+		byte g;
 
-		private byte n = 0;
-		private byte[] P = null;
-		private byte s = 0;
+		byte n = 0;
+		byte[] P = null;
+		byte s = 0;
 
-		private byte[] T;
-		private byte[] workingIV;
+		byte[] T;
+		byte[] workingIV;
 
-		private byte[] workingKey;
+		byte[] workingKey;
 
-		private byte x1, x2, x3, x4;
+		byte x1, x2, x3, x4;
 
 		public virtual int DoFinal(byte[] output, int outOff)
 		{
@@ -61,7 +61,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			for (int i = 0; i < 20; i++)
 			{
 				s = P[(s + P[i & 0xff]) & 0xff];
-				M[i] = P[(P[(P[s & 0xff]) & 0xff] + 1) & 0xff];
+				M[i] = P[(P[P[s & 0xff] & 0xff] + 1) & 0xff];
 
 				byte temp = P[i & 0xff];
 				P[i & 0xff] = P[s & 0xff];
@@ -140,25 +140,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public virtual void Init(ICipherParameters parameters)
 		{
 			if (!(parameters is ParametersWithIV))
+			{
 				throw new ArgumentException("VMPC-MAC Init parameters must include an IV", "parameters");
+			}
 
 			ParametersWithIV ivParams = (ParametersWithIV)parameters;
 			KeyParameter key = (KeyParameter)ivParams.Parameters;
 
 			if (!(ivParams.Parameters is KeyParameter))
+			{
 				throw new ArgumentException("VMPC-MAC Init parameters must include a key", "parameters");
+			}
 
-			this.workingIV = ivParams.GetIV();
+			workingIV = ivParams.GetIV();
 
 			if (workingIV == null || workingIV.Length < 1 || workingIV.Length > 768)
+			{
 				throw new ArgumentException("VMPC-MAC requires 1 to 768 bytes of IV", "parameters");
+			}
 
-			this.workingKey = key.GetKey();
+			workingKey = key.GetKey();
 
 			Reset();
 		}
 
-		private void initKey(byte[] keyBytes, byte[] ivBytes)
+		void initKey(byte[] keyBytes, byte[] ivBytes)
 		{
 			s = 0;
 			P = new byte[256];
@@ -188,7 +194,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 
 		public virtual void Reset()
 		{
-			initKey(this.workingKey, this.workingIV);
+			initKey(workingKey, workingIV);
 			g = x1 = x2 = x3 = x4 = n = 0;
 			T = new byte[32];
 			for (int i = 0; i < 32; i++)
@@ -200,7 +206,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public virtual void Update(byte input)
 		{
 			s = P[(s + P[n & 0xff]) & 0xff];
-			byte c = (byte)(input ^ P[(P[(P[s & 0xff]) & 0xff] + 1) & 0xff]);
+			byte c = (byte)(input ^ P[(P[P[s & 0xff] & 0xff] + 1) & 0xff]);
 
 			x4 = P[(x4 + x3) & 0xff];
 			x3 = P[(x3 + x2) & 0xff];

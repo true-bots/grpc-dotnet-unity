@@ -82,7 +82,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 			}
 		}
 
-		private static CipherKeyGenerator CreateCipherKeyGenerator(SecureRandom random, int keySize)
+		static CipherKeyGenerator CreateCipherKeyGenerator(SecureRandom random, int keySize)
 		{
 			CipherKeyGenerator keyGen = new CipherKeyGenerator();
 			keyGen.Init(new KeyGenerationParameters(random, keySize));

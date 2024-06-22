@@ -8,11 +8,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public sealed class ByteQueueInputStream
 		: BaseInputStream
 	{
-		private readonly ByteQueue m_buffer;
+		readonly ByteQueue m_buffer;
 
 		public ByteQueueInputStream()
 		{
-			this.m_buffer = new ByteQueue();
+			m_buffer = new ByteQueue();
 		}
 
 		public void AddBytes(byte[] buf)
@@ -53,7 +53,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public override int ReadByte()
 		{
 			if (m_buffer.Available == 0)
+			{
 				return -1;
+			}
 
 			return m_buffer.RemoveData(1, 0)[0];
 		}

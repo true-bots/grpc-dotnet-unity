@@ -7,14 +7,14 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 {
-	internal sealed class BcTlsSrp6Server
+	sealed class BcTlsSrp6Server
 		: TlsSrp6Server
 	{
-		private readonly Srp6Server m_srp6Server;
+		readonly Srp6Server m_srp6Server;
 
 		internal BcTlsSrp6Server(Srp6Server srp6Server)
 		{
-			this.m_srp6Server = srp6Server;
+			m_srp6Server = srp6Server;
 		}
 
 		public BigInteger GenerateServerCredentials()

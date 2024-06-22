@@ -6,7 +6,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Compression
 {
 	using Impl = Utilities.Bzip2;
 
-	internal static class Bzip2
+	static class Bzip2
 	{
 		internal static Stream CompressOutput(Stream stream, bool leaveOpen = false)
 		{

@@ -11,8 +11,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class KdfParameters
 		: IDerivationParameters
 	{
-		private readonly byte[] m_iv;
-		private readonly byte[] m_shared;
+		readonly byte[] m_iv;
+		readonly byte[] m_shared;
 
 		public KdfParameters(byte[] shared, byte[] iv)
 		{

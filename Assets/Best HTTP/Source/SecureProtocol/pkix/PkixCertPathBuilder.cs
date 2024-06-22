@@ -25,9 +25,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		{
 			// search target certificates
 
-			var certSelector = pkixParams.GetTargetConstraintsCert();
+			ISelector<X509Certificate> certSelector = pkixParams.GetTargetConstraintsCert();
 
-			var targets = new HashSet<X509Certificate>();
+			HashSet<X509Certificate> targets = new HashSet<X509Certificate>();
 			try
 			{
 				CollectionUtilities.CollectMatches(targets, certSelector, pkixParams.GetStoresCert());
@@ -39,10 +39,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			}
 
 			if (targets.Count < 1)
+			{
 				throw new PkixCertPathBuilderException("No certificate found matching targetConstraints.");
+			}
 
 			PkixCertPathBuilderResult result = null;
-			var certPathList = new List<X509Certificate>();
+			List<X509Certificate> certPathList = new List<X509Certificate>();
 
 			// check all potential target certificates
 			foreach (X509Certificate cert in targets)
@@ -50,19 +52,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				result = Build(cert, pkixParams, certPathList);
 
 				if (result != null)
+				{
 					break;
+				}
 			}
 
 			if (result == null && certPathException != null)
+			{
 				throw new PkixCertPathBuilderException(certPathException.Message, certPathException.InnerException);
+			}
 
 			if (result == null && certPathException == null)
+			{
 				throw new PkixCertPathBuilderException("Unable to find certificate chain.");
+			}
 
 			return result;
 		}
 
-		private Exception certPathException;
+		Exception certPathException;
 
 		protected virtual PkixCertPathBuilderResult Build(
 			X509Certificate tbvCert,
@@ -71,17 +79,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		{
 			// If tbvCert is already present in tbvPath, it indicates having run into a cycle in the PKI graph.
 			if (tbvPath.Contains(tbvCert))
+			{
 				return null;
+			}
 
 			// step out, the certificate is not allowed to appear in a certification chain.
 			if (pkixParams.GetExcludedCerts().Contains(tbvCert))
+			{
 				return null;
+			}
 
 			// test if certificate path exceeds maximum length
 			if (pkixParams.MaxPathLength != -1)
 			{
 				if (tbvPath.Count - 1 > pkixParams.MaxPathLength)
+				{
 					return null;
+				}
 			}
 
 			tbvPath.Add(tbvCert);
@@ -143,14 +157,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					}
 
 					if (issuers.Count < 1)
+					{
 						throw new Exception("No issuer certificate for certificate in certification path found.");
+					}
 
 					foreach (X509Certificate issuer in issuers)
 					{
 						builderResult = Build(issuer, pkixParams, tbvPath);
 
 						if (builderResult != null)
+						{
 							break;
+						}
 					}
 				}
 			}

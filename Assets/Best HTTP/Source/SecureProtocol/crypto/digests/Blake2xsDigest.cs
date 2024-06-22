@@ -34,50 +34,50 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 */
 		public const int UnknownDigestLength = 65535;
 
-		private const int DigestLength = 32;
-		private const long MaxNumberBlocks = 1L << 32;
+		const int DigestLength = 32;
+		const long MaxNumberBlocks = 1L << 32;
 
 		/**
 		 * Expected digest length for the xof. It can be unknown.
 		 */
-		private int digestLength;
+		int digestLength;
 
 		/**
 		 * Root hash that will take the updates
 		 */
-		private Blake2sDigest hash;
+		Blake2sDigest hash;
 
 		/**
 		 * Digest of the root hash
 		 */
-		private byte[] h0 = null;
+		byte[] h0 = null;
 
 		/**
 		 * Digest of each round of the XOF
 		 */
-		private byte[] buf = new byte[32];
+		byte[] buf = new byte[32];
 
 		/**
 		 * Current position for a round
 		 */
-		private int bufPos = 32;
+		int bufPos = 32;
 
 		/**
 		 * Overall position of the digest. It is useful when the length is known
 		 * in advance to get last block length.
 		 */
-		private int digestPos = 0;
+		int digestPos = 0;
 
 		/**
 		 * Keep track of the round number to detect the end of the digest after
 		 * 2^32 blocks of 32 bytes.
 		 */
-		private long blockPos = 0;
+		long blockPos = 0;
 
 		/**
 		 * Current node offset incremented by 1 every round.
 		 */
-		private long nodeOffset;
+		long nodeOffset;
 
 		/**
 		 * BLAKE2xs for hashing with unknown digest length
@@ -119,7 +119,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public Blake2xsDigest(int digestBytes, byte[] key, byte[] salt, byte[] personalization)
 		{
 			if (digestBytes < 1 || digestBytes > UnknownDigestLength)
+			{
 				throw new ArgumentException("BLAKE2xs digest length must be between 1 and 2^16-1");
+			}
 
 			digestLength = digestBytes;
 			nodeOffset = ComputeNodeOffset();
@@ -143,14 +145,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 *
 		 * @return the algorithm name
 		 */
-		public string AlgorithmName => "BLAKE2xs";
+		public string AlgorithmName
+		{
+			get { return "BLAKE2xs"; }
+		}
 
 		/**
 		 * Return the size in bytes of the digest produced by this message digest.
 		 *
 		 * @return the size in bytes of the digest produced by this message digest.
 		 */
-		public int GetDigestSize() => digestLength;
+		public int GetDigestSize()
+		{
+			return digestLength;
+		}
 
 		/**
 		 * Return the size in bytes of the internal buffer the digest applies its
@@ -158,7 +166,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 *
 		 * @return byte length of the digest's internal buffer.
 		 */
-		public int GetByteLength() => hash.GetByteLength();
+		public int GetByteLength()
+		{
+			return hash.GetByteLength();
+		}
 
 		/**
 		 * Return the maximum size in bytes the digest can produce when the length
@@ -267,7 +278,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			if (digestLength != UnknownDigestLength)
 			{
 				if (digestPos + outLen > digestLength)
+				{
 					throw new ArgumentException("Output length is above the digest length");
+				}
 			}
 			else if (blockPos << 5 >= GetUnknownMaxLength())
 			{
@@ -354,15 +367,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 #endif
 
 		// get the next round length. If the length is unknown, the digest length is always the maximum.
-		private int ComputeStepLength()
+		int ComputeStepLength()
 		{
 			if (digestLength == UnknownDigestLength)
+			{
 				return DigestLength;
+			}
 
 			return System.Math.Min(DigestLength, digestLength - digestPos);
 		}
 
-		private long ComputeNodeOffset()
+		long ComputeNodeOffset()
 		{
 			return digestLength * 0x100000000L;
 		}

@@ -10,10 +10,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 {
 	public class X931SecureRandomBuilder
 	{
-		private readonly SecureRandom mRandom; // JDK 1.1 complains on final.
+		readonly SecureRandom mRandom; // JDK 1.1 complains on final.
 
-		private IEntropySourceProvider mEntropySourceProvider;
-		private byte[] mDateTimeVector;
+		IEntropySourceProvider mEntropySourceProvider;
+		byte[] mDateTimeVector;
 
 		/**
 		 * Basic constructor, creates a builder using an EntropySourceProvider based on the default SecureRandom with
@@ -41,10 +41,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		public X931SecureRandomBuilder(SecureRandom entropySource, bool predictionResistant)
 		{
 			if (entropySource == null)
+			{
 				throw new ArgumentNullException(nameof(entropySource));
+			}
 
-			this.mRandom = entropySource;
-			this.mEntropySourceProvider = new BasicEntropySourceProvider(mRandom, predictionResistant);
+			mRandom = entropySource;
+			mEntropySourceProvider = new BasicEntropySourceProvider(mRandom, predictionResistant);
 		}
 
 		/**
@@ -56,13 +58,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		 */
 		public X931SecureRandomBuilder(IEntropySourceProvider entropySourceProvider)
 		{
-			this.mRandom = null;
-			this.mEntropySourceProvider = entropySourceProvider;
+			mRandom = null;
+			mEntropySourceProvider = entropySourceProvider;
 		}
 
 		public X931SecureRandomBuilder SetDateTimeVector(byte[] dateTimeVector)
 		{
-			this.mDateTimeVector = dateTimeVector;
+			mDateTimeVector = dateTimeVector;
 			return this;
 		}
 

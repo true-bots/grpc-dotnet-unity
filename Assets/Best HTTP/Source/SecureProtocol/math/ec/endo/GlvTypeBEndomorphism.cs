@@ -18,8 +18,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Endo
 			 * endomorphism is being used with.
 			 */
 
-			this.m_parameters = parameters;
-			this.m_pointMap = new ScaleXPointMap(curve.FromBigInteger(parameters.Beta));
+			m_parameters = parameters;
+			m_pointMap = new ScaleXPointMap(curve.FromBigInteger(parameters.Beta));
 		}
 
 		public virtual BigInteger[] DecomposeScalar(BigInteger k)

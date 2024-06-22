@@ -13,9 +13,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 	{
 		public static readonly int SmallFactorLimit = 211;
 
-		private static readonly BigInteger One = BigInteger.One;
-		private static readonly BigInteger Two = BigInteger.Two;
-		private static readonly BigInteger Three = BigInteger.Three;
+		static readonly BigInteger One = BigInteger.One;
+		static readonly BigInteger Two = BigInteger.Two;
+		static readonly BigInteger Three = BigInteger.Three;
 
 		/// <summary>Used to return the output from the
 		/// <see cref="EnhancedMRProbablePrimeTest(BigInteger, SecureRandom, int)">
@@ -37,29 +37,38 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				return new MROutput(true, null);
 			}
 
-			private readonly bool m_provablyComposite;
-			private readonly BigInteger m_factor;
+			readonly bool m_provablyComposite;
+			readonly BigInteger m_factor;
 
-			private MROutput(bool provablyComposite, BigInteger factor)
+			MROutput(bool provablyComposite, BigInteger factor)
 			{
 				m_provablyComposite = provablyComposite;
 				m_factor = factor;
 			}
 
-			public BigInteger Factor => m_factor;
+			public BigInteger Factor
+			{
+				get { return m_factor; }
+			}
 
-			public bool IsProvablyComposite => m_provablyComposite;
+			public bool IsProvablyComposite
+			{
+				get { return m_provablyComposite; }
+			}
 
-			public bool IsNotPrimePower => m_provablyComposite && m_factor == null;
+			public bool IsNotPrimePower
+			{
+				get { return m_provablyComposite && m_factor == null; }
+			}
 		}
 
 		/// <summary>Used to return the output from the <see cref="GenerateSTRandomPrime(IDigest, int, byte[])">
 		/// Shawe-Taylor Random_Prime Routine</see></summary>
 		public sealed class STOutput
 		{
-			private readonly BigInteger m_prime;
-			private readonly byte[] m_primeSeed;
-			private readonly int m_primeGenCounter;
+			readonly BigInteger m_prime;
+			readonly byte[] m_primeSeed;
+			readonly int m_primeGenCounter;
 
 			internal STOutput(BigInteger prime, byte[] primeSeed, int primeGenCounter)
 			{
@@ -68,11 +77,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				m_primeGenCounter = primeGenCounter;
 			}
 
-			public BigInteger Prime => m_prime;
+			public BigInteger Prime
+			{
+				get { return m_prime; }
+			}
 
-			public byte[] PrimeSeed => m_primeSeed;
+			public byte[] PrimeSeed
+			{
+				get { return m_primeSeed; }
+			}
 
-			public int PrimeGenCounter => m_primeGenCounter;
+			public int PrimeGenCounter
+			{
+				get { return m_primeGenCounter; }
+			}
 		}
 
 		/// <summary>FIPS 186-4 C.6 Shawe-Taylor Random_Prime Routine.</summary>
@@ -85,13 +103,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 		public static STOutput GenerateSTRandomPrime(IDigest hash, int length, byte[] inputSeed)
 		{
 			if (hash == null)
+			{
 				throw new ArgumentNullException(nameof(hash));
+			}
+
 			if (length < 2)
+			{
 				throw new ArgumentException("must be >= 2", nameof(length));
+			}
+
 			if (inputSeed == null)
+			{
 				throw new ArgumentNullException(nameof(inputSeed));
+			}
+
 			if (inputSeed.Length == 0)
+			{
 				throw new ArgumentException("cannot be empty", nameof(inputSeed));
+			}
 
 			return ImplSTRandomPrime(hash, length, Arrays.Clone(inputSeed));
 		}
@@ -111,15 +140,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			CheckCandidate(candidate, nameof(candidate));
 
 			if (random == null)
+			{
 				throw new ArgumentNullException(nameof(random));
+			}
+
 			if (iterations < 1)
+			{
 				throw new ArgumentException("must be > 0", nameof(iterations));
+			}
 
 			if (candidate.BitLength == 2)
+			{
 				return MROutput.ProbablyPrime();
+			}
 
 			if (!candidate.TestBit(0))
+			{
 				return MROutput.ProvablyCompositeWithFactor(Two);
+			}
 
 			BigInteger w = candidate;
 			BigInteger wSubOne = candidate.Subtract(One);
@@ -134,12 +172,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				BigInteger g = b.Gcd(w);
 
 				if (g.CompareTo(One) > 0)
+				{
 					return MROutput.ProvablyCompositeWithFactor(g);
+				}
 
 				BigInteger z = b.ModPow(m, w);
 
 				if (z.Equals(One) || z.Equals(wSubOne))
+				{
 					continue;
+				}
 
 				bool primeToBase = false;
 
@@ -155,7 +197,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 					}
 
 					if (z.Equals(One))
+					{
 						break;
+					}
 
 					x = z;
 				}
@@ -176,7 +220,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 					g = x.Subtract(One).Gcd(w);
 
 					if (g.CompareTo(One) > 0)
+					{
 						return MROutput.ProvablyCompositeWithFactor(g);
+					}
 
 					return MROutput.ProvablyCompositeNotPrimePower();
 				}
@@ -210,14 +256,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			CheckCandidate(candidate, nameof(candidate));
 
 			if (random == null)
+			{
 				throw new ArgumentException("cannot be null", nameof(random));
+			}
+
 			if (iterations < 1)
+			{
 				throw new ArgumentException("must be > 0", nameof(iterations));
+			}
 
 			if (candidate.BitLength == 2)
+			{
 				return true;
+			}
+
 			if (!candidate.TestBit(0))
+			{
 				return false;
+			}
 
 			BigInteger w = candidate;
 			BigInteger wSubOne = candidate.Subtract(One);
@@ -231,7 +287,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				BigInteger b = BigIntegers.CreateRandomInRange(Two, wSubTwo, random);
 
 				if (!ImplMRProbablePrimeToBase(w, wSubOne, m, a, b))
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -249,10 +307,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			CheckCandidate(baseValue, nameof(baseValue));
 
 			if (baseValue.CompareTo(candidate.Subtract(One)) >= 0)
+			{
 				throw new ArgumentException("must be < ('candidate' - 1)", nameof(baseValue));
+			}
 
 			if (candidate.BitLength == 2)
+			{
 				return true;
+			}
 
 			BigInteger w = candidate;
 			BigInteger wSubOne = candidate.Subtract(One);
@@ -263,84 +325,86 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return ImplMRProbablePrimeToBase(w, wSubOne, m, a, baseValue);
 		}
 
-		private static void CheckCandidate(BigInteger n, string name)
+		static void CheckCandidate(BigInteger n, string name)
 		{
 			if (n == null || n.SignValue < 1 || n.BitLength < 2)
+			{
 				throw new ArgumentException("must be non-null and >= 2", name);
+			}
 		}
 
-		private static bool ImplHasAnySmallFactors(BigInteger x)
+		static bool ImplHasAnySmallFactors(BigInteger x)
 		{
 			/*
 			 * Bundle trial divisors into ~32-bit moduli then use fast tests on the ~32-bit remainders.
 			 */
 			int m = 2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23;
 			int r = x.Mod(BigInteger.ValueOf(m)).IntValue;
-			if ((r % 2) == 0 || (r % 3) == 0 || (r % 5) == 0 || (r % 7) == 0 || (r % 11) == 0 || (r % 13) == 0
-			    || (r % 17) == 0 || (r % 19) == 0 || (r % 23) == 0)
+			if (r % 2 == 0 || r % 3 == 0 || r % 5 == 0 || r % 7 == 0 || r % 11 == 0 || r % 13 == 0
+			    || r % 17 == 0 || r % 19 == 0 || r % 23 == 0)
 			{
 				return true;
 			}
 
 			m = 29 * 31 * 37 * 41 * 43;
 			r = x.Mod(BigInteger.ValueOf(m)).IntValue;
-			if ((r % 29) == 0 || (r % 31) == 0 || (r % 37) == 0 || (r % 41) == 0 || (r % 43) == 0)
+			if (r % 29 == 0 || r % 31 == 0 || r % 37 == 0 || r % 41 == 0 || r % 43 == 0)
 			{
 				return true;
 			}
 
 			m = 47 * 53 * 59 * 61 * 67;
 			r = x.Mod(BigInteger.ValueOf(m)).IntValue;
-			if ((r % 47) == 0 || (r % 53) == 0 || (r % 59) == 0 || (r % 61) == 0 || (r % 67) == 0)
+			if (r % 47 == 0 || r % 53 == 0 || r % 59 == 0 || r % 61 == 0 || r % 67 == 0)
 			{
 				return true;
 			}
 
 			m = 71 * 73 * 79 * 83;
 			r = x.Mod(BigInteger.ValueOf(m)).IntValue;
-			if ((r % 71) == 0 || (r % 73) == 0 || (r % 79) == 0 || (r % 83) == 0)
+			if (r % 71 == 0 || r % 73 == 0 || r % 79 == 0 || r % 83 == 0)
 			{
 				return true;
 			}
 
 			m = 89 * 97 * 101 * 103;
 			r = x.Mod(BigInteger.ValueOf(m)).IntValue;
-			if ((r % 89) == 0 || (r % 97) == 0 || (r % 101) == 0 || (r % 103) == 0)
+			if (r % 89 == 0 || r % 97 == 0 || r % 101 == 0 || r % 103 == 0)
 			{
 				return true;
 			}
 
 			m = 107 * 109 * 113 * 127;
 			r = x.Mod(BigInteger.ValueOf(m)).IntValue;
-			if ((r % 107) == 0 || (r % 109) == 0 || (r % 113) == 0 || (r % 127) == 0)
+			if (r % 107 == 0 || r % 109 == 0 || r % 113 == 0 || r % 127 == 0)
 			{
 				return true;
 			}
 
 			m = 131 * 137 * 139 * 149;
 			r = x.Mod(BigInteger.ValueOf(m)).IntValue;
-			if ((r % 131) == 0 || (r % 137) == 0 || (r % 139) == 0 || (r % 149) == 0)
+			if (r % 131 == 0 || r % 137 == 0 || r % 139 == 0 || r % 149 == 0)
 			{
 				return true;
 			}
 
 			m = 151 * 157 * 163 * 167;
 			r = x.Mod(BigInteger.ValueOf(m)).IntValue;
-			if ((r % 151) == 0 || (r % 157) == 0 || (r % 163) == 0 || (r % 167) == 0)
+			if (r % 151 == 0 || r % 157 == 0 || r % 163 == 0 || r % 167 == 0)
 			{
 				return true;
 			}
 
 			m = 173 * 179 * 181 * 191;
 			r = x.Mod(BigInteger.ValueOf(m)).IntValue;
-			if ((r % 173) == 0 || (r % 179) == 0 || (r % 181) == 0 || (r % 191) == 0)
+			if (r % 173 == 0 || r % 179 == 0 || r % 181 == 0 || r % 191 == 0)
 			{
 				return true;
 			}
 
 			m = 193 * 197 * 199 * 211;
 			r = x.Mod(BigInteger.ValueOf(m)).IntValue;
-			if ((r % 193) == 0 || (r % 197) == 0 || (r % 199) == 0 || (r % 211) == 0)
+			if (r % 193 == 0 || r % 197 == 0 || r % 199 == 0 || r % 211 == 0)
 			{
 				return true;
 			}
@@ -352,28 +416,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return false;
 		}
 
-		private static bool ImplMRProbablePrimeToBase(BigInteger w, BigInteger wSubOne, BigInteger m, int a, BigInteger b)
+		static bool ImplMRProbablePrimeToBase(BigInteger w, BigInteger wSubOne, BigInteger m, int a, BigInteger b)
 		{
 			BigInteger z = b.ModPow(m, w);
 
 			if (z.Equals(One) || z.Equals(wSubOne))
+			{
 				return true;
+			}
 
 			for (int j = 1; j < a; ++j)
 			{
 				z = z.Square().Mod(w);
 
 				if (z.Equals(wSubOne))
+				{
 					return true;
+				}
 
 				if (z.Equals(One))
+				{
 					return false;
+				}
 			}
 
 			return false;
 		}
 
-		private static STOutput ImplSTRandomPrime(IDigest d, int length, byte[] primeSeed)
+		static STOutput ImplSTRandomPrime(IDigest d, int length, byte[] primeSeed)
 		{
 			int dLen = d.GetDigestSize();
 			int cLen = System.Math.Max(4, dLen);
@@ -401,10 +471,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 					++primeGenCounter;
 
 					if (IsPrime32(c))
+					{
 						return new STOutput(BigInteger.ValueOf(c), primeSeed, primeGenCounter);
+					}
 
-					if (primeGenCounter > (4 * length))
+					if (primeGenCounter > 4 * length)
+					{
 						throw new InvalidOperationException("Too many iterations in Shawe-Taylor Random_Prime Routine");
+					}
 				}
 			}
 
@@ -464,11 +538,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 						BigInteger z = a.ModPow(tx2, c);
 
 						if (c.Gcd(z.Subtract(One)).Equals(One) && z.ModPow(c0, c).Equals(One))
+						{
 							return new STOutput(c, primeSeed, primeGenCounter);
+						}
 					}
 
-					if (primeGenCounter >= ((4 * length) + oldCounter))
+					if (primeGenCounter >= 4 * length + oldCounter)
+					{
 						throw new InvalidOperationException("Too many iterations in Shawe-Taylor Random_Prime Routine");
+					}
 
 					dt += 2;
 					c = c.Add(c0x2);
@@ -476,13 +554,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			}
 		}
 
-		private static void Hash(IDigest d, byte[] input, byte[] output, int outPos)
+		static void Hash(IDigest d, byte[] input, byte[] output, int outPos)
 		{
 			d.BlockUpdate(input, 0, input.Length);
 			d.DoFinal(output, outPos);
 		}
 
-		private static BigInteger HashGen(IDigest d, byte[] seed, int count)
+		static BigInteger HashGen(IDigest d, byte[] seed, int count)
 		{
 			int dLen = d.GetDigestSize();
 			int pos = count * dLen;
@@ -497,7 +575,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			return new BigInteger(1, buf);
 		}
 
-		private static void Inc(byte[] seed, int c)
+		static void Inc(byte[] seed, int c)
 		{
 			int pos = seed.Length;
 			while (c > 0 && --pos >= 0)
@@ -508,17 +586,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 			}
 		}
 
-		private static bool IsPrime32(uint x)
+		static bool IsPrime32(uint x)
 		{
 			/*
 			 * Use wheel factorization with 2, 3, 5 to select trial divisors.
 			 */
 
 			if (x < 32)
+			{
 				return ((1 << (int)x) & 0b0010_0000_1000_1010_0010_1000_1010_1100) != 0;
+			}
 
 			if (((1 << (int)(x % 30U)) & 0b1010_0000_1000_1010_0010_1000_1000_0010U) == 0)
+			{
 				return false;
+			}
 
 			uint[] ds = new uint[] { 1, 7, 11, 13, 17, 19, 23, 29 };
 			uint b = 0;
@@ -531,15 +613,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math
 				{
 					uint d = b + ds[pos];
 					if (x % d == 0)
+					{
 						return false;
+					}
 
 					++pos;
 				}
 
 				b += 30;
 
-				if ((b >> 16 != 0) || (b * b >= x))
+				if (b >> 16 != 0 || b * b >= x)
+				{
 					return true;
+				}
 			}
 		}
 	}

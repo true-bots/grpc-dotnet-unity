@@ -14,10 +14,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class Rfc3211WrapEngine
 		: IWrapper
 	{
-		private CbcBlockCipher engine;
-		private ParametersWithIV param;
-		private bool forWrapping;
-		private SecureRandom rand;
+		CbcBlockCipher engine;
+		ParametersWithIV param;
+		bool forWrapping;
+		SecureRandom rand;
 
 		public Rfc3211WrapEngine(
 			IBlockCipher engine)
@@ -31,7 +31,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			if (param is ParametersWithRandom withRandom)
 			{
-				this.rand = withRandom.Random;
+				rand = withRandom.Random;
 				this.param = withRandom.Parameters as ParametersWithIV;
 			}
 			else
@@ -45,7 +45,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			if (null == this.param)
+			{
 				throw new ArgumentException("RFC3211Wrap requires an IV", "param");
+			}
 		}
 
 		public virtual string AlgorithmName
@@ -59,9 +61,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int inLen)
 		{
 			if (!forWrapping)
+			{
 				throw new InvalidOperationException("not set for wrapping");
+			}
+
 			if (inLen > 255 || inLen < 0)
+			{
 				throw new ArgumentException("input must be from 0 to 255 bytes", "inLen");
+			}
 
 			engine.Init(true, param);
 
@@ -143,7 +150,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				engine.ProcessBlock(cekBlock, i, cekBlock, i);
 			}
 
-			bool invalidLength = (int)cekBlock[0] > (cekBlock.Length - 4);
+			bool invalidLength = (int)cekBlock[0] > cekBlock.Length - 4;
 
 			byte[] key;
 			if (invalidLength)
@@ -162,13 +169,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			for (int i = 0; i != 3; i++)
 			{
 				byte check = (byte)~cekBlock[1 + i];
-				nonEqual |= (check ^ cekBlock[4 + i]);
+				nonEqual |= check ^ cekBlock[4 + i];
 			}
 
 			Array.Clear(cekBlock, 0, cekBlock.Length);
 
-			if (nonEqual != 0 | invalidLength)
+			if ((nonEqual != 0) | invalidLength)
+			{
 				throw new InvalidCipherTextException("wrapped key corrupted");
+			}
 
 			return key;
 		}

@@ -11,8 +11,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class TweakableBlockCipherParameters
 		: ICipherParameters
 	{
-		private readonly byte[] tweak;
-		private readonly KeyParameter key;
+		readonly byte[] tweak;
+		readonly KeyParameter key;
 
 		public TweakableBlockCipherParameters(KeyParameter key, byte[] tweak)
 		{

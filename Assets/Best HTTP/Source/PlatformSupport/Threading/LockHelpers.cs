@@ -5,43 +5,51 @@ namespace BestHTTP.PlatformSupport.Threading
 {
 	public struct ReadLock : IDisposable
 	{
-		private ReaderWriterLockSlim rwLock;
-		private bool locked;
+		ReaderWriterLockSlim rwLock;
+		bool locked;
 
 		public ReadLock(ReaderWriterLockSlim rwLock)
 		{
 			this.rwLock = rwLock;
 
-			this.locked = this.rwLock.IsReadLockHeld;
-			if (!this.locked)
+			locked = this.rwLock.IsReadLockHeld;
+			if (!locked)
+			{
 				this.rwLock.EnterReadLock();
+			}
 		}
 
 		public void Dispose()
 		{
-			if (!this.locked)
-				this.rwLock.ExitReadLock();
+			if (!locked)
+			{
+				rwLock.ExitReadLock();
+			}
 		}
 	}
 
 	public struct WriteLock : IDisposable
 	{
-		private ReaderWriterLockSlim rwLock;
-		private bool locked;
+		ReaderWriterLockSlim rwLock;
+		bool locked;
 
 		public WriteLock(ReaderWriterLockSlim rwLock)
 		{
 			this.rwLock = rwLock;
-			this.locked = rwLock.IsWriteLockHeld;
+			locked = rwLock.IsWriteLockHeld;
 
 			if (!locked)
+			{
 				this.rwLock.EnterWriteLock();
+			}
 		}
 
 		public void Dispose()
 		{
 			if (!locked)
-				this.rwLock.ExitWriteLock();
+			{
+				rwLock.ExitWriteLock();
+			}
 		}
 	}
 }

@@ -9,14 +9,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class RsaPublicBcpgKey
 		: BcpgObject, IBcpgKey
 	{
-		private readonly MPInteger n, e;
+		readonly MPInteger n, e;
 
 		/// <summary>Construct an RSA public key from the passed in stream.</summary>
 		public RsaPublicBcpgKey(
 			BcpgInputStream bcpgIn)
 		{
-			this.n = new MPInteger(bcpgIn);
-			this.e = new MPInteger(bcpgIn);
+			n = new MPInteger(bcpgIn);
+			e = new MPInteger(bcpgIn);
 		}
 
 		/// <param name="n">The modulus.</param>

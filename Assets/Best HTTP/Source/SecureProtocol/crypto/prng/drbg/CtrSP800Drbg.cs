@@ -14,22 +14,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 	public sealed class CtrSP800Drbg
 		: ISP80090Drbg
 	{
-		private static readonly long TDEA_RESEED_MAX = 1L << (32 - 1);
-		private static readonly long AES_RESEED_MAX = 1L << (48 - 1);
-		private static readonly int TDEA_MAX_BITS_REQUEST = 1 << (13 - 1);
-		private static readonly int AES_MAX_BITS_REQUEST = 1 << (19 - 1);
+		static readonly long TDEA_RESEED_MAX = 1L << (32 - 1);
+		static readonly long AES_RESEED_MAX = 1L << (48 - 1);
+		static readonly int TDEA_MAX_BITS_REQUEST = 1 << (13 - 1);
+		static readonly int AES_MAX_BITS_REQUEST = 1 << (19 - 1);
 
-		private readonly IEntropySource mEntropySource;
-		private readonly IBlockCipher mEngine;
-		private readonly int mKeySizeInBits;
-		private readonly int mSeedLength;
-		private readonly int mSecurityStrength;
+		readonly IEntropySource mEntropySource;
+		readonly IBlockCipher mEngine;
+		readonly int mKeySizeInBits;
+		readonly int mSeedLength;
+		readonly int mSecurityStrength;
 
 		// internal state
-		private byte[] mKey;
-		private byte[] mV;
-		private long mReseedCounter = 0;
-		private bool mIsTdea = false;
+		byte[] mKey;
+		byte[] mV;
+		long mReseedCounter = 0;
+		bool mIsTdea = false;
 
 		/**
 		 * Construct a SP800-90A CTR DRBG.
@@ -47,11 +47,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			byte[] personalizationString, byte[] nonce)
 		{
 			if (securityStrength > 256)
+			{
 				throw new ArgumentException("Requested security strength is not supported by the derivation function");
+			}
+
 			if (GetMaxSecurityStrength(engine, keySizeInBits) < securityStrength)
+			{
 				throw new ArgumentException("Requested security strength is not supported by block cipher and key size");
+			}
+
 			if (entropySource.EntropySize < securityStrength)
+			{
 				throw new ArgumentException("Not enough entropy for security strength required");
+			}
 
 			mEntropySource = entropySource;
 			mEngine = engine;
@@ -64,7 +72,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			CTR_DRBG_Instantiate_algorithm(nonce, personalizationString);
 		}
 
-		private void CTR_DRBG_Instantiate_algorithm(byte[] nonce, byte[] personalisationString)
+		void CTR_DRBG_Instantiate_algorithm(byte[] nonce, byte[] personalisationString)
 		{
 			byte[] entropy = GetEntropy(); // Get_entropy_input
 			byte[] seedMaterial = Arrays.ConcatenateAll(entropy, nonce, personalisationString);
@@ -110,7 +118,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			v.CopyFrom(temp[key.Length..]);
         }
 #else
-		private void CTR_DRBG_Update(byte[] seed, byte[] key, byte[] v)
+		void CTR_DRBG_Update(byte[] seed, byte[] key, byte[] v)
 		{
 			byte[] temp = new byte[seed.Length];
 			byte[] outputBlock = new byte[mEngine.GetBlockSize()];
@@ -136,7 +144,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 		}
 #endif
 
-		private void CTR_DRBG_Reseed_algorithm(byte[] additionalInput)
+		void CTR_DRBG_Reseed_algorithm(byte[] additionalInput)
 		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			CTR_DRBG_Reseed_algorithm(Spans.FromNullableReadOnly(additionalInput));
@@ -189,7 +197,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
             }
         }
 #else
-		private void Xor(byte[] output, byte[] a, byte[] b, int bOff)
+		void Xor(byte[] output, byte[] a, byte[] b, int bOff)
 		{
 			for (int i = 0; i < output.Length; i++)
 			{
@@ -201,7 +209,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private void AddOneTo(Span<byte> longer)
 #else
-		private void AddOneTo(byte[] longer)
+		void AddOneTo(byte[] longer)
 #endif
 		{
 			uint carry = 1;
@@ -214,11 +222,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			}
 		}
 
-		private byte[] GetEntropy()
+		byte[] GetEntropy()
 		{
 			byte[] entropy = mEntropySource.GetEntropy();
 			if (entropy.Length < (mSecurityStrength + 7) / 8)
+			{
 				throw new InvalidOperationException("Insufficient entropy provided by entropy source");
+			}
+
 			return entropy;
 		}
 
@@ -239,7 +250,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 
 		// -- Internal state migration ---
 
-		private static readonly byte[] K_BITS = Hex.DecodeStrict(
+		static readonly byte[] K_BITS = Hex.DecodeStrict(
 			"000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F");
 
 		// 1. If (number_of_bits_to_return > max_number_of_bits), then return an
@@ -302,7 +313,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 		// 14. requested_bits = Leftmost number_of_bits_to_return of temp.
 		//
 		// 15. Return SUCCESS and requested_bits.
-		private byte[] BlockCipherDF(byte[] input, int N)
+		byte[] BlockCipherDF(byte[] input, int N)
 		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return BlockCipherDF(input.AsSpan(), N);
@@ -311,7 +322,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			int L = input.Length; // already in bytes
 			// 4 S = L || N || input || 0x80
 			int sLen = 4 + 4 + L + 1;
-			int blockLen = ((sLen + outLen - 1) / outLen) * outLen;
+			int blockLen = (sLen + outLen - 1) / outLen * outLen;
 			byte[] S = new byte[blockLen];
 			Pack.UInt32_To_BE((uint)L, S, 0);
 			Pack.UInt32_To_BE((uint)N, S, 4);
@@ -327,7 +338,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			int i = 0;
 			byte[] K = new byte[mKeySizeInBits / 8];
 			Array.Copy(K_BITS, 0, K, 0, K.Length);
-			var K1 = ExpandToKeyParameter(K);
+			KeyParameter K1 = ExpandToKeyParameter(K);
 			mEngine.Init(true, K1);
 
 			while (i * outLen * 8 < mKeySizeInBits + outLen * 8)
@@ -457,7 +468,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
             bccOut.CopyFrom(chainingValue);
         }
 #else
-		private void BCC(byte[] bccOut, byte[] iV, byte[] data)
+		void BCC(byte[] bccOut, byte[] iV, byte[] data)
 		{
 			int outlen = mEngine.GetBlockSize();
 			byte[] chainingValue = new byte[outlen]; // initial values = 0
@@ -507,18 +518,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			if (mIsTdea)
 			{
 				if (mReseedCounter > TDEA_RESEED_MAX)
+				{
 					return -1;
+				}
 
 				if (outputLen > TDEA_MAX_BITS_REQUEST / 8)
+				{
 					throw new ArgumentException("Number of bits per request limited to " + TDEA_MAX_BITS_REQUEST, "output");
+				}
 			}
 			else
 			{
 				if (mReseedCounter > AES_RESEED_MAX)
+				{
 					return -1;
+				}
 
 				if (outputLen > AES_MAX_BITS_REQUEST / 8)
+				{
 					throw new ArgumentException("Number of bits per request limited to " + AES_MAX_BITS_REQUEST, "output");
+				}
 			}
 
 			if (predictionResistant)
@@ -680,12 +699,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
         }
 #endif
 
-		private bool IsTdea(IBlockCipher cipher)
+		bool IsTdea(IBlockCipher cipher)
 		{
 			return cipher.AlgorithmName.Equals("DESede") || cipher.AlgorithmName.Equals("TDEA");
 		}
 
-		private int GetMaxSecurityStrength(IBlockCipher cipher, int keySizeInBits)
+		int GetMaxSecurityStrength(IBlockCipher cipher, int keySizeInBits)
 		{
 			if (IsTdea(cipher) && keySizeInBits == 168)
 			{
@@ -700,10 +719,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			return -1;
 		}
 
-		private KeyParameter ExpandToKeyParameter(byte[] key)
+		KeyParameter ExpandToKeyParameter(byte[] key)
 		{
 			if (!mIsTdea)
+			{
 				return new KeyParameter(key);
+			}
 
 			// expand key to 192 bits.
 			byte[] tmp = new byte[24];
@@ -740,7 +761,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 		 * @param tmp
 		 * @param tmpOff
 		 */
-		private void PadKey(byte[] keyMaster, int keyOff, byte[] tmp, int tmpOff)
+		void PadKey(byte[] keyMaster, int keyOff, byte[] tmp, int tmpOff)
 		{
 			tmp[tmpOff + 0] = (byte)(keyMaster[keyOff + 0] & 0xfe);
 			tmp[tmpOff + 1] = (byte)((keyMaster[keyOff + 0] << 7) | ((keyMaster[keyOff + 1] & 0xfc) >> 1));

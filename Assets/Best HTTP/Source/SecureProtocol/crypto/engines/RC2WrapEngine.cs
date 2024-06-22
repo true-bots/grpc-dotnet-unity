@@ -16,24 +16,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		: IWrapper
 	{
 		/** Field engine */
-		private CbcBlockCipher engine;
+		CbcBlockCipher engine;
 
 		/** Field param */
-		private ICipherParameters parameters;
+		ICipherParameters parameters;
 
 		/** Field paramPlusIV */
-		private ParametersWithIV paramPlusIV;
+		ParametersWithIV paramPlusIV;
 
 		/** Field iv */
-		private byte[] iv;
+		byte[] iv;
 
 		/** Field forWrapping */
-		private bool forWrapping;
+		bool forWrapping;
 
-		private SecureRandom sr;
+		SecureRandom sr;
 
 		/** Field IV2           */
-		private static readonly byte[] IV2 =
+		static readonly byte[] IV2 =
 		{
 			(byte)0x4a, (byte)0xdd, (byte)0xa2,
 			(byte)0x2c, (byte)0x79, (byte)0xe8,
@@ -43,8 +43,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		//
 		// checksum digest
 		//
-		private readonly IDigest sha1 = new Sha1Digest();
-		private readonly byte[] digest = new byte[20];
+		readonly IDigest sha1 = new Sha1Digest();
+		readonly byte[] digest = new byte[20];
 
 		/**
 			* Method init
@@ -55,7 +55,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual void Init(bool forWrapping, ICipherParameters parameters)
 		{
 			this.forWrapping = forWrapping;
-			this.engine = new CbcBlockCipher(new RC2Engine());
+			engine = new CbcBlockCipher(new RC2Engine());
 
 			if (parameters is ParametersWithRandom pWithR)
 			{
@@ -70,14 +70,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (parameters is ParametersWithIV)
 			{
 				if (!forWrapping)
+				{
 					throw new ArgumentException("You should not supply an IV for unwrapping");
+				}
 
-				this.paramPlusIV = (ParametersWithIV)parameters;
-				this.iv = this.paramPlusIV.GetIV();
-				this.parameters = this.paramPlusIV.Parameters;
+				paramPlusIV = (ParametersWithIV)parameters;
+				iv = paramPlusIV.GetIV();
+				this.parameters = paramPlusIV.Parameters;
 
-				if (this.iv.Length != 8)
+				if (iv.Length != 8)
+				{
 					throw new ArgumentException("IV is not 8 octets");
+				}
 			}
 			else
 			{
@@ -87,9 +91,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					// Hm, we have no IV but we want to wrap ?!?
 					// well, then we have to create our own IV.
-					this.iv = new byte[8];
+					iv = new byte[8];
 					sr.NextBytes(iv);
-					this.paramPlusIV = new ParametersWithIV(this.parameters, this.iv);
+					paramPlusIV = new ParametersWithIV(this.parameters, iv);
 				}
 			}
 		}
@@ -123,9 +127,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			int len = length + 1;
-			if ((len % 8) != 0)
+			if (len % 8 != 0)
 			{
-				len += 8 - (len % 8);
+				len += 8 - len % 8;
 			}
 
 			byte[] keyToBeWrapped = new byte[len];
@@ -174,10 +178,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			// Left TEMP2 = IV || TEMP1.
-			byte[] TEMP2 = new byte[this.iv.Length + TEMP1.Length];
+			byte[] TEMP2 = new byte[iv.Length + TEMP1.Length];
 
-			Array.Copy(this.iv, 0, TEMP2, 0, this.iv.Length);
-			Array.Copy(TEMP1, 0, TEMP2, this.iv.Length, TEMP1.Length);
+			Array.Copy(iv, 0, TEMP2, 0, iv.Length);
+			Array.Copy(TEMP1, 0, TEMP2, iv.Length, TEMP1.Length);
 
 			// Reverse the order of the octets in TEMP2 and call the result TEMP3.
 			byte[] TEMP3 = new byte[TEMP2.Length];
@@ -190,9 +194,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			// Encrypt TEMP3 in CBC mode using the KEK and an initialization vector
 			// of 0x 4a dd a2 2c 79 e8 21 05. The resulting cipher text is the desired
 			// result. It is 40 octets long if a 168 bit key is being wrapped.
-			ParametersWithIV param2 = new ParametersWithIV(this.parameters, IV2);
+			ParametersWithIV param2 = new ParametersWithIV(parameters, IV2);
 
-			this.engine.Init(true, param2);
+			engine.Init(true, param2);
 
 			for (int i = 0; i < noOfBlocks + 1; i++)
 			{
@@ -252,15 +256,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			// Decrypt the cipher text with TRIPLedeS in CBC mode using the KEK
 			// and an initialization vector (IV) of 0x4adda22c79e82105. Call the output TEMP3.
-			ParametersWithIV param2 = new ParametersWithIV(this.parameters, IV2);
+			ParametersWithIV param2 = new ParametersWithIV(parameters, IV2);
 
-			this.engine.Init(false, param2);
+			engine.Init(false, param2);
 
 			byte[] TEMP3 = new byte[length];
 
 			Array.Copy(input, inOff, TEMP3, 0, length);
 
-			for (int i = 0; i < (TEMP3.Length / engine.GetBlockSize()); i++)
+			for (int i = 0; i < TEMP3.Length / engine.GetBlockSize(); i++)
 			{
 				int currentBytePos = i * engine.GetBlockSize();
 
@@ -276,24 +280,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			// Decompose TEMP2 into IV, the first 8 octets, and TEMP1, the remaining octets.
-			this.iv = new byte[8];
+			iv = new byte[8];
 
 			byte[] TEMP1 = new byte[TEMP2.Length - 8];
 
-			Array.Copy(TEMP2, 0, this.iv, 0, 8);
+			Array.Copy(TEMP2, 0, iv, 0, 8);
 			Array.Copy(TEMP2, 8, TEMP1, 0, TEMP2.Length - 8);
 
 			// Decrypt TEMP1 using TRIPLedeS in CBC mode using the KEK and the IV
 			// found in the previous step. Call the result WKCKS.
-			this.paramPlusIV = new ParametersWithIV(this.parameters, this.iv);
+			paramPlusIV = new ParametersWithIV(parameters, iv);
 
-			this.engine.Init(false, this.paramPlusIV);
+			engine.Init(false, paramPlusIV);
 
 			byte[] LCEKPADICV = new byte[TEMP1.Length];
 
 			Array.Copy(TEMP1, 0, LCEKPADICV, 0, TEMP1.Length);
 
-			for (int i = 0; i < (LCEKPADICV.Length / engine.GetBlockSize()); i++)
+			for (int i = 0; i < LCEKPADICV.Length / engine.GetBlockSize(); i++)
 			{
 				int currentBytePos = i * engine.GetBlockSize();
 
@@ -316,7 +320,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					"Checksum inside ciphertext is corrupted");
 			}
 
-			if ((result.Length - ((result[0] & 0xff) + 1)) > 7)
+			if (result.Length - ((result[0] & 0xff) + 1) > 7)
 			{
 				throw new InvalidCipherTextException(
 					"too many pad bytes (" + (result.Length - ((result[0] & 0xff) + 1)) + ")");
@@ -341,7 +345,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @throws Exception
 		* @see http://www.w3.org/TR/xmlenc-core/#sec-CMSKeyChecksum
 		*/
-		private byte[] CalculateCmsKeyChecksum(
+		byte[] CalculateCmsKeyChecksum(
 			byte[] key)
 		{
 			sha1.BlockUpdate(key, 0, key.Length);
@@ -358,7 +362,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @return
 		* @see http://www.w3.org/TR/xmlenc-core/#sec-CMSKeyChecksum
 		*/
-		private bool CheckCmsKeyChecksum(
+		bool CheckCmsKeyChecksum(
 			byte[] key,
 			byte[] checksum)
 		{

@@ -9,11 +9,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 	public class DefaultSignatureCalculator
 		: IStreamCalculator<IBlockResult>
 	{
-		private readonly SignerSink mSignerSink;
+		readonly SignerSink mSignerSink;
 
 		public DefaultSignatureCalculator(ISigner signer)
 		{
-			this.mSignerSink = new SignerSink(signer);
+			mSignerSink = new SignerSink(signer);
 		}
 
 		public Stream Stream

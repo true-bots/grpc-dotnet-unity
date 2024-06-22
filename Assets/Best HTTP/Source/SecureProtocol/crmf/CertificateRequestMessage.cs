@@ -15,10 +15,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 		public static readonly int popKeyEncipherment = BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf.ProofOfPossession.TYPE_KEY_ENCIPHERMENT;
 		public static readonly int popKeyAgreement = BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf.ProofOfPossession.TYPE_KEY_AGREEMENT;
 
-		private readonly CertReqMsg certReqMsg;
-		private readonly Controls controls;
+		readonly CertReqMsg certReqMsg;
+		readonly Controls controls;
 
-		private static CertReqMsg ParseBytes(byte[] encoding)
+		static CertReqMsg ParseBytes(byte[] encoding)
 		{
 			return CertReqMsg.GetInstance(encoding);
 		}
@@ -35,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 		public CertificateRequestMessage(CertReqMsg certReqMsg)
 		{
 			this.certReqMsg = certReqMsg;
-			this.controls = certReqMsg.CertReq.Controls;
+			controls = certReqMsg.CertReq.Controls;
 		}
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 		/// <returns>a CertTemplate structure.</returns>
 		public CertTemplate GetCertTemplate()
 		{
-			return this.certReqMsg.CertReq.CertTemplate;
+			return certReqMsg.CertReq.CertTemplate;
 		}
 
 		/// <summary>
@@ -190,7 +190,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 			throw new InvalidOperationException("not Signing Key type of proof of possession");
 		}
 
-		private bool verifySignature(IVerifierFactoryProvider verifierFactoryProvider, PopoSigningKey signKey)
+		bool verifySignature(IVerifierFactoryProvider verifierFactoryProvider, PopoSigningKey signKey)
 		{
 			IVerifierFactory verifer;
 			IStreamCalculator<IVerifier> calculator;

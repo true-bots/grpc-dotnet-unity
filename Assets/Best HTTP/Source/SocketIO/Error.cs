@@ -9,13 +9,13 @@ namespace BestHTTP.SocketIO
 
 		public Error(SocketIOErrors code, string msg)
 		{
-			this.Code = code;
-			this.Message = msg;
+			Code = code;
+			Message = msg;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("Code: {0} Message: \"{1}\"", this.Code.ToString(), this.Message);
+			return string.Format("Code: {0} Message: \"{1}\"", Code.ToString(), Message);
 		}
 	}
 }

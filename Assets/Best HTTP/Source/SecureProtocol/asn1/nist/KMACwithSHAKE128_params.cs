@@ -14,16 +14,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Nist
 	/// </summary>
 	public class KMacWithShake128Params : Asn1Encodable
 	{
-		private static readonly byte[] EMPTY_STRING = new byte[0];
-		private static readonly int DEF_LENGTH = 256;
+		static readonly byte[] EMPTY_STRING = new byte[0];
+		static readonly int DEF_LENGTH = 256;
 
-		private readonly int outputLength;
-		private readonly byte[] customizationString;
+		readonly int outputLength;
+		readonly byte[] customizationString;
 
 		public KMacWithShake128Params(int outputLength)
 		{
 			this.outputLength = outputLength;
-			this.customizationString = EMPTY_STRING;
+			customizationString = EMPTY_STRING;
 		}
 
 		public KMacWithShake128Params(int outputLength, byte[] customizationString)
@@ -46,33 +46,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Nist
 			return null;
 		}
 
-		private KMacWithShake128Params(Asn1Sequence seq)
+		KMacWithShake128Params(Asn1Sequence seq)
 		{
 			if (seq.Count > 2)
+			{
 				throw new InvalidOperationException("sequence size greater than 2");
+			}
 
 			if (seq.Count == 2)
 			{
-				this.outputLength = DerInteger.GetInstance(seq[0]).IntValueExact;
-				this.customizationString = Arrays.Clone(Asn1OctetString.GetInstance(seq[1]).GetOctets());
+				outputLength = DerInteger.GetInstance(seq[0]).IntValueExact;
+				customizationString = Arrays.Clone(Asn1OctetString.GetInstance(seq[1]).GetOctets());
 			}
 			else if (seq.Count == 1)
 			{
 				if (seq[0] is DerInteger)
 				{
-					this.outputLength = DerInteger.GetInstance(seq[0]).IntValueExact;
-					this.customizationString = EMPTY_STRING;
+					outputLength = DerInteger.GetInstance(seq[0]).IntValueExact;
+					customizationString = EMPTY_STRING;
 				}
 				else
 				{
-					this.outputLength = DEF_LENGTH;
-					this.customizationString = Arrays.Clone(Asn1OctetString.GetInstance(seq[0]).GetOctets());
+					outputLength = DEF_LENGTH;
+					customizationString = Arrays.Clone(Asn1OctetString.GetInstance(seq[0]).GetOctets());
 				}
 			}
 			else
 			{
-				this.outputLength = DEF_LENGTH;
-				this.customizationString = EMPTY_STRING;
+				outputLength = DEF_LENGTH;
+				customizationString = EMPTY_STRING;
 			}
 		}
 

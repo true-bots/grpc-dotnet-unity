@@ -21,7 +21,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class Cast5Engine
 		: IBlockCipher
 	{
-		private static readonly uint[] S1 =
+		static readonly uint[] S1 =
 			{
 				0x30fb40d4, 0x9fa0ff0b, 0x6beccd2f, 0x3f258c7a, 0x1e213f2f, 0x9c004dd3, 0x6003e540, 0xcf9fc949,
 				0xbfd4af27, 0x88bbbdb5, 0xe2034090, 0x98d09675, 0x6e63a0e0, 0x15c361d2, 0xc2e7661d, 0x22d4ff8e,
@@ -309,15 +309,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		internal static readonly int MAX_ROUNDS = 16;
 		internal static readonly int RED_ROUNDS = 12;
 
-		private const int BLOCK_SIZE = 8; // bytes = 64 bits
+		const int BLOCK_SIZE = 8; // bytes = 64 bits
 
-		private int[] _Kr = new int[17]; // the rotating round key
-		private uint[] _Km = new uint[17]; // the masking round key
+		int[] _Kr = new int[17]; // the rotating round key
+		uint[] _Km = new uint[17]; // the masking round key
 
-		private bool _encrypting;
+		bool _encrypting;
 
-		private byte[] _workingKey;
-		private int _rounds = MAX_ROUNDS;
+		byte[] _workingKey;
+		int _rounds = MAX_ROUNDS;
 
 		public Cast5Engine()
 		{
@@ -336,7 +336,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
-				throw new ArgumentException("Invalid parameter passed to " + AlgorithmName + " init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			{
+				throw new ArgumentException("Invalid parameter passed to " + AlgorithmName + " init - " + Platform.GetTypeName(parameters));
+			}
 
 			_encrypting = forEncryption;
 			_workingKey = ((KeyParameter)parameters).GetKey();
@@ -351,7 +353,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (_workingKey == null)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
 
 			int blockSize = GetBlockSize();
 			Check.DataLength(input, inOff, blockSize, "input buffer too short");
@@ -674,8 +678,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		internal static uint F1(uint D, uint Kmi, int Kri)
 		{
 			uint I = Kmi + D;
-			I = I << Kri | (I >> (32 - Kri));
-			return ((S1[(I >> 24) & 0xff] ^ S2[(I >> 16) & 0xff]) - S3[(I >> 8) & 0xff]) + S4[I & 0xff];
+			I = (I << Kri) | (I >> (32 - Kri));
+			return (S1[(I >> 24) & 0xff] ^ S2[(I >> 16) & 0xff]) - S3[(I >> 8) & 0xff] + S4[I & 0xff];
 		}
 
 		/**
@@ -690,8 +694,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		internal static uint F2(uint D, uint Kmi, int Kri)
 		{
 			uint I = Kmi ^ D;
-			I = I << Kri | (I >> (32 - Kri));
-			return ((S1[(I >> 24) & 0xff] - S2[(I >> 16) & 0xff]) + S3[(I >> 8) & 0xff]) ^ S4[I & 0xff];
+			I = (I << Kri) | (I >> (32 - Kri));
+			return (S1[(I >> 24) & 0xff] - S2[(I >> 16) & 0xff] + S3[(I >> 8) & 0xff]) ^ S4[I & 0xff];
 		}
 
 		/**
@@ -706,7 +710,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		internal static uint F3(uint D, uint Kmi, int Kri)
 		{
 			uint I = Kmi - D;
-			I = I << Kri | (I >> (32 - Kri));
+			I = (I << Kri) | (I >> (32 - Kri));
 			return ((S1[(I >> 24) & 0xff] + S2[(I >> 16) & 0xff]) ^ S3[(I >> 8) & 0xff]) - S4[I & 0xff];
 		}
 
@@ -829,7 +833,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return (uint)(((b[i] & 0xff) << 24) |
 			              ((b[i + 1] & 0xff) << 16) |
 			              ((b[i + 2] & 0xff) << 8) |
-			              ((b[i + 3] & 0xff)));
+			              b[i + 3] & 0xff);
 		}
 	}
 }

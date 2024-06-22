@@ -111,17 +111,19 @@ namespace BestHTTP.SignalRCore
 
 		public StreamItemContainer(long _id)
 		{
-			this.id = _id;
-			this.Items = new List<T>();
+			id = _id;
+			Items = new List<T>();
 		}
 
 		public void AddItem(T item)
 		{
-			if (this.Items == null)
-				this.Items = new List<T>();
+			if (Items == null)
+			{
+				Items = new List<T>();
+			}
 
-			this.Items.Add(item);
-			this.LastAdded = item;
+			Items.Add(item);
+			LastAdded = item;
 		}
 	}
 
@@ -132,8 +134,8 @@ namespace BestHTTP.SignalRCore
 
 		public CallbackDescriptor(Type[] paramTypes, Action<object[]> callback)
 		{
-			this.ParamTypes = paramTypes;
-			this.Callback = callback;
+			ParamTypes = paramTypes;
+			Callback = callback;
 		}
 	}
 
@@ -145,34 +147,36 @@ namespace BestHTTP.SignalRCore
 
 		public FunctionCallbackDescriptor(Type returnType, Type[] paramTypes, Func<object[], object> callback)
 		{
-			this.ReturnType = returnType;
-			this.ParamTypes = paramTypes;
-			this.Callback = callback;
+			ReturnType = returnType;
+			ParamTypes = paramTypes;
+			Callback = callback;
 		}
 	}
 
-	internal struct InvocationDefinition
+	struct InvocationDefinition
 	{
 		public Action<Messages.Message> callback;
 		public Type returnType;
 	}
 
-	internal sealed class Subscription
+	sealed class Subscription
 	{
 		public List<CallbackDescriptor> callbacks = new List<CallbackDescriptor>(1);
 		public List<FunctionCallbackDescriptor> functionCallbacks;
 
 		public void Add(Type[] paramTypes, Action<object[]> callback)
 		{
-			this.callbacks.Add(new CallbackDescriptor(paramTypes, callback));
+			callbacks.Add(new CallbackDescriptor(paramTypes, callback));
 		}
 
 		public void AddFunc(Type resultType, Type[] paramTypes, Func<object[], object> callback)
 		{
-			if (this.functionCallbacks == null)
-				this.functionCallbacks = new List<FunctionCallbackDescriptor>(1);
+			if (functionCallbacks == null)
+			{
+				functionCallbacks = new List<FunctionCallbackDescriptor>(1);
+			}
 
-			this.functionCallbacks.Add(new FunctionCallbackDescriptor(resultType, paramTypes, callback));
+			functionCallbacks.Add(new FunctionCallbackDescriptor(resultType, paramTypes, callback));
 		}
 	}
 
@@ -224,16 +228,16 @@ namespace BestHTTP.SignalRCore
 
 		public HubOptions()
 		{
-			this.SkipNegotiation = false;
+			SkipNegotiation = false;
 #if !BESTHTTP_DISABLE_WEBSOCKET
-			this.PreferedTransport = TransportTypes.WebSocket;
+			PreferedTransport = TransportTypes.WebSocket;
 #else
             this.PreferedTransport = TransportTypes.LongPolling;
 #endif
-			this.PingInterval = TimeSpan.FromSeconds(15);
-			this.PingTimeoutInterval = TimeSpan.FromSeconds(30);
-			this.MaxRedirects = 100;
-			this.ConnectTimeout = TimeSpan.FromSeconds(60);
+			PingInterval = TimeSpan.FromSeconds(15);
+			PingTimeoutInterval = TimeSpan.FromSeconds(30);
+			MaxRedirects = 100;
+			ConnectTimeout = TimeSpan.FromSeconds(60);
 		}
 	}
 
@@ -265,7 +269,7 @@ namespace BestHTTP.SignalRCore
 
 	public sealed class DefaultRetryPolicy : IRetryPolicy
 	{
-		private static TimeSpan?[] DefaultBackoffTimes = new TimeSpan?[]
+		static TimeSpan?[] DefaultBackoffTimes = new TimeSpan?[]
 		{
 			TimeSpan.Zero,
 			TimeSpan.FromSeconds(2),
@@ -278,20 +282,22 @@ namespace BestHTTP.SignalRCore
 
 		public DefaultRetryPolicy()
 		{
-			this.backoffTimes = DefaultBackoffTimes;
+			backoffTimes = DefaultBackoffTimes;
 		}
 
 		public DefaultRetryPolicy(TimeSpan?[] customBackoffTimes)
 		{
-			this.backoffTimes = customBackoffTimes;
+			backoffTimes = customBackoffTimes;
 		}
 
 		public TimeSpan? GetNextRetryDelay(RetryContext context)
 		{
-			if (context.PreviousRetryCount >= this.backoffTimes.Length)
+			if (context.PreviousRetryCount >= backoffTimes.Length)
+			{
 				return null;
+			}
 
-			return this.backoffTimes[context.PreviousRetryCount];
+			return backoffTimes[context.PreviousRetryCount];
 		}
 	}
 }

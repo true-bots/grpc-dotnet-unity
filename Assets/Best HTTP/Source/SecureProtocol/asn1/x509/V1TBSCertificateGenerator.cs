@@ -84,14 +84,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public void SetSubjectPublicKeyInfo(
 			SubjectPublicKeyInfo pubKeyInfo)
 		{
-			this.subjectPublicKeyInfo = pubKeyInfo;
+			subjectPublicKeyInfo = pubKeyInfo;
 		}
 
 		public TbsCertificateStructure GenerateTbsCertificate()
 		{
-			if ((serialNumber == null) || (signature == null)
-			                           || (issuer == null) || (startDate == null) || (endDate == null)
-			                           || (subject == null) || (subjectPublicKeyInfo == null))
+			if (serialNumber == null || signature == null
+			                         || issuer == null || startDate == null || endDate == null
+			                         || subject == null || subjectPublicKeyInfo == null)
 			{
 				throw new InvalidOperationException("not all mandatory fields set in V1 TBScertificate generator");
 			}

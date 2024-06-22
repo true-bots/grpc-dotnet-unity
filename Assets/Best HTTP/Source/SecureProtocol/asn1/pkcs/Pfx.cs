@@ -15,26 +15,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		public static Pfx GetInstance(object obj)
 		{
 			if (obj is Pfx)
+			{
 				return (Pfx)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new Pfx(Asn1Sequence.GetInstance(obj));
 		}
 
-		private readonly ContentInfo contentInfo;
-		private readonly MacData macData;
+		readonly ContentInfo contentInfo;
+		readonly MacData macData;
 
-		private Pfx(Asn1Sequence seq)
+		Pfx(Asn1Sequence seq)
 		{
 			DerInteger version = DerInteger.GetInstance(seq[0]);
 			if (!version.HasValue(3))
+			{
 				throw new ArgumentException("wrong version for PFX PDU");
+			}
 
-			this.contentInfo = ContentInfo.GetInstance(seq[1]);
+			contentInfo = ContentInfo.GetInstance(seq[1]);
 
 			if (seq.Count == 3)
 			{
-				this.macData = MacData.GetInstance(seq[2]);
+				macData = MacData.GetInstance(seq[2]);
 			}
 		}
 

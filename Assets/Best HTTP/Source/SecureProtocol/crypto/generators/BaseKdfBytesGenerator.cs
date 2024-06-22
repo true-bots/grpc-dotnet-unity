@@ -15,10 +15,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public abstract class BaseKdfBytesGenerator
 		: IDerivationFunction
 	{
-		private int counterStart;
-		private IDigest digest;
-		private byte[] shared;
-		private byte[] iv;
+		int counterStart;
+		IDigest digest;
+		byte[] shared;
+		byte[] iv;
 
 		/**
 		* Construct a KDF Parameters generator.
@@ -53,7 +53,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		/**
 		* return the underlying digest.
 		*/
-		public IDigest Digest => digest;
+		public IDigest Digest
+		{
+			get { return digest; }
+		}
 
 		/**
 		* fill len bytes of the output buffer with bytes generated from
@@ -78,8 +81,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			// is the digest output size in bits. We can't have an
 			// array with a long index at the moment...
 			//
-			if (oBytes > ((2L << 32) - 1))
+			if (oBytes > (2L << 32) - 1)
+			{
 				throw new ArgumentException("Output length too large");
+			}
 
 			int cThreshold = (int)((oBytes + digestSize - 1) / digestSize);
 

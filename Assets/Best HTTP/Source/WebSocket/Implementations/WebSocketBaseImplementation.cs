@@ -28,7 +28,7 @@ namespace BestHTTP.WebSocket
 
 	public delegate void OnWebSocketBinaryNoAllocDelegate(WebSocket webSocket, BufferSegment data);
 
-	public delegate void OnWebSocketClosedDelegate(WebSocket webSocket, UInt16 code, string message);
+	public delegate void OnWebSocketClosedDelegate(WebSocket webSocket, ushort code, string message);
 
 	public delegate void OnWebSocketErrorDelegate(WebSocket webSocket, string reason);
 
@@ -47,10 +47,12 @@ namespace BestHTTP.WebSocket
 		{
 			get
 			{
-				if (this._internalRequest == null)
+				if (_internalRequest == null)
+				{
 					CreateInternalRequest();
+				}
 
-				return this._internalRequest;
+				return _internalRequest;
 			}
 		}
 
@@ -67,22 +69,22 @@ namespace BestHTTP.WebSocket
 
 		public WebSocketBaseImplementation(WebSocket parent, Uri uri, string origin, string protocol)
 		{
-			this.Parent = parent;
-			this.Uri = uri;
-			this.Origin = origin;
-			this.Protocol = protocol;
+			Parent = parent;
+			Uri = uri;
+			Origin = origin;
+			Protocol = protocol;
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-			this.LastMessageReceived = DateTime.MinValue;
+			LastMessageReceived = DateTime.MinValue;
 
 			// Set up some default values.
-			this.Parent.PingFrequency = 10_000;
-			this.Parent.CloseAfterNoMessage = TimeSpan.FromSeconds(2);
+			Parent.PingFrequency = 10_000;
+			Parent.CloseAfterNoMessage = TimeSpan.FromSeconds(2);
 #endif
 		}
 
 		public abstract void StartOpen();
-		public abstract void StartClose(UInt16 code, string message);
+		public abstract void StartClose(ushort code, string message);
 
 		public abstract void Send(string message);
 		public abstract void Send(byte[] buffer);

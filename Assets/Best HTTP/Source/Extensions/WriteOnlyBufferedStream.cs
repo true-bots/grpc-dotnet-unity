@@ -26,39 +26,39 @@ namespace BestHTTP.Extensions
 
 		public override long Length
 		{
-			get { return this.buffer.Length; }
+			get { return buffer.Length; }
 		}
 
 		public override long Position
 		{
-			get { return this._position; }
+			get { return _position; }
 			set { throw new NotImplementedException("Position set"); }
 		}
 
-		private int _position;
+		int _position;
 
-		private byte[] buffer;
-		private Stream stream;
+		byte[] buffer;
+		Stream stream;
 
 		public WriteOnlyBufferedStream(Stream stream, int bufferSize)
 		{
 			this.stream = stream;
 
-			this.buffer = BufferPool.Get(bufferSize, true);
-			this._position = 0;
+			buffer = BufferPool.Get(bufferSize, true);
+			_position = 0;
 		}
 
 		public override void Flush()
 		{
-			if (this._position > 0)
+			if (_position > 0)
 			{
-				this.stream.Write(this.buffer, 0, this._position);
-				this.stream.Flush();
+				stream.Write(buffer, 0, _position);
+				stream.Flush();
 
 				//if (HTTPManager.Logger.Level == Logger.Loglevels.All)
 				//    HTTPManager.Logger.Information("WriteOnlyBufferedStream", string.Format("Flushed {0:N0} bytes", this._position));
 
-				this._position = 0;
+				_position = 0;
 			}
 		}
 
@@ -66,15 +66,17 @@ namespace BestHTTP.Extensions
 		{
 			while (count > 0)
 			{
-				int writeCount = Math.Min(count, this.buffer.Length - this._position);
-				Array.Copy(bufferFrom, offset, this.buffer, this._position, writeCount);
+				int writeCount = Math.Min(count, buffer.Length - _position);
+				Array.Copy(bufferFrom, offset, buffer, _position, writeCount);
 
-				this._position += writeCount;
+				_position += writeCount;
 				offset += writeCount;
 				count -= writeCount;
 
-				if (this._position == this.buffer.Length)
-					this.Flush();
+				if (_position == buffer.Length)
+				{
+					Flush();
+				}
 			}
 		}
 
@@ -96,9 +98,12 @@ namespace BestHTTP.Extensions
 		{
 			base.Dispose(disposing);
 
-			if (disposing && this.buffer != null)
-				BufferPool.Release(this.buffer);
-			this.buffer = null;
+			if (disposing && buffer != null)
+			{
+				BufferPool.Release(buffer);
+			}
+
+			buffer = null;
 		}
 	}
 }

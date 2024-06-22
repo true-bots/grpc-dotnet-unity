@@ -43,7 +43,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		protected override void AdvanceCounter()
 		{
 			if (++engineState[12] == 0)
+			{
 				throw new InvalidOperationException("attempt to increase counter past 2^32.");
+			}
 		}
 
 		protected override void ResetCounter()
@@ -56,7 +58,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (keyBytes != null)
 			{
 				if (keyBytes.Length != 32)
+				{
 					throw new ArgumentException(AlgorithmName + " requires 256 bit key");
+				}
 
 				PackTauOrSigma(keyBytes.Length, engineState, 0);
 
@@ -76,9 +80,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		internal void DoFinal(byte[] inBuf, int inOff, int inLen, byte[] outBuf, int outOff)
 		{
 			if (!initialised)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
+
 			if (index != 0)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not in block-aligned state");
+			}
 
 			Check.DataLength(inBuf, inOff, inLen, "input buffer too short");
 			Check.OutputLength(outBuf, outOff, inLen, "output buffer too short");
@@ -180,9 +189,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		internal void ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			if (!initialised)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
+
 			if (LimitExceeded(64U))
+			{
 				throw new MaxBytesExceededException("2^38 byte limit per IV would be exceeded; Change IV");
+			}
 
 			Debug.Assert(index == 0);
 
@@ -192,9 +206,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		internal void ProcessBlocks2(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			if (!initialised)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
+
 			if (LimitExceeded(128U))
+			{
 				throw new MaxBytesExceededException("2^38 byte limit per IV would be exceeded; Change IV");
+			}
 
 			Debug.Assert(index == 0);
 

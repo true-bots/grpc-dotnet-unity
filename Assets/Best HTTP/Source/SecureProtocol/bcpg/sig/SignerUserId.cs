@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 	public class SignerUserId
 		: SignatureSubpacket
 	{
-		private static byte[] UserIdToBytes(
+		static byte[] UserIdToBytes(
 			string id)
 		{
 			byte[] idData = new byte[id.Length];

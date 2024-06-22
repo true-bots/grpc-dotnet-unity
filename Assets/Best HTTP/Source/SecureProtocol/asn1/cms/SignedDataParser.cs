@@ -20,29 +20,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	*/
 	public class SignedDataParser
 	{
-		private Asn1SequenceParser _seq;
-		private DerInteger _version;
-		private object _nextObject;
-		private bool _certsCalled;
-		private bool _crlsCalled;
+		Asn1SequenceParser _seq;
+		DerInteger _version;
+		object _nextObject;
+		bool _certsCalled;
+		bool _crlsCalled;
 
 		public static SignedDataParser GetInstance(
 			object o)
 		{
 			if (o is Asn1Sequence)
+			{
 				return new SignedDataParser(((Asn1Sequence)o).Parser);
+			}
 
 			if (o is Asn1SequenceParser)
+			{
 				return new SignedDataParser((Asn1SequenceParser)o);
+			}
 
-			throw new IOException("unknown object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+			throw new IOException("unknown object encountered: " + Platform.GetTypeName(o));
 		}
 
 		public SignedDataParser(
 			Asn1SequenceParser seq)
 		{
-			this._seq = seq;
-			this._version = (DerInteger)seq.ReadObject();
+			_seq = seq;
+			_version = (DerInteger)seq.ReadObject();
 		}
 
 		public DerInteger Version
@@ -81,7 +85,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public Asn1SetParser GetCrls()
 		{
 			if (!_certsCalled)
+			{
 				throw new IOException("GetCerts() has not been called.");
+			}
 
 			_crlsCalled = true;
 
@@ -106,7 +112,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public Asn1SetParser GetSignerInfos()
 		{
 			if (!_certsCalled || !_crlsCalled)
+			{
 				throw new IOException("GetCerts() and/or GetCrls() has not been called.");
+			}
 
 			if (_nextObject == null)
 			{

@@ -33,9 +33,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 	public class MonetaryLimit
 		: Asn1Encodable
 	{
-		private readonly DerPrintableString currency;
-		private readonly DerInteger amount;
-		private readonly DerInteger exponent;
+		readonly DerPrintableString currency;
+		readonly DerInteger amount;
+		readonly DerInteger exponent;
 
 		public static MonetaryLimit GetInstance(
 			object obj)
@@ -50,14 +50,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				return new MonetaryLimit(Asn1Sequence.GetInstance(obj));
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private MonetaryLimit(
+		MonetaryLimit(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 3)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
 			currency = DerPrintableString.GetInstance(seq[0]);
 			amount = DerInteger.GetInstance(seq[1]);

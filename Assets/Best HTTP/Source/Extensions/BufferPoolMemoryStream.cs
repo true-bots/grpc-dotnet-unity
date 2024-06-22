@@ -42,7 +42,7 @@ namespace BestHTTP.Extensions
 	/// <summary>
 	/// This is a modified MemoryStream class to use VariableSizedBufferPool
 	/// </summary>
-	public sealed class BufferPoolMemoryStream : System.IO.Stream
+	public sealed class BufferPoolMemoryStream : Stream
 	{
 		bool canWrite;
 		bool allowGetBuffer;
@@ -63,7 +63,9 @@ namespace BestHTTP.Extensions
 		public BufferPoolMemoryStream(int capacity)
 		{
 			if (capacity < 0)
+			{
 				throw new ArgumentOutOfRangeException("capacity");
+			}
 
 			canWrite = true;
 
@@ -72,14 +74,16 @@ namespace BestHTTP.Extensions
 			//
 			//expandable = true;
 			//allowGetBuffer = true;
-			var buffer = capacity > 0 ? BufferPool.Get(capacity, true) : BufferPool.NoData;
+			byte[] buffer = capacity > 0 ? BufferPool.Get(capacity, true) : BufferPool.NoData;
 			InternalConstructor(buffer, 0, buffer.Length, true, true, true, true);
 		}
 
 		public BufferPoolMemoryStream(byte[] buffer)
 		{
 			if (buffer == null)
+			{
 				throw new ArgumentNullException("buffer");
+			}
 
 			InternalConstructor(buffer, 0, buffer.Length, true, false, true, false);
 		}
@@ -87,7 +91,9 @@ namespace BestHTTP.Extensions
 		public BufferPoolMemoryStream(byte[] buffer, bool writable)
 		{
 			if (buffer == null)
+			{
 				throw new ArgumentNullException("buffer");
+			}
 
 			InternalConstructor(buffer, 0, buffer.Length, writable, false, true, false);
 		}
@@ -120,14 +126,20 @@ namespace BestHTTP.Extensions
 		void InternalConstructor(byte[] buffer, int index, int count, bool writable, bool publicallyVisible, bool releaseBuffer, bool canExpand)
 		{
 			if (buffer == null)
+			{
 				throw new ArgumentNullException("buffer");
+			}
 
 			if (index < 0 || count < 0)
+			{
 				throw new ArgumentOutOfRangeException("index or count is less than 0.");
+			}
 
 			if (buffer.Length - index < count)
+			{
 				throw new ArgumentException("index+count",
 					"The size of the buffer is less than index + count.");
+			}
 
 			canWrite = writable;
 
@@ -146,7 +158,9 @@ namespace BestHTTP.Extensions
 		void CheckIfClosedThrowDisposed()
 		{
 			if (streamClosed)
+			{
 				throw new ObjectDisposedException("MemoryStream");
+			}
 		}
 
 		public override bool CanRead
@@ -161,7 +175,7 @@ namespace BestHTTP.Extensions
 
 		public override bool CanWrite
 		{
-			get { return (!streamClosed && canWrite); }
+			get { return !streamClosed && canWrite; }
 		}
 
 		public int Capacity
@@ -176,14 +190,20 @@ namespace BestHTTP.Extensions
 			{
 				CheckIfClosedThrowDisposed();
 				if (value == capacity)
+				{
 					return; // LAMENESS: see MemoryStreamTest.ConstructorFive
+				}
 
 				if (!expandable)
+				{
 					throw new NotSupportedException("Cannot expand this MemoryStream");
+				}
 
 				if (value < 0 || value < length)
+				{
 					throw new ArgumentOutOfRangeException("value",
 						"New capacity cannot be negative or less than the current capacity " + value + " " + capacity);
+				}
 
 				byte[] newBuffer = null;
 				if (value != 0)
@@ -227,12 +247,16 @@ namespace BestHTTP.Extensions
 			{
 				CheckIfClosedThrowDisposed();
 				if (value < 0)
+				{
 					throw new ArgumentOutOfRangeException("value",
 						"Position cannot be negative");
+				}
 
-				if (value > Int32.MaxValue)
+				if (value > int.MaxValue)
+				{
 					throw new ArgumentOutOfRangeException("value",
 						"Position must be non-negative and less than 2^31 - 1 - origin");
+				}
 
 				position = initialIndex + (int)value;
 			}
@@ -242,8 +266,11 @@ namespace BestHTTP.Extensions
 		{
 			streamClosed = true;
 			expandable = false;
-			if (disposing && internalBuffer != null && this.releaseInternalBuffer)
+			if (disposing && internalBuffer != null && releaseInternalBuffer)
+			{
 				BufferPool.Release(internalBuffer);
+			}
+
 			internalBuffer = null;
 		}
 
@@ -255,7 +282,9 @@ namespace BestHTTP.Extensions
 		public byte[] GetBuffer()
 		{
 			if (!allowGetBuffer)
+			{
 				throw new UnauthorizedAccessException();
+			}
 
 			return internalBuffer;
 		}
@@ -265,20 +294,30 @@ namespace BestHTTP.Extensions
 			CheckIfClosedThrowDisposed();
 
 			if (buffer == null)
+			{
 				throw new ArgumentNullException("buffer");
+			}
 
 			if (offset < 0 || count < 0)
+			{
 				throw new ArgumentOutOfRangeException("offset or count less than zero.");
+			}
 
 			if (buffer.Length - offset < count)
+			{
 				throw new ArgumentException("offset+count",
 					"The size of the buffer is less than offset + count.");
+			}
 
 			if (position >= length || count == 0)
+			{
 				return 0;
+			}
 
 			if (position > length - count)
+			{
 				count = length - position;
+			}
 
 			Buffer.BlockCopy(internalBuffer, position, buffer, offset, count);
 			position += count;
@@ -289,7 +328,9 @@ namespace BestHTTP.Extensions
 		{
 			CheckIfClosedThrowDisposed();
 			if (position >= length)
+			{
 				return -1;
+			}
 
 			return internalBuffer[position++];
 		}
@@ -299,15 +340,20 @@ namespace BestHTTP.Extensions
 			CheckIfClosedThrowDisposed();
 
 			// It's funny that they don't throw this exception for < Int32.MinValue
-			if (offset > (long)Int32.MaxValue)
+			if (offset > (long)int.MaxValue)
+			{
 				throw new ArgumentOutOfRangeException("Offset out of range. " + offset);
+			}
 
 			int refPoint;
 			switch (loc)
 			{
 				case SeekOrigin.Begin:
 					if (offset < 0)
+					{
 						throw new IOException("Attempted to seek before start of MemoryStream.");
+					}
+
 					refPoint = initialIndex;
 					break;
 				case SeekOrigin.Current:
@@ -329,7 +375,9 @@ namespace BestHTTP.Extensions
 
 			refPoint += (int)offset;
 			if (refPoint < initialIndex)
+			{
 				throw new IOException("Attempted to seek before start of MemoryStream.");
+			}
 
 			position = refPoint;
 			return position;
@@ -338,13 +386,19 @@ namespace BestHTTP.Extensions
 		int CalculateNewCapacity(int minimum)
 		{
 			if (minimum < 256)
+			{
 				minimum = 256; // See GetBufferTwo test
+			}
 
 			if (minimum < capacity * 2)
+			{
 				minimum = capacity * 2;
+			}
 
 			if (!UnityEngine.Mathf.IsPowerOfTwo(minimum))
+			{
 				minimum = UnityEngine.Mathf.NextPowerOfTwo(minimum);
+			}
 
 			return minimum;
 		}
@@ -354,7 +408,9 @@ namespace BestHTTP.Extensions
 			// We don't need to take into account the dirty bytes when incrementing the
 			// Capacity, as changing it will only preserve the valid clear region.
 			if (newSize > capacity)
+			{
 				Capacity = CalculateNewCapacity(newSize);
+			}
 			else if (dirty_bytes > 0)
 			{
 				Array.Clear(internalBuffer, length, dirty_bytes);
@@ -365,7 +421,9 @@ namespace BestHTTP.Extensions
 		public override void SetLength(long value)
 		{
 			if (!expandable && value > capacity)
+			{
 				throw new NotSupportedException("Expanding this MemoryStream is not supported");
+			}
 
 			CheckIfClosedThrowDisposed();
 
@@ -378,19 +436,27 @@ namespace BestHTTP.Extensions
 			// greater than "the maximum length of the MemoryStream".  I haven't
 			// seen anywhere mention what the maximum length of a MemoryStream is and
 			// since we're this far this memory stream is expandable.
-			if (value < 0 || (value + initialIndex) > (long)Int32.MaxValue)
+			if (value < 0 || value + initialIndex > (long)int.MaxValue)
+			{
 				throw new ArgumentOutOfRangeException();
+			}
 
 			int newSize = (int)value + initialIndex;
 
 			if (newSize > length)
+			{
 				Expand(newSize);
+			}
 			else if (newSize < length) // Postpone the call to Array.Clear till expand time
+			{
 				dirty_bytes += length - newSize;
+			}
 
 			length = newSize;
 			if (position > length)
+			{
 				position = length;
+			}
 		}
 
 		public byte[] ToArray()
@@ -406,9 +472,13 @@ namespace BestHTTP.Extensions
 			if (l > 0)
 			{
 				if (canBeLarger)
+				{
 					outBuffer = BufferPool.Get(l, true);
+				}
 				else
+				{
 					outBuffer = new byte[l];
+				}
 			}
 			else
 			{
@@ -416,7 +486,10 @@ namespace BestHTTP.Extensions
 			}
 
 			if (internalBuffer != null)
+			{
 				Buffer.BlockCopy(internalBuffer, initialIndex, outBuffer, 0, l);
+			}
+
 			return outBuffer;
 		}
 
@@ -426,7 +499,9 @@ namespace BestHTTP.Extensions
 			byte[] outBuffer = l > 0 ? BufferPool.Get(l, true) : BufferPool.NoData;
 
 			if (internalBuffer != null)
+			{
 				Buffer.BlockCopy(internalBuffer, initialIndex, outBuffer, 0, l);
+			}
 
 			return new BufferSegment(outBuffer, 0, l);
 		}
@@ -436,33 +511,47 @@ namespace BestHTTP.Extensions
 			CheckIfClosedThrowDisposed();
 
 			if (!canWrite)
+			{
 				throw new NotSupportedException("Cannot write to this stream.");
+			}
 
 			if (buffer == null)
+			{
 				throw new ArgumentNullException("buffer");
+			}
 
 			if (offset < 0 || count < 0)
+			{
 				throw new ArgumentOutOfRangeException();
+			}
 
 			if (buffer.Length - offset < count)
+			{
 				throw new ArgumentException("offset+count",
 					"The size of the buffer is less than offset + count.");
+			}
 
 			// reordered to avoid possible integer overflow
 			if (position > length - count)
+			{
 				Expand(position + count);
+			}
 
 			Buffer.BlockCopy(buffer, offset, internalBuffer, position, count);
 			position += count;
 			if (position >= length)
+			{
 				length = position;
+			}
 		}
 
 		public override void WriteByte(byte value)
 		{
 			CheckIfClosedThrowDisposed();
 			if (!canWrite)
+			{
 				throw new NotSupportedException("Cannot write to this stream.");
+			}
 
 			if (position >= length)
 			{
@@ -478,7 +567,9 @@ namespace BestHTTP.Extensions
 			CheckIfClosedThrowDisposed();
 
 			if (stream == null)
+			{
 				throw new ArgumentNullException("stream");
+			}
 
 			stream.Write(internalBuffer, initialIndex, length - initialIndex);
 		}

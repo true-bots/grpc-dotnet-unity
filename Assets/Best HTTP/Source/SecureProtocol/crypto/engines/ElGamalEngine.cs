@@ -13,10 +13,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class ElGamalEngine
 		: IAsymmetricBlockCipher
 	{
-		private ElGamalKeyParameters key;
-		private SecureRandom random;
-		private bool forEncryption;
-		private int bitSize;
+		ElGamalKeyParameters key;
+		SecureRandom random;
+		bool forEncryption;
+		int bitSize;
 
 		public virtual string AlgorithmName
 		{
@@ -33,27 +33,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		{
 			if (parameters is ParametersWithRandom withRandom)
 			{
-				this.key = (ElGamalKeyParameters)withRandom.Parameters;
-				this.random = withRandom.Random;
+				key = (ElGamalKeyParameters)withRandom.Parameters;
+				random = withRandom.Random;
 			}
 			else
 			{
-				this.key = (ElGamalKeyParameters)parameters;
-				this.random = CryptoServicesRegistrar.GetSecureRandom();
+				key = (ElGamalKeyParameters)parameters;
+				random = CryptoServicesRegistrar.GetSecureRandom();
 			}
 
 			this.forEncryption = forEncryption;
-			this.bitSize = key.Parameters.P.BitLength;
+			bitSize = key.Parameters.P.BitLength;
 
 			if (forEncryption)
 			{
 				if (!(key is ElGamalPublicKeyParameters))
+				{
 					throw new ArgumentException("ElGamalPublicKeyParameters are required for encryption.");
+				}
 			}
 			else
 			{
 				if (!(key is ElGamalPrivateKeyParameters))
+				{
 					throw new ArgumentException("ElGamalPrivateKeyParameters are required for decryption.");
+				}
 			}
 		}
 
@@ -106,14 +110,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int length)
 		{
 			if (key == null)
+			{
 				throw new InvalidOperationException("ElGamal engine not initialised");
+			}
 
 			int maxLength = forEncryption
 				? (bitSize - 1 + 7) / 8
 				: GetInputBlockSize();
 
 			if (length > maxLength)
+			{
 				throw new DataLengthException("input too large for ElGamal cipher.\n");
+			}
 
 			BigInteger p = key.Parameters.P;
 
@@ -137,7 +145,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				BigInteger tmp = new BigInteger(1, input, inOff, length);
 
 				if (tmp.BitLength >= p.BitLength)
+				{
 					throw new DataLengthException("input too large for ElGamal cipher.\n");
+				}
 
 
 				ElGamalPublicKeyParameters pub = (ElGamalPublicKeyParameters)key;
@@ -155,7 +165,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				BigInteger gamma = g.ModPow(k, p);
 				BigInteger phi = tmp.Multiply(pub.Y.ModPow(k, p)).Mod(p);
 
-				output = new byte[this.GetOutputBlockSize()];
+				output = new byte[GetOutputBlockSize()];
 
 				// TODO Add methods to allow writing BigInteger to existing byte array?
 				byte[] out1 = gamma.ToByteArrayUnsigned();

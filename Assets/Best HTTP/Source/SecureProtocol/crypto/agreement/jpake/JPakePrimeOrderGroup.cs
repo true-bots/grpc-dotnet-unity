@@ -18,9 +18,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 	/// </summary>
 	public class JPakePrimeOrderGroup
 	{
-		private readonly BigInteger p;
-		private readonly BigInteger q;
-		private readonly BigInteger g;
+		readonly BigInteger p;
+		readonly BigInteger q;
+		readonly BigInteger g;
 
 		/// <summary>
 		/// Constructs a new JPakePrimeOrderGroup.
@@ -67,18 +67,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 			if (!skipChecks)
 			{
 				if (!p.Subtract(JPakeUtilities.One).Mod(q).Equals(JPakeUtilities.Zero))
+				{
 					throw new ArgumentException("p-1 must be evenly divisible by q");
+				}
+
 				if (g.CompareTo(BigInteger.Two) == -1 || g.CompareTo(p.Subtract(JPakeUtilities.One)) == 1)
+				{
 					throw new ArgumentException("g must be in [2, p-1]");
+				}
+
 				if (!g.ModPow(q, p).Equals(JPakeUtilities.One))
+				{
 					throw new ArgumentException("g^q mod p must equal 1");
+				}
 
 				// Note these checks do not guarantee that p and q are prime.
 				// We just have reasonable certainty that they are prime.
 				if (!p.IsProbablePrime(20))
+				{
 					throw new ArgumentException("p must be prime");
+				}
+
 				if (!q.IsProbablePrime(20))
+				{
 					throw new ArgumentException("q must be prime");
+				}
 			}
 
 			this.p = p;

@@ -11,10 +11,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class Dstu7624WrapEngine
 		: IWrapper
 	{
-		private KeyParameter param;
-		private Dstu7624Engine engine;
-		private bool forWrapping;
-		private int blockSize;
+		KeyParameter param;
+		Dstu7624Engine engine;
+		bool forWrapping;
+		int blockSize;
 
 		public Dstu7624WrapEngine(int blockSizeBits)
 		{
@@ -35,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			if (parameters is KeyParameter)
 			{
-				this.param = (KeyParameter)parameters;
+				param = (KeyParameter)parameters;
 
 				engine.Init(forWrapping, param);
 			}
@@ -48,10 +48,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public byte[] Wrap(byte[] input, int inOff, int length)
 		{
 			if (!forWrapping)
+			{
 				throw new InvalidOperationException("Not set for wrapping");
+			}
 
 			if (length % blockSize != 0)
+			{
 				throw new ArgumentException("Padding not supported");
+			}
 
 			int n = 2 * (1 + length / blockSize);
 			int V = (n - 1) * 6;
@@ -64,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			Array.Copy(buffer, 0, B, 0, blockSize / 2);
 			//Console.WriteLine("B0: "+ BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders.Hex.ToHexString(B));
 
-			var bTemp = new List<byte[]>();
+			List<byte[]> bTemp = new List<byte[]>();
 			int bHalfBlocksLen = buffer.Length - blockSize / 2;
 			int bufOff = blockSize / 2;
 			while (bHalfBlocksLen != 0)
@@ -126,10 +130,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public byte[] Unwrap(byte[] input, int inOff, int length)
 		{
 			if (forWrapping)
+			{
 				throw new InvalidOperationException("not set for unwrapping");
+			}
 
 			if (length % blockSize != 0)
+			{
 				throw new ArgumentException("Padding not supported");
+			}
 
 			int n = 2 * length / blockSize;
 			int V = (n - 1) * 6;
@@ -141,7 +149,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			Array.Copy(buffer, 0, B, 0, blockSize / 2);
 			//Console.WriteLine("B18: " + BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders.Hex.ToHexString(B));
 
-			var bTemp = new List<byte[]>();
+			List<byte[]> bTemp = new List<byte[]>();
 
 			int bHalfBlocksLen = buffer.Length - blockSize / 2;
 			int bufOff = blockSize / 2;
@@ -209,7 +217,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			if (diff != 0)
+			{
 				throw new InvalidCipherTextException("checksum failed");
+			}
 
 			return Arrays.CopyOfRange(buffer, 0, buffer.Length - blockSize);
 		}

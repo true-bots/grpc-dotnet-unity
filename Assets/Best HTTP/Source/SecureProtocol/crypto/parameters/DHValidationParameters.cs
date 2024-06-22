@@ -7,15 +7,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
 	public class DHValidationParameters
 	{
-		private readonly byte[] seed;
-		private readonly int counter;
+		readonly byte[] seed;
+		readonly int counter;
 
 		public DHValidationParameters(
 			byte[] seed,
 			int counter)
 		{
 			if (seed == null)
+			{
 				throw new ArgumentNullException("seed");
+			}
 
 			this.seed = (byte[])seed.Clone();
 			this.counter = counter;
@@ -35,12 +37,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			DHValidationParameters other = obj as DHValidationParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}
@@ -49,7 +55,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			DHValidationParameters other)
 		{
 			return counter == other.counter
-			       && Arrays.AreEqual(this.seed, other.seed);
+			       && Arrays.AreEqual(seed, other.seed);
 		}
 
 		public override int GetHashCode()

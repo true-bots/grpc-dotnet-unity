@@ -9,10 +9,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class KeyTransRecipientInfo
 		: Asn1Encodable
 	{
-		private DerInteger version;
-		private RecipientIdentifier rid;
-		private AlgorithmIdentifier keyEncryptionAlgorithm;
-		private Asn1OctetString encryptedKey;
+		DerInteger version;
+		RecipientIdentifier rid;
+		AlgorithmIdentifier keyEncryptionAlgorithm;
+		Asn1OctetString encryptedKey;
 
 		public KeyTransRecipientInfo(
 			RecipientIdentifier rid,
@@ -21,11 +21,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		{
 			if (rid.ToAsn1Object() is Asn1TaggedObject)
 			{
-				this.version = new DerInteger(2);
+				version = new DerInteger(2);
 			}
 			else
 			{
-				this.version = new DerInteger(0);
+				version = new DerInteger(0);
 			}
 
 			this.rid = rid;
@@ -36,10 +36,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public KeyTransRecipientInfo(
 			Asn1Sequence seq)
 		{
-			this.version = (DerInteger)seq[0];
-			this.rid = RecipientIdentifier.GetInstance(seq[1]);
-			this.keyEncryptionAlgorithm = AlgorithmIdentifier.GetInstance(seq[2]);
-			this.encryptedKey = (Asn1OctetString)seq[3];
+			version = (DerInteger)seq[0];
+			rid = RecipientIdentifier.GetInstance(seq[1]);
+			keyEncryptionAlgorithm = AlgorithmIdentifier.GetInstance(seq[2]);
+			encryptedKey = (Asn1OctetString)seq[3];
 		}
 
 		/**
@@ -52,13 +52,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is KeyTransRecipientInfo)
+			{
 				return (KeyTransRecipientInfo)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new KeyTransRecipientInfo((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
-				"Illegal object in KeyTransRecipientInfo: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+				"Illegal object in KeyTransRecipientInfo: " + Platform.GetTypeName(obj));
 		}
 
 		public DerInteger Version

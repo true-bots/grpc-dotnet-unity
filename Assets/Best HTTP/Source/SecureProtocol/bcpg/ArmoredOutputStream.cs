@@ -19,7 +19,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	{
 		public static readonly string HeaderVersion = "Version";
 
-		private static readonly byte[] encodingTable =
+		static readonly byte[] encodingTable =
 		{
 			(byte)'A', (byte)'B', (byte)'C', (byte)'D', (byte)'E', (byte)'F', (byte)'G',
 			(byte)'H', (byte)'I', (byte)'J', (byte)'K', (byte)'L', (byte)'M', (byte)'N',
@@ -38,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		/**
 		 * encode the input data producing a base 64 encoded byte array.
 		 */
-		private static void Encode(
+		static void Encode(
 			Stream outStream,
 			int[] data,
 			int len)
@@ -81,50 +81,50 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			outStream.Write(bs, 0, bs.Length);
 		}
 
-		private readonly Stream outStream;
-		private int[] buf = new int[3];
-		private int bufPtr = 0;
-		private Crc24 crc = new Crc24();
-		private int chunkCount = 0;
-		private int lastb;
+		readonly Stream outStream;
+		int[] buf = new int[3];
+		int bufPtr = 0;
+		Crc24 crc = new Crc24();
+		int chunkCount = 0;
+		int lastb;
 
-		private bool start = true;
-		private bool clearText = false;
-		private bool newLine = false;
+		bool start = true;
+		bool clearText = false;
+		bool newLine = false;
 
-		private string type;
+		string type;
 
-		private static readonly string NewLine = Environment.NewLine;
-		private static readonly string headerStart = "-----BEGIN PGP ";
-		private static readonly string headerTail = "-----";
-		private static readonly string footerStart = "-----END PGP ";
-		private static readonly string footerTail = "-----";
+		static readonly string NewLine = Environment.NewLine;
+		static readonly string headerStart = "-----BEGIN PGP ";
+		static readonly string headerTail = "-----";
+		static readonly string footerStart = "-----END PGP ";
+		static readonly string footerTail = "-----";
 
-		private static string CreateVersion()
+		static string CreateVersion()
 		{
-			var assembly = Assembly.GetExecutingAssembly();
-			var title = assembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
-			var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			string title = assembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
+			string version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 			return title + " v" + version;
 		}
 
-		private static readonly string Version = CreateVersion();
+		static readonly string Version = CreateVersion();
 
-		private readonly IDictionary<string, IList<string>> m_headers;
+		readonly IDictionary<string, IList<string>> m_headers;
 
 		public ArmoredOutputStream(Stream outStream)
 		{
 			this.outStream = outStream;
-			this.m_headers = new Dictionary<string, IList<string>>(1);
+			m_headers = new Dictionary<string, IList<string>>(1);
 			SetHeader(HeaderVersion, Version);
 		}
 
 		public ArmoredOutputStream(Stream outStream, IDictionary<string, string> headers)
 			: this(outStream)
 		{
-			foreach (var header in headers)
+			foreach (KeyValuePair<string, string> header in headers)
 			{
-				var headerList = new List<string>(1);
+				List<string> headerList = new List<string>(1);
 				headerList.Add(header.Value);
 
 				m_headers[header.Key] = headerList;
@@ -141,11 +141,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		{
 			if (val == null)
 			{
-				this.m_headers.Remove(name);
+				m_headers.Remove(name);
 				return;
 			}
 
-			if (m_headers.TryGetValue(name, out var valueList))
+			if (m_headers.TryGetValue(name, out IList<string> valueList))
 			{
 				valueList.Clear();
 			}
@@ -168,9 +168,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public void AddHeader(string name, string val)
 		{
 			if (val == null || name == null)
+			{
 				return;
+			}
 
-			if (!m_headers.TryGetValue(name, out var valueList))
+			if (!m_headers.TryGetValue(name, out IList<string> valueList))
 			{
 				valueList = new List<string>(1);
 				m_headers[name] = valueList;
@@ -184,7 +186,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		 */
 		public void ResetHeaders()
 		{
-			var versions = CollectionUtilities.GetValueOrNull(m_headers, HeaderVersion);
+			IList<string> versions = CollectionUtilities.GetValueOrNull(m_headers, HeaderVersion);
 
 			m_headers.Clear();
 
@@ -304,12 +306,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 
 				DoWrite(headerStart + type + headerTail + NewLine);
 
-				if (m_headers.TryGetValue(HeaderVersion, out var versionHeaders))
+				if (m_headers.TryGetValue(HeaderVersion, out IList<string> versionHeaders))
 				{
 					WriteHeaderEntry(HeaderVersion, versionHeaders[0]);
 				}
 
-				foreach (var de in m_headers)
+				foreach (KeyValuePair<string, IList<string>> de in m_headers)
 				{
 					string k = de.Key;
 					if (k != HeaderVersion)
@@ -360,7 +362,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			base.Dispose(disposing);
 		}
 
-		private void DoClose()
+		void DoClose()
 		{
 			if (bufPtr > 0)
 			{
@@ -371,9 +373,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 
 			int crcV = crc.Value;
 
-			buf[0] = ((crcV >> 16) & 0xff);
-			buf[1] = ((crcV >> 8) & 0xff);
-			buf[2] = (crcV & 0xff);
+			buf[0] = (crcV >> 16) & 0xff;
+			buf[1] = (crcV >> 8) & 0xff;
+			buf[2] = crcV & 0xff;
 
 			Encode(outStream, buf, 3);
 
@@ -386,14 +388,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			outStream.Flush();
 		}
 
-		private void WriteHeaderEntry(
+		void WriteHeaderEntry(
 			string name,
 			string v)
 		{
 			DoWrite(name + ": " + v + NewLine);
 		}
 
-		private void DoWrite(
+		void DoWrite(
 			string s)
 		{
 			byte[] bs = Strings.ToAsciiByteArray(s);

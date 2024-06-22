@@ -18,8 +18,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	/// </remarks>
 	public sealed class Certificate
 	{
-		private static readonly TlsCertificate[] EmptyCerts = new TlsCertificate[0];
-		private static readonly CertificateEntry[] EmptyCertEntries = new CertificateEntry[0];
+		static readonly TlsCertificate[] EmptyCerts = new TlsCertificate[0];
+		static readonly CertificateEntry[] EmptyCertEntries = new CertificateEntry[0];
 
 		public static readonly Certificate EmptyChain = new Certificate(EmptyCerts);
 		public static readonly Certificate EmptyChainTls13 = new Certificate(TlsUtilities.EmptyBytes, EmptyCertEntries);
@@ -30,10 +30,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			public int MaxChainLength { get; set; } = int.MaxValue;
 		}
 
-		private static CertificateEntry[] Convert(TlsCertificate[] certificateList)
+		static CertificateEntry[] Convert(TlsCertificate[] certificateList)
 		{
 			if (TlsUtilities.IsNullOrContainsNull(certificateList))
+			{
 				throw new ArgumentException("cannot be null or contain any nulls", "certificateList");
+			}
 
 			int count = certificateList.Length;
 			CertificateEntry[] result = new CertificateEntry[count];
@@ -45,9 +47,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return result;
 		}
 
-		private readonly byte[] m_certificateRequestContext;
-		private readonly CertificateEntry[] m_certificateEntryList;
-		private readonly short m_certificateType;
+		readonly byte[] m_certificateRequestContext;
+		readonly CertificateEntry[] m_certificateEntryList;
+		readonly short m_certificateType;
 
 		public Certificate(TlsCertificate[] certificateList)
 			: this(null, Convert(certificateList))
@@ -63,9 +65,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public Certificate(short certificateType, byte[] certificateRequestContext, CertificateEntry[] certificateEntryList)
 		{
 			if (null != certificateRequestContext && !TlsUtilities.IsValidUint8(certificateRequestContext.Length))
+			{
 				throw new ArgumentException("cannot be longer than 255", "certificateRequestContext");
+			}
+
 			if (TlsUtilities.IsNullOrContainsNull(certificateEntryList))
+			{
 				throw new ArgumentException("cannot be null or contain any nulls", "certificateEntryList");
+			}
 
 			m_certificateRequestContext = TlsUtilities.Clone(certificateRequestContext);
 			m_certificateEntryList = certificateEntryList;
@@ -98,13 +105,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return CloneCertificateEntryList();
 		}
 
-		public short CertificateType => m_certificateType;
+		public short CertificateType
+		{
+			get { return m_certificateType; }
+		}
 
-		public int Length => m_certificateEntryList.Length;
+		public int Length
+		{
+			get { return m_certificateEntryList.Length; }
+		}
 
 		/// <returns><c>true</c> if this certificate chain contains no certificates, or <c>false</c> otherwise.
 		/// </returns>
-		public bool IsEmpty => m_certificateEntryList.Length == 0;
+		public bool IsEmpty
+		{
+			get { return m_certificateEntryList.Length == 0; }
+		}
 
 		/// <summary>Encode this <see cref="Certificate"/> to a <see cref="Stream"/>, and optionally calculate the
 		/// "end point hash" (per RFC 5929's tls-server-end-point binding).</summary>
@@ -117,8 +133,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			bool isTlsV13 = TlsUtilities.IsTlsV13(context);
 
-			if ((null != m_certificateRequestContext) != isTlsV13)
+			if (null != m_certificateRequestContext != isTlsV13)
+			{
 				throw new InvalidOperationException();
+			}
 
 			if (isTlsV13)
 			{
@@ -126,8 +144,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 
 			int count = m_certificateEntryList.Length;
-			var certEncodings = new List<byte[]>(count);
-			var extEncodings = isTlsV13 ? new List<byte[]>(count) : null;
+			List<byte[]> certEncodings = new List<byte[]>(count);
+			List<byte[]> extEncodings = isTlsV13 ? new List<byte[]>(count) : null;
 
 			long totalLength = 0;
 			for (int i = 0; i < count; ++i)
@@ -147,8 +165,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 				if (isTlsV13)
 				{
-					var extensions = entry.Extensions;
-					byte[] extEncoding = (null == extensions)
+					IDictionary<int, byte[]> extensions = entry.Extensions;
+					byte[] extEncoding = null == extensions
 						? TlsUtilities.EmptyBytes
 						: TlsProtocol.WriteExtensionsData(extensions);
 
@@ -212,7 +230,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			TlsCrypto crypto = context.Crypto;
 			int maxChainLength = System.Math.Max(1, options.MaxChainLength);
 
-			var certificate_list = new List<CertificateEntry>();
+			List<CertificateEntry> certificate_list = new List<CertificateEntry>();
 			while (buf.Position < buf.Length)
 			{
 				if (certificate_list.Count >= maxChainLength)
@@ -261,7 +279,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return new Certificate(certType, certificateRequestContext, certificateList);
 		}
 
-		private static void CalculateEndPointHash(TlsContext context, TlsCertificate cert, byte[] encoding,
+		static void CalculateEndPointHash(TlsContext context, TlsCertificate cert, byte[] encoding,
 			Stream output)
 		{
 			byte[] endPointHash = TlsUtilities.CalculateEndPointHash(context, cert, encoding);
@@ -271,11 +289,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 		}
 
-		private TlsCertificate[] CloneCertificateList()
+		TlsCertificate[] CloneCertificateList()
 		{
 			int count = m_certificateEntryList.Length;
 			if (0 == count)
+			{
 				return EmptyCerts;
+			}
 
 			TlsCertificate[] result = new TlsCertificate[count];
 			for (int i = 0; i < count; ++i)
@@ -286,11 +306,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return result;
 		}
 
-		private CertificateEntry[] CloneCertificateEntryList()
+		CertificateEntry[] CloneCertificateEntryList()
 		{
 			int count = m_certificateEntryList.Length;
 			if (0 == count)
+			{
 				return EmptyCertEntries;
+			}
 
 			CertificateEntry[] result = new CertificateEntry[count];
 			Array.Copy(m_certificateEntryList, 0, result, 0, count);

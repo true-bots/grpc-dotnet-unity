@@ -14,20 +14,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 	public class X9ECParameters
 		: Asn1Encodable
 	{
-		private X9FieldID fieldID;
-		private ECCurve curve;
-		private X9ECPoint g;
-		private BigInteger n;
-		private BigInteger h;
-		private byte[] seed;
+		X9FieldID fieldID;
+		ECCurve curve;
+		X9ECPoint g;
+		BigInteger n;
+		BigInteger h;
+		byte[] seed;
 
 		public static X9ECParameters GetInstance(object obj)
 		{
 			if (obj is X9ECParameters)
+			{
 				return (X9ECParameters)obj;
+			}
 
 			if (obj != null)
+			{
 				return new X9ECParameters(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
@@ -41,30 +45,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 				throw new ArgumentException("bad version in X9ECParameters");
 			}
 
-			this.n = ((DerInteger)seq[4]).Value;
+			n = ((DerInteger)seq[4]).Value;
 
 			if (seq.Count == 6)
 			{
-				this.h = ((DerInteger)seq[5]).Value;
+				h = ((DerInteger)seq[5]).Value;
 			}
 
 			X9Curve x9c = new X9Curve(
 				X9FieldID.GetInstance(seq[1]), n, h,
 				Asn1Sequence.GetInstance(seq[2]));
 
-			this.curve = x9c.Curve;
+			curve = x9c.Curve;
 			object p = seq[3];
 
 			if (p is X9ECPoint)
 			{
-				this.g = (X9ECPoint)p;
+				g = (X9ECPoint)p;
 			}
 			else
 			{
-				this.g = new X9ECPoint(curve, (Asn1OctetString)p);
+				g = new X9ECPoint(curve, (Asn1OctetString)p);
 			}
 
-			this.seed = x9c.GetSeed();
+			seed = x9c.GetSeed();
 		}
 
 		public X9ECParameters(
@@ -99,7 +103,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 
 			if (ECAlgorithms.IsFpCurve(curve))
 			{
-				this.fieldID = new X9FieldID(curve.Field.Characteristic);
+				fieldID = new X9FieldID(curve.Field.Characteristic);
 			}
 			else if (ECAlgorithms.IsF2mCurve(curve))
 			{
@@ -107,11 +111,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 				int[] exponents = field.MinimalPolynomial.GetExponentsPresent();
 				if (exponents.Length == 3)
 				{
-					this.fieldID = new X9FieldID(exponents[2], exponents[1]);
+					fieldID = new X9FieldID(exponents[2], exponents[1]);
 				}
 				else if (exponents.Length == 5)
 				{
-					this.fieldID = new X9FieldID(exponents[4], exponents[1], exponents[2], exponents[3]);
+					fieldID = new X9FieldID(exponents[4], exponents[1], exponents[2], exponents[3]);
 				}
 				else
 				{

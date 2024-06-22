@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 {
@@ -10,26 +11,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class SignedData
 		: Asn1Encodable
 	{
-		private static readonly DerInteger Version1 = new DerInteger(1);
-		private static readonly DerInteger Version3 = new DerInteger(3);
-		private static readonly DerInteger Version4 = new DerInteger(4);
-		private static readonly DerInteger Version5 = new DerInteger(5);
+		static readonly DerInteger Version1 = new DerInteger(1);
+		static readonly DerInteger Version3 = new DerInteger(3);
+		static readonly DerInteger Version4 = new DerInteger(4);
+		static readonly DerInteger Version5 = new DerInteger(5);
 
-		private readonly DerInteger version;
-		private readonly Asn1Set digestAlgorithms;
-		private readonly ContentInfo contentInfo;
-		private readonly Asn1Set certificates;
-		private readonly Asn1Set crls;
-		private readonly Asn1Set signerInfos;
-		private readonly bool certsBer;
-		private readonly bool crlsBer;
+		readonly DerInteger version;
+		readonly Asn1Set digestAlgorithms;
+		readonly ContentInfo contentInfo;
+		readonly Asn1Set certificates;
+		readonly Asn1Set crls;
+		readonly Asn1Set signerInfos;
+		readonly bool certsBer;
+		readonly bool crlsBer;
 
 		public static SignedData GetInstance(object obj)
 		{
 			if (obj is SignedData)
+			{
 				return (SignedData)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new SignedData(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -40,14 +47,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			Asn1Set crls,
 			Asn1Set signerInfos)
 		{
-			this.version = CalculateVersion(contentInfo.ContentType, certificates, crls, signerInfos);
+			version = CalculateVersion(contentInfo.ContentType, certificates, crls, signerInfos);
 			this.digestAlgorithms = digestAlgorithms;
 			this.contentInfo = contentInfo;
 			this.certificates = certificates;
 			this.crls = crls;
 			this.signerInfos = signerInfos;
-			this.crlsBer = crls is BerSet;
-			this.certsBer = certificates is BerSet;
+			crlsBer = crls is BerSet;
+			certsBer = certificates is BerSet;
 		}
 
 		// RFC3852, section 5.1:
@@ -68,7 +75,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		//       THEN version MUST be 3
 		//       ELSE version MUST be 1
 		//
-		private DerInteger CalculateVersion(
+		DerInteger CalculateVersion(
 			DerObjectIdentifier contentOid,
 			Asn1Set certs,
 			Asn1Set crls,
@@ -139,7 +146,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			return Version1;
 		}
 
-		private bool CheckForVersion3(Asn1Set signerInfs)
+		bool CheckForVersion3(Asn1Set signerInfs)
 		{
 			foreach (object obj in signerInfs)
 			{
@@ -154,9 +161,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			return false;
 		}
 
-		private SignedData(Asn1Sequence seq)
+		SignedData(Asn1Sequence seq)
 		{
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
 			e.MoveNext();
 			version = (DerInteger)e.Current;

@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -28,12 +29,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 	public class PersonalData
 		: Asn1Encodable
 	{
-		private readonly NameOrPseudonym nameOrPseudonym;
-		private readonly BigInteger nameDistinguisher;
-		private readonly Asn1GeneralizedTime dateOfBirth;
-		private readonly DirectoryString placeOfBirth;
-		private readonly string gender;
-		private readonly DirectoryString postalAddress;
+		readonly NameOrPseudonym nameOrPseudonym;
+		readonly BigInteger nameDistinguisher;
+		readonly Asn1GeneralizedTime dateOfBirth;
+		readonly DirectoryString placeOfBirth;
+		readonly string gender;
+		readonly DirectoryString postalAddress;
 
 		public static PersonalData GetInstance(
 			object obj)
@@ -48,7 +49,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 				return new PersonalData((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -69,12 +70,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 		*
 		* @param seq The ASN.1 sequence.
 		*/
-		private PersonalData(Asn1Sequence seq)
+		PersonalData(Asn1Sequence seq)
 		{
 			if (seq.Count < 1)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 			e.MoveNext();
 
 			nameOrPseudonym = NameOrPseudonym.GetInstance(e.Current);

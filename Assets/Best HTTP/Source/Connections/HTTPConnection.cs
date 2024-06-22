@@ -23,17 +23,23 @@ namespace BestHTTP.Connections
 		{
 			get
 			{
-				if (this.requestHandler != null && this.requestHandler.KeepAlive != null)
+				if (requestHandler != null && requestHandler.KeepAlive != null)
 				{
-					if (this.requestHandler.KeepAlive.MaxRequests > 0)
+					if (requestHandler.KeepAlive.MaxRequests > 0)
 					{
-						if (base.KeepAliveTime < this.requestHandler.KeepAlive.TimeOut)
+						if (base.KeepAliveTime < requestHandler.KeepAlive.TimeOut)
+						{
 							return base.KeepAliveTime;
+						}
 						else
-							return this.requestHandler.KeepAlive.TimeOut;
+						{
+							return requestHandler.KeepAlive.TimeOut;
+						}
 					}
 					else
+					{
 						return TimeSpan.Zero;
+					}
 				}
 
 				return base.KeepAliveTime;
@@ -46,8 +52,11 @@ namespace BestHTTP.Connections
 		{
 			get
 			{
-				if (this.requestHandler != null)
-					return this.requestHandler.CanProcessMultiple;
+				if (requestHandler != null)
+				{
+					return requestHandler.CanProcessMultiple;
+				}
+
 				return base.CanProcessMultiple;
 			}
 		}
@@ -63,17 +72,17 @@ namespace BestHTTP.Connections
 			try
 			{
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL
-				TlsStream stream = (this.connector?.Stream as TlsStream);
+				TlsStream stream = connector?.Stream as TlsStream;
 				if (stream != null && stream.Protocol != null)
 				{
 					bool locked = stream.Protocol.TryEnterApplicationDataLock(0);
 					try
 					{
-						if (locked && this.connector.Client.Available > 0)
+						if (locked && connector.Client.Available > 0)
 						{
 							try
 							{
-								var available = stream.Protocol.TestApplicationData();
+								int available = stream.Protocol.TestApplicationData();
 								return !stream.Protocol.IsClosed;
 							}
 							catch
@@ -85,12 +94,14 @@ namespace BestHTTP.Connections
 					finally
 					{
 						if (locked)
+						{
 							stream.Protocol.ExitApplicationDataLock();
+						}
 					}
 				}
 #endif
 
-				bool connected = this.connector.Client.Connected;
+				bool connected = connector.Client.Connected;
 
 				return connected;
 			}
@@ -105,25 +116,31 @@ namespace BestHTTP.Connections
 
 		internal override void Process(HTTPRequest request)
 		{
-			this.LastProcessedUri = request.CurrentUri;
+			LastProcessedUri = request.CurrentUri;
 
-			if (this.requestHandler == null || !this.requestHandler.HasCustomRequestProcessor)
+			if (requestHandler == null || !requestHandler.HasCustomRequestProcessor)
+			{
 				base.Process(request);
+			}
 			else
 			{
-				this.requestHandler.Process(request);
+				requestHandler.Process(request);
 				LastProcessTime = DateTime.Now;
 			}
 		}
 
 		protected override void ThreadFunc()
 		{
-			if (this.CurrentRequest.IsRedirected)
-				this.CurrentRequest.Timing.Add(TimingEventNames.Queued_For_Redirection);
+			if (CurrentRequest.IsRedirected)
+			{
+				CurrentRequest.Timing.Add(TimingEventNames.Queued_For_Redirection);
+			}
 			else
-				this.CurrentRequest.Timing.Add(TimingEventNames.Queued);
+			{
+				CurrentRequest.Timing.Add(TimingEventNames.Queued);
+			}
 
-			if (this.connector != null && !this.connector.IsConnected)
+			if (connector != null && !connector.IsConnected)
 			{
 				// this will send the request back to the queue
 				RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(CurrentRequest, RequestEvents.Resend));
@@ -131,26 +148,30 @@ namespace BestHTTP.Connections
 				return;
 			}
 
-			if (this.connector == null)
+			if (connector == null)
 			{
-				this.connector = new Connections.TCPConnector();
+				connector = new TCPConnector();
 
 				try
 				{
-					this.connector.Connect(this.CurrentRequest);
+					connector.Connect(CurrentRequest);
 				}
 				catch (Exception ex)
 				{
 					if (HTTPManager.Logger.Level == Logger.Loglevels.All)
-						HTTPManager.Logger.Exception("HTTPConnection", "Connector.Connect", ex, this.Context, this.CurrentRequest.Context);
+					{
+						HTTPManager.Logger.Exception("HTTPConnection", "Connector.Connect", ex, Context, CurrentRequest.Context);
+					}
 
 
 					if (ex is TimeoutException)
-						this.CurrentRequest.State = HTTPRequestStates.ConnectionTimedOut;
-					else if (!this.CurrentRequest.IsTimedOut) // Do nothing here if Abort() got called on the request, its State is already set.
 					{
-						this.CurrentRequest.Exception = ex;
-						this.CurrentRequest.State = HTTPRequestStates.Error;
+						CurrentRequest.State = HTTPRequestStates.ConnectionTimedOut;
+					}
+					else if (!CurrentRequest.IsTimedOut) // Do nothing here if Abort() got called on the request, its State is already set.
+					{
+						CurrentRequest.Exception = ex;
+						CurrentRequest.State = HTTPRequestStates.Error;
 					}
 
 					ConnectionEventHelper.EnqueueConnectionEvent(new ConnectionEventInfo(this, HTTPConnectionStates.Closed));
@@ -160,31 +181,31 @@ namespace BestHTTP.Connections
 
 #if !NETFX_CORE
 				// data sending is buffered for all protocols, so when we put data into the socket we want to send them asap
-				this.connector.Client.NoDelay = true;
+				connector.Client.NoDelay = true;
 #endif
 				StartTime = DateTime.UtcNow;
 
-				HTTPManager.Logger.Information("HTTPConnection", "Negotiated protocol through ALPN: '" + this.connector.NegotiatedProtocol + "'", this.Context,
-					this.CurrentRequest.Context);
+				HTTPManager.Logger.Information("HTTPConnection", "Negotiated protocol through ALPN: '" + connector.NegotiatedProtocol + "'", Context,
+					CurrentRequest.Context);
 
-				switch (this.connector.NegotiatedProtocol)
+				switch (connector.NegotiatedProtocol)
 				{
 					case HTTPProtocolFactory.W3C_HTTP1:
-						this.requestHandler = new Connections.HTTP1Handler(this);
+						requestHandler = new HTTP1Handler(this);
 						ConnectionEventHelper.EnqueueConnectionEvent(new ConnectionEventInfo(this, HostProtocolSupport.HTTP1));
 						break;
 
 #if (!UNITY_WEBGL || UNITY_EDITOR) && !BESTHTTP_DISABLE_ALTERNATE_SSL && !BESTHTTP_DISABLE_HTTP2
 					case HTTPProtocolFactory.W3C_HTTP2:
-						this.requestHandler = new Connections.HTTP2.HTTP2Handler(this);
-						this.CurrentRequest = null;
+						requestHandler = new HTTP2.HTTP2Handler(this);
+						CurrentRequest = null;
 						ConnectionEventHelper.EnqueueConnectionEvent(new ConnectionEventInfo(this, HostProtocolSupport.HTTP2));
 						break;
 #endif
 
 					default:
-						HTTPManager.Logger.Error("HTTPConnection", "Unknown negotiated protocol: " + this.connector.NegotiatedProtocol, this.Context,
-							this.CurrentRequest.Context);
+						HTTPManager.Logger.Error("HTTPConnection", "Unknown negotiated protocol: " + connector.NegotiatedProtocol, Context,
+							CurrentRequest.Context);
 
 						RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(CurrentRequest, RequestEvents.Resend));
 						ConnectionEventHelper.EnqueueConnectionEvent(new ConnectionEventInfo(this, HTTPConnectionStates.Closed));
@@ -192,10 +213,10 @@ namespace BestHTTP.Connections
 				}
 			}
 
-			this.requestHandler.Context.Add("Connection", this.GetHashCode());
-			this.Context.Add("RequestHandler", this.requestHandler.GetHashCode());
+			requestHandler.Context.Add("Connection", GetHashCode());
+			Context.Add("RequestHandler", requestHandler.GetHashCode());
 
-			this.requestHandler.RunHandler();
+			requestHandler.RunHandler();
 			LastProcessTime = DateTime.Now;
 		}
 
@@ -203,13 +224,15 @@ namespace BestHTTP.Connections
 		{
 			base.Shutdown(type);
 
-			if (this.requestHandler != null)
-				this.requestHandler.Shutdown(type);
+			if (requestHandler != null)
+			{
+				requestHandler.Shutdown(type);
+			}
 
-			switch (this.ShutdownType)
+			switch (ShutdownType)
 			{
 				case ShutdownTypes.Immediate:
-					this.connector.Dispose();
+					connector.Dispose();
 					break;
 			}
 		}
@@ -219,32 +242,32 @@ namespace BestHTTP.Connections
 			if (disposing)
 			{
 				LastProcessedUri = null;
-				if (this.State != HTTPConnectionStates.WaitForProtocolShutdown)
+				if (State != HTTPConnectionStates.WaitForProtocolShutdown)
 				{
-					if (this.connector != null)
+					if (connector != null)
 					{
 						try
 						{
-							this.connector.Close();
+							connector.Close();
 						}
 						catch
 						{
 						}
 
-						this.connector = null;
+						connector = null;
 					}
 
-					if (this.requestHandler != null)
+					if (requestHandler != null)
 					{
 						try
 						{
-							this.requestHandler.Dispose();
+							requestHandler.Dispose();
 						}
 						catch
 						{
 						}
 
-						this.requestHandler = null;
+						requestHandler = null;
 					}
 				}
 				else
@@ -254,8 +277,10 @@ namespace BestHTTP.Connections
 					// But, finalizing (and disposing) the connector while the protocol is still active would be fatal, 
 					//  so we have to make sure that it will not happen. This also means that the protocol has the responsibility (as always had)
 					//  to close the stream and TCP connection properly.
-					if (this.connector != null)
-						this.connector.LeaveOpen = true;
+					if (connector != null)
+					{
+						connector.LeaveOpen = true;
+					}
 				}
 			}
 

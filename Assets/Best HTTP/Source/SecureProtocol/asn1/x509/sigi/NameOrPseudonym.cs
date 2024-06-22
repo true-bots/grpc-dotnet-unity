@@ -25,9 +25,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 	public class NameOrPseudonym
 		: Asn1Encodable, IAsn1Choice
 	{
-		private readonly DirectoryString pseudonym;
-		private readonly DirectoryString surname;
-		private readonly Asn1Sequence givenName;
+		readonly DirectoryString pseudonym;
+		readonly DirectoryString surname;
+		readonly Asn1Sequence givenName;
 
 		public static NameOrPseudonym GetInstance(
 			object obj)
@@ -47,7 +47,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 				return new NameOrPseudonym((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -89,14 +89,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 		*
 		* @param seq The ASN.1 sequence.
 		*/
-		private NameOrPseudonym(
+		NameOrPseudonym(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
 			if (!(seq[0] is IAsn1String))
-				throw new ArgumentException("Bad object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(seq[0]));
+			{
+				throw new ArgumentException("Bad object encountered: " + Platform.GetTypeName(seq[0]));
+			}
 
 			surname = DirectoryString.GetInstance(seq[0]);
 			givenName = Asn1Sequence.GetInstance(seq[1]);

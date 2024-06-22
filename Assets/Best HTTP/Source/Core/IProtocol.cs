@@ -10,13 +10,13 @@ namespace BestHTTP.Core
 
 		public HostConnectionKey(string host, string connection)
 		{
-			this.Host = host;
-			this.Connection = connection;
+			Host = host;
+			Connection = connection;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("[HostConnectionKey Host: '{0}', Connection: '{1}']", this.Host, this.Connection);
+			return string.Format("[HostConnectionKey Host: '{0}', Connection: '{1}']", Host, Connection);
 		}
 	}
 

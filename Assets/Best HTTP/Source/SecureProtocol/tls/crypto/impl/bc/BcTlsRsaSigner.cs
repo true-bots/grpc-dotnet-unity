@@ -15,12 +15,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 	public class BcTlsRsaSigner
 		: BcTlsSigner
 	{
-		private readonly RsaKeyParameters m_publicKey;
+		readonly RsaKeyParameters m_publicKey;
 
 		public BcTlsRsaSigner(BcTlsCrypto crypto, RsaKeyParameters privateKey, RsaKeyParameters publicKey)
 			: base(crypto, privateKey)
 		{
-			this.m_publicKey = publicKey;
+			m_publicKey = publicKey;
 		}
 
 		public override byte[] GenerateRawSignature(SignatureAndHashAlgorithm algorithm, byte[] hash)
@@ -31,7 +31,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			if (algorithm != null)
 			{
 				if (algorithm.Signature != SignatureAlgorithm.rsa)
+				{
 					throw new InvalidOperationException("Invalid algorithm: " + algorithm);
+				}
 
 				/*
 				 * RFC 5246 4.7. In RSA signing, the opaque vector contains the signature generated

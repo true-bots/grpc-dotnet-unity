@@ -5,7 +5,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Nist;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal class CmsAuthEnvelopedGenerator
+	class CmsAuthEnvelopedGenerator
 	{
 		public static readonly string Aes128Ccm = NistObjectIdentifiers.IdAes128Ccm.Id;
 		public static readonly string Aes192Ccm = NistObjectIdentifiers.IdAes192Ccm.Id;

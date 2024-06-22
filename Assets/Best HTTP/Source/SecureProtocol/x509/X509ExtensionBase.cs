@@ -16,9 +16,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		{
 			X509Extensions extensions = GetX509Extensions();
 			if (extensions == null)
+			{
 				return null;
+			}
 
-			var set = new HashSet<string>();
+			HashSet<string> set = new HashSet<string>();
 			foreach (DerObjectIdentifier oid in extensions.ExtensionOids)
 			{
 				X509Extension ext = extensions.GetExtension(oid);

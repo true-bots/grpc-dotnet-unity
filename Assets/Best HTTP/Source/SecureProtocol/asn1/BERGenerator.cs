@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public abstract class BerGenerator
 		: Asn1Generator
 	{
-		private bool _tagged = false;
-		private bool _isExplicit;
-		private int _tagNo;
+		bool _tagged = false;
+		bool _isExplicit;
+		int _tagNo;
 
 		protected BerGenerator(
 			Stream outStream)
@@ -49,7 +49,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			WriteBerEnd();
 		}
 
-		private void WriteHdr(
+		void WriteHdr(
 			int tag)
 		{
 			Out.WriteByte((byte)tag);

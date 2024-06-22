@@ -12,38 +12,38 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class Dstu7564Digest
 		: IDigest, IMemoable
 	{
-		private const int NB_512 = 8; //Number of 8-byte words in state for <=256-bit hash code.
-		private const int NB_1024 = 16; //Number of 8-byte words in state for <=512-bit hash code. 
+		const int NB_512 = 8; //Number of 8-byte words in state for <=256-bit hash code.
+		const int NB_1024 = 16; //Number of 8-byte words in state for <=512-bit hash code. 
 
-		private const int NR_512 = 10; //Number of rounds for 512-bit state.
-		private const int NR_1024 = 14; //Number of rounds for 1024-bit state.
+		const int NR_512 = 10; //Number of rounds for 512-bit state.
+		const int NR_1024 = 14; //Number of rounds for 1024-bit state.
 
-		private int hashSize;
-		private int blockSize;
+		int hashSize;
+		int blockSize;
 
-		private int columns;
-		private int rounds;
+		int columns;
+		int rounds;
 
-		private ulong[] state;
-		private ulong[] tempState1;
-		private ulong[] tempState2;
+		ulong[] state;
+		ulong[] tempState1;
+		ulong[] tempState2;
 
 		// TODO Guard against 'inputBlocks' overflow (2^64 blocks)
-		private ulong inputBlocks;
-		private int bufOff;
-		private byte[] buf;
+		ulong inputBlocks;
+		int bufOff;
+		byte[] buf;
 
 		public Dstu7564Digest(Dstu7564Digest digest)
 		{
 			CopyIn(digest);
 		}
 
-		private void CopyIn(Dstu7564Digest digest)
+		void CopyIn(Dstu7564Digest digest)
 		{
-			this.hashSize = digest.hashSize;
-			this.blockSize = digest.blockSize;
+			hashSize = digest.hashSize;
+			blockSize = digest.blockSize;
 
-			this.rounds = digest.rounds;
+			rounds = digest.rounds;
 			if (columns > 0 && columns == digest.columns)
 			{
 				Array.Copy(digest.state, 0, state, 0, columns);
@@ -51,22 +51,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 			else
 			{
-				this.columns = digest.columns;
-				this.state = Arrays.Clone(digest.state);
-				this.tempState1 = new ulong[columns];
-				this.tempState2 = new ulong[columns];
-				this.buf = Arrays.Clone(digest.buf);
+				columns = digest.columns;
+				state = Arrays.Clone(digest.state);
+				tempState1 = new ulong[columns];
+				tempState2 = new ulong[columns];
+				buf = Arrays.Clone(digest.buf);
 			}
 
-			this.inputBlocks = digest.inputBlocks;
-			this.bufOff = digest.bufOff;
+			inputBlocks = digest.inputBlocks;
+			bufOff = digest.bufOff;
 		}
 
 		public Dstu7564Digest(int hashSizeBits)
 		{
 			if (hashSizeBits == 256 || hashSizeBits == 384 || hashSizeBits == 512)
 			{
-				this.hashSize = hashSizeBits / 8;
+				hashSize = hashSizeBits / 8;
 			}
 			else
 			{
@@ -75,24 +75,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 			if (hashSizeBits > 256)
 			{
-				this.columns = NB_1024;
-				this.rounds = NR_1024;
+				columns = NB_1024;
+				rounds = NR_1024;
 			}
 			else
 			{
-				this.columns = NB_512;
-				this.rounds = NR_512;
+				columns = NB_512;
+				rounds = NR_512;
 			}
 
-			this.blockSize = columns << 3;
+			blockSize = columns << 3;
 
-			this.state = new ulong[columns];
-			this.state[0] = (ulong)blockSize;
+			state = new ulong[columns];
+			state[0] = (ulong)blockSize;
 
-			this.tempState1 = new ulong[columns];
-			this.tempState2 = new ulong[columns];
+			tempState1 = new ulong[columns];
+			tempState2 = new ulong[columns];
 
-			this.buf = new byte[blockSize];
+			buf = new byte[blockSize];
 		}
 
 		public virtual string AlgorithmName
@@ -335,7 +335,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-		private void P(ulong[] s)
+		void P(ulong[] s)
 		{
 			for (int round = 0; round < rounds; ++round)
 			{
@@ -354,7 +354,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private void Q(ulong[] s)
+		void Q(ulong[] s)
 		{
 			for (int round = 0; round < rounds; ++round)
 			{
@@ -373,7 +373,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private static ulong MixColumn(ulong c)
+		static ulong MixColumn(ulong c)
 		{
 			//// Calculate column multiplied by powers of 'x'
 			//ulong x0 = c;
@@ -417,7 +417,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return u ^ Rotate(32, v) ^ Rotate(40, x1) ^ Rotate(48, x1);
 		}
 
-		private void MixColumns(ulong[] s)
+		void MixColumns(ulong[] s)
 		{
 			for (int col = 0; col < columns; ++col)
 			{
@@ -425,12 +425,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private static ulong Rotate(int n, ulong x)
+		static ulong Rotate(int n, ulong x)
 		{
 			return (x >> n) | (x << -n);
 		}
 
-		private void ShiftRows(ulong[] s)
+		void ShiftRows(ulong[] s)
 		{
 			switch (columns)
 			{
@@ -624,7 +624,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private void SubBytes(ulong[] s)
+		void SubBytes(ulong[] s)
 		{
 			for (int i = 0; i < columns; ++i)
 			{
@@ -644,7 +644,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private static readonly byte[] S0 = new byte[]
+		static readonly byte[] S0 = new byte[]
 		{
 			0xa8, 0x43, 0x5f, 0x06, 0x6b, 0x75, 0x6c, 0x59, 0x71, 0xdf, 0x87, 0x95, 0x17, 0xf0, 0xd8, 0x09,
 			0x6d, 0xf3, 0x1d, 0xcb, 0xc9, 0x4d, 0x2c, 0xaf, 0x79, 0xe0, 0x97, 0xfd, 0x6f, 0x4b, 0x45, 0x39,
@@ -664,7 +664,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			0x81, 0x54, 0xc0, 0xed, 0x4e, 0x44, 0xa7, 0x2a, 0x85, 0x25, 0xe6, 0xca, 0x7c, 0x8b, 0x56, 0x80
 		};
 
-		private static readonly byte[] S1 = new byte[]
+		static readonly byte[] S1 = new byte[]
 		{
 			0xce, 0xbb, 0xeb, 0x92, 0xea, 0xcb, 0x13, 0xc1, 0xe9, 0x3a, 0xd6, 0xb2, 0xd2, 0x90, 0x17, 0xf8,
 			0x42, 0x15, 0x56, 0xb4, 0x65, 0x1c, 0x88, 0x43, 0xc5, 0x5c, 0x36, 0xba, 0xf5, 0x57, 0x67, 0x8d,
@@ -684,7 +684,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			0xb6, 0xc2, 0x01, 0xf0, 0x5a, 0xed, 0xa7, 0x66, 0x21, 0x7f, 0x8a, 0x27, 0xc7, 0xc0, 0x29, 0xd7
 		};
 
-		private static readonly byte[] S2 = new byte[]
+		static readonly byte[] S2 = new byte[]
 		{
 			0x93, 0xd9, 0x9a, 0xb5, 0x98, 0x22, 0x45, 0xfc, 0xba, 0x6a, 0xdf, 0x02, 0x9f, 0xdc, 0x51, 0x59,
 			0x4a, 0x17, 0x2b, 0xc2, 0x94, 0xf4, 0xbb, 0xa3, 0x62, 0xe4, 0x71, 0xd4, 0xcd, 0x70, 0x16, 0xe1,
@@ -704,7 +704,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			0x42, 0x04, 0xa0, 0xdb, 0x39, 0x86, 0x54, 0xaa, 0x8c, 0x34, 0x21, 0x8b, 0xf8, 0x0c, 0x74, 0x67
 		};
 
-		private static readonly byte[] S3 = new byte[]
+		static readonly byte[] S3 = new byte[]
 		{
 			0x68, 0x8d, 0xca, 0x4d, 0x73, 0x4b, 0x4e, 0x2a, 0xd4, 0x52, 0x26, 0xb3, 0x54, 0x1e, 0x19, 0x1f,
 			0x22, 0x03, 0x46, 0x3d, 0x2d, 0x4a, 0x53, 0x83, 0x13, 0x8a, 0xb7, 0xd5, 0x25, 0x79, 0xf5, 0xbd,

@@ -12,13 +12,13 @@ namespace BestHTTP.Examples
 		[Header("Common Properties")] public string BaseURL = "https://besthttpwebgldemo.azurewebsites.net";
 
 		[Header("References")] [SerializeField]
-		private Text _pluginVersion;
+		Text _pluginVersion;
 
-		[SerializeField] private Dropdown _logLevelDropdown;
+		[SerializeField] Dropdown _logLevelDropdown;
 
-		[SerializeField] private Text _proxyLabel;
+		[SerializeField] Text _proxyLabel;
 
-		[SerializeField] private InputField _proxyInputField;
+		[SerializeField] InputField _proxyInputField;
 
 #pragma warning restore
 
@@ -26,15 +26,15 @@ namespace BestHTTP.Examples
 
 		[HideInInspector] public SampleBase selectedExamplePrefab;
 
-		private void Start()
+		void Start()
 		{
 			Application.runInBackground = true;
 
-			this._pluginVersion.text = "Version: " + HTTPManager.UserAgent;
+			_pluginVersion.text = "Version: " + HTTPManager.UserAgent;
 
 			int logLevel = PlayerPrefs.GetInt("BestHTTP.HTTPManager.Logger.Level", (int)HTTPManager.Logger.Level);
-			this._logLevelDropdown.value = logLevel;
-			HTTPManager.Logger.Level = (BestHTTP.Logger.Loglevels)logLevel;
+			_logLevelDropdown.value = logLevel;
+			HTTPManager.Logger.Level = (Logger.Loglevels)logLevel;
 
 #if (UNITY_WEBGL && !UNITY_EDITOR) || BESTHTTP_DISABLE_PROXY
             this._proxyLabel.gameObject.SetActive(false);
@@ -47,7 +47,7 @@ namespace BestHTTP.Examples
 				{
 					HTTPManager.Proxy = new HTTPProxy(new Uri(proxyURL), null, true);
 #if UNITY_2019_1_OR_NEWER
-					this._proxyInputField.SetTextWithoutNotify(proxyURL);
+					_proxyInputField.SetTextWithoutNotify(proxyURL);
 #else
                     this._proxyInputField.onEndEdit.RemoveAllListeners();
                     this._proxyInputField.text = proxyURL;
@@ -59,18 +59,20 @@ namespace BestHTTP.Examples
 				}
 			}
 			else
+			{
 				HTTPManager.Proxy = null;
+			}
 #endif
 
 #if !BESTHTTP_DISABLE_CACHING
 			// Remove too old cache entries.
-			BestHTTP.Caching.HTTPCacheService.BeginMaintainence(new BestHTTP.Caching.HTTPCacheMaintananceParams(TimeSpan.FromDays(30), ulong.MaxValue));
+			Caching.HTTPCacheService.BeginMaintainence(new Caching.HTTPCacheMaintananceParams(TimeSpan.FromDays(30), ulong.MaxValue));
 #endif
 		}
 
 		public void OnLogLevelChanged(int idx)
 		{
-			HTTPManager.Logger.Level = (BestHTTP.Logger.Loglevels)idx;
+			HTTPManager.Logger.Level = (Logger.Loglevels)idx;
 			PlayerPrefs.SetInt("BestHTTP.HTTPManager.Logger.Level", idx);
 		}
 
@@ -79,12 +81,16 @@ namespace BestHTTP.Examples
 #if (!UNITY_WEBGL || UNITY_EDITOR) && !BESTHTTP_DISABLE_PROXY
 			try
 			{
-				if (string.IsNullOrEmpty(this._proxyInputField.text))
+				if (string.IsNullOrEmpty(_proxyInputField.text))
+				{
 					HTTPManager.Proxy = null;
+				}
 				else
-					HTTPManager.Proxy = new HTTPProxy(new Uri(this._proxyInputField.text), null, true);
+				{
+					HTTPManager.Proxy = new HTTPProxy(new Uri(_proxyInputField.text), null, true);
+				}
 
-				PlayerPrefs.SetString("BestHTTP.HTTPManager.Proxy", this._proxyInputField.text);
+				PlayerPrefs.SetString("BestHTTP.HTTPManager.Proxy", _proxyInputField.text);
 			}
 			catch
 			{

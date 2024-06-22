@@ -19,15 +19,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class ReasonFlags
 		: DerBitString
 	{
-		public const int Unused = (1 << 7);
-		public const int KeyCompromise = (1 << 6);
-		public const int CACompromise = (1 << 5);
-		public const int AffiliationChanged = (1 << 4);
-		public const int Superseded = (1 << 3);
-		public const int CessationOfOperation = (1 << 2);
-		public const int CertificateHold = (1 << 1);
-		public const int PrivilegeWithdrawn = (1 << 0);
-		public const int AACompromise = (1 << 15);
+		public const int Unused = 1 << 7;
+		public const int KeyCompromise = 1 << 6;
+		public const int CACompromise = 1 << 5;
+		public const int AffiliationChanged = 1 << 4;
+		public const int Superseded = 1 << 3;
+		public const int CessationOfOperation = 1 << 2;
+		public const int CertificateHold = 1 << 1;
+		public const int PrivilegeWithdrawn = 1 << 0;
+		public const int AACompromise = 1 << 15;
 
 		/**
          * @param reasons - the bitwise OR of the Key Reason flags giving the

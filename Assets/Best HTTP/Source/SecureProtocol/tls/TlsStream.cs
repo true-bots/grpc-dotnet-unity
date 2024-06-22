@@ -5,14 +5,14 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-	internal class TlsStream
+	class TlsStream
 		: Stream
 	{
-		private readonly TlsProtocol m_handler;
+		readonly TlsProtocol m_handler;
 
 		public TlsProtocol Protocol
 		{
-			get => this.m_handler;
+			get { return m_handler; }
 		}
 
 		byte[] oneByteBuf = new byte[1];

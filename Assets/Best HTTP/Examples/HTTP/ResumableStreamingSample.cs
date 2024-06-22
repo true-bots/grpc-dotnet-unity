@@ -16,8 +16,8 @@ namespace BestHTTP.Examples.HTTP
 		/// </summary>
 		protected override long DownloadLength
 		{
-			get { return PlayerPrefs.GetInt(this._downloadPath + DownloadLengthKey); }
-			set { PlayerPrefs.SetInt(this._downloadPath + DownloadLengthKey, (int)value); }
+			get { return PlayerPrefs.GetInt(_downloadPath + DownloadLengthKey); }
+			set { PlayerPrefs.SetInt(_downloadPath + DownloadLengthKey, (int)value); }
 		}
 
 		/// <summary>
@@ -25,11 +25,11 @@ namespace BestHTTP.Examples.HTTP
 		/// </summary>
 		protected override long ProcessedBytes
 		{
-			get { return PlayerPrefs.GetInt(this._downloadPath + ProcessedBytesKey, 0); }
-			set { PlayerPrefs.SetInt(this._downloadPath + ProcessedBytesKey, (int)value); }
+			get { return PlayerPrefs.GetInt(_downloadPath + ProcessedBytesKey, 0); }
+			set { PlayerPrefs.SetInt(_downloadPath + ProcessedBytesKey, (int)value); }
 		}
 
-		private long downloadStartedAt = 0;
+		long downloadStartedAt = 0;
 
 		protected override void Start()
 		{
@@ -39,8 +39,8 @@ namespace BestHTTP.Examples.HTTP
 			float progress = GetSavedProgress();
 			if (progress > 0.0f)
 			{
-				this._downloadProgressSlider.value = progress;
-				base._statusText.text = progress.ToString("F2");
+				_downloadProgressSlider.value = progress;
+				_statusText.text = progress.ToString("F2");
 			}
 		}
 
@@ -49,16 +49,18 @@ namespace BestHTTP.Examples.HTTP
 			base.SetupRequest();
 
 			// Are there any progress, that we can continue?
-			this.downloadStartedAt = this.ProcessedBytes;
+			downloadStartedAt = ProcessedBytes;
 
-			if (this.downloadStartedAt > 0)
+			if (downloadStartedAt > 0)
 			{
 				// Set the range header
-				request.SetRangeHeader(this.downloadStartedAt);
+				request.SetRangeHeader(downloadStartedAt);
 			}
 			else
 				// This is a new request
+			{
 				DeleteKeys();
+			}
 		}
 
 		protected override void OnRequestFinished(HTTPRequest req, HTTPResponse resp)
@@ -66,37 +68,41 @@ namespace BestHTTP.Examples.HTTP
 			base.OnRequestFinished(req, resp);
 
 			if (req.State == HTTPRequestStates.Finished && resp.IsSuccess)
+			{
 				DeleteKeys();
+			}
 		}
 
 		protected override void OnDownloadProgress(HTTPRequest originalRequest, long downloaded, long downloadLength)
 		{
-			double downloadPercent = ((this.downloadStartedAt + downloaded) / (double)this.DownloadLength) * 100;
+			double downloadPercent = (downloadStartedAt + downloaded) / (double)DownloadLength * 100;
 
-			this._downloadProgressSlider.value = (float)downloadPercent;
-			this._downloadProgressText.text = string.Format("{0:F1}%", downloadPercent);
+			_downloadProgressSlider.value = (float)downloadPercent;
+			_downloadProgressText.text = string.Format("{0:F1}%", downloadPercent);
 		}
 
 		protected override void ResetProcessedValues()
 		{
-			SetDataProcessedUI(this.ProcessedBytes, this.DownloadLength);
+			SetDataProcessedUI(ProcessedBytes, DownloadLength);
 		}
 
-		private float GetSavedProgress()
+		float GetSavedProgress()
 		{
-			long down = this.ProcessedBytes;
-			long length = this.DownloadLength;
+			long down = ProcessedBytes;
+			long length = DownloadLength;
 
 			if (down > 0 && length > 0)
-				return (down / (float)length) * 100f;
+			{
+				return down / (float)length * 100f;
+			}
 
 			return -1;
 		}
 
-		private void DeleteKeys()
+		void DeleteKeys()
 		{
-			PlayerPrefs.DeleteKey(this._downloadPath + ProcessedBytesKey);
-			PlayerPrefs.DeleteKey(this._downloadPath + DownloadLengthKey);
+			PlayerPrefs.DeleteKey(_downloadPath + ProcessedBytesKey);
+			PlayerPrefs.DeleteKey(_downloadPath + DownloadLengthKey);
 			PlayerPrefs.Save();
 		}
 	}

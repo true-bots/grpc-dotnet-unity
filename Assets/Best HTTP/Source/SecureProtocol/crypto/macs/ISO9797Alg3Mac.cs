@@ -17,14 +17,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class ISO9797Alg3Mac
 		: IMac
 	{
-		private byte[] mac;
-		private byte[] buf;
-		private int bufOff;
-		private IBlockCipher cipher;
-		private IBlockCipherPadding padding;
-		private int macSize;
-		private KeyParameter lastKey2;
-		private KeyParameter lastKey3;
+		byte[] mac;
+		byte[] buf;
+		int bufOff;
+		IBlockCipher cipher;
+		IBlockCipherPadding padding;
+		int macSize;
+		KeyParameter lastKey2;
+		KeyParameter lastKey3;
 
 		/**
 		* create a Retail-MAC based on a CBC block cipher. This will produce an
@@ -93,15 +93,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			int macSizeInBits,
 			IBlockCipherPadding padding)
 		{
-			if ((macSizeInBits % 8) != 0)
+			if (macSizeInBits % 8 != 0)
+			{
 				throw new ArgumentException("MAC size must be multiple of 8");
+			}
 
 			if (!(cipher is DesEngine))
+			{
 				throw new ArgumentException("cipher must be instance of DesEngine");
+			}
 
 			this.cipher = new CbcBlockCipher(cipher);
 			this.padding = padding;
-			this.macSize = macSizeInBits / 8;
+			macSize = macSizeInBits / 8;
 
 			mac = new byte[cipher.GetBlockSize()];
 			buf = new byte[cipher.GetBlockSize()];
@@ -119,7 +123,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			Reset();
 
 			if (!(parameters is KeyParameter || parameters is ParametersWithIV))
+			{
 				throw new ArgumentException("parameters must be an instance of KeyParameter or ParametersWithIV");
+			}
 
 			// KeyParameter must contain a double or triple length DES key,
 			// however the underlying cipher is a single DES. The middle and
@@ -142,15 +148,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			{
 				// Double length DES key
 				key1 = new KeyParameter(keyvalue, 0, 8);
-				this.lastKey2 = new KeyParameter(keyvalue, 8, 8);
-				this.lastKey3 = key1;
+				lastKey2 = new KeyParameter(keyvalue, 8, 8);
+				lastKey3 = key1;
 			}
 			else if (keyvalue.Length == 24)
 			{
 				// Triple length DES key
 				key1 = new KeyParameter(keyvalue, 0, 8);
-				this.lastKey2 = new KeyParameter(keyvalue, 8, 8);
-				this.lastKey3 = new KeyParameter(keyvalue, 16, 8);
+				lastKey2 = new KeyParameter(keyvalue, 8, 8);
+				lastKey3 = new KeyParameter(keyvalue, 16, 8);
 			}
 			else
 			{
@@ -187,7 +193,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public void BlockUpdate(byte[] input, int inOff, int len)
 		{
 			if (len < 0)
+			{
 				throw new ArgumentException("Can't have a negative input length!");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			BlockUpdate(input.AsSpan(inOff, len));
@@ -281,10 +289,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			// Added to code from base class
 			DesEngine deseng = new DesEngine();
 
-			deseng.Init(false, this.lastKey2);
+			deseng.Init(false, lastKey2);
 			deseng.ProcessBlock(mac, 0, mac, 0);
 
-			deseng.Init(true, this.lastKey3);
+			deseng.Init(true, lastKey3);
 			deseng.ProcessBlock(mac, 0, mac, 0);
 			// ****
 

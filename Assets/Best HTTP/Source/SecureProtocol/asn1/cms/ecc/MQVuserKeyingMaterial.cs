@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms.Ecc
 	public class MQVuserKeyingMaterial
 		: Asn1Encodable
 	{
-		private OriginatorPublicKey ephemeralPublicKey;
-		private Asn1OctetString addedukm;
+		OriginatorPublicKey ephemeralPublicKey;
+		Asn1OctetString addedukm;
 
 		public MQVuserKeyingMaterial(
 			OriginatorPublicKey ephemeralPublicKey,
@@ -21,16 +21,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms.Ecc
 			this.addedukm = addedukm;
 		}
 
-		private MQVuserKeyingMaterial(
+		MQVuserKeyingMaterial(
 			Asn1Sequence seq)
 		{
 			// TODO Check seq has either 1 or 2 elements
 
-			this.ephemeralPublicKey = OriginatorPublicKey.GetInstance(seq[0]);
+			ephemeralPublicKey = OriginatorPublicKey.GetInstance(seq[0]);
 
 			if (seq.Count > 1)
 			{
-				this.addedukm = Asn1OctetString.GetInstance(
+				addedukm = Asn1OctetString.GetInstance(
 					(Asn1TaggedObject)seq[1], true);
 			}
 		}
@@ -70,7 +70,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms.Ecc
 				return new MQVuserKeyingMaterial((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Invalid MQVuserKeyingMaterial: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid MQVuserKeyingMaterial: " + Platform.GetTypeName(obj));
 		}
 
 		public OriginatorPublicKey EphemeralPublicKey

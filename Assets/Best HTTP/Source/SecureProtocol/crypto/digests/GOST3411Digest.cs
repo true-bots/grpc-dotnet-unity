@@ -14,23 +14,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class Gost3411Digest
 		: IDigest, IMemoable
 	{
-		private const int DIGEST_LENGTH = 32;
+		const int DIGEST_LENGTH = 32;
 
-		private byte[] H = new byte[32],
+		byte[] H = new byte[32],
 			L = new byte[32],
 			M = new byte[32],
 			Sum = new byte[32];
 
-		private byte[][] C = MakeC();
+		byte[][] C = MakeC();
 
-		private byte[] xBuf = new byte[32];
-		private int xBufOff;
-		private ulong byteCount;
+		byte[] xBuf = new byte[32];
+		int xBufOff;
+		ulong byteCount;
 
-		private readonly IBlockCipher cipher = new Gost28147Engine();
-		private byte[] sBox;
+		readonly IBlockCipher cipher = new Gost28147Engine();
+		byte[] sBox;
 
-		private static byte[][] MakeC()
+		static byte[][] MakeC()
 		{
 			byte[][] c = new byte[4][];
 			for (int i = 0; i < 4; ++i)
@@ -99,7 +99,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 		public void BlockUpdate(byte[] input, int inOff, int length)
 		{
-			while ((xBufOff != 0) && (length > 0))
+			while (xBufOff != 0 && length > 0)
 			{
 				Update(input[inOff]);
 				inOff++;
@@ -155,9 +155,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 #endif
 
 		// (i + 1 + 4(k - 1)) = 8i + k      i = 0-3, k = 1-8
-		private byte[] K = new byte[32];
+		byte[] K = new byte[32];
 
-		private byte[] P(byte[] input)
+		byte[] P(byte[] input)
 		{
 			int fourK = 0;
 			for (int k = 0; k < 8; k++)
@@ -174,7 +174,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		//A (x) = (x0 ^ x1) || x3 || x2 || x1
 		byte[] a = new byte[8];
 
-		private byte[] A(byte[] input)
+		byte[] A(byte[] input)
 		{
 			for (int j = 0; j < 8; j++)
 			{
@@ -188,7 +188,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		}
 
 		//Encrypt function, ECB mode
-		private void E(byte[] key, byte[] s, int sOff, byte[] input, int inOff)
+		void E(byte[] key, byte[] s, int sOff, byte[] input, int inOff)
 		{
 			cipher.Init(true, new KeyParameter(key));
 
@@ -198,7 +198,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		// (in:) n16||..||n1 ==> (out:) n1^n2^n3^n4^n13^n16||n16||..||n2
 		internal short[] wS = new short[16], w_S = new short[16];
 
-		private void fw(byte[] input)
+		void fw(byte[] input)
 		{
 			cpyBytesToShort(input, wS);
 			w_S[15] = (short)(wS[0] ^ wS[1] ^ wS[2] ^ wS[3] ^ wS[12] ^ wS[15]);
@@ -209,7 +209,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		// block processing
 		internal byte[] S = new byte[32], U = new byte[32], V = new byte[32], W = new byte[32];
 
-		private void processBlock(byte[] input, int inOff)
+		void processBlock(byte[] input, int inOff)
 		{
 			Array.Copy(input, inOff, M, 0, 32);
 
@@ -272,7 +272,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			Array.Copy(S, 0, H, 0, H.Length);
 		}
 
-		private void Finish()
+		void Finish()
 		{
 			ulong bitCount = byteCount * 8;
 			Pack.UInt64_To_LE(bitCount, L);
@@ -313,7 +313,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		* reset the chaining variables to the IV values.
 		*/
-		private static readonly byte[] C2 =
+		static readonly byte[] C2 =
 		{
 			0x00, (byte)0xFF, 0x00, (byte)0xFF, 0x00, (byte)0xFF, 0x00, (byte)0xFF,
 			(byte)0xFF, 0x00, (byte)0xFF, 0x00, (byte)0xFF, 0x00, (byte)0xFF, 0x00,
@@ -338,7 +338,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		}
 
 		//  256 bitsblock modul -> (Sum + a mod (2^256))
-		private void sumByteArray(
+		void sumByteArray(
 			byte[] input)
 		{
 			int carry = 0;
@@ -353,7 +353,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private static void cpyBytesToShort(byte[] S, short[] wS)
+		static void cpyBytesToShort(byte[] S, short[] wS)
 		{
 			for (int i = 0; i < S.Length / 2; i++)
 			{
@@ -361,7 +361,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private static void cpyShortToBytes(short[] wS, byte[] S)
+		static void cpyShortToBytes(short[] wS, byte[] S)
 		{
 			for (int i = 0; i < S.Length / 2; i++)
 			{
@@ -384,22 +384,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		{
 			Gost3411Digest t = (Gost3411Digest)other;
 
-			this.sBox = t.sBox;
+			sBox = t.sBox;
 			cipher.Init(true, new ParametersWithSBox(null, sBox));
 
 			Reset();
 
-			Array.Copy(t.H, 0, this.H, 0, t.H.Length);
-			Array.Copy(t.L, 0, this.L, 0, t.L.Length);
-			Array.Copy(t.M, 0, this.M, 0, t.M.Length);
-			Array.Copy(t.Sum, 0, this.Sum, 0, t.Sum.Length);
-			Array.Copy(t.C[1], 0, this.C[1], 0, t.C[1].Length);
-			Array.Copy(t.C[2], 0, this.C[2], 0, t.C[2].Length);
-			Array.Copy(t.C[3], 0, this.C[3], 0, t.C[3].Length);
-			Array.Copy(t.xBuf, 0, this.xBuf, 0, t.xBuf.Length);
+			Array.Copy(t.H, 0, H, 0, t.H.Length);
+			Array.Copy(t.L, 0, L, 0, t.L.Length);
+			Array.Copy(t.M, 0, M, 0, t.M.Length);
+			Array.Copy(t.Sum, 0, Sum, 0, t.Sum.Length);
+			Array.Copy(t.C[1], 0, C[1], 0, t.C[1].Length);
+			Array.Copy(t.C[2], 0, C[2], 0, t.C[2].Length);
+			Array.Copy(t.C[3], 0, C[3], 0, t.C[3].Length);
+			Array.Copy(t.xBuf, 0, xBuf, 0, t.xBuf.Length);
 
-			this.xBufOff = t.xBufOff;
-			this.byteCount = t.byteCount;
+			xBufOff = t.xBufOff;
+			byteCount = t.byteCount;
 		}
 	}
 }

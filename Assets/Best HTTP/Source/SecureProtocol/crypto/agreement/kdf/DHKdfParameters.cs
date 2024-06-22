@@ -8,10 +8,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Kdf
 	public class DHKdfParameters
 		: IDerivationParameters
 	{
-		private readonly DerObjectIdentifier algorithm;
-		private readonly int keySize;
-		private readonly byte[] z;
-		private readonly byte[] extraInfo;
+		readonly DerObjectIdentifier algorithm;
+		readonly int keySize;
+		readonly byte[] z;
+		readonly byte[] extraInfo;
 
 		public DHKdfParameters(
 			DerObjectIdentifier algorithm,

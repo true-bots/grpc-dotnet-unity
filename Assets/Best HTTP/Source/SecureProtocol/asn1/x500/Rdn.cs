@@ -10,9 +10,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 	public class Rdn
 		: Asn1Encodable
 	{
-		private readonly Asn1Set values;
+		readonly Asn1Set values;
 
-		private Rdn(Asn1Set values)
+		Rdn(Asn1Set values)
 		{
 			this.values = values;
 		}
@@ -20,9 +20,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 		public static Rdn GetInstance(object obj)
 		{
 			if (obj is Rdn)
+			{
 				return (Rdn)obj;
+			}
+
 			if (null != obj)
+			{
 				return new Rdn(Asn1Set.GetInstance(obj));
+			}
+
 			return null;
 		}
 
@@ -34,12 +40,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 		 */
 		public Rdn(DerObjectIdentifier oid, Asn1Encodable value)
 		{
-			this.values = new DerSet(new DerSequence(oid, value));
+			values = new DerSet(new DerSequence(oid, value));
 		}
 
 		public Rdn(AttributeTypeAndValue attrTAndV)
 		{
-			this.values = new DerSet(attrTAndV);
+			values = new DerSet(attrTAndV);
 		}
 
 		/**
@@ -49,12 +55,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 		 */
 		public Rdn(AttributeTypeAndValue[] aAndVs)
 		{
-			this.values = new DerSet(aAndVs);
+			values = new DerSet(aAndVs);
 		}
 
 		public virtual bool IsMultiValued
 		{
-			get { return this.values.Count > 1; }
+			get { return values.Count > 1; }
 		}
 
 		/**
@@ -64,15 +70,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 		 */
 		public virtual int Count
 		{
-			get { return this.values.Count; }
+			get { return values.Count; }
 		}
 
 		public virtual AttributeTypeAndValue GetFirst()
 		{
-			if (this.values.Count == 0)
+			if (values.Count == 0)
+			{
 				return null;
+			}
 
-			return AttributeTypeAndValue.GetInstance(this.values[0]);
+			return AttributeTypeAndValue.GetInstance(values[0]);
 		}
 
 		public virtual AttributeTypeAndValue[] GetTypesAndValues()

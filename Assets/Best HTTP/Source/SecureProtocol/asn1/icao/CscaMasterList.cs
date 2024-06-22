@@ -20,35 +20,43 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 	public class CscaMasterList
 		: Asn1Encodable
 	{
-		private DerInteger version = new DerInteger(0);
-		private X509CertificateStructure[] certList;
+		DerInteger version = new DerInteger(0);
+		X509CertificateStructure[] certList;
 
 		public static CscaMasterList GetInstance(
 			object obj)
 		{
 			if (obj is CscaMasterList)
+			{
 				return (CscaMasterList)obj;
+			}
 
 			if (obj != null)
+			{
 				return new CscaMasterList(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private CscaMasterList(
+		CscaMasterList(
 			Asn1Sequence seq)
 		{
 			if (seq == null || seq.Count == 0)
+			{
 				throw new ArgumentException("null or empty sequence passed.");
+			}
 
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Incorrect sequence size: " + seq.Count);
+			}
 
-			this.version = DerInteger.GetInstance(seq[0]);
+			version = DerInteger.GetInstance(seq[0]);
 
 			Asn1Set certSet = Asn1Set.GetInstance(seq[1]);
 
-			this.certList = new X509CertificateStructure[certSet.Count];
+			certList = new X509CertificateStructure[certSet.Count];
 			for (int i = 0; i < certList.Length; i++)
 			{
 				certList[i] = X509CertificateStructure.GetInstance(certSet[i]);
@@ -71,7 +79,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 			return CopyCertList(certList);
 		}
 
-		private static X509CertificateStructure[] CopyCertList(X509CertificateStructure[] orig)
+		static X509CertificateStructure[] CopyCertList(X509CertificateStructure[] orig)
 		{
 			return (X509CertificateStructure[])orig.Clone();
 		}

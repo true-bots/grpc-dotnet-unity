@@ -9,11 +9,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class KeyAgreeRecipientInfo
 		: Asn1Encodable
 	{
-		private DerInteger version;
-		private OriginatorIdentifierOrKey originator;
-		private Asn1OctetString ukm;
-		private AlgorithmIdentifier keyEncryptionAlgorithm;
-		private Asn1Sequence recipientEncryptedKeys;
+		DerInteger version;
+		OriginatorIdentifierOrKey originator;
+		Asn1OctetString ukm;
+		AlgorithmIdentifier keyEncryptionAlgorithm;
+		Asn1Sequence recipientEncryptedKeys;
 
 		public KeyAgreeRecipientInfo(
 			OriginatorIdentifierOrKey originator,
@@ -21,7 +21,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			AlgorithmIdentifier keyEncryptionAlgorithm,
 			Asn1Sequence recipientEncryptedKeys)
 		{
-			this.version = new DerInteger(3);
+			version = new DerInteger(3);
 			this.originator = originator;
 			this.ukm = ukm;
 			this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
@@ -75,13 +75,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is KeyAgreeRecipientInfo)
+			{
 				return (KeyAgreeRecipientInfo)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new KeyAgreeRecipientInfo((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
-				"Illegal object in KeyAgreeRecipientInfo: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+				"Illegal object in KeyAgreeRecipientInfo: " + Platform.GetTypeName(obj));
 		}
 
 		public DerInteger Version

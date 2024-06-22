@@ -17,7 +17,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 	public class PaddedBufferedBlockCipher
 		: BufferedBlockCipher
 	{
-		private readonly IBlockCipherPadding padding;
+		readonly IBlockCipherPadding padding;
 
 		public PaddedBufferedBlockCipher(IBlockCipher cipher, IBlockCipherPadding padding)
 			: this(EcbBlockCipher.GetBlockCipherMode(cipher), padding)
@@ -180,7 +180,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 		public override int ProcessBytes(byte[] input, int inOff, int length, byte[] output, int outOff)
 		{
 			if (length < 0)
+			{
 				throw new ArgumentException("Can't have a negative input length!");
+			}
 
 			int blockSize = GetBlockSize();
 			int outLength = GetUpdateOutputSize(length);
@@ -281,7 +283,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 			{
 				if (bufOff == blockSize)
 				{
-					if ((outOff + 2 * blockSize) > output.Length)
+					if (outOff + 2 * blockSize > output.Length)
 					{
 						Reset();
 

@@ -10,14 +10,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	 * Support fast rejection of duplicate records by maintaining a sliding receive window
 	 * </p>
 	 */
-	internal sealed class DtlsReplayWindow
+	sealed class DtlsReplayWindow
 	{
-		private const long ValidSeqMask = 0x0000FFFFFFFFFFFFL;
+		const long ValidSeqMask = 0x0000FFFFFFFFFFFFL;
 
-		private const long WindowSize = 64L;
+		const long WindowSize = 64L;
 
-		private long m_latestConfirmedSeq = -1;
-		private ulong m_bitmap = 0;
+		long m_latestConfirmedSeq = -1;
+		ulong m_bitmap = 0;
 
 		/// <summary>Check whether a received record with the given sequence number should be rejected as a duplicate.
 		/// </summary>
@@ -26,16 +26,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal bool ShouldDiscard(long seq)
 		{
 			if ((seq & ValidSeqMask) != seq)
+			{
 				return true;
+			}
 
 			if (seq <= m_latestConfirmedSeq)
 			{
 				long diff = m_latestConfirmedSeq - seq;
 				if (diff >= WindowSize)
+				{
 					return true;
+				}
 
 				if ((m_bitmap & (1UL << (int)diff)) != 0)
+				{
 					return true;
+				}
 			}
 
 			return false;
@@ -47,14 +53,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal void ReportAuthenticated(long seq)
 		{
 			if ((seq & ValidSeqMask) != seq)
+			{
 				throw new ArgumentException("out of range", "seq");
+			}
 
 			if (seq <= m_latestConfirmedSeq)
 			{
 				long diff = m_latestConfirmedSeq - seq;
 				if (diff < WindowSize)
 				{
-					m_bitmap |= (1UL << (int)diff);
+					m_bitmap |= 1UL << (int)diff;
 				}
 			}
 			else
@@ -77,7 +85,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal void Reset(long seq)
 		{
 			if ((seq & ValidSeqMask) != seq)
+			{
 				throw new ArgumentException("out of range", "seq");
+			}
 
 			// Discard future records unless sequence number > 'seq'
 			m_latestConfirmedSeq = seq;

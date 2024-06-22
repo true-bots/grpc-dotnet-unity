@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 	public class TeeOutputStream
 		: BaseOutputStream
 	{
-		private readonly Stream output, tee;
+		readonly Stream output, tee;
 
 		public TeeOutputStream(Stream output, Stream tee)
 		{

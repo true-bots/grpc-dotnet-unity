@@ -56,11 +56,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		protected virtual IList<int> GetNamedGroupRoles()
 		{
-			var namedGroupRoles = TlsUtilities.GetNamedGroupRoles(GetCipherSuites());
-			var sigAlgs = m_supportedSignatureAlgorithms;
-			var sigAlgsCert = m_supportedSignatureAlgorithmsCert;
+			IList<int> namedGroupRoles = TlsUtilities.GetNamedGroupRoles(GetCipherSuites());
+			IList<SignatureAndHashAlgorithm> sigAlgs = m_supportedSignatureAlgorithms;
+			IList<SignatureAndHashAlgorithm> sigAlgsCert = m_supportedSignatureAlgorithmsCert;
 
-			if ((null == sigAlgs || TlsUtilities.ContainsAnySignatureAlgorithm(sigAlgs, SignatureAlgorithm.ecdsa)) ||
+			if (null == sigAlgs || TlsUtilities.ContainsAnySignatureAlgorithm(sigAlgs, SignatureAlgorithm.ecdsa) ||
 			    (null != sigAlgsCert && TlsUtilities.ContainsAnySignatureAlgorithm(sigAlgsCert, SignatureAlgorithm.ecdsa)))
 			{
 				TlsUtilities.AddToSet(namedGroupRoles, NamedGroupRole.ecdsa);
@@ -75,7 +75,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			byte[] extensionData = TlsUtilities.GetExtensionData(serverExtensions, extensionType);
 			if (extensionData != null && !AllowUnexpectedServerExtension(extensionType, extensionData))
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 		}
 
 		/// <exception cref="IOException"/>
@@ -136,7 +138,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		protected virtual IList<int> GetSupportedGroups(IList<int> namedGroupRoles)
 		{
 			TlsCrypto crypto = Crypto;
-			var supportedGroups = new List<int>();
+			List<int> supportedGroups = new List<int>();
 
 			if (namedGroupRoles.Contains(NamedGroupRole.ecdh))
 			{
@@ -187,10 +189,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public virtual void Init(TlsClientContext context)
 		{
-			this.m_context = context;
+			m_context = context;
 
-			this.m_protocolVersions = GetSupportedVersions();
-			this.m_cipherSuites = GetSupportedCipherSuites();
+			m_protocolVersions = GetSupportedVersions();
+			m_cipherSuites = GetSupportedCipherSuites();
 		}
 
 		public override ProtocolVersion[] GetProtocolVersions()
@@ -208,9 +210,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			base.NotifyHandshakeBeginning();
 
-			this.m_supportedGroups = null;
-			this.m_supportedSignatureAlgorithms = null;
-			this.m_supportedSignatureAlgorithmsCert = null;
+			m_supportedGroups = null;
+			m_supportedSignatureAlgorithms = null;
+			m_supportedSignatureAlgorithmsCert = null;
 		}
 
 		public virtual TlsSession GetSessionToResume()
@@ -236,7 +238,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <exception cref="IOException"/>
 		public virtual IDictionary<int, byte[]> GetClientExtensions()
 		{
-			var clientExtensions = new Dictionary<int, byte[]>();
+			Dictionary<int, byte[]> clientExtensions = new Dictionary<int, byte[]>();
 
 			bool offeringTlsV13Plus = false;
 			bool offeringPreTlsV13 = false;
@@ -255,13 +257,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				}
 			}
 
-			var protocolNames = GetProtocolNames();
+			IList<ProtocolName> protocolNames = GetProtocolNames();
 			if (protocolNames != null)
 			{
 				TlsExtensionsUtilities.AddAlpnExtensionClient(clientExtensions, protocolNames);
 			}
 
-			var sniServerNames = GetSniServerNames();
+			IList<ServerName> sniServerNames = GetSniServerNames();
 			if (sniServerNames != null)
 			{
 				TlsExtensionsUtilities.AddServerNameExtensionClient(clientExtensions, sniServerNames);
@@ -275,7 +277,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			if (offeringTlsV13Plus)
 			{
-				var certificateAuthorities = GetCertificateAuthorities();
+				IList<X509Name> certificateAuthorities = GetCertificateAuthorities();
 				if (certificateAuthorities != null)
 				{
 					TlsExtensionsUtilities.AddCertificateAuthoritiesExtension(clientExtensions, certificateAuthorities);
@@ -287,13 +289,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				// TODO Shouldn't add if no offered cipher suite uses a block cipher?
 				TlsExtensionsUtilities.AddEncryptThenMacExtension(clientExtensions);
 
-				var statusRequestV2 = GetMultiCertStatusRequest();
+				IList<CertificateStatusRequestItemV2> statusRequestV2 = GetMultiCertStatusRequest();
 				if (statusRequestV2 != null)
 				{
 					TlsExtensionsUtilities.AddStatusRequestV2Extension(clientExtensions, statusRequestV2);
 				}
 
-				var trustedCAKeys = GetTrustedCAIndication();
+				IList<TrustedAuthority> trustedCAKeys = GetTrustedCAIndication();
 				if (trustedCAKeys != null)
 				{
 					TlsExtensionsUtilities.AddTrustedCAKeysExtensionClient(clientExtensions, trustedCAKeys);
@@ -308,29 +310,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			 */
 			if (TlsUtilities.IsSignatureAlgorithmsExtensionAllowed(clientVersion))
 			{
-				var supportedSigAlgs = GetSupportedSignatureAlgorithms();
+				IList<SignatureAndHashAlgorithm> supportedSigAlgs = GetSupportedSignatureAlgorithms();
 				if (null != supportedSigAlgs && supportedSigAlgs.Count > 0)
 				{
-					this.m_supportedSignatureAlgorithms = supportedSigAlgs;
+					m_supportedSignatureAlgorithms = supportedSigAlgs;
 
 					TlsExtensionsUtilities.AddSignatureAlgorithmsExtension(clientExtensions, supportedSigAlgs);
 				}
 
-				var supportedSigAlgsCert = GetSupportedSignatureAlgorithmsCert();
+				IList<SignatureAndHashAlgorithm> supportedSigAlgsCert = GetSupportedSignatureAlgorithmsCert();
 				if (null != supportedSigAlgsCert && supportedSigAlgsCert.Count > 0)
 				{
-					this.m_supportedSignatureAlgorithmsCert = supportedSigAlgsCert;
+					m_supportedSignatureAlgorithmsCert = supportedSigAlgsCert;
 
 					TlsExtensionsUtilities.AddSignatureAlgorithmsCertExtension(clientExtensions, supportedSigAlgsCert);
 				}
 			}
 
-			var namedGroupRoles = GetNamedGroupRoles();
+			IList<int> namedGroupRoles = GetNamedGroupRoles();
 
-			var supportedGroups = GetSupportedGroups(namedGroupRoles);
+			IList<int> supportedGroups = GetSupportedGroups(namedGroupRoles);
 			if (supportedGroups != null && supportedGroups.Count > 0)
 			{
-				this.m_supportedGroups = supportedGroups;
+				m_supportedGroups = supportedGroups;
 
 				TlsExtensionsUtilities.AddSupportedGroupsExtension(clientExtensions, supportedGroups);
 			}
@@ -385,13 +387,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			 */
 
 			if (null == m_supportedGroups || m_supportedGroups.Count < 1)
+			{
 				return null;
+			}
 
 			if (m_supportedGroups.Contains(NamedGroup.x25519))
+			{
 				return TlsUtilities.VectorOfOne(NamedGroup.x25519);
+			}
 
 			if (m_supportedGroups.Contains(NamedGroup.secp256r1))
+			{
 				return TlsUtilities.VectorOfOne(NamedGroup.secp256r1);
+			}
 
 			return TlsUtilities.VectorOfOne(m_supportedGroups[0]);
 		}
@@ -422,7 +430,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual void ProcessServerExtensions(IDictionary<int, byte[]> serverExtensions)
 		{
 			if (null == serverExtensions)
+			{
 				return;
+			}
 
 			SecurityParameters securityParameters = m_context.SecurityParameters;
 			bool isTlsV13 = TlsUtilities.IsTlsV13(securityParameters.NegotiatedVersion);
@@ -466,7 +476,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual void ProcessServerSupplementalData(IList<SupplementalDataEntry> serverSupplementalData)
 		{
 			if (serverSupplementalData != null)
+			{
 				throw new TlsFatalAlert(AlertDescription.unexpected_message);
+			}
 		}
 
 		public abstract TlsAuthentication GetAuthentication();

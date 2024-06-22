@@ -69,13 +69,13 @@ namespace BestHTTP.Decompression.Zlib
 {
 	sealed class InflateBlocks
 	{
-		private const int MANY = 1440;
+		const int MANY = 1440;
 
 		// Table for deflate from PKZIP's appnote.txt.
 		internal static readonly int[] border = new int[]
 			{ 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
 
-		private enum InflateBlockMode
+		enum InflateBlockMode
 		{
 			TYPE = 0, // get type bits (3, including end bit)
 			LENS = 1, // get lengths for stored
@@ -86,10 +86,10 @@ namespace BestHTTP.Decompression.Zlib
 			CODES = 6, // processing fixed or dynamic block
 			DRY = 7, // output remaining window bytes
 			DONE = 8, // finished last block, done
-			BAD = 9, // ot a data error--stuck here
+			BAD = 9 // ot a data error--stuck here
 		}
 
-		private InflateBlockMode mode; // current inflate_block mode
+		InflateBlockMode mode; // current inflate_block mode
 
 		internal int left; // if STORED, bytes left to copy
 
@@ -113,12 +113,12 @@ namespace BestHTTP.Decompression.Zlib
 		internal int end; // one byte after sliding window
 		internal int readAt; // window read pointer
 		internal int writeAt; // window write pointer
-		internal System.Object checkfn; // check function
+		internal object checkfn; // check function
 		internal uint check; // check on output
 
 		internal InfTree inftree = new InfTree();
 
-		internal InflateBlocks(ZlibCodec codec, System.Object checkfn, int w)
+		internal InflateBlocks(ZlibCodec codec, object checkfn, int w)
 		{
 			_codec = codec;
 			hufts = new int[MANY * 3];
@@ -138,7 +138,10 @@ namespace BestHTTP.Decompression.Zlib
 			readAt = writeAt = 0;
 
 			if (checkfn != null)
+			{
 				_codec._Adler32 = check = Adler.Adler32(0, null, 0, 0);
+			}
+
 			return oldCheck;
 		}
 
@@ -171,7 +174,7 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					case InflateBlockMode.TYPE:
 
-						while (k < (3))
+						while (k < 3)
 						{
 							if (n != 0)
 							{
@@ -200,7 +203,7 @@ namespace BestHTTP.Decompression.Zlib
 						{
 							case 0: // stored
 								b >>= 3;
-								k -= (3);
+								k -= 3;
 								t = k & 7; // go to byte boundary
 								b >>= t;
 								k -= t;
@@ -244,7 +247,7 @@ namespace BestHTTP.Decompression.Zlib
 
 					case InflateBlockMode.LENS:
 
-						while (k < (32))
+						while (k < 32)
 						{
 							if (n != 0)
 							{
@@ -267,7 +270,7 @@ namespace BestHTTP.Decompression.Zlib
 							k += 8;
 						}
 
-						if ((((~b) >> 16) & 0xffff) != (b & 0xffff))
+						if (((~b >> 16) & 0xffff) != (b & 0xffff))
 						{
 							mode = InflateBlockMode.BAD;
 							_codec.Message = "invalid stored block lengths";
@@ -282,9 +285,9 @@ namespace BestHTTP.Decompression.Zlib
 							return Flush(r);
 						}
 
-						left = (b & 0xffff);
+						left = b & 0xffff;
 						b = k = 0; // dump bits
-						mode = left != 0 ? InflateBlockMode.STORED : (last != 0 ? InflateBlockMode.DRY : InflateBlockMode.TYPE);
+						mode = left != 0 ? InflateBlockMode.STORED : last != 0 ? InflateBlockMode.DRY : InflateBlockMode.TYPE;
 						break;
 
 					case InflateBlockMode.STORED:
@@ -336,22 +339,31 @@ namespace BestHTTP.Decompression.Zlib
 
 						t = left;
 						if (t > n)
+						{
 							t = n;
+						}
+
 						if (t > m)
+						{
 							t = m;
+						}
+
 						Array.Copy(_codec.InputBuffer, p, window, q, t);
 						p += t;
 						n -= t;
 						q += t;
 						m -= t;
 						if ((left -= t) != 0)
+						{
 							break;
+						}
+
 						mode = last != 0 ? InflateBlockMode.DRY : InflateBlockMode.TYPE;
 						break;
 
 					case InflateBlockMode.TABLE:
 
-						while (k < (14))
+						while (k < 14)
 						{
 							if (n != 0)
 							{
@@ -373,7 +385,7 @@ namespace BestHTTP.Decompression.Zlib
 							k += 8;
 						}
 
-						table = t = (b & 0x3fff);
+						table = t = b & 0x3fff;
 						if ((t & 0x1f) > 29 || ((t >> 5) & 0x1f) > 29)
 						{
 							mode = InflateBlockMode.BAD;
@@ -414,7 +426,7 @@ namespace BestHTTP.Decompression.Zlib
 					case InflateBlockMode.BTREE:
 						while (index < 4 + (table >> 10))
 						{
-							while (k < (3))
+							while (k < 3)
 							{
 								if (n != 0)
 								{
@@ -521,7 +533,7 @@ namespace BestHTTP.Decompression.Zlib
 								i = c == 18 ? 7 : c - 14;
 								j = c == 18 ? 11 : 3;
 
-								while (k < (t + i))
+								while (k < t + i)
 								{
 									if (n != 0)
 									{
@@ -546,7 +558,7 @@ namespace BestHTTP.Decompression.Zlib
 								b >>= t;
 								k -= t;
 
-								j += (b & InternalInflateConstants.InflateMask[i]);
+								j += b & InternalInflateConstants.InflateMask[i];
 
 								b >>= i;
 								k -= i;
@@ -569,7 +581,7 @@ namespace BestHTTP.Decompression.Zlib
 									return Flush(r);
 								}
 
-								c = (c == 16) ? blens[i - 1] : 0;
+								c = c == 16 ? blens[i - 1] : 0;
 								do
 								{
 									blens[i++] = c;
@@ -743,15 +755,22 @@ namespace BestHTTP.Decompression.Zlib
 				if (nBytes == 0)
 				{
 					if (r == ZlibConstants.Z_BUF_ERROR)
+					{
 						r = ZlibConstants.Z_OK;
+					}
+
 					return r;
 				}
 
 				if (nBytes > _codec.AvailableBytesOut)
+				{
 					nBytes = _codec.AvailableBytesOut;
+				}
 
 				if (nBytes != 0 && r == ZlibConstants.Z_BUF_ERROR)
+				{
 					r = ZlibConstants.Z_OK;
+				}
 
 				// update counters
 				_codec.AvailableBytesOut -= nBytes;
@@ -759,7 +778,9 @@ namespace BestHTTP.Decompression.Zlib
 
 				// update check information
 				if (checkfn != null)
+				{
 					_codec._Adler32 = check = Adler.Adler32(check, window, readAt, nBytes);
+				}
 
 				// copy as far as end of window
 				Array.Copy(window, readAt, _codec.OutputBuffer, _codec.NextOut, nBytes);
@@ -772,9 +793,14 @@ namespace BestHTTP.Decompression.Zlib
 					// wrap pointers
 					readAt = 0;
 					if (writeAt == end)
+					{
 						writeAt = 0;
+					}
 				}
-				else pass++;
+				else
+				{
+					pass++;
+				}
 			}
 
 			// done
@@ -783,7 +809,7 @@ namespace BestHTTP.Decompression.Zlib
 	}
 
 
-	internal static class InternalInflateConstants
+	static class InternalInflateConstants
 	{
 		// And'ing with mask[n] masks the lower n bits
 		internal static readonly int[] InflateMask = new int[]
@@ -801,16 +827,16 @@ namespace BestHTTP.Decompression.Zlib
 		// waiting for "i:"=input,
 		//             "o:"=output,
 		//             "x:"=nothing
-		private const int START = 0; // x: set up for LEN
-		private const int LEN = 1; // i: get length/literal/eob next
-		private const int LENEXT = 2; // i: getting length extra (have base)
-		private const int DIST = 3; // i: get distance next
-		private const int DISTEXT = 4; // i: getting distance extra
-		private const int COPY = 5; // o: copying bytes in window, waiting for space
-		private const int LIT = 6; // o: got literal, waiting for output space
-		private const int WASH = 7; // o: got eob, possibly still output waiting
-		private const int END = 8; // x: got eob and all data flushed
-		private const int BADCODE = 9; // x: got error
+		const int START = 0; // x: set up for LEN
+		const int LEN = 1; // i: get length/literal/eob next
+		const int LENEXT = 2; // i: getting length extra (have base)
+		const int DIST = 3; // i: get distance next
+		const int DISTEXT = 4; // i: getting distance extra
+		const int COPY = 5; // o: copying bytes in window, waiting for space
+		const int LIT = 6; // o: got literal, waiting for output space
+		const int WASH = 7; // o: got eob, possibly still output waiting
+		const int END = 8; // x: got eob and all data flushed
+		const int BADCODE = 9; // x: got error
 
 		internal int mode; // current inflate_codes mode
 
@@ -899,7 +925,7 @@ namespace BestHTTP.Decompression.Zlib
 
 							if (r != ZlibConstants.Z_OK)
 							{
-								mode = (r == ZlibConstants.Z_STREAM_END) ? WASH : BADCODE;
+								mode = r == ZlibConstants.Z_STREAM_END ? WASH : BADCODE;
 								break;
 							}
 						}
@@ -917,7 +943,9 @@ namespace BestHTTP.Decompression.Zlib
 						while (k < j)
 						{
 							if (n != 0)
+							{
 								r = ZlibConstants.Z_OK;
+							}
 							else
 							{
 								blocks.bitb = b;
@@ -936,8 +964,8 @@ namespace BestHTTP.Decompression.Zlib
 
 						tindex = (tree_index + (b & InternalInflateConstants.InflateMask[j])) * 3;
 
-						b >>= (tree[tindex + 1]);
-						k -= (tree[tindex + 1]);
+						b >>= tree[tindex + 1];
+						k -= tree[tindex + 1];
 
 						e = tree[tindex];
 
@@ -992,7 +1020,9 @@ namespace BestHTTP.Decompression.Zlib
 						while (k < j)
 						{
 							if (n != 0)
+							{
 								r = ZlibConstants.Z_OK;
+							}
 							else
 							{
 								blocks.bitb = b;
@@ -1009,7 +1039,7 @@ namespace BestHTTP.Decompression.Zlib
 							k += 8;
 						}
 
-						len += (b & InternalInflateConstants.InflateMask[j]);
+						len += b & InternalInflateConstants.InflateMask[j];
 
 						b >>= j;
 						k -= j;
@@ -1026,7 +1056,9 @@ namespace BestHTTP.Decompression.Zlib
 						while (k < j)
 						{
 							if (n != 0)
+							{
 								r = ZlibConstants.Z_OK;
+							}
 							else
 							{
 								blocks.bitb = b;
@@ -1048,7 +1080,7 @@ namespace BestHTTP.Decompression.Zlib
 						b >>= tree[tindex + 1];
 						k -= tree[tindex + 1];
 
-						e = (tree[tindex]);
+						e = tree[tindex];
 						if ((e & 0x10) != 0)
 						{
 							// distance
@@ -1085,7 +1117,9 @@ namespace BestHTTP.Decompression.Zlib
 						while (k < j)
 						{
 							if (n != 0)
+							{
 								r = ZlibConstants.Z_OK;
+							}
 							else
 							{
 								blocks.bitb = b;
@@ -1102,7 +1136,7 @@ namespace BestHTTP.Decompression.Zlib
 							k += 8;
 						}
 
-						dist += (b & InternalInflateConstants.InflateMask[j]);
+						dist += b & InternalInflateConstants.InflateMask[j];
 
 						b >>= j;
 						k -= j;
@@ -1158,7 +1192,10 @@ namespace BestHTTP.Decompression.Zlib
 							m--;
 
 							if (f == blocks.end)
+							{
 								f = 0;
+							}
+
 							len--;
 						}
 
@@ -1315,7 +1352,7 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				// assume called with m >= 258 && n >= 10
 				// get literal/length code
-				while (k < (20))
+				while (k < 20)
 				{
 					// max bits for literal/length code
 					n--;
@@ -1329,8 +1366,8 @@ namespace BestHTTP.Decompression.Zlib
 				tp_index_t_3 = (tp_index + t) * 3;
 				if ((e = tp[tp_index_t_3]) == 0)
 				{
-					b >>= (tp[tp_index_t_3 + 1]);
-					k -= (tp[tp_index_t_3 + 1]);
+					b >>= tp[tp_index_t_3 + 1];
+					k -= tp[tp_index_t_3 + 1];
 
 					s.window[q++] = (byte)tp[tp_index_t_3 + 2];
 					m--;
@@ -1339,8 +1376,8 @@ namespace BestHTTP.Decompression.Zlib
 
 				do
 				{
-					b >>= (tp[tp_index_t_3 + 1]);
-					k -= (tp[tp_index_t_3 + 1]);
+					b >>= tp[tp_index_t_3 + 1];
+					k -= tp[tp_index_t_3 + 1];
 
 					if ((e & 16) != 0)
 					{
@@ -1367,8 +1404,8 @@ namespace BestHTTP.Decompression.Zlib
 
 						do
 						{
-							b >>= (tp[tp_index_t_3 + 1]);
-							k -= (tp[tp_index_t_3 + 1]);
+							b >>= tp[tp_index_t_3 + 1];
+							k -= tp[tp_index_t_3 + 1];
 
 							if ((e & 16) != 0)
 							{
@@ -1394,7 +1431,7 @@ namespace BestHTTP.Decompression.Zlib
 									// offset before dest
 									//  just copy
 									r = q - d;
-									if (q - r > 0 && 2 > (q - r))
+									if (q - r > 0 && 2 > q - r)
 									{
 										s.window[q++] = s.window[r++]; // minimum count is three,
 										s.window[q++] = s.window[r++]; // so unroll loop a little
@@ -1422,7 +1459,7 @@ namespace BestHTTP.Decompression.Zlib
 									{
 										// if source crosses,
 										c -= e; // wrapped copy
-										if (q - r > 0 && e > (q - r))
+										if (q - r > 0 && e > q - r)
 										{
 											do
 											{
@@ -1442,7 +1479,7 @@ namespace BestHTTP.Decompression.Zlib
 								}
 
 								// copy all or what's left
-								if (q - r > 0 && c > (q - r))
+								if (q - r > 0 && c > q - r)
 								{
 									do
 									{
@@ -1462,7 +1499,7 @@ namespace BestHTTP.Decompression.Zlib
 							else if ((e & 64) == 0)
 							{
 								t += tp[tp_index_t_3 + 2];
-								t += (b & InternalInflateConstants.InflateMask[e]);
+								t += b & InternalInflateConstants.InflateMask[e];
 								tp_index_t_3 = (tp_index + t) * 3;
 								e = tp[tp_index_t_3];
 							}
@@ -1471,10 +1508,10 @@ namespace BestHTTP.Decompression.Zlib
 								z.Message = "invalid distance code";
 
 								c = z.AvailableBytesIn - n;
-								c = (k >> 3) < c ? k >> 3 : c;
+								c = k >> 3 < c ? k >> 3 : c;
 								n += c;
 								p -= c;
-								k -= (c << 3);
+								k -= c << 3;
 
 								s.bitb = b;
 								s.bitk = k;
@@ -1493,12 +1530,12 @@ namespace BestHTTP.Decompression.Zlib
 					if ((e & 64) == 0)
 					{
 						t += tp[tp_index_t_3 + 2];
-						t += (b & InternalInflateConstants.InflateMask[e]);
+						t += b & InternalInflateConstants.InflateMask[e];
 						tp_index_t_3 = (tp_index + t) * 3;
 						if ((e = tp[tp_index_t_3]) == 0)
 						{
-							b >>= (tp[tp_index_t_3 + 1]);
-							k -= (tp[tp_index_t_3 + 1]);
+							b >>= tp[tp_index_t_3 + 1];
+							k -= tp[tp_index_t_3 + 1];
 							s.window[q++] = (byte)tp[tp_index_t_3 + 2];
 							m--;
 							break;
@@ -1507,10 +1544,10 @@ namespace BestHTTP.Decompression.Zlib
 					else if ((e & 32) != 0)
 					{
 						c = z.AvailableBytesIn - n;
-						c = (k >> 3) < c ? k >> 3 : c;
+						c = k >> 3 < c ? k >> 3 : c;
 						n += c;
 						p -= c;
-						k -= (c << 3);
+						k -= c << 3;
 
 						s.bitb = b;
 						s.bitk = k;
@@ -1526,10 +1563,10 @@ namespace BestHTTP.Decompression.Zlib
 						z.Message = "invalid literal/length code";
 
 						c = z.AvailableBytesIn - n;
-						c = (k >> 3) < c ? k >> 3 : c;
+						c = k >> 3 < c ? k >> 3 : c;
 						n += c;
 						p -= c;
-						k -= (c << 3);
+						k -= c << 3;
 
 						s.bitb = b;
 						s.bitk = k;
@@ -1545,10 +1582,10 @@ namespace BestHTTP.Decompression.Zlib
 
 			// not enough input or output--restore pointers and return
 			c = z.AvailableBytesIn - n;
-			c = (k >> 3) < c ? k >> 3 : c;
+			c = k >> 3 < c ? k >> 3 : c;
 			n += c;
 			p -= c;
-			k -= (c << 3);
+			k -= c << 3;
 
 			s.bitb = b;
 			s.bitk = k;
@@ -1562,14 +1599,14 @@ namespace BestHTTP.Decompression.Zlib
 	}
 
 
-	internal sealed class InflateManager
+	sealed class InflateManager
 	{
 		// preset dictionary flag in zlib header
-		private const int PRESET_DICT = 0x20;
+		const int PRESET_DICT = 0x20;
 
-		private const int Z_DEFLATED = 8;
+		const int Z_DEFLATED = 8;
 
-		private enum InflateManagerMode
+		enum InflateManagerMode
 		{
 			METHOD = 0, // waiting for method byte
 			FLAG = 1, // waiting for flag byte
@@ -1584,10 +1621,10 @@ namespace BestHTTP.Decompression.Zlib
 			CHECK2 = 10, // two check bytes to go
 			CHECK1 = 11, // one check byte to go
 			DONE = 12, // finished check, done
-			BAD = 13, // got an error--stay here
+			BAD = 13 // got an error--stay here
 		}
 
-		private InflateManagerMode mode; // current inflate mode
+		InflateManagerMode mode; // current inflate mode
 		internal ZlibCodec _codec; // pointer back to this zlib stream
 
 		// mode dependent information
@@ -1602,7 +1639,7 @@ namespace BestHTTP.Decompression.Zlib
 
 		// mode independent information
 		//internal int nowrap; // flag for no wrapper
-		private bool _handleRfc1950HeaderBytes = true;
+		bool _handleRfc1950HeaderBytes = true;
 
 		internal bool HandleRfc1950HeaderBytes
 		{
@@ -1635,7 +1672,10 @@ namespace BestHTTP.Decompression.Zlib
 		internal int End()
 		{
 			if (blocks != null)
+			{
 				blocks.Free();
+			}
+
 			blocks = null;
 			return ZlibConstants.Z_OK;
 		}
@@ -1680,9 +1720,11 @@ namespace BestHTTP.Decompression.Zlib
 			int b;
 
 			if (_codec.InputBuffer == null)
+			{
 				throw new ZlibException("InputBuffer is null. ");
+			}
 
-//             int f = (flush == FlushType.Finish)
+			//             int f = (flush == FlushType.Finish)
 //                 ? ZlibConstants.Z_BUF_ERROR
 //                 : ZlibConstants.Z_OK;
 
@@ -1695,14 +1737,18 @@ namespace BestHTTP.Decompression.Zlib
 				switch (mode)
 				{
 					case InflateManagerMode.METHOD:
-						if (_codec.AvailableBytesIn == 0) return r;
+						if (_codec.AvailableBytesIn == 0)
+						{
+							return r;
+						}
+
 						r = f;
 						_codec.AvailableBytesIn--;
 						_codec.TotalBytesIn++;
 						if (((method = _codec.InputBuffer[_codec.NextIn++]) & 0xf) != Z_DEFLATED)
 						{
 							mode = InflateManagerMode.BAD;
-							_codec.Message = String.Format("unknown compression method (0x{0:X2})", method);
+							_codec.Message = string.Format("unknown compression method (0x{0:X2})", method);
 							marker = 5; // can't try inflateSync
 							break;
 						}
@@ -1710,7 +1756,7 @@ namespace BestHTTP.Decompression.Zlib
 						if ((method >> 4) + 8 > wbits)
 						{
 							mode = InflateManagerMode.BAD;
-							_codec.Message = String.Format("invalid window size ({0})", (method >> 4) + 8);
+							_codec.Message = string.Format("invalid window size ({0})", (method >> 4) + 8);
 							marker = 5; // can't try inflateSync
 							break;
 						}
@@ -1720,13 +1766,17 @@ namespace BestHTTP.Decompression.Zlib
 
 
 					case InflateManagerMode.FLAG:
-						if (_codec.AvailableBytesIn == 0) return r;
+						if (_codec.AvailableBytesIn == 0)
+						{
+							return r;
+						}
+
 						r = f;
 						_codec.AvailableBytesIn--;
 						_codec.TotalBytesIn++;
-						b = (_codec.InputBuffer[_codec.NextIn++]) & 0xff;
+						b = _codec.InputBuffer[_codec.NextIn++] & 0xff;
 
-						if ((((method << 8) + b) % 31) != 0)
+						if (((method << 8) + b) % 31 != 0)
 						{
 							mode = InflateManagerMode.BAD;
 							_codec.Message = "incorrect header check";
@@ -1734,13 +1784,17 @@ namespace BestHTTP.Decompression.Zlib
 							break;
 						}
 
-						mode = ((b & PRESET_DICT) == 0)
+						mode = (b & PRESET_DICT) == 0
 							? InflateManagerMode.BLOCKS
 							: InflateManagerMode.DICT4;
 						break;
 
 					case InflateManagerMode.DICT4:
-						if (_codec.AvailableBytesIn == 0) return r;
+						if (_codec.AvailableBytesIn == 0)
+						{
+							return r;
+						}
+
 						r = f;
 						_codec.AvailableBytesIn--;
 						_codec.TotalBytesIn++;
@@ -1749,7 +1803,11 @@ namespace BestHTTP.Decompression.Zlib
 						break;
 
 					case InflateManagerMode.DICT3:
-						if (_codec.AvailableBytesIn == 0) return r;
+						if (_codec.AvailableBytesIn == 0)
+						{
+							return r;
+						}
+
 						r = f;
 						_codec.AvailableBytesIn--;
 						_codec.TotalBytesIn++;
@@ -1759,7 +1817,11 @@ namespace BestHTTP.Decompression.Zlib
 
 					case InflateManagerMode.DICT2:
 
-						if (_codec.AvailableBytesIn == 0) return r;
+						if (_codec.AvailableBytesIn == 0)
+						{
+							return r;
+						}
+
 						r = f;
 						_codec.AvailableBytesIn--;
 						_codec.TotalBytesIn++;
@@ -1769,7 +1831,11 @@ namespace BestHTTP.Decompression.Zlib
 
 
 					case InflateManagerMode.DICT1:
-						if (_codec.AvailableBytesIn == 0) return r;
+						if (_codec.AvailableBytesIn == 0)
+						{
+							return r;
+						}
+
 						r = f;
 						_codec.AvailableBytesIn--;
 						_codec.TotalBytesIn++;
@@ -1795,10 +1861,15 @@ namespace BestHTTP.Decompression.Zlib
 							break;
 						}
 
-						if (r == ZlibConstants.Z_OK) r = f;
+						if (r == ZlibConstants.Z_OK)
+						{
+							r = f;
+						}
 
 						if (r != ZlibConstants.Z_STREAM_END)
+						{
 							return r;
+						}
 
 						r = f;
 						computedCheck = blocks.Reset();
@@ -1812,7 +1883,11 @@ namespace BestHTTP.Decompression.Zlib
 						break;
 
 					case InflateManagerMode.CHECK4:
-						if (_codec.AvailableBytesIn == 0) return r;
+						if (_codec.AvailableBytesIn == 0)
+						{
+							return r;
+						}
+
 						r = f;
 						_codec.AvailableBytesIn--;
 						_codec.TotalBytesIn++;
@@ -1821,7 +1896,11 @@ namespace BestHTTP.Decompression.Zlib
 						break;
 
 					case InflateManagerMode.CHECK3:
-						if (_codec.AvailableBytesIn == 0) return r;
+						if (_codec.AvailableBytesIn == 0)
+						{
+							return r;
+						}
+
 						r = f;
 						_codec.AvailableBytesIn--;
 						_codec.TotalBytesIn++;
@@ -1830,7 +1909,11 @@ namespace BestHTTP.Decompression.Zlib
 						break;
 
 					case InflateManagerMode.CHECK2:
-						if (_codec.AvailableBytesIn == 0) return r;
+						if (_codec.AvailableBytesIn == 0)
+						{
+							return r;
+						}
+
 						r = f;
 						_codec.AvailableBytesIn--;
 						_codec.TotalBytesIn++;
@@ -1839,7 +1922,11 @@ namespace BestHTTP.Decompression.Zlib
 						break;
 
 					case InflateManagerMode.CHECK1:
-						if (_codec.AvailableBytesIn == 0) return r;
+						if (_codec.AvailableBytesIn == 0)
+						{
+							return r;
+						}
+
 						r = f;
 						_codec.AvailableBytesIn--;
 						_codec.TotalBytesIn++;
@@ -1859,7 +1946,7 @@ namespace BestHTTP.Decompression.Zlib
 						return ZlibConstants.Z_STREAM_END;
 
 					case InflateManagerMode.BAD:
-						throw new ZlibException(String.Format("Bad state ({0})", _codec.Message));
+						throw new ZlibException(string.Format("Bad state ({0})", _codec.Message));
 
 					default:
 						throw new ZlibException("Stream error.");
@@ -1873,7 +1960,9 @@ namespace BestHTTP.Decompression.Zlib
 			int index = 0;
 			int length = dictionary.Length;
 			if (mode != InflateManagerMode.DICT0)
+			{
 				throw new ZlibException("Stream error.");
+			}
 
 			if (Adler.Adler32(1, dictionary, 0, dictionary.Length) != _codec._Adler32)
 			{
@@ -1882,7 +1971,7 @@ namespace BestHTTP.Decompression.Zlib
 
 			_codec._Adler32 = Adler.Adler32(0, null, 0, 0);
 
-			if (length >= (1 << wbits))
+			if (length >= 1 << wbits)
 			{
 				length = (1 << wbits) - 1;
 				index = dictionary.Length - length;
@@ -1894,7 +1983,7 @@ namespace BestHTTP.Decompression.Zlib
 		}
 
 
-		private static readonly byte[] mark = new byte[] { 0, 0, 0xff, 0xff };
+		static readonly byte[] mark = new byte[] { 0, 0, 0xff, 0xff };
 
 		internal int Sync()
 		{
@@ -1911,7 +2000,10 @@ namespace BestHTTP.Decompression.Zlib
 			}
 
 			if ((n = _codec.AvailableBytesIn) == 0)
+			{
 				return ZlibConstants.Z_BUF_ERROR;
+			}
+
 			p = _codec.NextIn;
 			m = marker;
 

@@ -10,10 +10,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class DsaDigestSigner
 		: ISigner
 	{
-		private readonly IDsa dsa;
-		private readonly IDigest digest;
-		private readonly IDsaEncoding encoding;
-		private bool forSigning;
+		readonly IDsa dsa;
+		readonly IDigest digest;
+		readonly IDsaEncoding encoding;
+		bool forSigning;
 
 		public DsaDigestSigner(IDsa dsa, IDigest digest)
 			: this(dsa, digest, StandardDsaEncoding.Instance)
@@ -47,10 +47,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			}
 
 			if (forSigning && !k.IsPrivate)
+			{
 				throw new InvalidKeyException("Signing Requires Private Key.");
+			}
 
 			if (!forSigning && k.IsPrivate)
+			{
 				throw new InvalidKeyException("Verification Requires Public Key.");
+			}
 
 			Reset();
 
@@ -77,7 +81,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual byte[] GenerateSignature()
 		{
 			if (!forSigning)
+			{
 				throw new InvalidOperationException("DSADigestSigner not initialised for signature generation.");
+			}
 
 			byte[] hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
@@ -97,7 +103,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual bool VerifySignature(byte[] signature)
 		{
 			if (forSigning)
+			{
 				throw new InvalidOperationException("DSADigestSigner not initialised for verification");
+			}
 
 			byte[] hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);

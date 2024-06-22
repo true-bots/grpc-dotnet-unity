@@ -28,7 +28,10 @@ namespace BestHTTP.Extensions
 		{
 			StringBuilder sb = StringBuilderPool.Get(bytes.Length); //new StringBuilder(bytes.Length);
 			foreach (byte b in bytes)
+			{
 				sb.Append(b <= 0x7f ? (char)b : '?');
+			}
+
 			return StringBuilderPool.ReleaseAndGrab(sb);
 		}
 
@@ -41,7 +44,7 @@ namespace BestHTTP.Extensions
 			for (int i = 0; i < str.Length; ++i)
 			{
 				char ch = str[i];
-				result[i] = (byte)((ch < (char)0x80) ? ch : '?');
+				result[i] = (byte)(ch < (char)0x80 ? ch : '?');
 			}
 
 			return new BufferSegment(result, 0, str.Length);
@@ -53,7 +56,7 @@ namespace BestHTTP.Extensions
 			{
 				char ch = str[i];
 
-				stream.Write((byte)((ch < (char)0x80) ? ch : '?'));
+				stream.Write((byte)(ch < (char)0x80 ? ch : '?'));
 			}
 		}
 
@@ -68,7 +71,7 @@ namespace BestHTTP.Extensions
 
 		public static void WriteLine(this Stream fs, string line)
 		{
-			var buff = line.GetASCIIBytes();
+			BufferSegment buff = line.GetASCIIBytes();
 			fs.Write(buff.Data, buff.Offset, buff.Count);
 			fs.WriteLine();
 			BufferPool.Release(buff);
@@ -76,7 +79,7 @@ namespace BestHTTP.Extensions
 
 		public static void WriteLine(this Stream fs, string format, params object[] values)
 		{
-			var buff = string.Format(format, values).GetASCIIBytes();
+			BufferSegment buff = string.Format(format, values).GetASCIIBytes();
 			fs.Write(buff.Data, buff.Offset, buff.Count);
 			fs.WriteLine();
 			BufferPool.Release(buff);
@@ -107,7 +110,9 @@ namespace BestHTTP.Extensions
 
 			// http://forum.unity3d.com/threads/best-http-released.200006/page-26#post-2723250
 			if (string.IsNullOrEmpty(requestPathAndQuery))
+			{
 				requestPathAndQuery = "/";
+			}
 
 			return requestPathAndQuery;
 		}
@@ -119,8 +124,12 @@ namespace BestHTTP.Extensions
 			option = option.ToLower();
 
 			for (int i = 0; i < options.Length; ++i)
+			{
 				if (options[i].Contains(option))
+				{
 					return options[i].Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+				}
+			}
 
 			return null;
 		}
@@ -128,8 +137,12 @@ namespace BestHTTP.Extensions
 		public static string[] FindOption(this string[] options, string option)
 		{
 			for (int i = 0; i < options.Length; ++i)
+			{
 				if (options[i].Contains(option))
+				{
 					return options[i].Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+				}
+			}
 
 			return null;
 		}
@@ -150,14 +163,16 @@ namespace BestHTTP.Extensions
 		public static bool IsHostIsAnIPAddress(this Uri uri)
 		{
 			if (uri == null)
+			{
 				return false;
+			}
 
 			return IsIpV4AddressValid(uri.Host) || IsIpV6AddressValid(uri.Host);
 		}
 
 		// Original idea from: https://www.code4copy.com/csharp/c-validate-ip-address-string/
 		// Working regex: https://www.regular-expressions.info/ip.html
-		private static readonly System.Text.RegularExpressions.Regex validIpV4AddressRegex =
+		static readonly System.Text.RegularExpressions.Regex validIpV4AddressRegex =
 			new System.Text.RegularExpressions.Regex("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
 		/// <summary>
@@ -166,7 +181,9 @@ namespace BestHTTP.Extensions
 		public static bool IsIpV4AddressValid(string address)
 		{
 			if (!string.IsNullOrEmpty(address))
+			{
 				return validIpV4AddressRegex.IsMatch(address.Trim());
+			}
 
 			return false;
 		}
@@ -181,7 +198,9 @@ namespace BestHTTP.Extensions
 			{
 				System.Net.IPAddress ip;
 				if (System.Net.IPAddress.TryParse(address, out ip))
+				{
 					return ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6;
+				}
 			}
 #endif
 			return false;
@@ -191,10 +210,12 @@ namespace BestHTTP.Extensions
 
 		#region String Conversions
 
-		public static int ToInt32(this string str, int defaultValue = default(int))
+		public static int ToInt32(this string str, int defaultValue = default)
 		{
 			if (str == null)
+			{
 				return defaultValue;
+			}
 
 			try
 			{
@@ -206,10 +227,12 @@ namespace BestHTTP.Extensions
 			}
 		}
 
-		public static long ToInt64(this string str, long defaultValue = default(long))
+		public static long ToInt64(this string str, long defaultValue = default)
 		{
 			if (str == null)
+			{
 				return defaultValue;
+			}
 
 			try
 			{
@@ -221,10 +244,12 @@ namespace BestHTTP.Extensions
 			}
 		}
 
-		public static DateTime ToDateTime(this string str, DateTime defaultValue = default(DateTime))
+		public static DateTime ToDateTime(this string str, DateTime defaultValue = default)
 		{
 			if (str == null)
+			{
 				return defaultValue;
+			}
 
 			try
 			{
@@ -240,7 +265,9 @@ namespace BestHTTP.Extensions
 		public static string ToStrOrEmpty(this string str)
 		{
 			if (str == null)
-				return String.Empty;
+			{
+				return string.Empty;
+			}
 
 			return str;
 		}
@@ -248,7 +275,9 @@ namespace BestHTTP.Extensions
 		public static string ToStr(this string str, string defaultVale)
 		{
 			if (str == null)
+			{
 				return defaultVale;
+			}
 
 			return str;
 		}
@@ -264,8 +293,8 @@ namespace BestHTTP.Extensions
 
 		public static string CalculateMD5Hash(this string input)
 		{
-			var asciiBuff = input.GetASCIIBytes();
-			var hash = asciiBuff.CalculateMD5Hash();
+			BufferSegment asciiBuff = input.GetASCIIBytes();
+			string hash = asciiBuff.CalculateMD5Hash();
 			BufferPool.Release(asciiBuff);
 			return hash;
 		}
@@ -280,12 +309,15 @@ namespace BestHTTP.Extensions
             var res = CryptographicBuffer.EncodeToHexString(hashed);
             return res;
 #else
-			using (var md5 = Cryptography.MD5.Create())
+			using (Cryptography.MD5 md5 = Cryptography.MD5.Create())
 			{
-				var hash = md5.ComputeHash(input.Data, input.Offset, input.Count);
-				var sb = StringBuilderPool.Get(hash.Length); //new StringBuilder(hash.Length);
+				byte[] hash = md5.ComputeHash(input.Data, input.Offset, input.Count);
+				StringBuilder sb = StringBuilderPool.Get(hash.Length); //new StringBuilder(hash.Length);
 				for (int i = 0; i < hash.Length; ++i)
+				{
 					sb.Append(hash[i].ToString("x2"));
+				}
+
 				BufferPool.Release(hash);
 				return StringBuilderPool.ReleaseAndGrab(sb);
 			}
@@ -304,14 +336,18 @@ namespace BestHTTP.Extensions
 		internal static string Read(this string str, ref int pos, Func<char, bool> block, bool needResult = true)
 		{
 			if (pos >= str.Length)
+			{
 				return string.Empty;
+			}
 
 			str.SkipWhiteSpace(ref pos);
 
 			int startPos = pos;
 
 			while (pos < str.Length && block(str[pos]))
+			{
 				pos++;
+			}
 
 			string result = needResult ? str.Substring(startPos, pos - startPos) : null;
 
@@ -325,7 +361,9 @@ namespace BestHTTP.Extensions
 		{
 			string result = string.Empty;
 			if (str == null)
+			{
 				return result;
+			}
 
 			// It's a quoted text?
 			if (str[pos] == '\"')
@@ -341,7 +379,9 @@ namespace BestHTTP.Extensions
 			}
 			else
 				// It's not a quoted text, so we will read until the next option
+			{
 				result = str.Read(ref pos, (ch) => ch != ',' && ch != ';');
+			}
 
 			return result;
 		}
@@ -349,16 +389,22 @@ namespace BestHTTP.Extensions
 		internal static void SkipWhiteSpace(this string str, ref int pos)
 		{
 			if (pos >= str.Length)
+			{
 				return;
+			}
 
 			while (pos < str.Length && char.IsWhiteSpace(str[pos]))
+			{
 				pos++;
+			}
 		}
 
 		internal static string TrimAndLower(this string str)
 		{
 			if (str == null)
+			{
 				return null;
+			}
 
 			char[] buffer = new char[str.Length];
 			int length = 0;
@@ -367,7 +413,9 @@ namespace BestHTTP.Extensions
 			{
 				char ch = str[i];
 				if (!char.IsWhiteSpace(ch) && !char.IsControl(ch))
+				{
 					buffer[length++] = char.ToLowerInvariant(ch);
+				}
 			}
 
 			return new string(buffer, 0, length);
@@ -376,7 +424,9 @@ namespace BestHTTP.Extensions
 		internal static char? Peek(this string str, int pos)
 		{
 			if (pos < 0 || pos >= str.Length)
+			{
 				return null;
+			}
 
 			return str[pos];
 		}
@@ -391,7 +441,9 @@ namespace BestHTTP.Extensions
 			List<HeaderValue> result = new List<HeaderValue>();
 
 			if (str == null)
+			{
 				return result;
+			}
 
 			int idx = 0;
 
@@ -403,7 +455,9 @@ namespace BestHTTP.Extensions
 				HeaderValue qp = new HeaderValue(key);
 
 				if (str[idx - 1] == '=')
+				{
 					qp.Value = str.ReadPossibleQuotedText(ref idx);
+				}
 
 				result.Add(qp);
 			}
@@ -417,7 +471,9 @@ namespace BestHTTP.Extensions
 			List<HeaderValue> result = new List<HeaderValue>();
 
 			if (str == null)
+			{
 				return result;
+			}
 
 			int idx = 0;
 			while (idx < str.Length)
@@ -454,7 +510,9 @@ namespace BestHTTP.Extensions
 				int read = stream.Read(buffer, count, buffer.Length - count);
 
 				if (read <= 0)
+				{
 					throw ExceptionHelper.ServerClosedTCPStream();
+				}
 
 				count += read;
 			} while (count < buffer.Length);
@@ -469,7 +527,9 @@ namespace BestHTTP.Extensions
 				int read = stream.Read(buffer, count, length - count);
 
 				if (read <= 0)
+				{
 					throw ExceptionHelper.ServerClosedTCPStream();
+				}
 
 				count += read;
 			} while (count < length);
@@ -481,7 +541,7 @@ namespace BestHTTP.Extensions
 
 		public static void WriteString(this BufferPoolMemoryStream ms, string str)
 		{
-			var byteCount = Encoding.UTF8.GetByteCount(str);
+			int byteCount = Encoding.UTF8.GetByteCount(str);
 			byte[] buffer = BufferPool.Get(byteCount, true);
 			Encoding.UTF8.GetBytes(str, 0, str.Length, buffer, 0);
 			ms.Write(buffer, 0, byteCount);
@@ -506,7 +566,9 @@ namespace BestHTTP.Extensions
 		{
 			T result;
 			while (queue.TryDequeue(out result))
+			{
 				;
+			}
 		}
 #endif
 	}

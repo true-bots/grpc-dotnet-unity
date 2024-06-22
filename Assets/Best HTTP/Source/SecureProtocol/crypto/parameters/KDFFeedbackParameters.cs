@@ -8,15 +8,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class KdfFeedbackParameters : IDerivationParameters
 	{
 		// could be any valid value, using 32, don't know why
-		private static readonly int UNUSED_R = -1;
+		static readonly int UNUSED_R = -1;
 
-		private readonly byte[] ki;
-		private readonly byte[] iv;
-		private readonly bool useCounter;
-		private readonly int r;
-		private readonly byte[] fixedInputData;
+		readonly byte[] ki;
+		readonly byte[] iv;
+		readonly bool useCounter;
+		readonly int r;
+		readonly byte[] fixedInputData;
 
-		private KdfFeedbackParameters(byte[] ki, byte[] iv, byte[] fixedInputData, int r, bool useCounter)
+		KdfFeedbackParameters(byte[] ki, byte[] iv, byte[] fixedInputData, int r, bool useCounter)
 		{
 			if (ki == null)
 			{

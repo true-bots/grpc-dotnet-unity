@@ -10,17 +10,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static PollReqContent GetInstance(object obj)
 		{
 			if (obj is PollReqContent pollReqContent)
+			{
 				return pollReqContent;
+			}
 
 			if (obj != null)
+			{
 				return new PollReqContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly Asn1Sequence m_content;
+		readonly Asn1Sequence m_content;
 
-		private PollReqContent(Asn1Sequence seq)
+		PollReqContent(Asn1Sequence seq)
 		{
 			m_content = seq;
 		}
@@ -101,12 +105,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			return m_content;
 		}
 
-		private static DerInteger[] SequenceToDerIntegerArray(Asn1Sequence seq)
+		static DerInteger[] SequenceToDerIntegerArray(Asn1Sequence seq)
 		{
 			return seq.MapElements(DerInteger.GetInstance);
 		}
 
-		private static DerSequence[] IntsToSequence(DerInteger[] ids)
+		static DerSequence[] IntsToSequence(DerInteger[] ids)
 		{
 			DerSequence[] result = new DerSequence[ids.Length];
 
@@ -118,7 +122,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			return result;
 		}
 
-		private static DerInteger[] IntsToAsn1(BigInteger[] ids)
+		static DerInteger[] IntsToAsn1(BigInteger[] ids)
 		{
 			DerInteger[] result = new DerInteger[ids.Length];
 

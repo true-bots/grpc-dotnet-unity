@@ -31,7 +31,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 	public class ECDHCBasicAgreement
 		: IBasicAgreement
 	{
-		private ECPrivateKeyParameters privKey;
+		ECPrivateKeyParameters privKey;
 
 		public virtual void Init(
 			ICipherParameters parameters)
@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 				parameters = ((ParametersWithRandom)parameters).Parameters;
 			}
 
-			this.privKey = (ECPrivateKeyParameters)parameters;
+			privKey = (ECPrivateKeyParameters)parameters;
 		}
 
 		public virtual int GetFieldSize()
@@ -55,18 +55,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 			ECPublicKeyParameters pub = (ECPublicKeyParameters)pubKey;
 			ECDomainParameters dp = privKey.Parameters;
 			if (!dp.Equals(pub.Parameters))
+			{
 				throw new InvalidOperationException("ECDHC public key has wrong domain parameters");
+			}
 
 			BigInteger hd = dp.H.Multiply(privKey.D).Mod(dp.N);
 
 			// Always perform calculations on the exact curve specified by our private key's parameters
 			ECPoint pubPoint = ECAlgorithms.CleanPoint(dp.Curve, pub.Q);
 			if (pubPoint.IsInfinity)
+			{
 				throw new InvalidOperationException("Infinity is not a valid public key for ECDHC");
+			}
 
 			ECPoint P = pubPoint.Multiply(hd).Normalize();
 			if (P.IsInfinity)
+			{
 				throw new InvalidOperationException("Infinity is not a valid agreement value for ECDHC");
+			}
 
 			return P.AffineXCoord.ToBigInteger();
 		}

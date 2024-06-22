@@ -13,10 +13,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public const int TYPE_KEY_ENCIPHERMENT = 2;
 		public const int TYPE_KEY_AGREEMENT = 3;
 
-		private readonly int tagNo;
-		private readonly Asn1Encodable obj;
+		readonly int tagNo;
+		readonly Asn1Encodable obj;
 
-		private ProofOfPossession(Asn1TaggedObject tagged)
+		ProofOfPossession(Asn1TaggedObject tagged)
 		{
 			tagNo = tagged.TagNo;
 			switch (tagNo)
@@ -39,12 +39,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static ProofOfPossession GetInstance(object obj)
 		{
 			if (obj is ProofOfPossession)
+			{
 				return (ProofOfPossession)obj;
+			}
 
 			if (obj is Asn1TaggedObject)
+			{
 				return new ProofOfPossession((Asn1TaggedObject)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/** Creates a ProofOfPossession with type raVerified. */

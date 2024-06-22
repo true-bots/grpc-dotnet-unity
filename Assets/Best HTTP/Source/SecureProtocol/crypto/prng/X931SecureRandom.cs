@@ -8,16 +8,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 	public class X931SecureRandom
 		: SecureRandom
 	{
-		private readonly bool mPredictionResistant;
-		private readonly SecureRandom mRandomSource;
-		private readonly X931Rng mDrbg;
+		readonly bool mPredictionResistant;
+		readonly SecureRandom mRandomSource;
+		readonly X931Rng mDrbg;
 
 		internal X931SecureRandom(SecureRandom randomSource, X931Rng drbg, bool predictionResistant)
 			: base(null)
 		{
-			this.mRandomSource = randomSource;
-			this.mDrbg = drbg;
-			this.mPredictionResistant = predictionResistant;
+			mRandomSource = randomSource;
+			mDrbg = drbg;
+			mPredictionResistant = predictionResistant;
 		}
 
 		public override void SetSeed(byte[] seed)
@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 			{
 				if (mRandomSource != null)
 				{
-					this.mRandomSource.SetSeed(seed);
+					mRandomSource.SetSeed(seed);
 				}
 			}
 		}
@@ -51,7 +51,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 				// this will happen when SecureRandom() is created
 				if (mRandomSource != null)
 				{
-					this.mRandomSource.SetSeed(seed);
+					mRandomSource.SetSeed(seed);
 				}
 			}
 		}

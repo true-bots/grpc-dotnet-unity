@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class SrpTlsClient
 		: AbstractTlsClient
 	{
-		private static readonly int[] DefaultCipherSuites = new int[]
+		static readonly int[] DefaultCipherSuites = new int[]
 		{
 			CipherSuite.TLS_SRP_SHA_RSA_WITH_AES_128_CBC_SHA
 		};
@@ -25,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public SrpTlsClient(TlsCrypto crypto, TlsSrpIdentity srpIdentity)
 			: base(crypto)
 		{
-			this.m_srpIdentity = srpIdentity;
+			m_srpIdentity = srpIdentity;
 		}
 
 		protected override int[] GetSupportedCipherSuites()
@@ -47,7 +47,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <exception cref="IOException"/>
 		public override IDictionary<int, byte[]> GetClientExtensions()
 		{
-			var clientExtensions = TlsExtensionsUtilities.EnsureExtensionsInitialised(
+			IDictionary<int, byte[]> clientExtensions = TlsExtensionsUtilities.EnsureExtensionsInitialised(
 				base.GetClientExtensions());
 			TlsSrpUtilities.AddSrpExtension(clientExtensions, m_srpIdentity.GetSrpIdentity());
 			return clientExtensions;
@@ -60,7 +60,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				    AlertDescription.illegal_parameter))
 			{
 				if (RequireSrpServerExtension)
+				{
 					throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+				}
 			}
 
 			base.ProcessServerExtensions(serverExtensions);

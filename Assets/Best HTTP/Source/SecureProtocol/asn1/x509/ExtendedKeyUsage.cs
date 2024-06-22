@@ -26,11 +26,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj is ExtendedKeyUsage)
+			{
 				return (ExtendedKeyUsage)obj;
+			}
+
 			if (obj is X509Extension)
+			{
 				return GetInstance(X509Extension.ConvertValueToObject((X509Extension)obj));
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new ExtendedKeyUsage(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -42,7 +51,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		internal readonly ISet<DerObjectIdentifier> m_usageTable = new HashSet<DerObjectIdentifier>();
 		internal readonly Asn1Sequence seq;
 
-		private ExtendedKeyUsage(Asn1Sequence seq)
+		ExtendedKeyUsage(Asn1Sequence seq)
 		{
 			this.seq = seq;
 
@@ -56,7 +65,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public ExtendedKeyUsage(params KeyPurposeID[] usages)
 		{
-			this.seq = new DerSequence(usages);
+			seq = new DerSequence(usages);
 
 			foreach (KeyPurposeID usage in usages)
 			{
@@ -76,7 +85,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				m_usageTable.Add(oid);
 			}
 
-			this.seq = new DerSequence(v);
+			seq = new DerSequence(v);
 		}
 
 		public bool HasKeyPurposeId(KeyPurposeID keyPurposeId)

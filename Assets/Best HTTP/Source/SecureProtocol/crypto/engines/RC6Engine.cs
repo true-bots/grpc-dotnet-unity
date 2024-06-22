@@ -16,12 +16,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/*
 		 * the number of rounds to perform
 		 */
-		private static readonly int _noRounds = 20;
+		static readonly int _noRounds = 20;
 
 		/*
 		 * the expanded key array of size 2*(rounds + 1)
 		 */
-		private int[] _S;
+		int[] _S;
 
 		/*
 		 * our "magic constants" for wordSize 32
@@ -32,12 +32,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		 * where e is the base of natural logarithms (2.718281828...)
 		 * and o is the golden ratio (1.61803398...)
 		 */
-		private static readonly int P32 = unchecked((int)0xb7e15163);
-		private static readonly int Q32 = unchecked((int)0x9e3779b9);
+		static readonly int P32 = unchecked((int)0xb7e15163);
+		static readonly int Q32 = unchecked((int)0x9e3779b9);
 
-		private static readonly int LGW = 5; // log2(32)
+		static readonly int LGW = 5; // log2(32)
 
-		private bool forEncryption;
+		bool forEncryption;
 
 		/**
 		* Create an instance of the RC6 encryption algorithm
@@ -68,7 +68,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter keyParameter))
-				throw new ArgumentException("invalid parameter passed to RC6 init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			{
+				throw new ArgumentException("invalid parameter passed to RC6 init - " + Platform.GetTypeName(parameters));
+			}
 
 			this.forEncryption = forEncryption;
 
@@ -78,7 +80,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (_S == null)
+			{
 				throw new InvalidOperationException("RC6 engine not initialised");
+			}
 
 			int blockSize = GetBlockSize();
 			Check.DataLength(input, inOff, blockSize, "input buffer too short");
@@ -116,7 +120,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @param inKey the key to be used
 		*/
-		private void SetKey(
+		void SetKey(
 			byte[] key)
 		{
 			//
@@ -158,7 +162,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			_S[0] = P32;
 			for (int i = 1; i < _S.Length; i++)
 			{
-				_S[i] = (_S[i - 1] + Q32);
+				_S[i] = _S[i - 1] + Q32;
 			}
 
 			//
@@ -292,7 +296,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             return 16;
         }
 #else
-		private int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			// load A,B,C and D registers from in.
 			int A = (int)Pack.LE_To_UInt32(input, inOff);
@@ -343,7 +347,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return 16;
 		}
 
-		private int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			// load A,B,C and D registers from out.
 			int A = (int)Pack.LE_To_UInt32(input, inOff);

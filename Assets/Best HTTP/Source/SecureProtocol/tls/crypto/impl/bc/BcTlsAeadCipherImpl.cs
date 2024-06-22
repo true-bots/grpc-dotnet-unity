@@ -7,18 +7,18 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 {
-	internal sealed class BcTlsAeadCipherImpl
+	sealed class BcTlsAeadCipherImpl
 		: TlsAeadCipherImpl
 	{
-		private readonly bool m_isEncrypting;
-		private readonly IAeadCipher m_cipher;
+		readonly bool m_isEncrypting;
+		readonly IAeadCipher m_cipher;
 
-		private KeyParameter key;
+		KeyParameter key;
 
 		internal BcTlsAeadCipherImpl(IAeadCipher cipher, bool isEncrypting)
 		{
-			this.m_cipher = cipher;
-			this.m_isEncrypting = isEncrypting;
+			m_cipher = cipher;
+			m_isEncrypting = isEncrypting;
 		}
 
 		public void SetKey(byte[] key, int keyOff, int keyLen)

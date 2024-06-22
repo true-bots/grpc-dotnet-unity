@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 	public class CryptoApiEntropySourceProvider
 		: IEntropySourceProvider
 	{
-		private readonly RandomNumberGenerator mRng;
-		private readonly bool mPredictionResistant;
+		readonly RandomNumberGenerator mRng;
+		readonly bool mPredictionResistant;
 
 		public CryptoApiEntropySourceProvider()
 			: this(RandomNumberGenerator.Create(), true)
@@ -19,7 +19,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		public CryptoApiEntropySourceProvider(RandomNumberGenerator rng, bool isPredictionResistant)
 		{
 			if (rng == null)
+			{
 				throw new ArgumentNullException("rng");
+			}
 
 			mRng = rng;
 			mPredictionResistant = isPredictionResistant;
@@ -30,18 +32,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 			return new CryptoApiEntropySource(mRng, mPredictionResistant, bitsRequired);
 		}
 
-		private class CryptoApiEntropySource
+		class CryptoApiEntropySource
 			: IEntropySource
 		{
-			private readonly RandomNumberGenerator mRng;
-			private readonly bool mPredictionResistant;
-			private readonly int mEntropySize;
+			readonly RandomNumberGenerator mRng;
+			readonly bool mPredictionResistant;
+			readonly int mEntropySize;
 
 			internal CryptoApiEntropySource(RandomNumberGenerator rng, bool predictionResistant, int entropySize)
 			{
-				this.mRng = rng;
-				this.mPredictionResistant = predictionResistant;
-				this.mEntropySize = entropySize;
+				mRng = rng;
+				mPredictionResistant = predictionResistant;
+				mEntropySize = entropySize;
 			}
 
 			#region IEntropySource Members

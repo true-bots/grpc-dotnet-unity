@@ -45,14 +45,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 	public class ZInputStream
 		: BaseInputStream
 	{
-		private static ZStream GetDefaultZStream(bool nowrap)
+		static ZStream GetDefaultZStream(bool nowrap)
 		{
 			ZStream z = new ZStream();
 			z.inflateInit(nowrap);
 			return z;
 		}
 
-		private const int BufferSize = 4096;
+		const int BufferSize = 4096;
 
 		protected ZStream z;
 
@@ -66,7 +66,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		protected Stream input;
 		protected bool closed;
 
-		private bool nomoreinput = false;
+		bool nomoreinput = false;
 
 		public ZInputStream(Stream input)
 			: this(input, false)
@@ -94,7 +94,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			}
 
 			this.input = input;
-			this.compress = (z.istate == null);
+			compress = z.istate == null;
 			this.z = z;
 			this.z.next_in = buf;
 			this.z.next_in_index = 0;
@@ -111,12 +111,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			Debug.Assert(input.CanRead);
 
 			this.input = input;
-			this.compress = true;
-			this.z = new ZStream();
-			this.z.deflateInit(level, nowrap);
-			this.z.next_in = buf;
-			this.z.next_in_index = 0;
-			this.z.avail_in = 0;
+			compress = true;
+			z = new ZStream();
+			z.deflateInit(level, nowrap);
+			z.next_in = buf;
+			z.next_in_index = 0;
+			z.avail_in = 0;
 		}
 
 		protected override void Dispose(bool disposing)
@@ -136,7 +136,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		public virtual int FlushMode
 		{
 			get { return flushLevel; }
-			set { this.flushLevel = value; }
+			set { flushLevel = value; }
 		}
 
 		public override int Read(byte[] buffer, int offset, int count)
@@ -144,7 +144,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			Streams.ValidateBufferArguments(buffer, offset, count);
 
 			if (count == 0)
+			{
 				return 0;
+			}
 
 			z.next_out = buffer;
 			z.next_out_index = offset;
@@ -171,13 +173,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					: z.inflate(flushLevel);
 
 				if (nomoreinput && err == JZlib.Z_BUF_ERROR)
+				{
 					return 0;
+				}
+
 				if (err != JZlib.Z_OK && err != JZlib.Z_STREAM_END)
 					// TODO
 					//throw new ZStreamException((compress ? "de" : "in") + "flating: " + z.msg);
+				{
 					throw new IOException((compress ? "de" : "in") + "flating: " + z.msg);
+				}
+
 				if ((nomoreinput || err == JZlib.Z_STREAM_END) && z.avail_out == count)
+				{
 					return 0;
+				}
 			} while (z.avail_out == count && err == JZlib.Z_OK);
 
 			//Console.Error.WriteLine("("+(len-z.avail_out)+")");
@@ -187,7 +197,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		public override int ReadByte()
 		{
 			if (Read(buf1, 0, 1) <= 0)
+			{
 				return -1;
+			}
+
 			return buf1[0];
 		}
 

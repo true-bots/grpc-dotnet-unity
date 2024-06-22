@@ -93,13 +93,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			Asn1Set attributes)
 		{
 			if (signatureAlgorithm == null)
+			{
 				throw new ArgumentNullException("signatureAlgorithm");
+			}
+
 			if (subject == null)
+			{
 				throw new ArgumentNullException("subject");
+			}
+
 			if (publicKey == null)
+			{
 				throw new ArgumentNullException("publicKey");
+			}
+
 			if (publicKey.IsPrivate)
+			{
 				throw new ArgumentException("expected public key", "publicKey");
+			}
 
 			DerObjectIdentifier sigOid = CollectionUtilities.GetValueOrNull(m_algorithms, signatureAlgorithm);
 			if (sigOid == null)
@@ -116,19 +127,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 			if (m_noParams.Contains(sigOid))
 			{
-				this.sigAlgId = new AlgorithmIdentifier(sigOid);
+				sigAlgId = new AlgorithmIdentifier(sigOid);
 			}
-			else if (m_exParams.TryGetValue(signatureAlgorithm, out var explicitParameters))
+			else if (m_exParams.TryGetValue(signatureAlgorithm, out Asn1Encodable explicitParameters))
 			{
-				this.sigAlgId = new AlgorithmIdentifier(sigOid, explicitParameters);
+				sigAlgId = new AlgorithmIdentifier(sigOid, explicitParameters);
 			}
 			else
 			{
-				this.sigAlgId = new AlgorithmIdentifier(sigOid, DerNull.Instance);
+				sigAlgId = new AlgorithmIdentifier(sigOid, DerNull.Instance);
 			}
 
 			SubjectPublicKeyInfo pubInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(publicKey);
-			this.reqInfo = new CertificationRequestInfo(subject, pubInfo, attributes);
+			reqInfo = new CertificationRequestInfo(subject, pubInfo, attributes);
 		}
 
 		public byte[] GetDataToSign()

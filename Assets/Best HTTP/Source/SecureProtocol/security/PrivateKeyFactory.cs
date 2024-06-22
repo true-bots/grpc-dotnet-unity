@@ -141,7 +141,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				{
 					X9ECParameters ecP = ECGost3410NamedCurves.GetByOid(gostParams.PublicKeyParamSet);
 					if (ecP == null)
+					{
 						throw new ArgumentException("Unrecognized curve OID for GostR3410x2001 private key");
+					}
 
 					ecSpec = new ECGost3410Parameters(
 						new ECNamedDomainParameters(gostParams.PublicKeyParamSet, ecP),
@@ -177,7 +179,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 						DerObjectIdentifier oid = DerObjectIdentifier.GetInstance(x962Parameters.Parameters);
 						X9ECParameters ecP = ECNamedCurveTable.GetByOid(oid);
 						if (ecP == null)
+						{
 							throw new ArgumentException("Unrecognized curve OID for GostR3410x2001 private key");
+						}
 
 						ecSpec = new ECGost3410Parameters(
 							new ECNamedDomainParameters(oid, ecP),
@@ -350,7 +354,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 		}
 
-		private static byte[] GetRawKey(PrivateKeyInfo keyInfo)
+		static byte[] GetRawKey(PrivateKeyInfo keyInfo)
 		{
 			return Asn1OctetString.GetInstance(keyInfo.ParsePrivateKey()).GetOctets();
 		}
@@ -376,7 +380,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return DecryptKey(passPhrase, Asn1Object.FromStream(encryptedPrivateKeyInfoStream));
 		}
 
-		private static AsymmetricKeyParameter DecryptKey(
+		static AsymmetricKeyParameter DecryptKey(
 			char[] passPhrase,
 			Asn1Object asn1Object)
 		{

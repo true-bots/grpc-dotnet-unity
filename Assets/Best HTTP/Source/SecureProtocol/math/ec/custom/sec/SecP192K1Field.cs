@@ -8,7 +8,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP192K1Field
+	class SecP192K1Field
 	{
 		// 2^192 - 2^32 - 2^12 - 2^8 - 2^7 - 2^6 - 2^3 - 1
 		internal static readonly uint[] P = new uint[]
@@ -17,21 +17,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			0xFFFFFFFF
 		};
 
-		private static readonly uint[] PExt = new uint[]
+		static readonly uint[] PExt = new uint[]
 		{
 			0x013C4FD1, 0x00002392, 0x00000001, 0x00000000, 0x00000000,
 			0x00000000, 0xFFFFDC6E, 0xFFFFFFFD, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
 		};
 
-		private static readonly uint[] PExtInv = new uint[]
+		static readonly uint[] PExtInv = new uint[]
 		{
 			0xFEC3B02F, 0xFFFFDC6D, 0xFFFFFFFE, 0xFFFFFFFF,
 			0xFFFFFFFF, 0xFFFFFFFF, 0x00002391, 0x00000002
 		};
 
-		private const uint P5 = 0xFFFFFFFF;
-		private const uint PExt11 = 0xFFFFFFFF;
-		private const uint PInv33 = 0x11C9;
+		const uint P5 = 0xFFFFFFFF;
+		const uint PExt11 = 0xFFFFFFFF;
+		const uint PInv33 = 0x11C9;
 
 		public static void Add(uint[] x, uint[] y, uint[] z)
 		{

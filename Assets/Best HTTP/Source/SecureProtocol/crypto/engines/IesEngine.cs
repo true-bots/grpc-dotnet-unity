@@ -13,15 +13,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	*/
 	public class IesEngine
 	{
-		private readonly IBasicAgreement agree;
-		private readonly IDerivationFunction kdf;
-		private readonly IMac mac;
-		private readonly BufferedBlockCipher cipher;
-		private readonly byte[] macBuf;
+		readonly IBasicAgreement agree;
+		readonly IDerivationFunction kdf;
+		readonly IMac mac;
+		readonly BufferedBlockCipher cipher;
+		readonly byte[] macBuf;
 
-		private bool forEncryption;
-		private ICipherParameters privParam, pubParam;
-		private IesParameters param;
+		bool forEncryption;
+		ICipherParameters privParam, pubParam;
+		IesParameters param;
 
 		/**
 		* set up for use with stream mode, where the key derivation function
@@ -39,7 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			this.agree = agree;
 			this.kdf = kdf;
 			this.mac = mac;
-			this.macBuf = new byte[mac.GetMacSize()];
+			macBuf = new byte[mac.GetMacSize()];
 //            this.cipher = null;
 		}
 
@@ -61,7 +61,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			this.agree = agree;
 			this.kdf = kdf;
 			this.mac = mac;
-			this.macBuf = new byte[mac.GetMacSize()];
+			macBuf = new byte[mac.GetMacSize()];
 			this.cipher = cipher;
 		}
 
@@ -80,12 +80,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ICipherParameters iesParameters)
 		{
 			this.forEncryption = forEncryption;
-			this.privParam = privParameters;
-			this.pubParam = pubParameters;
-			this.param = (IesParameters)iesParameters;
+			privParam = privParameters;
+			pubParam = pubParameters;
+			param = (IesParameters)iesParameters;
 		}
 
-		private byte[] DecryptBlock(
+		byte[] DecryptBlock(
 			byte[] in_enc,
 			int inOff,
 			int inLen,
@@ -100,13 +100,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			// Ensure that the length of the input is greater than the MAC in bytes
 			if (inLen < mac.GetMacSize())
+			{
 				throw new InvalidCipherTextException("Length of input must be greater than the MAC");
+			}
 
 			inLen -= mac.GetMacSize();
 
 			if (cipher == null) // stream mode
 			{
-				byte[] Buffer = GenerateKdfBytes(kParam, inLen + (macKeySize / 8));
+				byte[] Buffer = GenerateKdfBytes(kParam, inLen + macKeySize / 8);
 
 				M = new byte[inLen];
 
@@ -115,18 +117,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					M[i] = (byte)(in_enc[inOff + i] ^ Buffer[i]);
 				}
 
-				macKey = new KeyParameter(Buffer, inLen, (macKeySize / 8));
+				macKey = new KeyParameter(Buffer, inLen, macKeySize / 8);
 			}
 			else
 			{
 				int cipherKeySize = ((IesWithCipherParameters)param).CipherKeySize;
-				byte[] Buffer = GenerateKdfBytes(kParam, (cipherKeySize / 8) + (macKeySize / 8));
+				byte[] Buffer = GenerateKdfBytes(kParam, cipherKeySize / 8 + macKeySize / 8);
 
-				cipher.Init(false, new KeyParameter(Buffer, 0, (cipherKeySize / 8)));
+				cipher.Init(false, new KeyParameter(Buffer, 0, cipherKeySize / 8));
 
 				M = cipher.DoFinal(in_enc, inOff, inLen);
 
-				macKey = new KeyParameter(Buffer, (cipherKeySize / 8), (macKeySize / 8));
+				macKey = new KeyParameter(Buffer, cipherKeySize / 8, macKeySize / 8);
 			}
 
 			byte[] macIV = param.GetEncodingV();
@@ -141,12 +143,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			byte[] T1 = Arrays.CopyOfRange(in_enc, inOff, inOff + macBuf.Length);
 
 			if (!Arrays.ConstantTimeAreEqual(T1, macBuf))
-				throw (new InvalidCipherTextException("Invalid MAC."));
+			{
+				throw new InvalidCipherTextException("Invalid MAC.");
+			}
 
 			return M;
 		}
 
-		private byte[] EncryptBlock(
+		byte[] EncryptBlock(
 			byte[] input,
 			int inOff,
 			int inLen,
@@ -160,7 +164,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			if (cipher == null) // stream mode
 			{
-				byte[] Buffer = GenerateKdfBytes(kParam, inLen + (macKeySize / 8));
+				byte[] Buffer = GenerateKdfBytes(kParam, inLen + macKeySize / 8);
 
 				C = new byte[inLen + mac.GetMacSize()];
 				c_text_length = inLen;
@@ -170,14 +174,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					C[i] = (byte)(input[inOff + i] ^ Buffer[i]);
 				}
 
-				macKey = new KeyParameter(Buffer, inLen, (macKeySize / 8));
+				macKey = new KeyParameter(Buffer, inLen, macKeySize / 8);
 			}
 			else
 			{
 				int cipherKeySize = ((IesWithCipherParameters)param).CipherKeySize;
-				byte[] Buffer = GenerateKdfBytes(kParam, (cipherKeySize / 8) + (macKeySize / 8));
+				byte[] Buffer = GenerateKdfBytes(kParam, cipherKeySize / 8 + macKeySize / 8);
 
-				cipher.Init(true, new KeyParameter(Buffer, 0, (cipherKeySize / 8)));
+				cipher.Init(true, new KeyParameter(Buffer, 0, cipherKeySize / 8));
 
 				c_text_length = cipher.GetOutputSize(inLen);
 				byte[] tmp = new byte[c_text_length];
@@ -190,7 +194,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 				Array.Copy(tmp, 0, C, 0, len);
 
-				macKey = new KeyParameter(Buffer, (cipherKeySize / 8), (macKeySize / 8));
+				macKey = new KeyParameter(Buffer, cipherKeySize / 8, macKeySize / 8);
 			}
 
 			byte[] macIV = param.GetEncodingV();
@@ -205,7 +209,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return C;
 		}
 
-		private byte[] GenerateKdfBytes(
+		byte[] GenerateKdfBytes(
 			KdfParameters kParam,
 			int length)
 		{

@@ -10,7 +10,7 @@ using BestHTTP.PlatformSupport.Memory;
 namespace BestHTTP.Connections.TLS.Crypto.Impl
 {
 	/// <summary>A generic TLS 1.2 AEAD cipher.</summary>
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	public sealed class FastTlsAeadCipher
 		: TlsCipher
 	{
@@ -18,20 +18,20 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 		public const int AEAD_CHACHA20_POLY1305 = 2;
 		public const int AEAD_GCM = 3;
 
-		private const int NONCE_RFC5288 = 1;
-		private const int NONCE_RFC7905 = 2;
+		const int NONCE_RFC5288 = 1;
+		const int NONCE_RFC7905 = 2;
 
-		private readonly TlsCryptoParameters m_cryptoParams;
-		private readonly int m_keySize;
-		private readonly int m_macSize;
-		private readonly int m_fixed_iv_length;
-		private readonly int m_record_iv_length;
+		readonly TlsCryptoParameters m_cryptoParams;
+		readonly int m_keySize;
+		readonly int m_macSize;
+		readonly int m_fixed_iv_length;
+		readonly int m_record_iv_length;
 
-		private readonly TlsAeadCipherImpl m_decryptCipher, m_encryptCipher;
-		private readonly byte[] m_decryptNonce, m_encryptNonce;
+		readonly TlsAeadCipherImpl m_decryptCipher, m_encryptCipher;
+		readonly byte[] m_decryptNonce, m_encryptNonce;
 
-		private readonly bool m_isTlsV13;
-		private readonly int m_nonceMode;
+		readonly bool m_isTlsV13;
+		readonly int m_nonceMode;
 
 		/// <exception cref="IOException"/>
 		public FastTlsAeadCipher(TlsCryptoParameters cryptoParams, TlsAeadCipherImpl encryptCipher,
@@ -41,34 +41,36 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			ProtocolVersion negotiatedVersion = securityParameters.NegotiatedVersion;
 
 			if (!TlsImplUtilities.IsTlsV12(negotiatedVersion))
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
-			this.m_isTlsV13 = TlsImplUtilities.IsTlsV13(negotiatedVersion);
-			this.m_nonceMode = GetNonceMode(m_isTlsV13, aeadType);
+			m_isTlsV13 = TlsImplUtilities.IsTlsV13(negotiatedVersion);
+			m_nonceMode = GetNonceMode(m_isTlsV13, aeadType);
 
 			switch (m_nonceMode)
 			{
 				case NONCE_RFC5288:
-					this.m_fixed_iv_length = 4;
-					this.m_record_iv_length = 8;
+					m_fixed_iv_length = 4;
+					m_record_iv_length = 8;
 					break;
 				case NONCE_RFC7905:
-					this.m_fixed_iv_length = 12;
-					this.m_record_iv_length = 0;
+					m_fixed_iv_length = 12;
+					m_record_iv_length = 0;
 					break;
 				default:
 					throw new TlsFatalAlert(AlertDescription.internal_error);
 			}
 
-			this.m_cryptoParams = cryptoParams;
-			this.m_keySize = keySize;
-			this.m_macSize = macSize;
+			m_cryptoParams = cryptoParams;
+			m_keySize = keySize;
+			m_macSize = macSize;
 
-			this.m_decryptCipher = decryptCipher;
-			this.m_encryptCipher = encryptCipher;
+			m_decryptCipher = decryptCipher;
+			m_encryptCipher = encryptCipher;
 
-			this.m_decryptNonce = new byte[m_fixed_iv_length];
-			this.m_encryptNonce = new byte[m_fixed_iv_length];
+			m_decryptNonce = new byte[m_fixed_iv_length];
+			m_encryptNonce = new byte[m_fixed_iv_length];
 
 			bool isServer = cryptoParams.IsServer;
 			if (m_isTlsV13)
@@ -78,7 +80,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 				return;
 			}
 
-			int keyBlockSize = (2 * keySize) + (2 * m_fixed_iv_length);
+			int keyBlockSize = 2 * keySize + 2 * m_fixed_iv_length;
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             Span<byte> keyBlock = keyBlockSize <= 512
@@ -135,7 +137,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			}
 
 			if (pos != keyBlockSize)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 #endif
 
 			int nonceLength = m_fixed_iv_length + m_record_iv_length;
@@ -162,7 +166,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 				// TODO[tls13] Add support for padding
 				int maxPadding = 0;
 
-				innerPlaintextLimit = 1 + System.Math.Min(plaintextLimit, plaintextLength + maxPadding);
+				innerPlaintextLimit = 1 + Math.Min(plaintextLimit, plaintextLength + maxPadding);
 			}
 
 			return innerPlaintextLimit + m_macSize + m_record_iv_length;
@@ -331,7 +335,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			byte[] ciphertext, int ciphertextOffset, int ciphertextLength)
 		{
 			if (GetPlaintextLimit(ciphertextLength) < 0)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			byte[] nonce = new byte[m_decryptNonce.Length + m_record_iv_length];
 
@@ -391,7 +397,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 				for (;;)
 				{
 					if (--pos < 0)
+					{
 						throw new TlsFatalAlert(AlertDescription.unexpected_message);
+					}
 
 					byte octet = ciphertext[encryptionOffset + pos];
 					if (0 != octet)
@@ -421,7 +429,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			get { return m_isTlsV13; }
 		}
 
-		private byte[] GetAdditionalData(long seqNo, short recordType, ProtocolVersion recordVersion,
+		byte[] GetAdditionalData(long seqNo, short recordType, ProtocolVersion recordVersion,
 			int ciphertextLength, int plaintextLength)
 		{
 			if (m_isTlsV13)
@@ -451,11 +459,13 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			}
 		}
 
-		private void RekeyCipher(SecurityParameters securityParameters, TlsAeadCipherImpl cipher,
+		void RekeyCipher(SecurityParameters securityParameters, TlsAeadCipherImpl cipher,
 			byte[] nonce, bool serverSecret)
 		{
 			if (!m_isTlsV13)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			TlsSecret secret = serverSecret
 				? securityParameters.TrafficSecretServer
@@ -463,12 +473,14 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 
 			// TODO[tls13] For early data, have to disable server->client
 			if (null == secret)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			Setup13Cipher(cipher, nonce, secret, securityParameters.PrfCryptoHashAlgorithm);
 		}
 
-		private void Setup13Cipher(TlsAeadCipherImpl cipher, byte[] nonce, TlsSecret secret,
+		void Setup13Cipher(TlsAeadCipherImpl cipher, byte[] nonce, TlsSecret secret,
 			int cryptoHashAlgorithm)
 		{
 			byte[] key = TlsCryptoUtilities.HkdfExpandLabel(secret, cryptoHashAlgorithm, "key",
@@ -484,7 +496,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			cipher.Init(iv, m_macSize, null);
 		}
 
-		private static int GetNonceMode(bool isTLSv13, int aeadType)
+		static int GetNonceMode(bool isTLSv13, int aeadType)
 		{
 			switch (aeadType)
 			{

@@ -7,14 +7,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class HeartbeatExtension
 	{
-		private readonly short m_mode;
+		readonly short m_mode;
 
 		public HeartbeatExtension(short mode)
 		{
 			if (!HeartbeatMode.IsValid(mode))
+			{
 				throw new ArgumentException("not a valid HeartbeatMode value", "mode");
+			}
 
-			this.m_mode = mode;
+			m_mode = mode;
 		}
 
 		public short Mode
@@ -38,7 +40,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			short mode = TlsUtilities.ReadUint8(input);
 			if (!HeartbeatMode.IsValid(mode))
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			return new HeartbeatExtension(mode);
 		}

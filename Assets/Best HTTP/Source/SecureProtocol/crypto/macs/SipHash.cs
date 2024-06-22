@@ -57,13 +57,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		{
 			KeyParameter keyParameter = parameters as KeyParameter;
 			if (keyParameter == null)
+			{
 				throw new ArgumentException("must be an instance of KeyParameter", "parameters");
+			}
+
 			byte[] key = keyParameter.GetKey();
 			if (key.Length != 16)
+			{
 				throw new ArgumentException("must be a 128-bit key", "parameters");
+			}
 
-			this.k0 = (long)Pack.LE_To_UInt64(key, 0);
-			this.k1 = (long)Pack.LE_To_UInt64(key, 8);
+			k0 = (long)Pack.LE_To_UInt64(key, 0);
+			k1 = (long)Pack.LE_To_UInt64(key, 8);
 
 			Reset();
 		}

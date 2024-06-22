@@ -6,9 +6,9 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 {
-	internal abstract class Nat
+	abstract class Nat
 	{
-		private const ulong M = 0xFFFFFFFFUL;
+		const ulong M = 0xFFFFFFFFUL;
 
 		public static uint Add(int len, uint[] x, uint[] y, uint[] z)
 		{
@@ -39,7 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static uint Add33At(int len, uint x, uint[] z, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 2));
+			Debug.Assert(zPos <= len - 2);
 			ulong c = (ulong)z[zPos + 0] + x;
 			z[zPos + 0] = (uint)c;
 			c >>= 32;
@@ -51,7 +51,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static uint Add33At(int len, uint x, uint[] z, int zOff, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 2));
+			Debug.Assert(zPos <= len - 2);
 			ulong c = (ulong)z[zOff + zPos] + x;
 			z[zOff + zPos] = (uint)c;
 			c >>= 32;
@@ -152,7 +152,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static uint AddDWordAt(int len, ulong x, uint[] z, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 2));
+			Debug.Assert(zPos <= len - 2);
 			ulong c = z[zPos + 0] + (x & M);
 			z[zPos + 0] = (uint)c;
 			c >>= 32;
@@ -164,7 +164,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static uint AddDWordAt(int len, ulong x, uint[] z, int zOff, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 2));
+			Debug.Assert(zPos <= len - 2);
 			ulong c = z[zOff + zPos] + (x & M);
 			z[zOff + zPos] = (uint)c;
 			c >>= 32;
@@ -321,7 +321,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static uint AddWordAt(int len, uint x, uint[] z, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 1));
+			Debug.Assert(zPos <= len - 1);
 			ulong c = (ulong)x + z[zPos];
 			z[zPos] = (uint)c;
 			c >>= 32;
@@ -330,7 +330,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static uint AddWordAt(int len, uint x, uint[] z, int zOff, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 1));
+			Debug.Assert(zPos <= len - 1);
 			ulong c = (ulong)x + z[zOff + zPos];
 			z[zOff + zPos] = (uint)c;
 			c >>= 32;
@@ -458,9 +458,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 				uint x_i = x[i];
 				uint y_i = y[i];
 				if (x_i < y_i)
+				{
 					return -1;
+				}
+
 				if (x_i > y_i)
+				{
 					return 1;
+				}
 			}
 
 			return 0;
@@ -473,9 +478,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 				uint x_i = x[xOff + i];
 				uint y_i = y[yOff + i];
 				if (x_i < y_i)
+				{
 					return -1;
+				}
+
 				if (x_i > y_i)
+				{
 					return 1;
+				}
 			}
 
 			return 0;
@@ -603,7 +613,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			for (int i = 0; i < len; ++i)
 			{
 				if (--z[i] != uint.MaxValue)
+				{
 					return 0;
+				}
 			}
 
 			return -1;
@@ -673,7 +685,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			for (int i = zPos; i < len; ++i)
 			{
 				if (--z[i] != uint.MaxValue)
+				{
 					return 0;
+				}
 			}
 
 			return -1;
@@ -685,7 +699,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			for (int i = zPos; i < len; ++i)
 			{
 				if (--z[zOff + i] != uint.MaxValue)
+				{
 					return 0;
+				}
 			}
 
 			return -1;
@@ -709,7 +725,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			for (int i = len - 1; i >= 0; --i)
 			{
 				if (x[i] != y[i])
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -843,7 +861,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			int len = GetLengthForBits(bits);
 
 			if (x.SignValue < 0 || x.BitLength > bits)
+			{
 				throw new ArgumentException();
+			}
 
 			uint[] z = Create(len);
 
@@ -883,7 +903,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			int len = GetLengthForBits64(bits);
 
 			if (x.SignValue < 0 || x.BitLength > bits)
+			{
 				throw new ArgumentException();
+			}
 
 			ulong[] z = Create64(len);
 
@@ -921,11 +943,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 		public static uint GetBit(uint[] x, int bit)
 		{
 			if (bit == 0)
+			{
 				return x[0] & 1;
+			}
 
 			int w = bit >> 5;
 			if (w < 0 || w >= x.Length)
+			{
 				return 0;
+			}
 
 			int b = bit & 31;
 			return (x[w] >> b) & 1;
@@ -949,7 +975,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 		public static int GetLengthForBits(int bits)
 		{
 			if (bits < 1)
+			{
 				throw new ArgumentException();
+			}
 
 			return (int)(((uint)bits + 31) >> 5);
 		}
@@ -957,7 +985,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 		public static int GetLengthForBits64(int bits)
 		{
 			if (bits < 1)
+			{
 				throw new ArgumentException();
+			}
 
 			return (int)(((uint)bits + 63) >> 6);
 		}
@@ -968,9 +998,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			{
 				uint x_i = x[i], y_i = y[i];
 				if (x_i < y_i)
+				{
 					return false;
+				}
+
 				if (x_i > y_i)
+				{
 					return true;
+				}
 			}
 
 			return true;
@@ -996,7 +1031,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			for (int i = 0; i < len; ++i)
 			{
 				if (++z[i] != uint.MinValue)
+				{
 					return 0;
+				}
 			}
 
 			return 1;
@@ -1066,7 +1103,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			for (int i = zPos; i < len; ++i)
 			{
 				if (++z[i] != uint.MinValue)
+				{
 					return 0;
+				}
 			}
 
 			return 1;
@@ -1078,7 +1117,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			for (int i = zPos; i < len; ++i)
 			{
 				if (++z[zOff + i] != uint.MinValue)
+				{
 					return 0;
+				}
 			}
 
 			return 1;
@@ -1100,12 +1141,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 		public static bool IsOne(int len, uint[] x)
 		{
 			if (x[0] != 1)
+			{
 				return false;
+			}
 
 			for (int i = 1; i < len; ++i)
 			{
 				if (x[i] != 0)
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -1129,12 +1174,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 		public static bool IsZero(int len, uint[] x)
 		{
 			if (x[0] != 0)
+			{
 				return false;
+			}
 
 			for (int i = 1; i < len; ++i)
 			{
 				if (x[i] != 0)
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -1401,7 +1450,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static uint MulWordDwordAddAt(int len, uint x, ulong y, uint[] z, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 3));
+			Debug.Assert(zPos <= len - 3);
 			ulong c = 0, xVal = x;
 			c += xVal * (uint)y + z[zPos + 0];
 			z[zPos + 0] = (uint)c;
@@ -2468,7 +2517,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static int Sub33At(int len, uint x, uint[] z, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 2));
+			Debug.Assert(zPos <= len - 2);
 			long c = (long)z[zPos + 0] - x;
 			z[zPos + 0] = (uint)c;
 			c >>= 32;
@@ -2480,7 +2529,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static int Sub33At(int len, uint x, uint[] z, int zOff, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 2));
+			Debug.Assert(zPos <= len - 2);
 			long c = (long)z[zOff + zPos] - x;
 			z[zOff + zPos] = (uint)c;
 			c >>= 32;
@@ -2581,7 +2630,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static int SubDWordAt(int len, ulong x, uint[] z, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 2));
+			Debug.Assert(zPos <= len - 2);
 			long c = z[zPos + 0] - (long)(x & M);
 			z[zPos + 0] = (uint)c;
 			c >>= 32;
@@ -2593,7 +2642,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static int SubDWordAt(int len, ulong x, uint[] z, int zOff, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 2));
+			Debug.Assert(zPos <= len - 2);
 			long c = z[zOff + zPos] - (long)(x & M);
 			z[zOff + zPos] = (uint)c;
 			c >>= 32;
@@ -2694,7 +2743,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static int SubWordAt(int len, uint x, uint[] z, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 1));
+			Debug.Assert(zPos <= len - 1);
 			long c = (long)z[zPos] - x;
 			z[zPos] = (uint)c;
 			c >>= 32;
@@ -2703,7 +2752,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 
 		public static int SubWordAt(int len, uint x, uint[] z, int zOff, int zPos)
 		{
-			Debug.Assert(zPos <= (len - 1));
+			Debug.Assert(zPos <= len - 1);
 			long c = (long)z[zOff + zPos] - x;
 			z[zOff + zPos] = (uint)c;
 			c >>= 32;

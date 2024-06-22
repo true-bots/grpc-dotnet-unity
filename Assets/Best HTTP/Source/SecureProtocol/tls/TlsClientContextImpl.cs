@@ -5,7 +5,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-	internal class TlsClientContextImpl
+	class TlsClientContextImpl
 		: AbstractTlsContext, TlsClientContext
 	{
 		internal TlsClientContextImpl(TlsCrypto crypto)

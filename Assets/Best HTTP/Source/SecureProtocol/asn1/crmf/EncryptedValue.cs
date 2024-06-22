@@ -11,22 +11,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static EncryptedValue GetInstance(object obj)
 		{
 			if (obj is EncryptedValue encryptedValue)
+			{
 				return encryptedValue;
+			}
 
 			if (obj != null)
+			{
 				return new EncryptedValue(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly AlgorithmIdentifier m_intendedAlg;
-		private readonly AlgorithmIdentifier m_symmAlg;
-		private readonly DerBitString m_encSymmKey;
-		private readonly AlgorithmIdentifier m_keyAlg;
-		private readonly Asn1OctetString m_valueHint;
-		private readonly DerBitString m_encValue;
+		readonly AlgorithmIdentifier m_intendedAlg;
+		readonly AlgorithmIdentifier m_symmAlg;
+		readonly DerBitString m_encSymmKey;
+		readonly AlgorithmIdentifier m_keyAlg;
+		readonly Asn1OctetString m_valueHint;
+		readonly DerBitString m_encValue;
 
-		private EncryptedValue(Asn1Sequence seq)
+		EncryptedValue(Asn1Sequence seq)
 		{
 			int index = 0;
 			while (seq[index] is Asn1TaggedObject tObj)
@@ -60,7 +64,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 			AlgorithmIdentifier keyAlg, Asn1OctetString valueHint, DerBitString encValue)
 		{
 			if (encValue == null)
+			{
 				throw new ArgumentNullException(nameof(encValue));
+			}
 
 			m_intendedAlg = intendedAlg;
 			m_symmAlg = symmAlg;
@@ -70,17 +76,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 			m_encValue = encValue;
 		}
 
-		public virtual AlgorithmIdentifier IntendedAlg => m_intendedAlg;
+		public virtual AlgorithmIdentifier IntendedAlg
+		{
+			get { return m_intendedAlg; }
+		}
 
-		public virtual AlgorithmIdentifier SymmAlg => m_symmAlg;
+		public virtual AlgorithmIdentifier SymmAlg
+		{
+			get { return m_symmAlg; }
+		}
 
-		public virtual DerBitString EncSymmKey => m_encSymmKey;
+		public virtual DerBitString EncSymmKey
+		{
+			get { return m_encSymmKey; }
+		}
 
-		public virtual AlgorithmIdentifier KeyAlg => m_keyAlg;
+		public virtual AlgorithmIdentifier KeyAlg
+		{
+			get { return m_keyAlg; }
+		}
 
-		public virtual Asn1OctetString ValueHint => m_valueHint;
+		public virtual Asn1OctetString ValueHint
+		{
+			get { return m_valueHint; }
+		}
 
-		public virtual DerBitString EncValue => m_encValue;
+		public virtual DerBitString EncValue
+		{
+			get { return m_encValue; }
+		}
 
 		/**
 		 * <pre>

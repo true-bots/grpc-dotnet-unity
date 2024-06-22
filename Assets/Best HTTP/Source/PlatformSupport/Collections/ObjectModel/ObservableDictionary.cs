@@ -14,12 +14,12 @@ namespace PlatformSupport.Collections.ObjectModel
 {
 	public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, specialized.INotifyCollectionChanged, INotifyPropertyChanged
 	{
-		private const string CountString = "Count";
-		private const string IndexerName = "Item[]";
-		private const string KeysName = "Keys";
-		private const string ValuesName = "Values";
+		const string CountString = "Count";
+		const string IndexerName = "Item[]";
+		const string KeysName = "Keys";
+		const string ValuesName = "Values";
 
-		private IDictionary<TKey, TValue> _Dictionary;
+		IDictionary<TKey, TValue> _Dictionary;
 
 		protected IDictionary<TKey, TValue> Dictionary
 		{
@@ -79,15 +79,20 @@ namespace PlatformSupport.Collections.ObjectModel
 
 		public bool Remove(TKey key)
 		{
-			if (key == null) throw new ArgumentNullException("key");
+			if (key == null)
+			{
+				throw new ArgumentNullException("key");
+			}
 
 			TValue value;
 			Dictionary.TryGetValue(key, out value);
-			var removed = Dictionary.Remove(key);
+			bool removed = Dictionary.Remove(key);
 			if (removed)
 
 				//OnCollectionChanged(NotifyCollectionChangedAction.Remove, new KeyValuePair<TKey, TValue>(key, value));
+			{
 				OnCollectionChanged();
+			}
 
 
 			return removed;
@@ -186,34 +191,56 @@ namespace PlatformSupport.Collections.ObjectModel
 
 		public void AddRange(IDictionary<TKey, TValue> items)
 		{
-			if (items == null) throw new ArgumentNullException("items");
+			if (items == null)
+			{
+				throw new ArgumentNullException("items");
+			}
 
 			if (items.Count > 0)
 			{
 				if (Dictionary.Count > 0)
 				{
 					if (items.Keys.Any((k) => Dictionary.ContainsKey(k)))
+					{
 						throw new ArgumentException("An item with the same key has already been added.");
+					}
 					else
-						foreach (var item in items)
+					{
+						foreach (KeyValuePair<TKey, TValue> item in items)
+						{
 							Dictionary.Add(item);
+						}
+					}
 				}
 				else
+				{
 					_Dictionary = new Dictionary<TKey, TValue>(items);
+				}
 
 				OnCollectionChanged(specialized.NotifyCollectionChangedAction.Add, items.ToArray());
 			}
 		}
 
-		private void Insert(TKey key, TValue value, bool add)
+		void Insert(TKey key, TValue value, bool add)
 		{
-			if (key == null) throw new ArgumentNullException("key");
+			if (key == null)
+			{
+				throw new ArgumentNullException("key");
+			}
 
 			TValue item;
 			if (Dictionary.TryGetValue(key, out item))
 			{
-				if (add) throw new ArgumentException("An item with the same key has already been added.");
-				if (Equals(item, value)) return;
+				if (add)
+				{
+					throw new ArgumentException("An item with the same key has already been added.");
+				}
+
+				if (Equals(item, value))
+				{
+					return;
+				}
+
 				Dictionary[key] = value;
 
 				OnCollectionChanged(specialized.NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value),
@@ -227,7 +254,7 @@ namespace PlatformSupport.Collections.ObjectModel
 			}
 		}
 
-		private void OnPropertyChanged()
+		void OnPropertyChanged()
 		{
 			OnPropertyChanged(CountString);
 			OnPropertyChanged(IndexerName);
@@ -237,31 +264,46 @@ namespace PlatformSupport.Collections.ObjectModel
 
 		protected virtual void OnPropertyChanged(string propertyName)
 		{
-			if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			if (PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 
-		private void OnCollectionChanged()
+		void OnCollectionChanged()
 		{
 			OnPropertyChanged();
-			if (CollectionChanged != null) CollectionChanged(this, new specialized.NotifyCollectionChangedEventArgs(specialized.NotifyCollectionChangedAction.Reset));
+			if (CollectionChanged != null)
+			{
+				CollectionChanged(this, new specialized.NotifyCollectionChangedEventArgs(specialized.NotifyCollectionChangedAction.Reset));
+			}
 		}
 
-		private void OnCollectionChanged(specialized.NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> changedItem)
+		void OnCollectionChanged(specialized.NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> changedItem)
 		{
 			OnPropertyChanged();
-			if (CollectionChanged != null) CollectionChanged(this, new specialized.NotifyCollectionChangedEventArgs(action, changedItem));
+			if (CollectionChanged != null)
+			{
+				CollectionChanged(this, new specialized.NotifyCollectionChangedEventArgs(action, changedItem));
+			}
 		}
 
-		private void OnCollectionChanged(specialized.NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> newItem, KeyValuePair<TKey, TValue> oldItem)
+		void OnCollectionChanged(specialized.NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> newItem, KeyValuePair<TKey, TValue> oldItem)
 		{
 			OnPropertyChanged();
-			if (CollectionChanged != null) CollectionChanged(this, new specialized.NotifyCollectionChangedEventArgs(action, newItem, oldItem));
+			if (CollectionChanged != null)
+			{
+				CollectionChanged(this, new specialized.NotifyCollectionChangedEventArgs(action, newItem, oldItem));
+			}
 		}
 
-		private void OnCollectionChanged(specialized.NotifyCollectionChangedAction action, IList newItems)
+		void OnCollectionChanged(specialized.NotifyCollectionChangedAction action, IList newItems)
 		{
 			OnPropertyChanged();
-			if (CollectionChanged != null) CollectionChanged(this, new specialized.NotifyCollectionChangedEventArgs(action, newItems));
+			if (CollectionChanged != null)
+			{
+				CollectionChanged(this, new specialized.NotifyCollectionChangedEventArgs(action, newItems));
+			}
 		}
 	}
 }

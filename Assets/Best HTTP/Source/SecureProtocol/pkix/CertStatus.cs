@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		public const int Undetermined = 12;
 
-		private int status = Unrevoked;
+		int status = Unrevoked;
 
 		DateTime? revocationDate = null;
 
@@ -20,7 +20,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		public DateTime? RevocationDate
 		{
 			get { return revocationDate; }
-			set { this.revocationDate = value; }
+			set { revocationDate = value; }
 		}
 
 		/// <summary>
@@ -29,7 +29,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		public int Status
 		{
 			get { return status; }
-			set { this.status = value; }
+			set { status = value; }
 		}
 	}
 }

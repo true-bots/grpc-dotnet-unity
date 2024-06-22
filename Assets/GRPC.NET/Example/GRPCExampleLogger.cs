@@ -5,16 +5,16 @@ namespace GRPC.NET.Example
 {
 	public class GRPCExampleLogger : MonoBehaviour
 	{
-		private const int MAX_SIZE = 16382;
-		private string m_LogContent = "";
-		private Vector2 m_LogScrollView = Vector2.zero;
+		const int MAX_SIZE = 16382;
+		string m_LogContent = "";
+		Vector2 m_LogScrollView = Vector2.zero;
 
 		public void WriteLogOutput(string s)
 		{
 			m_LogContent += s + "\n";
 			while (m_LogContent.Length > MAX_SIZE)
 			{
-				var index = m_LogContent.IndexOf("\n", StringComparison.Ordinal);
+				int index = m_LogContent.IndexOf("\n", StringComparison.Ordinal);
 				m_LogContent = m_LogContent.Substring(index + 1);
 			}
 
@@ -36,7 +36,7 @@ namespace GRPC.NET.Example
 		{
 			const int pad = 10;
 
-			var logArea = new Rect(pad, Screen.height * (1.0f / 2.0f), Screen.width - 2 * pad, Screen.height * (1.0f / 2.0f) - pad);
+			Rect logArea = new Rect(pad, Screen.height * (1.0f / 2.0f), Screen.width - 2 * pad, Screen.height * (1.0f / 2.0f) - pad);
 			GUILayout.BeginArea(logArea);
 			GUIDisplayLog();
 			GUILayout.EndArea();

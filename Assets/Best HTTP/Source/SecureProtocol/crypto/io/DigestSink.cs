@@ -8,14 +8,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 	public sealed class DigestSink
 		: BaseOutputStream
 	{
-		private readonly IDigest m_digest;
+		readonly IDigest m_digest;
 
 		public DigestSink(IDigest digest)
 		{
 			m_digest = digest;
 		}
 
-		public IDigest Digest => m_digest;
+		public IDigest Digest
+		{
+			get { return m_digest; }
+		}
 
 		public override void Write(byte[] buffer, int offset, int count)
 		{

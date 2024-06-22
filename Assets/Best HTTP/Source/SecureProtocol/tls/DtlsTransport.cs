@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class DtlsTransport
 		: DatagramTransport
 	{
-		private readonly DtlsRecordLayer m_recordLayer;
-		private readonly bool m_ignoreCorruptRecords;
+		readonly DtlsRecordLayer m_recordLayer;
+		readonly bool m_ignoreCorruptRecords;
 
 		internal DtlsTransport(DtlsRecordLayer recordLayer, bool ignoreCorruptRecords)
 		{
@@ -34,17 +34,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual int Receive(byte[] buf, int off, int len, int waitMillis)
 		{
 			if (null == buf)
+			{
 				throw new ArgumentNullException("buf");
+			}
+
 			if (off < 0 || off >= buf.Length)
+			{
 				throw new ArgumentException("invalid offset: " + off, "off");
+			}
+
 			if (len < 0 || len > buf.Length - off)
+			{
 				throw new ArgumentException("invalid length: " + len, "len");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return Receive(buf.AsSpan(off, len), waitMillis);
 #else
 			if (waitMillis < 0)
+			{
 				throw new ArgumentException("cannot be negative", "waitMillis");
+			}
 
 			try
 			{
@@ -53,7 +63,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			catch (TlsFatalAlert fatalAlert)
 			{
 				if (m_ignoreCorruptRecords && AlertDescription.bad_record_mac == fatalAlert.AlertDescription)
+				{
 					return -1;
+				}
 
 				m_recordLayer.Fail(fatalAlert.AlertDescription);
 				throw fatalAlert;
@@ -65,7 +77,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			catch (SocketException e)
 			{
 				if (TlsUtilities.IsTimeout(e))
+				{
 					throw e;
+				}
 
 				m_recordLayer.Fail(AlertDescription.internal_error);
 				throw new TlsFatalAlert(AlertDescription.internal_error, e);
@@ -141,11 +155,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual void Send(byte[] buf, int off, int len)
 		{
 			if (null == buf)
+			{
 				throw new ArgumentNullException("buf");
+			}
+
 			if (off < 0 || off >= buf.Length)
+			{
 				throw new ArgumentException("invalid offset: " + off, "off");
+			}
+
 			if (len < 0 || len > buf.Length - off)
+			{
 				throw new ArgumentException("invalid length: " + len, "len");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             Send(buf.AsSpan(off, len));
@@ -166,7 +188,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			catch (SocketException e)
 			{
 				if (TlsUtilities.IsTimeout(e))
+				{
 					throw e;
+				}
 
 				m_recordLayer.Fail(AlertDescription.internal_error);
 				throw new TlsFatalAlert(AlertDescription.internal_error, e);

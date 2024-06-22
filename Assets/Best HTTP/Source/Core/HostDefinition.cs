@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using BestHTTP.Connections;
 using BestHTTP.PlatformSupport.Text;
 
@@ -23,7 +24,7 @@ namespace BestHTTP.Core
 
 		public HostDefinition(string host)
 		{
-			this.Host = host;
+			Host = host;
 		}
 
 		public HostConnection HasBetterAlternate(HTTPRequest request)
@@ -42,8 +43,10 @@ namespace BestHTTP.Core
 		{
 			HostConnection host = null;
 
-			if (!this.hostConnectionVariant.TryGetValue(key, out host))
-				this.hostConnectionVariant.Add(key, host = new HostConnection(this, key));
+			if (!hostConnectionVariant.TryGetValue(key, out host))
+			{
+				hostConnectionVariant.Add(key, host = new HostConnection(this, key));
+			}
 
 			return host;
 		}
@@ -56,15 +59,19 @@ namespace BestHTTP.Core
 
 		public void TryToSendQueuedRequests()
 		{
-			foreach (var kvp in hostConnectionVariant)
+			foreach (KeyValuePair<string, HostConnection> kvp in hostConnectionVariant)
+			{
 				kvp.Value.TryToSendQueuedRequests();
+			}
 		}
 
 		public void HandleAltSvcHeader(HTTPResponse response)
 		{
-			var headerValues = response.GetHeaderValues("alt-svc");
+			List<string> headerValues = response.GetHeaderValues("alt-svc");
 			if (headerValues == null)
+			{
 				HTTPManager.Logger.Warning(typeof(HostDefinition).Name, "Received HandleAltSvcHeader message, but no Alt-Svc header found!", response.Context);
+			}
 		}
 
 		public void HandleConnectProtocol(HTTP2ConnectProtocolInfo info)
@@ -75,7 +82,7 @@ namespace BestHTTP.Core
 
 		internal void Shutdown()
 		{
-			foreach (var kvp in this.hostConnectionVariant)
+			foreach (KeyValuePair<string, HostConnection> kvp in hostConnectionVariant)
 			{
 				kvp.Value.Shutdown();
 			}
@@ -83,9 +90,9 @@ namespace BestHTTP.Core
 
 		internal void SaveTo(System.IO.BinaryWriter bw)
 		{
-			bw.Write(this.hostConnectionVariant.Count);
+			bw.Write(hostConnectionVariant.Count);
 
-			foreach (var kvp in this.hostConnectionVariant)
+			foreach (KeyValuePair<string, HostConnection> kvp in hostConnectionVariant)
 			{
 				bw.Write(kvp.Key.ToString());
 
@@ -119,9 +126,11 @@ namespace BestHTTP.Core
 		)
 		{
 			if (uri.IsFile)
+			{
 				return uri.ToString();
+			}
 
-			var keyBuilder = StringBuilderPool.Get(11);
+			StringBuilder keyBuilder = StringBuilderPool.Get(11);
 
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
 			if (proxy != null && proxy.UseProxyForAddress(uri))

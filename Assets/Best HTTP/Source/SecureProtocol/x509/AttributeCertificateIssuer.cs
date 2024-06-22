@@ -34,7 +34,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			form = new V2Form(new GeneralNames(new GeneralName(principal)));
 		}
 
-		private object[] GetNames()
+		object[] GetNames()
 		{
 			GeneralNames name;
 			if (form is V2Form)
@@ -75,7 +75,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		/// <returns>An array of IPrincipal objects (usually X509Principal).</returns>
 		public X509Name[] GetPrincipals()
 		{
-			object[] p = this.GetNames();
+			object[] p = GetNames();
 
 			int count = 0;
 			for (int i = 0; i != p.Length; i++)
@@ -100,7 +100,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			return result;
 		}
 
-		private bool MatchesDN(
+		bool MatchesDN(
 			X509Name subject,
 			GeneralNames targets)
 		{
@@ -136,7 +136,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		public bool Match(X509Certificate x509Cert)
 		{
 			if (x509Cert == null)
+			{
 				return false;
+			}
 
 			if (form is V2Form)
 			{
@@ -168,12 +170,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			AttributeCertificateIssuer other = (AttributeCertificateIssuer)obj;
 
-			return this.form.Equals(other.form);
+			return form.Equals(other.form);
 		}
 
 		public override int GetHashCode()
 		{
-			return this.form.GetHashCode();
+			return form.GetHashCode();
 		}
 	}
 }

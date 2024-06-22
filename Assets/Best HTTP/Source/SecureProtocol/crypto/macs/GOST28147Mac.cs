@@ -13,18 +13,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class Gost28147Mac
 		: IMac
 	{
-		private const int BlockSize = 8;
-		private const int MacSize = 4;
-		private int bufOff;
-		private byte[] buf;
-		private byte[] mac;
-		private bool firstStep = true;
-		private int[] workingKey;
-		private byte[] macIV = null;
+		const int BlockSize = 8;
+		const int MacSize = 4;
+		int bufOff;
+		byte[] buf;
+		byte[] mac;
+		bool firstStep = true;
+		int[] workingKey;
+		byte[] macIV = null;
 
 		//
 		// This is default S-box - E_A.
-		private byte[] S =
+		byte[] S =
 		{
 			0x9, 0x6, 0x3, 0x2, 0x8, 0xB, 0x1, 0x7, 0xA, 0x4, 0xE, 0xF, 0xC, 0x0, 0xD, 0x5,
 			0x3, 0x7, 0xE, 0x9, 0x8, 0xA, 0xF, 0x0, 0x5, 0x2, 0x6, 0xC, 0xB, 0x4, 0xD, 0x1,
@@ -43,11 +43,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			bufOff = 0;
 		}
 
-		private static int[] GenerateWorkingKey(
+		static int[] GenerateWorkingKey(
 			byte[] userKey)
 		{
 			if (userKey.Length != 32)
+			{
 				throw new ArgumentException("Key length invalid. Key needs to be 32 byte - 256 bit!!!");
+			}
 
 			int[] key = new int[8];
 			for (int i = 0; i != 8; i++)
@@ -68,7 +70,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 				//
 				// Set the S-Box
 				//
-				param.GetSBox().CopyTo(this.S, 0);
+				param.GetSBox().CopyTo(S, 0);
 
 				//
 				// set key if there is one
@@ -91,7 +93,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			else
 			{
 				throw new ArgumentException("invalid parameter passed to Gost28147 init - "
-				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Platform.GetTypeName(parameters));
 			}
 		}
 
@@ -105,9 +107,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			return MacSize;
 		}
 
-		private int Gost28147_mainStep(int n1, int key)
+		int Gost28147_mainStep(int n1, int key)
 		{
-			int cm = (key + n1); // CM1
+			int cm = key + n1; // CM1
 
 			// S-box replacing
 
@@ -122,12 +124,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 
 //			return om << 11 | om >>> (32-11); // 11-leftshift
 			int omLeft = om << 11;
-			int omRight = (int)(((uint)om) >> (32 - 11)); // Note: Casts required to get unsigned bit rotation
+			int omRight = (int)((uint)om >> (32 - 11)); // Note: Casts required to get unsigned bit rotation
 
 			return omLeft | omRight;
 		}
 
-		private void Gost28147MacFunc(
+		void Gost28147MacFunc(
 			int[] workingKey,
 			byte[] input,
 			int inOff,
@@ -184,7 +186,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public void BlockUpdate(byte[] input, int inOff, int len)
 		{
 			if (len < 0)
+			{
 				throw new ArgumentException("Can't have a negative input length!");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			BlockUpdate(input.AsSpan(inOff, len));
@@ -306,7 +310,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 
 			Gost28147MacFunc(workingKey, sum, 0, mac, 0);
 
-			Array.Copy(mac, (mac.Length / 2) - MacSize, output, outOff, MacSize);
+			Array.Copy(mac, mac.Length / 2 - MacSize, output, outOff, MacSize);
 
 			Reset();
 
@@ -353,7 +357,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			firstStep = true;
 		}
 
-		private static void Cm5Func(byte[] buf, int bufOff, byte[] mac, byte[] sum)
+		static void Cm5Func(byte[] buf, int bufOff, byte[] mac, byte[] sum)
 		{
 			for (int i = 0; i < BlockSize; ++i)
 			{

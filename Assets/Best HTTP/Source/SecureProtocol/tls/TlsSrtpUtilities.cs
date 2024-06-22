@@ -26,7 +26,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateUseSrtpExtension(UseSrtpData useSrtpData)
 		{
 			if (useSrtpData == null)
+			{
 				throw new ArgumentNullException("useSrtpData");
+			}
 
 			MemoryStream buf = new MemoryStream();
 
@@ -43,14 +45,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static UseSrtpData ReadUseSrtpExtension(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
 			// SRTPProtectionProfiles
 			int length = TlsUtilities.ReadUint16(buf);
 			if (length < 2 || (length & 1) != 0)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			int[] protectionProfiles = TlsUtilities.ReadUint16Array(length / 2, buf);
 

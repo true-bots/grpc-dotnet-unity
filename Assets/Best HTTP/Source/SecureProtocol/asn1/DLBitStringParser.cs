@@ -6,11 +6,11 @@ using System.IO;
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
 	/// <summary>Parser for a DL encoded BIT STRING.</summary>
-	internal class DLBitStringParser
+	class DLBitStringParser
 		: Asn1BitStringParser
 	{
-		private readonly DefiniteLengthInputStream m_stream;
-		private int m_padBits = 0;
+		readonly DefiniteLengthInputStream m_stream;
+		int m_padBits = 0;
 
 		internal DLBitStringParser(DefiniteLengthInputStream stream)
 		{
@@ -44,21 +44,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private Stream GetBitStream(bool octetAligned)
+		Stream GetBitStream(bool octetAligned)
 		{
 			int length = m_stream.Remaining;
 			if (length < 1)
+			{
 				throw new InvalidOperationException("content octets cannot be empty");
+			}
 
 			m_padBits = m_stream.ReadByte();
 			if (m_padBits > 0)
 			{
 				if (length < 2)
+				{
 					throw new InvalidOperationException("zero length data with non-zero pad bits");
+				}
+
 				if (m_padBits > 7)
+				{
 					throw new InvalidOperationException("pad bits cannot be greater than 7 or less than 0");
+				}
+
 				if (octetAligned)
+				{
 					throw new IOException("expected octet-aligned bitstring, but found padBits: " + m_padBits);
+				}
 			}
 
 			return m_stream;

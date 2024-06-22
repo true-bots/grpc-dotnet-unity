@@ -6,17 +6,17 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal class LazyDLEnumerator
+	class LazyDLEnumerator
 		: IEnumerator<Asn1Encodable>
 	{
-		private readonly byte[] m_contents;
+		readonly byte[] m_contents;
 
-		private Asn1InputStream m_input;
-		private Asn1Object m_current;
+		Asn1InputStream m_input;
+		Asn1Object m_current;
 
 		internal LazyDLEnumerator(byte[] contents)
 		{
-			this.m_contents = contents;
+			m_contents = contents;
 
 			Reset();
 		}
@@ -31,7 +31,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			get
 			{
 				if (null == m_current)
+				{
 					throw new InvalidOperationException();
+				}
 
 				return m_current;
 			}
@@ -43,16 +45,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		public bool MoveNext()
 		{
-			return null != (this.m_current = ReadObject());
+			return null != (m_current = ReadObject());
 		}
 
 		public void Reset()
 		{
-			this.m_input = new LazyAsn1InputStream(m_contents);
-			this.m_current = null;
+			m_input = new LazyAsn1InputStream(m_contents);
+			m_current = null;
 		}
 
-		private Asn1Object ReadObject()
+		Asn1Object ReadObject()
 		{
 			try
 			{

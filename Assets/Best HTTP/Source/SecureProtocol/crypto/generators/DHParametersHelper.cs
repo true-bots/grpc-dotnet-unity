@@ -8,15 +8,15 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 {
-	internal class DHParametersHelper
+	class DHParametersHelper
 	{
-		private static readonly BigInteger Six = BigInteger.ValueOf(6);
+		static readonly BigInteger Six = BigInteger.ValueOf(6);
 
-		private static readonly int[][] primeLists = BigInteger.primeLists;
-		private static readonly int[] primeProducts = BigInteger.primeProducts;
-		private static readonly BigInteger[] BigPrimeProducts = ConstructBigPrimeProducts(primeProducts);
+		static readonly int[][] primeLists = BigInteger.primeLists;
+		static readonly int[] primeProducts = BigInteger.primeProducts;
+		static readonly BigInteger[] BigPrimeProducts = ConstructBigPrimeProducts(primeProducts);
 
-		private static BigInteger[] ConstructBigPrimeProducts(int[] primeProducts)
+		static BigInteger[] ConstructBigPrimeProducts(int[] primeProducts)
 		{
 			BigInteger[] bpp = new BigInteger[primeProducts.Length];
 			for (int i = 0; i < bpp.Length; ++i)
@@ -47,10 +47,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 					p = q.ShiftLeft(1).Add(BigInteger.One);
 
 					if (!p.IsProbablePrime(certainty, true))
+					{
 						continue;
+					}
 
 					if (certainty > 2 && !q.IsProbablePrime(certainty, true))
+					{
 						continue;
+					}
 
 					break;
 				}
@@ -83,7 +87,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 						{
 							int prime = primeList[j];
 							int qRem = test % prime;
-							if (qRem == 0 || qRem == (prime >> 1))
+							if (qRem == 0 || qRem == prime >> 1)
 							{
 								q = q.Add(Six);
 								goto retry;
@@ -92,18 +96,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 					}
 
 					if (q.BitLength != qLength)
+					{
 						continue;
+					}
 
 					if (!q.RabinMillerTest(2, random, true))
+					{
 						continue;
+					}
 
 					p = q.ShiftLeft(1).Add(BigInteger.One);
 
 					if (!p.RabinMillerTest(certainty, random, true))
+					{
 						continue;
+					}
 
 					if (certainty > 2 && !q.RabinMillerTest(certainty - 2, random, true))
+					{
 						continue;
+					}
 
 					/*
 					 * Require a minimum weight of the NAF representation, since low-weight primes may be
@@ -112,7 +124,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 					 * See "The number field sieve for integers of low weight", Oliver Schirokauer.
 					 */
 					if (WNafUtilities.GetNafWeight(p) < minWeight)
+					{
 						continue;
+					}
 
 					break;
 				}

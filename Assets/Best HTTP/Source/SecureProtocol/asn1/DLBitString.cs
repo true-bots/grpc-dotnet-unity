@@ -41,7 +41,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncoding(int encoding)
 		{
 			if (Asn1OutputStream.EncodingDer == encoding)
+			{
 				return base.GetEncoding(encoding);
+			}
 
 			return new PrimitiveEncoding(Asn1Tags.Universal, Asn1Tags.BitString, contents);
 		}
@@ -49,7 +51,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncodingImplicit(int encoding, int tagClass, int tagNo)
 		{
 			if (Asn1OutputStream.EncodingDer == encoding)
+			{
 				return base.GetEncodingImplicit(encoding, tagClass, tagNo);
+			}
 
 			return new PrimitiveEncoding(tagClass, tagNo, contents);
 		}

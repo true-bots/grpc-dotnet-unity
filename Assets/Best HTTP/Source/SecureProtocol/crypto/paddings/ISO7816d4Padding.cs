@@ -71,7 +71,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 			}
 
 			if (position < 0)
+			{
 				throw new InvalidCipherTextException("pad block corrupted");
+			}
 
 			return input.Length - position;
 		}

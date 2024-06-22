@@ -15,7 +15,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerObjectIdentifier), Asn1Tags.ObjectIdentifier)
+			Meta() : base(typeof(DerObjectIdentifier), Asn1Tags.ObjectIdentifier)
 			{
 			}
 
@@ -38,16 +38,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerObjectIdentifier GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerObjectIdentifier derObjectIdentifier)
+			{
 				return derObjectIdentifier;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerObjectIdentifier converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -61,7 +67,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static DerObjectIdentifier GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
@@ -75,40 +81,49 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				Asn1Object baseObject = taggedObject.GetObject();
 				if (!(baseObject is DerObjectIdentifier))
+				{
 					return FromContents(Asn1OctetString.GetInstance(baseObject).GetOctets());
+				}
 			}
 
 			return (DerObjectIdentifier)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private const long LongLimit = (long.MaxValue >> 7) - 0x7F;
+		const long LongLimit = (long.MaxValue >> 7) - 0x7F;
 
-		private static readonly DerObjectIdentifier[] cache = new DerObjectIdentifier[1024];
+		static readonly DerObjectIdentifier[] cache = new DerObjectIdentifier[1024];
 
-		private readonly string identifier;
-		private byte[] contents;
+		readonly string identifier;
+		byte[] contents;
 
 		public DerObjectIdentifier(string identifier)
 		{
 			if (identifier == null)
+			{
 				throw new ArgumentNullException("identifier");
+			}
+
 			if (!IsValidIdentifier(identifier))
+			{
 				throw new FormatException("string " + identifier + " not an OID");
+			}
 
 			this.identifier = identifier;
 		}
 
-		private DerObjectIdentifier(DerObjectIdentifier oid, string branchID)
+		DerObjectIdentifier(DerObjectIdentifier oid, string branchID)
 		{
 			if (!Asn1RelativeOid.IsValidIdentifier(branchID, 0))
+			{
 				throw new ArgumentException("string " + branchID + " not a valid OID branch", "branchID");
+			}
 
-			this.identifier = oid.Id + "." + branchID;
+			identifier = oid.Id + "." + branchID;
 		}
 
-		private DerObjectIdentifier(byte[] contents, bool clone)
+		DerObjectIdentifier(byte[] contents, bool clone)
 		{
-			this.identifier = ParseContents(contents);
+			identifier = ParseContents(contents);
 			this.contents = clone ? Arrays.Clone(contents) : contents;
 		}
 
@@ -130,7 +145,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public virtual bool On(DerObjectIdentifier stem)
 		{
 			string id = Id, stemId = stem.Id;
-			return id.Length > stemId.Length && id[stemId.Length] == '.' && Org.BouncyCastle.Utilities.Platform.StartsWith(id, stemId);
+			return id.Length > stemId.Length && id[stemId.Length] == '.' && Platform.StartsWith(id, stemId);
 		}
 
 		public override string ToString()
@@ -142,7 +157,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			DerObjectIdentifier that = asn1Object as DerObjectIdentifier;
 			return null != that
-			       && this.identifier == that.identifier;
+			       && identifier == that.identifier;
 		}
 
 		protected override int Asn1GetHashCode()
@@ -160,7 +175,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return new PrimitiveEncoding(tagClass, tagNo, GetContents());
 		}
 
-		private void DoOutput(MemoryStream bOut)
+		void DoOutput(MemoryStream bOut)
 		{
 			OidTokenizer tok = new OidTokenizer(identifier);
 
@@ -191,7 +206,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private byte[] GetContents()
+		byte[] GetContents()
 		{
 			lock (this)
 			{
@@ -223,19 +238,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private static bool IsValidIdentifier(string identifier)
+		static bool IsValidIdentifier(string identifier)
 		{
 			if (identifier.Length < 3 || identifier[1] != '.')
+			{
 				return false;
+			}
 
 			char first = identifier[0];
 			if (first < '0' || first > '2')
+			{
 				return false;
+			}
 
 			return Asn1RelativeOid.IsValidIdentifier(identifier, 2);
 		}
 
-		private static string ParseContents(byte[] contents)
+		static string ParseContents(byte[] contents)
 		{
 			StringBuilder objId = new StringBuilder();
 			long value = 0;

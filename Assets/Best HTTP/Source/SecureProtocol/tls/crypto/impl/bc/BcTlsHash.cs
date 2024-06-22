@@ -5,23 +5,23 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 {
-	internal sealed class BcTlsHash
+	sealed class BcTlsHash
 		: TlsHash
 	{
-		private readonly BcTlsCrypto m_crypto;
-		private readonly int m_cryptoHashAlgorithm;
-		private readonly IDigest m_digest;
+		readonly BcTlsCrypto m_crypto;
+		readonly int m_cryptoHashAlgorithm;
+		readonly IDigest m_digest;
 
 		internal BcTlsHash(BcTlsCrypto crypto, int cryptoHashAlgorithm)
 			: this(crypto, cryptoHashAlgorithm, crypto.CreateDigest(cryptoHashAlgorithm))
 		{
 		}
 
-		private BcTlsHash(BcTlsCrypto crypto, int cryptoHashAlgorithm, IDigest digest)
+		BcTlsHash(BcTlsCrypto crypto, int cryptoHashAlgorithm, IDigest digest)
 		{
-			this.m_crypto = crypto;
-			this.m_cryptoHashAlgorithm = cryptoHashAlgorithm;
-			this.m_digest = digest;
+			m_crypto = crypto;
+			m_cryptoHashAlgorithm = cryptoHashAlgorithm;
+			m_digest = digest;
 		}
 
 		public void Update(byte[] data, int offSet, int length)

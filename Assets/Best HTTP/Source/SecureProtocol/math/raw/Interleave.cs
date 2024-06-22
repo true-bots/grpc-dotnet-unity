@@ -8,11 +8,11 @@ using System.Runtime.Intrinsics.X86;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 {
-	internal abstract class Interleave
+	abstract class Interleave
 	{
-		private const ulong M32 = 0x55555555UL;
-		private const ulong M64 = 0x5555555555555555UL;
-		private const ulong M64R = 0xAAAAAAAAAAAAAAAAUL;
+		const ulong M32 = 0x55555555UL;
+		const ulong M64 = 0x5555555555555555UL;
+		const ulong M64R = 0xAAAAAAAAAAAAAAAAUL;
 
 		internal static uint Expand8to16(uint x)
 		{
@@ -49,7 +49,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			x = Bits.BitPermuteStep(x, 0x0C0C0C0CU, 2);
 			x = Bits.BitPermuteStep(x, 0x22222222U, 1);
 
-			return ((x >> 1) & M32) << 32 | (x & M32);
+			return (((x >> 1) & M32) << 32) | (x & M32);
 		}
 
 		internal static void Expand64To128(ulong x, ulong[] z, int zOff)
@@ -70,7 +70,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			x = Bits.BitPermuteStep(x, 0x0C0C0C0C0C0C0C0CUL, 2);
 			x = Bits.BitPermuteStep(x, 0x2222222222222222UL, 1);
 
-			z[zOff] = (x) & M64;
+			z[zOff] = x & M64;
 			z[zOff + 1] = (x >> 1) & M64;
 		}
 
@@ -138,7 +138,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			x = Bits.BitPermuteStep(x, 0x0C0C0C0C0C0C0C0CUL, 2);
 			x = Bits.BitPermuteStep(x, 0x2222222222222222UL, 1);
 
-			low = (x) & M64R;
+			low = x & M64R;
 			return (x << 1) & M64R;
 		}
 

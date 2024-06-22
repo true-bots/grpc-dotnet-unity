@@ -23,31 +23,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class EaxBlockCipher
 		: IAeadBlockCipher
 	{
-		private enum Tag : byte
+		enum Tag : byte
 		{
 			N,
 			H,
 			C
 		};
 
-		private SicBlockCipher cipher;
+		SicBlockCipher cipher;
 
-		private bool forEncryption;
+		bool forEncryption;
 
-		private int blockSize;
+		int blockSize;
 
-		private IMac mac;
+		IMac mac;
 
-		private byte[] nonceMac;
-		private byte[] associatedTextMac;
-		private byte[] macBlock;
+		byte[] nonceMac;
+		byte[] associatedTextMac;
+		byte[] macBlock;
 
-		private int macSize;
-		private byte[] bufBlock;
-		private int bufOff;
+		int macSize;
+		byte[] bufBlock;
+		int bufOff;
 
-		private bool cipherInitialized;
-		private byte[] initialAssociatedText;
+		bool cipherInitialized;
+		byte[] initialAssociatedText;
 
 		/**
 		* Constructor that accepts an instance of a block cipher engine.
@@ -65,9 +65,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			this.cipher = new SicBlockCipher(cipher);
 		}
 
-		public virtual string AlgorithmName => cipher.UnderlyingCipher.AlgorithmName + "/EAX";
+		public virtual string AlgorithmName
+		{
+			get { return cipher.UnderlyingCipher.AlgorithmName + "/EAX"; }
+		}
 
-		public virtual IBlockCipher UnderlyingCipher => cipher;
+		public virtual IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		public virtual int GetBlockSize()
 		{
@@ -100,7 +106,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				throw new ArgumentException("invalid parameters passed to EAX");
 			}
 
-			bufBlock = new byte[forEncryption ? blockSize : (blockSize + macSize)];
+			bufBlock = new byte[forEncryption ? blockSize : blockSize + macSize];
 
 			byte[] tag = new byte[blockSize];
 
@@ -118,7 +124,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			Reset();
 		}
 
-		private void InitCipher()
+		void InitCipher()
 		{
 			if (cipherInitialized)
 			{
@@ -134,7 +140,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			mac.BlockUpdate(tag, 0, blockSize);
 		}
 
-		private void CalculateMac()
+		void CalculateMac()
 		{
 			byte[] outC = new byte[blockSize];
 			mac.DoFinal(outC, 0);
@@ -150,7 +156,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			Reset(true);
 		}
 
-		private void Reset(
+		void Reset(
 			bool clearMac)
 		{
 			cipher.Reset(); // TODO Redundant since the mac will reset it?
@@ -189,7 +195,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		public virtual void ProcessAadBytes(byte[] inBytes, int inOff, int len)
 		{
 			if (cipherInitialized)
+			{
 				throw new InvalidOperationException("AAD data cannot be added after encryption/decryption processing has begun.");
+			}
 
 			mac.BlockUpdate(inBytes, inOff, len);
 		}
@@ -292,7 +300,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			else
 			{
 				if (extra < macSize)
+				{
 					throw new InvalidCipherTextException("data too short");
+				}
 
 				Check.OutputLength(outBytes, outOff, extra - macSize, "output buffer too short");
 
@@ -308,7 +318,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				CalculateMac();
 
 				if (!VerifyMac(bufBlock, extra - macSize))
+				{
 					throw new InvalidCipherTextException("mac check in EAX failed");
+				}
 
 				Reset(false);
 
@@ -456,7 +468,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
             return 0;
         }
 #else
-		private int Process(byte b, byte[] outBytes, int outOff)
+		int Process(byte b, byte[] outBytes, int outOff)
 		{
 			bufBlock[bufOff++] = b;
 
@@ -496,13 +508,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		}
 #endif
 
-		private bool VerifyMac(byte[] mac, int off)
+		bool VerifyMac(byte[] mac, int off)
 		{
 			int nonEqual = 0;
 
 			for (int i = 0; i < macSize; i++)
 			{
-				nonEqual |= (macBlock[i] ^ mac[off + i]);
+				nonEqual |= macBlock[i] ^ mac[off + i];
 			}
 
 			return nonEqual == 0;

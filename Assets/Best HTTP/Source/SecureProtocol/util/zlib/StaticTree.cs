@@ -39,15 +39,15 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 {
-	internal sealed class StaticTree
+	sealed class StaticTree
 	{
-		private const int MAX_BITS = 15;
+		const int MAX_BITS = 15;
 
-		private const int BL_CODES = 19;
-		private const int D_CODES = 30;
-		private const int LITERALS = 256;
-		private const int LENGTH_CODES = 29;
-		private const int L_CODES = (LITERALS + 1 + LENGTH_CODES);
+		const int BL_CODES = 19;
+		const int D_CODES = 30;
+		const int LITERALS = 256;
+		const int LENGTH_CODES = 29;
+		const int L_CODES = LITERALS + 1 + LENGTH_CODES;
 
 		// Bit length codes must not exceed MAX_BL_BITS bits
 		internal const int MAX_BL_BITS = 7;

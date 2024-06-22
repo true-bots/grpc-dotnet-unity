@@ -12,12 +12,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class RipeMD128Digest
 		: GeneralDigest
 	{
-		private const int DigestLength = 16;
+		const int DigestLength = 16;
 
-		private int H0, H1, H2, H3; // IV's
+		int H0, H1, H2, H3; // IV's
 
-		private int[] X = new int[16];
-		private int xOff;
+		int[] X = new int[16];
+		int xOff;
 
 		/**
 		* Standard constructor
@@ -36,7 +36,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			CopyIn(t);
 		}
 
-		private void CopyIn(RipeMD128Digest t)
+		void CopyIn(RipeMD128Digest t)
 		{
 			base.CopyIn(t);
 
@@ -146,7 +146,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rotate int x left n bits.
 		 */
-		private int RL(
+		int RL(
 			int x,
 			int n)
 		{
@@ -160,7 +160,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * F
 		 */
-		private int F1(
+		int F1(
 			int x,
 			int y,
 			int z)
@@ -171,7 +171,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * G
 		 */
-		private int F2(
+		int F2(
 			int x,
 			int y,
 			int z)
@@ -182,7 +182,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * H
 		 */
-		private int F3(
+		int F3(
 			int x,
 			int y,
 			int z)
@@ -193,7 +193,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * I
 		 */
-		private int F4(
+		int F4(
 			int x,
 			int y,
 			int z)
@@ -201,7 +201,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return (x & z) | (y & ~z);
 		}
 
-		private int F1(
+		int F1(
 			int a,
 			int b,
 			int c,
@@ -212,7 +212,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return RL(a + F1(b, c, d) + x, s);
 		}
 
-		private int F2(
+		int F2(
 			int a,
 			int b,
 			int c,
@@ -223,7 +223,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return RL(a + F2(b, c, d) + x + unchecked((int)0x5a827999), s);
 		}
 
-		private int F3(
+		int F3(
 			int a,
 			int b,
 			int c,
@@ -234,7 +234,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return RL(a + F3(b, c, d) + x + unchecked((int)0x6ed9eba1), s);
 		}
 
-		private int F4(
+		int F4(
 			int a,
 			int b,
 			int c,
@@ -245,7 +245,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return RL(a + F4(b, c, d) + x + unchecked((int)0x8f1bbcdc), s);
 		}
 
-		private int FF1(
+		int FF1(
 			int a,
 			int b,
 			int c,
@@ -256,7 +256,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return RL(a + F1(b, c, d) + x, s);
 		}
 
-		private int FF2(
+		int FF2(
 			int a,
 			int b,
 			int c,
@@ -267,7 +267,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return RL(a + F2(b, c, d) + x + unchecked((int)0x6d703ef3), s);
 		}
 
-		private int FF3(
+		int FF3(
 			int a,
 			int b,
 			int c,
@@ -278,7 +278,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return RL(a + F3(b, c, d) + x + unchecked((int)0x5c4dd124), s);
 		}
 
-		private int FF4(
+		int FF4(
 			int a,
 			int b,
 			int c,

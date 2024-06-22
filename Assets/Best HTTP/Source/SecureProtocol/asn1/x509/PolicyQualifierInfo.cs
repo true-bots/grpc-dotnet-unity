@@ -17,8 +17,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class PolicyQualifierInfo
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier policyQualifierId;
-		private readonly Asn1Encodable qualifier;
+		readonly DerObjectIdentifier policyQualifierId;
+		readonly Asn1Encodable qualifier;
 
 		/**
 		 * Creates a new <code>PolicyQualifierInfo</code> instance.
@@ -54,11 +54,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * @param as <code>PolicyQualifierInfo</code> X509 structure
 		 * encoded as an Asn1Sequence.
 		 */
-		private PolicyQualifierInfo(
+		PolicyQualifierInfo(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
 			policyQualifierId = DerObjectIdentifier.GetInstance(seq[0]);
 			qualifier = seq[1];
@@ -68,9 +70,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj is PolicyQualifierInfo)
+			{
 				return (PolicyQualifierInfo)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new PolicyQualifierInfo(Asn1Sequence.GetInstance(obj));
 		}
 

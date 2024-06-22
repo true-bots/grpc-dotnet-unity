@@ -11,9 +11,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 	{
 		public const int Size = 16;
 
-		private const uint M28 = 0x0FFFFFFFU;
+		const uint M28 = 0x0FFFFFFFU;
 
-		private static readonly uint[] P32 = new uint[]
+		static readonly uint[] P32 = new uint[]
 		{
 			0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU,
 			0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFEU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU,
@@ -71,31 +71,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			uint z0 = z[0], z1 = z[1], z2 = z[2], z3 = z[3], z4 = z[4], z5 = z[5], z6 = z[6], z7 = z[7];
 			uint z8 = z[8], z9 = z[9], z10 = z[10], z11 = z[11], z12 = z[12], z13 = z[13], z14 = z[14], z15 = z[15];
 
-			z1 += (z0 >> 28);
+			z1 += z0 >> 28;
 			z0 &= M28;
-			z5 += (z4 >> 28);
+			z5 += z4 >> 28;
 			z4 &= M28;
-			z9 += (z8 >> 28);
+			z9 += z8 >> 28;
 			z8 &= M28;
-			z13 += (z12 >> 28);
+			z13 += z12 >> 28;
 			z12 &= M28;
 
-			z2 += (z1 >> 28);
+			z2 += z1 >> 28;
 			z1 &= M28;
-			z6 += (z5 >> 28);
+			z6 += z5 >> 28;
 			z5 &= M28;
-			z10 += (z9 >> 28);
+			z10 += z9 >> 28;
 			z9 &= M28;
-			z14 += (z13 >> 28);
+			z14 += z13 >> 28;
 			z13 &= M28;
 
-			z3 += (z2 >> 28);
+			z3 += z2 >> 28;
 			z2 &= M28;
-			z7 += (z6 >> 28);
+			z7 += z6 >> 28;
 			z6 &= M28;
-			z11 += (z10 >> 28);
+			z11 += z10 >> 28;
 			z10 &= M28;
-			z15 += (z14 >> 28);
+			z15 += z14 >> 28;
 			z14 &= M28;
 
 			uint t = z15 >> 28;
@@ -103,20 +103,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			z0 += t;
 			z8 += t;
 
-			z4 += (z3 >> 28);
+			z4 += z3 >> 28;
 			z3 &= M28;
-			z8 += (z7 >> 28);
+			z8 += z7 >> 28;
 			z7 &= M28;
-			z12 += (z11 >> 28);
+			z12 += z11 >> 28;
 			z11 &= M28;
 
-			z1 += (z0 >> 28);
+			z1 += z0 >> 28;
 			z0 &= M28;
-			z5 += (z4 >> 28);
+			z5 += z4 >> 28;
 			z4 &= M28;
-			z9 += (z8 >> 28);
+			z9 += z8 >> 28;
 			z8 &= M28;
-			z13 += (z12 >> 28);
+			z13 += z12 >> 28;
 			z12 &= M28;
 
 			z[0] = z0;
@@ -146,7 +146,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			for (int i = 0; i < Size; ++i)
 			{
 				uint z_i = z[zOff + i], diff = z_i ^ x[xOff + i];
-				z_i ^= (diff & MASK);
+				z_i ^= diff & MASK;
 				z[zOff + i] = z_i;
 			}
 		}
@@ -257,18 +257,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Decode224(uint[] x, int xOff, uint[] z, int zOff)
+		static void Decode224(uint[] x, int xOff, uint[] z, int zOff)
 		{
 			uint x0 = x[xOff + 0], x1 = x[xOff + 1], x2 = x[xOff + 2], x3 = x[xOff + 3];
 			uint x4 = x[xOff + 4], x5 = x[xOff + 5], x6 = x[xOff + 6];
 
 			z[zOff + 0] = x0 & M28;
-			z[zOff + 1] = (x0 >> 28 | x1 << 4) & M28;
-			z[zOff + 2] = (x1 >> 24 | x2 << 8) & M28;
-			z[zOff + 3] = (x2 >> 20 | x3 << 12) & M28;
-			z[zOff + 4] = (x3 >> 16 | x4 << 16) & M28;
-			z[zOff + 5] = (x4 >> 12 | x5 << 20) & M28;
-			z[zOff + 6] = (x5 >> 8 | x6 << 24) & M28;
+			z[zOff + 1] = ((x0 >> 28) | (x1 << 4)) & M28;
+			z[zOff + 2] = ((x1 >> 24) | (x2 << 8)) & M28;
+			z[zOff + 3] = ((x2 >> 20) | (x3 << 12)) & M28;
+			z[zOff + 4] = ((x3 >> 16) | (x4 << 16)) & M28;
+			z[zOff + 5] = ((x4 >> 12) | (x5 << 20)) & M28;
+			z[zOff + 6] = ((x5 >> 8) | (x6 << 24)) & M28;
 			z[zOff + 7] = x6 >> 4;
 		}
 
@@ -289,7 +289,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static uint Decode24(byte[] bs, int off)
+		static uint Decode24(byte[] bs, int off)
 		{
 			uint n = bs[off];
 			n |= (uint)bs[++off] << 8;
@@ -307,7 +307,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static uint Decode32(byte[] bs, int off)
+		static uint Decode32(byte[] bs, int off)
 		{
 			uint n = bs[off];
 			n |= (uint)bs[++off] << 8;
@@ -327,7 +327,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Decode56(byte[] bs, int off, uint[] z, int zOff)
+		static void Decode56(byte[] bs, int off, uint[] z, int zOff)
 		{
 			uint lo = Decode32(bs, off);
 			uint hi = Decode24(bs, off + 4);
@@ -385,7 +385,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Encode224(uint[] x, int xOff, uint[] z, int zOff)
+		static void Encode224(uint[] x, int xOff, uint[] z, int zOff)
 		{
 			uint x0 = x[xOff + 0], x1 = x[xOff + 1], x2 = x[xOff + 2], x3 = x[xOff + 3];
 			uint x4 = x[xOff + 4], x5 = x[xOff + 5], x6 = x[xOff + 6], x7 = x[xOff + 7];
@@ -415,9 +415,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Encode24(uint n, byte[] bs, int off)
+		static void Encode24(uint n, byte[] bs, int off)
 		{
-			bs[off] = (byte)(n);
+			bs[off] = (byte)n;
 			bs[++off] = (byte)(n >> 8);
 			bs[++off] = (byte)(n >> 16);
 		}
@@ -431,9 +431,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Encode32(uint n, byte[] bs, int off)
+		static void Encode32(uint n, byte[] bs, int off)
 		{
-			bs[off] = (byte)(n);
+			bs[off] = (byte)n;
 			bs[++off] = (byte)(n >> 8);
 			bs[++off] = (byte)(n >> 16);
 			bs[++off] = (byte)(n >> 24);
@@ -449,7 +449,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Encode56(uint[] x, int xOff, byte[] bs, int off)
+		static void Encode56(uint[] x, int xOff, byte[] bs, int off)
 		{
 			uint lo = x[xOff], hi = x[xOff + 1];
 			Encode32(lo | (hi << 28), bs, off);
@@ -1019,7 +1019,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			}
 		}
 
-		private static void PowPm3d4(uint[] x, uint[] z)
+		static void PowPm3d4(uint[] x, uint[] z)
 		{
 			// z = x^((p-3)/4) = x^(2^446 - 2^222 - 1)
 			// (223 1s) (1 0s) (222 1s)
@@ -1063,7 +1063,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			Mul(t, x222, z);
 		}
 
-		private static void Reduce(uint[] z, int x)
+		static void Reduce(uint[] z, int x)
 		{
 			uint u = z[15], z15 = u & M28;
 			int t = (int)(u >> 28) + x;

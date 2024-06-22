@@ -12,8 +12,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 {
 	public abstract class RsaUtilities
 	{
-		private static readonly byte[] RSAPSSParams_256_A, RSAPSSParams_384_A, RSAPSSParams_512_A;
-		private static readonly byte[] RSAPSSParams_256_B, RSAPSSParams_384_B, RSAPSSParams_512_B;
+		static readonly byte[] RSAPSSParams_256_A, RSAPSSParams_384_A, RSAPSSParams_512_A;
+		static readonly byte[] RSAPSSParams_256_B, RSAPSSParams_384_B, RSAPSSParams_512_B;
 
 		static RsaUtilities()
 		{
@@ -73,7 +73,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 		{
 			DerObjectIdentifier oid = pubKeyAlgID.Algorithm;
 			if (!PkcsObjectIdentifiers.IdRsassaPss.Equals(oid))
+			{
 				return false;
+			}
 
 			/*
 			 * TODO ASN.1 NULL shouldn't really be allowed here; it's a workaround for e.g. Oracle JDK

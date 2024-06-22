@@ -6,15 +6,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class DtlsRequest
 	{
-		private readonly long m_recordSeq;
-		private readonly byte[] m_message;
-		private readonly ClientHello m_clientHello;
+		readonly long m_recordSeq;
+		readonly byte[] m_message;
+		readonly ClientHello m_clientHello;
 
 		internal DtlsRequest(long recordSeq, byte[] message, ClientHello clientHello)
 		{
-			this.m_recordSeq = recordSeq;
-			this.m_message = message;
-			this.m_clientHello = clientHello;
+			m_recordSeq = recordSeq;
+			m_message = message;
+			m_clientHello = clientHello;
 		}
 
 		internal ClientHello ClientHello

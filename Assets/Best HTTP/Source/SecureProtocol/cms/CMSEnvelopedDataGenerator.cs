@@ -44,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		/// Generate an enveloped object that contains a CMS Enveloped Data
 		/// object using the passed in key generator.
 		/// </summary>
-		private CmsEnvelopedData Generate(
+		CmsEnvelopedData Generate(
 			CmsProcessable content,
 			string encryptionOid,
 			CipherKeyGenerator keyGen)
@@ -68,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				cipher.Init(true, new ParametersWithRandom(cipherParameters, m_random));
 
 				MemoryStream bOut = new MemoryStream();
-				using (var cOut = new CipherStream(bOut, null, cipher))
+				using (CipherStream cOut = new CipherStream(bOut, null, cipher))
 				{
 					content.Write(cOut);
 				}
@@ -159,8 +159,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				encKey = (KeyParameter)cipherBuilder.Key;
 
 				MemoryStream collector = new MemoryStream();
-				var cipher = cipherBuilder.BuildCipher(collector);
-				using (var bOut = cipher.Stream)
+				ICipher cipher = cipherBuilder.BuildCipher(collector);
+				using (Stream bOut = cipher.Stream)
 				{
 					content.Write(bOut);
 				}

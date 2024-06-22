@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 	public class X509CertificateEntry
 		: Pkcs12Entry
 	{
-		private readonly X509Certificate cert;
+		readonly X509Certificate cert;
 
 		public X509CertificateEntry(X509Certificate cert)
 			: base(new Dictionary<DerObjectIdentifier, Asn1Encodable>())
@@ -25,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 		public X509Certificate Certificate
 		{
-			get { return this.cert; }
+			get { return cert; }
 		}
 
 		public override bool Equals(object obj)
@@ -33,7 +33,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			X509CertificateEntry other = obj as X509CertificateEntry;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return cert.Equals(other.cert);
 		}

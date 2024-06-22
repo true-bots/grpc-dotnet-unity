@@ -38,20 +38,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public sealed class CertificateRequest
 	{
 		/// <exception cref="IOException"/>
-		private static IList<SignatureAndHashAlgorithm> CheckSupportedSignatureAlgorithms(
+		static IList<SignatureAndHashAlgorithm> CheckSupportedSignatureAlgorithms(
 			IList<SignatureAndHashAlgorithm> supportedSignatureAlgorithms, short alertDescription)
 		{
 			if (null == supportedSignatureAlgorithms)
+			{
 				throw new TlsFatalAlert(alertDescription, "'signature_algorithms' is required");
+			}
 
 			return supportedSignatureAlgorithms;
 		}
 
-		private readonly byte[] m_certificateRequestContext;
-		private readonly short[] m_certificateTypes;
-		private readonly IList<SignatureAndHashAlgorithm> m_supportedSignatureAlgorithms;
-		private readonly IList<SignatureAndHashAlgorithm> m_supportedSignatureAlgorithmsCert;
-		private readonly IList<X509Name> m_certificateAuthorities;
+		readonly byte[] m_certificateRequestContext;
+		readonly short[] m_certificateTypes;
+		readonly IList<SignatureAndHashAlgorithm> m_supportedSignatureAlgorithms;
+		readonly IList<SignatureAndHashAlgorithm> m_supportedSignatureAlgorithmsCert;
+		readonly IList<X509Name> m_certificateAuthorities;
 
 		/// <param name="certificateTypes">see <see cref="ClientCertificateType"/> for valid constants.</param>
 		/// <param name="supportedSignatureAlgorithms"></param>
@@ -78,23 +80,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			 */
 		}
 
-		private CertificateRequest(byte[] certificateRequestContext, short[] certificateTypes,
+		CertificateRequest(byte[] certificateRequestContext, short[] certificateTypes,
 			IList<SignatureAndHashAlgorithm> supportedSignatureAlgorithms,
 			IList<SignatureAndHashAlgorithm> supportedSignatureAlgorithmsCert, IList<X509Name> certificateAuthorities)
 		{
 			if (null != certificateRequestContext && !TlsUtilities.IsValidUint8(certificateRequestContext.Length))
+			{
 				throw new ArgumentException("cannot be longer than 255", "certificateRequestContext");
+			}
+
 			if (null != certificateTypes
 			    && (certificateTypes.Length < 1 || !TlsUtilities.IsValidUint8(certificateTypes.Length)))
 			{
 				throw new ArgumentException("should have length from 1 to 255", "certificateTypes");
 			}
 
-			this.m_certificateRequestContext = TlsUtilities.Clone(certificateRequestContext);
-			this.m_certificateTypes = certificateTypes;
-			this.m_supportedSignatureAlgorithms = supportedSignatureAlgorithms;
-			this.m_supportedSignatureAlgorithmsCert = supportedSignatureAlgorithmsCert;
-			this.m_certificateAuthorities = certificateAuthorities;
+			m_certificateRequestContext = TlsUtilities.Clone(certificateRequestContext);
+			m_certificateTypes = certificateTypes;
+			m_supportedSignatureAlgorithms = supportedSignatureAlgorithms;
+			m_supportedSignatureAlgorithmsCert = supportedSignatureAlgorithmsCert;
+			m_certificateAuthorities = certificateAuthorities;
 		}
 
 		public byte[] GetCertificateRequestContext()
@@ -147,7 +152,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			if (isTlsV13 != (null != m_certificateRequestContext) ||
 			    isTlsV13 != (null == m_certificateTypes) ||
 			    isTlsV12 != (null != m_supportedSignatureAlgorithms) ||
-			    (!isTlsV13 && (null != m_supportedSignatureAlgorithmsCert)))
+			    (!isTlsV13 && null != m_supportedSignatureAlgorithmsCert))
 			{
 				throw new InvalidOperationException();
 			}
@@ -156,7 +161,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				TlsUtilities.WriteOpaque8(m_certificateRequestContext, output);
 
-				var extensions = new Dictionary<int, byte[]>();
+				Dictionary<int, byte[]> extensions = new Dictionary<int, byte[]>();
 				TlsExtensionsUtilities.AddSignatureAlgorithmsExtension(extensions, m_supportedSignatureAlgorithms);
 
 				if (null != m_supportedSignatureAlgorithmsCert)
@@ -190,7 +195,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 			else
 			{
-				var derEncodings = new List<byte[]>(m_certificateAuthorities.Count);
+				List<byte[]> derEncodings = new List<byte[]>(m_certificateAuthorities.Count);
 
 				int totalLength = 0;
 				foreach (X509Name certificateAuthority in m_certificateAuthorities)
@@ -232,14 +237,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 				byte[] extEncoding = TlsUtilities.ReadOpaque16(input);
 
-				var extensions = TlsProtocol.ReadExtensionsData13(HandshakeType.certificate_request, extEncoding);
+				IDictionary<int, byte[]> extensions = TlsProtocol.ReadExtensionsData13(HandshakeType.certificate_request, extEncoding);
 
-				var supportedSignatureAlgorithms13 = CheckSupportedSignatureAlgorithms(
+				IList<SignatureAndHashAlgorithm> supportedSignatureAlgorithms13 = CheckSupportedSignatureAlgorithms(
 					TlsExtensionsUtilities.GetSignatureAlgorithmsExtension(extensions),
 					AlertDescription.missing_extension);
-				var supportedSignatureAlgorithmsCert13 = TlsExtensionsUtilities
+				IList<SignatureAndHashAlgorithm> supportedSignatureAlgorithmsCert13 = TlsExtensionsUtilities
 					.GetSignatureAlgorithmsCertExtension(extensions);
-				var certificateAuthorities13 = TlsExtensionsUtilities.GetCertificateAuthoritiesExtension(extensions);
+				IList<X509Name> certificateAuthorities13 = TlsExtensionsUtilities.GetCertificateAuthoritiesExtension(extensions);
 
 				return new CertificateRequest(certificateRequestContext, supportedSignatureAlgorithms13,
 					supportedSignatureAlgorithmsCert13, certificateAuthorities13);

@@ -16,20 +16,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public class Asn1InputStream
 		: FilterStream
 	{
-		private readonly int limit;
+		readonly int limit;
 
 		internal byte[][] tmpBuffers;
 
 		internal static int FindLimit(Stream input)
 		{
 			if (input is LimitedInputStream limited)
+			{
 				return limited.Limit;
+			}
 
 			if (input is Asn1InputStream asn1)
+			{
 				return asn1.Limit;
+			}
 
 			if (input is MemoryStream memory)
+			{
 				return Convert.ToInt32(memory.Length - memory.Position);
+			}
 
 			return int.MaxValue;
 		}
@@ -78,14 +84,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		/**
 		* build an object given its tag and the number of bytes to construct it from.
 		*/
-		private Asn1Object BuildObject(int tagHdr, int tagNo, int length)
+		Asn1Object BuildObject(int tagHdr, int tagNo, int length)
 		{
 			// TODO[asn1] Special-case zero length first?
 
 			DefiniteLengthInputStream defIn = new DefiniteLengthInputStream(s, length, limit);
 
 			if (0 == (tagHdr & Asn1Tags.Flags))
+			{
 				return CreatePrimitiveDerObject(tagNo, defIn, tmpBuffers);
+			}
 
 			int tagClass = tagHdr & Asn1Tags.Private;
 			if (0 != tagClass)
@@ -127,7 +135,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			Asn1Object o = ReadObject();
 			if (null == o)
+			{
 				return new Asn1EncodableVector(0);
+			}
 
 			Asn1EncodableVector v = new Asn1EncodableVector();
 			do
@@ -142,7 +152,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			int remaining = defIn.Remaining;
 			if (remaining < 1)
+			{
 				return new Asn1EncodableVector(0);
+			}
 
 			return new Asn1InputStream(defIn, remaining, tmpBuffers).ReadVector();
 		}
@@ -163,7 +175,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			if (tagHdr <= 0)
 			{
 				if (tagHdr == 0)
+				{
 					throw new IOException("unexpected end-of-contents marker");
+				}
 
 				return null;
 			}
@@ -187,14 +201,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			// indefinite-length
 
 			if (0 == (tagHdr & Asn1Tags.Constructed))
+			{
 				throw new IOException("indefinite-length primitive encoding encountered");
+			}
 
 			IndefiniteLengthInputStream indIn = new IndefiniteLengthInputStream(s, limit);
 			Asn1StreamParser sp = new Asn1StreamParser(indIn, limit, tmpBuffers);
 
 			int tagClass = tagHdr & Asn1Tags.Private;
 			if (0 != tagClass)
+			{
 				return sp.LoadTaggedIL(tagClass, tagNo);
+			}
 
 			switch (tagNo)
 			{
@@ -222,8 +240,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				DerBitString bitString = contentsElements[i] as DerBitString;
 				if (null == bitString)
+				{
 					throw new Asn1Exception("unknown object encountered in constructed BIT STRING: "
-					                        + Org.BouncyCastle.Utilities.Platform.GetTypeName(contentsElements[i]));
+					                        + Platform.GetTypeName(contentsElements[i]));
+				}
 
 				bitStrings[i] = bitString;
 			}
@@ -239,8 +259,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				Asn1OctetString octetString = contentsElements[i] as Asn1OctetString;
 				if (null == octetString)
+				{
 					throw new Asn1Exception("unknown object encountered in constructed OCTET STRING: "
-					                        + Org.BouncyCastle.Utilities.Platform.GetTypeName(contentsElements[i]));
+					                        + Platform.GetTypeName(contentsElements[i]));
+				}
 
 				octetStrings[i] = octetString;
 			}
@@ -267,7 +289,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				if (b < 31)
 				{
 					if (b < 0)
+					{
 						throw new EndOfStreamException("EOF found inside tag value.");
+					}
 
 					throw new IOException("corrupted stream - high tag number < 31 found");
 				}
@@ -277,18 +301,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				// X.690-0207 8.1.2.4.2
 				// "c) bits 7 to 1 of the first subsequent octet shall not all be zero."
 				if (0 == tagNo)
+				{
 					throw new IOException("corrupted stream - invalid high tag number found");
+				}
 
 				while ((b & 0x80) != 0)
 				{
-					if (((uint)tagNo >> 24) != 0U)
+					if ((uint)tagNo >> 24 != 0U)
+					{
 						throw new IOException("Tag number more than 31 bits");
+					}
 
 					tagNo <<= 7;
 
 					b = s.ReadByte();
 					if (b < 0)
+					{
 						throw new EndOfStreamException("EOF found inside tag value.");
+					}
 
 					tagNo |= b & 0x7f;
 				}
@@ -300,7 +330,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal static int ReadLength(Stream s, int limit, bool isParsing)
 		{
 			int length = s.ReadByte();
-			if (0U == ((uint)length >> 7))
+			if (0U == (uint)length >> 7)
 			{
 				// definite-length short form 
 				return length;
@@ -329,21 +359,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				int octet = s.ReadByte();
 				if (octet < 0)
+				{
 					throw new EndOfStreamException("EOF found reading length");
+				}
 
-				if (((uint)length >> 23) != 0U)
+				if ((uint)length >> 23 != 0U)
+				{
 					throw new IOException("long form definite-length more than 31 bits");
+				}
 
 				length = (length << 8) + octet;
 			} while (++octetsPos < octetsCount);
 
 			if (length >= limit && !isParsing) // after all we must have read at least 1 byte
+			{
 				throw new IOException("corrupted stream - out of bounds length found: " + length + " >= " + limit);
+			}
 
 			return length;
 		}
 
-		private static byte[] GetBuffer(DefiniteLengthInputStream defIn, byte[][] tmpBuffers)
+		static byte[] GetBuffer(DefiniteLengthInputStream defIn, byte[][] tmpBuffers)
 		{
 			int len = defIn.Remaining;
 			if (len >= tmpBuffers.Length)
@@ -362,11 +398,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return buf;
 		}
 
-		private static char[] GetBmpCharBuffer(DefiniteLengthInputStream defIn)
+		static char[] GetBmpCharBuffer(DefiniteLengthInputStream defIn)
 		{
 			int remainingBytes = defIn.Remaining;
 			if (0 != (remainingBytes & 1))
+			{
 				throw new IOException("malformed BMPString encoding encountered");
+			}
 
 			char[] str = new char[remainingBytes / 2];
 			int stringPos = 0;
@@ -375,7 +413,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			while (remainingBytes >= 8)
 			{
 				if (Streams.ReadFully(defIn, buf, 0, 8) != 8)
+				{
 					throw new EndOfStreamException("EOF encountered in middle of BMPString");
+				}
 
 				str[stringPos] = (char)((buf[0] << 8) | (buf[1] & 0xFF));
 				str[stringPos + 1] = (char)((buf[2] << 8) | (buf[3] & 0xFF));
@@ -388,7 +428,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			if (remainingBytes > 0)
 			{
 				if (Streams.ReadFully(defIn, buf, 0, remainingBytes) != remainingBytes)
+				{
 					throw new EndOfStreamException("EOF encountered in middle of BMPString");
+				}
 
 				int bufPos = 0;
 				do
@@ -400,7 +442,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 
 			if (0 != defIn.Remaining || str.Length != stringPos)
+			{
 				throw new InvalidOperationException();
+			}
 
 			return str;
 		}

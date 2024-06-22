@@ -11,8 +11,8 @@ namespace BestHTTP.Decompression
 
 		internal DecompressedData(byte[] data, int length)
 		{
-			this.Data = data;
-			this.Length = length;
+			Data = data;
+			Length = length;
 		}
 	}
 
@@ -33,9 +33,13 @@ namespace BestHTTP.Decompression
                 request.AddHeader("Accept-Encoding", "identity");
 #elif NET_STANDARD_2_1 || UNITY_2021_2_OR_NEWER
 				if (BrotliDecompressor.IsSupported())
+				{
 					request.AddHeader("Accept-Encoding", "br, gzip, identity");
+				}
 				else
+				{
 					request.AddHeader("Accept-Encoding", "gzip, identity");
+				}
 #else
                 request.AddHeader("Accept-Encoding", "gzip, identity");
 #endif
@@ -45,7 +49,9 @@ namespace BestHTTP.Decompression
 		public static IDecompressor GetDecompressor(string encoding, LoggingContext context)
 		{
 			if (encoding == null)
+			{
 				return null;
+			}
 
 			switch (encoding.ToLowerInvariant())
 			{
@@ -53,14 +59,18 @@ namespace BestHTTP.Decompression
 				case "utf-8":
 					break;
 
-				case "gzip": return new Decompression.GZipDecompressor(MinLengthToDecompress);
+				case "gzip": return new GZipDecompressor(MinLengthToDecompress);
 
 #if NET_STANDARD_2_1 || UNITY_2021_2_OR_NEWER
 				case "br":
-					if (Decompression.BrotliDecompressor.IsSupported())
-						return new Decompression.BrotliDecompressor(MinLengthToDecompress);
+					if (BrotliDecompressor.IsSupported())
+					{
+						return new BrotliDecompressor(MinLengthToDecompress);
+					}
 					else
+					{
 						goto default;
+					}
 #endif
 				default:
 					HTTPManager.Logger.Warning("DecompressorFactory", "GetDecompressor - unsupported encoding: " + encoding, context);
@@ -76,16 +86,20 @@ namespace BestHTTP.Decompression
 		public static Stream GetDecoderStream(Stream streamToDecode, string encoding)
 		{
 			if (streamToDecode == null)
+			{
 				throw new ArgumentNullException(nameof(streamToDecode));
+			}
 
 			if (string.IsNullOrEmpty(encoding))
+			{
 				return null;
+			}
 
 			switch (encoding)
 			{
 #if !UNITY_WEBGL || UNITY_EDITOR
-				case "gzip": return new Decompression.Zlib.GZipStream(streamToDecode, Decompression.Zlib.CompressionMode.Decompress);
-				case "deflate": return new Decompression.Zlib.DeflateStream(streamToDecode, Decompression.Zlib.CompressionMode.Decompress);
+				case "gzip": return new Zlib.GZipStream(streamToDecode, Zlib.CompressionMode.Decompress);
+				case "deflate": return new Zlib.DeflateStream(streamToDecode, Zlib.CompressionMode.Decompress);
 #if NET_STANDARD_2_1 || UNITY_2021_2_OR_NEWER
 				case "br": return new System.IO.Compression.BrotliStream(streamToDecode, System.IO.Compression.CompressionMode.Decompress, true);
 #endif

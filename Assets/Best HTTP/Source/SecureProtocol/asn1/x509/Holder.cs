@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		internal readonly IssuerSerial baseCertificateID;
 		internal readonly GeneralNames entityName;
 		internal readonly ObjectDigestInfo objectDigestInfo;
-		private readonly int version;
+		readonly int version;
 
 		public static Holder GetInstance(
 			object obj)
@@ -61,7 +61,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new Holder((Asn1TaggedObject)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -84,7 +84,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 					throw new ArgumentException("unknown tag in Holder");
 			}
 
-			this.version = 0;
+			version = 0;
 		}
 
 		/**
@@ -92,11 +92,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 *
 		 * @param seq The ASN.1 sequence.
 		 */
-		private Holder(
+		Holder(
 			Asn1Sequence seq)
 		{
 			if (seq.Count > 3)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
 			for (int i = 0; i != seq.Count; i++)
 			{
@@ -118,7 +120,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				}
 			}
 
-			this.version = 1;
+			version = 1;
 		}
 
 		public Holder(
@@ -186,7 +188,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			ObjectDigestInfo objectDigestInfo)
 		{
 			this.objectDigestInfo = objectDigestInfo;
-			this.version = 1;
+			version = 1;
 		}
 
 		public IssuerSerial BaseCertificateID

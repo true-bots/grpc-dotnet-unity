@@ -10,9 +10,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class CmsProcessableInputStream
 		: CmsProcessable, CmsReadable
 	{
-		private readonly Stream input;
+		readonly Stream input;
 
-		private bool used = false;
+		bool used = false;
 
 		public CmsProcessableInputStream(Stream input)
 		{
@@ -39,7 +39,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			lock (this)
 			{
 				if (used)
+				{
 					throw new InvalidOperationException("CmsProcessableInputStream can only be used once");
+				}
 
 				used = true;
 			}

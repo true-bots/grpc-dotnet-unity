@@ -3,14 +3,14 @@
 namespace BestHTTP.SocketIO3
 {
 	using System.Collections.Generic;
-	using BestHTTP.PlatformSupport.Memory;
-	using BestHTTP.SocketIO3.Events;
+	using PlatformSupport.Memory;
+	using Events;
 
 	public struct OutgoingPacket
 	{
 		public bool IsBinary
 		{
-			get { return string.IsNullOrEmpty(this.Payload); }
+			get { return string.IsNullOrEmpty(Payload); }
 		}
 
 		public string Payload { get; set; }
@@ -22,10 +22,14 @@ namespace BestHTTP.SocketIO3
 
 		public override string ToString()
 		{
-			if (!string.IsNullOrEmpty(this.Payload))
-				return this.Payload;
+			if (!string.IsNullOrEmpty(Payload))
+			{
+				return Payload;
+			}
 			else
-				return this.PayloadData.ToString();
+			{
+				return PayloadData.ToString();
+			}
 		}
 	}
 
@@ -77,21 +81,25 @@ namespace BestHTTP.SocketIO3
 
 		public IncomingPacket(TransportEventTypes transportEvent, SocketIOEventTypes packetType, string nsp, int id)
 		{
-			this.TransportEvent = transportEvent;
-			this.SocketIOEvent = packetType;
-			this.Namespace = nsp;
-			this.Id = id;
+			TransportEvent = transportEvent;
+			SocketIOEvent = packetType;
+			Namespace = nsp;
+			Id = id;
 
-			this.AttachementCount = 0;
+			AttachementCount = 0;
 			//this.ReceivedAttachements = 0;
-			this.Attachements = null;
+			Attachements = null;
 
-			if (this.SocketIOEvent != SocketIOEventTypes.Unknown)
-				this.EventName = EventNames.GetNameFor(this.SocketIOEvent);
+			if (SocketIOEvent != SocketIOEventTypes.Unknown)
+			{
+				EventName = EventNames.GetNameFor(SocketIOEvent);
+			}
 			else
-				this.EventName = EventNames.GetNameFor(this.TransportEvent);
+			{
+				EventName = EventNames.GetNameFor(TransportEvent);
+			}
 
-			this.DecodedArg = this.DecodedArgs = null;
+			DecodedArg = DecodedArgs = null;
 		}
 
 		/// <summary>
@@ -99,26 +107,28 @@ namespace BestHTTP.SocketIO3
 		/// </summary>
 		public override string ToString()
 		{
-			return string.Format("[Packet {0}{1}/{2},{3}[{4}]]", this.TransportEvent, this.SocketIOEvent, this.Namespace, this.Id, this.EventName);
+			return string.Format("[Packet {0}{1}/{2},{3}[{4}]]", TransportEvent, SocketIOEvent, Namespace, Id, EventName);
 		}
 
 		public override bool Equals(object obj)
 		{
 			if (obj is IncomingPacket)
+			{
 				return Equals((IncomingPacket)obj);
+			}
 
 			return false;
 		}
 
 		public bool Equals(IncomingPacket packet)
 		{
-			return this.TransportEvent == packet.TransportEvent &&
-			       this.SocketIOEvent == packet.SocketIOEvent &&
-			       this.Id == packet.Id &&
-			       this.Namespace == packet.Namespace &&
-			       this.EventName == packet.EventName &&
-			       this.DecodedArg == packet.DecodedArg &&
-			       this.DecodedArgs == packet.DecodedArgs;
+			return TransportEvent == packet.TransportEvent &&
+			       SocketIOEvent == packet.SocketIOEvent &&
+			       Id == packet.Id &&
+			       Namespace == packet.Namespace &&
+			       EventName == packet.EventName &&
+			       DecodedArg == packet.DecodedArg &&
+			       DecodedArgs == packet.DecodedArgs;
 		}
 
 		public override int GetHashCode()
@@ -129,16 +139,24 @@ namespace BestHTTP.SocketIO3
 			hashCode = hashCode * -1521134295 + Id.GetHashCode();
 
 			if (Namespace != null)
+			{
 				hashCode = hashCode * -1521134295 + Namespace.GetHashCode();
+			}
 
 			if (EventName != null)
+			{
 				hashCode = hashCode * -1521134295 + EventName.GetHashCode();
+			}
 
 			if (DecodedArgs != null)
+			{
 				hashCode = hashCode * -1521134295 + DecodedArgs.GetHashCode();
+			}
 
 			if (DecodedArg != null)
+			{
 				hashCode = hashCode * -1521134295 + DecodedArg.GetHashCode();
+			}
 
 			return hashCode;
 		}

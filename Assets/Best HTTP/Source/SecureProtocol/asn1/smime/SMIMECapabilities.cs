@@ -36,7 +36,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Smime
 		public static readonly DerObjectIdentifier DesEde3Cbc = PkcsObjectIdentifiers.DesEde3Cbc;
 		public static readonly DerObjectIdentifier RC2Cbc = PkcsObjectIdentifiers.RC2Cbc;
 
-		private Asn1Sequence capabilities;
+		Asn1Sequence capabilities;
 
 		/**
          * return an Attr object from the given object.
@@ -60,10 +60,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Smime
 			if (obj is AttributeX509)
 			{
 				return new SmimeCapabilities(
-					(Asn1Sequence)(((AttributeX509)obj).AttrValues[0]));
+					(Asn1Sequence)((AttributeX509)obj).AttrValues[0]);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public SmimeCapabilities(
@@ -79,12 +79,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Smime
 		 */
 		public IList<SmimeCapability> GetCapabilitiesForOid(DerObjectIdentifier capability)
 		{
-			var list = new List<SmimeCapability>();
+			List<SmimeCapability> list = new List<SmimeCapability>();
 			DoGetCapabilitiesForOid(capability, list);
 			return list;
 		}
 
-		private void DoGetCapabilitiesForOid(DerObjectIdentifier capability, IList<SmimeCapability> list)
+		void DoGetCapabilitiesForOid(DerObjectIdentifier capability, IList<SmimeCapability> list)
 		{
 			foreach (object o in capabilities)
 			{

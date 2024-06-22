@@ -12,18 +12,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class HkdfParameters
 		: IDerivationParameters
 	{
-		private readonly byte[] ikm;
-		private readonly bool skipExpand;
-		private readonly byte[] salt;
-		private readonly byte[] info;
+		readonly byte[] ikm;
+		readonly bool skipExpand;
+		readonly byte[] salt;
+		readonly byte[] info;
 
-		private HkdfParameters(byte[] ikm, bool skip, byte[] salt, byte[] info)
+		HkdfParameters(byte[] ikm, bool skip, byte[] salt, byte[] info)
 		{
 			if (ikm == null)
+			{
 				throw new ArgumentNullException("ikm");
+			}
 
 			this.ikm = Arrays.Clone(ikm);
-			this.skipExpand = skip;
+			skipExpand = skip;
 
 			if (salt == null || salt.Length == 0)
 			{

@@ -32,7 +32,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Misc
 			this.iv = new DerOctetString(iv);
 		}
 
-		private IdeaCbcPar(
+		IdeaCbcPar(
 			Asn1Sequence seq)
 		{
 			if (seq.Count == 1)

@@ -4,6 +4,7 @@ using BestHTTP.Core;
 using BestHTTP.PlatformSupport.FileSystem;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 
 namespace BestHTTP.Cookies
@@ -14,7 +15,7 @@ namespace BestHTTP.Cookies
 	public static class CookieJar
 	{
 		// Version of the cookie store. It may be used in a future version for maintaining compatibility.
-		private const int Version = 1;
+		const int Version = 1;
 
 		/// <summary>
 		/// Returns true if File apis are supported.
@@ -25,7 +26,9 @@ namespace BestHTTP.Cookies
 			{
 #if !BESTHTTP_DISABLE_COOKIE_SAVE
 				if (IsSupportCheckDone)
+				{
 					return _isSavingSupported;
+				}
 
 				try
 				{
@@ -64,22 +67,22 @@ namespace BestHTTP.Cookies
 		/// <summary>
 		/// List of the Cookies
 		/// </summary>
-		private static List<Cookie> Cookies = new List<Cookie>();
+		static List<Cookie> Cookies = new List<Cookie>();
 
-		private static string CookieFolder { get; set; }
-		private static string LibraryPath { get; set; }
+		static string CookieFolder { get; set; }
+		static string LibraryPath { get; set; }
 
 		/// <summary>
 		/// Synchronization object for thread safety.
 		/// </summary>
-		private static ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+		static ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
 #if !BESTHTTP_DISABLE_COOKIE_SAVE
-		private static bool _isSavingSupported;
-		private static bool IsSupportCheckDone;
+		static bool _isSavingSupported;
+		static bool IsSupportCheckDone;
 #endif
 
-		private static bool Loaded;
+		static bool Loaded;
 
 		#endregion
 
@@ -88,8 +91,10 @@ namespace BestHTTP.Cookies
 		internal static void SetupFolder()
 		{
 #if !BESTHTTP_DISABLE_COOKIE_SAVE
-			if (!CookieJar.IsSavingSupported)
+			if (!IsSavingSupported)
+			{
 				return;
+			}
 
 			try
 			{
@@ -111,16 +116,20 @@ namespace BestHTTP.Cookies
 		internal static bool Set(HTTPResponse response)
 		{
 			if (response == null)
+			{
 				return false;
+			}
 
 			List<Cookie> newCookies = new List<Cookie>();
-			var setCookieHeaders = response.GetHeaderValues("set-cookie");
+			List<string> setCookieHeaders = response.GetHeaderValues("set-cookie");
 
 			// No cookies. :'(
 			if (setCookieHeaders == null)
+			{
 				return false;
+			}
 
-			foreach (var cookieHeader in setCookieHeaders)
+			foreach (string cookieHeader in setCookieHeaders)
 			{
 				Cookie cookie = Cookie.Parse(cookieHeader, response.baseRequest.CurrentUri, response.baseRequest.Context);
 				if (cookie != null)
@@ -129,7 +138,7 @@ namespace BestHTTP.Cookies
 					try
 					{
 						int idx;
-						var old = Find(cookie, out idx);
+						Cookie old = Find(cookie, out idx);
 
 						// if no value for the cookie or already expired then the server asked us to delete the cookie
 						bool expired = string.IsNullOrEmpty(cookie.Value) || !cookie.WillExpireInTheFuture();
@@ -153,7 +162,9 @@ namespace BestHTTP.Cookies
 							}
 						}
 						else if (idx != -1) // delete the cookie
+						{
 							Cookies.RemoveAt(idx);
+						}
 					}
 					catch
 					{
@@ -188,17 +199,20 @@ namespace BestHTTP.Cookies
 
 				for (int i = 0; i < Cookies.Count;)
 				{
-					var cookie = Cookies[i];
+					Cookie cookie = Cookies[i];
 
 					// Remove expired or not used cookies
-					if (!cookie.WillExpireInTheFuture() || (cookie.LastAccess + AccessThreshold) < DateTime.UtcNow)
+					if (!cookie.WillExpireInTheFuture() || cookie.LastAccess + AccessThreshold < DateTime.UtcNow)
 					{
 						Cookies.RemoveAt(i);
 					}
 					else
 					{
 						if (!cookie.IsSession)
+						{
 							size += cookie.GuessSize();
+						}
+
 						i++;
 					}
 				}
@@ -209,7 +223,7 @@ namespace BestHTTP.Cookies
 
 					while (size > HTTPManager.CookieJarSize && Cookies.Count > 0)
 					{
-						var cookie = Cookies[0];
+						Cookie cookie = Cookies[0];
 						Cookies.RemoveAt(0);
 
 						size -= cookie.GuessSize();
@@ -225,7 +239,9 @@ namespace BestHTTP.Cookies
 			}
 
 			if (sendEvent)
+			{
 				PluginEventHelper.EnqueuePluginEvent(new PluginEventInfo(PluginEvents.SaveCookieLibrary));
+			}
 		}
 
 		/// <summary>
@@ -236,10 +252,14 @@ namespace BestHTTP.Cookies
 		{
 #if !BESTHTTP_DISABLE_COOKIE_SAVE
 			if (!IsSavingSupported)
+			{
 				return;
+			}
 
 			if (!Loaded)
+			{
 				return;
+			}
 
 			// Delete any expired cookie
 			Maintain(false);
@@ -248,25 +268,35 @@ namespace BestHTTP.Cookies
 			try
 			{
 				if (!HTTPManager.IOService.DirectoryExists(CookieFolder))
+				{
 					HTTPManager.IOService.DirectoryCreate(CookieFolder);
+				}
 
-				using (var fs = HTTPManager.IOService.CreateFileStream(LibraryPath, FileStreamModes.Create))
-				using (var bw = new System.IO.BinaryWriter(fs))
+				using (Stream fs = HTTPManager.IOService.CreateFileStream(LibraryPath, FileStreamModes.Create))
+				using (BinaryWriter bw = new System.IO.BinaryWriter(fs))
 				{
 					bw.Write(Version);
 
 					// Count how many non-session cookies we have
 					int count = 0;
-					foreach (var cookie in Cookies)
+					foreach (Cookie cookie in Cookies)
+					{
 						if (!cookie.IsSession)
+						{
 							count++;
+						}
+					}
 
 					bw.Write(count);
 
 					// Save only the persistable cookies
-					foreach (var cookie in Cookies)
+					foreach (Cookie cookie in Cookies)
+					{
 						if (!cookie.IsSession)
+						{
 							cookie.SaveTo(bw);
+						}
+					}
 				}
 			}
 			catch
@@ -286,10 +316,14 @@ namespace BestHTTP.Cookies
 		{
 #if !BESTHTTP_DISABLE_COOKIE_SAVE
 			if (!IsSavingSupported)
+			{
 				return;
+			}
 
 			if (Loaded)
+			{
 				return;
+			}
 
 			SetupFolder();
 
@@ -299,13 +333,17 @@ namespace BestHTTP.Cookies
 				Cookies.Clear();
 
 				if (!HTTPManager.IOService.DirectoryExists(CookieFolder))
+				{
 					HTTPManager.IOService.DirectoryCreate(CookieFolder);
+				}
 
 				if (!HTTPManager.IOService.FileExists(LibraryPath))
+				{
 					return;
+				}
 
-				using (var fs = HTTPManager.IOService.CreateFileStream(LibraryPath, FileStreamModes.OpenRead))
-				using (var br = new System.IO.BinaryReader(fs))
+				using (Stream fs = HTTPManager.IOService.CreateFileStream(LibraryPath, FileStreamModes.OpenRead))
+				using (BinaryReader br = new System.IO.BinaryReader(fs))
 				{
 					/*int version = */
 					br.ReadInt32();
@@ -317,7 +355,9 @@ namespace BestHTTP.Cookies
 						cookie.LoadFrom(br);
 
 						if (cookie.WillExpireInTheFuture())
+						{
 							Cookies.Add(cookie);
+						}
 					}
 				}
 			}
@@ -357,7 +397,9 @@ namespace BestHTTP.Cookies
 					    uri.AbsolutePath.StartsWith(cookie.Path))
 					{
 						if (result == null)
+						{
 							result = new List<Cookie>();
+						}
 
 						result.Add(cookie);
 					}
@@ -393,9 +435,13 @@ namespace BestHTTP.Cookies
 				Find(cookie, out idx);
 
 				if (idx >= 0)
+				{
 					Cookies[idx] = cookie;
+				}
 				else
+				{
 					Cookies.Add(cookie);
+				}
 			}
 			finally
 			{
@@ -444,13 +490,17 @@ namespace BestHTTP.Cookies
 			{
 				for (int i = 0; i < Cookies.Count;)
 				{
-					var cookie = Cookies[i];
+					Cookie cookie = Cookies[i];
 
 					// Remove expired or not used cookies
-					if (!cookie.WillExpireInTheFuture() || (cookie.Date + olderThan) < DateTime.UtcNow)
+					if (!cookie.WillExpireInTheFuture() || cookie.Date + olderThan < DateTime.UtcNow)
+					{
 						Cookies.RemoveAt(i);
+					}
 					else
+					{
 						i++;
+					}
 				}
 			}
 			finally
@@ -473,13 +523,17 @@ namespace BestHTTP.Cookies
 			{
 				for (int i = 0; i < Cookies.Count;)
 				{
-					var cookie = Cookies[i];
+					Cookie cookie = Cookies[i];
 
 					// Remove expired or not used cookies
 					if (!cookie.WillExpireInTheFuture() || cookie.Domain.IndexOf(domain) != -1)
+					{
 						Cookies.RemoveAt(i);
+					}
 					else
+					{
 						i++;
+					}
 				}
 			}
 			finally
@@ -499,12 +553,16 @@ namespace BestHTTP.Cookies
 			{
 				for (int i = 0; i < Cookies.Count;)
 				{
-					var cookie = Cookies[i];
+					Cookie cookie = Cookies[i];
 
 					if (cookie.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && uri.Host.IndexOf(cookie.Domain) != -1)
+					{
 						Cookies.RemoveAt(i);
+					}
 					else
+					{
 						i++;
+					}
 				}
 			}
 			finally
@@ -522,7 +580,7 @@ namespace BestHTTP.Cookies
 		/// <summary>
 		/// Find and return a Cookie and his index in the list.
 		/// </summary>
-		private static Cookie Find(Cookie cookie, out int idx)
+		static Cookie Find(Cookie cookie, out int idx)
 		{
 			for (int i = 0; i < Cookies.Count; ++i)
 			{

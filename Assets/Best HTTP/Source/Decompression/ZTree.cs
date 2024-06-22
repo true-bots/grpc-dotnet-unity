@@ -67,7 +67,7 @@ namespace BestHTTP.Decompression.Zlib
 {
 	sealed class ZTree
 	{
-		private static readonly int HEAP_SIZE = (2 * InternalConstants.L_CODES + 1);
+		static readonly int HEAP_SIZE = 2 * InternalConstants.L_CODES + 1;
 
 		// extra bits for each length code
 		internal static readonly int[] ExtraLengthBits = new int[]
@@ -98,7 +98,7 @@ namespace BestHTTP.Decompression.Zlib
 		// see definition of array dist_code below
 		//internal const int DIST_CODE_LEN = 512;
 
-		private static readonly sbyte[] _dist_code = new sbyte[]
+		static readonly sbyte[] _dist_code = new sbyte[]
 		{
 			0, 1, 2, 3, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7,
 			8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9,
@@ -177,7 +177,7 @@ namespace BestHTTP.Decompression.Zlib
 		/// </remarks>
 		internal static int DistanceCode(int dist)
 		{
-			return (dist < 256)
+			return dist < 256
 				? _dist_code[dist]
 				: _dist_code[256 + SharedUtils.URShift(dist, 7)];
 		}
@@ -209,7 +209,9 @@ namespace BestHTTP.Decompression.Zlib
 			int overflow = 0; // number of elements with bit length too large
 
 			for (bits = 0; bits <= InternalConstants.MAX_BITS; bits++)
+			{
 				s.bl_count[bits] = 0;
+			}
 
 			// In a first pass, compute the optimal bit lengths (which may
 			// overflow in the case of the bit length tree).
@@ -229,20 +231,29 @@ namespace BestHTTP.Decompression.Zlib
 				// We overwrite tree[n*2+1] which is no longer needed
 
 				if (n > max_code)
+				{
 					continue; // not a leaf node
+				}
 
 				s.bl_count[bits]++;
 				xbits = 0;
 				if (n >= base_Renamed)
+				{
 					xbits = extra[n - base_Renamed];
+				}
+
 				f = tree[n * 2];
 				s.opt_len += f * (bits + xbits);
 				if (stree != null)
+				{
 					s.static_len += f * (stree[n * 2 + 1] + xbits);
+				}
 			}
 
 			if (overflow == 0)
+			{
 				return;
+			}
 
 			// This happens for example on obj2 and pic of the Calgary corpus
 			// Find the first bit length which could increase:
@@ -250,7 +261,10 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				bits = max_length - 1;
 				while (s.bl_count[bits] == 0)
+				{
 					bits--;
+				}
+
 				s.bl_count[bits]--; // move one leaf down the tree
 				s.bl_count[bits + 1] = (short)(s.bl_count[bits + 1] + 2); // move one overflow item as its brother
 				s.bl_count[max_length]--;
@@ -266,7 +280,10 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					m = s.heap[--h];
 					if (m > max_code)
+					{
 						continue;
+					}
+
 					if (tree[m * 2 + 1] != bits)
 					{
 						s.opt_len = (int)(s.opt_len + ((long)bits - (long)tree[m * 2 + 1]) * (long)tree[m * 2]);
@@ -318,12 +335,14 @@ namespace BestHTTP.Decompression.Zlib
 			// two codes of non zero frequency.
 			while (s.heap_len < 2)
 			{
-				node = s.heap[++s.heap_len] = (max_code < 2 ? ++max_code : 0);
+				node = s.heap[++s.heap_len] = max_code < 2 ? ++max_code : 0;
 				tree[node * 2] = 1;
 				s.depth[node] = 0;
 				s.opt_len--;
 				if (stree != null)
+				{
 					s.static_len -= stree[node * 2 + 1];
+				}
 				// node is 0 or 1 so it does not have extra bits
 			}
 
@@ -333,7 +352,9 @@ namespace BestHTTP.Decompression.Zlib
 			// establish sub-heaps of increasing lengths:
 
 			for (n = s.heap_len / 2; n >= 1; n--)
+			{
 				s.pqdownheap(tree, n);
+			}
 
 			// Construct the Huffman tree by repeatedly combining the least two
 			// frequent nodes.
@@ -352,7 +373,7 @@ namespace BestHTTP.Decompression.Zlib
 
 				// Create a new node father of n and m
 				tree[node * 2] = unchecked((short)(tree[n * 2] + tree[m * 2]));
-				s.depth[node] = (sbyte)(System.Math.Max((byte)s.depth[n], (byte)s.depth[m]) + 1);
+				s.depth[node] = (sbyte)(Math.Max((byte)s.depth[n], (byte)s.depth[m]) + 1);
 				tree[n * 2 + 1] = tree[m * 2 + 1] = (short)node;
 
 				// and insert the new node in the heap
@@ -387,10 +408,12 @@ namespace BestHTTP.Decompression.Zlib
 			// The distribution counts are first used to generate the code values
 			// without bit reversal.
 			for (bits = 1; bits <= InternalConstants.MAX_BITS; bits++)
+			{
 				unchecked
 				{
 					next_code[bits] = code = (short)((code + bl_count[bits - 1]) << 1);
 				}
+			}
 
 			// Check that the bit counts in bl_count are consistent. The last code
 			// must be all ones.
@@ -402,9 +425,12 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				int len = tree[n * 2 + 1];
 				if (len == 0)
+				{
 					continue;
+				}
+
 				// Now reverse the bits
-				tree[n * 2] = unchecked((short)(bi_reverse(next_code[len]++, len)));
+				tree[n * 2] = unchecked((short)bi_reverse(next_code[len]++, len));
 			}
 		}
 

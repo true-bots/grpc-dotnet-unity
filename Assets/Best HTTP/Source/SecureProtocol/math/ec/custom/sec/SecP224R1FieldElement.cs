@@ -8,7 +8,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP224R1FieldElement
+	class SecP224R1FieldElement
 		: AbstractFpFieldElement
 	{
 		public static readonly BigInteger Q = new BigInteger(1,
@@ -19,14 +19,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public SecP224R1FieldElement(BigInteger x)
 		{
 			if (x == null || x.SignValue < 0 || x.CompareTo(Q) >= 0)
+			{
 				throw new ArgumentException("value invalid for SecP224R1FieldElement", "x");
+			}
 
 			this.x = SecP224R1Field.FromBigInteger(x);
 		}
 
 		public SecP224R1FieldElement()
 		{
-			this.x = Nat224.Create();
+			x = Nat224.Create();
 		}
 
 		protected internal SecP224R1FieldElement(uint[] x)
@@ -128,9 +130,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		 */
 		public override ECFieldElement Sqrt()
 		{
-			uint[] c = this.x;
+			uint[] c = x;
 			if (Nat224.IsZero(c) || Nat224.IsOne(c))
+			{
 				return this;
+			}
 
 			uint[] nc = Nat224.Create();
 			SecP224R1Field.Negate(c, nc);
@@ -139,7 +143,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			uint[] t = Nat224.Create();
 
 			if (!IsSquare(c))
+			{
 				return null;
+			}
 
 			while (!TrySqrt(nc, r, t))
 			{
@@ -164,9 +170,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public virtual bool Equals(SecP224R1FieldElement other)
 		{
 			if (this == other)
+			{
 				return true;
+			}
+
 			if (null == other)
+			{
 				return false;
+			}
+
 			return Nat224.Eq(x, other.x);
 		}
 
@@ -175,7 +187,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			return Q.GetHashCode() ^ Arrays.GetHashCode(x, 0, 7);
 		}
 
-		private static bool IsSquare(uint[] x)
+		static bool IsSquare(uint[] x)
 		{
 			uint[] t1 = Nat224.Create();
 			uint[] t2 = Nat224.Create();
@@ -192,7 +204,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			return Nat224.IsOne(t1);
 		}
 
-		private static void RM(uint[] nc, uint[] d0, uint[] e0, uint[] d1, uint[] e1, uint[] f1, uint[] t)
+		static void RM(uint[] nc, uint[] d0, uint[] e0, uint[] d1, uint[] e1, uint[] f1, uint[] t)
 		{
 			SecP224R1Field.Multiply(e1, e0, t);
 			SecP224R1Field.Multiply(t, nc, t);
@@ -206,7 +218,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			SecP224R1Field.Multiply(f1, nc, f1);
 		}
 
-		private static void RP(uint[] nc, uint[] d1, uint[] e1, uint[] f1, uint[] t)
+		static void RP(uint[] nc, uint[] d1, uint[] e1, uint[] f1, uint[] t)
 		{
 			Nat224.Copy(nc, f1);
 
@@ -228,7 +240,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			}
 		}
 
-		private static void RS(uint[] d, uint[] e, uint[] f, uint[] t)
+		static void RS(uint[] d, uint[] e, uint[] f, uint[] t)
 		{
 			SecP224R1Field.Multiply(e, d, e);
 			SecP224R1Field.Twice(e, e);
@@ -239,7 +251,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			SecP224R1Field.Reduce32(c, f);
 		}
 
-		private static bool TrySqrt(uint[] nc, uint[] r, uint[] t)
+		static bool TrySqrt(uint[] nc, uint[] r, uint[] t)
 		{
 			uint[] d1 = Nat224.Create();
 			Nat224.Copy(r, d1);

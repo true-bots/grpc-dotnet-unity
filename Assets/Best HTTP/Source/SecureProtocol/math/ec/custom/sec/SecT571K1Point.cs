@@ -5,7 +5,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecT571K1Point
+	class SecT571K1Point
 		: AbstractF2mPoint
 	{
 		internal SecT571K1Point(ECCurve curve, ECFieldElement x, ECFieldElement y)
@@ -20,7 +20,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 
 		protected override ECPoint Detach()
 		{
-			return new SecT571K1Point(null, this.AffineXCoord, this.AffineYCoord);
+			return new SecT571K1Point(null, AffineXCoord, AffineYCoord);
 		}
 
 		public override ECFieldElement YCoord
@@ -29,8 +29,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			{
 				ECFieldElement X = RawXCoord, L = RawYCoord;
 
-				if (this.IsInfinity || X.IsZero)
+				if (IsInfinity || X.IsZero)
+				{
 					return L;
+				}
 
 				// Y is actually Lambda (X + Y/X) here; convert to affine value on the fly
 				ECFieldElement Y = L.Add(X).Multiply(X);
@@ -49,11 +51,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		{
 			get
 			{
-				ECFieldElement X = this.RawXCoord;
+				ECFieldElement X = RawXCoord;
 				if (X.IsZero)
+				{
 					return false;
+				}
 
-				ECFieldElement Y = this.RawYCoord;
+				ECFieldElement Y = RawYCoord;
 
 				// Y is actually Lambda (X + Y/X) here
 				return Y.TestBitZero() != X.TestBitZero();
@@ -62,25 +66,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 
 		public override ECPoint Add(ECPoint b)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return b;
+			}
+
 			if (b.IsInfinity)
+			{
 				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			SecT571FieldElement X1 = (SecT571FieldElement)this.RawXCoord;
+			SecT571FieldElement X1 = (SecT571FieldElement)RawXCoord;
 			SecT571FieldElement X2 = (SecT571FieldElement)b.RawXCoord;
 
 			if (X1.IsZero)
 			{
 				if (X2.IsZero)
+				{
 					return curve.Infinity;
+				}
 
 				return b.Add(this);
 			}
 
-			SecT571FieldElement L1 = (SecT571FieldElement)this.RawYCoord, Z1 = (SecT571FieldElement)this.RawZCoords[0];
+			SecT571FieldElement L1 = (SecT571FieldElement)RawYCoord, Z1 = (SecT571FieldElement)RawZCoords[0];
 			SecT571FieldElement L2 = (SecT571FieldElement)b.RawYCoord, Z2 = (SecT571FieldElement)b.RawZCoords[0];
 
 			ulong[] t1 = Nat576.Create64();
@@ -123,7 +134,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			if (Nat576.IsZero64(B))
 			{
 				if (Nat576.IsZero64(A))
+				{
 					return Twice();
+				}
 
 				return curve.Infinity;
 			}
@@ -132,7 +145,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			if (X2.IsZero)
 			{
 				// TODO This can probably be optimized quite a bit
-				ECPoint p = this.Normalize();
+				ECPoint p = Normalize();
 				X1 = (SecT571FieldElement)p.XCoord;
 				ECFieldElement Y1 = p.YCoord;
 
@@ -200,19 +213,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 
 		public override ECPoint Twice()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			ECFieldElement X1 = this.RawXCoord;
+			ECFieldElement X1 = RawXCoord;
 			if (X1.IsZero)
 			{
 				// A point with X == 0 is its own additive inverse
 				return curve.Infinity;
 			}
 
-			ECFieldElement L1 = this.RawYCoord, Z1 = this.RawZCoords[0];
+			ECFieldElement L1 = RawYCoord, Z1 = RawZCoords[0];
 
 			bool Z1IsOne = Z1.IsOne;
 			ECFieldElement Z1Sq = Z1IsOne ? Z1 : Z1.Square();
@@ -243,14 +258,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 
 		public override ECPoint TwicePlus(ECPoint b)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return b;
+			}
+
 			if (b.IsInfinity)
+			{
 				return Twice();
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			ECFieldElement X1 = this.RawXCoord;
+			ECFieldElement X1 = RawXCoord;
 			if (X1.IsZero)
 			{
 				// A point with X == 0 is its own additive inverse
@@ -264,7 +284,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 				return Twice().Add(b);
 			}
 
-			ECFieldElement L1 = this.RawYCoord, Z1 = this.RawZCoords[0];
+			ECFieldElement L1 = RawYCoord, Z1 = RawZCoords[0];
 			ECFieldElement L2 = b.RawYCoord;
 
 			ECFieldElement X1Sq = X1.Square();
@@ -281,7 +301,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			if (B.IsZero)
 			{
 				if (A.IsZero)
+				{
 					return b.Twice();
+				}
 
 				return curve.Infinity;
 			}
@@ -300,15 +322,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 
 		public override ECPoint Negate()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
-			ECFieldElement X = this.RawXCoord;
+			ECFieldElement X = RawXCoord;
 			if (X.IsZero)
+			{
 				return this;
+			}
 
 			// L is actually Lambda (X + Y/X) here
-			ECFieldElement L = this.RawYCoord, Z = this.RawZCoords[0];
+			ECFieldElement L = RawYCoord, Z = RawZCoords[0];
 			return new SecT571K1Point(Curve, X, L.Add(Z), new ECFieldElement[] { Z });
 		}
 	}

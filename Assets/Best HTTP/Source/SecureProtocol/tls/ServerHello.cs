@@ -9,18 +9,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class ServerHello
 	{
-		private static readonly byte[] HelloRetryRequestMagic =
+		static readonly byte[] HelloRetryRequestMagic =
 		{
 			0xCF, 0x21, 0xAD, 0x74, 0xE5, 0x9A, 0x61, 0x11, 0xBE,
 			0x1D, 0x8C, 0x02, 0x1E, 0x65, 0xB8, 0x91, 0xC2, 0xA2, 0x11, 0x16, 0x7A, 0xBB, 0x8C, 0x5E, 0x07, 0x9E, 0x09,
 			0xE2, 0xC8, 0xA8, 0x33, 0x9C
 		};
 
-		private readonly ProtocolVersion m_version;
-		private readonly byte[] m_random;
-		private readonly byte[] m_sessionID;
-		private readonly int m_cipherSuite;
-		private readonly IDictionary<int, byte[]> m_extensions;
+		readonly ProtocolVersion m_version;
+		readonly byte[] m_random;
+		readonly byte[] m_sessionID;
+		readonly int m_cipherSuite;
+		readonly IDictionary<int, byte[]> m_extensions;
 
 		public ServerHello(byte[] sessionID, int cipherSuite, IDictionary<int, byte[]> extensions)
 			: this(ProtocolVersion.TLSv12, Arrays.Clone(HelloRetryRequestMagic), sessionID, cipherSuite, extensions)
@@ -30,11 +30,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public ServerHello(ProtocolVersion version, byte[] random, byte[] sessionID, int cipherSuite,
 			IDictionary<int, byte[]> extensions)
 		{
-			this.m_version = version;
-			this.m_random = random;
-			this.m_sessionID = sessionID;
-			this.m_cipherSuite = cipherSuite;
-			this.m_extensions = extensions;
+			m_version = version;
+			m_random = random;
+			m_sessionID = sessionID;
+			m_cipherSuite = cipherSuite;
+			m_extensions = extensions;
 		}
 
 		public int CipherSuite
@@ -102,9 +102,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			short compressionMethod = TlsUtilities.ReadUint8(input);
 			if (CompressionMethod.cls_null != compressionMethod)
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
-			var extensions = TlsProtocol.ReadExtensions(input);
+			IDictionary<int, byte[]> extensions = TlsProtocol.ReadExtensions(input);
 
 			return new ServerHello(version, random, sessionID, cipherSuite, extensions);
 		}

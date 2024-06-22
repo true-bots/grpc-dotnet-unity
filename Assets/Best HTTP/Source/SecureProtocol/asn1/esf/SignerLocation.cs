@@ -20,9 +20,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class SignerLocation
 		: Asn1Encodable
 	{
-		private DirectoryString countryName;
-		private DirectoryString localityName;
-		private Asn1Sequence postalAddress;
+		DirectoryString countryName;
+		DirectoryString localityName;
+		Asn1Sequence postalAddress;
 
 		public SignerLocation(Asn1Sequence seq)
 		{
@@ -31,16 +31,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 				switch (obj.TagNo)
 				{
 					case 0:
-						this.countryName = DirectoryString.GetInstance(obj, true);
+						countryName = DirectoryString.GetInstance(obj, true);
 						break;
 					case 1:
-						this.localityName = DirectoryString.GetInstance(obj, true);
+						localityName = DirectoryString.GetInstance(obj, true);
 						break;
 					case 2:
 						bool isExplicit = obj.IsExplicit(); // handle erroneous implicitly tagged sequences
-						this.postalAddress = Asn1Sequence.GetInstance(obj, isExplicit);
+						postalAddress = Asn1Sequence.GetInstance(obj, isExplicit);
 						if (postalAddress != null && postalAddress.Count > 6)
+						{
 							throw new ArgumentException("postal address must contain less than 6 strings");
+						}
+
 						break;
 					default:
 						throw new ArgumentException("illegal tag");
@@ -48,13 +51,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			}
 		}
 
-		private SignerLocation(
+		SignerLocation(
 			DirectoryString countryName,
 			DirectoryString localityName,
 			Asn1Sequence postalAddress)
 		{
 			if (postalAddress != null && postalAddress.Count > 6)
+			{
 				throw new ArgumentException("postal address must contain less than 6 strings");
+			}
 
 			this.countryName = countryName;
 			this.localityName = localityName;
@@ -80,7 +85,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		public static SignerLocation GetInstance(object obj)
 		{
 			if (obj == null || obj is SignerLocation)
+			{
 				return (SignerLocation)obj;
+			}
 
 			return new SignerLocation(Asn1Sequence.GetInstance(obj));
 		}
@@ -98,7 +105,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		public DirectoryString[] GetPostal()
 		{
 			if (postalAddress == null)
+			{
 				return null;
+			}
 
 			DirectoryString[] dirStrings = new DirectoryString[postalAddress.Count];
 			for (int i = 0; i != dirStrings.Length; i++)

@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerGraphicString), Asn1Tags.GraphicString)
+			Meta() : base(typeof(DerGraphicString), Asn1Tags.GraphicString)
 			{
 			}
 
@@ -33,16 +33,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerGraphicString GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerGraphicString derGraphicString)
+			{
 				return derGraphicString;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerGraphicString converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -56,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -72,7 +78,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (DerGraphicString)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly byte[] m_contents;
+		readonly byte[] m_contents;
 
 		public DerGraphicString(byte[] contents)
 			: this(contents, true)
@@ -82,9 +88,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal DerGraphicString(byte[] contents, bool clone)
 		{
 			if (null == contents)
+			{
 				throw new ArgumentNullException("contents");
+			}
 
-			this.m_contents = clone ? Arrays.Clone(contents) : contents;
+			m_contents = clone ? Arrays.Clone(contents) : contents;
 		}
 
 		public override string GetString()
@@ -116,7 +124,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			DerGraphicString that = asn1Object as DerGraphicString;
 			return null != that
-			       && Arrays.AreEqual(this.m_contents, that.m_contents);
+			       && Arrays.AreEqual(m_contents, that.m_contents);
 		}
 
 		internal static DerGraphicString CreatePrimitive(byte[] contents)

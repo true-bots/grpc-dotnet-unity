@@ -29,18 +29,18 @@ namespace BestHTTP.SignalR.Authentication
 
 		#region Privates
 
-		private HTTPRequest AuthRequest;
-		private Cookie Cookie;
+		HTTPRequest AuthRequest;
+		Cookie Cookie;
 
 		#endregion
 
 		public SampleCookieAuthentication(Uri authUri, string user, string passwd, string roles)
 		{
-			this.AuthUri = authUri;
-			this.UserName = user;
-			this.Password = passwd;
-			this.UserRoles = roles;
-			this.IsPreAuthRequired = true;
+			AuthUri = authUri;
+			UserName = user;
+			Password = passwd;
+			UserRoles = roles;
+			IsPreAuthRequired = true;
 		}
 
 		#region IAuthenticationProvider Implementation
@@ -86,20 +86,26 @@ namespace BestHTTP.SignalR.Authentication
 							HTTPManager.Logger.Information("CookieAuthentication", "Auth. Cookie found!");
 
 							if (OnAuthenticationSucceded != null)
+							{
 								OnAuthenticationSucceded(this);
+							}
 
 							// return now, all other paths are authentication failures
 							return;
 						}
 						else
+						{
 							HTTPManager.Logger.Warning("CookieAuthentication", failReason = "Auth. Cookie NOT found!");
+						}
 					}
 					else
+					{
 						HTTPManager.Logger.Warning("CookieAuthentication", failReason = string.Format(
 							"Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText));
+					}
 
 					break;
 
@@ -107,7 +113,7 @@ namespace BestHTTP.SignalR.Authentication
 				case HTTPRequestStates.Error:
 					HTTPManager.Logger.Warning("CookieAuthentication",
 						failReason = "Request Finished with Error! " +
-						             (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception"));
+						             (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception"));
 					break;
 
 				// The request aborted, initiated by the user.
@@ -127,7 +133,9 @@ namespace BestHTTP.SignalR.Authentication
 			}
 
 			if (OnAuthenticationFailed != null)
+			{
 				OnAuthenticationFailed(this, failReason);
+			}
 		}
 
 		#endregion

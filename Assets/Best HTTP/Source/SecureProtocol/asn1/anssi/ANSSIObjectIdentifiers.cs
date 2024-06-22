@@ -6,7 +6,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Anssi
 {
 	public sealed class AnssiObjectIdentifiers
 	{
-		private AnssiObjectIdentifiers()
+		AnssiObjectIdentifiers()
 		{
 		}
 

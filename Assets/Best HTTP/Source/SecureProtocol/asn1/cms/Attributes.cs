@@ -7,9 +7,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class Attributes
 		: Asn1Encodable
 	{
-		private readonly Asn1Set attributes;
+		readonly Asn1Set attributes;
 
-		private Attributes(Asn1Set attributes)
+		Attributes(Asn1Set attributes)
 		{
 			this.attributes = attributes;
 		}
@@ -22,10 +22,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public static Attributes GetInstance(object obj)
 		{
 			if (obj is Attributes)
+			{
 				return (Attributes)obj;
+			}
 
 			if (obj != null)
+			{
 				return new Attributes(Asn1Set.GetInstance(obj));
+			}
 
 			return null;
 		}

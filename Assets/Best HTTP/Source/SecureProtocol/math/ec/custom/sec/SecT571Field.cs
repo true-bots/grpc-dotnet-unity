@@ -11,11 +11,11 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecT571Field
+	class SecT571Field
 	{
-		private const ulong M59 = ulong.MaxValue >> 5;
+		const ulong M59 = ulong.MaxValue >> 5;
 
-		private static readonly ulong[] ROOT_Z = new ulong[]
+		static readonly ulong[] ROOT_Z = new ulong[]
 		{
 			0x2BE1195F08CAFB99UL, 0x95F08CAF84657C23UL,
 			0xCAF84657C232BE11UL, 0x657C232BE1195F08UL, 0xF84657C2308CAF84UL, 0x7C232BE1195F08CAUL,
@@ -27,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			Nat.Xor64(9, x, y, z);
 		}
 
-		private static void Add(ulong[] x, int xOff, ulong[] y, int yOff, ulong[] z, int zOff)
+		static void Add(ulong[] x, int xOff, ulong[] y, int yOff, ulong[] z, int zOff)
 		{
 			Nat.Xor64(9, x, xOff, y, yOff, z, zOff);
 		}
@@ -40,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			}
 		}
 
-		private static void AddBothTo(ulong[] x, int xOff, ulong[] y, int yOff, ulong[] z, int zOff)
+		static void AddBothTo(ulong[] x, int xOff, ulong[] y, int yOff, ulong[] z, int zOff)
 		{
 			for (int i = 0; i < 9; ++i)
 			{
@@ -62,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			}
 		}
 
-		private static void AddTo(ulong[] x, ulong[] z)
+		static void AddTo(ulong[] x, ulong[] z)
 		{
 			Nat.XorTo64(9, x, z);
 		}
@@ -90,7 +90,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public static void Invert(ulong[] x, ulong[] z)
 		{
 			if (Nat576.IsZero64(x))
+			{
 				throw new InvalidOperationException();
+			}
 
 			// Itoh-Tsujii inversion with bases { 2, 3, 5 }
 
@@ -448,15 +450,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			ulong g,
 				h = 0,
 				l = u[j & 15]
-				    ^ u[(j >> 4) & 15] << 4;
+				    ^ (u[(j >> 4) & 15] << 4);
 			int k = 56;
 			do
 			{
 				j = (uint)(x >> k);
 				g = u[j & 15]
-				    ^ u[(j >> 4) & 15] << 4;
-				l ^= (g << k);
-				h ^= (g >> -k);
+				    ^ (u[(j >> 4) & 15] << 4);
+				l ^= g << k;
+				h ^= g >> -k;
 			} while ((k -= 8) > 0);
 
 			for (int p = 0; p < 7; ++p)

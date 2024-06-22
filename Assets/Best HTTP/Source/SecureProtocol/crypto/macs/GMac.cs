@@ -17,8 +17,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class GMac
 		: IMac
 	{
-		private readonly GcmBlockCipher cipher;
-		private readonly int macSizeBits;
+		readonly GcmBlockCipher cipher;
+		readonly int macSizeBits;
 
 		/// <summary>
 		/// Creates a GMAC based on the operation of a block cipher in GCM mode.

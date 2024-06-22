@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class TlsSrpKeyExchange
 		: AbstractTlsKeyExchange
 	{
-		private static int CheckKeyExchange(int keyExchange)
+		static int CheckKeyExchange(int keyExchange)
 		{
 			switch (keyExchange)
 			{
@@ -41,36 +41,42 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public TlsSrpKeyExchange(int keyExchange, TlsSrpIdentity srpIdentity, TlsSrpConfigVerifier srpConfigVerifier)
 			: base(CheckKeyExchange(keyExchange))
 		{
-			this.m_srpIdentity = srpIdentity;
-			this.m_srpConfigVerifier = srpConfigVerifier;
+			m_srpIdentity = srpIdentity;
+			m_srpConfigVerifier = srpConfigVerifier;
 		}
 
 		public TlsSrpKeyExchange(int keyExchange, TlsSrpLoginParameters srpLoginParameters)
 			: base(CheckKeyExchange(keyExchange))
 		{
-			this.m_srpLoginParameters = srpLoginParameters;
+			m_srpLoginParameters = srpLoginParameters;
 		}
 
 		public override void SkipServerCredentials()
 		{
 			if (m_keyExchange != KeyExchangeAlgorithm.SRP)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 		}
 
 		public override void ProcessServerCredentials(TlsCredentials serverCredentials)
 		{
 			if (m_keyExchange == KeyExchangeAlgorithm.SRP)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
-			this.m_serverCredentials = TlsUtilities.RequireSignerCredentials(serverCredentials);
+			m_serverCredentials = TlsUtilities.RequireSignerCredentials(serverCredentials);
 		}
 
 		public override void ProcessServerCertificate(Certificate serverCertificate)
 		{
 			if (m_keyExchange == KeyExchangeAlgorithm.SRP)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
-			this.m_serverCertificate = serverCertificate.GetCertificateAt(0);
+			m_serverCertificate = serverCertificate.GetCertificateAt(0);
 		}
 
 		public override bool RequiresServerKeyExchange
@@ -82,7 +88,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			TlsSrpConfig config = m_srpLoginParameters.Config;
 
-			this.m_srpServer = m_context.Crypto.CreateSrp6Server(config, m_srpLoginParameters.Verifier);
+			m_srpServer = m_context.Crypto.CreateSrp6Server(config, m_srpLoginParameters.Verifier);
 
 			BigInteger B = m_srpServer.GenerateServerCredentials();
 
@@ -124,16 +130,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			config.SetExplicitNG(new BigInteger[] { srpParams.N, srpParams.G });
 
 			if (!m_srpConfigVerifier.Accept(config))
+			{
 				throw new TlsFatalAlert(AlertDescription.insufficient_security);
+			}
 
-			this.m_srpSalt = srpParams.S;
+			m_srpSalt = srpParams.S;
 
 			/*
 			 * RFC 5054 2.5.3: The client MUST abort the handshake with an "illegal_parameter" alert if
 			 * B % N = 0.
 			 */
-			this.m_srpPeerCredentials = ValidatePublicValue(srpParams.N, srpParams.B);
-			this.m_srpClient = m_context.Crypto.CreateSrp6Client(config);
+			m_srpPeerCredentials = ValidatePublicValue(srpParams.N, srpParams.B);
+			m_srpClient = m_context.Crypto.CreateSrp6Client(config);
 		}
 
 		public override void ProcessClientCredentials(TlsCredentials clientCredentials)
@@ -158,7 +166,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			 * RFC 5054 2.5.4: The server MUST abort the handshake with an "illegal_parameter" alert if
 			 * A % N = 0.
 			 */
-			this.m_srpPeerCredentials = ValidatePublicValue(m_srpLoginParameters.Config.GetExplicitNG()[0],
+			m_srpPeerCredentials = ValidatePublicValue(m_srpLoginParameters.Config.GetExplicitNG()[0],
 				TlsSrpUtilities.ReadSrpParameter(input));
 
 			m_context.SecurityParameters.m_srpIdentity = Arrays.Clone(m_srpLoginParameters.Identity);
@@ -180,7 +188,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			// Check that val % N != 0
 			if (val.Equals(BigInteger.Zero))
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			return val;
 		}

@@ -9,16 +9,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class DsaPublicBcpgKey
 		: BcpgObject, IBcpgKey
 	{
-		private readonly MPInteger p, q, g, y;
+		readonly MPInteger p, q, g, y;
 
 		/// <param name="bcpgIn">The stream to read the packet from.</param>
 		public DsaPublicBcpgKey(
 			BcpgInputStream bcpgIn)
 		{
-			this.p = new MPInteger(bcpgIn);
-			this.q = new MPInteger(bcpgIn);
-			this.g = new MPInteger(bcpgIn);
-			this.y = new MPInteger(bcpgIn);
+			p = new MPInteger(bcpgIn);
+			q = new MPInteger(bcpgIn);
+			g = new MPInteger(bcpgIn);
+			y = new MPInteger(bcpgIn);
 		}
 
 		public DsaPublicBcpgKey(

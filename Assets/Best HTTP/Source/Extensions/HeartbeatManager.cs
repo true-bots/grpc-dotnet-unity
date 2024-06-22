@@ -16,11 +16,11 @@ namespace BestHTTP.Extensions
 	/// </summary>
 	public sealed class HeartbeatManager
 	{
-		private ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+		ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
-		private List<IHeartbeat> Heartbeats = new List<IHeartbeat>();
-		private IHeartbeat[] UpdateArray;
-		private DateTime LastUpdate = DateTime.MinValue;
+		List<IHeartbeat> Heartbeats = new List<IHeartbeat>();
+		IHeartbeat[] UpdateArray;
+		DateTime LastUpdate = DateTime.MinValue;
 
 		public void Subscribe(IHeartbeat heartbeat)
 		{
@@ -28,7 +28,9 @@ namespace BestHTTP.Extensions
 			try
 			{
 				if (!Heartbeats.Contains(heartbeat))
+				{
 					Heartbeats.Add(heartbeat);
+				}
 			}
 			finally
 			{
@@ -52,7 +54,9 @@ namespace BestHTTP.Extensions
 		public void Update()
 		{
 			if (LastUpdate == DateTime.MinValue)
+			{
 				LastUpdate = DateTime.UtcNow;
+			}
 			else
 			{
 				TimeSpan dif = DateTime.UtcNow - LastUpdate;
@@ -64,7 +68,9 @@ namespace BestHTTP.Extensions
 				try
 				{
 					if (UpdateArray == null || UpdateArray.Length < Heartbeats.Count)
+					{
 						Array.Resize(ref UpdateArray, Heartbeats.Count);
+					}
 
 					Heartbeats.CopyTo(0, UpdateArray, 0, Heartbeats.Count);
 

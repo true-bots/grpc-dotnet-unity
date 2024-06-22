@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 {
 	public sealed class JZlib
 	{
-		private const string _version = "1.0.7";
+		const string _version = "1.0.7";
 
 		public static string version()
 		{

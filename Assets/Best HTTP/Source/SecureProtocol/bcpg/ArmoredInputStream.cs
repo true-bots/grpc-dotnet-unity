@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		/*
 		 * set up the decoding table.
 		 */
-		private readonly static byte[] decodingTable;
+		static readonly byte[] decodingTable;
 
 		static ArmoredInputStream()
 		{
@@ -58,10 +58,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		*
 		* @return the offset the data starts in out.
 		*/
-		private static int Decode(int in0, int in1, int in2, int in3, int[] result)
+		static int Decode(int in0, int in1, int in2, int in3, int[] result)
 		{
 			if (in3 < 0)
+			{
 				throw new EndOfStreamException("unexpected end of file in armored stream.");
+			}
 
 			int b1, b2, b3, b4;
 			if (in2 == '=')
@@ -69,7 +71,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				b1 = decodingTable[in0];
 				b2 = decodingTable[in1];
 				if ((b1 | b2) >= 128)
+				{
 					throw new IOException("invalid armor");
+				}
 
 				result[2] = ((b1 << 2) | (b2 >> 4)) & 0xff;
 				return 2;
@@ -80,7 +84,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				b2 = decodingTable[in1];
 				b3 = decodingTable[in2];
 				if ((b1 | b2 | b3) >= 128)
+				{
 					throw new IOException("invalid armor");
+				}
 
 				result[1] = ((b1 << 2) | (b2 >> 4)) & 0xff;
 				result[2] = ((b2 << 4) | (b3 >> 2)) & 0xff;
@@ -93,7 +99,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				b3 = decodingTable[in2];
 				b4 = decodingTable[in3];
 				if ((b1 | b2 | b3 | b4) >= 128)
+				{
 					throw new IOException("invalid armor");
+				}
 
 				result[0] = ((b1 << 2) | (b2 >> 4)) & 0xff;
 				result[1] = ((b2 << 4) | (b3 >> 2)) & 0xff;
@@ -106,7 +114,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		 * Ignore missing CRC checksums.
 		 * https://tests.sequoia-pgp.org/#ASCII_Armor suggests that missing CRC sums do not invalidate the message.
 		 */
-		private bool detectMissingChecksum = false;
+		bool detectMissingChecksum = false;
 
 		Stream input;
 		bool start = true;
@@ -155,7 +163,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			start = false;
 		}
 
-		private bool ParseHeaders()
+		bool ParseHeaders()
 		{
 			header = null;
 
@@ -204,7 +212,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 						crLf = true;
 					}
 
-					if (eolReached && (last != '\r' && c == '\n'))
+					if (eolReached && last != '\r' && c == '\n')
 					{
 						break;
 					}
@@ -218,10 +226,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 					{
 						string line = buf.ToString();
 						if (line.Trim().Length < 1)
+						{
 							break;
+						}
 
 						if (headerList.Count > 0 && line.IndexOf(':') < 0)
+						{
 							throw new IOException("invalid armor header");
+						}
 
 						headerList.Add(line);
 						buf.Length = 0;
@@ -293,7 +305,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public string[] GetArmorHeaders()
 		{
 			if (headerList.Count <= 1)
+			{
 				return null;
+			}
 
 			string[] hdrs = new string[headerList.Count - 1];
 			for (int i = 0; i != hdrs.Length; i++)
@@ -304,7 +318,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			return hdrs;
 		}
 
-		private int ReadIgnoreSpace()
+		int ReadIgnoreSpace()
 		{
 			int c;
 			do
@@ -313,7 +327,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			} while (c == ' ' || c == '\t' || c == '\f' || c == '\u000B'); // \u000B ~ \v
 
 			if (c >= 128)
+			{
 				throw new IOException("invalid armor");
+			}
 
 			return c;
 		}
@@ -331,7 +347,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			{
 				int b = ReadByte();
 				if (b < 0)
+				{
 					break;
+				}
 
 				buffer[offset + pos++] = (byte)b;
 			}
@@ -532,7 +550,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		 */
 		public virtual void SetDetectMissingCrc(bool detectMissing)
 		{
-			this.detectMissingChecksum = detectMissing;
+			detectMissingChecksum = detectMissing;
 		}
 	}
 }

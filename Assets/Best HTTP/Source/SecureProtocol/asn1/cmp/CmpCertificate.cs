@@ -15,10 +15,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			// TODO[cmp] Review this whole metho
 
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is CmpCertificate cmpCertificate)
+			{
 				return cmpCertificate;
+			}
 
 			if (obj is byte[] bs)
 			{
@@ -33,31 +37,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CmpCertificate(X509CertificateStructure.GetInstance(obj));
+			}
 
 			if (obj is Asn1TaggedObject taggedObject)
+			{
 				return new CmpCertificate(taggedObject.TagNo, taggedObject.GetObject());
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), nameof(obj));
 		}
 
 		public static CmpCertificate GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
 		{
 			// TODO[cmp]
 			if (taggedObject == null)
+			{
 				return null;
+			}
 
 			if (!declaredExplicit)
+			{
 				throw new ArgumentException("tag must be explicit");
+			}
 
 			// TODO[cmp]
 			return GetInstance(taggedObject.GetObject());
 		}
 
-		private readonly X509CertificateStructure m_x509v3PKCert;
+		readonly X509CertificateStructure m_x509v3PKCert;
 
-		private readonly int m_otherTagValue;
-		private readonly Asn1Encodable m_otherCert;
+		readonly int m_otherTagValue;
+		readonly Asn1Encodable m_otherCert;
 
 		/**
 		 * Note: the addition of other certificates is a BC extension. If you use this constructor they
@@ -75,18 +87,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public CmpCertificate(X509CertificateStructure x509v3PKCert)
 		{
 			if (x509v3PKCert.Version != 3)
+			{
 				throw new ArgumentException("only version 3 certificates allowed", nameof(x509v3PKCert));
+			}
 
 			m_x509v3PKCert = x509v3PKCert;
 		}
 
-		public virtual bool IsX509v3PKCert => m_x509v3PKCert != null;
+		public virtual bool IsX509v3PKCert
+		{
+			get { return m_x509v3PKCert != null; }
+		}
 
-		public virtual X509CertificateStructure X509v3PKCert => m_x509v3PKCert;
+		public virtual X509CertificateStructure X509v3PKCert
+		{
+			get { return m_x509v3PKCert; }
+		}
 
-		public virtual int OtherCertTag => m_otherTagValue;
+		public virtual int OtherCertTag
+		{
+			get { return m_otherTagValue; }
+		}
 
-		public virtual Asn1Encodable OtherCert => m_otherCert;
+		public virtual Asn1Encodable OtherCert
+		{
+			get { return m_otherCert; }
+		}
 
 		/**
 		 * <pre>

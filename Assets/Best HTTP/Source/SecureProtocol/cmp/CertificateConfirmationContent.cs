@@ -8,19 +8,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 {
 	public class CertificateConfirmationContent
 	{
-		private readonly DefaultDigestAlgorithmIdentifierFinder m_digestAlgFinder;
-		private readonly CertConfirmContent m_content;
+		readonly DefaultDigestAlgorithmIdentifierFinder m_digestAlgFinder;
+		readonly CertConfirmContent m_content;
 
 		public CertificateConfirmationContent(CertConfirmContent content)
 		{
-			this.m_content = content;
+			m_content = content;
 		}
 
 		public CertificateConfirmationContent(CertConfirmContent content,
 			DefaultDigestAlgorithmIdentifierFinder digestAlgFinder)
 		{
-			this.m_content = content;
-			this.m_digestAlgFinder = digestAlgFinder;
+			m_content = content;
+			m_digestAlgFinder = digestAlgFinder;
 		}
 
 		public CertConfirmContent ToAsn1Structure()

@@ -37,19 +37,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static Challenge GetInstance(object obj)
 		{
 			if (obj is Challenge challenge)
+			{
 				return challenge;
+			}
 
 			if (obj != null)
+			{
 				return new Challenge(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly AlgorithmIdentifier m_owf;
-		private readonly Asn1OctetString m_witness;
-		private readonly Asn1OctetString m_challenge;
+		readonly AlgorithmIdentifier m_owf;
+		readonly Asn1OctetString m_witness;
+		readonly Asn1OctetString m_challenge;
 
-		private Challenge(Asn1Sequence seq)
+		Challenge(Asn1Sequence seq)
 		{
 			int index = 0;
 
@@ -74,11 +78,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_challenge = new DerOctetString(challenge);
 		}
 
-		public virtual AlgorithmIdentifier Owf => m_owf;
+		public virtual AlgorithmIdentifier Owf
+		{
+			get { return m_owf; }
+		}
 
-		public virtual Asn1OctetString Witness => m_witness;
+		public virtual Asn1OctetString Witness
+		{
+			get { return m_witness; }
+		}
 
-		public virtual Asn1OctetString ChallengeValue => m_challenge;
+		public virtual Asn1OctetString ChallengeValue
+		{
+			get { return m_challenge; }
+		}
 
 		/**
 		 * <pre>
@@ -124,16 +137,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			public static Rand GetInstance(object obj)
 			{
 				if (obj is Rand rand)
+				{
 					return rand;
+				}
 
 				if (obj != null)
+				{
 					return new Rand(Asn1Sequence.GetInstance(obj));
+				}
 
 				return null;
 			}
 
-			private readonly DerInteger m_intVal;
-			private readonly GeneralName m_sender;
+			readonly DerInteger m_intVal;
+			readonly GeneralName m_sender;
 
 			public Rand(DerInteger intVal, GeneralName sender)
 			{
@@ -144,15 +161,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			public Rand(Asn1Sequence seq)
 			{
 				if (seq.Count != 2)
+				{
 					throw new ArgumentException("expected sequence size of 2");
+				}
 
 				m_intVal = DerInteger.GetInstance(seq[0]);
 				m_sender = GeneralName.GetInstance(seq[1]);
 			}
 
-			public virtual DerInteger IntVal => m_intVal;
+			public virtual DerInteger IntVal
+			{
+				get { return m_intVal; }
+			}
 
-			public virtual GeneralName Sender => m_sender;
+			public virtual GeneralName Sender
+			{
+				get { return m_sender; }
+			}
 
 			public override Asn1Object ToAsn1Object()
 			{

@@ -12,8 +12,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 	public class X9FieldID
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier id;
-		private readonly Asn1Object parameters;
+		readonly DerObjectIdentifier id;
+		readonly Asn1Object parameters;
 
 		/**
 		 * Constructor for elliptic curves over prime fields
@@ -23,8 +23,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		public X9FieldID(
 			BigInteger primeP)
 		{
-			this.id = X9ObjectIdentifiers.PrimeField;
-			this.parameters = new DerInteger(primeP);
+			id = X9ObjectIdentifiers.PrimeField;
+			parameters = new DerInteger(primeP);
 		}
 
 		/**
@@ -62,14 +62,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 			int k2,
 			int k3)
 		{
-			this.id = X9ObjectIdentifiers.CharacteristicTwoField;
+			id = X9ObjectIdentifiers.CharacteristicTwoField;
 
 			Asn1EncodableVector fieldIdParams = new Asn1EncodableVector(new DerInteger(m));
 
 			if (k2 == 0)
 			{
 				if (k3 != 0)
+				{
 					throw new ArgumentException("inconsistent k values");
+				}
 
 				fieldIdParams.Add(
 					X9ObjectIdentifiers.TPBasis,
@@ -78,7 +80,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 			else
 			{
 				if (k2 <= k1 || k3 <= k2)
+				{
 					throw new ArgumentException("inconsistent k values");
+				}
 
 				fieldIdParams.Add(
 					X9ObjectIdentifiers.PPBasis,
@@ -88,21 +92,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 						new DerInteger(k3)));
 			}
 
-			this.parameters = new DerSequence(fieldIdParams);
+			parameters = new DerSequence(fieldIdParams);
 		}
 
-		private X9FieldID(Asn1Sequence seq)
+		X9FieldID(Asn1Sequence seq)
 		{
-			this.id = DerObjectIdentifier.GetInstance(seq[0]);
-			this.parameters = seq[1].ToAsn1Object();
+			id = DerObjectIdentifier.GetInstance(seq[0]);
+			parameters = seq[1].ToAsn1Object();
 		}
 
 		public static X9FieldID GetInstance(object obj)
 		{
 			if (obj is X9FieldID)
+			{
 				return (X9FieldID)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new X9FieldID(Asn1Sequence.GetInstance(obj));
 		}
 

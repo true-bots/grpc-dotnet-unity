@@ -9,7 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 		{
 			int sign = k.SignValue;
 			if (sign == 0 || p.IsInfinity)
+			{
 				return p.Curve.Infinity;
+			}
 
 			ECPoint positive = MultiplyPositive(p, k.Abs());
 			ECPoint result = sign > 0 ? positive : positive.Negate();

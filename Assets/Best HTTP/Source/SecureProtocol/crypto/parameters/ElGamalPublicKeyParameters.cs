@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class ElGamalPublicKeyParameters
 		: ElGamalKeyParameters
 	{
-		private readonly BigInteger y;
+		readonly BigInteger y;
 
 		public ElGamalPublicKeyParameters(
 			BigInteger y,
@@ -16,7 +16,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(false, parameters)
 		{
 			if (y == null)
+			{
 				throw new ArgumentNullException("y");
+			}
 
 			this.y = y;
 		}
@@ -30,12 +32,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			ElGamalPublicKeyParameters other = obj as ElGamalPublicKeyParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

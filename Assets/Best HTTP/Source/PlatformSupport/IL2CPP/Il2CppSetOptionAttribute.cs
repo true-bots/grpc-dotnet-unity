@@ -47,7 +47,7 @@ namespace BestHTTP.PlatformSupport.IL2CPP
 		/// thrown in generated code. Most code doesn't need to handle this
 		/// exception, so it is probably safe to leave it disabled.
 		/// </summary>
-		DivideByZeroChecks = 3,
+		DivideByZeroChecks = 3
 	}
 
 	/// <summary>

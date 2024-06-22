@@ -10,17 +10,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 	public class PemReader
 		: IDisposable
 	{
-		private readonly TextReader reader;
-		private readonly MemoryStream buffer;
-		private readonly StreamWriter textBuffer;
-		private readonly List<int> pushback = new List<int>();
+		readonly TextReader reader;
+		readonly MemoryStream buffer;
+		readonly StreamWriter textBuffer;
+		readonly List<int> pushback = new List<int>();
 		int c = 0;
 
 		public PemReader(TextReader reader)
 		{
 			this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
-			this.buffer = new MemoryStream();
-			this.textBuffer = new StreamWriter(buffer);
+			buffer = new MemoryStream();
+			textBuffer = new StreamWriter(buffer);
 		}
 
 		#region IDisposable
@@ -115,7 +115,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			// Look for a colon for up to 64 characters, as an indication there might be a header.
 			//
 
-			var headers = new List<PemHeader>();
+			List<PemHeader> headers = new List<PemHeader>();
 
 			while (seekColon(64))
 			{
@@ -195,7 +195,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		}
 
 
-		private string bufferedString()
+		string bufferedString()
 		{
 			textBuffer.Flush();
 			string value = Strings.FromUtf8ByteArray(buffer.ToArray());
@@ -205,7 +205,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		}
 
 
-		private bool seekDash()
+		bool seekDash()
 		{
 			c = 0;
 			while ((c = Read()) >= 0)
@@ -227,11 +227,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		/// </summary>
 		/// <param name="upTo"></param>
 		/// <returns></returns>
-		private bool seekColon(int upTo)
+		bool seekColon(int upTo)
 		{
 			c = 0;
 			bool colonFound = false;
-			var read = new List<int>();
+			List<int> read = new List<int>();
 
 			for (; upTo >= 0 && c >= 0; upTo--)
 			{
@@ -258,7 +258,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		/// Consume the dashes
 		/// </summary>
 		/// <returns></returns>
-		private bool consumeDash()
+		bool consumeDash()
 		{
 			c = 0;
 			while ((c = Read()) >= 0)
@@ -277,7 +277,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		/// <summary>
 		/// Skip white space leave char in stream.
 		/// </summary>
-		private void skipWhiteSpace()
+		void skipWhiteSpace()
 		{
 			while ((c = Read()) >= 0)
 			{
@@ -295,7 +295,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		/// </summary>
 		/// <param name="value">expected string</param>
 		/// <returns>false if not consumed</returns>
-		private bool expect(string value)
+		bool expect(string value)
 		{
 			for (int t = 0; t < value.Length; t++)
 			{
@@ -317,7 +317,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		/// Consume until dash.
 		/// </summary>
 		/// <returns>true if stream end not met</returns>
-		private bool bufferUntilStopChar(char stopChar, bool skipWhiteSpace)
+		bool bufferUntilStopChar(char stopChar, bool skipWhiteSpace)
 		{
 			while ((c = Read()) >= 0)
 			{
@@ -341,7 +341,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			return c > -1;
 		}
 
-		private void PushBack(int value)
+		void PushBack(int value)
 		{
 			if (pushback.Count == 0)
 			{
@@ -353,7 +353,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			}
 		}
 
-		private int Read()
+		int Read()
 		{
 			if (pushback.Count > 0)
 			{

@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class ExperimentalPacket
 		: ContainedPacket //, PublicKeyAlgorithmTag
 	{
-		private readonly PacketTag tag;
-		private readonly byte[] contents;
+		readonly PacketTag tag;
+		readonly byte[] contents;
 
 		internal ExperimentalPacket(
 			PacketTag tag,
@@ -18,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		{
 			this.tag = tag;
 
-			this.contents = bcpgIn.ReadAll();
+			contents = bcpgIn.ReadAll();
 		}
 
 		public PacketTag Tag

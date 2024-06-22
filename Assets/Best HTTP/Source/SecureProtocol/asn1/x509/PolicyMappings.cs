@@ -17,7 +17,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class PolicyMappings
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence seq;
+		readonly Asn1Sequence seq;
 
 		/**
 		 * Creates a new <code>PolicyMappings</code> instance.
@@ -42,7 +42,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 			Asn1EncodableVector v = new Asn1EncodableVector();
 
-			foreach (var entry in mappings)
+			foreach (KeyValuePair<string, string> entry in mappings)
 			{
 				string idp = entry.Key;
 				string sdp = entry.Value;

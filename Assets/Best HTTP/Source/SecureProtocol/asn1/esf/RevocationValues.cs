@@ -20,26 +20,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class RevocationValues
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence crlVals;
-		private readonly Asn1Sequence ocspVals;
-		private readonly OtherRevVals otherRevVals;
+		readonly Asn1Sequence crlVals;
+		readonly Asn1Sequence ocspVals;
+		readonly OtherRevVals otherRevVals;
 
 		public static RevocationValues GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is RevocationValues)
+			{
 				return (RevocationValues)obj;
+			}
 
 			return new RevocationValues(Asn1Sequence.GetInstance(obj));
 		}
 
-		private RevocationValues(
+		RevocationValues(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
+			}
+
 			if (seq.Count > 3)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
 			foreach (Asn1TaggedObject taggedObj in seq)
 			{
@@ -53,7 +60,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 							CertificateList.GetInstance(ae.ToAsn1Object());
 						}
 
-						this.crlVals = crlValsSeq;
+						crlVals = crlValsSeq;
 						break;
 					case 1:
 						Asn1Sequence ocspValsSeq = (Asn1Sequence)asn1Obj;
@@ -62,10 +69,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 							BasicOcspResponse.GetInstance(ae.ToAsn1Object());
 						}
 
-						this.ocspVals = ocspValsSeq;
+						ocspVals = ocspValsSeq;
 						break;
 					case 2:
-						this.otherRevVals = OtherRevVals.GetInstance(asn1Obj);
+						otherRevVals = OtherRevVals.GetInstance(asn1Obj);
 						break;
 					default:
 						throw new ArgumentException("Illegal tag in RevocationValues", "seq");

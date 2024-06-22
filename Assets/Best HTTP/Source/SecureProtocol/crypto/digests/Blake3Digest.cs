@@ -18,152 +18,152 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Already outputting error.
 		 */
-		private const string ERR_OUTPUTTING = "Already outputting";
+		const string ERR_OUTPUTTING = "Already outputting";
 
 		/**
 		 * Number of Words.
 		 */
-		private const int NUMWORDS = 8;
+		const int NUMWORDS = 8;
 
 		/**
 		 * Number of Rounds.
 		 */
-		private const int ROUNDS = 7;
+		const int ROUNDS = 7;
 
 		/**
 		 * Buffer length.
 		 */
-		private const int BLOCKLEN = NUMWORDS * Integers.NumBytes * 2;
+		const int BLOCKLEN = NUMWORDS * Integers.NumBytes * 2;
 
 		/**
 		 * Chunk length.
 		 */
-		private const int CHUNKLEN = 1024;
+		const int CHUNKLEN = 1024;
 
 		/**
 		 * ChunkStart Flag.
 		 */
-		private const int CHUNKSTART = 1;
+		const int CHUNKSTART = 1;
 
 		/**
 		 * ChunkEnd Flag.
 		 */
-		private const int CHUNKEND = 2;
+		const int CHUNKEND = 2;
 
 		/**
 		 * Parent Flag.
 		 */
-		private const int PARENT = 4;
+		const int PARENT = 4;
 
 		/**
 		 * Root Flag.
 		 */
-		private const int ROOT = 8;
+		const int ROOT = 8;
 
 		/**
 		 * KeyedHash Flag.
 		 */
-		private const int KEYEDHASH = 16;
+		const int KEYEDHASH = 16;
 
 		/**
 		 * DeriveContext Flag.
 		 */
-		private const int DERIVECONTEXT = 32;
+		const int DERIVECONTEXT = 32;
 
 		/**
 		 * DeriveKey Flag.
 		 */
-		private const int DERIVEKEY = 64;
+		const int DERIVEKEY = 64;
 
 		/**
 		 * Chaining0 State Locations.
 		 */
-		private const int CHAINING0 = 0;
+		const int CHAINING0 = 0;
 
 		/**
 		 * Chaining1 State Location.
 		 */
-		private const int CHAINING1 = 1;
+		const int CHAINING1 = 1;
 
 		/**
 		 * Chaining2 State Location.
 		 */
-		private const int CHAINING2 = 2;
+		const int CHAINING2 = 2;
 
 		/**
 		 * Chaining3 State Location.
 		 */
-		private const int CHAINING3 = 3;
+		const int CHAINING3 = 3;
 
 		/**
 		 * Chaining4 State Location.
 		 */
-		private const int CHAINING4 = 4;
+		const int CHAINING4 = 4;
 
 		/**
 		 * Chaining5 State Location.
 		 */
-		private const int CHAINING5 = 5;
+		const int CHAINING5 = 5;
 
 		/**
 		 * Chaining6 State Location.
 		 */
-		private const int CHAINING6 = 6;
+		const int CHAINING6 = 6;
 
 		/**
 		 * Chaining7 State Location.
 		 */
-		private const int CHAINING7 = 7;
+		const int CHAINING7 = 7;
 
 		/**
 		 * IV0 State Locations.
 		 */
-		private const int IV0 = 8;
+		const int IV0 = 8;
 
 		/**
 		 * IV1 State Location.
 		 */
-		private const int IV1 = 9;
+		const int IV1 = 9;
 
 		/**
 		 * IV2 State Location.
 		 */
-		private const int IV2 = 10;
+		const int IV2 = 10;
 
 		/**
 		 * IV3 State Location.
 		 */
-		private const int IV3 = 11;
+		const int IV3 = 11;
 
 		/**
 		 * Count0 State Location.
 		 */
-		private const int COUNT0 = 12;
+		const int COUNT0 = 12;
 
 		/**
 		 * Count1 State Location.
 		 */
-		private const int COUNT1 = 13;
+		const int COUNT1 = 13;
 
 		/**
 		 * DataLen State Location.
 		 */
-		private const int DATALEN = 14;
+		const int DATALEN = 14;
 
 		/**
 		 * Flags State Location.
 		 */
-		private const int FLAGS = 15;
+		const int FLAGS = 15;
 
 		/**
 		 * Message word permutations.
 		 */
-		private static readonly byte[] SIGMA = { 2, 6, 3, 10, 7, 0, 4, 13, 1, 11, 12, 5, 9, 14, 15, 8 };
+		static readonly byte[] SIGMA = { 2, 6, 3, 10, 7, 0, 4, 13, 1, 11, 12, 5, 9, 14, 15, 8 };
 
 		/**
 		 * Blake3 Initialization Vector.
 		 */
-		private static readonly uint[] IV =
+		static readonly uint[] IV =
 		{
 			0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
 		};
@@ -171,82 +171,82 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * The byte input/output buffer.
 		 */
-		private readonly byte[] m_theBuffer = new byte[BLOCKLEN];
+		readonly byte[] m_theBuffer = new byte[BLOCKLEN];
 
 		/**
 		 * The key.
 		 */
-		private readonly uint[] m_theK = new uint[NUMWORDS];
+		readonly uint[] m_theK = new uint[NUMWORDS];
 
 		/**
 		 * The chaining value.
 		 */
-		private readonly uint[] m_theChaining = new uint[NUMWORDS];
+		readonly uint[] m_theChaining = new uint[NUMWORDS];
 
 		/**
 		 * The state.
 		 */
-		private readonly uint[] m_theV = new uint[NUMWORDS << 1];
+		readonly uint[] m_theV = new uint[NUMWORDS << 1];
 
 		/**
 		 * The message Buffer.
 		 */
-		private readonly uint[] m_theM = new uint[NUMWORDS << 1];
+		readonly uint[] m_theM = new uint[NUMWORDS << 1];
 
 		/**
 		 * The indices.
 		 */
-		private readonly byte[] m_theIndices = new byte[NUMWORDS << 1];
+		readonly byte[] m_theIndices = new byte[NUMWORDS << 1];
 
 		/**
 		 * The chainingStack.
 		 */
-		private readonly List<uint[]> m_theStack = new List<uint[]>();
+		readonly List<uint[]> m_theStack = new List<uint[]>();
 
 		/**
 		 * The default digestLength.
 		 */
-		private readonly int m_theDigestLen;
+		readonly int m_theDigestLen;
 
 		/**
 		 * Are we outputting?
 		 */
-		private bool m_outputting;
+		bool m_outputting;
 
 		/**
 		 * How many more bytes can we output?
 		 */
-		private long m_outputAvailable;
+		long m_outputAvailable;
 
 		/**
 		 * The current mode.
 		 */
-		private int m_theMode;
+		int m_theMode;
 
 		/**
 		 * The output mode.
 		 */
-		private int m_theOutputMode;
+		int m_theOutputMode;
 
 		/**
 		 * The output dataLen.
 		 */
-		private int m_theOutputDataLen;
+		int m_theOutputDataLen;
 
 		/**
 		 * The block counter.
 		 */
-		private long m_theCounter;
+		long m_theCounter;
 
 		/**
 		 * The # of bytes in the current block.
 		 */
-		private int m_theCurrBytes;
+		int m_theCurrBytes;
 
 		/**
 		 * The position of the next byte in the buffer.
 		 */
-		private int m_thePos;
+		int m_thePos;
 
 		public Blake3Digest()
 			: this((BLOCKLEN >> 1) * 8)
@@ -275,11 +275,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			Reset(pSource);
 		}
 
-		public int GetByteLength() => BLOCKLEN;
+		public int GetByteLength()
+		{
+			return BLOCKLEN;
+		}
 
-		public string AlgorithmName => "BLAKE3";
+		public string AlgorithmName
+		{
+			get { return "BLAKE3"; }
+		}
 
-		public int GetDigestSize() => m_theDigestLen;
+		public int GetDigestSize()
+		{
+			return m_theDigestLen;
+		}
 
 		/**
 		 * Initialise.
@@ -329,7 +338,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		{
 			/* Check that we are not outputting */
 			if (m_outputting)
+			{
 				throw new InvalidOperationException(ERR_OUTPUTTING);
+			}
 
 			/* If the buffer is full */
 			int blockLen = m_theBuffer.Length;
@@ -357,17 +368,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		{
 			/* Ignore null operation */
 			if (pMessage == null)
+			{
 				return;
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             BlockUpdate(pMessage.AsSpan(pOffset, pLen));
 #else
 			if (pLen == 0)
+			{
 				return;
+			}
 
 			/* Check that we are not outputting */
 			if (m_outputting)
+			{
 				throw new InvalidOperationException(ERR_OUTPUTTING);
+			}
 
 			/* Process any bytes currently in the buffer */
 			int remainingLen = 0; // left bytes of buffer
@@ -482,7 +499,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 #else
 			/* Reject if we are already outputting */
 			if (m_outputting)
+			{
 				throw new InvalidOperationException(ERR_OUTPUTTING);
+			}
 
 			/* Build the required output */
 			int length = Output(pOut, pOutOffset, pOutLen);
@@ -507,7 +526,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 			/* Reject if there is insufficient Xof remaining */
 			if (pOutLen < 0 || (m_outputAvailable >= 0 && pOutLen > m_outputAvailable))
+			{
 				throw new ArgumentException("Insufficient bytes remaining");
+			}
 
 			/* If we have some remaining data in the current buffer */
 			int dataLeft = pOutLen;
@@ -652,7 +673,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 			/* Copy stack */
 			m_theStack.Clear();
-			foreach (var element in mySource.m_theStack)
+			foreach (uint[] element in mySource.m_theStack)
 			{
 				m_theStack.Add(Arrays.Clone(element));
 			}
@@ -694,7 +715,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 * @param pMessage the message buffer
 		 * @param pMsgPos  the position within the message buffer
 		 */
-		private void CompressBlock(byte[] pMessage, int pMsgPos)
+		void CompressBlock(byte[] pMessage, int pMsgPos)
 		{
 			/* Initialise state and compress message */
 			InitChunkBlock(BLOCKLEN, false);
@@ -714,7 +735,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 * @param pMessage the source message
 		 * @param pMsgPos  the message position
 		 */
-		private void InitM(byte[] pMessage, int pMsgPos)
+		void InitM(byte[] pMessage, int pMsgPos)
 		{
 			/* Copy message bytes into word array */
 			Pack.LE_To_UInt32(pMessage, pMsgPos, m_theM);
@@ -724,7 +745,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Adjust the stack.
 		 */
-		private void AdjustStack()
+		void AdjustStack()
 		{
 			/* Loop to combine blocks */
 			long myCount = m_theCounter;
@@ -732,7 +753,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			{
 				/* Break loop if we are not combining */
 				if ((myCount & 1) == 1)
+				{
 					break;
+				}
 
 				/* Build the message to be hashed */
 				uint[] myLeft = m_theStack[m_theStack.Count - 1];
@@ -758,7 +781,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 *
 		 * @param pDataLen the data length
 		 */
-		private void CompressFinalBlock(int pDataLen)
+		void CompressFinalBlock(int pDataLen)
 		{
 			/* Initialise state and compress message */
 			InitChunkBlock(pDataLen, true);
@@ -776,7 +799,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Process the stack.
 		 */
-		private void ProcessStack()
+		void ProcessStack()
 		{
 			/* Finalise stack */
 			while (m_theStack.Count > 0)
@@ -802,7 +825,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Perform compression.
 		 */
-		private void Compress()
+		void Compress()
 		{
 			/* Initialise the buffers */
 			InitIndices();
@@ -825,7 +848,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 #if NETSTANDARD1_0_OR_GREATER || NETCOREAPP1_0_OR_GREATER || UNITY_2021_2_OR_NEWER
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-		private void PerformRound()
+		void PerformRound()
 		{
 			/* Apply to columns of V */
 			MixG(0, CHAINING0, CHAINING4, IV0, COUNT0);
@@ -843,7 +866,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Adjust Chaining after compression.
 		 */
-		private void AdjustChaining()
+		void AdjustChaining()
 		{
 			/* If we are outputting */
 			if (m_outputting)
@@ -883,7 +906,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 #if NETSTANDARD1_0_OR_GREATER || NETCOREAPP1_0_OR_GREATER || UNITY_2021_2_OR_NEWER
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-		private void MixG(int msgIdx, int posA, int posB, int posC, int posD)
+		void MixG(int msgIdx, int posA, int posB, int posC, int posD)
 		{
 			/* Determine indices */
 			int msg = msgIdx << 1;
@@ -902,7 +925,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * initialise the indices.
 		 */
-		private void InitIndices()
+		void InitIndices()
 		{
 			for (byte i = 0; i < m_theIndices.Length; i++)
 			{
@@ -913,7 +936,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * PermuteIndices.
 		 */
-		private void PermuteIndices()
+		void PermuteIndices()
 		{
 			for (byte i = 0; i < m_theIndices.Length; i++)
 			{
@@ -924,7 +947,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Initialise null key.
 		 */
-		private void InitNullKey()
+		void InitNullKey()
 		{
 			Array.Copy(IV, 0, m_theK, 0, NUMWORDS);
 		}
@@ -934,7 +957,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 *
 		 * @param pKey the keyBytes
 		 */
-		private void InitKey(byte[] pKey)
+		void InitKey(byte[] pKey)
 		{
 			/* Copy message bytes into word array */
 			Pack.LE_To_UInt32(pKey, 0, m_theK);
@@ -944,7 +967,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Initialise key from context.
 		 */
-		private void InitKeyFromContext()
+		void InitKeyFromContext()
 		{
 			Array.Copy(m_theV, 0, m_theK, 0, NUMWORDS);
 			m_theMode = DERIVEKEY;
@@ -956,7 +979,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 * @param pDataLen the dataLength
 		 * @param pFinal   is this the final chunk?
 		 */
-		private void InitChunkBlock(int pDataLen, bool pFinal)
+		void InitChunkBlock(int pDataLen, bool pFinal)
 		{
 			/* Initialise the block */
 			Array.Copy(m_theCurrBytes == 0 ? m_theK : m_theChaining, 0, m_theV, 0, NUMWORDS);
@@ -986,7 +1009,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Initialise parent block.
 		 */
-		private void InitParentBlock()
+		void InitParentBlock()
 		{
 			/* Initialise the block */
 			Array.Copy(m_theK, 0, m_theV, 0, NUMWORDS);
@@ -1000,7 +1023,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Initialise output block.
 		 */
-		private void NextOutputBlock()
+		void NextOutputBlock()
 		{
 			/* Increment the counter */
 			m_theCounter++;
@@ -1020,7 +1043,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * IncrementBlockCount.
 		 */
-		private void IncrementBlockCount()
+		void IncrementBlockCount()
 		{
 			m_theCounter++;
 			m_theCurrBytes = 0;
@@ -1029,7 +1052,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * ResetBlockCount.
 		 */
-		private void ResetBlockCount()
+		void ResetBlockCount()
 		{
 			m_theCounter = 0;
 			m_theCurrBytes = 0;
@@ -1038,7 +1061,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Set root indication.
 		 */
-		private void SetRoot()
+		void SetRoot()
 		{
 			m_theV[FLAGS] |= ROOT;
 			m_theOutputMode = (int)m_theV[FLAGS];

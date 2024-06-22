@@ -37,7 +37,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			int remaining = defIn.Remaining;
 			if (remaining < 1)
+			{
 				return new Asn1EncodableVector(0);
+			}
 
 			return new LazyAsn1InputStream(defIn, remaining, tmpBuffers).ReadVector();
 		}

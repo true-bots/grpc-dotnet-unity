@@ -7,8 +7,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
 	public class ParametersWithSBox : ICipherParameters
 	{
-		private ICipherParameters parameters;
-		private byte[] sBox;
+		ICipherParameters parameters;
+		byte[] sBox;
 
 		public ParametersWithSBox(
 			ICipherParameters parameters,

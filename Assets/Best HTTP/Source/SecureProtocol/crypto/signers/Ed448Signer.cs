@@ -11,12 +11,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class Ed448Signer
 		: ISigner
 	{
-		private readonly Buffer buffer = new Buffer();
-		private readonly byte[] context;
+		readonly Buffer buffer = new Buffer();
+		readonly byte[] context;
 
-		private bool forSigning;
-		private Ed448PrivateKeyParameters privateKey;
-		private Ed448PublicKeyParameters publicKey;
+		bool forSigning;
+		Ed448PrivateKeyParameters privateKey;
+		Ed448PublicKeyParameters publicKey;
 
 		public Ed448Signer(byte[] context)
 		{
@@ -34,13 +34,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 			if (forSigning)
 			{
-				this.privateKey = (Ed448PrivateKeyParameters)parameters;
-				this.publicKey = null;
+				privateKey = (Ed448PrivateKeyParameters)parameters;
+				publicKey = null;
 			}
 			else
 			{
-				this.privateKey = null;
-				this.publicKey = (Ed448PublicKeyParameters)parameters;
+				privateKey = null;
+				publicKey = (Ed448PublicKeyParameters)parameters;
 			}
 
 			Reset();
@@ -66,7 +66,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual byte[] GenerateSignature()
 		{
 			if (!forSigning || null == privateKey)
+			{
 				throw new InvalidOperationException("Ed448Signer not initialised for signature generation.");
+			}
 
 			return buffer.GenerateSignature(privateKey, context);
 		}
@@ -74,7 +76,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual bool VerifySignature(byte[] signature)
 		{
 			if (forSigning || null == publicKey)
+			{
 				throw new InvalidOperationException("Ed448Signer not initialised for verification");
+			}
 
 			return buffer.VerifySignature(publicKey, context, signature);
 		}
@@ -84,7 +88,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			buffer.Reset();
 		}
 
-		private class Buffer : MemoryStream
+		class Buffer : MemoryStream
 		{
 			internal byte[] GenerateSignature(Ed448PrivateKeyParameters privateKey, byte[] ctx)
 			{

@@ -39,12 +39,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 {
-	internal sealed class Inflate
+	sealed class Inflate
 	{
-		private const int MAX_WBITS = 15; // 32K LZ77 window
+		const int MAX_WBITS = 15; // 32K LZ77 window
 
 		// preset dictionary flag in zlib header
-		private const int PRESET_DICT = 0x20;
+		const int PRESET_DICT = 0x20;
 
 		internal const int Z_NO_FLUSH = 0;
 		internal const int Z_PARTIAL_FLUSH = 1;
@@ -52,32 +52,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		internal const int Z_FULL_FLUSH = 3;
 		internal const int Z_FINISH = 4;
 
-		private const int Z_DEFLATED = 8;
+		const int Z_DEFLATED = 8;
 
-		private const int Z_OK = 0;
-		private const int Z_STREAM_END = 1;
-		private const int Z_NEED_DICT = 2;
-		private const int Z_ERRNO = -1;
-		private const int Z_STREAM_ERROR = -2;
-		private const int Z_DATA_ERROR = -3;
-		private const int Z_MEM_ERROR = -4;
-		private const int Z_BUF_ERROR = -5;
-		private const int Z_VERSION_ERROR = -6;
+		const int Z_OK = 0;
+		const int Z_STREAM_END = 1;
+		const int Z_NEED_DICT = 2;
+		const int Z_ERRNO = -1;
+		const int Z_STREAM_ERROR = -2;
+		const int Z_DATA_ERROR = -3;
+		const int Z_MEM_ERROR = -4;
+		const int Z_BUF_ERROR = -5;
+		const int Z_VERSION_ERROR = -6;
 
-		private const int METHOD = 0; // waiting for method byte
-		private const int FLAG = 1; // waiting for flag byte
-		private const int DICT4 = 2; // four dictionary check bytes to go
-		private const int DICT3 = 3; // three dictionary check bytes to go
-		private const int DICT2 = 4; // two dictionary check bytes to go
-		private const int DICT1 = 5; // one dictionary check byte to go
-		private const int DICT0 = 6; // waiting for inflateSetDictionary
-		private const int BLOCKS = 7; // decompressing blocks
-		private const int CHECK4 = 8; // four check bytes to go
-		private const int CHECK3 = 9; // three check bytes to go
-		private const int CHECK2 = 10; // two check bytes to go
-		private const int CHECK1 = 11; // one check byte to go
-		private const int DONE = 12; // finished check, done
-		private const int BAD = 13; // got an error--stay here
+		const int METHOD = 0; // waiting for method byte
+		const int FLAG = 1; // waiting for flag byte
+		const int DICT4 = 2; // four dictionary check bytes to go
+		const int DICT3 = 3; // three dictionary check bytes to go
+		const int DICT2 = 4; // two dictionary check bytes to go
+		const int DICT1 = 5; // one dictionary check byte to go
+		const int DICT0 = 6; // waiting for inflateSetDictionary
+		const int BLOCKS = 7; // decompressing blocks
+		const int CHECK4 = 8; // four check bytes to go
+		const int CHECK3 = 9; // three check bytes to go
+		const int CHECK2 = 10; // two check bytes to go
+		const int CHECK1 = 11; // one check byte to go
+		const int DONE = 12; // finished check, done
+		const int BAD = 13; // got an error--stay here
 
 		internal int mode; // current inflate mode
 
@@ -99,7 +99,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 		internal int inflateReset(ZStream z)
 		{
-			if (z == null || z.istate == null) return Z_STREAM_ERROR;
+			if (z == null || z.istate == null)
+			{
+				return Z_STREAM_ERROR;
+			}
 
 			z.total_in = z.total_out = 0;
 			z.msg = null;
@@ -111,7 +114,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		internal int inflateEnd(ZStream z)
 		{
 			if (blocks != null)
+			{
 				blocks.free(z);
+			}
+
 			blocks = null;
 			//    ZFREE(z, z->state);
 			return Z_OK;
@@ -154,7 +160,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			int b;
 
 			if (z == null || z.istate == null || z.next_in == null)
+			{
 				return Z_STREAM_ERROR;
+			}
+
 			f = f == Z_FINISH ? Z_BUF_ERROR : Z_OK;
 			r = Z_BUF_ERROR;
 			while (true)
@@ -164,7 +173,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				{
 					case METHOD:
 
-						if (z.avail_in == 0) return r;
+						if (z.avail_in == 0)
+						{
+							return r;
+						}
+
 						r = f;
 
 						z.avail_in--;
@@ -189,14 +202,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						goto case FLAG;
 					case FLAG:
 
-						if (z.avail_in == 0) return r;
+						if (z.avail_in == 0)
+						{
+							return r;
+						}
+
 						r = f;
 
 						z.avail_in--;
 						z.total_in++;
-						b = (z.next_in[z.next_in_index++]) & 0xff;
+						b = z.next_in[z.next_in_index++] & 0xff;
 
-						if ((((z.istate.method << 8) + b) % 31) != 0)
+						if (((z.istate.method << 8) + b) % 31 != 0)
 						{
 							z.istate.mode = BAD;
 							z.msg = "incorrect header check";
@@ -214,7 +231,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						goto case DICT4;
 					case DICT4:
 
-						if (z.avail_in == 0) return r;
+						if (z.avail_in == 0)
+						{
+							return r;
+						}
+
 						r = f;
 
 						z.avail_in--;
@@ -224,7 +245,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						goto case DICT3;
 					case DICT3:
 
-						if (z.avail_in == 0) return r;
+						if (z.avail_in == 0)
+						{
+							return r;
+						}
+
 						r = f;
 
 						z.avail_in--;
@@ -234,7 +259,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						goto case DICT2;
 					case DICT2:
 
-						if (z.avail_in == 0) return r;
+						if (z.avail_in == 0)
+						{
+							return r;
+						}
+
 						r = f;
 
 						z.avail_in--;
@@ -244,12 +273,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						goto case DICT1;
 					case DICT1:
 
-						if (z.avail_in == 0) return r;
+						if (z.avail_in == 0)
+						{
+							return r;
+						}
+
 						r = f;
 
 						z.avail_in--;
 						z.total_in++;
-						z.istate.need += (z.next_in[z.next_in_index++] & 0xffL);
+						z.istate.need += z.next_in[z.next_in_index++] & 0xffL;
 						z.adler = z.istate.need;
 						z.istate.mode = DICT0;
 						return Z_NEED_DICT;
@@ -290,7 +323,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						goto case CHECK4;
 					case CHECK4:
 
-						if (z.avail_in == 0) return r;
+						if (z.avail_in == 0)
+						{
+							return r;
+						}
+
 						r = f;
 
 						z.avail_in--;
@@ -300,7 +337,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						goto case CHECK3;
 					case CHECK3:
 
-						if (z.avail_in == 0) return r;
+						if (z.avail_in == 0)
+						{
+							return r;
+						}
+
 						r = f;
 
 						z.avail_in--;
@@ -310,7 +351,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						goto case CHECK2;
 					case CHECK2:
 
-						if (z.avail_in == 0) return r;
+						if (z.avail_in == 0)
+						{
+							return r;
+						}
+
 						r = f;
 
 						z.avail_in--;
@@ -320,14 +365,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						goto case CHECK1;
 					case CHECK1:
 
-						if (z.avail_in == 0) return r;
+						if (z.avail_in == 0)
+						{
+							return r;
+						}
+
 						r = f;
 
 						z.avail_in--;
 						z.total_in++;
-						z.istate.need += (z.next_in[z.next_in_index++] & 0xffL);
+						z.istate.need += z.next_in[z.next_in_index++] & 0xffL;
 
-						if (((int)(z.istate.was[0])) != ((int)(z.istate.need)))
+						if ((int)z.istate.was[0] != (int)z.istate.need)
 						{
 							z.istate.mode = BAD;
 							z.msg = "incorrect data check";
@@ -353,7 +402,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			int index = 0;
 			int length = dictLength;
 			if (z == null || z.istate == null || z.istate.mode != DICT0)
+			{
 				return Z_STREAM_ERROR;
+			}
 
 			if (z._adler.adler32(1L, dictionary, 0, dictLength) != z.adler)
 			{
@@ -362,7 +413,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 			z.adler = z._adler.adler32(0, null, 0, 0);
 
-			if (length >= (1 << z.istate.wbits))
+			if (length >= 1 << z.istate.wbits)
 			{
 				length = (1 << z.istate.wbits) - 1;
 				index = dictLength - length;
@@ -373,7 +424,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			return Z_OK;
 		}
 
-		private static readonly byte[] mark = { (byte)0, (byte)0, (byte)0xff, (byte)0xff };
+		static readonly byte[] mark = { (byte)0, (byte)0, (byte)0xff, (byte)0xff };
 
 		internal int inflateSync(ZStream z)
 		{
@@ -384,7 +435,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 			// set up
 			if (z == null || z.istate == null)
+			{
 				return Z_STREAM_ERROR;
+			}
+
 			if (z.istate.mode != BAD)
 			{
 				z.istate.mode = BAD;
@@ -392,7 +446,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			}
 
 			if ((n = z.avail_in) == 0)
+			{
 				return Z_BUF_ERROR;
+			}
+
 			p = z.next_in_index;
 			m = z.istate.marker;
 
@@ -446,7 +503,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		internal int inflateSyncPoint(ZStream z)
 		{
 			if (z == null || z.istate == null || z.istate.blocks == null)
+			{
 				return Z_STREAM_ERROR;
+			}
+
 			return z.istate.blocks.sync_point();
 		}
 	}

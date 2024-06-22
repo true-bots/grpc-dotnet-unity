@@ -7,42 +7,46 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class TimeStampAndCrl
 		: Asn1Encodable
 	{
-		private ContentInfo timeStamp;
-		private X509.CertificateList crl;
+		ContentInfo timeStamp;
+		X509.CertificateList crl;
 
 		public TimeStampAndCrl(ContentInfo timeStamp)
 		{
 			this.timeStamp = timeStamp;
 		}
 
-		private TimeStampAndCrl(Asn1Sequence seq)
+		TimeStampAndCrl(Asn1Sequence seq)
 		{
-			this.timeStamp = ContentInfo.GetInstance(seq[0]);
+			timeStamp = ContentInfo.GetInstance(seq[0]);
 			if (seq.Count == 2)
 			{
-				this.crl = X509.CertificateList.GetInstance(seq[1]);
+				crl = X509.CertificateList.GetInstance(seq[1]);
 			}
 		}
 
 		public static TimeStampAndCrl GetInstance(object obj)
 		{
 			if (obj is TimeStampAndCrl)
+			{
 				return (TimeStampAndCrl)obj;
+			}
 
 			if (obj != null)
+			{
 				return new TimeStampAndCrl(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
 		public virtual ContentInfo TimeStampToken
 		{
-			get { return this.timeStamp; }
+			get { return timeStamp; }
 		}
 
 		public virtual X509.CertificateList Crl
 		{
-			get { return this.crl; }
+			get { return crl; }
 		}
 
 		/**

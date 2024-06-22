@@ -11,19 +11,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static RevAnnContent GetInstance(object obj)
 		{
 			if (obj is RevAnnContent revAnnContent)
+			{
 				return revAnnContent;
+			}
 
 			if (obj != null)
+			{
 				return new RevAnnContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly PkiStatusEncodable m_status;
-		private readonly CertId m_certID;
-		private readonly Asn1GeneralizedTime m_willBeRevokedAt;
-		private readonly Asn1GeneralizedTime m_badSinceDate;
-		private readonly X509Extensions m_crlDetails;
+		readonly PkiStatusEncodable m_status;
+		readonly CertId m_certID;
+		readonly Asn1GeneralizedTime m_willBeRevokedAt;
+		readonly Asn1GeneralizedTime m_badSinceDate;
+		readonly X509Extensions m_crlDetails;
 
 		public RevAnnContent(PkiStatusEncodable status, CertId certID, Asn1GeneralizedTime willBeRevokedAt,
 			Asn1GeneralizedTime badSinceDate)
@@ -41,7 +45,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_crlDetails = crlDetails;
 		}
 
-		private RevAnnContent(Asn1Sequence seq)
+		RevAnnContent(Asn1Sequence seq)
 		{
 			m_status = PkiStatusEncodable.GetInstance(seq[0]);
 			m_certID = CertId.GetInstance(seq[1]);
@@ -54,15 +58,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			}
 		}
 
-		public virtual PkiStatusEncodable Status => m_status;
+		public virtual PkiStatusEncodable Status
+		{
+			get { return m_status; }
+		}
 
-		public virtual CertId CertID => m_certID;
+		public virtual CertId CertID
+		{
+			get { return m_certID; }
+		}
 
-		public virtual Asn1GeneralizedTime WillBeRevokedAt => m_willBeRevokedAt;
+		public virtual Asn1GeneralizedTime WillBeRevokedAt
+		{
+			get { return m_willBeRevokedAt; }
+		}
 
-		public virtual Asn1GeneralizedTime BadSinceDate => m_badSinceDate;
+		public virtual Asn1GeneralizedTime BadSinceDate
+		{
+			get { return m_badSinceDate; }
+		}
 
-		public virtual X509Extensions CrlDetails => m_crlDetails;
+		public virtual X509Extensions CrlDetails
+		{
+			get { return m_crlDetails; }
+		}
 
 		/**
 		 * <pre>

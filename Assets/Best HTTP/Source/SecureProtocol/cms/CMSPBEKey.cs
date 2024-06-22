@@ -35,20 +35,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			AlgorithmIdentifier keyDerivationAlgorithm)
 		{
 			if (!keyDerivationAlgorithm.Algorithm.Equals(PkcsObjectIdentifiers.IdPbkdf2))
+			{
 				throw new ArgumentException("Unsupported key derivation algorithm: "
 				                            + keyDerivationAlgorithm.Algorithm);
+			}
 
 			Pbkdf2Params kdfParams = Pbkdf2Params.GetInstance(
 				keyDerivationAlgorithm.Parameters.ToAsn1Object());
 
 			this.password = (char[])password.Clone();
-			this.salt = kdfParams.GetSalt();
-			this.iterationCount = kdfParams.IterationCount.IntValue;
+			salt = kdfParams.GetSalt();
+			iterationCount = kdfParams.IterationCount.IntValue;
 		}
 
 		~CmsPbeKey()
 		{
-			Array.Clear(this.password, 0, this.password.Length);
+			Array.Clear(password, 0, password.Length);
 		}
 
 		public byte[] Salt

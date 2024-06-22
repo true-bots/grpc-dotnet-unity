@@ -33,7 +33,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new Signature((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public Signature(
@@ -49,16 +49,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			Asn1Sequence certs)
 		{
 			if (signatureAlgorithm == null)
+			{
 				throw new ArgumentException("signatureAlgorithm");
+			}
+
 			if (signatureValue == null)
+			{
 				throw new ArgumentException("signatureValue");
+			}
 
 			this.signatureAlgorithm = signatureAlgorithm;
 			this.signatureValue = signatureValue;
 			this.certs = certs;
 		}
 
-		private Signature(
+		Signature(
 			Asn1Sequence seq)
 		{
 			signatureAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);

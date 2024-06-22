@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public abstract class DerGenerator
 		: Asn1Generator
 	{
-		private bool _tagged = false;
-		private bool _isExplicit;
-		private int _tagNo;
+		bool _tagged = false;
+		bool _isExplicit;
+		int _tagNo;
 
 		protected DerGenerator(
 			Stream outStream)
@@ -29,7 +29,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			_tagNo = tagNo;
 		}
 
-		private static void WriteLength(
+		static void WriteLength(
 			Stream outStr,
 			int length)
 		{

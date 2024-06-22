@@ -17,7 +17,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class KekRecipientInformation
 		: RecipientInformation
 	{
-		private KekRecipientInfo info;
+		KekRecipientInfo info;
 
 		internal KekRecipientInformation(
 			KekRecipientInfo info,
@@ -25,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			: base(info.KeyEncryptionAlgorithm, secureReadable)
 		{
 			this.info = info;
-			this.rid = new RecipientID();
+			rid = new RecipientID();
 
 			KekIdentifier kekId = info.KekID;
 

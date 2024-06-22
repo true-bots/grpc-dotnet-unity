@@ -5,7 +5,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Field
 {
-	internal class GF2Polynomial
+	class GF2Polynomial
 		: IPolynomial
 	{
 		protected readonly int[] exponents;

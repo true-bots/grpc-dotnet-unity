@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class RsaPublicKeyStructure
 		: Asn1Encodable
 	{
-		private BigInteger modulus;
-		private BigInteger publicExponent;
+		BigInteger modulus;
+		BigInteger publicExponent;
 
 		public static RsaPublicKeyStructure GetInstance(
 			Asn1TaggedObject obj,
@@ -32,7 +32,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new RsaPublicKeyStructure((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Invalid RsaPublicKeyStructure: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid RsaPublicKeyStructure: " + Platform.GetTypeName(obj));
 		}
 
 		public RsaPublicKeyStructure(
@@ -40,23 +40,36 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			BigInteger publicExponent)
 		{
 			if (modulus == null)
+			{
 				throw new ArgumentNullException("modulus");
+			}
+
 			if (publicExponent == null)
+			{
 				throw new ArgumentNullException("publicExponent");
+			}
+
 			if (modulus.SignValue <= 0)
+			{
 				throw new ArgumentException("Not a valid RSA modulus", "modulus");
+			}
+
 			if (publicExponent.SignValue <= 0)
+			{
 				throw new ArgumentException("Not a valid RSA public exponent", "publicExponent");
+			}
 
 			this.modulus = modulus;
 			this.publicExponent = publicExponent;
 		}
 
-		private RsaPublicKeyStructure(
+		RsaPublicKeyStructure(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
 			// Note: we are accepting technically incorrect (i.e. negative) values here
 			modulus = DerInteger.GetInstance(seq[0]).PositiveValue;

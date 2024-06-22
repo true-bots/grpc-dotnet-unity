@@ -10,31 +10,44 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		internal static IBlockCipherMode GetBlockCipherMode(IBlockCipher blockCipher)
 		{
 			if (blockCipher is IBlockCipherMode blockCipherMode)
+			{
 				return blockCipherMode;
+			}
 
 			return new EcbBlockCipher(blockCipher);
 		}
 
-		private readonly IBlockCipher m_cipher;
+		readonly IBlockCipher m_cipher;
 
 		public EcbBlockCipher(IBlockCipher cipher)
 		{
 			if (cipher == null)
+			{
 				throw new ArgumentNullException(nameof(cipher));
+			}
 
 			m_cipher = cipher;
 		}
 
-		public bool IsPartialBlockOkay => false;
+		public bool IsPartialBlockOkay
+		{
+			get { return false; }
+		}
 
-		public string AlgorithmName => m_cipher.AlgorithmName + "/ECB";
+		public string AlgorithmName
+		{
+			get { return m_cipher.AlgorithmName + "/ECB"; }
+		}
 
 		public int GetBlockSize()
 		{
 			return m_cipher.GetBlockSize();
 		}
 
-		public IBlockCipher UnderlyingCipher => m_cipher;
+		public IBlockCipher UnderlyingCipher
+		{
+			get { return m_cipher; }
+		}
 
 		public void Init(bool forEncryption, ICipherParameters parameters)
 		{

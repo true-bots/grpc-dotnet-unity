@@ -6,7 +6,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-	internal class DigestInputBuffer
+	class DigestInputBuffer
 		: MemoryStream
 	{
 		internal void UpdateDigest(TlsHash hash)

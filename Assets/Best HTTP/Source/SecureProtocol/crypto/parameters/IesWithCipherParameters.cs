@@ -6,7 +6,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
 	public class IesWithCipherParameters : IesParameters
 	{
-		private int cipherKeySize;
+		int cipherKeySize;
 
 		/**
 		 * @param derivation the derivation parameter for the KDF function.

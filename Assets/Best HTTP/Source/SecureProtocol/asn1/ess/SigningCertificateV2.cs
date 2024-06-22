@@ -9,41 +9,47 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 	public class SigningCertificateV2
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence certs;
-		private readonly Asn1Sequence policies;
+		readonly Asn1Sequence certs;
+		readonly Asn1Sequence policies;
 
 		public static SigningCertificateV2 GetInstance(
 			object o)
 		{
 			if (o == null || o is SigningCertificateV2)
+			{
 				return (SigningCertificateV2)o;
+			}
 
 			if (o is Asn1Sequence)
+			{
 				return new SigningCertificateV2((Asn1Sequence)o);
+			}
 
 			throw new ArgumentException(
 				"unknown object in 'SigningCertificateV2' factory : "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
+				+ Platform.GetTypeName(o) + ".");
 		}
 
-		private SigningCertificateV2(
+		SigningCertificateV2(
 			Asn1Sequence seq)
 		{
 			if (seq.Count < 1 || seq.Count > 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
-			this.certs = Asn1Sequence.GetInstance(seq[0].ToAsn1Object());
+			certs = Asn1Sequence.GetInstance(seq[0].ToAsn1Object());
 
 			if (seq.Count > 1)
 			{
-				this.policies = Asn1Sequence.GetInstance(seq[1].ToAsn1Object());
+				policies = Asn1Sequence.GetInstance(seq[1].ToAsn1Object());
 			}
 		}
 
 		public SigningCertificateV2(
 			EssCertIDv2 cert)
 		{
-			this.certs = new DerSequence(cert);
+			certs = new DerSequence(cert);
 		}
 
 		public SigningCertificateV2(
@@ -78,7 +84,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 		public PolicyInformation[] GetPolicies()
 		{
 			if (policies == null)
+			{
 				return null;
+			}
 
 			PolicyInformation[] policyInformations = new PolicyInformation[policies.Count];
 			for (int i = 0; i != policies.Count; i++)

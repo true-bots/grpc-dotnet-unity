@@ -37,21 +37,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class CmsSignedDataGenerator
 		: CmsSignedGenerator
 	{
-		private static readonly CmsSignedHelper Helper = CmsSignedHelper.Instance;
+		static readonly CmsSignedHelper Helper = CmsSignedHelper.Instance;
 
-		private readonly IList<SignerInf> signerInfs = new List<SignerInf>();
+		readonly IList<SignerInf> signerInfs = new List<SignerInf>();
 
-		private class SignerInf
+		class SignerInf
 		{
-			private readonly CmsSignedGenerator outer;
+			readonly CmsSignedGenerator outer;
 
-			private readonly ISignatureFactory sigCalc;
-			private readonly SignerIdentifier signerIdentifier;
-			private readonly string digestOID;
-			private readonly string encOID;
-			private readonly CmsAttributeTableGenerator sAttr;
-			private readonly CmsAttributeTableGenerator unsAttr;
-			private readonly Asn1.Cms.AttributeTable baseSignedTable;
+			readonly ISignatureFactory sigCalc;
+			readonly SignerIdentifier signerIdentifier;
+			readonly string digestOID;
+			readonly string encOID;
+			readonly CmsAttributeTableGenerator sAttr;
+			readonly CmsAttributeTableGenerator unsAttr;
+			readonly Asn1.Cms.AttributeTable baseSignedTable;
 
 			internal SignerInf(
 				CmsSignedGenerator outer,
@@ -69,7 +69,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				string signatureName = digestName + "with" + Helper.GetEncryptionAlgName(encOID);
 
 				this.outer = outer;
-				this.sigCalc = new Asn1SignatureFactory(signatureName, key, random);
+				sigCalc = new Asn1SignatureFactory(signatureName, key, random);
 				this.signerIdentifier = signerIdentifier;
 				this.digestOID = digestOID;
 				this.encOID = encOID;
@@ -89,9 +89,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				this.outer = outer;
 				this.sigCalc = sigCalc;
 				this.signerIdentifier = signerIdentifier;
-				this.digestOID = new DefaultDigestAlgorithmIdentifierFinder().Find(
+				digestOID = new DefaultDigestAlgorithmIdentifierFinder().Find(
 					(AlgorithmIdentifier)sigCalc.AlgorithmDetails).Algorithm.Id;
-				this.encOID = ((AlgorithmIdentifier)sigCalc.AlgorithmDetails).Algorithm.Id;
+				encOID = ((AlgorithmIdentifier)sigCalc.AlgorithmDetails).Algorithm.Id;
 				this.sAttr = sAttr;
 				this.unsAttr = unsAttr;
 				this.baseSignedTable = baseSignedTable;
@@ -119,7 +119,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 				string signatureName = digestName + "with" + Helper.GetEncryptionAlgName(encOID);
 
-				if (!outer.m_digests.TryGetValue(digestOID, out var hash))
+				if (!outer.m_digests.TryGetValue(digestOID, out byte[] hash))
 				{
 					IDigest dig = Helper.GetDigestInstance(digestName);
 					if (content != null)
@@ -138,7 +138,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				{
 					if (sAttr != null)
 					{
-						var parameters = outer.GetBaseParameters(contentType, digAlgId, hash);
+						IDictionary<CmsAttributeTableParameter, object> parameters = outer.GetBaseParameters(contentType, digAlgId, hash);
 
 						//Asn1.Cms.AttributeTable signed = sAttr.GetAttributes(Collections.unmodifiableMap(parameters));
 						Asn1.Cms.AttributeTable signed = sAttr.GetAttributes(parameters);
@@ -170,7 +170,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				Asn1Set unsignedAttr = null;
 				if (unsAttr != null)
 				{
-					var baseParameters = outer.GetBaseParameters(contentType, digAlgId, hash);
+					IDictionary<CmsAttributeTableParameter, object> baseParameters = outer.GetBaseParameters(contentType, digAlgId, hash);
 					baseParameters[CmsAttributeTableParameter.Signature] = sigBytes.Clone();
 
 //					Asn1.Cms.AttributeTable unsigned = unsAttr.GetAttributes(Collections.unmodifiableMap(baseParameters));
@@ -415,7 +415,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				signerInfoGenerator.signedGen, signerInfoGenerator.unsignedGen, null));
 		}
 
-		private void doAddSigner(
+		void doAddSigner(
 			AsymmetricKeyParameter privateKey,
 			SignerIdentifier signerIdentifier,
 			string encryptionOID,
@@ -468,7 +468,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			//
 			// add the SignerInfo objects
 			//
-			bool isCounterSignature = (signedContentType == null);
+			bool isCounterSignature = signedContentType == null;
 
 			DerObjectIdentifier contentTypeOid = isCounterSignature
 				? null
@@ -560,7 +560,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			CmsProcessable content,
 			bool encapsulate)
 		{
-			return this.Generate(Data, content, encapsulate);
+			return Generate(Data, content, encapsulate);
 		}
 
 		/**
@@ -574,7 +574,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		public SignerInformationStore GenerateCounterSigners(
 			SignerInformation signer)
 		{
-			return this.Generate(null, new CmsProcessableByteArray(signer.GetSignature()), false).GetSignerInfos();
+			return Generate(null, new CmsProcessableByteArray(signer.GetSignature()), false).GetSignerInfos();
 		}
 	}
 }

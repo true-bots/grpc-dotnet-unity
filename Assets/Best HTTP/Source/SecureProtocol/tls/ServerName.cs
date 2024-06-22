@@ -16,17 +16,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	/// </remarks>
 	public sealed class ServerName
 	{
-		private readonly short nameType;
-		private readonly byte[] nameData;
+		readonly short nameType;
+		readonly byte[] nameData;
 
 		public ServerName(short nameType, byte[] nameData)
 		{
 			if (!TlsUtilities.IsValidUint8(nameType))
+			{
 				throw new ArgumentException("must be from 0 to 255", "nameType");
+			}
+
 			if (null == nameData)
+			{
 				throw new ArgumentNullException("nameData");
+			}
+
 			if (nameData.Length < 1 || !TlsUtilities.IsValidUint16(nameData.Length))
+			{
 				throw new ArgumentException("must have length from 1 to 65535", "nameData");
+			}
 
 			this.nameType = nameType;
 			this.nameData = nameData;

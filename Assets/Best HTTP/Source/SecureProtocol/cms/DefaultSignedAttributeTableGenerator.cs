@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class DefaultSignedAttributeTableGenerator
 		: CmsAttributeTableGenerator
 	{
-		private readonly IDictionary<DerObjectIdentifier, object> m_table;
+		readonly IDictionary<DerObjectIdentifier, object> m_table;
 
 		/**
 		 * Initialise to use all defaults
@@ -53,12 +53,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		protected virtual IDictionary<DerObjectIdentifier, object> CreateStandardAttributeTable(
 			IDictionary<CmsAttributeTableParameter, object> parameters)
 		{
-			var std = new Dictionary<DerObjectIdentifier, object>(m_table);
+			Dictionary<DerObjectIdentifier, object> std = new Dictionary<DerObjectIdentifier, object>(m_table);
 			DoCreateStandardAttributeTable(parameters, std);
 			return std;
 		}
 
-		private void DoCreateStandardAttributeTable(IDictionary<CmsAttributeTableParameter, object> parameters,
+		void DoCreateStandardAttributeTable(IDictionary<CmsAttributeTableParameter, object> parameters,
 			IDictionary<DerObjectIdentifier, object> std)
 		{
 			// contentType will be absent if we're trying to generate a counter signature.
@@ -97,7 +97,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 */
 		public virtual AttributeTable GetAttributes(IDictionary<CmsAttributeTableParameter, object> parameters)
 		{
-			var table = CreateStandardAttributeTable(parameters);
+			IDictionary<DerObjectIdentifier, object> table = CreateStandardAttributeTable(parameters);
 			return new AttributeTable(table);
 		}
 	}

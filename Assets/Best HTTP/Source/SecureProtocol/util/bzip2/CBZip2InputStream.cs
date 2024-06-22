@@ -47,57 +47,57 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 		index of the last char in the block, so
 		the block size == last + 1.
 		*/
-		private int last;
+		int last;
 
 		/*
 		index in zptr[] of original string after sorting.
 		*/
-		private int origPtr;
+		int origPtr;
 
 		/*
 		always: in the range 0 .. 9.
 		The current block size is 100000 * this number.
 		*/
-		private int blockSize100k;
+		int blockSize100k;
 
-		private int bsBuff;
-		private int bsLive;
-		private readonly CRC m_blockCrc = new CRC();
+		int bsBuff;
+		int bsLive;
+		readonly CRC m_blockCrc = new CRC();
 
-		private int nInUse;
+		int nInUse;
 
-		private byte[] seqToUnseq = new byte[256];
+		byte[] seqToUnseq = new byte[256];
 
-		private byte[] m_selectors = new byte[BZip2Constants.MAX_SELECTORS];
+		byte[] m_selectors = new byte[BZip2Constants.MAX_SELECTORS];
 
-		private int[] tt;
-		private byte[] ll8;
+		int[] tt;
+		byte[] ll8;
 
 		/*
 		freq table collected to save a pass over the data
 		during decompression.
 		*/
-		private int[] unzftab = new int[256];
+		int[] unzftab = new int[256];
 
-		private int[][] limit = CreateIntArray(BZip2Constants.N_GROUPS, BZip2Constants.MAX_CODE_LEN + 1);
-		private int[][] basev = CreateIntArray(BZip2Constants.N_GROUPS, BZip2Constants.MAX_CODE_LEN + 1);
-		private int[][] perm = CreateIntArray(BZip2Constants.N_GROUPS, BZip2Constants.MAX_ALPHA_SIZE);
-		private int[] minLens = new int[BZip2Constants.N_GROUPS];
+		int[][] limit = CreateIntArray(BZip2Constants.N_GROUPS, BZip2Constants.MAX_CODE_LEN + 1);
+		int[][] basev = CreateIntArray(BZip2Constants.N_GROUPS, BZip2Constants.MAX_CODE_LEN + 1);
+		int[][] perm = CreateIntArray(BZip2Constants.N_GROUPS, BZip2Constants.MAX_ALPHA_SIZE);
+		int[] minLens = new int[BZip2Constants.N_GROUPS];
 
-		private Stream bsStream;
+		Stream bsStream;
 
-		private bool streamEnd = false;
+		bool streamEnd = false;
 
-		private int currentByte = -1;
+		int currentByte = -1;
 
-		private const int RAND_PART_B_STATE = 1;
-		private const int RAND_PART_C_STATE = 2;
-		private const int NO_RAND_PART_B_STATE = 3;
-		private const int NO_RAND_PART_C_STATE = 4;
+		const int RAND_PART_B_STATE = 1;
+		const int RAND_PART_C_STATE = 2;
+		const int NO_RAND_PART_B_STATE = 3;
+		const int NO_RAND_PART_C_STATE = 4;
 
-		private int currentState = 0;
+		int currentState = 0;
 
-		private int m_expectedBlockCrc, m_expectedStreamCrc, m_streamCrc;
+		int m_expectedBlockCrc, m_expectedStreamCrc, m_streamCrc;
 
 		int i2, count, chPrev, ch2;
 		int i, tPos;
@@ -119,10 +119,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			int version = bsStream.ReadByte();
 			int level = bsStream.ReadByte();
 			if (level < 0)
+			{
 				throw new EndOfStreamException();
+			}
 
-			if (magic1 != 'B' | magic2 != 'Z' | version != 'h' | level < '1' | level > '9')
+			if ((magic1 != 'B') | (magic2 != 'Z') | (version != 'h') | (level < '1') | (level > '9'))
+			{
 				throw new IOException("Invalid stream header");
+			}
 
 			blockSize100k = level - '0';
 
@@ -149,7 +153,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			{
 				int b = ReadByte();
 				if (b < 0)
+				{
 					break;
+				}
 
 				buffer[offset + pos++] = (byte)b;
 			}
@@ -160,7 +166,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 		public override int ReadByte()
 		{
 			if (streamEnd)
+			{
 				return -1;
+			}
 
 			int result = currentByte;
 			switch (currentState)
@@ -184,17 +192,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			return result;
 		}
 
-		private void BeginBlock()
+		void BeginBlock()
 		{
 			long magic48 = BsGetLong48();
 			if (magic48 != 0x314159265359L)
 			{
 				if (magic48 != 0x177245385090L)
+				{
 					throw new IOException("Block header error");
+				}
 
 				m_expectedStreamCrc = BsGetInt32();
 				if (m_expectedStreamCrc != m_streamCrc)
+				{
 					throw new IOException("Stream CRC error");
+				}
 
 				BsFinishedWithStream();
 				streamEnd = true;
@@ -219,8 +231,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					cftab[i + 1] = accum;
 				}
 
-				if (accum != (last + 1))
+				if (accum != last + 1)
+				{
 					throw new InvalidOperationException();
+				}
 			}
 
 			for (i = 0; i <= last; i++)
@@ -247,23 +261,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void EndBlock()
+		void EndBlock()
 		{
 			int blockFinalCrc = m_blockCrc.GetFinal();
 			if (m_expectedBlockCrc != blockFinalCrc)
+			{
 				throw new IOException("Block CRC error");
+			}
 
 			m_streamCrc = Integers.RotateLeft(m_streamCrc, 1) ^ blockFinalCrc;
 		}
 
-		private void BsFinishedWithStream()
+		void BsFinishedWithStream()
 		{
 			try
 			{
-				if (this.bsStream != null)
+				if (bsStream != null)
 				{
-					this.bsStream.Dispose();
-					this.bsStream = null;
+					bsStream.Dispose();
+					bsStream = null;
 				}
 			}
 			catch
@@ -272,7 +288,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private int BsGetBit()
+		int BsGetBit()
 		{
 			if (bsLive == 0)
 			{
@@ -286,7 +302,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			return (bsBuff >> bsLive) & 1;
 		}
 
-		private int BsGetBits(int n)
+		int BsGetBits(int n)
 		{
 			Debug.Assert(1 <= n && n <= 24);
 
@@ -301,7 +317,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			return (bsBuff >> bsLive) & ((1 << n) - 1);
 		}
 
-		private int BsGetBitsSmall(int n)
+		int BsGetBitsSmall(int n)
 		{
 			Debug.Assert(1 <= n && n <= 8);
 
@@ -316,19 +332,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			return (bsBuff >> bsLive) & ((1 << n) - 1);
 		}
 
-		private int BsGetInt32()
+		int BsGetInt32()
 		{
 			int u = BsGetBits(16) << 16;
 			return u | BsGetBits(16);
 		}
 
-		private long BsGetLong48()
+		long BsGetLong48()
 		{
 			long u = (long)BsGetBits(24) << 24;
 			return u | (long)BsGetBits(24);
 		}
 
-		private void HbCreateDecodeTables(int[] limit, int[] basev, int[] perm, byte[] length, int minLen, int maxLen,
+		void HbCreateDecodeTables(int[] limit, int[] basev, int[] perm, byte[] length, int minLen, int maxLen,
 			int alphaSize)
 		{
 			Array.Clear(basev, 0, basev.Length);
@@ -351,7 +367,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private int RecvDecodingTables()
+		int RecvDecodingTables()
 		{
 			int i, j;
 
@@ -378,18 +394,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 
 			if (nInUse < 1)
+			{
 				throw new InvalidOperationException();
+			}
 
 			int alphaSize = nInUse + 2;
 
 			/* Now the selectors */
 			int nGroups = BsGetBitsSmall(3);
 			if (nGroups < 2 || nGroups > BZip2Constants.N_GROUPS)
+			{
 				throw new InvalidOperationException();
+			}
 
 			int nSelectors = BsGetBits(15);
 			if (nSelectors < 1)
+			{
 				throw new InvalidOperationException();
+			}
 
 			uint mtfGroups = 0x00543210U;
 			for (i = 0; i < nSelectors; i++)
@@ -398,12 +420,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 				while (BsGetBit() == 1)
 				{
 					if (++mtfSelector >= nGroups)
+					{
 						throw new InvalidOperationException();
+					}
 				}
 
 				// Ignore declared selectors in excess of the maximum usable number
 				if (i >= BZip2Constants.MAX_SELECTORS)
+				{
 					continue;
+				}
 
 				// Undo the MTF value for the selector.
 				switch (mtfSelector)
@@ -411,19 +437,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					case 0:
 						break;
 					case 1:
-						mtfGroups = (mtfGroups >> 4) & 0x00000FU | (mtfGroups << 4) & 0x0000F0U | mtfGroups & 0xFFFF00U;
+						mtfGroups = ((mtfGroups >> 4) & 0x00000FU) | ((mtfGroups << 4) & 0x0000F0U) | (mtfGroups & 0xFFFF00U);
 						break;
 					case 2:
-						mtfGroups = (mtfGroups >> 8) & 0x00000FU | (mtfGroups << 4) & 0x000FF0U | mtfGroups & 0xFFF000U;
+						mtfGroups = ((mtfGroups >> 8) & 0x00000FU) | ((mtfGroups << 4) & 0x000FF0U) | (mtfGroups & 0xFFF000U);
 						break;
 					case 3:
-						mtfGroups = (mtfGroups >> 12) & 0x00000FU | (mtfGroups << 4) & 0x00FFF0U | mtfGroups & 0xFF0000U;
+						mtfGroups = ((mtfGroups >> 12) & 0x00000FU) | ((mtfGroups << 4) & 0x00FFF0U) | (mtfGroups & 0xFF0000U);
 						break;
 					case 4:
-						mtfGroups = (mtfGroups >> 16) & 0x00000FU | (mtfGroups << 4) & 0x0FFFF0U | mtfGroups & 0xF00000U;
+						mtfGroups = ((mtfGroups >> 16) & 0x00000FU) | ((mtfGroups << 4) & 0x0FFFF0U) | (mtfGroups & 0xF00000U);
 						break;
 					case 5:
-						mtfGroups = (mtfGroups >> 20) & 0x00000FU | (mtfGroups << 4) & 0xFFFFF0U;
+						mtfGroups = ((mtfGroups >> 20) & 0x00000FU) | ((mtfGroups << 4) & 0xFFFFF0U);
 						break;
 					default:
 						throw new InvalidOperationException();
@@ -440,7 +466,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 				int maxLen = 0, minLen = 32;
 				int curr = BsGetBitsSmall(5);
 				if ((curr < 1) | (curr > BZip2Constants.MAX_CODE_LEN))
+				{
 					throw new InvalidOperationException();
+				}
 
 				for (i = 0; i < alphaSize; i++)
 				{
@@ -450,7 +478,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 						int nextTwoBits = BsGetBitsSmall(2);
 						curr += 1 - (nextTwoBits & 2);
 						if ((curr < 1) | (curr > BZip2Constants.MAX_CODE_LEN))
+						{
 							throw new InvalidOperationException();
+						}
+
 						markerBit = nextTwoBits & 1;
 					}
 
@@ -467,7 +498,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			return nSelectors;
 		}
 
-		private void GetAndMoveToFrontDecode()
+		void GetAndMoveToFrontDecode()
 		{
 			int i, j, nextSym;
 
@@ -475,7 +506,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 
 			origPtr = BsGetBits(24);
 			if (origPtr > 10 + limitLast)
+			{
 				throw new InvalidOperationException();
+			}
 
 			int nSelectors = RecvDecodingTables();
 
@@ -512,14 +545,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 				while (zvec >= groupLimits[zn])
 				{
 					if (++zn > BZip2Constants.MAX_CODE_LEN)
+					{
 						throw new InvalidOperationException();
+					}
 
 					zvec = (zvec << 1) | BsGetBit();
 				}
 
 				int permIndex = zvec - groupBase[zn];
 				if (permIndex >= alphaSize)
+				{
 					throw new InvalidOperationException();
+				}
 
 				nextSym = groupPerm[permIndex];
 			}
@@ -533,7 +570,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					do
 					{
 						if (n > 1024 * 1024)
+						{
 							throw new InvalidOperationException();
+						}
 
 						s += n << nextSym;
 						n <<= 1;
@@ -542,7 +581,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 							if (groupPos == 0)
 							{
 								if (++groupNo >= nSelectors)
+								{
 									throw new InvalidOperationException();
+								}
 
 								groupPos = BZip2Constants.G_SIZE;
 								groupSel = m_selectors[groupNo];
@@ -559,14 +600,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 							while (zvec >= groupLimits[zn])
 							{
 								if (++zn > BZip2Constants.MAX_CODE_LEN)
+								{
 									throw new InvalidOperationException();
+								}
 
 								zvec = (zvec << 1) | BsGetBit();
 							}
 
 							int permIndex = zvec - groupBase[zn];
 							if (permIndex >= alphaSize)
+							{
 								throw new InvalidOperationException();
+							}
 
 							nextSym = groupPerm[permIndex];
 						}
@@ -578,7 +623,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 					unzftab[ch] += s;
 
 					if (last >= limitLast - s)
+					{
 						throw new InvalidOperationException("Block overrun");
+					}
 
 					while (--s >= 0)
 					{
@@ -590,7 +637,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 				else
 				{
 					if (++last >= limitLast)
+					{
 						throw new InvalidOperationException("Block overrun");
+					}
 
 					byte tmp = yy[nextSym - 1];
 					unzftab[tmp]++;
@@ -619,7 +668,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 						if (groupPos == 0)
 						{
 							if (++groupNo >= nSelectors)
+							{
 								throw new InvalidOperationException();
+							}
 
 							groupPos = BZip2Constants.G_SIZE;
 							groupSel = m_selectors[groupNo];
@@ -636,14 +687,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 						while (zvec >= groupLimits[zn])
 						{
 							if (++zn > BZip2Constants.MAX_CODE_LEN)
+							{
 								throw new InvalidOperationException();
+							}
 
 							zvec = (zvec << 1) | BsGetBit();
 						}
 
 						int permIndex = zvec - groupBase[zn];
 						if (permIndex >= alphaSize)
+						{
 							throw new InvalidOperationException();
+						}
 
 						nextSym = groupPerm[permIndex];
 					}
@@ -652,7 +707,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 
 			if (origPtr > last)
+			{
 				throw new InvalidOperationException();
+			}
 
 			// Check unzftab entries are in range.
 			{
@@ -667,19 +724,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 				}
 
 				if (check < 0)
+				{
 					throw new InvalidOperationException();
+				}
 			}
 		}
 
-		private int RequireByte()
+		int RequireByte()
 		{
 			int b = bsStream.ReadByte();
 			if (b < 0)
+			{
 				throw new EndOfStreamException();
+			}
+
 			return b & 0xFF;
 		}
 
-		private void SetupRandPartA()
+		void SetupRandPartA()
 		{
 			if (i2 <= last)
 			{
@@ -707,7 +769,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void SetupNoRandPartA()
+		void SetupNoRandPartA()
 		{
 			if (i2 <= last)
 			{
@@ -727,7 +789,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void SetupRandPartB()
+		void SetupRandPartB()
 		{
 			if (ch2 != chPrev)
 			{
@@ -756,7 +818,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void SetupNoRandPartB()
+		void SetupNoRandPartB()
 		{
 			if (ch2 != chPrev)
 			{
@@ -777,7 +839,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void SetupRandPartC()
+		void SetupRandPartC()
 		{
 			if (j2 < z)
 			{
@@ -793,7 +855,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Bzip2
 			}
 		}
 
-		private void SetupNoRandPartC()
+		void SetupNoRandPartC()
 		{
 			if (j2 < z)
 			{

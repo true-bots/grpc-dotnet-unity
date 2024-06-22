@@ -6,7 +6,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 #if BESTHTTP_WITH_BURST
     [Unity.Burst.BurstCompile]
 #endif
-	internal static class FastSalsa20EngineHelper
+	static class FastSalsa20EngineHelper
 	{
 #if BESTHTTP_WITH_BURST
         [Unity.Burst.BurstCompile]

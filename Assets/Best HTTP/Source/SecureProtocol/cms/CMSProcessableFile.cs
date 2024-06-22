@@ -12,10 +12,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class CmsProcessableFile
 		: CmsProcessable, CmsReadable
 	{
-		private const int DefaultBufSize = 32 * 1024;
+		const int DefaultBufSize = 32 * 1024;
 
-		private readonly FileInfo _file;
-		private readonly int _bufSize;
+		readonly FileInfo _file;
+		readonly int _bufSize;
 
 		public CmsProcessableFile(FileInfo file)
 			: this(file, DefaultBufSize)
@@ -35,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		public virtual void Write(Stream zOut)
 		{
-			using (var inStr = _file.OpenRead())
+			using (FileStream inStr = _file.OpenRead())
 			{
 				Streams.PipeAll(inStr, zOut, _bufSize);
 			}

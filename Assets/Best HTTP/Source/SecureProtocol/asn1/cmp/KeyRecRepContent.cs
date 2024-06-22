@@ -10,20 +10,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static KeyRecRepContent GetInstance(object obj)
 		{
 			if (obj is KeyRecRepContent keyRecRepContent)
+			{
 				return keyRecRepContent;
+			}
 
 			if (obj != null)
+			{
 				return new KeyRecRepContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly PkiStatusInfo m_status;
-		private readonly CmpCertificate m_newSigCert;
-		private readonly Asn1Sequence m_caCerts;
-		private readonly Asn1Sequence m_keyPairHist;
+		readonly PkiStatusInfo m_status;
+		readonly CmpCertificate m_newSigCert;
+		readonly Asn1Sequence m_caCerts;
+		readonly Asn1Sequence m_keyPairHist;
 
-		private KeyRecRepContent(Asn1Sequence seq)
+		KeyRecRepContent(Asn1Sequence seq)
 		{
 			m_status = PkiStatusInfo.GetInstance(seq[0]);
 
@@ -48,14 +52,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			}
 		}
 
-		public virtual PkiStatusInfo Status => m_status;
+		public virtual PkiStatusInfo Status
+		{
+			get { return m_status; }
+		}
 
-		public virtual CmpCertificate NewSigCert => m_newSigCert;
+		public virtual CmpCertificate NewSigCert
+		{
+			get { return m_newSigCert; }
+		}
 
 		public virtual CmpCertificate[] GetCACerts()
 		{
 			if (m_caCerts == null)
+			{
 				return null;
+			}
 
 			return m_caCerts.MapElements(CmpCertificate.GetInstance);
 		}
@@ -63,7 +75,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public virtual CertifiedKeyPair[] GetKeyPairHist()
 		{
 			if (m_keyPairHist == null)
+			{
 				return null;
+			}
 
 			return m_keyPairHist.MapElements(CertifiedKeyPair.GetInstance);
 		}

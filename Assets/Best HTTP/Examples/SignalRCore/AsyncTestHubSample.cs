@@ -14,23 +14,23 @@ namespace BestHTTP.Examples
 {
 	// Server side of this example can be found here:
 	// https://github.com/Benedicht/BestHTTP_DemoSite/blob/master/BestHTTP_DemoSite/Hubs/TestHub.cs
-	public class AsyncTestHubSample : BestHTTP.Examples.Helpers.SampleBase
+	public class AsyncTestHubSample : SampleBase
 	{
 #pragma warning disable 0649
 #pragma warning disable 0414
-		[SerializeField] private string _path = "/TestHub";
+		[SerializeField] string _path = "/TestHub";
 
-		[SerializeField] private ScrollRect _scrollRect;
+		[SerializeField] ScrollRect _scrollRect;
 
-		[SerializeField] private RectTransform _contentRoot;
+		[SerializeField] RectTransform _contentRoot;
 
-		[SerializeField] private TextListItem _listItemPrefab;
+		[SerializeField] TextListItem _listItemPrefab;
 
-		[SerializeField] private int _maxListItemEntries = 100;
+		[SerializeField] int _maxListItemEntries = 100;
 
-		[SerializeField] private Button _connectButton;
+		[SerializeField] Button _connectButton;
 
-		[SerializeField] private Button _closeButton;
+		[SerializeField] Button _closeButton;
 
 #pragma warning restore
 
@@ -93,7 +93,7 @@ namespace BestHTTP.Examples
 			protocol = new JsonProtocol(new LitJsonEncoder());
 #endif
 			// Crete the HubConnection
-			hub = new HubConnection(new Uri(this.sampleSelector.BaseURL + this._path), protocol);
+			hub = new HubConnection(new Uri(sampleSelector.BaseURL + _path), protocol);
 
 			// Subscribe to hub events
 			hub.OnError += Hub_OnError;
@@ -137,14 +137,14 @@ namespace BestHTTP.Examples
 			}
 
 			// Call a function on the server to add two numbers. OnSuccess will be called with the result and OnError if there's an error.
-			var addResult = await hub.InvokeAsync<int>("Add", 10, 20);
+			int addResult = await hub.InvokeAsync<int>("Add", 10, 20);
 			AddText(string.Format("'<color=green>Add(10, 20)</color>' returned: '<color=yellow>{0}</color>'", addResult)).AddLeftPadding(20);
 
-			var nullabelTestResult = await hub.InvokeAsync<int?>("NullableTest", 10);
+			int? nullabelTestResult = await hub.InvokeAsync<int?>("NullableTest", 10);
 			AddText(string.Format("'<color=green>NullableTest(10)</color>' returned: '<color=yellow>{0}</color>'", nullabelTestResult)).AddLeftPadding(20);
 
 			// Call a function that will return a Person object constructed from the function's parameters.
-			var getPersonResult = await hub.InvokeAsync<Person>("GetPerson", "Mr. Smith", 26);
+			Person getPersonResult = await hub.InvokeAsync<Person>("GetPerson", "Mr. Smith", 26);
 			AddText(string.Format("'<color=green>GetPerson(\"Mr. Smith\", 26)</color>' returned: '<color=yellow>{0}</color>'", getPersonResult)).AddLeftPadding(20);
 
 			// To test errors/exceptions this call always throws an exception on the server side resulting in an OnError call.
@@ -152,7 +152,7 @@ namespace BestHTTP.Examples
 
 			try
 			{
-				var singleResultFailureResult = await hub.InvokeAsync<int>("SingleResultFailure", 10, 20);
+				int singleResultFailureResult = await hub.InvokeAsync<int>("SingleResultFailure", 10, 20);
 				AddText(string.Format("'<color=green>SingleResultFailure(10, 20)</color>' returned: '<color=yellow>{0}</color>'", singleResultFailureResult))
 					.AddLeftPadding(20);
 			}
@@ -162,7 +162,7 @@ namespace BestHTTP.Examples
 			}
 
 			// This call demonstrates IEnumerable<> functions, result will be the yielded numbers.
-			var batchedResult = await hub.InvokeAsync<int[]>("Batched", 10);
+			int[] batchedResult = await hub.InvokeAsync<int[]>("Batched", 10);
 			AddText(string.Format("'<color=green>Batched(10)</color>' returned items: '<color=yellow>{0}</color>'", batchedResult.Length)).AddLeftPadding(20);
 
 			// OnItem is called for a streaming request for every items returned by the server. OnSuccess will still be called with all the items.
@@ -173,7 +173,7 @@ namespace BestHTTP.Examples
 				.OnError(error => AddText(string.Format("'<color=green>ObservableCounter(10, 1000)</color>' error: '<color=red>{0}</color>'", error)).AddLeftPadding(20));
 
 			// A stream request can be cancelled any time.
-			var controller = hub.GetDownStreamController<int>("ChannelCounter", 10, 1000);
+			DownStreamItemController<int> controller = hub.GetDownStreamController<int>("ChannelCounter", 10, 1000);
 
 			controller.OnItem(result =>
 					AddText(string.Format("'<color=green>ChannelCounter(10, 1000)</color>' OnItem: '<color=yellow>{0}</color>'", result)).AddLeftPadding(20))
@@ -201,12 +201,12 @@ namespace BestHTTP.Examples
 			void OnCloseButton()
 		{
 #if CSHARP_7_OR_LATER
-			if (this.hub != null)
+			if (hub != null)
 			{
 				AddText("Calling CloseAsync");
 				SetButtons(false, false);
 
-				await this.hub.CloseAsync();
+				await hub.CloseAsync();
 
 				SetButtons(true, false);
 				AddText("Hub Closed");
@@ -217,24 +217,28 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// Called when an unrecoverable error happen. After this event the hub will not send or receive any messages.
 		/// </summary>
-		private void Hub_OnError(HubConnection hub, string error)
+		void Hub_OnError(HubConnection hub, string error)
 		{
 			SetButtons(true, false);
 			AddText(string.Format("Hub Error: <color=red>{0}</color>", error));
 		}
 
-		private void SetButtons(bool connect, bool close)
+		void SetButtons(bool connect, bool close)
 		{
-			if (this._connectButton != null)
-				this._connectButton.interactable = connect;
+			if (_connectButton != null)
+			{
+				_connectButton.interactable = connect;
+			}
 
-			if (this._closeButton != null)
-				this._closeButton.interactable = close;
+			if (_closeButton != null)
+			{
+				_closeButton.interactable = close;
+			}
 		}
 
-		private TextListItem AddText(string text)
+		TextListItem AddText(string text)
 		{
-			return GUIHelper.AddText(this._listItemPrefab, this._contentRoot, text, this._maxListItemEntries, this._scrollRect);
+			return GUIHelper.AddText(_listItemPrefab, _contentRoot, text, _maxListItemEntries, _scrollRect);
 		}
 	}
 }

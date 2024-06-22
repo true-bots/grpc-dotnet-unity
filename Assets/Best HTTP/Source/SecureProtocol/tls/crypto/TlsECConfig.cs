@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 
 		public TlsECConfig(int namedGroup)
 		{
-			this.m_namedGroup = namedGroup;
+			m_namedGroup = namedGroup;
 		}
 
 		/// <summary>Return the group used.</summary>

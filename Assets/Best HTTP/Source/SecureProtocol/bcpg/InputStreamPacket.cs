@@ -5,7 +5,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class InputStreamPacket
 		: Packet
 	{
-		private readonly BcpgInputStream bcpgIn;
+		readonly BcpgInputStream bcpgIn;
 
 		public InputStreamPacket(
 			BcpgInputStream bcpgIn)

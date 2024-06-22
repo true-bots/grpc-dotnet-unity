@@ -9,18 +9,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	/// <summary>RFC 6066 5.</summary>
 	public sealed class UrlAndHash
 	{
-		private readonly string m_url;
-		private readonly byte[] m_sha1Hash;
+		readonly string m_url;
+		readonly byte[] m_sha1Hash;
 
 		public UrlAndHash(string url, byte[] sha1Hash)
 		{
-			if (TlsUtilities.IsNullOrEmpty(url) || url.Length >= (1 << 16))
+			if (TlsUtilities.IsNullOrEmpty(url) || url.Length >= 1 << 16)
+			{
 				throw new ArgumentException("must have length from 1 to (2^16 - 1)", "url");
-			if (sha1Hash != null && sha1Hash.Length != 20)
-				throw new ArgumentException("must have length == 20, if present", "sha1Hash");
+			}
 
-			this.m_url = url;
-			this.m_sha1Hash = sha1Hash;
+			if (sha1Hash != null && sha1Hash.Length != 20)
+			{
+				throw new ArgumentException("must have length == 20, if present", "sha1Hash");
+			}
+
+			m_url = url;
+			m_sha1Hash = sha1Hash;
 		}
 
 		public string Url
@@ -68,7 +73,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				case 0:
 					if (TlsUtilities.IsTlsV12(context))
+					{
 						throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+					}
 
 					break;
 				case 1:

@@ -72,7 +72,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 				return CreateSecret(sec.CopyData());
 			}
 
-			throw new ArgumentException("unrecognized TlsSecret - cannot copy data: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(secret));
+			throw new ArgumentException("unrecognized TlsSecret - cannot copy data: " + Platform.GetTypeName(secret));
 		}
 
 		public abstract TlsHash CreateHash(int cryptoHashAlgorithm);

@@ -7,7 +7,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 {
-	internal struct LongArray
+	struct LongArray
 	{
 		internal static bool AreAliased(ref LongArray a, ref LongArray b)
 		{
@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		// TODO make m fixed for the LongArray, and hence compute T once and for all
 
-		private ulong[] m_data;
+		ulong[] m_data;
 
 		internal LongArray(int intLen)
 		{
@@ -44,7 +44,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		internal LongArray(BigInteger bigInt)
 		{
 			if (bigInt == null || bigInt.SignValue < 0)
+			{
 				throw new ArgumentException("invalid F2m field value", nameof(bigInt));
+			}
 
 			if (bigInt.SignValue == 0)
 			{
@@ -106,12 +108,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			ulong[] a = m_data;
 			int aLen = a.Length;
 			if (aLen < 1 || a[0] != 1UL)
+			{
 				return false;
+			}
 
 			for (int i = 1; i < aLen; ++i)
 			{
 				if (a[i] != 0UL)
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -123,7 +129,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			for (int i = 0; i < a.Length; ++i)
 			{
 				if (a[i] != 0UL)
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -140,7 +148,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			from = System.Math.Min(from, a.Length);
 
 			if (from < 1)
+			{
 				return 0;
+			}
 
 			// Check if first element will act as sentinel
 			if (a[0] != 0UL)
@@ -170,7 +180,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			do
 			{
 				if (i == 0)
+				{
 					return 0;
+				}
 
 				w = m_data[--i];
 			} while (w == 0UL);
@@ -178,14 +190,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return (i << 6) + BitLength(w);
 		}
 
-		private int DegreeFrom(int limit)
+		int DegreeFrom(int limit)
 		{
 			int i = (int)(((uint)limit + 62) >> 6);
 			ulong w;
 			do
 			{
 				if (i == 0)
+				{
 					return 0;
+				}
 
 				w = m_data[--i];
 			} while (w == 0);
@@ -193,12 +207,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return (i << 6) + BitLength(w);
 		}
 
-		private static int BitLength(ulong w)
+		static int BitLength(ulong w)
 		{
 			return 64 - Longs.NumberOfLeadingZeros((long)w);
 		}
 
-		private ulong[] ResizedData(int newLen)
+		ulong[] ResizedData(int newLen)
 		{
 			ulong[] newInts = new ulong[newLen];
 			Array.Copy(m_data, 0, newInts, 0, System.Math.Min(m_data.Length, newLen));
@@ -209,7 +223,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			int usedLen = GetUsedLength();
 			if (usedLen == 0)
+			{
 				return BigInteger.Zero;
+			}
 
 			ulong highestInt = m_data[usedLen - 1];
 			byte[] temp = new byte[8];
@@ -218,7 +234,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			for (int j = 7; j >= 0; j--)
 			{
 				byte thisByte = (byte)(highestInt >> (8 * j));
-				if (trailingZeroBytesDone || (thisByte != 0))
+				if (trailingZeroBytesDone || thisByte != 0)
 				{
 					trailingZeroBytesDone = true;
 					temp[barrI++] = thisByte;
@@ -245,7 +261,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return new BigInteger(1, barr);
 		}
 
-		private static ulong ShiftUp(ulong[] x, int xOff, int count, int shift)
+		static ulong ShiftUp(ulong[] x, int xOff, int count, int shift)
 		{
 			int shiftInv = 64 - shift;
 			ulong prev = 0UL;
@@ -259,7 +275,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return prev;
 		}
 
-		private static ulong ShiftUp(ulong[] x, int xOff, ulong[] z, int zOff, int count, int shift)
+		static ulong ShiftUp(ulong[] x, int xOff, ulong[] z, int zOff, int count, int shift)
 		{
 			int shiftInv = 64 - shift;
 			ulong prev = 0UL;
@@ -276,7 +292,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		internal LongArray AddOne()
 		{
 			if (m_data.Length == 0)
+			{
 				return new LongArray(new ulong[1] { 1UL });
+			}
 
 			int resultLen = System.Math.Max(1, GetUsedLength());
 			ulong[] data = ResizedData(resultLen);
@@ -284,7 +302,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return new LongArray(data);
 		}
 
-		private void AddShiftedByBitsSafe(LongArray other, int otherDegree, int bits)
+		void AddShiftedByBitsSafe(LongArray other, int otherDegree, int bits)
 		{
 			int otherLen = (int)((uint)(otherDegree + 63) >> 6);
 
@@ -304,7 +322,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			}
 		}
 
-		private static ulong AddShiftedUp(ulong[] x, int xOff, ulong[] y, int yOff, int count, int shift)
+		static ulong AddShiftedUp(ulong[] x, int xOff, ulong[] y, int yOff, int count, int shift)
 		{
 			int shiftInv = 64 - shift;
 			ulong prev = 0;
@@ -318,7 +336,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return prev;
 		}
 
-		private static ulong AddShiftedDown(ulong[] x, int xOff, ulong[] y, int yOff, int count, int shift)
+		static ulong AddShiftedDown(ulong[] x, int xOff, ulong[] y, int yOff, int count, int shift)
 		{
 			int shiftInv = 64 - shift;
 			ulong prev = 0;
@@ -337,7 +355,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			int otherUsedLen = other.GetUsedLength();
 			if (otherUsedLen == 0)
+			{
 				return;
+			}
 
 			int minLen = otherUsedLen + words;
 			if (minLen > m_data.Length)
@@ -348,17 +368,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			Add(m_data, words, other.m_data, 0, otherUsedLen);
 		}
 
-		private static void Add(ulong[] x, int xOff, ulong[] y, int yOff, int count)
+		static void Add(ulong[] x, int xOff, ulong[] y, int yOff, int count)
 		{
 			Nat.XorTo64(count, y, yOff, x, xOff);
 		}
 
-		private static void Add(ulong[] x, int xOff, ulong[] y, int yOff, ulong[] z, int zOff, int count)
+		static void Add(ulong[] x, int xOff, ulong[] y, int yOff, ulong[] z, int zOff, int count)
 		{
 			Nat.Xor64(count, x, xOff, y, yOff, z, zOff);
 		}
 
-		private static void AddBoth(ulong[] x, int xOff, ulong[] y1, int y1Off, ulong[] y2, int y2Off, int count)
+		static void AddBoth(ulong[] x, int xOff, ulong[] y1, int y1Off, ulong[] y2, int y2Off, int count)
 		{
 			for (int i = 0; i < count; ++i)
 			{
@@ -366,7 +386,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			}
 		}
 
-		private static void FlipWord(ulong[] buf, int off, int bit, ulong word)
+		static void FlipWord(ulong[] buf, int off, int bit, ulong word)
 		{
 			int n = off + (int)((uint)bit >> 6);
 			int shift = bit & 0x3F;
@@ -390,7 +410,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return m_data.Length > 0 && (m_data[0] & 1UL) != 0;
 		}
 
-		private static bool TestBit(ulong[] buf, int off, int n)
+		static bool TestBit(ulong[] buf, int off, int n)
 		{
 			// theInt = n / 64
 			int theInt = (int)((uint)n >> 6);
@@ -400,7 +420,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return (buf[off + theInt] & tester) != 0UL;
 		}
 
-		private static void FlipBit(ulong[] buf, int off, int n)
+		static void FlipBit(ulong[] buf, int off, int n)
 		{
 			// theInt = n / 64
 			int theInt = (int)((uint)n >> 6);
@@ -410,7 +430,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			buf[off + theInt] ^= flipper;
 		}
 
-		private static void MultiplyWord(ulong a, ulong[] b, int bLen, ulong[] c, int cOff)
+		static void MultiplyWord(ulong a, ulong[] b, int bLen, ulong[] c, int cOff)
 		{
 			if ((a & 1UL) != 0UL)
 			{
@@ -440,11 +460,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			 */
 			int aDeg = Degree();
 			if (aDeg == 0)
+			{
 				return this;
+			}
 
 			int bDeg = other.Degree();
 			if (bDeg == 0)
+			{
 				return other;
+			}
 
 			/*
 			 * Swap if necessary so that A is the smaller argument
@@ -470,7 +494,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			{
 				ulong a0 = A.m_data[0];
 				if (a0 == 1UL)
+				{
 					return B;
+				}
 
 				/*
 				 * Fast path for small A, with performance dependent only on the number of set bits
@@ -503,7 +529,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			Array.Copy(B.m_data, 0, T0, tOff, bLen);
 			for (int i = 2; i < 16; ++i)
 			{
-				ti[i] = (tOff += bMax);
+				ti[i] = tOff += bMax;
 				if ((i & 1) == 0)
 				{
 					ShiftUp(T0, (int)((uint)tOff >> 1), T0, tOff, bMax, 1);
@@ -572,11 +598,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			 */
 			int aDeg = Degree();
 			if (aDeg == 0)
+			{
 				return this;
+			}
 
 			int bDeg = other.Degree();
 			if (bDeg == 0)
+			{
 				return other;
+			}
 
 			/*
 			 * Swap if necessary so that A is the smaller argument
@@ -602,7 +632,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			{
 				ulong a0 = A.m_data[0];
 				if (a0 == 1UL)
+				{
 					return B;
+				}
 
 				/*
 				 * Fast path for small A, with performance dependent only on the number of set bits
@@ -675,7 +707,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 					aVal >>= 4;
 					AddBoth(c, cOff, T0, ti[u], T1, ti[v], bMax);
 					if (aVal == 0UL)
+					{
 						break;
+					}
 
 					cOff += cLen;
 				}
@@ -709,11 +743,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			 */
 			int aDeg = Degree();
 			if (aDeg == 0)
+			{
 				return this;
+			}
 
 			int bDeg = other.Degree();
 			if (bDeg == 0)
+			{
 				return other;
+			}
 
 			/*
 			 * Swap if necessary so that A is the smaller argument
@@ -739,7 +777,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			{
 				ulong a0 = A.m_data[0];
 				if (a0 == 1UL)
+				{
 					return B;
+				}
 
 				/*
 				 * Fast path for small A, with performance dependent only on the number of set bits
@@ -813,7 +853,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 					aVal >>= 4;
 					AddBoth(c, cOff, T0, ti[u], T1, ti[v], bMax);
 					if (aVal == 0UL)
+					{
 						break;
+					}
 
 					cOff += cLen;
 				}
@@ -845,17 +887,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			}
 		}
 
-		private static LongArray ReduceResult(ulong[] buf, int off, int len, int m, int[] ks)
+		static LongArray ReduceResult(ulong[] buf, int off, int len, int m, int[] ks)
 		{
 			int rLen = ReduceInPlace(buf, off, len, m, ks);
 			return new LongArray(buf, off, rLen);
 		}
 
-		private static int ReduceInPlace(ulong[] buf, int off, int len, int m, int[] ks)
+		static int ReduceInPlace(ulong[] buf, int off, int len, int m, int[] ks)
 		{
 			int mLen = (m + 63) >> 6;
 			if (len < mLen)
+			{
 				return len;
+			}
 
 			int numBits = System.Math.Min(len << 6, (m << 1) - 1); // TODO use actual degree?
 			int excessBits = (len << 6) - numBits;
@@ -894,7 +938,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return mLen;
 		}
 
-		private static void ReduceBitWise(ulong[] buf, int off, int BitLength, int m, int[] ks)
+		static void ReduceBitWise(ulong[] buf, int off, int BitLength, int m, int[] ks)
 		{
 			while (--BitLength >= m)
 			{
@@ -905,7 +949,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			}
 		}
 
-		private static void ReduceBit(ulong[] buf, int off, int bit, int m, int[] ks)
+		static void ReduceBit(ulong[] buf, int off, int bit, int m, int[] ks)
 		{
 			FlipBit(buf, off, bit);
 			int n = bit - m;
@@ -918,7 +962,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			FlipBit(buf, off, n);
 		}
 
-		private static void ReduceWordWise(ulong[] buf, int off, int len, int toBit, int m, int[] ks)
+		static void ReduceWordWise(ulong[] buf, int off, int len, int toBit, int m, int[] ks)
 		{
 			int toPos = (int)((uint)toBit >> 6);
 
@@ -928,7 +972,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				if (word != 0)
 				{
 					buf[off + len] = 0UL;
-					ReduceWord(buf, off, (len << 6), word, m, ks);
+					ReduceWord(buf, off, len << 6, word, m, ks);
 				}
 			}
 
@@ -943,7 +987,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			}
 		}
 
-		private static void ReduceWord(ulong[] buf, int off, int bit, ulong word, int m, int[] ks)
+		static void ReduceWord(ulong[] buf, int off, int bit, ulong word, int m, int[] ks)
 		{
 			int offset = bit - m;
 			int j = ks.Length;
@@ -955,7 +999,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			FlipWord(buf, off, offset, word);
 		}
 
-		private static void ReduceVectorWise(ulong[] buf, int off, int len, int words, int m, int[] ks)
+		static void ReduceVectorWise(ulong[] buf, int off, int len, int words, int m, int[] ks)
 		{
 			/*
 			 * NOTE: It's important we go from highest coefficient to lowest, because for the highest
@@ -972,7 +1016,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			FlipVector(buf, off, buf, off + words, len - words, baseBit);
 		}
 
-		private static void FlipVector(ulong[] x, int xOff, ulong[] y, int yOff, int yLen, int bits)
+		static void FlipVector(ulong[] x, int xOff, ulong[] y, int yOff, int yLen, int bits)
 		{
 			xOff += (int)((uint)bits >> 6);
 			bits &= 0x3F;
@@ -992,7 +1036,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			int len = GetUsedLength();
 			if (len == 0)
+			{
 				return this;
+			}
 
 			ulong[] r = new ulong[len << 1];
 			Interleave.Expand64To128(m_data, 0, len, r, 0);
@@ -1004,7 +1050,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			int len = GetUsedLength();
 			if (len == 0)
+			{
 				return this;
+			}
 
 			int mLen = (m + 63) >> 6;
 			ulong[] r = new ulong[mLen << 1];
@@ -1023,7 +1071,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			int len = GetUsedLength();
 			if (len == 0)
+			{
 				return this;
+			}
 
 			ulong[] r = new ulong[len << 1];
 			Interleave.Expand64To128(m_data, 0, len, r, 0);
@@ -1182,10 +1232,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			 */
 			int uzDegree = Degree();
 			if (uzDegree == 0)
+			{
 				throw new InvalidOperationException();
+			}
 
 			if (uzDegree == 1)
+			{
 				return this;
+			}
 
 			// u(z) := a(z)
 			LongArray uz = Copy();
@@ -1228,7 +1282,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 				int duv2 = uv[b].DegreeFrom(duv1);
 				if (duv2 == 0)
+				{
 					return gg[1 - b];
+				}
 
 				{
 					int dgg2 = ggDeg[1 - b];
@@ -1245,7 +1301,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 					}
 				}
 
-				j += (duv2 - duv1);
+				j += duv2 - duv1;
 				duv1 = duv2;
 			}
 		}
@@ -1253,7 +1309,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public override bool Equals(object obj)
 		{
 			if (obj is LongArray longArray)
+			{
 				return Equals(ref longArray);
+			}
 
 			return false;
 		}
@@ -1261,16 +1319,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		internal bool Equals(ref LongArray other)
 		{
 			if (AreAliased(ref this, ref other))
+			{
 				return true;
+			}
 
 			int usedLen = GetUsedLength();
 			if (other.GetUsedLength() != usedLen)
+			{
 				return false;
+			}
 
 			for (int i = 0; i < usedLen; i++)
 			{
 				if (m_data[i] != other.m_data[i])
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -1301,7 +1365,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			int i = GetUsedLength();
 			if (i == 0)
+			{
 				return "0";
+			}
 
 			StringBuilder sb = new StringBuilder(i * 64);
 			sb.Append(Convert.ToString((long)m_data[--i], 2));

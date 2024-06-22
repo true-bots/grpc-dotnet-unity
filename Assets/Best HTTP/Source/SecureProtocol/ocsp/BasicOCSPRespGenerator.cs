@@ -19,12 +19,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 	 */
 	public class BasicOcspRespGenerator
 	{
-		private readonly List<ResponseObject> list = new List<ResponseObject>();
+		readonly List<ResponseObject> list = new List<ResponseObject>();
 
-		private X509Extensions responseExtensions;
-		private RespID responderID;
+		X509Extensions responseExtensions;
+		RespID responderID;
 
-		private class ResponseObject
+		class ResponseObject
 		{
 			internal CertificateID certId;
 			internal CertStatus certStatus;
@@ -87,7 +87,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		public BasicOcspRespGenerator(
 			AsymmetricKeyParameter publicKey)
 		{
-			this.responderID = new RespID(publicKey);
+			responderID = new RespID(publicKey);
 		}
 
 		/**
@@ -165,7 +165,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			this.responseExtensions = responseExtensions;
 		}
 
-		private BasicOcspResp GenerateResponse(
+		BasicOcspResp GenerateResponse(
 			ISignatureFactory signatureCalculator,
 			X509Certificate[] chain,
 			DateTime producedAt)

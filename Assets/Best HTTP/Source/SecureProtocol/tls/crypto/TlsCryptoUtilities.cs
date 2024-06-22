@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 	public abstract class TlsCryptoUtilities
 	{
 		// "tls13 "
-		private static readonly byte[] Tls13Prefix = new byte[] { 0x74, 0x6c, 0x73, 0x31, 0x33, 0x20 };
+		static readonly byte[] Tls13Prefix = new byte[] { 0x74, 0x6c, 0x73, 0x31, 0x33, 0x20 };
 
 		public static int GetHash(short hashAlgorithm)
 		{
@@ -189,12 +189,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 #else
 			int labelLength = label.Length;
 			if (labelLength < 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			int contextLength = context.Length;
 			int expandedLabelLength = Tls13Prefix.Length + labelLength;
 
-			byte[] hkdfLabel = new byte[2 + (1 + expandedLabelLength) + (1 + contextLength)];
+			byte[] hkdfLabel = new byte[2 + 1 + expandedLabelLength + 1 + contextLength];
 
 			// uint16 length
 			{
@@ -209,7 +211,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 
 				Array.Copy(Tls13Prefix, 0, hkdfLabel, 2 + 1, Tls13Prefix.Length);
 
-				int labelPos = 2 + (1 + Tls13Prefix.Length);
+				int labelPos = 2 + 1 + Tls13Prefix.Length;
 				for (int i = 0; i < labelLength; ++i)
 				{
 					char c = label[i];
@@ -219,7 +221,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 
 			// context
 			{
-				TlsUtilities.WriteOpaque8(context, hkdfLabel, 2 + (1 + expandedLabelLength));
+				TlsUtilities.WriteOpaque8(context, hkdfLabel, 2 + 1 + expandedLabelLength);
 			}
 
 			return secret.HkdfExpand(cryptoHashAlgorithm, hkdfLabel, length);

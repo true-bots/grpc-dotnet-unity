@@ -138,18 +138,18 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 	//    }
 	//}
 
-	internal sealed class FastTlsAeadCipherImpl
+	sealed class FastTlsAeadCipherImpl
 		: TlsAeadCipherImpl
 	{
-		private readonly bool m_isEncrypting;
-		private readonly IAeadCipher m_cipher;
+		readonly bool m_isEncrypting;
+		readonly IAeadCipher m_cipher;
 
-		private KeyParameter key;
+		KeyParameter key;
 
 		internal FastTlsAeadCipherImpl(IAeadCipher cipher, bool isEncrypting)
 		{
-			this.m_cipher = cipher;
-			this.m_isEncrypting = isEncrypting;
+			m_cipher = cipher;
+			m_isEncrypting = isEncrypting;
 		}
 
 		public void SetKey(byte[] key, int keyOff, int keyLen)

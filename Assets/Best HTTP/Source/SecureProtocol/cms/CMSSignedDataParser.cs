@@ -57,17 +57,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class CmsSignedDataParser
 		: CmsContentInfoParser
 	{
-		private static readonly CmsSignedHelper Helper = CmsSignedHelper.Instance;
+		static readonly CmsSignedHelper Helper = CmsSignedHelper.Instance;
 
-		private SignedDataParser _signedData;
-		private DerObjectIdentifier _signedContentType;
-		private CmsTypedStream _signedContent;
-		private IDictionary<string, IDigest> m_digests;
-		private HashSet<string> _digestOids;
+		SignedDataParser _signedData;
+		DerObjectIdentifier _signedContentType;
+		CmsTypedStream _signedContent;
+		IDictionary<string, IDigest> m_digests;
+		HashSet<string> _digestOids;
 
-		private SignerInformationStore _signerInfoStore;
-		private Asn1Set _certSet, _crlSet;
-		private bool _isCertCrlParsed;
+		SignerInformationStore _signerInfoStore;
+		Asn1Set _certSet, _crlSet;
+		bool _isCertCrlParsed;
 
 		public CmsSignedDataParser(
 			byte[] sigBlock)
@@ -104,10 +104,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		{
 			try
 			{
-				this._signedContent = signedContent;
-				this._signedData = SignedDataParser.GetInstance(this.contentInfo.GetContent(Asn1Tags.Sequence));
-				this.m_digests = new Dictionary<string, IDigest>(StringComparer.OrdinalIgnoreCase);
-				this._digestOids = new HashSet<string>();
+				_signedContent = signedContent;
+				_signedData = SignedDataParser.GetInstance(contentInfo.GetContent(Asn1Tags.Sequence));
+				m_digests = new Dictionary<string, IDigest>(StringComparer.OrdinalIgnoreCase);
+				_digestOids = new HashSet<string>();
 
 				Asn1SetParser digAlgs = _signedData.GetDigestAlgorithms();
 				IAsn1Convertible o;
@@ -121,10 +121,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 						string digestOid = id.Algorithm.Id;
 						string digestName = Helper.GetDigestAlgName(digestOid);
 
-						if (!this.m_digests.ContainsKey(digestName))
+						if (!m_digests.ContainsKey(digestName))
 						{
-							this.m_digests[digestName] = Helper.GetDigestInstance(digestName);
-							this._digestOids.Add(digestOid);
+							m_digests[digestName] = Helper.GetDigestInstance(digestName);
+							_digestOids.Add(digestOid);
 						}
 					}
 					catch (SecurityUtilityException)
@@ -147,7 +147,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 					if (_signedContent == null)
 					{
-						this._signedContent = ctStr;
+						_signedContent = ctStr;
 					}
 					else
 					{
@@ -194,10 +194,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			{
 				PopulateCertCrlSets();
 
-				var signerInfos = new List<SignerInformation>();
-				var hashes = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+				List<SignerInformation> signerInfos = new List<SignerInformation>();
+				Dictionary<string, byte[]> hashes = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
 
-				foreach (var digest in m_digests)
+				foreach (KeyValuePair<string, IDigest> digest in m_digests)
 				{
 					hashes[digest.Key] = DigestUtilities.DoFinal(digest.Value);
 				}
@@ -283,10 +283,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return Helper.GetOtherRevInfos(_crlSet, otherRevInfoFormat);
 		}
 
-		private void PopulateCertCrlSets()
+		void PopulateCertCrlSets()
 		{
 			if (_isCertCrlParsed)
+			{
 				return;
+			}
 
 			_isCertCrlParsed = true;
 
@@ -320,7 +322,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 			Stream digStream = _signedContent.ContentStream;
 
-			foreach (var digest in m_digests.Values)
+			foreach (IDigest digest in m_digests.Values)
 			{
 				digStream = new DigestStream(digStream, digest, null);
 			}
@@ -354,7 +356,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			gen.AddSigners(signerInformationStore);
 
 			CmsTypedStream signedContent = parser.GetSignedContent();
-			bool encapsulate = (signedContent != null);
+			bool encapsulate = signedContent != null;
 			Stream contentOut = gen.Open(outStr, parser.SignedContentType.Id, encapsulate);
 			if (encapsulate)
 			{
@@ -394,7 +396,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			gen.AddDigests(parser.DigestOids);
 
 			CmsTypedStream signedContent = parser.GetSignedContent();
-			bool encapsulate = (signedContent != null);
+			bool encapsulate = signedContent != null;
 			Stream contentOut = gen.Open(outStr, parser.SignedContentType.Id, encapsulate);
 			if (encapsulate)
 			{
@@ -423,7 +425,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return outStr;
 		}
 
-		private static Asn1Set GetAsn1Set(
+		static Asn1Set GetAsn1Set(
 			Asn1SetParser asn1SetParser)
 		{
 			return asn1SetParser == null

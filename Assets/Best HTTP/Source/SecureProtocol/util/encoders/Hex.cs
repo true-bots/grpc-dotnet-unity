@@ -10,9 +10,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 	/// </summary>
 	public sealed class Hex
 	{
-		private static readonly HexEncoder encoder = new HexEncoder();
+		static readonly HexEncoder encoder = new HexEncoder();
 
-		private Hex()
+		Hex()
 		{
 		}
 

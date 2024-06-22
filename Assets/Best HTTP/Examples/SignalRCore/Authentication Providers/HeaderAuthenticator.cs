@@ -27,11 +27,11 @@ namespace BestHTTP.SignalRCore.Authentication
 
 #pragma warning restore 0067
 
-		private string _credentials;
+		string _credentials;
 
 		public HeaderAuthenticator(string credentials)
 		{
-			this._credentials = credentials;
+			_credentials = credentials;
 		}
 
 		/// <summary>
@@ -44,10 +44,10 @@ namespace BestHTTP.SignalRCore.Authentication
 		/// <summary>
 		/// Prepares the request by adding two headers to it
 		/// </summary>
-		public void PrepareRequest(BestHTTP.HTTPRequest request)
+		public void PrepareRequest(HTTPRequest request)
 		{
 #if !UNITY_WEBGL || UNITY_EDITOR
-			request.SetHeader("Authorization", "Bearer " + this._credentials);
+			request.SetHeader("Authorization", "Bearer " + _credentials);
 #endif
 		}
 

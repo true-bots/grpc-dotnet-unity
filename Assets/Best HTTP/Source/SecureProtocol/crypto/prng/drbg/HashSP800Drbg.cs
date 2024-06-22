@@ -13,12 +13,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 	public sealed class HashSP800Drbg
 		: ISP80090Drbg
 	{
-		private readonly static byte[] ONE = { 0x01 };
+		static readonly byte[] ONE = { 0x01 };
 
-		private readonly static long RESEED_MAX = 1L << (48 - 1);
-		private readonly static int MAX_BITS_REQUEST = 1 << (19 - 1);
+		static readonly long RESEED_MAX = 1L << (48 - 1);
+		static readonly int MAX_BITS_REQUEST = 1 << (19 - 1);
 
-		private static readonly IDictionary<string, int> SeedLens =
+		static readonly IDictionary<string, int> SeedLens =
 			new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
 		static HashSP800Drbg()
@@ -32,14 +32,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			SeedLens.Add("SHA-512", 888);
 		}
 
-		private readonly IDigest mDigest;
-		private readonly IEntropySource mEntropySource;
-		private readonly int mSecurityStrength;
-		private readonly int mSeedLength;
+		readonly IDigest mDigest;
+		readonly IEntropySource mEntropySource;
+		readonly int mSecurityStrength;
+		readonly int mSeedLength;
 
-		private byte[] mV;
-		private byte[] mC;
-		private long mReseedCounter;
+		byte[] mV;
+		byte[] mC;
+		long mReseedCounter;
 
 		/**
 		 * Construct a SP800-90A Hash DRBG.
@@ -55,9 +55,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 		public HashSP800Drbg(IDigest digest, int securityStrength, IEntropySource entropySource, byte[] personalizationString, byte[] nonce)
 		{
 			if (securityStrength > DrbgUtilities.GetMaxSecurityStrength(digest))
+			{
 				throw new ArgumentException("Requested security strength is not supported by the derivation function");
+			}
+
 			if (entropySource.EntropySize < securityStrength)
+			{
 				throw new ArgumentException("Not enough entropy for security strength required");
+			}
 
 			mDigest = digest;
 			mEntropySource = entropySource;
@@ -128,10 +133,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 			int numberOfBits = outputLen * 8;
 
 			if (numberOfBits > MAX_BITS_REQUEST)
+			{
 				throw new ArgumentException("Number of bits per request limited to " + MAX_BITS_REQUEST, "output");
+			}
 
 			if (mReseedCounter > RESEED_MAX)
+			{
 				return -1;
+			}
 
 			if (predictionResistant)
 			{
@@ -286,11 +295,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
         }
 #endif
 
-		private byte[] GetEntropy()
+		byte[] GetEntropy()
 		{
 			byte[] entropy = mEntropySource.GetEntropy();
 			if (entropy.Length < (mSecurityStrength + 7) / 8)
+			{
 				throw new InvalidOperationException("Insufficient entropy provided by entropy source");
+			}
+
 			return entropy;
 		}
 
@@ -315,7 +327,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private void AddTo(Span<byte> longer, ReadOnlySpan<byte> shorter)
 #else
-		private void AddTo(byte[] longer, byte[] shorter)
+		void AddTo(byte[] longer, byte[] shorter)
 #endif
 		{
 			int off = longer.Length - shorter.Length;
@@ -424,13 +436,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
             mDigest.DoFinal(output);
         }
 #else
-		private void DoHash(byte[] input, byte[] output)
+		void DoHash(byte[] input, byte[] output)
 		{
 			mDigest.BlockUpdate(input, 0, input.Length);
 			mDigest.DoFinal(output, 0);
 		}
 
-		private byte[] Hash(byte[] input)
+		byte[] Hash(byte[] input)
 		{
 			byte[] hash = new byte[mDigest.GetDigestSize()];
 			DoHash(input, hash);
@@ -473,7 +485,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng.Drbg
 	        }
 	    }
 #else
-		private byte[] Hashgen(byte[] input, int length)
+		byte[] Hashgen(byte[] input, int length)
 		{
 			int digestSize = mDigest.GetDigestSize();
 			int m = length / digestSize;

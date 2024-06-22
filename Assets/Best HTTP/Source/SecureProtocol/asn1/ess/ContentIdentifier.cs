@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 	public class ContentIdentifier
 		: Asn1Encodable
 	{
-		private Asn1OctetString value;
+		Asn1OctetString value;
 
 		public static ContentIdentifier GetInstance(
 			object o)
@@ -25,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 
 			throw new ArgumentException(
 				"unknown object in 'ContentIdentifier' factory : "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
+				+ Platform.GetTypeName(o) + ".");
 		}
 
 		/**

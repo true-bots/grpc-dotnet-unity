@@ -6,8 +6,8 @@ using System.IO;
 
 namespace BestHTTP.Caching
 {
-	using BestHTTP.Extensions;
-	using BestHTTP.PlatformSupport.FileSystem;
+	using Extensions;
+	using PlatformSupport.FileSystem;
 
 	/// <summary>
 	/// Holds all metadata that need for efficient caching, so we don't need to touch the disk to load headers.
@@ -94,7 +94,7 @@ namespace BestHTTP.Caching
 		/// <summary>
 		/// This is the index of the entity. Filenames are generated from this value.
 		/// </summary>
-		internal UInt64 MappedNameIDX { get; private set; }
+		internal ulong MappedNameIDX { get; private set; }
 
 		#endregion
 
@@ -107,42 +107,42 @@ namespace BestHTTP.Caching
 
 		internal HTTPCacheFileInfo(Uri uri, DateTime lastAcces, int bodyLength)
 		{
-			this.Uri = uri;
-			this.LastAccess = lastAcces;
-			this.BodyLength = bodyLength;
-			this.MaxAge = -1;
+			Uri = uri;
+			LastAccess = lastAcces;
+			BodyLength = bodyLength;
+			MaxAge = -1;
 
-			this.MappedNameIDX = HTTPCacheService.GetNameIdx();
+			MappedNameIDX = HTTPCacheService.GetNameIdx();
 		}
 
-		internal HTTPCacheFileInfo(Uri uri, System.IO.BinaryReader reader, int version)
+		internal HTTPCacheFileInfo(Uri uri, BinaryReader reader, int version)
 		{
-			this.Uri = uri;
-			this.LastAccess = DateTime.FromBinary(reader.ReadInt64());
-			this.BodyLength = reader.ReadInt32();
+			Uri = uri;
+			LastAccess = DateTime.FromBinary(reader.ReadInt64());
+			BodyLength = reader.ReadInt32();
 
 			switch (version)
 			{
 				case 3:
-					this.NoCache = reader.ReadBoolean();
-					this.StaleWhileRevalidate = reader.ReadInt64();
-					this.StaleIfError = reader.ReadInt64();
+					NoCache = reader.ReadBoolean();
+					StaleWhileRevalidate = reader.ReadInt64();
+					StaleIfError = reader.ReadInt64();
 					goto case 2;
 
 				case 2:
-					this.MappedNameIDX = reader.ReadUInt64();
+					MappedNameIDX = reader.ReadUInt64();
 					goto case 1;
 
 				case 1:
 				{
-					this.ETag = reader.ReadString();
-					this.LastModified = reader.ReadString();
-					this.Expires = DateTime.FromBinary(reader.ReadInt64());
-					this.Age = reader.ReadInt64();
-					this.MaxAge = reader.ReadInt64();
-					this.Date = DateTime.FromBinary(reader.ReadInt64());
-					this.MustRevalidate = reader.ReadBoolean();
-					this.Received = DateTime.FromBinary(reader.ReadInt64());
+					ETag = reader.ReadString();
+					LastModified = reader.ReadString();
+					Expires = DateTime.FromBinary(reader.ReadInt64());
+					Age = reader.ReadInt64();
+					MaxAge = reader.ReadInt64();
+					Date = DateTime.FromBinary(reader.ReadInt64());
+					MustRevalidate = reader.ReadBoolean();
+					Received = DateTime.FromBinary(reader.ReadInt64());
 					break;
 				}
 			}
@@ -152,43 +152,47 @@ namespace BestHTTP.Caching
 
 		#region Helper Functions
 
-		internal void SaveTo(System.IO.BinaryWriter writer)
+		internal void SaveTo(BinaryWriter writer)
 		{
 			// base
-			writer.Write(this.LastAccess.ToBinary());
-			writer.Write(this.BodyLength);
+			writer.Write(LastAccess.ToBinary());
+			writer.Write(BodyLength);
 
 			// version 3
-			writer.Write(this.NoCache);
-			writer.Write(this.StaleWhileRevalidate);
-			writer.Write(this.StaleIfError);
+			writer.Write(NoCache);
+			writer.Write(StaleWhileRevalidate);
+			writer.Write(StaleIfError);
 
 			// version 2
-			writer.Write(this.MappedNameIDX);
+			writer.Write(MappedNameIDX);
 
 			// version 1
-			writer.Write(this.ETag);
-			writer.Write(this.LastModified);
-			writer.Write(this.Expires.ToBinary());
-			writer.Write(this.Age);
-			writer.Write(this.MaxAge);
-			writer.Write(this.Date.ToBinary());
-			writer.Write(this.MustRevalidate);
-			writer.Write(this.Received.ToBinary());
+			writer.Write(ETag);
+			writer.Write(LastModified);
+			writer.Write(Expires.ToBinary());
+			writer.Write(Age);
+			writer.Write(MaxAge);
+			writer.Write(Date.ToBinary());
+			writer.Write(MustRevalidate);
+			writer.Write(Received.ToBinary());
 		}
 
 		public string GetPath()
 		{
 			if (ConstructedPath != null)
+			{
 				return ConstructedPath;
+			}
 
-			return ConstructedPath = System.IO.Path.Combine(HTTPCacheService.CacheFolder, MappedNameIDX.ToString("X"));
+			return ConstructedPath = Path.Combine(HTTPCacheService.CacheFolder, MappedNameIDX.ToString("X"));
 		}
 
 		public bool IsExists()
 		{
 			if (!HTTPCacheService.IsSupported)
+			{
 				return false;
+			}
 
 			return HTTPManager.IOService.FileExists(GetPath());
 		}
@@ -196,7 +200,9 @@ namespace BestHTTP.Caching
 		internal void Delete()
 		{
 			if (!HTTPCacheService.IsSupported)
+			{
 				return;
+			}
 
 			string path = GetPath();
 			try
@@ -212,21 +218,21 @@ namespace BestHTTP.Caching
 			}
 		}
 
-		private void Reset()
+		void Reset()
 		{
 			// MappedNameIDX will remain the same. When we re-save an entity, it will not reset the MappedNameIDX.
-			this.BodyLength = -1;
-			this.ETag = string.Empty;
-			this.Expires = DateTime.FromBinary(0);
-			this.LastModified = string.Empty;
-			this.Age = 0;
-			this.MaxAge = -1;
-			this.Date = DateTime.FromBinary(0);
-			this.MustRevalidate = false;
-			this.Received = DateTime.FromBinary(0);
-			this.NoCache = false;
-			this.StaleWhileRevalidate = 0;
-			this.StaleIfError = 0;
+			BodyLength = -1;
+			ETag = string.Empty;
+			Expires = DateTime.FromBinary(0);
+			LastModified = string.Empty;
+			Age = 0;
+			MaxAge = -1;
+			Date = DateTime.FromBinary(0);
+			MustRevalidate = false;
+			Received = DateTime.FromBinary(0);
+			NoCache = false;
+			StaleWhileRevalidate = 0;
+			StaleIfError = 0;
 		}
 
 		#endregion
@@ -237,13 +243,13 @@ namespace BestHTTP.Caching
 		{
 			response.CacheFileInfo = this;
 
-			this.ETag = response.GetFirstHeaderValue("ETag").ToStr(this.ETag ?? string.Empty);
-			this.Expires = response.GetFirstHeaderValue("Expires").ToDateTime(this.Expires);
-			this.LastModified = response.GetFirstHeaderValue("Last-Modified").ToStr(this.LastModified ?? string.Empty);
+			ETag = response.GetFirstHeaderValue("ETag").ToStr(ETag ?? string.Empty);
+			Expires = response.GetFirstHeaderValue("Expires").ToDateTime(Expires);
+			LastModified = response.GetFirstHeaderValue("Last-Modified").ToStr(LastModified ?? string.Empty);
 
-			this.Age = response.GetFirstHeaderValue("Age").ToInt64(this.Age);
+			Age = response.GetFirstHeaderValue("Age").ToInt64(Age);
 
-			this.Date = response.GetFirstHeaderValue("Date").ToDateTime(this.Date);
+			Date = response.GetFirstHeaderValue("Date").ToDateTime(Date);
 
 			List<string> cacheControls = response.GetHeaderValues("cache-control");
 			if (cacheControls != null && cacheControls.Count > 0)
@@ -251,7 +257,9 @@ namespace BestHTTP.Caching
 				// Merge all Cache-Control header values into one
 				string cacheControl = cacheControls[0];
 				for (int i = 1; i < cacheControls.Count; ++i)
+				{
 					cacheControl += "," + cacheControls[i];
+				}
 
 				if (!string.IsNullOrEmpty(cacheControl))
 				{
@@ -261,7 +269,7 @@ namespace BestHTTP.Caching
 					{
 						for (int i = 0; i < parser.Values.Count; ++i)
 						{
-							var kvp = parser.Values[i];
+							HeaderValue kvp = parser.Values[i];
 
 							switch (kvp.Key.ToLowerInvariant())
 							{
@@ -271,29 +279,35 @@ namespace BestHTTP.Caching
 										// Some cache proxies will return float values
 										double maxAge;
 										if (double.TryParse(kvp.Value, out maxAge))
-											this.MaxAge = (int)maxAge;
+										{
+											MaxAge = (int)maxAge;
+										}
 										else
-											this.MaxAge = 0;
+										{
+											MaxAge = 0;
+										}
 									}
 									else
-										this.MaxAge = 0;
+									{
+										MaxAge = 0;
+									}
 
 									break;
 
 								case "stale-while-revalidate":
-									this.StaleWhileRevalidate = kvp.HasValue ? kvp.Value.ToInt64(0) : 0;
+									StaleWhileRevalidate = kvp.HasValue ? kvp.Value.ToInt64(0) : 0;
 									break;
 
 								case "stale-if-error":
-									this.StaleIfError = kvp.HasValue ? kvp.Value.ToInt64(0) : 0;
+									StaleIfError = kvp.HasValue ? kvp.Value.ToInt64(0) : 0;
 									break;
 
 								case "must-revalidate":
-									this.MustRevalidate = true;
+									MustRevalidate = true;
 									break;
 
 								case "no-cache":
-									this.NoCache = true;
+									NoCache = true;
 									break;
 							}
 						}
@@ -327,7 +341,7 @@ namespace BestHTTP.Caching
 				}
 			}
 
-			this.Received = DateTime.UtcNow;
+			Received = DateTime.UtcNow;
 		}
 
 		/// <summary>
@@ -336,13 +350,17 @@ namespace BestHTTP.Caching
 		public bool WillExpireInTheFuture(bool isInError)
 		{
 			if (!IsExists())
+			{
 				return false;
+			}
 
 			// https://csswizardry.com/2019/03/cache-control-for-civilians/#no-cache
 			// no-cache will always hit the network as it has to revalidate with the server before it can release the browser’s cached copy (unless the server responds with a fresher response),
 			// but if the server responds favourably, the network transfer is only a file’s headers: the body can be grabbed from cache rather than redownloaded.
-			if (this.NoCache)
+			if (NoCache)
+			{
 				return false;
+			}
 
 			// http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13.2.4 :
 			//  The max-age directive takes priority over Expires
@@ -351,36 +369,42 @@ namespace BestHTTP.Caching
 				// Age calculation:
 				// http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13.2.3
 
-				long apparent_age = Math.Max(0, (long)(this.Received - this.Date).TotalSeconds);
-				long corrected_received_age = Math.Max(apparent_age, this.Age);
-				long resident_time = (long)(DateTime.UtcNow - this.Date).TotalSeconds;
+				long apparent_age = Math.Max(0, (long)(Received - Date).TotalSeconds);
+				long corrected_received_age = Math.Max(apparent_age, Age);
+				long resident_time = (long)(DateTime.UtcNow - Date).TotalSeconds;
 				long current_age = corrected_received_age + resident_time;
 
-				long maxAge = this.MaxAge + (this.NoCache ? 0 : this.StaleWhileRevalidate) + (isInError ? this.StaleIfError : 0);
+				long maxAge = MaxAge + (NoCache ? 0 : StaleWhileRevalidate) + (isInError ? StaleIfError : 0);
 
-				return current_age < maxAge || this.Expires > DateTime.UtcNow;
+				return current_age < maxAge || Expires > DateTime.UtcNow;
 			}
 
-			return this.Expires > DateTime.UtcNow;
+			return Expires > DateTime.UtcNow;
 		}
 
 		internal void SetUpRevalidationHeaders(HTTPRequest request)
 		{
 			if (!IsExists())
+			{
 				return;
+			}
 
 			// -If an entity tag has been provided by the origin server, MUST use that entity tag in any cache-conditional request (using If-Match or If-None-Match).
 			// -If only a Last-Modified value has been provided by the origin server, SHOULD use that value in non-subrange cache-conditional requests (using If-Modified-Since).
 			// -If both an entity tag and a Last-Modified value have been provided by the origin server, SHOULD use both validators in cache-conditional requests. This allows both HTTP/1.0 and HTTP/1.1 caches to respond appropriately.
 
 			if (!string.IsNullOrEmpty(ETag))
+			{
 				request.SetHeader("If-None-Match", ETag);
+			}
 
 			if (!string.IsNullOrEmpty(LastModified))
+			{
 				request.SetHeader("If-Modified-Since", LastModified);
+			}
 		}
 
-		public System.IO.Stream GetBodyStream(out int length)
+		public Stream GetBodyStream(out int length)
 		{
 			if (!IsExists())
 			{
@@ -393,7 +417,7 @@ namespace BestHTTP.Caching
 			LastAccess = DateTime.UtcNow;
 
 			Stream stream = HTTPManager.IOService.CreateFileStream(GetPath(), FileStreamModes.OpenRead);
-			stream.Seek(-length, System.IO.SeekOrigin.End);
+			stream.Seek(-length, SeekOrigin.End);
 
 			return stream;
 		}
@@ -401,7 +425,9 @@ namespace BestHTTP.Caching
 		internal void ReadResponseTo(HTTPRequest request)
 		{
 			if (!IsExists())
+			{
 				return;
+			}
 
 			LastAccess = DateTime.UtcNow;
 
@@ -416,24 +442,32 @@ namespace BestHTTP.Caching
 		internal void Store(HTTPResponse response)
 		{
 			if (!HTTPCacheService.IsSupported)
+			{
 				return;
+			}
 
 			string path = GetPath();
 
 			// Path name too long, we don't want to get exceptions
 			if (path.Length > HTTPManager.MaxPathLength)
+			{
 				return;
+			}
 
 			if (HTTPManager.IOService.FileExists(path))
+			{
 				Delete();
+			}
 
 			using (Stream writer = HTTPManager.IOService.CreateFileStream(GetPath(), FileStreamModes.Create))
 			{
 				writer.WriteLine("HTTP/{0}.{1} {2} {3}", response.VersionMajor, response.VersionMinor, response.StatusCode, response.Message);
-				foreach (var kvp in response.Headers)
+				foreach (KeyValuePair<string, List<string>> kvp in response.Headers)
 				{
 					for (int i = 0; i < kvp.Value.Count; ++i)
+					{
 						writer.WriteLine("{0}: {1}", kvp.Key, kvp.Value[i]);
+					}
 				}
 
 				writer.WriteLine();
@@ -448,30 +482,38 @@ namespace BestHTTP.Caching
 			SetUpCachingValues(response);
 		}
 
-		internal System.IO.Stream GetSaveStream(HTTPResponse response)
+		internal Stream GetSaveStream(HTTPResponse response)
 		{
 			if (!HTTPCacheService.IsSupported)
+			{
 				return null;
+			}
 
 			LastAccess = DateTime.UtcNow;
 
 			string path = GetPath();
 
 			if (HTTPManager.IOService.FileExists(path))
+			{
 				Delete();
+			}
 
 			// Path name too long, we don't want to get exceptions
 			if (path.Length > HTTPManager.MaxPathLength)
+			{
 				return null;
+			}
 
 			// First write out the headers
 			using (Stream writer = HTTPManager.IOService.CreateFileStream(GetPath(), FileStreamModes.Create))
 			{
 				writer.WriteLine("HTTP/1.1 {0} {1}", response.StatusCode, response.Message);
-				foreach (var kvp in response.Headers)
+				foreach (KeyValuePair<string, List<string>> kvp in response.Headers)
 				{
 					for (int i = 0; i < kvp.Value.Count; ++i)
+					{
 						writer.WriteLine("{0}: {1}", kvp.Key, kvp.Value[i]);
+					}
 				}
 
 				writer.WriteLine();
@@ -479,7 +521,9 @@ namespace BestHTTP.Caching
 
 			// If caching is enabled and the response is from cache, and no content-length header set, then we set one to the response.
 			if (response.IsFromCache && !response.HasHeader("content-length"))
+			{
 				response.AddHeader("content-length", BodyLength.ToString());
+			}
 
 			SetUpCachingValues(response);
 
@@ -493,7 +537,7 @@ namespace BestHTTP.Caching
 
 		public int CompareTo(HTTPCacheFileInfo other)
 		{
-			return this.LastAccess.CompareTo(other.LastAccess);
+			return LastAccess.CompareTo(other.LastAccess);
 		}
 
 		#endregion

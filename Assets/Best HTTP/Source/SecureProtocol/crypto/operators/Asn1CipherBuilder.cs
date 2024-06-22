@@ -14,8 +14,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 {
 	public class Asn1CipherBuilderWithKey : ICipherBuilderWithKey
 	{
-		private readonly KeyParameter encKey;
-		private AlgorithmIdentifier algorithmIdentifier;
+		readonly KeyParameter encKey;
+		AlgorithmIdentifier algorithmIdentifier;
 
 		public Asn1CipherBuilderWithKey(DerObjectIdentifier encryptionOID, int keySize, SecureRandom random)
 		{
@@ -67,8 +67,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 
 	public class BufferedCipherWrapper : ICipher
 	{
-		private readonly IBufferedCipher bufferedCipher;
-		private readonly CipherStream stream;
+		readonly IBufferedCipher bufferedCipher;
+		readonly CipherStream stream;
 
 		public BufferedCipherWrapper(IBufferedCipher bufferedCipher, Stream source)
 		{

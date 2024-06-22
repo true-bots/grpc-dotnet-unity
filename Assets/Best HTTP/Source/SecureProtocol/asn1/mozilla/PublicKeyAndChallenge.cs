@@ -21,9 +21,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Mozilla
 	public class PublicKeyAndChallenge
 		: Asn1Encodable
 	{
-		private Asn1Sequence pkacSeq;
-		private SubjectPublicKeyInfo spki;
-		private DerIA5String challenge;
+		Asn1Sequence pkacSeq;
+		SubjectPublicKeyInfo spki;
+		DerIA5String challenge;
 
 		public static PublicKeyAndChallenge GetInstance(
 			object obj)
@@ -40,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Mozilla
 
 			throw new ArgumentException(
 				"unknown object in 'PublicKeyAndChallenge' factory : "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj) + ".");
+				+ Platform.GetTypeName(obj) + ".");
 		}
 
 		public PublicKeyAndChallenge(

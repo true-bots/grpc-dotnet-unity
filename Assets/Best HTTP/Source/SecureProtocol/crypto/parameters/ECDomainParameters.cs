@@ -10,13 +10,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
 	public class ECDomainParameters
 	{
-		private readonly ECCurve curve;
-		private readonly byte[] seed;
-		private readonly ECPoint g;
-		private readonly BigInteger n;
-		private readonly BigInteger h;
+		readonly ECCurve curve;
+		readonly byte[] seed;
+		readonly ECPoint g;
+		readonly BigInteger n;
+		readonly BigInteger h;
 
-		private BigInteger hInv;
+		BigInteger hInv;
 
 		public ECDomainParameters(X9ECParameters x9)
 			: this(x9.Curve, x9.G, x9.N, x9.H, x9.GetSeed())
@@ -48,11 +48,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			byte[] seed)
 		{
 			if (curve == null)
+			{
 				throw new ArgumentNullException("curve");
+			}
+
 			if (g == null)
+			{
 				throw new ArgumentNullException("g");
+			}
+
 			if (n == null)
+			{
 				throw new ArgumentNullException("n");
+			}
 			// we can't check for h == null here as h is optional in X9.62 as it is not required for ECDSA
 
 			this.curve = curve;
@@ -107,12 +115,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			ECDomainParameters other = obj as ECDomainParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}
@@ -141,10 +153,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		public BigInteger ValidatePrivateScalar(BigInteger d)
 		{
 			if (null == d)
+			{
 				throw new ArgumentNullException("d", "Scalar cannot be null");
+			}
 
-			if (d.CompareTo(BigInteger.One) < 0 || (d.CompareTo(N) >= 0))
+			if (d.CompareTo(BigInteger.One) < 0 || d.CompareTo(N) >= 0)
+			{
 				throw new ArgumentException("Scalar is not in the interval [1, n - 1]", "d");
+			}
 
 			return d;
 		}
@@ -157,15 +173,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		internal static ECPoint ValidatePublicPoint(ECCurve c, ECPoint q)
 		{
 			if (null == q)
+			{
 				throw new ArgumentNullException("q", "Point cannot be null");
+			}
 
 			q = ECAlgorithms.ImportPoint(c, q).Normalize();
 
 			if (q.IsInfinity)
+			{
 				throw new ArgumentException("Point at infinity", "q");
+			}
 
 			if (!q.IsValid())
+			{
 				throw new ArgumentException("Point not on curve", "q");
+			}
 
 			return q;
 		}

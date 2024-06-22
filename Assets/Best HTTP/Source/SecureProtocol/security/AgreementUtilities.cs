@@ -18,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 	/// </remarks>
 	public static class AgreementUtilities
 	{
-		private static readonly IDictionary<string, string> Algorithms =
+		static readonly IDictionary<string, string> Algorithms =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 		static AgreementUtilities()
@@ -43,16 +43,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			string mechanism = GetMechanism(algorithm);
 
 			if (mechanism == "DH" || mechanism == "DIFFIEHELLMAN")
+			{
 				return new DHBasicAgreement();
+			}
 
 			if (mechanism == "ECDH")
+			{
 				return new ECDHBasicAgreement();
+			}
 
 			if (mechanism == "ECDHC" || mechanism == "ECCDH")
+			{
 				return new ECDHCBasicAgreement();
+			}
 
 			if (mechanism == "ECMQV")
+			{
 				return new ECMqvBasicAgreement();
+			}
 
 			throw new SecurityUtilityException("Basic Agreement " + algorithm + " not recognised.");
 		}
@@ -72,16 +80,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 			// 'DHWITHSHA1KDF' retained for backward compatibility
 			if (mechanism == "DHWITHSHA1KDF" || mechanism == "ECDHWITHSHA1KDF")
+			{
 				return new ECDHWithKdfBasicAgreement(
 					wrapAlgorithm,
 					new ECDHKekGenerator(
 						new Sha1Digest()));
+			}
 
 			if (mechanism == "ECMQVWITHSHA1KDF")
+			{
 				return new ECMqvWithKdfBasicAgreement(
 					wrapAlgorithm,
 					new ECDHKekGenerator(
 						new Sha1Digest()));
+			}
 
 			throw new SecurityUtilityException("Basic Agreement (with KDF) " + agreeAlgorithm + " not recognised.");
 		}
@@ -97,10 +109,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			string mechanism = GetMechanism(algorithm);
 
 			if (mechanism == "X25519")
+			{
 				return new X25519Agreement();
+			}
 
 			if (mechanism == "X448")
+			{
 				return new X448Agreement();
+			}
 
 			throw new SecurityUtilityException("Raw Agreement " + algorithm + " not recognised.");
 		}
@@ -110,9 +126,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return CollectionUtilities.GetValueOrNull(Algorithms, oid.Id);
 		}
 
-		private static string GetMechanism(string algorithm)
+		static string GetMechanism(string algorithm)
 		{
-			var mechanism = CollectionUtilities.GetValueOrKey(Algorithms, algorithm);
+			string mechanism = CollectionUtilities.GetValueOrKey(Algorithms, algorithm);
 
 			return mechanism.ToUpperInvariant();
 		}

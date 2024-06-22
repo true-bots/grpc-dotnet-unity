@@ -14,14 +14,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		protected BcTlsVerifier(BcTlsCrypto crypto, AsymmetricKeyParameter publicKey)
 		{
 			if (crypto == null)
+			{
 				throw new ArgumentNullException("crypto");
-			if (publicKey == null)
-				throw new ArgumentNullException("publicKey");
-			if (publicKey.IsPrivate)
-				throw new ArgumentException("must be public", "publicKey");
+			}
 
-			this.m_crypto = crypto;
-			this.m_publicKey = publicKey;
+			if (publicKey == null)
+			{
+				throw new ArgumentNullException("publicKey");
+			}
+
+			if (publicKey.IsPrivate)
+			{
+				throw new ArgumentException("must be public", "publicKey");
+			}
+
+			m_crypto = crypto;
+			m_publicKey = publicKey;
 		}
 
 		public virtual TlsStreamVerifier GetStreamVerifier(DigitallySigned digitallySigned)

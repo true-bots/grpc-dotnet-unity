@@ -10,17 +10,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static PopoDecKeyChallContent GetInstance(object obj)
 		{
 			if (obj is PopoDecKeyChallContent popoDecKeyChallContent)
+			{
 				return popoDecKeyChallContent;
+			}
 
 			if (obj != null)
+			{
 				return new PopoDecKeyChallContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly Asn1Sequence m_content;
+		readonly Asn1Sequence m_content;
 
-		private PopoDecKeyChallContent(Asn1Sequence seq)
+		PopoDecKeyChallContent(Asn1Sequence seq)
 		{
 			m_content = seq;
 		}

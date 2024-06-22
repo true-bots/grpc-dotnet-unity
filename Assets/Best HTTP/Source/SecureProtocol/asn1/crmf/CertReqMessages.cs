@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class CertReqMessages
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence content;
+		readonly Asn1Sequence content;
 
-		private CertReqMessages(Asn1Sequence seq)
+		CertReqMessages(Asn1Sequence seq)
 		{
 			content = seq;
 		}
@@ -18,12 +18,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static CertReqMessages GetInstance(object obj)
 		{
 			if (obj is CertReqMessages)
+			{
 				return (CertReqMessages)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CertReqMessages((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public CertReqMessages(params CertReqMsg[] msgs)

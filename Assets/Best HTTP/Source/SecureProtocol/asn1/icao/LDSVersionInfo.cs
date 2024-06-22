@@ -7,8 +7,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 	public class LdsVersionInfo
 		: Asn1Encodable
 	{
-		private DerPrintableString ldsVersion;
-		private DerPrintableString unicodeVersion;
+		DerPrintableString ldsVersion;
+		DerPrintableString unicodeVersion;
 
 		public LdsVersionInfo(string ldsVersion, string unicodeVersion)
 		{
@@ -16,22 +16,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 			this.unicodeVersion = new DerPrintableString(unicodeVersion);
 		}
 
-		private LdsVersionInfo(Asn1Sequence seq)
+		LdsVersionInfo(Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("sequence wrong size for LDSVersionInfo", "seq");
+			}
 
-			this.ldsVersion = DerPrintableString.GetInstance(seq[0]);
-			this.unicodeVersion = DerPrintableString.GetInstance(seq[1]);
+			ldsVersion = DerPrintableString.GetInstance(seq[0]);
+			unicodeVersion = DerPrintableString.GetInstance(seq[1]);
 		}
 
 		public static LdsVersionInfo GetInstance(object obj)
 		{
 			if (obj is LdsVersionInfo)
+			{
 				return (LdsVersionInfo)obj;
+			}
 
 			if (obj != null)
+			{
 				return new LdsVersionInfo(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}

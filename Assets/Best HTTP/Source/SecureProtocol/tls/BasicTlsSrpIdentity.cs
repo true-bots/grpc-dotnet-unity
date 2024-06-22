@@ -14,14 +14,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public BasicTlsSrpIdentity(byte[] identity, byte[] password)
 		{
-			this.m_identity = Arrays.Clone(identity);
-			this.m_password = Arrays.Clone(password);
+			m_identity = Arrays.Clone(identity);
+			m_password = Arrays.Clone(password);
 		}
 
 		public BasicTlsSrpIdentity(string identity, string password)
 		{
-			this.m_identity = Strings.ToUtf8ByteArray(identity);
-			this.m_password = Strings.ToUtf8ByteArray(password);
+			m_identity = Strings.ToUtf8ByteArray(identity);
+			m_password = Strings.ToUtf8ByteArray(password);
 		}
 
 		public virtual byte[] GetSrpIdentity()

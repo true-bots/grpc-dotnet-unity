@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Operators
 {
 	public class CmsContentEncryptorBuilder
 	{
-		private static readonly IDictionary<DerObjectIdentifier, int> KeySizes =
+		static readonly IDictionary<DerObjectIdentifier, int> KeySizes =
 			new Dictionary<DerObjectIdentifier, int>();
 
 		static CmsContentEncryptorBuilder()
@@ -27,15 +27,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Operators
 			KeySizes[NttObjectIdentifiers.IdCamellia256Cbc] = 256;
 		}
 
-		private static int GetKeySize(DerObjectIdentifier oid)
+		static int GetKeySize(DerObjectIdentifier oid)
 		{
-			return KeySizes.TryGetValue(oid, out var keySize) ? keySize : -1;
+			return KeySizes.TryGetValue(oid, out int keySize) ? keySize : -1;
 		}
 
-		private readonly DerObjectIdentifier encryptionOID;
-		private readonly int keySize;
+		readonly DerObjectIdentifier encryptionOID;
+		readonly int keySize;
 
-		private readonly EnvelopedDataHelper helper = new EnvelopedDataHelper();
+		readonly EnvelopedDataHelper helper = new EnvelopedDataHelper();
 		//private SecureRandom random;
 
 		public CmsContentEncryptorBuilder(DerObjectIdentifier encryptionOID)

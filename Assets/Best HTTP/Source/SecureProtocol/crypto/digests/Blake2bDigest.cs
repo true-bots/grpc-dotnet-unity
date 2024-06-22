@@ -48,7 +48,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		: IDigest
 	{
 		// Blake2b Initialization Vector:
-		private static readonly ulong[] blake2b_IV =
+		static readonly ulong[] blake2b_IV =
 			// Produced from the square root of primes 2, 3, 5, 7, 11, 13, 17, 19.
 			// The same as SHA-512 IV.
 			{
@@ -58,7 +58,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			};
 
 		// Message word permutations:
-		private static readonly byte[,] blake2b_sigma =
+		static readonly byte[,] blake2b_sigma =
 		{
 			{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
 			{ 14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3 },
@@ -74,17 +74,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			{ 14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3 }
 		};
 
-		private const int ROUNDS = 12; // to use for Catenas H'
-		private const int BLOCK_LENGTH_BYTES = 128; // bytes
+		const int ROUNDS = 12; // to use for Catenas H'
+		const int BLOCK_LENGTH_BYTES = 128; // bytes
 
 		// General parameters:
-		private int digestLength = 64; // 1- 64 bytes
-		private int keyLength = 0; // 0 - 64 bytes for keyed hashing for MAC
-		private byte[] salt = null; // new byte[16];
-		private byte[] personalization = null; // new byte[16];
+		int digestLength = 64; // 1- 64 bytes
+		int keyLength = 0; // 0 - 64 bytes for keyed hashing for MAC
+		byte[] salt = null; // new byte[16];
+		byte[] personalization = null; // new byte[16];
 
 		// the key
-		private byte[] key = null;
+		byte[] key = null;
 
 		// Tree hashing parameters:
 		// Because this class does not implement the Tree Hashing Mode,
@@ -98,20 +98,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		// whenever this buffer overflows, it will be processed
 		// in the Compress() function.
 		// For performance issues, long messages will not use this buffer.
-		private byte[] buffer = null; // new byte[BLOCK_LENGTH_BYTES];
+		byte[] buffer = null; // new byte[BLOCK_LENGTH_BYTES];
 
 		// Position of last inserted byte:
-		private int bufferPos = 0; // a value from 0 up to 128
+		int bufferPos = 0; // a value from 0 up to 128
 
-		private ulong[] internalState = new ulong[16]; // In the Blake2b paper it is
+		ulong[] internalState = new ulong[16]; // In the Blake2b paper it is
 
 		// called: v
-		private ulong[] chainValue = null; // state vector, in the Blake2b paper it
+		ulong[] chainValue = null; // state vector, in the Blake2b paper it
 		// is called: h
 
-		private ulong t0 = 0UL; // holds last significant bits, counter (counts bytes)
-		private ulong t1 = 0UL; // counter: Length up to 2^128 are supported
-		private ulong f0 = 0UL; // finalization flag, for last block: ~0L
+		ulong t0 = 0UL; // holds last significant bits, counter (counts bytes)
+		ulong t1 = 0UL; // counter: Length up to 2^128 are supported
+		ulong f0 = 0UL; // finalization flag, for last block: ~0L
 
 		// For Tree Hashing Mode, not used here:
 		// private long f1 = 0L; // finalization flag, for last node: ~0L
@@ -123,17 +123,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 		public Blake2bDigest(Blake2bDigest digest)
 		{
-			this.bufferPos = digest.bufferPos;
-			this.buffer = Arrays.Clone(digest.buffer);
-			this.keyLength = digest.keyLength;
-			this.key = Arrays.Clone(digest.key);
-			this.digestLength = digest.digestLength;
-			this.chainValue = Arrays.Clone(digest.chainValue);
-			this.personalization = Arrays.Clone(digest.personalization);
-			this.salt = Arrays.Clone(digest.salt);
-			this.t0 = digest.t0;
-			this.t1 = digest.t1;
-			this.f0 = digest.f0;
+			bufferPos = digest.bufferPos;
+			buffer = Arrays.Clone(digest.buffer);
+			keyLength = digest.keyLength;
+			key = Arrays.Clone(digest.key);
+			digestLength = digest.digestLength;
+			chainValue = Arrays.Clone(digest.chainValue);
+			personalization = Arrays.Clone(digest.personalization);
+			salt = Arrays.Clone(digest.salt);
+			t0 = digest.t0;
+			t1 = digest.t1;
+			f0 = digest.f0;
 		}
 
 		/**
@@ -144,11 +144,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public Blake2bDigest(int digestSize)
 		{
 			if (digestSize < 8 || digestSize > 512 || digestSize % 8 != 0)
+			{
 				throw new ArgumentException("BLAKE2b digest bit length must be a multiple of 8 and not greater than 512");
+			}
 
 			buffer = new byte[BLOCK_LENGTH_BYTES];
 			keyLength = 0;
-			this.digestLength = digestSize / 8;
+			digestLength = digestSize / 8;
 			Init();
 		}
 
@@ -170,7 +172,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 				Array.Copy(key, 0, this.key, 0, key.Length);
 
 				if (key.Length > 64)
+				{
 					throw new ArgumentException("Keys > 64 are not supported");
+				}
 
 				keyLength = key.Length;
 				Array.Copy(key, 0, buffer, 0, key.Length);
@@ -196,15 +200,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public Blake2bDigest(byte[] key, int digestLength, byte[] salt, byte[] personalization)
 		{
 			if (digestLength < 1 || digestLength > 64)
+			{
 				throw new ArgumentException("Invalid digest length (required: 1 - 64)");
+			}
 
 			this.digestLength = digestLength;
-			this.buffer = new byte[BLOCK_LENGTH_BYTES];
+			buffer = new byte[BLOCK_LENGTH_BYTES];
 
 			if (salt != null)
 			{
 				if (salt.Length != 16)
+				{
 					throw new ArgumentException("salt length must be exactly 16 bytes");
+				}
 
 				this.salt = new byte[16];
 				Array.Copy(salt, 0, this.salt, 0, salt.Length);
@@ -213,7 +221,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			if (personalization != null)
 			{
 				if (personalization.Length != 16)
+				{
 					throw new ArgumentException("personalization length must be exactly 16 bytes");
+				}
 
 				this.personalization = new byte[16];
 				Array.Copy(personalization, 0, this.personalization, 0, personalization.Length);
@@ -222,7 +232,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			if (key != null)
 			{
 				if (key.Length > 64)
+				{
 					throw new ArgumentException("Keys > 64 are not supported");
+				}
 
 				this.key = new byte[key.Length];
 				Array.Copy(key, 0, this.key, 0, key.Length);
@@ -236,7 +248,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		}
 
 		// initialize chainValue
-		private void Init()
+		void Init()
 		{
 			if (chainValue == null)
 			{
@@ -271,7 +283,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private void InitializeInternalState()
+		void InitializeInternalState()
 		{
 			// initialize v:
 			Array.Copy(chainValue, 0, internalState, 0, chainValue.Length);
@@ -326,7 +338,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public void BlockUpdate(byte[] message, int offset, int len)
 		{
 			if (message == null || len == 0)
+			{
 				return;
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             BlockUpdate(message.AsSpan(offset, len));
@@ -559,7 +573,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
             }
         }
 #else
-		private void Compress(byte[] message, int messagePos)
+		void Compress(byte[] message, int messagePos)
 		{
 			InitializeInternalState();
 
@@ -591,7 +605,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 #if NETSTANDARD1_0_OR_GREATER || NETCOREAPP1_0_OR_GREATER || UNITY_2021_2_OR_NEWER
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-		private void G(ulong m1, ulong m2, int posA, int posB, int posC, int posD)
+		void G(ulong m1, ulong m2, int posA, int posB, int posC, int posD)
 		{
 			internalState[posA] = internalState[posA] + internalState[posB] + m1;
 			internalState[posD] = Rotr64(internalState[posD] ^ internalState[posA], 32);
@@ -603,9 +617,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			internalState[posB] = Rotr64(internalState[posB] ^ internalState[posC], 63); // replaces 11 of BLAKE
 		}
 
-		private static ulong Rotr64(ulong x, int rot)
+		static ulong Rotr64(ulong x, int rot)
 		{
-			return x >> rot | x << -rot;
+			return (x >> rot) | (x << -rot);
 		}
 
 		/**
@@ -613,7 +627,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 *
 		 * @return the algorithm name
 		 */
-		public string AlgorithmName => "BLAKE2b";
+		public string AlgorithmName
+		{
+			get { return "BLAKE2b"; }
+		}
 
 		/**
 		 * return the size, in bytes, of the digest produced by this message digest.

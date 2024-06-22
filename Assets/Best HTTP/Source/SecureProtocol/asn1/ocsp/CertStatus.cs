@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class CertStatus
 		: Asn1Encodable, IAsn1Choice
 	{
-		private readonly int tagNo;
-		private readonly Asn1Encodable value;
+		readonly int tagNo;
+		readonly Asn1Encodable value;
 
 		/**
          * create a CertStatus object with a tag of zero.
@@ -37,7 +37,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 
 		public CertStatus(Asn1TaggedObject choice)
 		{
-			this.tagNo = choice.TagNo;
+			tagNo = choice.TagNo;
 
 			switch (choice.TagNo)
 			{
@@ -68,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new CertStatus((Asn1TaggedObject)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public int TagNo

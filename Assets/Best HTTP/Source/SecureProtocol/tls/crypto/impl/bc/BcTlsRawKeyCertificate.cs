@@ -40,7 +40,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			m_keyInfo = keyInfo;
 		}
 
-		public virtual SubjectPublicKeyInfo SubjectPublicKeyInfo => m_keyInfo;
+		public virtual SubjectPublicKeyInfo SubjectPublicKeyInfo
+		{
+			get { return m_keyInfo; }
+		}
 
 		/// <exception cref="IOException"/>
 		public virtual TlsEncryptor CreateEncryptor(int tlsCertificateRole)
@@ -51,7 +54,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			{
 				case TlsCertificateRole.RsaEncryption:
 				{
-					this.m_pubKeyRsa = GetPubKeyRsa();
+					m_pubKeyRsa = GetPubKeyRsa();
 					return new BcTlsRsaEncryptor(m_crypto, m_pubKeyRsa);
 				}
 				// TODO[gmssl]
@@ -234,21 +237,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			return null;
 		}
 
-		public virtual BigInteger SerialNumber => null;
+		public virtual BigInteger SerialNumber
+		{
+			get { return null; }
+		}
 
-		public virtual string SigAlgOid => null;
+		public virtual string SigAlgOid
+		{
+			get { return null; }
+		}
 
-		public virtual Asn1Encodable GetSigAlgParams() => null;
+		public virtual Asn1Encodable GetSigAlgParams()
+		{
+			return null;
+		}
 
 		/// <exception cref="IOException"/>
 		public virtual short GetLegacySignatureAlgorithm()
 		{
 			AsymmetricKeyParameter publicKey = GetPublicKey();
 			if (publicKey.IsPrivate)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			if (!SupportsKeyUsage(KeyUsage.DigitalSignature))
+			{
 				return -1;
+			}
 
 			/*
 			 * RFC 5246 7.4.6. Client Certificate
@@ -260,14 +276,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			 * message.
 			 */
 			if (publicKey is RsaKeyParameters)
+			{
 				return SignatureAlgorithm.rsa;
+			}
 
 			/*
 			 * DSA public key; the certificate MUST allow the key to be used for signing with the
 			 * hash algorithm that will be employed in the certificate verify message.
 			 */
 			if (publicKey is DsaPublicKeyParameters)
+			{
 				return SignatureAlgorithm.dsa;
+			}
 
 			/*
 			 * ECDSA-capable public key; the certificate MUST allow the key to be used for signing
@@ -381,13 +401,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 				case TlsCertificateRole.DH:
 				{
 					ValidateKeyUsage(KeyUsage.KeyAgreement);
-					this.m_pubKeyDH = GetPubKeyDH();
+					m_pubKeyDH = GetPubKeyDH();
 					return this;
 				}
 				case TlsCertificateRole.ECDH:
 				{
 					ValidateKeyUsage(KeyUsage.KeyAgreement);
-					this.m_pubKeyEC = GetPubKeyEC();
+					m_pubKeyEC = GetPubKeyEC();
 					return this;
 				}
 			}
@@ -435,7 +455,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		protected virtual bool SupportsSignatureAlgorithm(short signatureAlgorithm, int keyUsage)
 		{
 			if (!SupportsKeyUsage(keyUsage))
+			{
 				return false;
+			}
 
 			AsymmetricKeyParameter publicKey = GetPublicKey();
 
@@ -481,28 +503,36 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public virtual void ValidateKeyUsage(int keyUsageBits)
 		{
 			if (!SupportsKeyUsage(keyUsageBits))
+			{
 				throw new TlsFatalAlert(AlertDescription.certificate_unknown);
+			}
 		}
 
 		/// <exception cref="IOException"/>
 		protected virtual void ValidateRsa_Pkcs1()
 		{
 			if (!SupportsRsa_Pkcs1())
+			{
 				throw new TlsFatalAlert(AlertDescription.certificate_unknown);
+			}
 		}
 
 		/// <exception cref="IOException"/>
 		protected virtual void ValidateRsa_Pss_Pss(short signatureAlgorithm)
 		{
 			if (!SupportsRsa_Pss_Pss(signatureAlgorithm))
+			{
 				throw new TlsFatalAlert(AlertDescription.certificate_unknown);
+			}
 		}
 
 		/// <exception cref="IOException"/>
 		protected virtual void ValidateRsa_Pss_Rsae()
 		{
 			if (!SupportsRsa_Pss_Rsae())
+			{
 				throw new TlsFatalAlert(AlertDescription.certificate_unknown);
+			}
 		}
 	}
 }

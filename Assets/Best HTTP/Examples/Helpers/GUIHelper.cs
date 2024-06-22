@@ -3,13 +3,14 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace BestHTTP.Examples
 {
 	public static class GUIHelper
 	{
 		// https://en.wikipedia.org/wiki/Binary_prefix
-		private static string[] prefixes = new string[] { " B", " KiB", " MiB", " GiB", " TiB" };
+		static string[] prefixes = new string[] { " B", " KiB", " MiB", " GiB", " TiB" };
 
 		public static string GetBytesStr(double bytes, byte precision)
 		{
@@ -27,25 +28,29 @@ namespace BestHTTP.Examples
 		{
 			while (transform.childCount > maxChildCount)
 			{
-				var child = transform.GetChild(0);
+				Transform child = transform.GetChild(0);
 				child.SetParent(null);
 
-				GameObject.Destroy(child.gameObject);
+				Object.Destroy(child.gameObject);
 			}
 		}
 
 		public static TextListItem AddText(TextListItem prefab, RectTransform contentRoot, string text, int maxEntries, ScrollRect scrollRect)
 		{
 			if (contentRoot == null)
+			{
 				return null;
+			}
 
-			var listItem = GameObject.Instantiate<TextListItem>(prefab, contentRoot, false);
+			TextListItem listItem = Object.Instantiate<TextListItem>(prefab, contentRoot, false);
 			listItem.SetText(text);
 
-			GUIHelper.RemoveChildren(contentRoot, maxEntries);
+			RemoveChildren(contentRoot, maxEntries);
 
 			if (scrollRect != null && scrollRect.isActiveAndEnabled)
+			{
 				scrollRect.StartCoroutine(ScrollToBottom(scrollRect));
+			}
 
 			return listItem;
 		}
@@ -55,7 +60,9 @@ namespace BestHTTP.Examples
 			yield return null;
 
 			if (scrollRect != null && scrollRect.isActiveAndEnabled)
+			{
 				scrollRect.normalizedPosition = new Vector2(0, 0);
+			}
 		}
 	}
 }

@@ -21,9 +21,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class CertificateList
 		: Asn1Encodable
 	{
-		private readonly TbsCertificateList tbsCertList;
-		private readonly AlgorithmIdentifier sigAlgID;
-		private readonly DerBitString sig;
+		readonly TbsCertificateList tbsCertList;
+		readonly AlgorithmIdentifier sigAlgID;
+		readonly DerBitString sig;
 
 		public static CertificateList GetInstance(
 			Asn1TaggedObject obj,
@@ -36,19 +36,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj is CertificateList)
+			{
 				return (CertificateList)obj;
+			}
 
 			if (obj != null)
+			{
 				return new CertificateList(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private CertificateList(
+		CertificateList(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 3)
+			{
 				throw new ArgumentException("sequence wrong size for CertificateList", "seq");
+			}
 
 			tbsCertList = TbsCertificateList.GetInstance(seq[0]);
 			sigAlgID = AlgorithmIdentifier.GetInstance(seq[1]);

@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 	/// <summary>Carrier class for SRP-6 group parameters.</summary>
 	public class Srp6Group
 	{
-		private readonly BigInteger n, g;
+		readonly BigInteger n, g;
 
 		/// <summary>Base constructor.</summary>
 		/// <param name="n">the n value.</param>

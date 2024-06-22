@@ -1,23 +1,26 @@
 using BestHTTP.PlatformSupport.FileSystem;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BestHTTP.Core
 {
 	public static class HostManager
 	{
-		private const int Version = 1;
-		private static string LibraryPath = string.Empty;
-		private static bool IsSaveAndLoadSupported = false;
-		private static bool IsLoaded = false;
+		const int Version = 1;
+		static string LibraryPath = string.Empty;
+		static bool IsSaveAndLoadSupported = false;
+		static bool IsLoaded = false;
 
-		private static Dictionary<string, HostDefinition> hosts = new Dictionary<string, HostDefinition>();
+		static Dictionary<string, HostDefinition> hosts = new Dictionary<string, HostDefinition>();
 
 		public static HostDefinition GetHost(string hostStr)
 		{
 			HostDefinition host;
 			if (!hosts.TryGetValue(hostStr, out host))
+			{
 				hosts.Add(hostStr, host = new HostDefinition(hostStr));
+			}
 
 			return host;
 		}
@@ -25,22 +28,28 @@ namespace BestHTTP.Core
 		public static void RemoveAllIdleConnections()
 		{
 			HTTPManager.Logger.Information("HostManager", "RemoveAllIdleConnections");
-			foreach (var host_kvp in hosts)
-			foreach (var variant_kvp in host_kvp.Value.hostConnectionVariant)
+			foreach (KeyValuePair<string, HostDefinition> host_kvp in hosts)
+			foreach (KeyValuePair<string, HostConnection> variant_kvp in host_kvp.Value.hostConnectionVariant)
+			{
 				variant_kvp.Value.RemoveAllIdleConnections();
+			}
 		}
 
 		public static void TryToSendQueuedRequests()
 		{
-			foreach (var kvp in hosts)
+			foreach (KeyValuePair<string, HostDefinition> kvp in hosts)
+			{
 				kvp.Value.TryToSendQueuedRequests();
+			}
 		}
 
 		public static void Shutdown()
 		{
 			HTTPManager.Logger.Information("HostManager", "Shutdown initiated!");
-			foreach (var kvp in hosts)
+			foreach (KeyValuePair<string, HostDefinition> kvp in hosts)
+			{
 				kvp.Value.Shutdown();
+			}
 		}
 
 		public static void Clear()
@@ -49,7 +58,7 @@ namespace BestHTTP.Core
 			hosts.Clear();
 		}
 
-		private static void SetupFolder()
+		static void SetupFolder()
 		{
 			if (string.IsNullOrEmpty(LibraryPath))
 			{
@@ -70,17 +79,19 @@ namespace BestHTTP.Core
 		public static void Save()
 		{
 			if (!IsSaveAndLoadSupported || string.IsNullOrEmpty(LibraryPath))
+			{
 				return;
+			}
 
 			try
 			{
-				using (var fs = HTTPManager.IOService.CreateFileStream(LibraryPath, FileStreamModes.Create))
-				using (var bw = new System.IO.BinaryWriter(fs))
+				using (Stream fs = HTTPManager.IOService.CreateFileStream(LibraryPath, FileStreamModes.Create))
+				using (BinaryWriter bw = new System.IO.BinaryWriter(fs))
 				{
 					bw.Write(Version);
 
 					bw.Write(hosts.Count);
-					foreach (var kvp in hosts)
+					foreach (KeyValuePair<string, HostDefinition> kvp in hosts)
 					{
 						bw.Write(kvp.Key.ToString());
 
@@ -98,18 +109,23 @@ namespace BestHTTP.Core
 		public static void Load()
 		{
 			if (IsLoaded)
+			{
 				return;
+			}
+
 			IsLoaded = true;
 
 			SetupFolder();
 
 			if (!IsSaveAndLoadSupported || string.IsNullOrEmpty(LibraryPath) || !HTTPManager.IOService.FileExists(LibraryPath))
+			{
 				return;
+			}
 
 			try
 			{
-				using (var fs = HTTPManager.IOService.CreateFileStream(LibraryPath, FileStreamModes.OpenRead))
-				using (var br = new System.IO.BinaryReader(fs))
+				using (Stream fs = HTTPManager.IOService.CreateFileStream(LibraryPath, FileStreamModes.OpenRead))
+				using (BinaryReader br = new System.IO.BinaryReader(fs))
 				{
 					int version = br.ReadInt32();
 

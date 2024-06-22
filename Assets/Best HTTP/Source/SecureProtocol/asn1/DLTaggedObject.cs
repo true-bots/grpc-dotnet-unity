@@ -4,7 +4,7 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal class DLTaggedObject
+	class DLTaggedObject
 		: DerTaggedObject
 	{
 		internal DLTaggedObject(int tagNo, Asn1Encodable obj)
@@ -41,12 +41,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncoding(int encoding)
 		{
 			if (Asn1OutputStream.EncodingDer == encoding)
+			{
 				return base.GetEncoding(encoding);
+			}
 
 			Asn1Object baseObject = GetBaseObject().ToAsn1Object();
 
 			if (!IsExplicit())
+			{
 				return baseObject.GetEncodingImplicit(encoding, TagClass, TagNo);
+			}
 
 			return new ConstructedDLEncoding(TagClass, TagNo, new IAsn1Encoding[] { baseObject.GetEncoding(encoding) });
 		}
@@ -54,12 +58,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncodingImplicit(int encoding, int tagClass, int tagNo)
 		{
 			if (Asn1OutputStream.EncodingDer == encoding)
+			{
 				return base.GetEncodingImplicit(encoding, tagClass, tagNo);
+			}
 
 			Asn1Object baseObject = GetBaseObject().ToAsn1Object();
 
 			if (!IsExplicit())
+			{
 				return baseObject.GetEncodingImplicit(encoding, tagClass, tagNo);
+			}
 
 			return new ConstructedDLEncoding(tagClass, tagNo, new IAsn1Encoding[] { baseObject.GetEncoding(encoding) });
 		}

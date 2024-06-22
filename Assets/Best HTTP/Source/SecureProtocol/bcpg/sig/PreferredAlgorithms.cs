@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 	public class PreferredAlgorithms
 		: SignatureSubpacket
 	{
-		private static byte[] IntToByteArray(
+		static byte[] IntToByteArray(
 			int[] v)
 		{
 			byte[] data = new byte[v.Length];

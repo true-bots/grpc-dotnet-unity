@@ -12,12 +12,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public abstract class GeneralDigest
 		: IDigest, IMemoable
 	{
-		private const int BYTE_LENGTH = 64;
+		const int BYTE_LENGTH = 64;
 
-		private byte[] xBuf;
-		private int xBufOff;
+		byte[] xBuf;
+		int xBufOff;
 
-		private long byteCount;
+		long byteCount;
 
 		internal GeneralDigest()
 		{
@@ -142,14 +142,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 		public void Finish()
 		{
-			long bitLength = (byteCount << 3);
+			long bitLength = byteCount << 3;
 
 			//
 			// add the pad bytes.
 			//
 			Update((byte)128);
 
-			while (xBufOff != 0) Update((byte)0);
+			while (xBufOff != 0)
+			{
+				Update((byte)0);
+			}
+
 			ProcessLength(bitLength);
 			ProcessBlock();
 		}

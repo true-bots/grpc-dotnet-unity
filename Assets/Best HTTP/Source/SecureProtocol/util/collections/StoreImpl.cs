@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections
 {
-	internal sealed class StoreImpl<T>
+	sealed class StoreImpl<T>
 		: IStore<T>
 	{
-		private readonly List<T> m_contents;
+		readonly List<T> m_contents;
 
 		internal StoreImpl(IEnumerable<T> e)
 		{
@@ -20,7 +20,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections
 			foreach (T candidate in m_contents)
 			{
 				if (selector == null || selector.Match(candidate))
+				{
 					yield return candidate;
+				}
 			}
 		}
 	}

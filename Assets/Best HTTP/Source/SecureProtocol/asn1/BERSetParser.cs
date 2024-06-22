@@ -7,11 +7,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public class BerSetParser
 		: Asn1SetParser
 	{
-		private readonly Asn1StreamParser _parser;
+		readonly Asn1StreamParser _parser;
 
 		internal BerSetParser(Asn1StreamParser parser)
 		{
-			this._parser = parser;
+			_parser = parser;
 		}
 
 		public IAsn1Convertible ReadObject()

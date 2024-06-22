@@ -21,7 +21,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal AlgorithmIdentifier keyEncAlg;
 		internal CmsSecureReadable secureReadable;
 
-		private byte[] resultMac;
+		byte[] resultMac;
 
 		internal RecipientInformation(
 			AlgorithmIdentifier keyEncAlg,

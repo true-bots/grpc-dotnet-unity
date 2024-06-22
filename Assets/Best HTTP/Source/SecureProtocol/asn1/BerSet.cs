@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public class BerSet
 		: DerSet
 	{
-		public static new readonly BerSet Empty = new BerSet();
+		public new static readonly BerSet Empty = new BerSet();
 
-		public static new BerSet FromVector(Asn1EncodableVector elementVector)
+		public new static BerSet FromVector(Asn1EncodableVector elementVector)
 		{
 			return elementVector.Count < 1 ? Empty : new BerSet(elementVector);
 		}
@@ -52,7 +52,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncoding(int encoding)
 		{
 			if (Asn1OutputStream.EncodingBer != encoding)
+			{
 				return base.GetEncoding(encoding);
+			}
 
 			return new ConstructedILEncoding(Asn1Tags.Universal, Asn1Tags.Set,
 				Asn1OutputStream.GetContentsEncodings(encoding, elements));
@@ -61,7 +63,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncodingImplicit(int encoding, int tagClass, int tagNo)
 		{
 			if (Asn1OutputStream.EncodingBer != encoding)
+			{
 				return base.GetEncodingImplicit(encoding, tagClass, tagNo);
+			}
 
 			return new ConstructedILEncoding(tagClass, tagNo,
 				Asn1OutputStream.GetContentsEncodings(encoding, elements));

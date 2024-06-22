@@ -13,13 +13,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	public class BufferedAeadBlockCipher
 		: BufferedCipherBase
 	{
-		private readonly IAeadBlockCipher cipher;
+		readonly IAeadBlockCipher cipher;
 
 		public BufferedAeadBlockCipher(
 			IAeadBlockCipher cipher)
 		{
 			if (cipher == null)
+			{
 				throw new ArgumentNullException("cipher");
+			}
 
 			this.cipher = cipher;
 		}
@@ -135,9 +137,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			int length)
 		{
 			if (input == null)
+			{
 				throw new ArgumentNullException("input");
+			}
+
 			if (length < 1)
+			{
 				return null;
+			}
 
 			int outLength = GetUpdateOutputSize(length);
 
@@ -206,11 +213,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			int inLen)
 		{
 			if (input == null)
+			{
 				throw new ArgumentNullException("input");
+			}
 
 			byte[] outBytes = new byte[GetOutputSize(inLen)];
 
-			int pos = (inLen > 0)
+			int pos = inLen > 0
 				? ProcessBytes(input, inOff, inLen, outBytes, 0)
 				: 0;
 

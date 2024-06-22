@@ -11,15 +11,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class KCtrBlockCipher
 		: IStreamCipher, IBlockCipherMode
 	{
-		private byte[] IV;
-		private byte[] ofbV;
-		private byte[] ofbOutV;
-		private bool initialised;
+		byte[] IV;
+		byte[] ofbV;
+		byte[] ofbOutV;
+		bool initialised;
 
-		private int byteCount;
+		int byteCount;
 
-		private readonly int blockSize;
-		private readonly IBlockCipher cipher;
+		readonly int blockSize;
+		readonly IBlockCipher cipher;
 
 		/**
 	  * Basic constructor.
@@ -30,11 +30,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		public KCtrBlockCipher(IBlockCipher cipher)
 		{
 			this.cipher = cipher;
-			this.IV = new byte[cipher.GetBlockSize()];
-			this.blockSize = cipher.GetBlockSize();
+			IV = new byte[cipher.GetBlockSize()];
+			blockSize = cipher.GetBlockSize();
 
-			this.ofbV = new byte[cipher.GetBlockSize()];
-			this.ofbOutV = new byte[cipher.GetBlockSize()];
+			ofbV = new byte[cipher.GetBlockSize()];
+			ofbOutV = new byte[cipher.GetBlockSize()];
 		}
 
 		/**
@@ -42,7 +42,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		*
 		* @return the underlying block cipher that we are wrapping.
 		*/
-		public IBlockCipher UnderlyingCipher => cipher;
+		public IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		/**
 		* Initialise the cipher and, possibly, the initialisation vector (IV).
@@ -59,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			bool forEncryption,
 			ICipherParameters parameters)
 		{
-			this.initialised = true;
+			initialised = true;
 			if (parameters is ParametersWithIV)
 			{
 				ParametersWithIV ivParam = (ParametersWithIV)parameters;
@@ -217,7 +220,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			byteCount = 0;
 		}
 
-		private void incrementCounterAt(int pos)
+		void incrementCounterAt(int pos)
 		{
 			int i = pos;
 			while (i < ofbV.Length)
@@ -229,7 +232,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			}
 		}
 
-		private void checkCounter()
+		void checkCounter()
 		{
 			// TODO:
 			// if the IV is the same as the blocksize we assume the user knows what they are doing

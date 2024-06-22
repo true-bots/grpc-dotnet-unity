@@ -10,28 +10,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.SigI
 	 */
 	public sealed class SigIObjectIdentifiers
 	{
-		private SigIObjectIdentifiers()
+		SigIObjectIdentifiers()
 		{
 		}
 
-		public readonly static DerObjectIdentifier IdSigI = new DerObjectIdentifier("1.3.36.8");
+		public static readonly DerObjectIdentifier IdSigI = new DerObjectIdentifier("1.3.36.8");
 
 		/**
 		* Key purpose IDs for German SigI (Signature Interoperability
 		* Specification)
 		*/
-		public readonly static DerObjectIdentifier IdSigIKP = new DerObjectIdentifier(IdSigI + ".2");
+		public static readonly DerObjectIdentifier IdSigIKP = new DerObjectIdentifier(IdSigI + ".2");
 
 		/**
 		* Certificate policy IDs for German SigI (Signature Interoperability
 		* Specification)
 		*/
-		public readonly static DerObjectIdentifier IdSigICP = new DerObjectIdentifier(IdSigI + ".1");
+		public static readonly DerObjectIdentifier IdSigICP = new DerObjectIdentifier(IdSigI + ".1");
 
 		/**
 		* Other Name IDs for German SigI (Signature Interoperability Specification)
 		*/
-		public readonly static DerObjectIdentifier IdSigION = new DerObjectIdentifier(IdSigI + ".4");
+		public static readonly DerObjectIdentifier IdSigION = new DerObjectIdentifier(IdSigI + ".4");
 
 		/**
 		* To be used for for the generation of directory service certificates.

@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
@@ -47,11 +48,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class PrivateKeyInfo
 		: Asn1Encodable
 	{
-		private readonly DerInteger version;
-		private readonly AlgorithmIdentifier privateKeyAlgorithm;
-		private readonly Asn1OctetString privateKey;
-		private readonly Asn1Set attributes;
-		private readonly DerBitString publicKey;
+		readonly DerInteger version;
+		readonly AlgorithmIdentifier privateKeyAlgorithm;
+		readonly Asn1OctetString privateKey;
+		readonly Asn1Set attributes;
+		readonly DerBitString publicKey;
 
 		public static PrivateKeyInfo GetInstance(Asn1TaggedObject obj, bool explicitly)
 		{
@@ -62,17 +63,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
+
 			if (obj is PrivateKeyInfo)
+			{
 				return (PrivateKeyInfo)obj;
+			}
+
 			return new PrivateKeyInfo(Asn1Sequence.GetInstance(obj));
 		}
 
-		private static int GetVersionValue(DerInteger version)
+		static int GetVersionValue(DerInteger version)
 		{
 			BigInteger bigValue = version.Value;
 			if (bigValue.CompareTo(BigInteger.Zero) < 0 || bigValue.CompareTo(BigInteger.One) > 0)
+			{
 				throw new ArgumentException("invalid version for private key info", "version");
+			}
 
 			return bigValue.IntValue;
 		}
@@ -98,23 +107,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			Asn1Set attributes,
 			byte[] publicKey)
 		{
-			this.version = new DerInteger(publicKey != null ? BigInteger.One : BigInteger.Zero);
+			version = new DerInteger(publicKey != null ? BigInteger.One : BigInteger.Zero);
 			this.privateKeyAlgorithm = privateKeyAlgorithm;
 			this.privateKey = new DerOctetString(privateKey);
 			this.attributes = attributes;
 			this.publicKey = publicKey == null ? null : new DerBitString(publicKey);
 		}
 
-		private PrivateKeyInfo(Asn1Sequence seq)
+		PrivateKeyInfo(Asn1Sequence seq)
 		{
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
-			this.version = DerInteger.GetInstance(CollectionUtilities.RequireNext(e));
+			version = DerInteger.GetInstance(CollectionUtilities.RequireNext(e));
 
 			int versionValue = GetVersionValue(version);
 
-			this.privateKeyAlgorithm = AlgorithmIdentifier.GetInstance(CollectionUtilities.RequireNext(e));
-			this.privateKey = Asn1OctetString.GetInstance(CollectionUtilities.RequireNext(e));
+			privateKeyAlgorithm = AlgorithmIdentifier.GetInstance(CollectionUtilities.RequireNext(e));
+			privateKey = Asn1OctetString.GetInstance(CollectionUtilities.RequireNext(e));
 
 			int lastTag = -1;
 			while (e.MoveNext())
@@ -123,7 +132,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 
 				int tag = tagged.TagNo;
 				if (tag <= lastTag)
+				{
 					throw new ArgumentException("invalid optional field in private key info", "seq");
+				}
 
 				lastTag = tag;
 
@@ -131,15 +142,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				{
 					case 0:
 					{
-						this.attributes = Asn1Set.GetInstance(tagged, false);
+						attributes = Asn1Set.GetInstance(tagged, false);
 						break;
 					}
 					case 1:
 					{
 						if (versionValue < 1)
+						{
 							throw new ArgumentException("'publicKey' requires version v2(1) or later", "seq");
+						}
 
-						this.publicKey = DerBitString.GetInstance(tagged, false);
+						publicKey = DerBitString.GetInstance(tagged, false);
 						break;
 					}
 					default:

@@ -29,8 +29,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 	public class CertHash
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier hashAlgorithm;
-		private readonly byte[] certificateHash;
+		readonly AlgorithmIdentifier hashAlgorithm;
+		readonly byte[] certificateHash;
 
 		public static CertHash GetInstance(
 			object obj)
@@ -45,7 +45,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 				return new CertHash((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -62,14 +62,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 		*
 		* @param seq The ASN.1 sequence.
 		*/
-		private CertHash(
+		CertHash(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
-			this.hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
-			this.certificateHash = DerOctetString.GetInstance(seq[1]).GetOctets();
+			hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
+			certificateHash = Asn1OctetString.GetInstance(seq[1]).GetOctets();
 		}
 
 		/**
@@ -83,9 +85,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 			byte[] certificateHash)
 		{
 			if (hashAlgorithm == null)
+			{
 				throw new ArgumentNullException("hashAlgorithm");
+			}
+
 			if (certificateHash == null)
+			{
 				throw new ArgumentNullException("certificateHash");
+			}
 
 			this.hashAlgorithm = hashAlgorithm;
 			this.certificateHash = (byte[])certificateHash.Clone();

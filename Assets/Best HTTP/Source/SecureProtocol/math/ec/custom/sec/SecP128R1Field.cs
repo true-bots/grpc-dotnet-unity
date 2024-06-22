@@ -8,25 +8,25 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP128R1Field
+	class SecP128R1Field
 	{
 		// 2^128 - 2^97 - 1
 		internal static readonly uint[] P = new uint[] { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFD };
 
-		private static readonly uint[] PExt = new uint[]
+		static readonly uint[] PExt = new uint[]
 		{
 			0x00000001, 0x00000000, 0x00000000, 0x00000004, 0xFFFFFFFE,
 			0xFFFFFFFF, 0x00000003, 0xFFFFFFFC
 		};
 
-		private static readonly uint[] PExtInv = new uint[]
+		static readonly uint[] PExtInv = new uint[]
 		{
 			0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFB,
 			0x00000001, 0x00000000, 0xFFFFFFFC, 0x00000003
 		};
 
-		private const uint P3 = 0xFFFFFFFD;
-		private const uint PExt7 = 0xFFFFFFFC;
+		const uint P3 = 0xFFFFFFFD;
+		const uint PExt7 = 0xFFFFFFFC;
 
 		public static void Add(uint[] x, uint[] y, uint[] z)
 		{
@@ -148,20 +148,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			ulong x4 = xx[4], x5 = xx[5], x6 = xx[6], x7 = xx[7];
 
 			x3 += x7;
-			x6 += (x7 << 1);
+			x6 += x7 << 1;
 			x2 += x6;
-			x5 += (x6 << 1);
+			x5 += x6 << 1;
 			x1 += x5;
-			x4 += (x5 << 1);
+			x4 += x5 << 1;
 			x0 += x4;
-			x3 += (x4 << 1);
+			x3 += x4 << 1;
 
 			z[0] = (uint)x0;
-			x1 += (x0 >> 32);
+			x1 += x0 >> 32;
 			z[1] = (uint)x1;
-			x2 += (x1 >> 32);
+			x2 += x1 >> 32;
 			z[2] = (uint)x2;
-			x3 += (x2 >> 32);
+			x3 += x2 >> 32;
 			z[3] = (uint)x3;
 
 			Reduce32((uint)(x3 >> 32), z);
@@ -250,7 +250,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			}
 		}
 
-		private static void AddPInvTo(uint[] z)
+		static void AddPInvTo(uint[] z)
 		{
 			long c = (long)z[0] + 1;
 			z[0] = (uint)c;
@@ -269,7 +269,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			z[3] = (uint)c;
 		}
 
-		private static void SubPInvFrom(uint[] z)
+		static void SubPInvFrom(uint[] z)
 		{
 			long c = (long)z[0] - 1;
 			z[0] = (uint)c;

@@ -8,7 +8,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP521R1Field
+	class SecP521R1Field
 	{
 		// 2^521 - 1
 		internal static readonly uint[] P = new uint[]
@@ -18,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			0xFFFFFFFF, 0xFFFFFFFF, 0x1FF
 		};
 
-		private const uint P16 = 0x1FFU;
+		const uint P16 = 0x1FFU;
 
 		public static void Add(uint[] x, uint[] y, uint[] z)
 		{
@@ -218,7 +218,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			Nat512.Mul(x, y, zz);
 
 			uint x16 = x[16], y16 = y[16];
-			zz[32] = Nat.Mul31BothAdd(16, x16, y, y16, x, zz, 16) + (x16 * y16);
+			zz[32] = Nat.Mul31BothAdd(16, x16, y, y16, x, zz, 16) + x16 * y16;
 		}
 
 		protected static void ImplSquare(uint[] x, uint[] zz)
@@ -226,7 +226,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			Nat512.Square(x, zz);
 
 			uint x16 = x[16];
-			zz[32] = Nat.MulWordAddTo(16, x16 << 1, x, 0, zz, 16) + (x16 * x16);
+			zz[32] = Nat.MulWordAddTo(16, x16 << 1, x, 0, zz, 16) + x16 * x16;
 		}
 	}
 }

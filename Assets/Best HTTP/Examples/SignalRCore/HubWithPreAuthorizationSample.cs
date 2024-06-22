@@ -11,25 +11,25 @@ using UnityEngine.UI;
 
 namespace BestHTTP.Examples
 {
-	public sealed class HubWithPreAuthorizationSample : BestHTTP.Examples.Helpers.SampleBase
+	public sealed class HubWithPreAuthorizationSample : SampleBase
 	{
 #pragma warning disable 0649
 
-		[SerializeField] private string _hubPath = "/HubWithAuthorization";
+		[SerializeField] string _hubPath = "/HubWithAuthorization";
 
-		[SerializeField] private string _jwtTokenPath = "/generateJwtToken";
+		[SerializeField] string _jwtTokenPath = "/generateJwtToken";
 
-		[SerializeField] private ScrollRect _scrollRect;
+		[SerializeField] ScrollRect _scrollRect;
 
-		[SerializeField] private RectTransform _contentRoot;
+		[SerializeField] RectTransform _contentRoot;
 
-		[SerializeField] private TextListItem _listItemPrefab;
+		[SerializeField] TextListItem _listItemPrefab;
 
-		[SerializeField] private int _maxListItemEntries = 100;
+		[SerializeField] int _maxListItemEntries = 100;
 
-		[SerializeField] private Button _connectButton;
+		[SerializeField] Button _connectButton;
 
-		[SerializeField] private Button _closeButton;
+		[SerializeField] Button _closeButton;
 
 #pragma warning restore
 
@@ -46,7 +46,9 @@ namespace BestHTTP.Examples
 		void OnDestroy()
 		{
 			if (hub != null)
+			{
 				hub.StartClose();
+			}
 		}
 
 		public void OnConnectButton()
@@ -82,9 +84,9 @@ namespace BestHTTP.Examples
 #endif
 
 			// Crete the HubConnection
-			hub = new HubConnection(new Uri(base.sampleSelector.BaseURL + this._hubPath), protocol);
+			hub = new HubConnection(new Uri(sampleSelector.BaseURL + _hubPath), protocol);
 
-			hub.AuthenticationProvider = new PreAuthAccessTokenAuthenticator(new Uri(base.sampleSelector.BaseURL + this._jwtTokenPath));
+			hub.AuthenticationProvider = new PreAuthAccessTokenAuthenticator(new Uri(sampleSelector.BaseURL + _jwtTokenPath));
 
 			hub.AuthenticationProvider.OnAuthenticationSucceded += AuthenticationProvider_OnAuthenticationSucceded;
 			hub.AuthenticationProvider.OnAuthenticationFailed += AuthenticationProvider_OnAuthenticationFailed;
@@ -115,7 +117,7 @@ namespace BestHTTP.Examples
 			}
 		}
 
-		private void AuthenticationProvider_OnAuthenticationSucceded(IAuthenticationProvider provider)
+		void AuthenticationProvider_OnAuthenticationSucceded(IAuthenticationProvider provider)
 		{
 			string str = string.Format("Pre-Authentication Succeded! Token: '<color=green>{0}</color>' ",
 				(hub.AuthenticationProvider as PreAuthAccessTokenAuthenticator).Token);
@@ -123,7 +125,7 @@ namespace BestHTTP.Examples
 			AddText(str);
 		}
 
-		private void AuthenticationProvider_OnAuthenticationFailed(IAuthenticationProvider provider, string reason)
+		void AuthenticationProvider_OnAuthenticationFailed(IAuthenticationProvider provider, string reason)
 		{
 			AddText(string.Format("Authentication Failed! Reason: '{0}'", reason));
 		}
@@ -131,7 +133,7 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This callback is called when the plugin is connected to the server successfully. Messages can be sent to the server after this point.
 		/// </summary>
-		private void Hub_OnConnected(HubConnection hub)
+		void Hub_OnConnected(HubConnection hub)
 		{
 			AddText(string.Format("Hub Connected with <color=green>{0}</color> transport using the <color=green>{1}</color> encoder.",
 				hub.Transport.TransportType.ToString(), hub.Protocol.Name));
@@ -148,7 +150,7 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This is called when the hub is closed after a StartClose() call.
 		/// </summary>
-		private void Hub_OnClosed(HubConnection hub)
+		void Hub_OnClosed(HubConnection hub)
 		{
 			AddText("Hub Closed");
 			SetButtons(true, false);
@@ -157,24 +159,28 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// Called when an unrecoverable error happen. After this event the hub will not send or receive any messages.
 		/// </summary>
-		private void Hub_OnError(HubConnection hub, string error)
+		void Hub_OnError(HubConnection hub, string error)
 		{
 			AddText(string.Format("Hub Error: <color=red>{0}</color>", error));
 			SetButtons(true, false);
 		}
 
-		private void SetButtons(bool connect, bool close)
+		void SetButtons(bool connect, bool close)
 		{
-			if (this._connectButton != null)
-				this._connectButton.interactable = connect;
+			if (_connectButton != null)
+			{
+				_connectButton.interactable = connect;
+			}
 
-			if (this._closeButton != null)
-				this._closeButton.interactable = close;
+			if (_closeButton != null)
+			{
+				_closeButton.interactable = close;
+			}
 		}
 
-		private TextListItem AddText(string text)
+		TextListItem AddText(string text)
 		{
-			return GUIHelper.AddText(this._listItemPrefab, this._contentRoot, text, this._maxListItemEntries, this._scrollRect);
+			return GUIHelper.AddText(_listItemPrefab, _contentRoot, text, _maxListItemEntries, _scrollRect);
 		}
 	}
 
@@ -203,23 +209,23 @@ namespace BestHTTP.Examples
 
 		public string Token { get; private set; }
 
-		private Uri authenticationUri;
+		Uri authenticationUri;
 
-		private HTTPRequest authenticationRequest;
-		private bool isCancellationRequested;
+		HTTPRequest authenticationRequest;
+		bool isCancellationRequested;
 
 		public PreAuthAccessTokenAuthenticator(Uri authUri)
 		{
-			this.authenticationUri = authUri;
+			authenticationUri = authUri;
 		}
 
 		public void StartAuthentication()
 		{
-			this.authenticationRequest = new HTTPRequest(this.authenticationUri, OnAuthenticationRequestFinished);
-			this.authenticationRequest.Send();
+			authenticationRequest = new HTTPRequest(authenticationUri, OnAuthenticationRequestFinished);
+			authenticationRequest.Send();
 		}
 
-		private void OnAuthenticationRequestFinished(HTTPRequest req, HTTPResponse resp)
+		void OnAuthenticationRequestFinished(HTTPRequest req, HTTPResponse resp)
 		{
 			switch (req.State)
 			{
@@ -227,23 +233,27 @@ namespace BestHTTP.Examples
 				case HTTPRequestStates.Finished:
 					if (resp.IsSuccess)
 					{
-						this.authenticationRequest = null;
-						this.Token = resp.DataAsText;
-						if (this.OnAuthenticationSucceded != null)
-							this.OnAuthenticationSucceded(this);
+						authenticationRequest = null;
+						Token = resp.DataAsText;
+						if (OnAuthenticationSucceded != null)
+						{
+							OnAuthenticationSucceded(this);
+						}
 					}
 					else // Internal server error?
+					{
 						AuthenticationFailed(string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText));
+					}
 
 					break;
 
 				// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 				case HTTPRequestStates.Error:
 					AuthenticationFailed("Request Finished with Error! " +
-					                     (req.Exception != null ? (req.Exception.Message + "" + req.Exception.StackTrace) : "No Exception"));
+					                     (req.Exception != null ? req.Exception.Message + "" + req.Exception.StackTrace : "No Exception"));
 					break;
 
 				// The request aborted, initiated by the user.
@@ -263,43 +273,53 @@ namespace BestHTTP.Examples
 			}
 		}
 
-		private void AuthenticationFailed(string reason)
+		void AuthenticationFailed(string reason)
 		{
-			this.authenticationRequest = null;
+			authenticationRequest = null;
 
-			if (this.isCancellationRequested)
+			if (isCancellationRequested)
+			{
 				return;
+			}
 
-			if (this.OnAuthenticationFailed != null)
-				this.OnAuthenticationFailed(this, reason);
+			if (OnAuthenticationFailed != null)
+			{
+				OnAuthenticationFailed(this, reason);
+			}
 		}
 
 		/// <summary>
 		/// Prepares the request by adding two headers to it
 		/// </summary>
-		public void PrepareRequest(BestHTTP.HTTPRequest request)
+		public void PrepareRequest(HTTPRequest request)
 		{
 			if (HTTPProtocolFactory.GetProtocolFromUri(request.CurrentUri) == SupportedProtocols.HTTP)
+			{
 				request.Uri = PrepareUri(request.Uri);
+			}
 		}
 
 		public Uri PrepareUri(Uri uri)
 		{
-			if (!string.IsNullOrEmpty(this.Token))
+			if (!string.IsNullOrEmpty(Token))
 			{
 				string query = string.IsNullOrEmpty(uri.Query) ? "?" : uri.Query + "&";
-				UriBuilder uriBuilder = new UriBuilder(uri.Scheme, uri.Host, uri.Port, uri.AbsolutePath, query + "access_token=" + this.Token);
+				UriBuilder uriBuilder = new UriBuilder(uri.Scheme, uri.Host, uri.Port, uri.AbsolutePath, query + "access_token=" + Token);
 				return uriBuilder.Uri;
 			}
 			else
+			{
 				return uri;
+			}
 		}
 
 		public void Cancel()
 		{
-			this.isCancellationRequested = true;
-			if (this.authenticationRequest != null)
-				this.authenticationRequest.Abort();
+			isCancellationRequested = true;
+			if (authenticationRequest != null)
+			{
+				authenticationRequest.Abort();
+			}
 		}
 	}
 }

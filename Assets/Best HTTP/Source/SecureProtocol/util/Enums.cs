@@ -5,7 +5,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Date;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 {
-	internal static class Enums
+	static class Enums
 	{
 		internal static TEnum GetEnumValue<TEnum>(string s)
 			where TEnum : struct, Enum

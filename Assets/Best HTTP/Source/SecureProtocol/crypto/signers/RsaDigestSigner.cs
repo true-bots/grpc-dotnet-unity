@@ -19,12 +19,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class RsaDigestSigner
 		: ISigner
 	{
-		private readonly IAsymmetricBlockCipher rsaEngine;
-		private readonly AlgorithmIdentifier algId;
-		private readonly IDigest digest;
-		private bool forSigning;
+		readonly IAsymmetricBlockCipher rsaEngine;
+		readonly AlgorithmIdentifier algId;
+		readonly IDigest digest;
+		bool forSigning;
 
-		private static readonly IDictionary<string, DerObjectIdentifier> OidMap =
+		static readonly IDictionary<string, DerObjectIdentifier> OidMap =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
 		/// <summary>
@@ -113,10 +113,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			}
 
 			if (forSigning && !k.IsPrivate)
+			{
 				throw new InvalidKeyException("Signing requires private key.");
+			}
 
 			if (!forSigning && k.IsPrivate)
+			{
 				throw new InvalidKeyException("Verification requires public key.");
+			}
 
 			Reset();
 
@@ -143,7 +147,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual byte[] GenerateSignature()
 		{
 			if (!forSigning)
+			{
 				throw new InvalidOperationException("RsaDigestSigner not initialised for signature generation.");
+			}
 
 			byte[] hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
@@ -155,7 +161,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual bool VerifySignature(byte[] signature)
 		{
 			if (forSigning)
+			{
 				throw new InvalidOperationException("RsaDigestSigner not initialised for verification");
+			}
 
 			byte[] hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
@@ -189,12 +197,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 				for (int i = 0; i < hash.Length; i++)
 				{
-					nonEqual |= (sig[sigOffset + i] ^ expected[expectedOffset + i]);
+					nonEqual |= sig[sigOffset + i] ^ expected[expectedOffset + i];
 				}
 
 				for (int i = 0; i < sigOffset; i++)
 				{
-					nonEqual |= (sig[i] ^ expected[i]); // check header less NULL
+					nonEqual |= sig[i] ^ expected[i]; // check header less NULL
 				}
 
 				return nonEqual == 0;
@@ -210,7 +218,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			digest.Reset();
 		}
 
-		private byte[] DerEncode(byte[] hash)
+		byte[] DerEncode(byte[] hash)
 		{
 			if (algId == null)
 			{

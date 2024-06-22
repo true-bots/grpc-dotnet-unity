@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class XteaEngine
 		: IBlockCipher
 	{
-		private const int
+		const int
 			rounds = 32,
 			block_size = 8,
 //			key_size	= 16,
@@ -22,11 +22,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/*
 		 * the expanded key array of 4 subkeys
 		 */
-		private uint[] _S = new uint[4],
+		uint[] _S = new uint[4],
 			_sum0 = new uint[32],
 			_sum1 = new uint[32];
 
-		private bool _initialised, _forEncryption;
+		bool _initialised, _forEncryption;
 
 		/**
 		* Create an instance of the TEA encryption algorithm
@@ -62,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (!(parameters is KeyParameter))
 			{
 				throw new ArgumentException("invalid parameter passed to TEA init - "
-				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Platform.GetTypeName(parameters));
 			}
 
 			_forEncryption = forEncryption;
@@ -76,7 +76,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			if (!_initialised)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
 
 			Check.DataLength(inBytes, inOff, block_size, "input buffer too short");
 			Check.OutputLength(outBytes, outOff, block_size, "output buffer too short");
@@ -112,7 +114,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*
 		* @param  key  the key to be used
 		*/
-		private void setKey(
+		void setKey(
 			byte[] key)
 		{
 			int i, j;
@@ -123,9 +125,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			for (i = j = 0; i < rounds; i++)
 			{
-				_sum0[i] = ((uint)j + _S[j & 3]);
+				_sum0[i] = (uint)j + _S[j & 3];
 				j += delta;
-				_sum1[i] = ((uint)j + _S[j >> 11 & 3]);
+				_sum1[i] = (uint)j + _S[(j >> 11) & 3];
 			}
 		}
 
@@ -166,15 +168,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return block_size;
 		}
 #else
-		private int EncryptBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
+		int EncryptBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			uint v0 = Pack.BE_To_UInt32(inBytes, inOff);
 			uint v1 = Pack.BE_To_UInt32(inBytes, inOff + 4);
 
 			for (int i = 0; i < rounds; i++)
 			{
-				v0 += ((v1 << 4 ^ v1 >> 5) + v1) ^ _sum0[i];
-				v1 += ((v0 << 4 ^ v0 >> 5) + v0) ^ _sum1[i];
+				v0 += (((v1 << 4) ^ (v1 >> 5)) + v1) ^ _sum0[i];
+				v1 += (((v0 << 4) ^ (v0 >> 5)) + v0) ^ _sum1[i];
 			}
 
 			Pack.UInt32_To_BE(v0, outBytes, outOff);
@@ -183,7 +185,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return block_size;
 		}
 
-		private int DecryptBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
+		int DecryptBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			// Pack bytes into integers
 			uint v0 = Pack.BE_To_UInt32(inBytes, inOff);
@@ -191,8 +193,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			for (int i = rounds - 1; i >= 0; i--)
 			{
-				v1 -= ((v0 << 4 ^ v0 >> 5) + v0) ^ _sum1[i];
-				v0 -= ((v1 << 4 ^ v1 >> 5) + v1) ^ _sum0[i];
+				v1 -= (((v0 << 4) ^ (v0 >> 5)) + v0) ^ _sum1[i];
+				v0 -= (((v1 << 4) ^ (v1 >> 5)) + v1) ^ _sum0[i];
 			}
 
 			Pack.UInt32_To_BE(v0, outBytes, outOff);

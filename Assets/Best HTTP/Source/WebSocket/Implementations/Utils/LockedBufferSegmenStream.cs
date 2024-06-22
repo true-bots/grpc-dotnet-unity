@@ -13,10 +13,12 @@ namespace BestHTTP.WebSocket.Implementations.Utils
 
 		public override int Read(byte[] buffer, int offset, int count)
 		{
-			lock (base.bufferList)
+			lock (bufferList)
 			{
-				if (this.IsClosed && base.bufferList.Count == 0)
+				if (IsClosed && bufferList.Count == 0)
+				{
 					return 0;
+				}
 
 				int sumReadCount = base.Read(buffer, offset, count);
 
@@ -26,10 +28,12 @@ namespace BestHTTP.WebSocket.Implementations.Utils
 
 		public override void Write(BufferSegment bufferSegment)
 		{
-			lock (base.bufferList)
+			lock (bufferList)
 			{
-				if (this.IsClosed)
+				if (IsClosed)
+				{
 					return;
+				}
 
 				base.Write(bufferSegment);
 			}
@@ -37,7 +41,7 @@ namespace BestHTTP.WebSocket.Implementations.Utils
 
 		public override void Reset()
 		{
-			lock (base.bufferList)
+			lock (bufferList)
 			{
 				base.Reset();
 			}
@@ -52,7 +56,7 @@ namespace BestHTTP.WebSocket.Implementations.Utils
 
 		public override void Close()
 		{
-			this.IsClosed = true;
+			IsClosed = true;
 		}
 	}
 }

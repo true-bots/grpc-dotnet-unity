@@ -8,7 +8,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP256R1Field
+	class SecP256R1Field
 	{
 		// 2^256 - 2^224 + 2^192 + 2^96 - 1
 		internal static readonly uint[] P = new uint[]
@@ -17,15 +17,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			0x00000000, 0x00000001, 0xFFFFFFFF
 		};
 
-		private static readonly uint[] PExt = new uint[]
+		static readonly uint[] PExt = new uint[]
 		{
 			0x00000001, 0x00000000, 0x00000000, 0xFFFFFFFE, 0xFFFFFFFF,
 			0xFFFFFFFF, 0xFFFFFFFE, 0x00000001, 0xFFFFFFFE, 0x00000001, 0xFFFFFFFE, 0x00000001, 0x00000001, 0xFFFFFFFE,
 			0x00000002, 0xFFFFFFFE
 		};
 
-		private const uint P7 = 0xFFFFFFFF;
-		private const uint PExt15 = 0xFFFFFFFE;
+		const uint P7 = 0xFFFFFFFF;
+		const uint PExt15 = 0xFFFFFFFE;
 
 		public static void Add(uint[] x, uint[] y, uint[] z)
 		{
@@ -316,7 +316,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			}
 		}
 
-		private static void AddPInvTo(uint[] z)
+		static void AddPInvTo(uint[] z)
 		{
 			long c = (long)z[0] + 1;
 			z[0] = (uint)c;
@@ -352,7 +352,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			//c >>= 32;
 		}
 
-		private static void SubPInvFrom(uint[] z)
+		static void SubPInvFrom(uint[] z)
 		{
 			long c = (long)z[0] - 1;
 			z[0] = (uint)c;

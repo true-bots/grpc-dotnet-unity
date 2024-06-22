@@ -15,7 +15,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class Sha3Digest
 		: KeccakDigest
 	{
-		private static int CheckBitLength(int bitLength)
+		static int CheckBitLength(int bitLength)
 		{
 			switch (bitLength)
 			{
@@ -71,7 +71,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		protected override int DoFinal(byte[] output, int outOff, byte partialByte, int partialBits)
 		{
 			if (partialBits < 0 || partialBits > 7)
+			{
 				throw new ArgumentException("must be in the range [0,7]", "partialBits");
+			}
 
 			int finalInput = (partialByte & ((1 << partialBits) - 1)) | (0x02 << partialBits);
 			Debug.Assert(finalInput >= 0);

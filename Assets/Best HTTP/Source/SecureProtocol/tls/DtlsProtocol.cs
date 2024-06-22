@@ -23,7 +23,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			TlsProtocol.AssertEmpty(buf);
 
 			if (!Arrays.ConstantTimeAreEqual(expected_verify_data, verify_data))
+			{
 				throw new TlsFatalAlert(AlertDescription.handshake_failure);
+			}
 		}
 
 		/// <exception cref="IOException"/>
@@ -32,7 +34,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			if (maxFragmentLength >= 0)
 			{
 				if (!MaxFragmentLength.IsValid(maxFragmentLength))
+				{
 					throw new TlsFatalAlert(AlertDescription.internal_error);
+				}
 
 				int plainTextLimit = 1 << (8 + maxFragmentLength);
 				recordLayer.SetPlaintextLimit(plainTextLimit);
@@ -80,7 +84,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			SecurityParameters securityParameters = context.SecurityParameters;
 			if (null != securityParameters.LocalCertificate)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			if (null == certificate)
 			{

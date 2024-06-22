@@ -14,12 +14,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 	public sealed class CipherStream
 		: Stream
 	{
-		private readonly Stream m_stream;
-		private readonly IBufferedCipher m_readCipher, m_writeCipher;
+		readonly Stream m_stream;
+		readonly IBufferedCipher m_readCipher, m_writeCipher;
 
-		private byte[] m_readBuf;
-		private int m_readBufPos;
-		private bool m_readEnded;
+		byte[] m_readBuf;
+		int m_readBufPos;
+		bool m_readEnded;
 
 		public CipherStream(Stream stream, IBufferedCipher readCipher, IBufferedCipher writeCipher)
 		{
@@ -37,9 +37,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 			}
 		}
 
-		public IBufferedCipher ReadCipher => m_readCipher;
+		public IBufferedCipher ReadCipher
+		{
+			get { return m_readCipher; }
+		}
 
-		public IBufferedCipher WriteCipher => m_writeCipher;
+		public IBufferedCipher WriteCipher
+		{
+			get { return m_writeCipher; }
+		}
 
 		public override bool CanRead
 		{
@@ -89,7 +95,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			if (m_readCipher == null)
+			{
 				return m_stream.Read(buffer, offset, count);
+			}
 
 			Streams.ValidateBufferArguments(buffer, offset, count);
 
@@ -99,7 +107,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 				if (m_readBuf == null || m_readBufPos >= m_readBuf.Length)
 				{
 					if (!FillInBuf())
+					{
 						break;
+					}
 				}
 
 				int numToCopy = System.Math.Min(count - num, m_readBuf.Length - m_readBufPos);
@@ -143,12 +153,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 		public override int ReadByte()
 		{
 			if (m_readCipher == null)
+			{
 				return m_stream.ReadByte();
+			}
 
 			if (m_readBuf == null || m_readBufPos >= m_readBuf.Length)
 			{
 				if (!FillInBuf())
+				{
 					return -1;
+				}
 			}
 
 			return m_readBuf[m_readBufPos++];
@@ -276,10 +290,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 			base.Dispose(disposing);
 		}
 
-		private bool FillInBuf()
+		bool FillInBuf()
 		{
 			if (m_readEnded)
+			{
 				return false;
+			}
 
 			m_readBufPos = 0;
 
@@ -291,7 +307,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 			return m_readBuf != null;
 		}
 
-		private byte[] ReadAndProcessBlock()
+		byte[] ReadAndProcessBlock()
 		{
 			int blockSize = m_readCipher.GetBlockSize();
 			int readSize = blockSize == 0 ? 256 : blockSize;

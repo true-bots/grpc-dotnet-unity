@@ -20,24 +20,29 @@ namespace BestHTTP.Timings
 
 		public TimingCollector(HTTPRequest parentRequest)
 		{
-			this.ParentRequest = parentRequest;
-			this.Start = DateTime.Now;
+			ParentRequest = parentRequest;
+			Start = DateTime.Now;
 		}
 
 		internal void AddEvent(string name, DateTime when, TimeSpan duration)
 		{
-			if (this.Events == null)
-				this.Events = new List<TimingEvent>();
+			if (Events == null)
+			{
+				Events = new List<TimingEvent>();
+			}
 
 			if (duration == TimeSpan.Zero)
 			{
-				DateTime prevEventAt = this.Start;
-				if (this.Events.Count > 0)
-					prevEventAt = this.Events[this.Events.Count - 1].When;
+				DateTime prevEventAt = Start;
+				if (Events.Count > 0)
+				{
+					prevEventAt = Events[Events.Count - 1].When;
+				}
+
 				duration = when - prevEventAt;
 			}
 
-			this.Events.Add(new TimingEvent(name, when, duration));
+			Events.Add(new TimingEvent(name, when, duration));
 		}
 
 		/// <summary>
@@ -45,7 +50,7 @@ namespace BestHTTP.Timings
 		/// </summary>
 		public void Add(string name)
 		{
-			RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this.ParentRequest, name, DateTime.Now));
+			RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(ParentRequest, name, DateTime.Now));
 		}
 
 		/// <summary>
@@ -53,18 +58,22 @@ namespace BestHTTP.Timings
 		/// </summary>
 		public void Add(string name, TimeSpan duration)
 		{
-			RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this.ParentRequest, name, duration));
+			RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(ParentRequest, name, duration));
 		}
 
 		public TimingEvent FindFirst(string name)
 		{
-			if (this.Events == null)
-				return TimingEvent.Empty;
-
-			for (int i = 0; i < this.Events.Count; ++i)
+			if (Events == null)
 			{
-				if (this.Events[i].Name == name)
-					return this.Events[i];
+				return TimingEvent.Empty;
+			}
+
+			for (int i = 0; i < Events.Count; ++i)
+			{
+				if (Events[i].Name == name)
+				{
+					return Events[i];
+				}
 			}
 
 			return TimingEvent.Empty;
@@ -72,13 +81,17 @@ namespace BestHTTP.Timings
 
 		public TimingEvent FindLast(string name)
 		{
-			if (this.Events == null)
-				return TimingEvent.Empty;
-
-			for (int i = this.Events.Count - 1; i >= 0; --i)
+			if (Events == null)
 			{
-				if (this.Events[i].Name == name)
-					return this.Events[i];
+				return TimingEvent.Empty;
+			}
+
+			for (int i = Events.Count - 1; i >= 0; --i)
+			{
+				if (Events[i].Name == name)
+				{
+					return Events[i];
+				}
 			}
 
 			return TimingEvent.Empty;
@@ -86,11 +99,15 @@ namespace BestHTTP.Timings
 
 		public override string ToString()
 		{
-			string result = string.Format("[TimingCollector Start: '{0}' ", this.Start.ToLongTimeString());
+			string result = string.Format("[TimingCollector Start: '{0}' ", Start.ToLongTimeString());
 
-			if (this.Events != null)
-				foreach (var @event in this.Events)
+			if (Events != null)
+			{
+				foreach (TimingEvent @event in Events)
+				{
 					result += '\n' + @event.ToString();
+				}
+			}
 
 			result += "]";
 

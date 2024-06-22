@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public class DtlsVerifier
 	{
-		private static TlsMac CreateCookieMac(TlsCrypto crypto)
+		static TlsMac CreateCookieMac(TlsCrypto crypto)
 		{
 			TlsMac mac = crypto.CreateHmac(MacAlgorithm.hmac_sha256);
 
@@ -21,13 +21,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return mac;
 		}
 
-		private readonly TlsMac m_cookieMac;
-		private readonly TlsMacSink m_cookieMacSink;
+		readonly TlsMac m_cookieMac;
+		readonly TlsMacSink m_cookieMacSink;
 
 		public DtlsVerifier(TlsCrypto crypto)
 		{
-			this.m_cookieMac = CreateCookieMac(crypto);
-			this.m_cookieMacSink = new TlsMacSink(m_cookieMac);
+			m_cookieMac = CreateCookieMac(crypto);
+			m_cookieMacSink = new TlsMacSink(m_cookieMac);
 		}
 
 		public virtual DtlsRequest VerifyRequest(byte[] clientID, byte[] data, int dataOff, int dataLen,
@@ -66,7 +66,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 						//}
 
 						if (Arrays.ConstantTimeAreEqual(expectedCookie, request.ClientHello.Cookie))
+						{
 							return request;
+						}
 
 						DtlsReliableHandshake.SendHelloVerifyRequest(sender, request.RecordSeq, expectedCookie);
 					}

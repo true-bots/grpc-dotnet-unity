@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class Gost3410Parameters
 		: ICipherParameters
 	{
-		private readonly BigInteger p, q, a;
-		private readonly Gost3410ValidationParameters validation;
+		readonly BigInteger p, q, a;
+		readonly Gost3410ValidationParameters validation;
 
 		public Gost3410Parameters(
 			BigInteger p,
@@ -27,11 +27,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			Gost3410ValidationParameters validation)
 		{
 			if (p == null)
+			{
 				throw new ArgumentNullException("p");
+			}
+
 			if (q == null)
+			{
 				throw new ArgumentNullException("q");
+			}
+
 			if (a == null)
+			{
 				throw new ArgumentNullException("a");
+			}
 
 			this.p = p;
 			this.q = q;
@@ -63,12 +71,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			Gost3410Parameters other = obj as Gost3410Parameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

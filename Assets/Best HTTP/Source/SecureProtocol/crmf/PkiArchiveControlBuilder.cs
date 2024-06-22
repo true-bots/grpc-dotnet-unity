@@ -13,8 +13,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 {
 	public class PkiArchiveControlBuilder
 	{
-		private CmsEnvelopedDataGenerator envGen;
-		private CmsProcessableByteArray keyContent;
+		CmsEnvelopedDataGenerator envGen;
+		CmsProcessableByteArray keyContent;
 
 		/// <summary>
 		///Basic constructor - specify the contents of the PKIArchiveControl structure.
@@ -28,14 +28,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 
 			try
 			{
-				this.keyContent = new CmsProcessableByteArray(CrmfObjectIdentifiers.id_ct_encKeyWithID, encKeyWithID.GetEncoded());
+				keyContent = new CmsProcessableByteArray(CrmfObjectIdentifiers.id_ct_encKeyWithID, encKeyWithID.GetEncoded());
 			}
 			catch (IOException e)
 			{
 				throw new InvalidOperationException("unable to encode key and general name info", e);
 			}
 
-			this.envGen = new CmsEnvelopedDataGenerator();
+			envGen = new CmsEnvelopedDataGenerator();
 		}
 
 		///<summary>Add a recipient generator to this control.</summary>       

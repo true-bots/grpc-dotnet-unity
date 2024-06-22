@@ -12,18 +12,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 	public class ECPrivateKeyStructure
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence m_seq;
+		readonly Asn1Sequence m_seq;
 
 		public static ECPrivateKeyStructure GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
+
 			if (obj is ECPrivateKeyStructure ecPrivateKeyStructure)
+			{
 				return ecPrivateKeyStructure;
+			}
+
 			return new ECPrivateKeyStructure(Asn1Sequence.GetInstance(obj));
 		}
 
-		private ECPrivateKeyStructure(Asn1Sequence seq)
+		ECPrivateKeyStructure(Asn1Sequence seq)
 		{
 			m_seq = seq ?? throw new ArgumentNullException(nameof(seq));
 		}
@@ -50,9 +56,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 			Asn1Encodable parameters)
 		{
 			if (key == null)
+			{
 				throw new ArgumentNullException(nameof(key));
+			}
+
 			if (orderBitLength < key.BitLength)
+			{
 				throw new ArgumentException("must be >= key bitlength", nameof(orderBitLength));
+			}
 
 			byte[] bytes = BigIntegers.AsUnsignedByteArray((orderBitLength + 7) / 8, key);
 
@@ -83,7 +94,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 			return GetObjectInTag(0, -1);
 		}
 
-		private Asn1Object GetObjectInTag(int tagNo, int baseTagNo)
+		Asn1Object GetObjectInTag(int tagNo, int baseTagNo)
 		{
 			foreach (Asn1Encodable ae in m_seq)
 			{

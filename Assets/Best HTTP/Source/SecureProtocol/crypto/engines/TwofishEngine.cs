@@ -17,7 +17,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public sealed class TwofishEngine
 		: IBlockCipher
 	{
-		private static readonly byte[,] P =
+		static readonly byte[,] P =
 		{
 			{
 				// p0
@@ -160,75 +160,75 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* By changing the following constant definitions, the S-boxes will
 		* automatically Get changed in the Twofish engine.
 		*/
-		private const int P_00 = 1;
+		const int P_00 = 1;
 
-		private const int P_01 = 0;
-		private const int P_02 = 0;
-		private const int P_03 = P_01 ^ 1;
-		private const int P_04 = 1;
+		const int P_01 = 0;
+		const int P_02 = 0;
+		const int P_03 = P_01 ^ 1;
+		const int P_04 = 1;
 
-		private const int P_10 = 0;
-		private const int P_11 = 0;
-		private const int P_12 = 1;
-		private const int P_13 = P_11 ^ 1;
-		private const int P_14 = 0;
+		const int P_10 = 0;
+		const int P_11 = 0;
+		const int P_12 = 1;
+		const int P_13 = P_11 ^ 1;
+		const int P_14 = 0;
 
-		private const int P_20 = 1;
-		private const int P_21 = 1;
-		private const int P_22 = 0;
-		private const int P_23 = P_21 ^ 1;
-		private const int P_24 = 0;
+		const int P_20 = 1;
+		const int P_21 = 1;
+		const int P_22 = 0;
+		const int P_23 = P_21 ^ 1;
+		const int P_24 = 0;
 
-		private const int P_30 = 0;
-		private const int P_31 = 1;
-		private const int P_32 = 1;
-		private const int P_33 = P_31 ^ 1;
-		private const int P_34 = 1;
+		const int P_30 = 0;
+		const int P_31 = 1;
+		const int P_32 = 1;
+		const int P_33 = P_31 ^ 1;
+		const int P_34 = 1;
 
 		/* Primitive polynomial for GF(256) */
-		private const int GF256_FDBK = 0x169;
-		private const int GF256_FDBK_2 = GF256_FDBK / 2;
-		private const int GF256_FDBK_4 = GF256_FDBK / 4;
+		const int GF256_FDBK = 0x169;
+		const int GF256_FDBK_2 = GF256_FDBK / 2;
+		const int GF256_FDBK_4 = GF256_FDBK / 4;
 
-		private const int RS_GF_FDBK = 0x14D; // field generator
+		const int RS_GF_FDBK = 0x14D; // field generator
 
 		//====================================
 		// Useful constants
 		//====================================
 
-		private const int ROUNDS = 16;
-		private const int MAX_ROUNDS = 16; // bytes = 128 bits
-		private const int BLOCK_SIZE = 16; // bytes = 128 bits
-		private const int MAX_KEY_BITS = 256;
+		const int ROUNDS = 16;
+		const int MAX_ROUNDS = 16; // bytes = 128 bits
+		const int BLOCK_SIZE = 16; // bytes = 128 bits
+		const int MAX_KEY_BITS = 256;
 
-		private const int INPUT_WHITEN = 0;
-		private const int OUTPUT_WHITEN = INPUT_WHITEN + BLOCK_SIZE / 4; // 4
-		private const int ROUND_SUBKEYS = OUTPUT_WHITEN + BLOCK_SIZE / 4; // 8
+		const int INPUT_WHITEN = 0;
+		const int OUTPUT_WHITEN = INPUT_WHITEN + BLOCK_SIZE / 4; // 4
+		const int ROUND_SUBKEYS = OUTPUT_WHITEN + BLOCK_SIZE / 4; // 8
 
-		private const int TOTAL_SUBKEYS = ROUND_SUBKEYS + 2 * MAX_ROUNDS; // 40
+		const int TOTAL_SUBKEYS = ROUND_SUBKEYS + 2 * MAX_ROUNDS; // 40
 
-		private const int SK_STEP = 0x02020202;
-		private const int SK_BUMP = 0x01010101;
-		private const int SK_ROTL = 9;
+		const int SK_STEP = 0x02020202;
+		const int SK_BUMP = 0x01010101;
+		const int SK_ROTL = 9;
 
-		private bool encrypting;
+		bool encrypting;
 
-		private int[] gMDS0 = new int[MAX_KEY_BITS];
-		private int[] gMDS1 = new int[MAX_KEY_BITS];
-		private int[] gMDS2 = new int[MAX_KEY_BITS];
-		private int[] gMDS3 = new int[MAX_KEY_BITS];
+		int[] gMDS0 = new int[MAX_KEY_BITS];
+		int[] gMDS1 = new int[MAX_KEY_BITS];
+		int[] gMDS2 = new int[MAX_KEY_BITS];
+		int[] gMDS3 = new int[MAX_KEY_BITS];
 
 		/**
 		* gSubKeys[] and gSBox[] are eventually used in the
 		* encryption and decryption methods.
 		*/
-		private int[] gSubKeys;
+		int[] gSubKeys;
 
-		private int[] gSBox;
+		int[] gSBox;
 
-		private int k64Cnt;
+		int k64Cnt;
 
-		private byte[] workingKey;
+		byte[] workingKey;
 
 		public TwofishEngine()
 		{
@@ -250,17 +250,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				mX[1] = Mx_X(j) & 0xff;
 				mY[1] = Mx_Y(j) & 0xff;
 
-				gMDS0[i] = m1[P_00] | mX[P_00] << 8 |
-				           mY[P_00] << 16 | mY[P_00] << 24;
+				gMDS0[i] = m1[P_00] | (mX[P_00] << 8) |
+				           (mY[P_00] << 16) | (mY[P_00] << 24);
 
-				gMDS1[i] = mY[P_10] | mY[P_10] << 8 |
-				           mX[P_10] << 16 | m1[P_10] << 24;
+				gMDS1[i] = mY[P_10] | (mY[P_10] << 8) |
+				           (mX[P_10] << 16) | (m1[P_10] << 24);
 
-				gMDS2[i] = mX[P_20] | mY[P_20] << 8 |
-				           m1[P_20] << 16 | mY[P_20] << 24;
+				gMDS2[i] = mX[P_20] | (mY[P_20] << 8) |
+				           (m1[P_20] << 16) | (mY[P_20] << 24);
 
-				gMDS3[i] = mX[P_30] | m1[P_30] << 8 |
-				           mY[P_30] << 16 | mX[P_30] << 24;
+				gMDS3[i] = mX[P_30] | (m1[P_30] << 8) |
+				           (mY[P_30] << 16) | (mX[P_30] << 24);
 			}
 		}
 
@@ -277,12 +277,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
-				throw new ArgumentException("invalid parameter passed to Twofish init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			{
+				throw new ArgumentException("invalid parameter passed to Twofish init - " + Platform.GetTypeName(parameters));
+			}
 
-			this.encrypting = forEncryption;
-			this.workingKey = ((KeyParameter)parameters).GetKey();
+			encrypting = forEncryption;
+			workingKey = ((KeyParameter)parameters).GetKey();
 
-			int keyBits = this.workingKey.Length * 8;
+			int keyBits = workingKey.Length * 8;
 			switch (keyBits)
 			{
 				case 128:
@@ -293,8 +295,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					throw new ArgumentException("Key length not 128/192/256 bits.");
 			}
 
-			this.k64Cnt = this.workingKey.Length / 8;
-			SetKey(this.workingKey);
+			k64Cnt = workingKey.Length / 8;
+			SetKey(workingKey);
 		}
 
 		public string AlgorithmName
@@ -305,7 +307,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (workingKey == null)
+			{
 				throw new InvalidOperationException("Twofish not initialised");
+			}
 
 			Check.DataLength(input, inOff, BLOCK_SIZE, "input buffer too short");
 			Check.OutputLength(output, outOff, BLOCK_SIZE, "output buffer too short");
@@ -364,7 +368,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		// Private Implementation
 		//==================================
 
-		private void SetKey(byte[] key)
+		void SetKey(byte[] key)
 		{
 			int[] k32e = new int[MAX_KEY_BITS / 64]; // 4
 			int[] k32o = new int[MAX_KEY_BITS / 64]; // 4
@@ -530,7 +534,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* encryptBlock uses the pre-calculated gSBox[] and subKey[]
 		* arrays.
 		*/
-		private void EncryptBlock(byte[] src, int srcIndex, byte[] dst, int dstIndex)
+		void EncryptBlock(byte[] src, int srcIndex, byte[] dst, int dstIndex)
 		{
 			int x0 = (int)Pack.LE_To_UInt32(src, srcIndex) ^ gSubKeys[INPUT_WHITEN];
 			int x1 = (int)Pack.LE_To_UInt32(src, srcIndex + 4) ^ gSubKeys[INPUT_WHITEN + 1];
@@ -565,7 +569,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* the result in the provided buffer starting at the given offset.
 		* The input will be an exact multiple of our blocksize.
 		*/
-		private void DecryptBlock(byte[] src, int srcIndex, byte[] dst, int dstIndex)
+		void DecryptBlock(byte[] src, int srcIndex, byte[] dst, int dstIndex)
 		{
 			int x2 = (int)Pack.LE_To_UInt32(src, srcIndex) ^ gSubKeys[OUTPUT_WHITEN];
 			int x3 = (int)Pack.LE_To_UInt32(src, srcIndex + 4) ^ gSubKeys[OUTPUT_WHITEN + 1];
@@ -601,7 +605,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		 * the functionality in this function and applying it appropriately
 		 * to the creation of the subkeys during key setup.
 		 */
-		private int F32(int x, int[] k32)
+		int F32(int x, int[] k32)
 		{
 			int b0 = M_b0(x);
 			int b1 = M_b1(x);
@@ -654,7 +658,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @param    k1 second 32-bit entity
 		* @return     Remainder polynomial Generated using RS code
 		*/
-		private int RS_MDS_Encode(int k0, int k1)
+		int RS_MDS_Encode(int k0, int k1)
 		{
 			int r = k1;
 			for (int i = 0; i < 4; i++) // shift 1 byte at a time
@@ -680,60 +684,60 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* where a = primitive root of field generator 0x14D
 		* </p>
 		*/
-		private int RS_rem(int x)
+		int RS_rem(int x)
 		{
 			int b = (int)(((uint)x >> 24) & 0xff);
 			int g2 = ((b << 1) ^
 			          ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
-			int g3 = ((int)((uint)b >> 1) ^
-			          ((b & 0x01) != 0 ? (int)((uint)RS_GF_FDBK >> 1) : 0)) ^ g2;
-			return ((x << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
+			int g3 = (int)((uint)b >> 1) ^
+			         ((b & 0x01) != 0 ? (int)((uint)RS_GF_FDBK >> 1) : 0) ^ g2;
+			return (x << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b;
 		}
 
-		private int LFSR1(int x)
+		int LFSR1(int x)
 		{
 			return (x >> 1) ^
-			       (((x & 0x01) != 0) ? GF256_FDBK_2 : 0);
+			       ((x & 0x01) != 0 ? GF256_FDBK_2 : 0);
 		}
 
-		private int LFSR2(int x)
+		int LFSR2(int x)
 		{
 			return (x >> 2) ^
-			       (((x & 0x02) != 0) ? GF256_FDBK_2 : 0) ^
-			       (((x & 0x01) != 0) ? GF256_FDBK_4 : 0);
+			       ((x & 0x02) != 0 ? GF256_FDBK_2 : 0) ^
+			       ((x & 0x01) != 0 ? GF256_FDBK_4 : 0);
 		}
 
-		private int Mx_X(int x)
+		int Mx_X(int x)
 		{
 			return x ^ LFSR2(x);
 		} // 5B
 
-		private int Mx_Y(int x)
+		int Mx_Y(int x)
 		{
 			return x ^ LFSR1(x) ^ LFSR2(x);
 		} // EF
 
-		private int M_b0(int x)
+		int M_b0(int x)
 		{
 			return x & 0xff;
 		}
 
-		private int M_b1(int x)
+		int M_b1(int x)
 		{
 			return (int)((uint)x >> 8) & 0xff;
 		}
 
-		private int M_b2(int x)
+		int M_b2(int x)
 		{
 			return (int)((uint)x >> 16) & 0xff;
 		}
 
-		private int M_b3(int x)
+		int M_b3(int x)
 		{
 			return (int)((uint)x >> 24) & 0xff;
 		}
 
-		private int Fe32_0(int x)
+		int Fe32_0(int x)
 		{
 			return gSBox[0x000 + 2 * (x & 0xff)] ^
 			       gSBox[0x001 + 2 * ((int)((uint)x >> 8) & 0xff)] ^
@@ -741,7 +745,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			       gSBox[0x201 + 2 * ((int)((uint)x >> 24) & 0xff)];
 		}
 
-		private int Fe32_3(int x)
+		int Fe32_3(int x)
 		{
 			return gSBox[0x000 + 2 * ((int)((uint)x >> 24) & 0xff)] ^
 			       gSBox[0x001 + 2 * (x & 0xff)] ^

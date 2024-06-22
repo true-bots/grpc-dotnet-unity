@@ -12,16 +12,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	/**
 	* containing class for an CMS AuthEnveloped Data object
 	*/
-	internal class CmsAuthEnvelopedData
+	class CmsAuthEnvelopedData
 	{
 		internal RecipientInformationStore recipientInfoStore;
 		internal ContentInfo contentInfo;
 
-		private OriginatorInfo originator;
-		private AlgorithmIdentifier authEncAlg;
-		private Asn1Set authAttrs;
-		private byte[] mac;
-		private Asn1Set unauthAttrs;
+		OriginatorInfo originator;
+		AlgorithmIdentifier authEncAlg;
+		Asn1Set authAttrs;
+		byte[] mac;
+		Asn1Set unauthAttrs;
 
 		public CmsAuthEnvelopedData(
 			byte[] authEnvData)
@@ -42,7 +42,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 			AuthEnvelopedData authEnvData = AuthEnvelopedData.GetInstance(contentInfo.Content);
 
-			this.originator = authEnvData.OriginatorInfo;
+			originator = authEnvData.OriginatorInfo;
 
 			//
 			// read the recipients
@@ -53,24 +53,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			// read the auth-encrypted content info
 			//
 			EncryptedContentInfo authEncInfo = authEnvData.AuthEncryptedContentInfo;
-			this.authEncAlg = authEncInfo.ContentEncryptionAlgorithm;
+			authEncAlg = authEncInfo.ContentEncryptionAlgorithm;
 			CmsSecureReadable secureReadable = new AuthEnvelopedSecureReadable(this);
 
 			//
 			// build the RecipientInformationStore
 			//
-			this.recipientInfoStore = CmsEnvelopedHelper.BuildRecipientInformationStore(
+			recipientInfoStore = CmsEnvelopedHelper.BuildRecipientInformationStore(
 				recipientInfos, secureReadable);
 
 			// FIXME These need to be passed to the AEAD cipher as AAD (Additional Authenticated Data)
-			this.authAttrs = authEnvData.AuthAttrs;
-			this.mac = authEnvData.Mac.GetOctets();
-			this.unauthAttrs = authEnvData.UnauthAttrs;
+			authAttrs = authEnvData.AuthAttrs;
+			mac = authEnvData.Mac.GetOctets();
+			unauthAttrs = authEnvData.UnauthAttrs;
 		}
 
-		private class AuthEnvelopedSecureReadable : CmsSecureReadable
+		class AuthEnvelopedSecureReadable : CmsSecureReadable
 		{
-			private readonly CmsAuthEnvelopedData parent;
+			readonly CmsAuthEnvelopedData parent;
 
 			internal AuthEnvelopedSecureReadable(CmsAuthEnvelopedData parent)
 			{

@@ -34,8 +34,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		public CmsCompressedData Generate(CmsProcessable content, string compressionOid)
 		{
 			if (ZLib != compressionOid)
+			{
 				throw new ArgumentException("Unsupported compression algorithm: " + compressionOid,
 					nameof(compressionOid));
+			}
 
 			AlgorithmIdentifier comAlgId;
 			Asn1OctetString comOcts;
@@ -44,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			{
 				MemoryStream bOut = new MemoryStream();
 
-				using (var zOut = Utilities.IO.Compression.ZLib.CompressOutput(bOut, -1))
+				using (Stream zOut = Utilities.IO.Compression.ZLib.CompressOutput(bOut, -1))
 				{
 					content.Write(zOut);
 				}

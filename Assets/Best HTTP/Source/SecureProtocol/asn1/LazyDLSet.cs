@@ -6,16 +6,18 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal class LazyDLSet
+	class LazyDLSet
 		: DLSet
 	{
-		private byte[] encoded;
+		byte[] encoded;
 
 		internal LazyDLSet(byte[] encoded)
 			: base()
 		{
 			if (null == encoded)
+			{
 				throw new ArgumentNullException("encoded");
+			}
 
 			this.encoded = encoded;
 		}
@@ -34,7 +36,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			byte[] encoded = GetContents();
 			if (null != encoded)
+			{
 				return new LazyDLEnumerator(encoded);
+			}
 
 			return base.GetEnumerator();
 		}
@@ -69,7 +73,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				byte[] encoded = GetContents();
 				if (null != encoded)
+				{
 					return new ConstructedLazyDLEncoding(Asn1Tags.Universal, Asn1Tags.Set, encoded);
+				}
 			}
 			else
 			{
@@ -85,7 +91,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				byte[] encoded = GetContents();
 				if (null != encoded)
+				{
 					return new ConstructedLazyDLEncoding(tagClass, tagNo, encoded);
+				}
 			}
 			else
 			{
@@ -95,7 +103,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return base.GetEncodingImplicit(encoding, tagClass, tagNo);
 		}
 
-		private void Force()
+		void Force()
 		{
 			lock (this)
 			{
@@ -106,9 +114,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 					{
 						Asn1EncodableVector v = input.ReadVector();
 
-						this.elements = v.TakeElements();
-						this.isSorted = elements.Length < 2;
-						this.encoded = null;
+						elements = v.TakeElements();
+						isSorted = elements.Length < 2;
+						encoded = null;
 					}
 					catch (IOException e)
 					{
@@ -118,9 +126,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private byte[] GetContents()
+		byte[] GetContents()
 		{
-			lock (this) return encoded;
+			lock (this)
+			{
+				return encoded;
+			}
 		}
 	}
 }

@@ -16,42 +16,50 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class CertificateValues
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence certificates;
+		readonly Asn1Sequence certificates;
 
 		public static CertificateValues GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is CertificateValues)
+			{
 				return (CertificateValues)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CertificateValues((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'CertificateValues' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
-		private CertificateValues(
+		CertificateValues(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
+			}
 
 			foreach (Asn1Encodable ae in seq)
 			{
 				X509CertificateStructure.GetInstance(ae.ToAsn1Object());
 			}
 
-			this.certificates = seq;
+			certificates = seq;
 		}
 
 		public CertificateValues(
 			params X509CertificateStructure[] certificates)
 		{
 			if (certificates == null)
+			{
 				throw new ArgumentNullException("certificates");
+			}
 
 			this.certificates = new DerSequence(certificates);
 		}
@@ -60,7 +68,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			IEnumerable<X509CertificateStructure> certificates)
 		{
 			if (certificates == null)
+			{
 				throw new ArgumentNullException("certificates");
+			}
 
 			this.certificates = new DerSequence(
 				Asn1EncodableVector.FromEnumerable(certificates));

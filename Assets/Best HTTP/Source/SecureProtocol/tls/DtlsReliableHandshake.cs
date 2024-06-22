@@ -7,13 +7,13 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Date;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-	internal class DtlsReliableHandshake
+	class DtlsReliableHandshake
 	{
-		private const int MAX_RECEIVE_AHEAD = 16;
-		private const int MESSAGE_HEADER_LENGTH = 12;
+		const int MAX_RECEIVE_AHEAD = 16;
+		const int MESSAGE_HEADER_LENGTH = 12;
 
 		internal const int INITIAL_RESEND_MILLIS = 1000;
-		private const int MAX_RESEND_MILLIS = 60000;
+		const int MAX_RESEND_MILLIS = 60000;
 
 		/// <exception cref="IOException"/>
 		internal static DtlsRequest ReadClientRequest(byte[] data, int dataOff, int dataLen, Stream dtlsOutput)
@@ -22,17 +22,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			byte[] message = DtlsRecordLayer.ReceiveClientHelloRecord(data, dataOff, dataLen);
 			if (null == message || message.Length < MESSAGE_HEADER_LENGTH)
+			{
 				return null;
+			}
 
 			long recordSeq = TlsUtilities.ReadUint48(data, dataOff + 5);
 
 			short msgType = TlsUtilities.ReadUint8(message, 0);
 			if (HandshakeType.client_hello != msgType)
+			{
 				return null;
+			}
 
 			int length = TlsUtilities.ReadUint24(message, 1);
 			if (message.Length != MESSAGE_HEADER_LENGTH + length)
+			{
 				return null;
+			}
 
 			// TODO Consider stricter HelloVerifyRequest-related checks
 			//int messageSeq = TlsUtilities.ReadUint16(message, 4);
@@ -41,11 +47,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			int fragmentOffset = TlsUtilities.ReadUint24(message, 6);
 			if (0 != fragmentOffset)
+			{
 				return null;
+			}
 
 			int fragmentLength = TlsUtilities.ReadUint24(message, 9);
 			if (length != fragmentLength)
+			{
 				return null;
+			}
 
 			ClientHello clientHello = ClientHello.Parse(
 				new MemoryStream(message, MESSAGE_HEADER_LENGTH, length, false), dtlsOutput);
@@ -77,31 +87,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/*
 		 * No 'final' modifiers so that it works in earlier JDKs
 		 */
-		private DtlsRecordLayer m_recordLayer;
-		private Timeout m_handshakeTimeout;
+		DtlsRecordLayer m_recordLayer;
+		Timeout m_handshakeTimeout;
 
-		private TlsHandshakeHash m_handshakeHash;
+		TlsHandshakeHash m_handshakeHash;
 
-		private IDictionary<int, DtlsReassembler> m_currentInboundFlight = new Dictionary<int, DtlsReassembler>();
-		private IDictionary<int, DtlsReassembler> m_previousInboundFlight = null;
-		private IList<Message> m_outboundFlight = new List<Message>();
+		IDictionary<int, DtlsReassembler> m_currentInboundFlight = new Dictionary<int, DtlsReassembler>();
+		IDictionary<int, DtlsReassembler> m_previousInboundFlight = null;
+		IList<Message> m_outboundFlight = new List<Message>();
 
-		private int m_resendMillis = -1;
-		private Timeout m_resendTimeout = null;
+		int m_resendMillis = -1;
+		Timeout m_resendTimeout = null;
 
-		private int m_next_send_seq = 0, m_next_receive_seq = 0;
+		int m_next_send_seq = 0, m_next_receive_seq = 0;
 
 		internal DtlsReliableHandshake(TlsContext context, DtlsRecordLayer transport, int timeoutMillis,
 			DtlsRequest request)
 		{
-			this.m_recordLayer = transport;
-			this.m_handshakeHash = new DeferredHash(context);
-			this.m_handshakeTimeout = Timeout.ForWaitMillis(timeoutMillis);
+			m_recordLayer = transport;
+			m_handshakeHash = new DeferredHash(context);
+			m_handshakeTimeout = Timeout.ForWaitMillis(timeoutMillis);
 
 			if (null != request)
 			{
-				this.m_resendMillis = INITIAL_RESEND_MILLIS;
-				this.m_resendTimeout = new Timeout(m_resendMillis);
+				m_resendMillis = INITIAL_RESEND_MILLIS;
+				m_resendTimeout = new Timeout(m_resendMillis);
 
 				long recordSeq = request.RecordSeq;
 				int messageSeq = request.MessageSeq;
@@ -115,8 +125,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				m_currentInboundFlight[messageSeq] = reassembler;
 
 				// We sent HelloVerifyRequest with (message) sequence number 0
-				this.m_next_send_seq = 1;
-				this.m_next_receive_seq = messageSeq + 1;
+				m_next_send_seq = 1;
+				m_next_receive_seq = messageSeq + 1;
 
 				m_handshakeHash.Update(message, 0, message.Length);
 			}
@@ -124,15 +134,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		internal void ResetAfterHelloVerifyRequestClient()
 		{
-			this.m_currentInboundFlight = new Dictionary<int, DtlsReassembler>();
-			this.m_previousInboundFlight = null;
-			this.m_outboundFlight = new List<Message>();
+			m_currentInboundFlight = new Dictionary<int, DtlsReassembler>();
+			m_previousInboundFlight = null;
+			m_outboundFlight = new List<Message>();
 
-			this.m_resendMillis = -1;
-			this.m_resendTimeout = null;
+			m_resendMillis = -1;
+			m_resendTimeout = null;
 
 			// We're waiting for ServerHello, always with (message) sequence number 1
-			this.m_next_receive_seq = 1;
+			m_next_receive_seq = 1;
 
 			m_handshakeHash.Reset();
 		}
@@ -156,8 +166,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				CheckInboundFlight();
 
-				this.m_resendMillis = -1;
-				this.m_resendTimeout = null;
+				m_resendMillis = -1;
+				m_resendTimeout = null;
 
 				m_outboundFlight.Clear();
 			}
@@ -183,7 +193,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			Message message = ImplReceiveMessage();
 			if (message.Type != msg_type)
+			{
 				throw new TlsFatalAlert(AlertDescription.unexpected_message);
+			}
 
 			UpdateHandshakeMessagesDigest(message);
 			return message.Body;
@@ -194,7 +206,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			Message message = ImplReceiveMessage();
 			if (message.Type != msg_type)
+			{
 				throw new TlsFatalAlert(AlertDescription.unexpected_message);
+			}
 
 			return message;
 		}
@@ -266,7 +280,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/**
 		 * Check that there are no "extra" messages left in the current inbound flight
 		 */
-		private void CheckInboundFlight()
+		void CheckInboundFlight()
 		{
 			foreach (int key in m_currentInboundFlight.Keys)
 			{
@@ -278,9 +292,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private Message GetPendingMessage()
+		Message GetPendingMessage()
 		{
-			if (m_currentInboundFlight.TryGetValue(m_next_receive_seq, out var next))
+			if (m_currentInboundFlight.TryGetValue(m_next_receive_seq, out DtlsReassembler next))
 			{
 				byte[] body = next.GetBodyIfComplete();
 				if (body != null)
@@ -294,7 +308,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private Message ImplReceiveMessage()
+		Message ImplReceiveMessage()
 		{
 			long currentTimeMillis = DateTimeUtilities.CurrentUnixMs();
 
@@ -311,14 +325,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			for (;;)
 			{
 				if (m_recordLayer.IsClosed)
+				{
 					throw new TlsFatalAlert(AlertDescription.user_canceled);
+				}
 
 				Message pending = GetPendingMessage();
 				if (pending != null)
+				{
 					return pending;
+				}
 
 				if (Timeout.HasExpired(m_handshakeTimeout, currentTimeMillis))
+				{
 					throw new TlsTimeoutException("Handshake timed out");
+				}
 
 				int waitMillis = Timeout.GetWaitMillis(m_handshakeTimeout, currentTimeMillis);
 				waitMillis = Timeout.ConstrainWaitMillis(waitMillis, m_resendTimeout, currentTimeMillis);
@@ -349,7 +369,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 		}
 
-		private void PrepareInboundFlight(IDictionary<int, DtlsReassembler> nextFlight)
+		void PrepareInboundFlight(IDictionary<int, DtlsReassembler> nextFlight)
 		{
 			ResetAll(m_currentInboundFlight);
 			m_previousInboundFlight = m_currentInboundFlight;
@@ -357,7 +377,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private void ProcessRecord(int windowSize, int epoch, byte[] buf, int off, int len)
+		void ProcessRecord(int windowSize, int epoch, byte[] buf, int off, int len)
 		{
 			bool checkPreviousFlight = false;
 
@@ -386,16 +406,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				short msg_type = TlsUtilities.ReadUint8(buf, off + 0);
 				int expectedEpoch = msg_type == HandshakeType.finished ? 1 : 0;
 				if (epoch != expectedEpoch)
+				{
 					break;
+				}
 
 				int message_seq = TlsUtilities.ReadUint16(buf, off + 4);
-				if (message_seq >= (m_next_receive_seq + windowSize))
+				if (message_seq >= m_next_receive_seq + windowSize)
 				{
 					// NOTE: Too far ahead - ignore
 				}
 				else if (message_seq >= m_next_receive_seq)
 				{
-					if (!m_currentInboundFlight.TryGetValue(message_seq, out var reassembler))
+					if (!m_currentInboundFlight.TryGetValue(message_seq, out DtlsReassembler reassembler))
 					{
 						reassembler = new DtlsReassembler(msg_type, length);
 						m_currentInboundFlight[message_seq] = reassembler;
@@ -411,7 +433,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					 * retransmit our last flight
 					 */
 
-					if (m_previousInboundFlight.TryGetValue(message_seq, out var reassembler))
+					if (m_previousInboundFlight.TryGetValue(message_seq, out DtlsReassembler reassembler))
 					{
 						reassembler.ContributeFragment(msg_type, length, buf, off + MESSAGE_HEADER_LENGTH,
 							fragment_offset, fragment_length);
@@ -431,7 +453,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private void ResendOutboundFlight()
+		void ResendOutboundFlight()
 		{
 			m_recordLayer.ResetWriteEpoch();
 			foreach (Message message in m_outboundFlight)
@@ -444,7 +466,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private void WriteMessage(Message message)
+		void WriteMessage(Message message)
 		{
 			int sendLimit = m_recordLayer.GetSendLimit();
 			int fragmentLimit = sendLimit - MESSAGE_HEADER_LENGTH;
@@ -469,7 +491,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private void WriteHandshakeFragment(Message message, int fragment_offset, int fragment_length)
+		void WriteHandshakeFragment(Message message, int fragment_offset, int fragment_length)
 		{
 			RecordLayerBuffer fragment = new RecordLayerBuffer(MESSAGE_HEADER_LENGTH + fragment_length);
 			TlsUtilities.WriteUint8(message.Type, fragment);
@@ -482,18 +504,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			fragment.SendToRecordLayer(m_recordLayer);
 		}
 
-		private static bool CheckAll(IDictionary<int, DtlsReassembler> inboundFlight)
+		static bool CheckAll(IDictionary<int, DtlsReassembler> inboundFlight)
 		{
 			foreach (DtlsReassembler r in inboundFlight.Values)
 			{
 				if (r.GetBodyIfComplete() == null)
+				{
 					return false;
+				}
 			}
 
 			return true;
 		}
 
-		private static void ResetAll(IDictionary<int, DtlsReassembler> inboundFlight)
+		static void ResetAll(IDictionary<int, DtlsReassembler> inboundFlight)
 		{
 			foreach (DtlsReassembler r in inboundFlight.Values)
 			{
@@ -503,15 +527,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		internal class Message
 		{
-			private readonly int m_message_seq;
-			private readonly short m_msg_type;
-			private readonly byte[] m_body;
+			readonly int m_message_seq;
+			readonly short m_msg_type;
+			readonly byte[] m_body;
 
 			internal Message(int message_seq, short msg_type, byte[] body)
 			{
-				this.m_message_seq = message_seq;
-				this.m_msg_type = msg_type;
-				this.m_body = body;
+				m_message_seq = message_seq;
+				m_msg_type = msg_type;
+				m_body = body;
 			}
 
 			public int Seq
@@ -551,11 +575,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal class Retransmit
 			: DtlsHandshakeRetransmit
 		{
-			private readonly DtlsReliableHandshake m_outer;
+			readonly DtlsReliableHandshake m_outer;
 
 			internal Retransmit(DtlsReliableHandshake outer)
 			{
-				this.m_outer = outer;
+				m_outer = outer;
 			}
 
 			public void ReceivedHandshakeRecord(int epoch, byte[] buf, int off, int len)

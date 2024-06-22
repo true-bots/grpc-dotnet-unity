@@ -17,7 +17,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public static BcTlsCertificate Convert(BcTlsCrypto crypto, TlsCertificate certificate)
 		{
 			if (certificate is BcTlsCertificate)
+			{
 				return (BcTlsCertificate)certificate;
+			}
 
 			return new BcTlsCertificate(crypto, certificate.GetEncoded());
 		}
@@ -50,7 +52,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			m_certificate = certificate;
 		}
 
-		public virtual X509CertificateStructure X509CertificateStructure => m_certificate;
+		public virtual X509CertificateStructure X509CertificateStructure
+		{
+			get { return m_certificate; }
+		}
 
 		/// <exception cref="IOException"/>
 		public override byte[] GetEncoded()
@@ -74,11 +79,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			return null;
 		}
 
-		public override BigInteger SerialNumber => m_certificate.SerialNumber.Value;
+		public override BigInteger SerialNumber
+		{
+			get { return m_certificate.SerialNumber.Value; }
+		}
 
-		public override string SigAlgOid => m_certificate.SignatureAlgorithm.Algorithm.Id;
+		public override string SigAlgOid
+		{
+			get { return m_certificate.SignatureAlgorithm.Algorithm.Id; }
+		}
 
-		public override Asn1Encodable GetSigAlgParams() => m_certificate.SignatureAlgorithm.Parameters;
+		public override Asn1Encodable GetSigAlgParams()
+		{
+			return m_certificate.SignatureAlgorithm.Parameters;
+		}
 
 		protected override bool SupportsKeyUsage(int keyUsageBits)
 		{
@@ -90,7 +104,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 				{
 					int bits = ku.GetBytes()[0] & 0xff;
 					if ((bits & keyUsageBits) != keyUsageBits)
+					{
 						return false;
+					}
 				}
 			}
 

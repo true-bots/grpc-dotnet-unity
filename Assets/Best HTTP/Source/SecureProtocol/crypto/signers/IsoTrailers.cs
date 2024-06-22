@@ -19,9 +19,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public const int TRAILER_SHA512_224 = 0x39CC;
 		public const int TRAILER_SHA512_256 = 0x40CC;
 
-		private static IDictionary<string, int> CreateTrailerMap()
+		static IDictionary<string, int> CreateTrailerMap()
 		{
-			var trailers = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+			Dictionary<string, int> trailers = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
 			trailers.Add("RIPEMD128", TRAILER_RIPEMD128);
 			trailers.Add("RIPEMD160", TRAILER_RIPEMD160);
@@ -40,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		}
 
 		// IDictionary is (string -> Int32)
-		private static readonly IDictionary<string, int> TrailerMap = CreateTrailerMap();
+		static readonly IDictionary<string, int> TrailerMap = CreateTrailerMap();
 
 		public static int GetTrailer(IDigest digest)
 		{

@@ -4,9 +4,9 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 
 namespace BestHTTP.Connections.TLS.Crypto.Impl
 {
-	internal static class FastAesEngineHelper
+	static class FastAesEngineHelper
 	{
-		public unsafe static void EncryptBlock(byte[] input, int inOff, byte[] output, int outOff, uint[][] KW, int ROUNDS, uint[] T0, byte[] S, byte[] s)
+		public static unsafe void EncryptBlock(byte[] input, int inOff, byte[] output, int outOff, uint[][] KW, int ROUNDS, uint[] T0, byte[] S, byte[] s)
 		{
 			uint C0 = Pack.LE_To_UInt32(input, inOff + 0);
 			uint C1 = Pack.LE_To_UInt32(input, inOff + 4);
@@ -177,10 +177,10 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 				fixed (byte* pS = S, ps = s)
 				fixed (uint* pkw = kw)
 				{
-					C0 = (uint)pS[(byte)r0] ^ (((uint)pS[(byte)(r1 >> 8)]) << 8) ^ (((uint)ps[(byte)(r2 >> 16)]) << 16) ^ (((uint)ps[(byte)(r3 >> 24)]) << 24) ^ pkw[0];
-					C1 = (uint)ps[(byte)r1] ^ (((uint)pS[(byte)(r2 >> 8)]) << 8) ^ (((uint)pS[(byte)(r3 >> 16)]) << 16) ^ (((uint)ps[(byte)(r0 >> 24)]) << 24) ^ pkw[1];
-					C2 = (uint)ps[(byte)r2] ^ (((uint)pS[(byte)(r3 >> 8)]) << 8) ^ (((uint)pS[(byte)(r0 >> 16)]) << 16) ^ (((uint)pS[(byte)(r1 >> 24)]) << 24) ^ pkw[2];
-					C3 = (uint)ps[(byte)r3] ^ (((uint)ps[(byte)(r0 >> 8)]) << 8) ^ (((uint)ps[(byte)(r1 >> 16)]) << 16) ^ (((uint)pS[(byte)(r2 >> 24)]) << 24) ^ pkw[3];
+					C0 = (uint)pS[(byte)r0] ^ ((uint)pS[(byte)(r1 >> 8)] << 8) ^ ((uint)ps[(byte)(r2 >> 16)] << 16) ^ ((uint)ps[(byte)(r3 >> 24)] << 24) ^ pkw[0];
+					C1 = (uint)ps[(byte)r1] ^ ((uint)pS[(byte)(r2 >> 8)] << 8) ^ ((uint)pS[(byte)(r3 >> 16)] << 16) ^ ((uint)ps[(byte)(r0 >> 24)] << 24) ^ pkw[1];
+					C2 = (uint)ps[(byte)r2] ^ ((uint)pS[(byte)(r3 >> 8)] << 8) ^ ((uint)pS[(byte)(r0 >> 16)] << 16) ^ ((uint)pS[(byte)(r1 >> 24)] << 24) ^ pkw[2];
+					C3 = (uint)ps[(byte)r3] ^ ((uint)ps[(byte)(r0 >> 8)] << 8) ^ ((uint)ps[(byte)(r1 >> 16)] << 16) ^ ((uint)pS[(byte)(r2 >> 24)] << 24) ^ pkw[3];
 				}
 			}
 

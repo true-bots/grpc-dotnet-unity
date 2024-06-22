@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 	public class ContentHints
 		: Asn1Encodable
 	{
-		private readonly DerUtf8String contentDescription;
-		private readonly DerObjectIdentifier contentType;
+		readonly DerUtf8String contentDescription;
+		readonly DerObjectIdentifier contentType;
 
 		public static ContentHints GetInstance(
 			object o)
@@ -25,13 +25,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 			}
 
 			throw new ArgumentException("unknown object in 'ContentHints' factory : "
-			                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
+			                            + Platform.GetTypeName(o) + ".");
 		}
 
 		/**
 		 * constructor
 		 */
-		private ContentHints(
+		ContentHints(
 			Asn1Sequence seq)
 		{
 			IAsn1Convertible field = seq[0];
@@ -50,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 			DerObjectIdentifier contentType)
 		{
 			this.contentType = contentType;
-			this.contentDescription = null;
+			contentDescription = null;
 		}
 
 		public ContentHints(

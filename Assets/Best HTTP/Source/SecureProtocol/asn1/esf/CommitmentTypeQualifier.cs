@@ -17,8 +17,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class CommitmentTypeQualifier
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier commitmentTypeIdentifier;
-		private readonly Asn1Object qualifier;
+		readonly DerObjectIdentifier commitmentTypeIdentifier;
+		readonly Asn1Object qualifier;
 
 		/**
 		* Creates a new <code>CommitmentTypeQualifier</code> instance.
@@ -42,7 +42,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			Asn1Encodable qualifier)
 		{
 			if (commitmentTypeIdentifier == null)
+			{
 				throw new ArgumentNullException("commitmentTypeIdentifier");
+			}
 
 			this.commitmentTypeIdentifier = commitmentTypeIdentifier;
 
@@ -62,9 +64,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
+			}
+
 			if (seq.Count < 1 || seq.Count > 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
 			commitmentTypeIdentifier = (DerObjectIdentifier)seq[0].ToAsn1Object();
 
@@ -78,14 +85,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			object obj)
 		{
 			if (obj == null || obj is CommitmentTypeQualifier)
+			{
 				return (CommitmentTypeQualifier)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CommitmentTypeQualifier((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'CommitmentTypeQualifier' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 

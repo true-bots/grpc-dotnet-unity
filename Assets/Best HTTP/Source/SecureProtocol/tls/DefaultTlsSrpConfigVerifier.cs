@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class DefaultTlsSrpConfigVerifier
 		: TlsSrpConfigVerifier
 	{
-		private static readonly List<Srp6Group> DefaultGroups = new List<Srp6Group>();
+		static readonly List<Srp6Group> DefaultGroups = new List<Srp6Group>();
 
 		static DefaultTlsSrpConfigVerifier()
 		{
@@ -36,7 +36,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <param name="groups">an <see cref="IList{T}"/> of acceptable <see cref="Srp6Group"/>.</param>
 		public DefaultTlsSrpConfigVerifier(IList<Srp6Group> groups)
 		{
-			this.m_groups = new List<Srp6Group>(groups);
+			m_groups = new List<Srp6Group>(groups);
 		}
 
 		public virtual bool Accept(TlsSrpConfig srpConfig)
@@ -44,7 +44,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			foreach (Srp6Group group in m_groups)
 			{
 				if (AreGroupsEqual(srpConfig, group))
+				{
 					return true;
+				}
 			}
 
 			return false;

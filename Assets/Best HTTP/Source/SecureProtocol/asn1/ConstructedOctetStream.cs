@@ -7,13 +7,13 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal class ConstructedOctetStream
+	class ConstructedOctetStream
 		: BaseInputStream
 	{
-		private readonly Asn1StreamParser m_parser;
+		readonly Asn1StreamParser m_parser;
 
-		private bool m_first = true;
-		private Stream m_currentStream;
+		bool m_first = true;
+		Stream m_currentStream;
 
 		internal ConstructedOctetStream(Asn1StreamParser parser)
 		{
@@ -28,16 +28,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return Read(buffer.AsSpan(offset, count));
 #else
 			if (count < 1)
+			{
 				return 0;
+			}
 
 			if (m_currentStream == null)
 			{
 				if (!m_first)
+				{
 					return 0;
+				}
 
 				Asn1OctetStringParser next = GetNextParser();
 				if (next == null)
+				{
 					return 0;
+				}
 
 				m_first = false;
 				m_currentStream = next.GetOctetStream();
@@ -54,7 +60,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 					totalRead += numRead;
 
 					if (totalRead == count)
+					{
 						return totalRead;
+					}
 				}
 				else
 				{
@@ -123,11 +131,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			if (m_currentStream == null)
 			{
 				if (!m_first)
+				{
 					return -1;
+				}
 
 				Asn1OctetStringParser next = GetNextParser();
 				if (next == null)
+				{
 					return -1;
+				}
 
 				m_first = false;
 				m_currentStream = next.GetOctetStream();
@@ -138,7 +150,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				int b = m_currentStream.ReadByte();
 
 				if (b >= 0)
+				{
 					return b;
+				}
 
 				Asn1OctetStringParser next = GetNextParser();
 				if (next == null)
@@ -151,16 +165,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private Asn1OctetStringParser GetNextParser()
+		Asn1OctetStringParser GetNextParser()
 		{
 			IAsn1Convertible asn1Obj = m_parser.ReadObject();
 			if (asn1Obj == null)
+			{
 				return null;
+			}
 
 			if (asn1Obj is Asn1OctetStringParser)
+			{
 				return (Asn1OctetStringParser)asn1Obj;
+			}
 
-			throw new IOException("unknown object encountered: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(asn1Obj));
+			throw new IOException("unknown object encountered: " + Platform.GetTypeName(asn1Obj));
 		}
 	}
 }

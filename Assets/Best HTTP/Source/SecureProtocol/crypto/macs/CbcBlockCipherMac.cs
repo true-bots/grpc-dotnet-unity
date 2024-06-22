@@ -13,11 +13,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class CbcBlockCipherMac
 		: IMac
 	{
-		private byte[] buf;
-		private int bufOff;
-		private IBlockCipherMode m_cipherMode;
-		private IBlockCipherPadding padding;
-		private int macSize;
+		byte[] buf;
+		int bufOff;
+		IBlockCipherMode m_cipherMode;
+		IBlockCipherPadding padding;
+		int macSize;
 
 		/**
         * create a standard MAC based on a CBC block cipher. This will produce an
@@ -27,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
         */
 		public CbcBlockCipherMac(
 			IBlockCipher cipher)
-			: this(cipher, (cipher.GetBlockSize() * 8) / 2, null)
+			: this(cipher, cipher.GetBlockSize() * 8 / 2, null)
 		{
 		}
 
@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public CbcBlockCipherMac(
 			IBlockCipher cipher,
 			IBlockCipherPadding padding)
-			: this(cipher, (cipher.GetBlockSize() * 8) / 2, padding)
+			: this(cipher, cipher.GetBlockSize() * 8 / 2, padding)
 		{
 		}
 
@@ -84,12 +84,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			int macSizeInBits,
 			IBlockCipherPadding padding)
 		{
-			if ((macSizeInBits % 8) != 0)
+			if (macSizeInBits % 8 != 0)
+			{
 				throw new ArgumentException("MAC size must be multiple of 8");
+			}
 
-			this.m_cipherMode = new CbcBlockCipher(cipher);
+			m_cipherMode = new CbcBlockCipher(cipher);
 			this.padding = padding;
-			this.macSize = macSizeInBits / 8;
+			macSize = macSizeInBits / 8;
 
 			buf = new byte[cipher.GetBlockSize()];
 			bufOff = 0;
@@ -126,7 +128,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public void BlockUpdate(byte[] input, int inOff, int len)
 		{
 			if (len < 0)
+			{
 				throw new ArgumentException("Can't have a negative input length!");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             BlockUpdate(input.AsSpan(inOff, len));

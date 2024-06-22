@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class NameConstraints
 		: Asn1Encodable
 	{
-		private Asn1Sequence permitted, excluded;
+		Asn1Sequence permitted, excluded;
 
 		public static NameConstraints GetInstance(
 			object obj)
@@ -24,7 +24,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new NameConstraints((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public NameConstraints(
@@ -67,7 +67,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			}
 		}
 
-		private DerSequence CreateSequence(IList<GeneralSubtree> subtrees)
+		DerSequence CreateSequence(IList<GeneralSubtree> subtrees)
 		{
 			GeneralSubtree[] gsts = new GeneralSubtree[subtrees.Count];
 			for (int i = 0; i < subtrees.Count; ++i)

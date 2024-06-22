@@ -8,20 +8,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class PskIdentity
 	{
-		private readonly byte[] m_identity;
-		private readonly long m_obfuscatedTicketAge;
+		readonly byte[] m_identity;
+		readonly long m_obfuscatedTicketAge;
 
 		public PskIdentity(byte[] identity, long obfuscatedTicketAge)
 		{
 			if (null == identity)
+			{
 				throw new ArgumentNullException("identity");
-			if (identity.Length < 1 || !TlsUtilities.IsValidUint16(identity.Length))
-				throw new ArgumentException("should have length from 1 to 65535", "identity");
-			if (!TlsUtilities.IsValidUint32(obfuscatedTicketAge))
-				throw new ArgumentException("should be a uint32", "obfuscatedTicketAge");
+			}
 
-			this.m_identity = identity;
-			this.m_obfuscatedTicketAge = obfuscatedTicketAge;
+			if (identity.Length < 1 || !TlsUtilities.IsValidUint16(identity.Length))
+			{
+				throw new ArgumentException("should have length from 1 to 65535", "identity");
+			}
+
+			if (!TlsUtilities.IsValidUint32(obfuscatedTicketAge))
+			{
+				throw new ArgumentException("should be a uint32", "obfuscatedTicketAge");
+			}
+
+			m_identity = identity;
+			m_obfuscatedTicketAge = obfuscatedTicketAge;
 		}
 
 		public int GetEncodedLength()
@@ -56,10 +64,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			PskIdentity that = obj as PskIdentity;
 			if (null == that)
+			{
 				return false;
+			}
 
-			return this.m_obfuscatedTicketAge == that.m_obfuscatedTicketAge
-			       && Arrays.ConstantTimeAreEqual(this.m_identity, that.m_identity);
+			return m_obfuscatedTicketAge == that.m_obfuscatedTicketAge
+			       && Arrays.ConstantTimeAreEqual(m_identity, that.m_identity);
 		}
 
 		public override int GetHashCode()

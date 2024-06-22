@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 	public class Gost3410ParamSetParameters
 		: Asn1Encodable
 	{
-		private readonly int keySize;
-		private readonly DerInteger p, q, a;
+		readonly int keySize;
+		readonly DerInteger p, q, a;
 
 		public static Gost3410ParamSetParameters GetInstance(Asn1TaggedObject obj, bool explicitly)
 		{
@@ -20,12 +20,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 		public static Gost3410ParamSetParameters GetInstance(object obj)
 		{
 			if (obj == null || obj is Gost3410ParamSetParameters)
+			{
 				return (Gost3410ParamSetParameters)obj;
+			}
 
 			if (obj is Asn1Sequence seq)
+			{
 				return new Gost3410ParamSetParameters(seq);
+			}
 
-			throw new ArgumentException("Invalid GOST3410Parameter: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid GOST3410Parameter: " + Platform.GetTypeName(obj));
 		}
 
 		public Gost3410ParamSetParameters(
@@ -40,16 +44,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 			this.a = new DerInteger(a);
 		}
 
-		private Gost3410ParamSetParameters(
+		Gost3410ParamSetParameters(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 4)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
-			this.keySize = DerInteger.GetInstance(seq[0]).IntValueExact;
-			this.p = DerInteger.GetInstance(seq[1]);
-			this.q = DerInteger.GetInstance(seq[2]);
-			this.a = DerInteger.GetInstance(seq[3]);
+			keySize = DerInteger.GetInstance(seq[0]).IntValueExact;
+			p = DerInteger.GetInstance(seq[1]);
+			q = DerInteger.GetInstance(seq[2]);
+			a = DerInteger.GetInstance(seq[3]);
 		}
 
 		public int KeySize

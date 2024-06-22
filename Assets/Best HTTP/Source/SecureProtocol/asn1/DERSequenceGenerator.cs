@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public class DerSequenceGenerator
 		: DerGenerator
 	{
-		private readonly MemoryStream _bOut = new MemoryStream();
+		readonly MemoryStream _bOut = new MemoryStream();
 
 		public DerSequenceGenerator(
 			Stream outStream)

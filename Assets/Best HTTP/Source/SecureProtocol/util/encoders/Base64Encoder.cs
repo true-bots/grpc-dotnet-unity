@@ -155,7 +155,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
             return Encode(buf.AsSpan(off, len), outStream);
 #else
 			if (len < 0)
+			{
 				return 0;
+			}
 
 			byte[] tmp = new byte[72];
 			int remaining = len;
@@ -188,7 +190,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
         }
 #endif
 
-		private bool Ignore(char c)
+		bool Ignore(char c)
 		{
 			return c == '\n' || c == '\r' || c == '\t' || c == ' ';
 		}
@@ -213,7 +215,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 			while (end > off)
 			{
 				if (!Ignore((char)data[end - 1]))
+				{
 					break;
+				}
 
 				end--;
 			}
@@ -238,7 +242,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 				b4 = decodingTable[data[i++]];
 
 				if ((b1 | b2 | b3 | b4) >= 0x80)
+				{
 					throw new IOException("invalid characters encountered in base64 data");
+				}
 
 				outBuffer[bufOff++] = (byte)((b1 << 2) | (b2 >> 4));
 				outBuffer[bufOff++] = (byte)((b2 << 4) | (b3 >> 2));
@@ -344,10 +350,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private int NextI(ReadOnlySpan<byte> data, int i, int finish)
 #else
-		private int NextI(byte[] data, int i, int finish)
+		int NextI(byte[] data, int i, int finish)
 #endif
 		{
-			while ((i < finish) && Ignore((char)data[i]))
+			while (i < finish && Ignore((char)data[i]))
 			{
 				i++;
 			}
@@ -376,7 +382,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 			while (end > 0)
 			{
 				if (!Ignore(data[end - 1]))
+				{
 					break;
+				}
 
 				end--;
 			}
@@ -404,7 +412,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 				b4 = decodingTable[data[i++]];
 
 				if ((b1 | b2 | b3 | b4) >= 0x80)
+				{
 					throw new IOException("invalid characters encountered in base64 data");
+				}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
                 buf[0] = (byte)((b1 << 2) | (b2 >> 4));
@@ -427,7 +437,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 			return length;
 		}
 
-		private int DecodeLastBlock(
+		int DecodeLastBlock(
 			Stream outStream,
 			char c1,
 			char c2,
@@ -437,13 +447,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 			if (c3 == padding)
 			{
 				if (c4 != padding)
+				{
 					throw new IOException("invalid characters encountered at end of base64 data");
+				}
 
 				byte b1 = decodingTable[c1];
 				byte b2 = decodingTable[c2];
 
 				if ((b1 | b2) >= 0x80)
+				{
 					throw new IOException("invalid characters encountered at end of base64 data");
+				}
 
 				outStream.WriteByte((byte)((b1 << 2) | (b2 >> 4)));
 
@@ -457,7 +471,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 				byte b3 = decodingTable[c3];
 
 				if ((b1 | b2 | b3) >= 0x80)
+				{
 					throw new IOException("invalid characters encountered at end of base64 data");
+				}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
                 Span<byte> buf = stackalloc byte[2] {
@@ -480,7 +496,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 				byte b4 = decodingTable[c4];
 
 				if ((b1 | b2 | b3 | b4) >= 0x80)
+				{
 					throw new IOException("invalid characters encountered at end of base64 data");
+				}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
                 Span<byte> buf = stackalloc byte[3] {
@@ -499,9 +517,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders
 			}
 		}
 
-		private int NextI(string data, int i, int finish)
+		int NextI(string data, int i, int finish)
 		{
-			while ((i < finish) && Ignore(data[i]))
+			while (i < finish && Ignore(data[i]))
 			{
 				i++;
 			}

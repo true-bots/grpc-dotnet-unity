@@ -15,11 +15,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class NaccacheSternEngine
 		: IAsymmetricBlockCipher
 	{
-		private bool forEncryption;
+		bool forEncryption;
 
-		private NaccacheSternKeyParameters key;
+		NaccacheSternKeyParameters key;
 
-		private IList<BigInteger>[] lookup = null;
+		IList<BigInteger>[] lookup = null;
 
 		public string AlgorithmName
 		{
@@ -49,7 +49,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			if (!this.forEncryption)
 			{
 				NaccacheSternPrivateKeyParameters priv = (NaccacheSternPrivateKeyParameters)key;
-				var primes = priv.SmallPrimesList;
+				IList<BigInteger> primes = priv.SmallPrimesList;
 				lookup = new IList<BigInteger>[primes.Count];
 				for (int i = 0; i < primes.Count; i++)
 				{
@@ -122,9 +122,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int length)
 		{
 			if (key == null)
+			{
 				throw new InvalidOperationException("NaccacheStern engine not initialised");
-			if (length > (GetInputBlockSize() + 1))
+			}
+
+			if (length > GetInputBlockSize() + 1)
+			{
 				throw new DataLengthException("input too large for Naccache-Stern cipher.\n");
+			}
 
 			if (!forEncryption)
 			{
@@ -145,14 +150,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 			else
 			{
-				var plain = new List<BigInteger>();
+				List<BigInteger> plain = new List<BigInteger>();
 				NaccacheSternPrivateKeyParameters priv = (NaccacheSternPrivateKeyParameters)key;
-				var primes = priv.SmallPrimesList;
+				IList<BigInteger> primes = priv.SmallPrimesList;
 				// Get Chinese Remainders of CipherText
 				for (int i = 0; i < primes.Count; i++)
 				{
 					BigInteger exp = input.ModPow(priv.PhiN.Divide((BigInteger)primes[i]), priv.Modulus);
-					var al = lookup[i];
+					IList<BigInteger> al = lookup[i];
 					if (lookup[i].Count != primes[i].IntValue)
 					{
 						throw new InvalidCipherTextException("Error in lookup Array for "
@@ -165,7 +170,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 					int lookedup = al.IndexOf(exp);
 
 					if (lookedup == -1)
+					{
 						throw new InvalidCipherTextException("Lookup failed");
+					}
 
 					plain.Add(BigInteger.ValueOf(lookedup));
 				}
@@ -231,8 +238,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			// check for correct blocksize
 			if (forEncryption)
 			{
-				if ((block1.Length > GetOutputBlockSize())
-				    || (block2.Length > GetOutputBlockSize()))
+				if (block1.Length > GetOutputBlockSize()
+				    || block2.Length > GetOutputBlockSize())
 				{
 					throw new InvalidCipherTextException(
 						"BlockLength too large for simple addition.\n");
@@ -240,8 +247,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 			else
 			{
-				if ((block1.Length > GetInputBlockSize())
-				    || (block2.Length > GetInputBlockSize()))
+				if (block1.Length > GetInputBlockSize()
+				    || block2.Length > GetInputBlockSize())
 				{
 					throw new InvalidCipherTextException(
 						"BlockLength too large for simple addition.\n");
@@ -329,7 +336,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*            the primes p_i
 		* @return an integer x for that x % p_i == c_i
 		*/
-		private static BigInteger ChineseRemainder(IList<BigInteger> congruences, IList<BigInteger> primes)
+		static BigInteger ChineseRemainder(IList<BigInteger> congruences, IList<BigInteger> primes)
 		{
 			BigInteger retval = BigInteger.Zero;
 			BigInteger all = BigInteger.One;

@@ -4,6 +4,7 @@ using System;
 using System.Text;
 using BestHTTP.Extensions;
 using BestHTTP.Connections;
+using BestHTTP.Connections.HTTP2;
 using BestHTTP.Logger;
 using BestHTTP.PlatformSupport.Memory;
 
@@ -19,7 +20,7 @@ namespace BestHTTP.WebSocket
 		/// <summary>
 		/// Maximum payload size of a websocket frame. Its default value is 32 KiB.
 		/// </summary>
-		public static uint MaxFragmentSize = UInt16.MaxValue / 2;
+		public static uint MaxFragmentSize = ushort.MaxValue / 2;
 
 #if !UNITY_WEBGL || UNITY_EDITOR
 		public static IExtension[] GetDefaultExtensions()
@@ -42,7 +43,7 @@ namespace BestHTTP.WebSocket
 
 		public WebSocketStates State
 		{
-			get { return this.implementation.State; }
+			get { return implementation.State; }
 		}
 
 		/// <summary>
@@ -50,7 +51,7 @@ namespace BestHTTP.WebSocket
 		/// </summary>
 		public bool IsOpen
 		{
-			get { return this.implementation.IsOpen; }
+			get { return implementation.IsOpen; }
 		}
 
 		/// <summary>
@@ -58,7 +59,7 @@ namespace BestHTTP.WebSocket
 		/// </summary>
 		public int BufferedAmount
 		{
-			get { return this.implementation.BufferedAmount; }
+			get { return implementation.BufferedAmount; }
 		}
 
 #if !UNITY_WEBGL || UNITY_EDITOR
@@ -84,7 +85,7 @@ namespace BestHTTP.WebSocket
 		/// </summary>
 		public HTTPRequest InternalRequest
 		{
-			get { return this.implementation.InternalRequest; }
+			get { return implementation.InternalRequest; }
 		}
 
 		/// <summary>
@@ -97,7 +98,7 @@ namespace BestHTTP.WebSocket
 		/// </summary>
 		public int Latency
 		{
-			get { return this.implementation.Latency; }
+			get { return implementation.Latency; }
 		}
 
 		/// <summary>
@@ -105,7 +106,7 @@ namespace BestHTTP.WebSocket
 		/// </summary>
 		public DateTime LastMessageReceived
 		{
-			get { return this.implementation.LastMessageReceived; }
+			get { return implementation.LastMessageReceived; }
 		}
 
 		/// <summary>
@@ -160,7 +161,7 @@ namespace BestHTTP.WebSocket
 		/// <summary>
 		/// The underlying, real implementation.
 		/// </summary>
-		private WebSocketBaseImplementation implementation;
+		WebSocketBaseImplementation implementation;
 
 		/// <summary>
 		/// Creates a WebSocket instance from the given uri.
@@ -170,7 +171,7 @@ namespace BestHTTP.WebSocket
 			: this(uri, string.Empty, string.Empty)
 		{
 #if (!UNITY_WEBGL || UNITY_EDITOR)
-			this.Extensions = WebSocket.GetDefaultExtensions();
+			Extensions = GetDefaultExtensions();
 #endif
 		}
 
@@ -179,7 +180,7 @@ namespace BestHTTP.WebSocket
 			: this(uri, origin, protocol, null)
 		{
 #if (!UNITY_WEBGL || UNITY_EDITOR)
-			this.Extensions = WebSocket.GetDefaultExtensions();
+			Extensions = GetDefaultExtensions();
 #endif
 		}
 #endif
@@ -199,43 +200,45 @@ namespace BestHTTP.WebSocket
 		)
 
 		{
-			this.Context = new LoggingContext(this);
+			Context = new LoggingContext(this);
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-			this.Extensions = extensions;
+			Extensions = extensions;
 
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && !BESTHTTP_DISABLE_HTTP2
 			if (HTTPManager.HTTP2Settings.WebSocketOverHTTP2Settings.EnableWebSocketOverHTTP2 && HTTPProtocolFactory.IsSecureProtocol(uri))
 			{
 				// Try to find a HTTP/2 connection that supports the connect protocol.
-				var connectionKey = Core.HostDefinition.GetKeyFor(new UriBuilder("https", uri.Host, uri.Port).Uri
+				string connectionKey = Core.HostDefinition.GetKeyFor(new UriBuilder("https", uri.Host, uri.Port).Uri
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
 					, GetProxy(uri)
 #endif
 				);
 
-				var con = BestHTTP.Core.HostManager.GetHost(uri.Host).GetHostDefinition(connectionKey).Find(c =>
+				ConnectionBase con = Core.HostManager.GetHost(uri.Host).GetHostDefinition(connectionKey).Find(c =>
 				{
-					var httpConnection = c as HTTPConnection;
-					var http2Handler = httpConnection?.requestHandler as Connections.HTTP2.HTTP2Handler;
+					HTTPConnection httpConnection = c as HTTPConnection;
+					HTTP2Handler http2Handler = httpConnection?.requestHandler as Connections.HTTP2.HTTP2Handler;
 
 					return http2Handler != null && http2Handler.settings.RemoteSettings[Connections.HTTP2.HTTP2Settings.ENABLE_CONNECT_PROTOCOL] != 0;
 				});
 
 				if (con != null)
 				{
-					HTTPManager.Logger.Information("WebSocket", "Connection with enabled Connect Protocol found!", this.Context);
+					HTTPManager.Logger.Information("WebSocket", "Connection with enabled Connect Protocol found!", Context);
 
-					var httpConnection = con as HTTPConnection;
-					var http2Handler = httpConnection?.requestHandler as Connections.HTTP2.HTTP2Handler;
+					HTTPConnection httpConnection = con as HTTPConnection;
+					HTTP2Handler http2Handler = httpConnection?.requestHandler as Connections.HTTP2.HTTP2Handler;
 
-					this.implementation = new OverHTTP2(this, uri, origin, protocol);
+					implementation = new OverHTTP2(this, uri, origin, protocol);
 				}
 			}
 #endif
 
-			if (this.implementation == null)
-				this.implementation = new OverHTTP1(this, uri, origin, protocol);
+			if (implementation == null)
+			{
+				implementation = new OverHTTP1(this, uri, origin, protocol);
+			}
 #else
             this.implementation = new WebGLBrowser(this, uri, origin, protocol);
 #endif
@@ -247,13 +250,15 @@ namespace BestHTTP.WebSocket
 #if !UNITY_WEBGL || UNITY_EDITOR
 		internal void FallbackToHTTP1()
 		{
-			HTTPManager.Logger.Verbose("WebSocket", "FallbackToHTTP1", this.Context);
+			HTTPManager.Logger.Verbose("WebSocket", "FallbackToHTTP1", Context);
 
-			if (this.implementation == null)
+			if (implementation == null)
+			{
 				return;
+			}
 
-			this.implementation = new OverHTTP1(this, this.implementation.Uri, this.implementation.Origin, this.implementation.Protocol);
-			this.implementation.StartOpen();
+			implementation = new OverHTTP1(this, implementation.Uri, implementation.Origin, implementation.Protocol);
+			implementation.StartOpen();
 		}
 #endif
 
@@ -262,7 +267,7 @@ namespace BestHTTP.WebSocket
 		/// </summary>
 		public void Open()
 		{
-			this.implementation.StartOpen();
+			implementation.StartOpen();
 		}
 
 		/// <summary>
@@ -271,9 +276,11 @@ namespace BestHTTP.WebSocket
 		public void Send(string message)
 		{
 			if (!IsOpen)
+			{
 				return;
+			}
 
-			this.implementation.Send(message);
+			implementation.Send(message);
 		}
 
 		/// <summary>
@@ -282,9 +289,11 @@ namespace BestHTTP.WebSocket
 		public void Send(byte[] buffer)
 		{
 			if (!IsOpen)
+			{
 				return;
+			}
 
-			this.implementation.Send(buffer);
+			implementation.Send(buffer);
 		}
 
 		/// <summary>
@@ -293,9 +302,11 @@ namespace BestHTTP.WebSocket
 		public void Send(byte[] buffer, ulong offset, ulong count)
 		{
 			if (!IsOpen)
+			{
 				return;
+			}
 
-			this.implementation.Send(buffer, offset, count);
+			implementation.Send(buffer, offset, count);
 		}
 
 		/// <summary>
@@ -309,7 +320,7 @@ namespace BestHTTP.WebSocket
 				return;
 			}
 
-			this.implementation.SendAsBinary(data);
+			implementation.SendAsBinary(data);
 		}
 
 		/// <summary>
@@ -323,7 +334,7 @@ namespace BestHTTP.WebSocket
 				return;
 			}
 
-			this.implementation.SendAsText(data);
+			implementation.SendAsText(data);
 		}
 
 #if !UNITY_WEBGL || UNITY_EDITOR
@@ -333,9 +344,11 @@ namespace BestHTTP.WebSocket
 		public void Send(WebSocketFrame frame)
 		{
 			if (!IsOpen)
+			{
 				return;
+			}
 
-			this.implementation.Send(frame);
+			implementation.Send(frame);
 		}
 #endif
 
@@ -345,20 +358,24 @@ namespace BestHTTP.WebSocket
 		public void Close()
 		{
 			if (State >= WebSocketStates.Closing)
+			{
 				return;
+			}
 
-			this.implementation.StartClose(1000, "Bye!");
+			implementation.StartClose(1000, "Bye!");
 		}
 
 		/// <summary>
 		/// It will initiate the closing of the connection to the server sending the given code and message.
 		/// </summary>
-		public void Close(UInt16 code, string message)
+		public void Close(ushort code, string message)
 		{
 			if (!IsOpen)
+			{
 				return;
+			}
 
-			this.implementation.StartClose(code, message);
+			implementation.StartClose(code, message);
 		}
 
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
@@ -367,11 +384,13 @@ namespace BestHTTP.WebSocket
 			// WebSocket is not a request-response based protocol, so we need a 'tunnel' through the proxy
 			HTTPProxy proxy = HTTPManager.Proxy as HTTPProxy;
 			if (proxy != null && proxy.UseProxyForAddress(uri))
+			{
 				proxy = new HTTPProxy(proxy.Address,
 					proxy.Credentials,
 					false, /*turn on 'tunneling'*/
 					false, /*sendWholeUri*/
 					proxy.NonTransparentForHTTPS);
+			}
 
 			return proxy;
 		}
@@ -379,18 +398,20 @@ namespace BestHTTP.WebSocket
 
 #if !UNITY_WEBGL || UNITY_EDITOR
 
-		public static BufferSegment EncodeCloseData(UInt16 code, string message)
+		public static BufferSegment EncodeCloseData(ushort code, string message)
 		{
 			//If there is a body, the first two bytes of the body MUST be a 2-byte unsigned integer
 			// (in network byte order) representing a status code with value /code/ defined in Section 7.4 (http://tools.ietf.org/html/rfc6455#section-7.4). Following the 2-byte integer,
 			// the body MAY contain UTF-8-encoded data with value /reason/, the interpretation of which is not defined by this specification.
 			// This data is not necessarily human readable but may be useful for debugging or passing information relevant to the script that opened the connection.
 			int msgLen = Encoding.UTF8.GetByteCount(message);
-			using (var ms = new BufferPoolMemoryStream(2 + msgLen))
+			using (BufferPoolMemoryStream ms = new BufferPoolMemoryStream(2 + msgLen))
 			{
 				byte[] buff = BitConverter.GetBytes(code);
 				if (BitConverter.IsLittleEndian)
+				{
 					Array.Reverse(buff, 0, buff.Length);
+				}
 
 				ms.Write(buff, 0, buff.Length);
 
@@ -411,13 +432,15 @@ namespace BestHTTP.WebSocket
 
 			for (int i = 0; i < from.Length; ++i)
 			{
-				byte[] hash = BitConverter.GetBytes((Int32)from[i].GetHashCode());
+				byte[] hash = BitConverter.GetBytes((int)from[i].GetHashCode());
 
 				for (int cv = 0; cv < hash.Length && pos < keysLength; ++cv)
+				{
 					keys[pos++] = hash[cv];
+				}
 			}
 
-			var result = Convert.ToBase64String(keys, 0, keysLength);
+			string result = Convert.ToBase64String(keys, 0, keysLength);
 			BufferPool.Release(keys);
 
 			return result;

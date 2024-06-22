@@ -10,34 +10,41 @@ namespace BestHTTP.Connections
 
 		public static long TotalNetworkBytesReceived
 		{
-			get => _totalNetworkBytesReceived;
+			get { return _totalNetworkBytesReceived; }
 		}
 
-		private static long _totalNetworkBytesReceived;
-		internal static void IncrementTotalNetworkBytesReceived(int amount) => System.Threading.Interlocked.Add(ref _totalNetworkBytesReceived, amount);
+		static long _totalNetworkBytesReceived;
+
+		internal static void IncrementTotalNetworkBytesReceived(int amount)
+		{
+			System.Threading.Interlocked.Add(ref _totalNetworkBytesReceived, amount);
+		}
 
 		public static long TotalNetworkBytesSent
 		{
-			get => _totalNetworkBytesSent;
+			get { return _totalNetworkBytesSent; }
 		}
 
-		private static long _totalNetworkBytesSent;
+		static long _totalNetworkBytesSent;
 
-		internal static void IncrementTotalNetworkBytesSent(int amount) => System.Threading.Interlocked.Add(ref _totalNetworkBytesSent, amount);
+		internal static void IncrementTotalNetworkBytesSent(int amount)
+		{
+			System.Threading.Interlocked.Add(ref _totalNetworkBytesSent, amount);
+		}
 
 		public static int TotalConnections
 		{
-			get => _totalConnections;
+			get { return _totalConnections; }
 		}
 
-		private static int _totalConnections;
+		static int _totalConnections;
 
 		public static int OpenConnections
 		{
-			get => _openConnections;
+			get { return _openConnections; }
 		}
 
-		private static int _openConnections;
+		static int _openConnections;
 
 		internal static void IncrementCurrentConnections()
 		{
@@ -45,7 +52,10 @@ namespace BestHTTP.Connections
 			System.Threading.Interlocked.Increment(ref _openConnections);
 		}
 
-		internal static void DecrementCurrentConnections() => System.Threading.Interlocked.Decrement(ref _openConnections);
+		internal static void DecrementCurrentConnections()
+		{
+			System.Threading.Interlocked.Decrement(ref _openConnections);
+		}
 
 		internal static void ResetNetworkStats()
 		{
@@ -83,13 +93,13 @@ namespace BestHTTP.Connections
 			set { throw new NotImplementedException(); }
 		}
 
-		private ReadOnlyBufferedStream readStream;
-		private Stream innerStream;
+		ReadOnlyBufferedStream readStream;
+		Stream innerStream;
 
 		public BufferedReadNetworkStream(Stream stream, int bufferSize)
 		{
-			this.innerStream = stream;
-			this.readStream = new ReadOnlyBufferedStream(stream, bufferSize);
+			innerStream = stream;
+			readStream = new ReadOnlyBufferedStream(stream, bufferSize);
 
 			IncrementCurrentConnections();
 		}
@@ -100,7 +110,7 @@ namespace BestHTTP.Connections
 
 		public override int Read(byte[] buffer, int offset, int count)
 		{
-			int read = this.readStream.Read(buffer, offset, count);
+			int read = readStream.Read(buffer, offset, count);
 			IncrementTotalNetworkBytesReceived(read);
 			return read;
 		}
@@ -118,31 +128,31 @@ namespace BestHTTP.Connections
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			IncrementTotalNetworkBytesSent(count);
-			this.innerStream.Write(buffer, offset, count);
+			innerStream.Write(buffer, offset, count);
 		}
 
 		public override void Close()
 		{
 			base.Close();
 
-			if (this.innerStream != null)
+			if (innerStream != null)
 			{
 				lock (this)
 				{
-					if (this.innerStream != null)
+					if (innerStream != null)
 					{
 						DecrementCurrentConnections();
 
-						var stream = this.innerStream;
-						this.innerStream = null;
+						Stream stream = innerStream;
+						innerStream = null;
 
 						stream.Close();
 					}
 
-					if (this.readStream != null)
+					if (readStream != null)
 					{
-						this.readStream.Close();
-						this.readStream = null;
+						readStream.Close();
+						readStream = null;
 					}
 				}
 			}

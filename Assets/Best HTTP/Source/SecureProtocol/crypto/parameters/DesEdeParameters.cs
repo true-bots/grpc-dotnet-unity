@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		 */
 		public const int DesEdeKeyLength = 24;
 
-		private static byte[] FixKey(
+		static byte[] FixKey(
 			byte[] key,
 			int keyOff,
 			int keyLen)
@@ -33,7 +33,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			}
 
 			if (IsWeakKey(tmp))
+			{
 				throw new ArgumentException("attempt to create weak DESede key");
+			}
 
 			return tmp;
 		}
@@ -81,14 +83,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		 * @param key bytes making up the key
 		 * @param offset offset into the byte array the key starts at
 		 */
-		public static new bool IsWeakKey(
+		public new static bool IsWeakKey(
 			byte[] key,
 			int offset)
 		{
 			return IsWeakKey(key, offset, key.Length - offset);
 		}
 
-		public static new bool IsWeakKey(
+		public new static bool IsWeakKey(
 			byte[] key)
 		{
 			return IsWeakKey(key, 0, key.Length);
@@ -116,7 +118,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			bool isValid = false;
 			for (int i = offset; i != offset + 8; i++)
 			{
-				isValid |= (key[i] != key[i + 8]);
+				isValid |= key[i] != key[i + 8];
 			}
 
 			return isValid;
@@ -133,9 +135,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			bool diff12 = false, diff13 = false, diff23 = false;
 			for (int i = offset; i != offset + 8; i++)
 			{
-				diff12 |= (key[i] != key[i + 8]);
-				diff13 |= (key[i] != key[i + 16]);
-				diff23 |= (key[i + 8] != key[i + 16]);
+				diff12 |= key[i] != key[i + 8];
+				diff13 |= key[i] != key[i + 16];
+				diff23 |= key[i + 8] != key[i + 16];
 			}
 
 			return diff12 && diff13 && diff23;

@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes.Gcm
 	public class BasicGcmMultiplier
 		: IGcmMultiplier
 	{
-		private GcmUtilities.FieldElement H;
+		GcmUtilities.FieldElement H;
 
 		public void Init(byte[] H)
 		{
@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes.Gcm
 
 		public void MultiplyH(byte[] x)
 		{
-			GcmUtilities.AsFieldElement(x, out var T);
+			GcmUtilities.AsFieldElement(x, out GcmUtilities.FieldElement T);
 			GcmUtilities.Multiply(ref T, ref H);
 			GcmUtilities.AsBytes(ref T, x);
 		}

@@ -29,24 +29,24 @@ namespace BestHTTP
 
 		internal HTTPRange()
 		{
-			this.ContentLength = -1;
-			this.IsValid = false;
+			ContentLength = -1;
+			IsValid = false;
 		}
 
 		internal HTTPRange(int contentLength)
 		{
-			this.ContentLength = contentLength;
-			this.IsValid = false;
+			ContentLength = contentLength;
+			IsValid = false;
 		}
 
 		internal HTTPRange(long firstBytePosition, long lastBytePosition, long contentLength)
 		{
-			this.FirstBytePos = firstBytePosition;
-			this.LastBytePos = lastBytePosition;
-			this.ContentLength = contentLength;
+			FirstBytePos = firstBytePosition;
+			LastBytePos = lastBytePosition;
+			ContentLength = contentLength;
 
 			// A byte-content-range-spec with a byte-range-resp-spec whose last-byte-pos value is less than its first-byte-pos value, or whose instance-length value is less than or equal to its last-byte-pos value, is invalid.
-			this.IsValid = this.FirstBytePos <= this.LastBytePos && this.ContentLength > this.LastBytePos;
+			IsValid = FirstBytePos <= LastBytePos && ContentLength > LastBytePos;
 		}
 
 		public override string ToString()

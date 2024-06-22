@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public abstract class DefaultTlsClient
 		: AbstractTlsClient
 	{
-		private static readonly int[] DefaultCipherSuites = new int[]
+		static readonly int[] DefaultCipherSuites = new int[]
 		{
 			/*
 			 * TLS 1.3
@@ -33,7 +33,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			CipherSuite.TLS_DHE_RSA_WITH_AES_128_CBC_SHA,
 			CipherSuite.TLS_RSA_WITH_AES_128_GCM_SHA256,
 			CipherSuite.TLS_RSA_WITH_AES_128_CBC_SHA256,
-			CipherSuite.TLS_RSA_WITH_AES_128_CBC_SHA,
+			CipherSuite.TLS_RSA_WITH_AES_128_CBC_SHA
 		};
 
 		public DefaultTlsClient(TlsCrypto crypto)

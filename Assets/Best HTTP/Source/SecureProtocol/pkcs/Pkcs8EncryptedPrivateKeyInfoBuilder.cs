@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 {
 	public class Pkcs8EncryptedPrivateKeyInfoBuilder
 	{
-		private PrivateKeyInfo privateKeyInfo;
+		PrivateKeyInfo privateKeyInfo;
 
 		public Pkcs8EncryptedPrivateKeyInfoBuilder(byte[] privateKeyInfo) : this(PrivateKeyInfo.GetInstance(privateKeyInfo))
 		{
@@ -37,7 +37,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				ICipher cOut = encryptor.BuildCipher(bOut);
 				byte[] keyData = privateKeyInfo.GetEncoded();
 
-				using (var str = cOut.Stream)
+				using (Stream str = cOut.Stream)
 				{
 					str.Write(keyData, 0, keyData.Length);
 				}

@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class CertificatePolicies
 		: Asn1Encodable
 	{
-		private static PolicyInformation[] Copy(PolicyInformation[] policyInfo)
+		static PolicyInformation[] Copy(PolicyInformation[] policyInfo)
 		{
 			return (PolicyInformation[])policyInfo.Clone();
 		}
@@ -16,9 +16,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static CertificatePolicies GetInstance(object obj)
 		{
 			if (obj is CertificatePolicies)
+			{
 				return (CertificatePolicies)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new CertificatePolicies(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -32,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return GetInstance(X509Extensions.GetExtensionParsedValue(extensions, X509Extensions.CertificatePolicies));
 		}
 
-		private readonly PolicyInformation[] policyInformation;
+		readonly PolicyInformation[] policyInformation;
 
 		/**
 		 * Construct a CertificatePolicies object containing one PolicyInformation.
@@ -41,7 +47,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 */
 		public CertificatePolicies(PolicyInformation name)
 		{
-			this.policyInformation = new PolicyInformation[] { name };
+			policyInformation = new PolicyInformation[] { name };
 		}
 
 		public CertificatePolicies(PolicyInformation[] policyInformation)
@@ -49,9 +55,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			this.policyInformation = Copy(policyInformation);
 		}
 
-		private CertificatePolicies(Asn1Sequence seq)
+		CertificatePolicies(Asn1Sequence seq)
 		{
-			this.policyInformation = new PolicyInformation[seq.Count];
+			policyInformation = new PolicyInformation[seq.Count];
 
 			for (int i = 0; i < seq.Count; ++i)
 			{

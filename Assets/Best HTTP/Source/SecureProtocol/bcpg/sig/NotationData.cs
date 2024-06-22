@@ -35,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 		{
 		}
 
-		private static byte[] CreateData(
+		static byte[] CreateData(
 			bool humanReadable,
 			string notationName,
 			string notationValue)
@@ -86,7 +86,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 
 		public string GetNotationName()
 		{
-			int nameLength = ((data[HeaderFlagLength] << 8) + (data[HeaderFlagLength + 1] << 0));
+			int nameLength = (data[HeaderFlagLength] << 8) + (data[HeaderFlagLength + 1] << 0);
 			int namePos = HeaderFlagLength + HeaderNameLength + HeaderValueLength;
 
 			return Encoding.UTF8.GetString(data, namePos, nameLength);
@@ -94,8 +94,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 
 		public string GetNotationValue()
 		{
-			int nameLength = ((data[HeaderFlagLength] << 8) + (data[HeaderFlagLength + 1] << 0));
-			int valueLength = ((data[HeaderFlagLength + HeaderNameLength] << 8) + (data[HeaderFlagLength + HeaderNameLength + 1] << 0));
+			int nameLength = (data[HeaderFlagLength] << 8) + (data[HeaderFlagLength + 1] << 0);
+			int valueLength = (data[HeaderFlagLength + HeaderNameLength] << 8) + (data[HeaderFlagLength + HeaderNameLength + 1] << 0);
 			int valuePos = HeaderFlagLength + HeaderNameLength + HeaderValueLength + nameLength;
 
 			return Encoding.UTF8.GetString(data, valuePos, valueLength);
@@ -103,8 +103,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 
 		public byte[] GetNotationValueBytes()
 		{
-			int nameLength = ((data[HeaderFlagLength] << 8) + (data[HeaderFlagLength + 1] << 0));
-			int valueLength = ((data[HeaderFlagLength + HeaderNameLength] << 8) + (data[HeaderFlagLength + HeaderNameLength + 1] << 0));
+			int nameLength = (data[HeaderFlagLength] << 8) + (data[HeaderFlagLength + 1] << 0);
+			int valueLength = (data[HeaderFlagLength + HeaderNameLength] << 8) + (data[HeaderFlagLength + HeaderNameLength + 1] << 0);
 			int valuePos = HeaderFlagLength + HeaderNameLength + HeaderValueLength + nameLength;
 
 			byte[] bytes = new byte[valueLength];

@@ -25,7 +25,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		{
 			SignatureAndHashAlgorithm algorithm = digitallySigned.Algorithm;
 			if (algorithm != null && algorithm.Signature != SignatureAlgorithm)
+			{
 				throw new InvalidOperationException("Invalid algorithm: " + algorithm);
+			}
 
 			ISigner signer = new DsaDigestSigner(CreateDsaImpl(), new NullDigest());
 			signer.Init(false, m_publicKey);

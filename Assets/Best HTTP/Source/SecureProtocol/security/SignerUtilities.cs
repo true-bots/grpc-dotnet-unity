@@ -481,7 +481,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public static DerObjectIdentifier GetObjectIdentifier(string mechanism)
 		{
 			if (mechanism == null)
+			{
 				throw new ArgumentNullException(nameof(mechanism));
+			}
 
 			string algorithm = CollectionUtilities.GetValueOrKey(AlgorithmMap, mechanism);
 
@@ -501,7 +503,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public static Asn1Encodable GetDefaultX509Parameters(string algorithm)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException(nameof(algorithm));
+			}
 
 			string mechanism = CollectionUtilities.GetValueOrKey(AlgorithmMap, algorithm);
 
@@ -512,7 +516,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				return GetPssX509Parameters("SHA-1");
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "withRSAandMGF1"))
+			if (Platform.EndsWith(mechanism, "withRSAandMGF1"))
 			{
 				string digestName = mechanism.Substring(0, mechanism.Length - "withRSAandMGF1".Length);
 				return GetPssX509Parameters(digestName);
@@ -521,7 +525,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return DerNull.Instance;
 		}
 
-		private static Asn1Encodable GetPssX509Parameters(
+		static Asn1Encodable GetPssX509Parameters(
 			string digestName)
 		{
 			AlgorithmIdentifier hashAlgorithm = new AlgorithmIdentifier(
@@ -544,11 +548,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public static ISigner GetSigner(string algorithm)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException(nameof(algorithm));
+			}
 
 			string mechanism = CollectionUtilities.GetValueOrKey(AlgorithmMap, algorithm.ToUpperInvariant());
 
-			if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "Ed"))
+			if (Platform.StartsWith(mechanism, "Ed"))
 			{
 				if (mechanism.Equals("Ed25519"))
 				{
@@ -578,7 +584,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 			if (mechanism.Equals("RSA"))
 			{
-				return (new RsaDigestSigner(new NullDigest(), (AlgorithmIdentifier)null));
+				return new RsaDigestSigner(new NullDigest(), (AlgorithmIdentifier)null);
 			}
 
 			if (mechanism.Equals("RAWRSASSA-PSS"))
@@ -594,50 +600,50 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				return new PssSigner(new RsaBlindedEngine(), new Sha1Digest());
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "withRSA"))
+			if (Platform.EndsWith(mechanism, "withRSA"))
 			{
 				string digestName = mechanism.Substring(0, mechanism.LastIndexOf("with"));
 				IDigest digest = DigestUtilities.GetDigest(digestName);
 				return new RsaDigestSigner(digest);
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "withRSAandMGF1"))
+			if (Platform.EndsWith(mechanism, "withRSAandMGF1"))
 			{
 				string digestName = mechanism.Substring(0, mechanism.LastIndexOf("with"));
 				IDigest digest = DigestUtilities.GetDigest(digestName);
 				return new PssSigner(new RsaBlindedEngine(), digest);
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "withDSA"))
+			if (Platform.EndsWith(mechanism, "withDSA"))
 			{
 				string digestName = mechanism.Substring(0, mechanism.LastIndexOf("with"));
 				IDigest digest = DigestUtilities.GetDigest(digestName);
 				return new DsaDigestSigner(new DsaSigner(), digest);
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "withECDSA"))
+			if (Platform.EndsWith(mechanism, "withECDSA"))
 			{
 				string digestName = mechanism.Substring(0, mechanism.LastIndexOf("with"));
 				IDigest digest = DigestUtilities.GetDigest(digestName);
 				return new DsaDigestSigner(new ECDsaSigner(), digest);
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "withCVC-ECDSA")
-			    || Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "withPLAIN-ECDSA"))
+			if (Platform.EndsWith(mechanism, "withCVC-ECDSA")
+			    || Platform.EndsWith(mechanism, "withPLAIN-ECDSA"))
 			{
 				string digestName = mechanism.Substring(0, mechanism.LastIndexOf("with"));
 				IDigest digest = DigestUtilities.GetDigest(digestName);
 				return new DsaDigestSigner(new ECDsaSigner(), digest, PlainDsaEncoding.Instance);
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "withECNR"))
+			if (Platform.EndsWith(mechanism, "withECNR"))
 			{
 				string digestName = mechanism.Substring(0, mechanism.LastIndexOf("with"));
 				IDigest digest = DigestUtilities.GetDigest(digestName);
 				return new DsaDigestSigner(new ECNRSigner(), digest);
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "withSM2"))
+			if (Platform.EndsWith(mechanism, "withSM2"))
 			{
 				string digestName = mechanism.Substring(0, mechanism.LastIndexOf("with"));
 				IDigest digest = DigestUtilities.GetDigest(digestName);
@@ -679,10 +685,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				return new Iso9796d2Signer(new RsaBlindedEngine(), new RipeMD160Digest(), true);
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.EndsWith(mechanism, "/X9.31"))
+			if (Platform.EndsWith(mechanism, "/X9.31"))
 			{
 				string x931 = mechanism.Substring(0, mechanism.Length - "/X9.31".Length);
-				int withPos = Org.BouncyCastle.Utilities.Platform.IndexOf(x931, "WITH");
+				int withPos = Platform.IndexOf(x931, "WITH");
 				if (withPos > 0)
 				{
 					int endPos = withPos + "WITH".Length;

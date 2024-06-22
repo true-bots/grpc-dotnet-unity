@@ -7,10 +7,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class AeadParameters
 		: ICipherParameters
 	{
-		private readonly byte[] associatedText;
-		private readonly byte[] nonce;
-		private readonly KeyParameter key;
-		private readonly int macSize;
+		readonly byte[] associatedText;
+		readonly byte[] nonce;
+		readonly KeyParameter key;
+		readonly int macSize;
 
 		/**
 		 * Base constructor.

@@ -21,7 +21,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		 */
 		public const string StrictLengthEnabledProperty = "BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs1.Strict";
 
-		private const int HeaderLength = 10;
+		const int HeaderLength = 10;
 
 		/**
 		 * The same effect can be achieved by setting the static property directly
@@ -36,24 +36,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			set { strictLengthEnabled[0] = value; }
 		}
 
-		private static readonly bool[] strictLengthEnabled;
+		static readonly bool[] strictLengthEnabled;
 
 		static Pkcs1Encoding()
 		{
-			string strictProperty = Org.BouncyCastle.Utilities.Platform.GetEnvironmentVariable(StrictLengthEnabledProperty);
+			string strictProperty = Platform.GetEnvironmentVariable(StrictLengthEnabledProperty);
 
-			strictLengthEnabled = new bool[] { strictProperty == null || Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase("true", strictProperty) };
+			strictLengthEnabled = new bool[] { strictProperty == null || Platform.EqualsIgnoreCase("true", strictProperty) };
 		}
 
 
-		private SecureRandom random;
-		private IAsymmetricBlockCipher engine;
-		private bool forEncryption;
-		private bool forPrivateKey;
-		private bool useStrictLength;
-		private int pLen = -1;
-		private byte[] fallback = null;
-		private byte[] blockBuffer = null;
+		SecureRandom random;
+		IAsymmetricBlockCipher engine;
+		bool forEncryption;
+		bool forPrivateKey;
+		bool useStrictLength;
+		int pLen = -1;
+		byte[] fallback = null;
+		byte[] blockBuffer = null;
 
 		/**
 		 * Basic constructor.
@@ -63,8 +63,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		public Pkcs1Encoding(
 			IAsymmetricBlockCipher cipher)
 		{
-			this.engine = cipher;
-			this.useStrictLength = StrictLengthEnabled;
+			engine = cipher;
+			useStrictLength = StrictLengthEnabled;
 		}
 
 		/**
@@ -75,8 +75,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		 */
 		public Pkcs1Encoding(IAsymmetricBlockCipher cipher, int pLen)
 		{
-			this.engine = cipher;
-			this.useStrictLength = StrictLengthEnabled;
+			engine = cipher;
+			useStrictLength = StrictLengthEnabled;
 			this.pLen = pLen;
 		}
 
@@ -91,38 +91,46 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		 */
 		public Pkcs1Encoding(IAsymmetricBlockCipher cipher, byte[] fallback)
 		{
-			this.engine = cipher;
-			this.useStrictLength = StrictLengthEnabled;
+			engine = cipher;
+			useStrictLength = StrictLengthEnabled;
 			this.fallback = fallback;
-			this.pLen = fallback.Length;
+			pLen = fallback.Length;
 		}
 
-		public string AlgorithmName => engine.AlgorithmName + "/PKCS1Padding";
+		public string AlgorithmName
+		{
+			get { return engine.AlgorithmName + "/PKCS1Padding"; }
+		}
 
-		public IAsymmetricBlockCipher UnderlyingCipher => engine;
+		public IAsymmetricBlockCipher UnderlyingCipher
+		{
+			get { return engine; }
+		}
 
 		public void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			AsymmetricKeyParameter kParam;
 			if (parameters is ParametersWithRandom withRandom)
 			{
-				this.random = withRandom.Random;
+				random = withRandom.Random;
 				kParam = (AsymmetricKeyParameter)withRandom.Parameters;
 			}
 			else
 			{
-				this.random = CryptoServicesRegistrar.GetSecureRandom();
+				random = CryptoServicesRegistrar.GetSecureRandom();
 				kParam = (AsymmetricKeyParameter)parameters;
 			}
 
 			engine.Init(forEncryption, parameters);
 
-			this.forPrivateKey = kParam.IsPrivate;
+			forPrivateKey = kParam.IsPrivate;
 			this.forEncryption = forEncryption;
-			this.blockBuffer = new byte[engine.GetOutputBlockSize()];
+			blockBuffer = new byte[engine.GetOutputBlockSize()];
 
 			if (pLen > 0 && fallback == null && random == null)
+			{
 				throw new ArgumentException("encoder requires random");
+			}
 		}
 
 		public int GetInputBlockSize()
@@ -153,13 +161,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 				: DecodeBlock(input, inOff, length);
 		}
 
-		private byte[] EncodeBlock(
+		byte[] EncodeBlock(
 			byte[] input,
 			int inOff,
 			int inLen)
 		{
 			if (inLen > GetInputBlockSize())
+			{
 				throw new ArgumentException("input data too large", "inLen");
+			}
 
 			byte[] block = new byte[engine.GetInputBlockSize()];
 
@@ -205,13 +215,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		 * @param pLen Expected length of the plaintext.
 		 * @return Either 0, if the encoding is correct, or -1, if it is incorrect.
 		 */
-		private static int CheckPkcs1Encoding(byte[] encoded, int pLen)
+		static int CheckPkcs1Encoding(byte[] encoded, int pLen)
 		{
 			int correct = 0;
 			/*
 			 * Check if the first two bytes are 0 2
 			 */
-			correct |= (encoded[0] ^ 2);
+			correct |= encoded[0] ^ 2;
 
 			/*
 			 * Now the padding check, check for no 0 byte in the padding
@@ -254,16 +264,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		 * @return The plaintext without padding, or a random value if the padding was incorrect.
 		 * @throws InvalidCipherTextException
 		 */
-		private byte[] DecodeBlockOrRandom(byte[] input, int inOff, int inLen)
+		byte[] DecodeBlockOrRandom(byte[] input, int inOff, int inLen)
 		{
 			if (!forPrivateKey)
+			{
 				throw new InvalidCipherTextException("sorry, this method is only for decryption, not for signing");
+			}
 
 			byte[] block = engine.ProcessBlock(input, inOff, inLen);
 			byte[] random;
-			if (this.fallback == null)
+			if (fallback == null)
 			{
-				random = new byte[this.pLen];
+				random = new byte[pLen];
 				this.random.NextBytes(random);
 			}
 			else
@@ -271,21 +283,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 				random = fallback;
 			}
 
-			byte[] data = (useStrictLength & (block.Length != engine.GetOutputBlockSize())) ? blockBuffer : block;
+			byte[] data = useStrictLength & (block.Length != engine.GetOutputBlockSize()) ? blockBuffer : block;
 
 			/*
 			 * Check the padding.
 			 */
-			int correct = CheckPkcs1Encoding(data, this.pLen);
+			int correct = CheckPkcs1Encoding(data, pLen);
 
 			/*
 			 * Now, to a constant time constant memory copy of the decrypted value
 			 * or the random value, depending on the validity of the padding.
 			 */
-			byte[] result = new byte[this.pLen];
-			for (int i = 0; i < this.pLen; i++)
+			byte[] result = new byte[pLen];
+			for (int i = 0; i < pLen; i++)
 			{
-				result[i] = (byte)((data[i + (data.Length - pLen)] & (~correct)) | (random[i] & correct));
+				result[i] = (byte)((data[i + (data.Length - pLen)] & ~correct) | (random[i] & correct));
 			}
 
 			Arrays.Fill(data, 0);
@@ -296,7 +308,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		/**
 		* @exception InvalidCipherTextException if the decrypted block is not in Pkcs1 format.
 		*/
-		private byte[] DecodeBlock(
+		byte[] DecodeBlock(
 			byte[] input,
 			int inOff,
 			int inLen)
@@ -305,13 +317,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			 * If the length of the expected plaintext is known, we use a constant-time decryption.
 			 * If the decryption fails, we return a random value.
 			 */
-			if (this.pLen != -1)
+			if (pLen != -1)
 			{
-				return this.DecodeBlockOrRandom(input, inOff, inLen);
+				return DecodeBlockOrRandom(input, inOff, inLen);
 			}
 
 			byte[] block = engine.ProcessBlock(input, inOff, inLen);
-			bool incorrectLength = (useStrictLength & (block.Length != engine.GetOutputBlockSize()));
+			bool incorrectLength = useStrictLength & (block.Length != engine.GetOutputBlockSize());
 
 			byte[] data;
 			if (block.Length < GetOutputBlockSize())
@@ -326,7 +338,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			byte expectedType = (byte)(forPrivateKey ? 2 : 1);
 			byte type = data[0];
 
-			bool badType = (type != expectedType);
+			bool badType = type != expectedType;
 
 			//
 			// find and extract the message block.
@@ -355,7 +367,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			return result;
 		}
 
-		private int FindStart(byte type, byte[] block)
+		int FindStart(byte type, byte[] block)
 		{
 			int start = -1;
 			bool padErr = false;
@@ -364,12 +376,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			{
 				byte pad = block[i];
 
-				if (pad == 0 & start < 0)
+				if ((pad == 0) & (start < 0))
 				{
 					start = i;
 				}
 
-				padErr |= ((type == 1) & (start < 0) & (pad != (byte)0xff));
+				padErr |= (type == 1) & (start < 0) & (pad != (byte)0xff);
 			}
 
 			return padErr ? -1 : start;

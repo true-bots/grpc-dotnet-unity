@@ -17,25 +17,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		internal CombinedHash(TlsContext context, TlsHash md5, TlsHash sha1)
 		{
-			this.m_context = context;
-			this.m_crypto = context.Crypto;
-			this.m_md5 = md5;
-			this.m_sha1 = sha1;
+			m_context = context;
+			m_crypto = context.Crypto;
+			m_md5 = md5;
+			m_sha1 = sha1;
 		}
 
 		public CombinedHash(TlsCrypto crypto)
 		{
-			this.m_crypto = crypto;
-			this.m_md5 = crypto.CreateHash(CryptoHashAlgorithm.md5);
-			this.m_sha1 = crypto.CreateHash(CryptoHashAlgorithm.sha1);
+			m_crypto = crypto;
+			m_md5 = crypto.CreateHash(CryptoHashAlgorithm.md5);
+			m_sha1 = crypto.CreateHash(CryptoHashAlgorithm.sha1);
 		}
 
 		public CombinedHash(CombinedHash t)
 		{
-			this.m_context = t.m_context;
-			this.m_crypto = t.m_crypto;
-			this.m_md5 = t.m_md5.CloneHash();
-			this.m_sha1 = t.m_sha1.CloneHash();
+			m_context = t.m_context;
+			m_crypto = t.m_crypto;
+			m_md5 = t.m_md5.CloneHash();
+			m_sha1 = t.m_sha1.CloneHash();
 		}
 
 		public virtual void Update(byte[] input, int inOff, int len)

@@ -5,15 +5,17 @@ using System.Collections.Generic;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections
 {
-	internal sealed class EnumerableProxy<T>
+	sealed class EnumerableProxy<T>
 		: IEnumerable<T>
 	{
-		private readonly IEnumerable<T> m_target;
+		readonly IEnumerable<T> m_target;
 
 		internal EnumerableProxy(IEnumerable<T> target)
 		{
 			if (target == null)
+			{
 				throw new ArgumentNullException(nameof(target));
+			}
 
 			m_target = target;
 		}

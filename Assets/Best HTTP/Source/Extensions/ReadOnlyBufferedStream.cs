@@ -48,9 +48,13 @@ namespace BestHTTP.Extensions
 					available = stream.Read(buf, 0, buf.Length);
 
 					if (available > 0)
+					{
 						return Read(buffer, offset, size);
+					}
 					else
+					{
 						return 0;
+					}
 				}
 			}
 		}
@@ -91,7 +95,9 @@ namespace BestHTTP.Extensions
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing && buf != null)
+			{
 				BufferPool.Release(buf);
+			}
 
 			buf = null;
 		}

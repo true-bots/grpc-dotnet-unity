@@ -27,30 +27,30 @@ namespace BestHTTP.SignalR.Transports
 		/// <summary>
 		/// When we received the last poll.
 		/// </summary>
-		private DateTime LastPoll;
+		DateTime LastPoll;
 
 		/// <summary>
 		/// How much time we have to wait before we can send out a new poll request. This value sent by the server.
 		/// </summary>
-		private TimeSpan PollDelay;
+		TimeSpan PollDelay;
 
 		/// <summary>
 		/// How much time we wait to a poll request to finish. It's value is the server sent negotiation's ConnectionTimeout + 10sec.
 		/// </summary>
-		private TimeSpan PollTimeout;
+		TimeSpan PollTimeout;
 
 		/// <summary>
 		/// Reference to the the current poll request.
 		/// </summary>
-		private HTTPRequest pollRequest;
+		HTTPRequest pollRequest;
 
 		#endregion
 
 		public PollingTransport(Connection connection)
 			: base("longPolling", connection)
 		{
-			this.LastPoll = DateTime.MinValue;
-			this.PollTimeout = connection.NegotiationResult.ConnectionTimeout + TimeSpan.FromSeconds(10);
+			LastPoll = DateTime.MinValue;
+			PollTimeout = connection.NegotiationResult.ConnectionTimeout + TimeSpan.FromSeconds(10);
 		}
 
 		#region Overrides from TransportBase
@@ -60,15 +60,17 @@ namespace BestHTTP.SignalR.Transports
 		/// </summary>
 		public override void Connect()
 		{
-			HTTPManager.Logger.Information("Transport - " + this.Name, "Sending Open Request");
+			HTTPManager.Logger.Information("Transport - " + Name, "Sending Open Request");
 
 			// Skip the Connecting state if we are reconnecting. If the connect succeeds, we will set the Started state directly
-			if (this.State != TransportStates.Reconnecting)
-				this.State = TransportStates.Connecting;
+			if (State != TransportStates.Reconnecting)
+			{
+				State = TransportStates.Connecting;
+			}
 
-			RequestTypes requestType = this.State == TransportStates.Reconnecting ? RequestTypes.Reconnect : RequestTypes.Connect;
+			RequestTypes requestType = State == TransportStates.Reconnecting ? RequestTypes.Reconnect : RequestTypes.Connect;
 
-			var request = new HTTPRequest(Connection.BuildUri(requestType, this), HTTPMethods.Get, true, true, OnConnectRequestFinished);
+			HTTPRequest request = new HTTPRequest(Connection.BuildUri(requestType, this), HTTPMethods.Get, true, true, OnConnectRequestFinished);
 
 			Connection.PrepareRequest(request, requestType);
 
@@ -114,11 +116,11 @@ namespace BestHTTP.SignalR.Transports
 				case HTTPRequestStates.Finished:
 					if (resp.IsSuccess)
 					{
-						HTTPManager.Logger.Information("Transport - " + this.Name, "Connect - Request Finished Successfully! " + resp.DataAsText);
+						HTTPManager.Logger.Information("Transport - " + Name, "Connect - Request Finished Successfully! " + resp.DataAsText);
 
 						OnConnected();
 
-						IServerMessage msg = TransportBase.Parse(Connection.JsonEncoder, resp.DataAsText);
+						IServerMessage msg = Parse(Connection.JsonEncoder, resp.DataAsText);
 
 						if (msg != null)
 						{
@@ -126,21 +128,25 @@ namespace BestHTTP.SignalR.Transports
 
 							MultiMessage multiple = msg as MultiMessage;
 							if (multiple != null && multiple.PollDelay.HasValue)
+							{
 								PollDelay = multiple.PollDelay.Value;
+							}
 						}
 					}
 					else
+					{
 						reason = string.Format("Connect - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText);
+					}
 
 					break;
 
 				// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 				case HTTPRequestStates.Error:
 					reason = "Connect - Request Finished with Error! " +
-					         (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception");
+					         (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception");
 					break;
 
 				// The request aborted, initiated by the user.
@@ -160,7 +166,9 @@ namespace BestHTTP.SignalR.Transports
 			}
 
 			if (!string.IsNullOrEmpty(reason))
+			{
 				Connection.Error(reason);
+			}
 		}
 
 		void OnPollRequestFinished(HTTPRequest req, HTTPResponse resp)
@@ -170,7 +178,7 @@ namespace BestHTTP.SignalR.Transports
 			// in this handler function we can null out the new request. So we return early here.
 			if (req.IsCancellationRequested)
 			{
-				HTTPManager.Logger.Warning("Transport - " + this.Name, "Poll - Request Aborted!");
+				HTTPManager.Logger.Warning("Transport - " + Name, "Poll - Request Aborted!");
 				return;
 			}
 
@@ -186,9 +194,9 @@ namespace BestHTTP.SignalR.Transports
 				case HTTPRequestStates.Finished:
 					if (resp.IsSuccess)
 					{
-						HTTPManager.Logger.Information("Transport - " + this.Name, "Poll - Request Finished Successfully! " + resp.DataAsText);
+						HTTPManager.Logger.Information("Transport - " + Name, "Poll - Request Finished Successfully! " + resp.DataAsText);
 
-						IServerMessage msg = TransportBase.Parse(Connection.JsonEncoder, resp.DataAsText);
+						IServerMessage msg = Parse(Connection.JsonEncoder, resp.DataAsText);
 
 						if (msg != null)
 						{
@@ -196,23 +204,27 @@ namespace BestHTTP.SignalR.Transports
 
 							MultiMessage multiple = msg as MultiMessage;
 							if (multiple != null && multiple.PollDelay.HasValue)
+							{
 								PollDelay = multiple.PollDelay.Value;
+							}
 
 							LastPoll = DateTime.UtcNow;
 						}
 					}
 					else
+					{
 						reason = string.Format("Poll - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText);
+					}
 
 					break;
 
 				// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 				case HTTPRequestStates.Error:
 					reason = "Poll - Request Finished with Error! " +
-					         (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception");
+					         (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception");
 					break;
 
 				// Connecting to the server is timed out.
@@ -227,7 +239,9 @@ namespace BestHTTP.SignalR.Transports
 			}
 
 			if (!string.IsNullOrEmpty(reason))
+			{
 				Connection.Error(reason);
+			}
 		}
 
 		#endregion
@@ -235,13 +249,13 @@ namespace BestHTTP.SignalR.Transports
 		/// <summary>
 		/// Polling transport speficic function. Sends a GET request to the /poll path to receive messages.
 		/// </summary>
-		private void Poll()
+		void Poll()
 		{
 			pollRequest = new HTTPRequest(Connection.BuildUri(RequestTypes.Poll, this), HTTPMethods.Get, true, true, OnPollRequestFinished);
 
 			Connection.PrepareRequest(pollRequest, RequestTypes.Poll);
 
-			pollRequest.Timeout = this.PollTimeout;
+			pollRequest.Timeout = PollTimeout;
 
 			pollRequest.Send();
 		}
@@ -253,8 +267,11 @@ namespace BestHTTP.SignalR.Transports
 			switch (State)
 			{
 				case TransportStates.Started:
-					if (pollRequest == null && DateTime.UtcNow >= (LastPoll + PollDelay + Connection.NegotiationResult.LongPollDelay))
+					if (pollRequest == null && DateTime.UtcNow >= LastPoll + PollDelay + Connection.NegotiationResult.LongPollDelay)
+					{
 						Poll();
+					}
+
 					break;
 			}
 		}

@@ -35,20 +35,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	*/
 	public class CmsSignedData
 	{
-		private static readonly CmsSignedHelper Helper = CmsSignedHelper.Instance;
+		static readonly CmsSignedHelper Helper = CmsSignedHelper.Instance;
 
-		private readonly CmsProcessable signedContent;
-		private SignedData signedData;
-		private ContentInfo contentInfo;
-		private SignerInformationStore signerInfoStore;
-		private IDictionary<string, byte[]> m_hashes;
+		readonly CmsProcessable signedContent;
+		SignedData signedData;
+		ContentInfo contentInfo;
+		SignerInformationStore signerInfoStore;
+		IDictionary<string, byte[]> m_hashes;
 
-		private CmsSignedData(CmsSignedData c)
+		CmsSignedData(CmsSignedData c)
 		{
-			this.signedData = c.signedData;
-			this.contentInfo = c.contentInfo;
-			this.signedContent = c.signedContent;
-			this.signerInfoStore = c.signerInfoStore;
+			signedData = c.signedData;
+			contentInfo = c.contentInfo;
+			signedContent = c.signedContent;
+			signerInfoStore = c.signerInfoStore;
 		}
 
 		public CmsSignedData(byte[] sigBlock)
@@ -94,21 +94,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		public CmsSignedData(CmsProcessable signedContent, ContentInfo sigData)
 		{
 			this.signedContent = signedContent;
-			this.contentInfo = sigData;
-			this.signedData = SignedData.GetInstance(contentInfo.Content);
+			contentInfo = sigData;
+			signedData = SignedData.GetInstance(contentInfo.Content);
 		}
 
 		public CmsSignedData(IDictionary<string, byte[]> hashes, ContentInfo sigData)
 		{
-			this.m_hashes = hashes;
-			this.contentInfo = sigData;
-			this.signedData = SignedData.GetInstance(contentInfo.Content);
+			m_hashes = hashes;
+			contentInfo = sigData;
+			signedData = SignedData.GetInstance(contentInfo.Content);
 		}
 
 		public CmsSignedData(ContentInfo sigData)
 		{
-			this.contentInfo = sigData;
-			this.signedData = SignedData.GetInstance(contentInfo.Content);
+			contentInfo = sigData;
+			signedData = SignedData.GetInstance(contentInfo.Content);
 
 			//
 			// this can happen if the signed message is sent simply to send a
@@ -116,8 +116,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			//
 			if (signedData.EncapContentInfo.Content != null)
 			{
-				this.signedContent = new CmsProcessableByteArray(
-					((Asn1OctetString)(signedData.EncapContentInfo.Content)).GetOctets());
+				signedContent = new CmsProcessableByteArray(
+					((Asn1OctetString)signedData.EncapContentInfo.Content).GetOctets());
 			}
 //			else
 //			{
@@ -139,7 +139,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		{
 			if (signerInfoStore == null)
 			{
-				var signerInfos = new List<SignerInformation>();
+				List<SignerInformation> signerInfos = new List<SignerInformation>();
 				Asn1Set s = signedData.SignerInfos;
 
 				foreach (object obj in s)
@@ -151,7 +151,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					{
 						signerInfos.Add(new SignerInformation(info, contentType, signedContent, null));
 					}
-					else if (m_hashes.TryGetValue(info.DigestAlgorithm.Algorithm.Id, out var hash))
+					else if (m_hashes.TryGetValue(info.DigestAlgorithm.Algorithm.Id, out byte[] hash))
 					{
 						signerInfos.Add(new SignerInformation(info, contentType, null, new BaseDigestCalculator(hash)));
 					}
@@ -354,7 +354,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 			if (x509Certs != null || x509AttrCerts != null)
 			{
-				var certificates = new List<Asn1Encodable>();
+				List<Asn1Encodable> certificates = new List<Asn1Encodable>();
 				if (x509Certs != null)
 				{
 					certificates.AddRange(CmsUtilities.GetCertificatesFromStore(x509Certs));
@@ -374,7 +374,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 			if (x509Crls != null || otherRevocationInfos != null)
 			{
-				var revocations = new List<Asn1Encodable>();
+				List<Asn1Encodable> revocations = new List<Asn1Encodable>();
 				if (x509Crls != null)
 				{
 					revocations.AddRange(CmsUtilities.GetCrlsFromStore(x509Crls));

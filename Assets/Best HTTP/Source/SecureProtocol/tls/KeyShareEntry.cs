@@ -7,27 +7,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class KeyShareEntry
 	{
-		private static bool CheckKeyExchangeLength(int length)
+		static bool CheckKeyExchangeLength(int length)
 		{
-			return 0 < length && length < (1 << 16);
+			return 0 < length && length < 1 << 16;
 		}
 
-		private readonly int m_namedGroup;
-		private readonly byte[] m_keyExchange;
+		readonly int m_namedGroup;
+		readonly byte[] m_keyExchange;
 
 		/// <param name="namedGroup"><see cref="NamedGroup"/></param>
 		/// <param name="keyExchange"></param>
 		public KeyShareEntry(int namedGroup, byte[] keyExchange)
 		{
 			if (!TlsUtilities.IsValidUint16(namedGroup))
+			{
 				throw new ArgumentException("should be a uint16", "namedGroup");
-			if (null == keyExchange)
-				throw new ArgumentNullException("keyExchange");
-			if (!CheckKeyExchangeLength(keyExchange.Length))
-				throw new ArgumentException("must have length from 1 to (2^16 - 1)", "keyExchange");
+			}
 
-			this.m_namedGroup = namedGroup;
-			this.m_keyExchange = keyExchange;
+			if (null == keyExchange)
+			{
+				throw new ArgumentNullException("keyExchange");
+			}
+
+			if (!CheckKeyExchangeLength(keyExchange.Length))
+			{
+				throw new ArgumentException("must have length from 1 to (2^16 - 1)", "keyExchange");
+			}
+
+			m_namedGroup = namedGroup;
+			m_keyExchange = keyExchange;
 		}
 
 		/// <returns><see cref="NamedGroup"/></returns>

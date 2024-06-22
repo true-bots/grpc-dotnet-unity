@@ -2,9 +2,9 @@
 
 namespace BestHTTP.SocketIO3
 {
-	using BestHTTP.Logger;
-	using BestHTTP.PlatformSupport.Memory;
-	using BestHTTP.SocketIO3.Transports;
+	using Logger;
+	using PlatformSupport.Memory;
+	using Transports;
 
 	/// <summary>
 	/// Interface to hide internal functions from the user by implementing it as an explicit interface.

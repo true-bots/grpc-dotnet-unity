@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public class DerOctetStringParser
 		: Asn1OctetStringParser
 	{
-		private readonly DefiniteLengthInputStream stream;
+		readonly DefiniteLengthInputStream stream;
 
 		internal DerOctetStringParser(
 			DefiniteLengthInputStream stream)

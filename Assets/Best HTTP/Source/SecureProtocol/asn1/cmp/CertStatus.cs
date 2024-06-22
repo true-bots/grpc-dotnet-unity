@@ -12,20 +12,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static CertStatus GetInstance(object obj)
 		{
 			if (obj is CertStatus certStatus)
+			{
 				return certStatus;
+			}
 
 			if (obj != null)
+			{
 				return new CertStatus(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly Asn1OctetString m_certHash;
-		private readonly DerInteger m_certReqID;
-		private readonly PkiStatusInfo m_statusInfo;
-		private readonly AlgorithmIdentifier m_hashAlg;
+		readonly Asn1OctetString m_certHash;
+		readonly DerInteger m_certReqID;
+		readonly PkiStatusInfo m_statusInfo;
+		readonly AlgorithmIdentifier m_hashAlg;
 
-		private CertStatus(Asn1Sequence seq)
+		CertStatus(Asn1Sequence seq)
 		{
 			m_certHash = Asn1OctetString.GetInstance(seq[0]);
 			m_certReqID = DerInteger.GetInstance(seq[1]);
@@ -43,7 +47,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 					if (p is Asn1TaggedObject dto)
 					{
 						if (dto.TagNo != 0)
+						{
 							throw new ArgumentException("unknown tag " + dto.TagNo);
+						}
 
 						m_hashAlg = AlgorithmIdentifier.GetInstance(dto, true);
 					}
@@ -72,13 +78,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_hashAlg = hashAlg;
 		}
 
-		public virtual Asn1OctetString CertHash => m_certHash;
+		public virtual Asn1OctetString CertHash
+		{
+			get { return m_certHash; }
+		}
 
-		public virtual DerInteger CertReqID => m_certReqID;
+		public virtual DerInteger CertReqID
+		{
+			get { return m_certReqID; }
+		}
 
-		public virtual PkiStatusInfo StatusInfo => m_statusInfo;
+		public virtual PkiStatusInfo StatusInfo
+		{
+			get { return m_statusInfo; }
+		}
 
-		public virtual AlgorithmIdentifier HashAlg => m_hashAlg;
+		public virtual AlgorithmIdentifier HashAlg
+		{
+			get { return m_hashAlg; }
+		}
 
 		/**
 		 * <pre>

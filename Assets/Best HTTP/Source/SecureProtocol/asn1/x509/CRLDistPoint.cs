@@ -17,9 +17,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static CrlDistPoint GetInstance(object obj)
 		{
 			if (obj is CrlDistPoint)
+			{
 				return (CrlDistPoint)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new CrlDistPoint(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -30,7 +36,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		internal readonly Asn1Sequence seq;
 
-		private CrlDistPoint(
+		CrlDistPoint(
 			Asn1Sequence seq)
 		{
 			this.seq = seq;

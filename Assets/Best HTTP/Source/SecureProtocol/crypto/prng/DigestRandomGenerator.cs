@@ -16,23 +16,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 	public sealed class DigestRandomGenerator
 		: IRandomGenerator
 	{
-		private const long CYCLE_COUNT = 10;
+		const long CYCLE_COUNT = 10;
 
-		private long stateCounter;
-		private long seedCounter;
-		private IDigest digest;
-		private byte[] state;
-		private byte[] seed;
+		long stateCounter;
+		long seedCounter;
+		IDigest digest;
+		byte[] state;
+		byte[] seed;
 
 		public DigestRandomGenerator(IDigest digest)
 		{
 			this.digest = digest;
 
-			this.seed = new byte[digest.GetDigestSize()];
-			this.seedCounter = 1;
+			seed = new byte[digest.GetDigestSize()];
+			seedCounter = 1;
 
-			this.state = new byte[digest.GetDigestSize()];
-			this.stateCounter = 1;
+			state = new byte[digest.GetDigestSize()];
+			stateCounter = 1;
 		}
 
 		public void AddSeedMaterial(byte[] inSeed)
@@ -127,21 +127,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		}
 #endif
 
-		private void CycleSeed()
+		void CycleSeed()
 		{
 			DigestUpdate(seed);
 			DigestAddCounter(seedCounter++);
 			DigestDoFinal(seed);
 		}
 
-		private void GenerateState()
+		void GenerateState()
 		{
 			DigestAddCounter(stateCounter++);
 			DigestUpdate(state);
 			DigestUpdate(seed);
 			DigestDoFinal(state);
 
-			if ((stateCounter % CYCLE_COUNT) == 0)
+			if (stateCounter % CYCLE_COUNT == 0)
 			{
 				CycleSeed();
 			}
@@ -165,19 +165,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
             digest.DoFinal(result);
         }
 #else
-		private void DigestAddCounter(long seedVal)
+		void DigestAddCounter(long seedVal)
 		{
 			byte[] bytes = new byte[8];
 			Pack.UInt64_To_LE((ulong)seedVal, bytes);
 			digest.BlockUpdate(bytes, 0, bytes.Length);
 		}
 
-		private void DigestUpdate(byte[] inSeed)
+		void DigestUpdate(byte[] inSeed)
 		{
 			digest.BlockUpdate(inSeed, 0, inSeed.Length);
 		}
 
-		private void DigestDoFinal(byte[] result)
+		void DigestDoFinal(byte[] result)
 		{
 			digest.DoFinal(result, 0);
 		}

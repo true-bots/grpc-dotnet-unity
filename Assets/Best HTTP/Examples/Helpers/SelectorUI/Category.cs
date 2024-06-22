@@ -9,13 +9,13 @@ namespace BestHTTP.Examples.Helpers.SelectorUI
 	{
 #pragma warning disable 0649
 
-		[SerializeField] private Text _text;
+		[SerializeField] Text _text;
 
 #pragma warning restore
 
 		public void SetLabel(string category)
 		{
-			this._text.text = category;
+			_text.text = category;
 		}
 	}
 }

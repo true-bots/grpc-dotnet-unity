@@ -11,12 +11,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class Ed448phSigner
 		: ISigner
 	{
-		private readonly IXof prehash = Ed448.CreatePrehash();
-		private readonly byte[] context;
+		readonly IXof prehash = Ed448.CreatePrehash();
+		readonly byte[] context;
 
-		private bool forSigning;
-		private Ed448PrivateKeyParameters privateKey;
-		private Ed448PublicKeyParameters publicKey;
+		bool forSigning;
+		Ed448PrivateKeyParameters privateKey;
+		Ed448PublicKeyParameters publicKey;
 
 		public Ed448phSigner(byte[] context)
 		{
@@ -34,13 +34,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 			if (forSigning)
 			{
-				this.privateKey = (Ed448PrivateKeyParameters)parameters;
-				this.publicKey = null;
+				privateKey = (Ed448PrivateKeyParameters)parameters;
+				publicKey = null;
 			}
 			else
 			{
-				this.privateKey = null;
-				this.publicKey = (Ed448PublicKeyParameters)parameters;
+				privateKey = null;
+				publicKey = (Ed448PublicKeyParameters)parameters;
 			}
 
 			Reset();
@@ -66,11 +66,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual byte[] GenerateSignature()
 		{
 			if (!forSigning || null == privateKey)
+			{
 				throw new InvalidOperationException("Ed448phSigner not initialised for signature generation.");
+			}
 
 			byte[] msg = new byte[Ed448.PrehashSize];
 			if (Ed448.PrehashSize != prehash.OutputFinal(msg, 0, Ed448.PrehashSize))
+			{
 				throw new InvalidOperationException("Prehash digest failed");
+			}
 
 			byte[] signature = new byte[Ed448PrivateKeyParameters.SignatureSize];
 			privateKey.Sign(Ed448.Algorithm.Ed448ph, context, msg, 0, Ed448.PrehashSize, signature, 0);
@@ -80,7 +84,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual bool VerifySignature(byte[] signature)
 		{
 			if (forSigning || null == publicKey)
+			{
 				throw new InvalidOperationException("Ed448phSigner not initialised for verification");
+			}
+
 			if (Ed448.SignatureSize != signature.Length)
 			{
 				prehash.Reset();

@@ -51,10 +51,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj is TbsCertificateStructure)
+			{
 				return (TbsCertificateStructure)obj;
+			}
 
 			if (obj != null)
+			{
 				return new TbsCertificateStructure(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
@@ -117,7 +121,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 			int extras = seq.Count - (seqStart + 6) - 1;
 			if (extras != 0 && isV1)
+			{
 				throw new ArgumentException("version 1 certificate contains extra data");
+			}
 
 			while (extras > 0)
 			{
@@ -137,7 +143,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 					case 3:
 					{
 						if (isV2)
+						{
 							throw new ArgumentException("version 2 certificate cannot contain extensions");
+						}
 
 						extensions = X509Extensions.GetInstance(Asn1Sequence.GetInstance(extra, true));
 						break;
@@ -214,9 +222,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public override Asn1Object ToAsn1Object()
 		{
-			string property = Org.BouncyCastle.Utilities.Platform.GetEnvironmentVariable("BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Allow_Non-DER_TBSCert");
-			if (null == property || Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase("true", property))
+			string property = Platform.GetEnvironmentVariable("BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Allow_Non-DER_TBSCert");
+			if (null == property || Platform.EqualsIgnoreCase("true", property))
+			{
 				return seq;
+			}
 
 			Asn1EncodableVector v = new Asn1EncodableVector();
 

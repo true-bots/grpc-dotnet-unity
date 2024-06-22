@@ -48,27 +48,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			switch (signatureAlgorithm)
 			{
-				case SignatureAlgorithm.rsa:
-				case SignatureAlgorithm.rsa_pss_rsae_sha256:
-				case SignatureAlgorithm.rsa_pss_rsae_sha384:
-				case SignatureAlgorithm.rsa_pss_rsae_sha512:
-				case SignatureAlgorithm.rsa_pss_pss_sha256:
-				case SignatureAlgorithm.rsa_pss_pss_sha384:
-				case SignatureAlgorithm.rsa_pss_pss_sha512:
+				case rsa:
+				case rsa_pss_rsae_sha256:
+				case rsa_pss_rsae_sha384:
+				case rsa_pss_rsae_sha512:
+				case rsa_pss_pss_sha256:
+				case rsa_pss_pss_sha384:
+				case rsa_pss_pss_sha512:
 					return ClientCertificateType.rsa_sign;
 
-				case SignatureAlgorithm.dsa:
+				case dsa:
 					return ClientCertificateType.dss_sign;
 
-				case SignatureAlgorithm.ecdsa:
-				case SignatureAlgorithm.ed25519:
-				case SignatureAlgorithm.ed448:
+				case ecdsa:
+				case ed25519:
+				case ed448:
 					return ClientCertificateType.ecdsa_sign;
 
-				case SignatureAlgorithm.gostr34102012_256:
+				case gostr34102012_256:
 					return ClientCertificateType.gost_sign256;
 
-				case SignatureAlgorithm.gostr34102012_512:
+				case gostr34102012_512:
 					return ClientCertificateType.gost_sign512;
 
 				default:

@@ -23,10 +23,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		public const int IVMaterial = 2;
 		public const int MacMaterial = 3;
 
-		private readonly IDigest digest;
+		readonly IDigest digest;
 
-		private readonly int u;
-		private readonly int v;
+		readonly int u;
+		readonly int v;
 
 		/**
 		 * Construct a Pkcs 12 Parameters generator.
@@ -48,7 +48,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * as a BigInteger of length (b.Length * 8) bits. The result is
 		 * modulo 2^b.Length in case of overflow.
 		 */
-		private void Adjust(
+		void Adjust(
 			byte[] a,
 			int aOff,
 			byte[] b)
@@ -69,7 +69,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		/**
 		 * generation of a derived key ala Pkcs12 V1.0.
 		 */
-		private byte[] GenerateDerivedKey(
+		byte[] GenerateDerivedKey(
 			int idByte,
 			int n)
 		{
@@ -83,7 +83,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 			byte[] S;
 
-			if ((mSalt != null) && (mSalt.Length != 0))
+			if (mSalt != null && mSalt.Length != 0)
 			{
 				S = new byte[v * ((mSalt.Length + v - 1) / v)];
 
@@ -99,7 +99,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 			byte[] P;
 
-			if ((mPassword != null) && (mPassword.Length != 0))
+			if (mPassword != null && mPassword.Length != 0)
 			{
 				P = new byte[v * ((mPassword.Length + v - 1) / v)];
 
@@ -146,7 +146,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 				if (i == c)
 				{
-					Array.Copy(A, 0, dKey, (i - 1) * u, dKey.Length - ((i - 1) * u));
+					Array.Copy(A, 0, dKey, (i - 1) * u, dKey.Length - (i - 1) * u);
 				}
 				else
 				{

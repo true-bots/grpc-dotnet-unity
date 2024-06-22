@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
 	public class OriginatorInformation
 	{
-		private readonly OriginatorInfo originatorInfo;
+		readonly OriginatorInfo originatorInfo;
 
 		internal OriginatorInformation(OriginatorInfo originatorInfo)
 		{

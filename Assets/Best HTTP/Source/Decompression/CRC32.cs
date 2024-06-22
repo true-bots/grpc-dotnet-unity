@@ -41,12 +41,12 @@ namespace BestHTTP.Decompression.Crc
 	///   directly by applications wishing to create, read, or manipulate zip
 	///   archive files.
 	/// </remarks>
-	internal class CRC32
+	class CRC32
 	{
 		/// <summary>
 		///   Indicates the total number of bytes applied to the CRC.
 		/// </summary>
-		public Int64 TotalBytesRead
+		public long TotalBytesRead
 		{
 			get { return _TotalBytesRead; }
 		}
@@ -54,9 +54,9 @@ namespace BestHTTP.Decompression.Crc
 		/// <summary>
 		/// Indicates the current CRC for all blocks slurped in.
 		/// </summary>
-		public Int32 Crc32Result
+		public int Crc32Result
 		{
-			get { return unchecked((Int32)(~_register)); }
+			get { return unchecked((int)(~_register)); }
 		}
 
 		/// <summary>
@@ -64,7 +64,7 @@ namespace BestHTTP.Decompression.Crc
 		/// </summary>
 		/// <param name="input">The stream over which to calculate the CRC32</param>
 		/// <returns>the CRC32 calculation</returns>
-		public Int32 GetCrc32(System.IO.Stream input)
+		public int GetCrc32(System.IO.Stream input)
 		{
 			return GetCrc32AndCopy(input, null);
 		}
@@ -76,10 +76,12 @@ namespace BestHTTP.Decompression.Crc
 		/// <param name="input">The stream over which to calculate the CRC32</param>
 		/// <param name="output">The stream into which to deflate the input</param>
 		/// <returns>the CRC32 calculation</returns>
-		public Int32 GetCrc32AndCopy(System.IO.Stream input, System.IO.Stream output)
+		public int GetCrc32AndCopy(System.IO.Stream input, System.IO.Stream output)
 		{
 			if (input == null)
+			{
 				throw new Exception("The input stream must not be null.");
+			}
 
 			unchecked
 			{
@@ -88,17 +90,25 @@ namespace BestHTTP.Decompression.Crc
 
 				_TotalBytesRead = 0;
 				int count = input.Read(buffer, 0, readSize);
-				if (output != null) output.Write(buffer, 0, count);
+				if (output != null)
+				{
+					output.Write(buffer, 0, count);
+				}
+
 				_TotalBytesRead += count;
 				while (count > 0)
 				{
 					SlurpBlock(buffer, 0, count);
 					count = input.Read(buffer, 0, readSize);
-					if (output != null) output.Write(buffer, 0, count);
+					if (output != null)
+					{
+						output.Write(buffer, 0, count);
+					}
+
 					_TotalBytesRead += count;
 				}
 
-				return (Int32)(~_register);
+				return (int)(~_register);
 			}
 		}
 
@@ -110,14 +120,14 @@ namespace BestHTTP.Decompression.Crc
 		/// <param name="W">The word to start with.</param>
 		/// <param name="B">The byte to combine it with.</param>
 		/// <returns>The CRC-ized result.</returns>
-		public Int32 ComputeCrc32(Int32 W, byte B)
+		public int ComputeCrc32(int W, byte B)
 		{
-			return _InternalComputeCrc32((UInt32)W, B);
+			return _InternalComputeCrc32((uint)W, B);
 		}
 
-		internal Int32 _InternalComputeCrc32(UInt32 W, byte B)
+		internal int _InternalComputeCrc32(uint W, byte B)
 		{
-			return (Int32)(crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
+			return (int)(crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
 		}
 
 
@@ -131,21 +141,23 @@ namespace BestHTTP.Decompression.Crc
 		public void SlurpBlock(byte[] block, int offset, int count)
 		{
 			if (block == null)
+			{
 				throw new Exception("The data buffer must not be null.");
+			}
 
 			// bzip algorithm
 			for (int i = 0; i < count; i++)
 			{
 				int x = offset + i;
 				byte b = block[x];
-				if (this.reverseBits)
+				if (reverseBits)
 				{
-					UInt32 temp = (_register >> 24) ^ b;
+					uint temp = (_register >> 24) ^ b;
 					_register = (_register << 8) ^ crc32Table[temp];
 				}
 				else
 				{
-					UInt32 temp = (_register & 0x000000FF) ^ b;
+					uint temp = (_register & 0x000000FF) ^ b;
 					_register = (_register >> 8) ^ crc32Table[temp];
 				}
 			}
@@ -160,14 +172,14 @@ namespace BestHTTP.Decompression.Crc
 		/// <param name = "b">the byte to include into the CRC .  </param>
 		public void UpdateCRC(byte b)
 		{
-			if (this.reverseBits)
+			if (reverseBits)
 			{
-				UInt32 temp = (_register >> 24) ^ b;
+				uint temp = (_register >> 24) ^ b;
 				_register = (_register << 8) ^ crc32Table[temp];
 			}
 			else
 			{
-				UInt32 temp = (_register & 0x000000FF) ^ b;
+				uint temp = (_register & 0x000000FF) ^ b;
 				_register = (_register >> 8) ^ crc32Table[temp];
 			}
 		}
@@ -190,38 +202,38 @@ namespace BestHTTP.Decompression.Crc
 		{
 			while (n-- > 0)
 			{
-				if (this.reverseBits)
+				if (reverseBits)
 				{
 					uint temp = (_register >> 24) ^ b;
-					_register = (_register << 8) ^ crc32Table[(temp >= 0)
+					_register = (_register << 8) ^ crc32Table[temp >= 0
 						? temp
-						: (temp + 256)];
+						: temp + 256];
 				}
 				else
 				{
-					UInt32 temp = (_register & 0x000000FF) ^ b;
-					_register = (_register >> 8) ^ crc32Table[(temp >= 0)
+					uint temp = (_register & 0x000000FF) ^ b;
+					_register = (_register >> 8) ^ crc32Table[temp >= 0
 						? temp
-						: (temp + 256)];
+						: temp + 256];
 				}
 			}
 		}
 
 
-		private static uint ReverseBits(uint data)
+		static uint ReverseBits(uint data)
 		{
 			unchecked
 			{
 				uint ret = data;
-				ret = (ret & 0x55555555) << 1 | (ret >> 1) & 0x55555555;
-				ret = (ret & 0x33333333) << 2 | (ret >> 2) & 0x33333333;
-				ret = (ret & 0x0F0F0F0F) << 4 | (ret >> 4) & 0x0F0F0F0F;
+				ret = ((ret & 0x55555555) << 1) | ((ret >> 1) & 0x55555555);
+				ret = ((ret & 0x33333333) << 2) | ((ret >> 2) & 0x33333333);
+				ret = ((ret & 0x0F0F0F0F) << 4) | ((ret >> 4) & 0x0F0F0F0F);
 				ret = (ret << 24) | ((ret & 0xFF00) << 8) | ((ret >> 8) & 0xFF00) | (ret >> 24);
 				return ret;
 			}
 		}
 
-		private static byte ReverseBits(byte data)
+		static byte ReverseBits(byte data)
 		{
 			unchecked
 			{
@@ -234,12 +246,12 @@ namespace BestHTTP.Decompression.Crc
 		}
 
 
-		private void GenerateLookupTable()
+		void GenerateLookupTable()
 		{
-			crc32Table = new UInt32[256];
+			crc32Table = new uint[256];
 			unchecked
 			{
-				UInt32 dwCrc;
+				uint dwCrc;
 				byte i = 0;
 				do
 				{
@@ -287,14 +299,17 @@ namespace BestHTTP.Decompression.Crc
 		}
 
 
-		private uint gf2_matrix_times(uint[] matrix, uint vec)
+		uint gf2_matrix_times(uint[] matrix, uint vec)
 		{
 			uint sum = 0;
 			int i = 0;
 			while (vec != 0)
 			{
 				if ((vec & 0x01) == 0x01)
+				{
 					sum ^= matrix[i];
+				}
+
 				vec >>= 1;
 				i++;
 			}
@@ -302,10 +317,12 @@ namespace BestHTTP.Decompression.Crc
 			return sum;
 		}
 
-		private void gf2_matrix_square(uint[] square, uint[] mat)
+		void gf2_matrix_square(uint[] square, uint[] mat)
 		{
 			for (int i = 0; i < 32; i++)
+			{
 				square[i] = gf2_matrix_times(mat, mat[i]);
+			}
 		}
 
 
@@ -326,13 +343,15 @@ namespace BestHTTP.Decompression.Crc
 			uint[] odd = new uint[32]; // odd-power-of-two zeros operator
 
 			if (length == 0)
+			{
 				return;
+			}
 
 			uint crc1 = ~_register;
 			uint crc2 = (uint)crc;
 
 			// put operator for one zero bit in odd
-			odd[0] = this.dwPolynomial; // the CRC-32 polynomial
+			odd[0] = dwPolynomial; // the CRC-32 polynomial
 			uint row = 1;
 			for (int i = 1; i < 32; i++)
 			{
@@ -356,16 +375,24 @@ namespace BestHTTP.Decompression.Crc
 				gf2_matrix_square(even, odd);
 
 				if ((len2 & 1) == 1)
+				{
 					crc1 = gf2_matrix_times(even, crc1);
+				}
+
 				len2 >>= 1;
 
 				if (len2 == 0)
+				{
 					break;
+				}
 
 				// another iteration of the loop with odd and even swapped
 				gf2_matrix_square(odd, even);
 				if ((len2 & 1) == 1)
+				{
 					crc1 = gf2_matrix_times(odd, crc1);
+				}
+
 				len2 >>= 1;
 			} while (len2 != 0);
 
@@ -436,8 +463,8 @@ namespace BestHTTP.Decompression.Crc
 		public CRC32(int polynomial, bool reverseBits)
 		{
 			this.reverseBits = reverseBits;
-			this.dwPolynomial = (uint)polynomial;
-			this.GenerateLookupTable();
+			dwPolynomial = (uint)polynomial;
+			GenerateLookupTable();
 		}
 
 		/// <summary>
@@ -455,11 +482,11 @@ namespace BestHTTP.Decompression.Crc
 		}
 
 		// private member vars
-		private UInt32 dwPolynomial;
-		private Int64 _TotalBytesRead;
-		private bool reverseBits;
-		private UInt32[] crc32Table;
-		private const int BUFFER_SIZE = 8192;
-		private UInt32 _register = 0xFFFFFFFFU;
+		uint dwPolynomial;
+		long _TotalBytesRead;
+		bool reverseBits;
+		uint[] crc32Table;
+		const int BUFFER_SIZE = 8192;
+		uint _register = 0xFFFFFFFFU;
 	}
 }

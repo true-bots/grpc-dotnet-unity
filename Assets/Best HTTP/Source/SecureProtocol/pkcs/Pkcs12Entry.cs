@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 {
 	public abstract class Pkcs12Entry
 	{
-		private readonly IDictionary<DerObjectIdentifier, Asn1Encodable> m_attributes;
+		readonly IDictionary<DerObjectIdentifier, Asn1Encodable> m_attributes;
 
 		protected internal Pkcs12Entry(IDictionary<DerObjectIdentifier, Asn1Encodable> attributes)
 		{

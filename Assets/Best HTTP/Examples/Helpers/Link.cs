@@ -14,13 +14,13 @@ namespace BestHTTP.Examples
 #if UNITY_WEBGL && !UNITY_EDITOR
             openWindow(this.url);
 #else
-			Application.OpenURL(this.url);
+			Application.OpenURL(url);
 #endif
 		}
 
 		void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
 		{
-			Cursor.SetCursor(this.linkSelectCursor, Vector2.zero, CursorMode.Auto);
+			Cursor.SetCursor(linkSelectCursor, Vector2.zero, CursorMode.Auto);
 		}
 
 		void IPointerExitHandler.OnPointerExit(PointerEventData eventData)

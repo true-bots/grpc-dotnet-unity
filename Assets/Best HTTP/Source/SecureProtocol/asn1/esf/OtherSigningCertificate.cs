@@ -18,37 +18,46 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class OtherSigningCertificate
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence certs;
-		private readonly Asn1Sequence policies;
+		readonly Asn1Sequence certs;
+		readonly Asn1Sequence policies;
 
 		public static OtherSigningCertificate GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is OtherSigningCertificate)
+			{
 				return (OtherSigningCertificate)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new OtherSigningCertificate((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'OtherSigningCertificate' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
-		private OtherSigningCertificate(
+		OtherSigningCertificate(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
-			if (seq.Count < 1 || seq.Count > 2)
-				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
-			this.certs = Asn1Sequence.GetInstance(seq[0].ToAsn1Object());
+			if (seq.Count < 1 || seq.Count > 2)
+			{
+				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
+
+			certs = Asn1Sequence.GetInstance(seq[0].ToAsn1Object());
 
 			if (seq.Count > 1)
 			{
-				this.policies = Asn1Sequence.GetInstance(seq[1].ToAsn1Object());
+				policies = Asn1Sequence.GetInstance(seq[1].ToAsn1Object());
 			}
 		}
 
@@ -63,7 +72,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			params PolicyInformation[] policies)
 		{
 			if (certs == null)
+			{
 				throw new ArgumentNullException("certs");
+			}
 
 			this.certs = new DerSequence(certs);
 
@@ -84,7 +95,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			IEnumerable<PolicyInformation> policies)
 		{
 			if (certs == null)
+			{
 				throw new ArgumentNullException("certs");
+			}
 
 			this.certs = new DerSequence(
 				Asn1EncodableVector.FromEnumerable(certs));
@@ -110,7 +123,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		public PolicyInformation[] GetPolicies()
 		{
 			if (policies == null)
+			{
 				return null;
+			}
 
 			PolicyInformation[] ps = new PolicyInformation[policies.Count];
 			for (int i = 0; i < policies.Count; ++i)

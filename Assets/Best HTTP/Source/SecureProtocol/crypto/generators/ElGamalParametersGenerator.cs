@@ -9,9 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 {
 	public class ElGamalParametersGenerator
 	{
-		private int size;
-		private int certainty;
-		private SecureRandom random;
+		int size;
+		int certainty;
+		SecureRandom random;
 
 		public void Init(
 			int size,

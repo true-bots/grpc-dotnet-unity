@@ -6,7 +6,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Nist
 {
 	public sealed class NistObjectIdentifiers
 	{
-		private NistObjectIdentifiers()
+		NistObjectIdentifiers()
 		{
 		}
 

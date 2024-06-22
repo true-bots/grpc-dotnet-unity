@@ -9,9 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class Controls
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence content;
+		readonly Asn1Sequence content;
 
-		private Controls(Asn1Sequence seq)
+		Controls(Asn1Sequence seq)
 		{
 			content = seq;
 		}
@@ -19,12 +19,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static Controls GetInstance(object obj)
 		{
 			if (obj is Controls)
+			{
 				return (Controls)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new Controls((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public Controls(params AttributeTypeAndValue[] atvs)

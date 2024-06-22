@@ -10,10 +10,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 	public class AttributeTypeAndValue
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier type;
-		private readonly Asn1Encodable value;
+		readonly DerObjectIdentifier type;
+		readonly Asn1Encodable value;
 
-		private AttributeTypeAndValue(Asn1Sequence seq)
+		AttributeTypeAndValue(Asn1Sequence seq)
 		{
 			type = (DerObjectIdentifier)seq[0];
 			value = seq[1];
@@ -22,9 +22,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 		public static AttributeTypeAndValue GetInstance(object obj)
 		{
 			if (obj is AttributeTypeAndValue)
+			{
 				return (AttributeTypeAndValue)obj;
+			}
+
 			if (null != obj)
+			{
 				return new AttributeTypeAndValue(Asn1Sequence.GetInstance(obj));
+			}
+
 			throw new ArgumentNullException("obj");
 		}
 

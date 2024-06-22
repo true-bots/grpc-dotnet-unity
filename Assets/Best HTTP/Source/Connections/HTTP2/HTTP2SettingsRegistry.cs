@@ -87,114 +87,134 @@ namespace BestHTTP.Connections.HTTP2
 	public sealed class HTTP2SettingsRegistry
 	{
 		public bool IsReadOnly { get; private set; }
-		public Action<HTTP2SettingsRegistry, HTTP2Settings, UInt32, UInt32> OnSettingChangedEvent;
+		public Action<HTTP2SettingsRegistry, HTTP2Settings, uint, uint> OnSettingChangedEvent;
 
-		private UInt32[] values;
-		private bool[] changeFlags;
+		uint[] values;
+		bool[] changeFlags;
 
-		public UInt32 this[HTTP2Settings setting]
+		public uint this[HTTP2Settings setting]
 		{
-			get { return this.values[(ushort)setting]; }
+			get { return values[(ushort)setting]; }
 
 			set
 			{
-				if (this.IsReadOnly)
+				if (IsReadOnly)
+				{
 					throw new NotSupportedException("It's a read-only one!");
+				}
 
 				ushort idx = (ushort)setting;
 
 				// https://httpwg.org/specs/rfc7540.html#SettingValues
 				// An endpoint that receives a SETTINGS frame with any unknown or unsupported identifier MUST ignore that setting.
-				if (idx == 0 || idx >= this.values.Length)
+				if (idx == 0 || idx >= values.Length)
+				{
 					return;
+				}
 
-				UInt32 oldValue = this.values[idx];
+				uint oldValue = values[idx];
 				if (oldValue != value)
 				{
-					this.values[idx] = value;
-					this.changeFlags[idx] = true;
+					values[idx] = value;
+					changeFlags[idx] = true;
 					IsChanged = true;
 
-					if (this.OnSettingChangedEvent != null)
-						this.OnSettingChangedEvent(this, setting, oldValue, value);
+					if (OnSettingChangedEvent != null)
+					{
+						OnSettingChangedEvent(this, setting, oldValue, value);
+					}
 				}
 			}
 		}
 
 		public bool IsChanged { get; private set; }
 
-		private HTTP2SettingsManager _parent;
+		HTTP2SettingsManager _parent;
 
 		public HTTP2SettingsRegistry(HTTP2SettingsManager parent, bool readOnly, bool treatItAsAlreadyChanged)
 		{
-			this._parent = parent;
+			_parent = parent;
 
-			this.values = new UInt32[HTTP2SettingsManager.SettingsCount];
+			values = new uint[HTTP2SettingsManager.SettingsCount];
 
-			this.IsReadOnly = readOnly;
-			if (!this.IsReadOnly)
-				this.changeFlags = new bool[HTTP2SettingsManager.SettingsCount];
+			IsReadOnly = readOnly;
+			if (!IsReadOnly)
+			{
+				changeFlags = new bool[HTTP2SettingsManager.SettingsCount];
+			}
 
 			// Set default values (https://httpwg.org/specs/rfc7540.html#iana-settings)
-			this.values[(UInt16)HTTP2Settings.HEADER_TABLE_SIZE] = 4096;
-			this.values[(UInt16)HTTP2Settings.ENABLE_PUSH] = 1;
-			this.values[(UInt16)HTTP2Settings.MAX_CONCURRENT_STREAMS] = 128;
-			this.values[(UInt16)HTTP2Settings.INITIAL_WINDOW_SIZE] = 65535;
-			this.values[(UInt16)HTTP2Settings.MAX_FRAME_SIZE] = 16384;
-			this.values[(UInt16)HTTP2Settings.MAX_HEADER_LIST_SIZE] = UInt32.MaxValue; // infinite
+			values[(ushort)HTTP2Settings.HEADER_TABLE_SIZE] = 4096;
+			values[(ushort)HTTP2Settings.ENABLE_PUSH] = 1;
+			values[(ushort)HTTP2Settings.MAX_CONCURRENT_STREAMS] = 128;
+			values[(ushort)HTTP2Settings.INITIAL_WINDOW_SIZE] = 65535;
+			values[(ushort)HTTP2Settings.MAX_FRAME_SIZE] = 16384;
+			values[(ushort)HTTP2Settings.MAX_HEADER_LIST_SIZE] = uint.MaxValue; // infinite
 
-			if (this.IsChanged = treatItAsAlreadyChanged)
+			if (IsChanged = treatItAsAlreadyChanged)
 			{
-				this.changeFlags[(UInt16)HTTP2Settings.MAX_CONCURRENT_STREAMS] = true;
+				changeFlags[(ushort)HTTP2Settings.MAX_CONCURRENT_STREAMS] = true;
 			}
 		}
 
-		public void Merge(List<KeyValuePair<HTTP2Settings, UInt32>> settings)
+		public void Merge(List<KeyValuePair<HTTP2Settings, uint>> settings)
 		{
 			if (settings == null)
+			{
 				return;
+			}
 
 			for (int i = 0; i < settings.Count; ++i)
 			{
 				HTTP2Settings setting = settings[i].Key;
-				UInt16 key = (UInt16)setting;
-				UInt32 value = settings[i].Value;
+				ushort key = (ushort)setting;
+				uint value = settings[i].Value;
 
 				if (key > 0 && key <= HTTP2SettingsManager.SettingsCount)
 				{
-					UInt32 oldValue = this.values[key];
-					this.values[key] = value;
+					uint oldValue = values[key];
+					values[key] = value;
 
-					if (oldValue != value && this.OnSettingChangedEvent != null)
-						this.OnSettingChangedEvent(this, setting, oldValue, value);
+					if (oldValue != value && OnSettingChangedEvent != null)
+					{
+						OnSettingChangedEvent(this, setting, oldValue, value);
+					}
 
 					if (HTTPManager.Logger.Level <= Logger.Loglevels.All)
-						HTTPManager.Logger.Information("HTTP2SettingsRegistry", string.Format("Merge {0}({1}) = {2}", setting, key, value), this._parent.Parent.Context);
+					{
+						HTTPManager.Logger.Information("HTTP2SettingsRegistry", string.Format("Merge {0}({1}) = {2}", setting, key, value), _parent.Parent.Context);
+					}
 				}
 			}
 		}
 
 		public void Merge(HTTP2SettingsRegistry from)
 		{
-			if (this.values != null)
-				this.values = new uint[from.values.Length];
+			if (values != null)
+			{
+				values = new uint[from.values.Length];
+			}
 
-			for (int i = 0; i < this.values.Length; ++i)
-				this.values[i] = from.values[i];
+			for (int i = 0; i < values.Length; ++i)
+			{
+				values[i] = from.values[i];
+			}
 		}
 
 		internal HTTP2FrameHeaderAndPayload CreateFrame()
 		{
-			List<KeyValuePair<HTTP2Settings, UInt32>> keyValuePairs = new List<KeyValuePair<HTTP2Settings, uint>>(HTTP2SettingsManager.SettingsCount);
+			List<KeyValuePair<HTTP2Settings, uint>> keyValuePairs = new List<KeyValuePair<HTTP2Settings, uint>>(HTTP2SettingsManager.SettingsCount);
 
 			for (int i = 1; i < HTTP2SettingsManager.SettingsCount; ++i)
-				if (this.changeFlags[i])
+			{
+				if (changeFlags[i])
 				{
 					keyValuePairs.Add(new KeyValuePair<HTTP2Settings, uint>((HTTP2Settings)i, this[(HTTP2Settings)i]));
-					this.changeFlags[i] = false;
+					changeFlags[i] = false;
 				}
+			}
 
-			this.IsChanged = false;
+			IsChanged = false;
 
 			return HTTP2FrameHelper.CreateSettingsFrame(keyValuePairs);
 		}
@@ -226,50 +246,56 @@ namespace BestHTTP.Connections.HTTP2
 
 		public HTTP2SettingsManager(HTTP2Handler parentHandler)
 		{
-			this.Parent = parentHandler;
+			Parent = parentHandler;
 
-			this.MySettings = new HTTP2SettingsRegistry(this, readOnly: true, treatItAsAlreadyChanged: false);
-			this.InitiatedMySettings = new HTTP2SettingsRegistry(this, readOnly: false, treatItAsAlreadyChanged: true);
-			this.RemoteSettings = new HTTP2SettingsRegistry(this, readOnly: true, treatItAsAlreadyChanged: false);
-			this.SettingsChangesSentAt = DateTime.MinValue;
+			MySettings = new HTTP2SettingsRegistry(this, true, false);
+			InitiatedMySettings = new HTTP2SettingsRegistry(this, false, true);
+			RemoteSettings = new HTTP2SettingsRegistry(this, true, false);
+			SettingsChangesSentAt = DateTime.MinValue;
 		}
 
 		internal void Process(HTTP2FrameHeaderAndPayload frame, List<HTTP2FrameHeaderAndPayload> outgoingFrames)
 		{
 			if (frame.Type != HTTP2FrameTypes.SETTINGS)
+			{
 				return;
+			}
 
 			HTTP2SettingsFrame settingsFrame = HTTP2FrameHelper.ReadSettings(frame);
 
 			if (HTTPManager.Logger.Level <= Logger.Loglevels.Information)
-				HTTPManager.Logger.Information("HTTP2SettingsManager", "Processing Settings frame: " + settingsFrame.ToString(), this.Parent.Context);
+			{
+				HTTPManager.Logger.Information("HTTP2SettingsManager", "Processing Settings frame: " + settingsFrame.ToString(), Parent.Context);
+			}
 
 			if ((settingsFrame.Flags & HTTP2SettingsFlags.ACK) == HTTP2SettingsFlags.ACK)
 			{
-				this.MySettings.Merge(this.InitiatedMySettings);
-				this.SettingsChangesSentAt = DateTime.MinValue;
+				MySettings.Merge(InitiatedMySettings);
+				SettingsChangesSentAt = DateTime.MinValue;
 			}
 			else
 			{
-				this.RemoteSettings.Merge(settingsFrame.Settings);
+				RemoteSettings.Merge(settingsFrame.Settings);
 				outgoingFrames.Add(HTTP2FrameHelper.CreateACKSettingsFrame());
 			}
 		}
 
 		internal void SendChanges(List<HTTP2FrameHeaderAndPayload> outgoingFrames)
 		{
-			if (this.SettingsChangesSentAt != DateTime.MinValue && DateTime.UtcNow - this.SettingsChangesSentAt >= TimeSpan.FromSeconds(10))
+			if (SettingsChangesSentAt != DateTime.MinValue && DateTime.UtcNow - SettingsChangesSentAt >= TimeSpan.FromSeconds(10))
 			{
-				HTTPManager.Logger.Error("HTTP2SettingsManager", "No ACK received for settings frame!", this.Parent.Context);
-				this.SettingsChangesSentAt = DateTime.MinValue;
+				HTTPManager.Logger.Error("HTTP2SettingsManager", "No ACK received for settings frame!", Parent.Context);
+				SettingsChangesSentAt = DateTime.MinValue;
 			}
 
 			//  Upon receiving a SETTINGS frame with the ACK flag set, the sender of the altered parameters can rely on the setting having been applied.
-			if (!this.InitiatedMySettings.IsChanged)
+			if (!InitiatedMySettings.IsChanged)
+			{
 				return;
+			}
 
-			outgoingFrames.Add(this.InitiatedMySettings.CreateFrame());
-			this.SettingsChangesSentAt = DateTime.UtcNow;
+			outgoingFrames.Add(InitiatedMySettings.CreateFrame());
+			SettingsChangesSentAt = DateTime.UtcNow;
 		}
 	}
 }

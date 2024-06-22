@@ -22,7 +22,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 		   fingerprint format */
 		public static readonly byte FEATURE_VERSION_5_PUBLIC_KEY = 0x04;
 
-		private static byte[] FeatureToByteArray(byte feature)
+		static byte[] FeatureToByteArray(byte feature)
 		{
 			return new byte[1] { feature };
 		}

@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 	public class X9FieldElement
 		: Asn1Encodable
 	{
-		private ECFieldElement f;
+		ECFieldElement f;
 
 		public X9FieldElement(
 			ECFieldElement f)

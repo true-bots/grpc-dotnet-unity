@@ -14,7 +14,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Misc
 
 		public override string ToString()
 		{
-			return "NetscapeRevocationUrl: " + this.GetString();
+			return "NetscapeRevocationUrl: " + GetString();
 		}
 	}
 }

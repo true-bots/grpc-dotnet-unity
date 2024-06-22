@@ -13,8 +13,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class CmsProcessableByteArray
 		: CmsProcessable, CmsReadable
 	{
-		private readonly DerObjectIdentifier type;
-		private readonly byte[] bytes;
+		readonly DerObjectIdentifier type;
+		readonly byte[] bytes;
 
 		public CmsProcessableByteArray(byte[] bytes)
 		{

@@ -21,22 +21,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		//====================================
 		// Useful constants
 		//====================================
-		private const int ROUNDS = 12;
-		private const int BLOCK_SIZE = 16; // bytes = 128 bits
+		const int ROUNDS = 12;
+		const int BLOCK_SIZE = 16; // bytes = 128 bits
 
 		/*
 		 * Put the round and mask keys into an array.
 		 * Kr0[i] => _Kr[i*4 + 0]
 		 */
-		private int[] _Kr = new int[ROUNDS * 4]; // the rotating round key(s)
-		private uint[] _Km = new uint[ROUNDS * 4]; // the masking round key(s)
+		int[] _Kr = new int[ROUNDS * 4]; // the rotating round key(s)
+		uint[] _Km = new uint[ROUNDS * 4]; // the masking round key(s)
 
 		/*
 		 * Key setup
 		 */
-		private int[] _Tr = new int[24 * 8];
-		private uint[] _Tm = new uint[24 * 8];
-		private uint[] _workingKey = new uint[8];
+		int[] _Tr = new int[24 * 8];
+		uint[] _Tm = new uint[24 * 8];
+		uint[] _workingKey = new uint[8];
 
 		public Cast6Engine()
 		{
@@ -214,7 +214,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* @param D    the 96-127 bits of the plaintext block
 		* @param result the resulting ciphertext
 		*/
-		private void CAST_Encipher(
+		void CAST_Encipher(
 			uint A,
 			uint B,
 			uint C,
@@ -256,7 +256,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         * @param D    the 96-127 bits of the ciphertext block
         * @param result the resulting plaintext
         */
-		private void CAST_Decipher(
+		void CAST_Decipher(
 			uint A,
 			uint B,
 			uint C,

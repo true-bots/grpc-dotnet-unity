@@ -38,7 +38,9 @@ namespace BestHTTP.Connections
 		public static SupportedProtocols GetProtocolFromUri(Uri uri)
 		{
 			if (uri == null || uri.Scheme == null)
+			{
 				throw new Exception("Malformed URI in GetProtocolFromUri");
+			}
 
 			string scheme = uri.Scheme.ToLowerInvariant();
 			switch (scheme)
@@ -57,7 +59,9 @@ namespace BestHTTP.Connections
 		public static bool IsSecureProtocol(Uri uri)
 		{
 			if (uri == null || uri.Scheme == null)
+			{
 				throw new Exception("Malformed URI in IsSecureProtocol");
+			}
 
 			string scheme = uri.Scheme.ToLowerInvariant();
 			switch (scheme)

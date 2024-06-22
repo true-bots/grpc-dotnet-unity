@@ -4,14 +4,14 @@ using System;
 
 namespace BestHTTP.Connections.HTTP2
 {
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstruction]
+	[PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstruction]
 	static class HuffmanEncoder
 	{
-		public const UInt16 EOS = 256;
+		public const ushort EOS = 256;
 
 		public struct TableEntry
 		{
-			public UInt32 Code;
+			public uint Code;
 			public byte Bits;
 
 			/// <summary>
@@ -19,26 +19,26 @@ namespace BestHTTP.Connections.HTTP2
 			/// </summary>
 			public byte GetBitAtIdx(byte idx)
 			{
-				return (byte)((this.Code >> (this.Bits - idx)) & 1);
+				return (byte)((Code >> (Bits - idx)) & 1);
 			}
 
 			public override string ToString()
 			{
-				return string.Format("[TableEntry Code: 0x{0:X}, Bits: {1}]", this.Code, this.Bits);
+				return string.Format("[TableEntry Code: 0x{0:X}, Bits: {1}]", Code, Bits);
 			}
 		}
 
 		public struct TreeNode
 		{
-			public UInt16 NextZeroIdx;
-			public UInt16 NextOneIdx;
+			public ushort NextZeroIdx;
+			public ushort NextOneIdx;
 
-			public UInt16 Value;
+			public ushort Value;
 
 			public override string ToString()
 			{
 				return string.Format("[TreeNode Value: {0}, NextZeroIdx: {1}, NextOneIdx: {2}]",
-					this.Value, this.NextZeroIdx, this.NextOneIdx);
+					Value, NextZeroIdx, NextOneIdx);
 			}
 		}
 
@@ -907,7 +907,7 @@ namespace BestHTTP.Connections.HTTP2
 			throw new Exception("HuffmanEncoder - GetNext - unsupported bit: " + bit);
 		}
 
-		public static TableEntry GetEntryForCodePoint(UInt16 codePoint)
+		public static TableEntry GetEntryForCodePoint(ushort codePoint)
 		{
 			return StaticTable[codePoint];
 		}

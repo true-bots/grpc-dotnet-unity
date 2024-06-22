@@ -20,7 +20,7 @@ using System.Text;
 
 namespace BestHTTP.JSON.LitJson
 {
-	internal enum Condition
+	enum Condition
 	{
 		InArray,
 		InObject,
@@ -29,7 +29,7 @@ namespace BestHTTP.JSON.LitJson
 		Value
 	}
 
-	internal class WriterContext
+	class WriterContext
 	{
 		public int Count;
 		public bool InArray;
@@ -42,19 +42,19 @@ namespace BestHTTP.JSON.LitJson
 	{
 		#region Fields
 
-		private static readonly NumberFormatInfo number_format;
+		static readonly NumberFormatInfo number_format;
 
-		private WriterContext context;
-		private Stack<WriterContext> ctx_stack;
-		private bool has_reached_end;
-		private char[] hex_seq;
-		private int indentation;
-		private int indent_value;
-		private StringBuilder inst_string_builder;
-		private bool pretty_print;
-		private bool validate;
-		private bool lower_case_properties;
-		private TextWriter writer;
+		WriterContext context;
+		Stack<WriterContext> ctx_stack;
+		bool has_reached_end;
+		char[] hex_seq;
+		int indentation;
+		int indent_value;
+		StringBuilder inst_string_builder;
+		bool pretty_print;
+		bool validate;
+		bool lower_case_properties;
+		TextWriter writer;
 
 		#endregion
 
@@ -66,7 +66,7 @@ namespace BestHTTP.JSON.LitJson
 			get { return indent_value; }
 			set
 			{
-				indentation = (indentation / indent_value) * value;
+				indentation = indentation / indent_value * value;
 				indent_value = value;
 			}
 		}
@@ -120,7 +120,9 @@ namespace BestHTTP.JSON.LitJson
 		public JsonWriter(TextWriter writer)
 		{
 			if (writer == null)
+			{
 				throw new ArgumentNullException("writer");
+			}
 
 			this.writer = writer;
 
@@ -132,55 +134,75 @@ namespace BestHTTP.JSON.LitJson
 
 		#region Private Methods
 
-		private void DoValidation(Condition cond)
+		void DoValidation(Condition cond)
 		{
 			if (!context.ExpectingValue)
+			{
 				context.Count++;
+			}
 
 			if (!validate)
+			{
 				return;
+			}
 
 			if (has_reached_end)
+			{
 				throw new JsonException(
 					"A complete JSON symbol has already been written");
+			}
 
 			switch (cond)
 			{
 				case Condition.InArray:
 					if (!context.InArray)
+					{
 						throw new JsonException(
 							"Can't close an array here");
+					}
+
 					break;
 
 				case Condition.InObject:
 					if (!context.InObject || context.ExpectingValue)
+					{
 						throw new JsonException(
 							"Can't close an object here");
+					}
+
 					break;
 
 				case Condition.NotAProperty:
 					if (context.InObject && !context.ExpectingValue)
+					{
 						throw new JsonException(
 							"Expected a property");
+					}
+
 					break;
 
 				case Condition.Property:
 					if (!context.InObject || context.ExpectingValue)
+					{
 						throw new JsonException(
 							"Can't add a property here");
+					}
+
 					break;
 
 				case Condition.Value:
 					if (!context.InArray &&
 					    (!context.InObject || !context.ExpectingValue))
+					{
 						throw new JsonException(
 							"Can't add a value here");
+					}
 
 					break;
 			}
 		}
 
-		private void Init()
+		void Init()
 		{
 			has_reached_end = false;
 			hex_seq = new char[4];
@@ -195,7 +217,7 @@ namespace BestHTTP.JSON.LitJson
 			ctx_stack.Push(context);
 		}
 
-		private static void IntToHex(int n, char[] hex)
+		static void IntToHex(int n, char[] hex)
 		{
 			int num;
 
@@ -204,48 +226,62 @@ namespace BestHTTP.JSON.LitJson
 				num = n % 16;
 
 				if (num < 10)
+				{
 					hex[3 - i] = (char)('0' + num);
+				}
 				else
+				{
 					hex[3 - i] = (char)('A' + (num - 10));
+				}
 
 				n >>= 4;
 			}
 		}
 
-		private void Indent()
+		void Indent()
 		{
 			if (pretty_print)
+			{
 				indentation += indent_value;
+			}
 		}
 
 
-		private void Put(string str)
+		void Put(string str)
 		{
 			if (pretty_print && !context.ExpectingValue)
+			{
 				for (int i = 0; i < indentation; i++)
+				{
 					writer.Write(' ');
+				}
+			}
 
 			writer.Write(str);
 		}
 
-		private void PutNewline()
+		void PutNewline()
 		{
 			PutNewline(true);
 		}
 
-		private void PutNewline(bool add_comma)
+		void PutNewline(bool add_comma)
 		{
 			if (add_comma && !context.ExpectingValue &&
 			    context.Count > 1)
+			{
 				writer.Write(',');
+			}
 
 			if (pretty_print && !context.ExpectingValue)
+			{
 				writer.Write(Environment.NewLine);
+			}
 		}
 
-		private void PutString(string str)
+		void PutString(string str)
 		{
-			Put(String.Empty);
+			Put(string.Empty);
 
 			writer.Write('"');
 
@@ -296,10 +332,12 @@ namespace BestHTTP.JSON.LitJson
 			writer.Write('"');
 		}
 
-		private void Unindent()
+		void Unindent()
 		{
 			if (pretty_print)
+			{
 				indentation -= indent_value;
+			}
 		}
 
 		#endregion
@@ -308,7 +346,9 @@ namespace BestHTTP.JSON.LitJson
 		public override string ToString()
 		{
 			if (inst_string_builder == null)
-				return String.Empty;
+			{
+				return string.Empty;
+			}
 
 			return inst_string_builder.ToString();
 		}
@@ -322,7 +362,9 @@ namespace BestHTTP.JSON.LitJson
 			ctx_stack.Push(context);
 
 			if (inst_string_builder != null)
+			{
 				inst_string_builder.Remove(0, inst_string_builder.Length);
+			}
 		}
 
 		public void Write(bool boolean)
@@ -355,7 +397,9 @@ namespace BestHTTP.JSON.LitJson
 
 			if (str.IndexOf('.') == -1 &&
 			    str.IndexOf('E') == -1)
+			{
 				writer.Write(".0");
+			}
 
 			context.ExpectingValue = false;
 		}
@@ -397,9 +441,13 @@ namespace BestHTTP.JSON.LitJson
 			PutNewline();
 
 			if (str == null)
+			{
 				Put("null");
+			}
 			else
+			{
 				PutString(str);
+			}
 
 			context.ExpectingValue = false;
 		}
@@ -422,7 +470,9 @@ namespace BestHTTP.JSON.LitJson
 
 			ctx_stack.Pop();
 			if (ctx_stack.Count == 1)
+			{
 				has_reached_end = true;
+			}
 			else
 			{
 				context = ctx_stack.Peek();
@@ -454,7 +504,9 @@ namespace BestHTTP.JSON.LitJson
 
 			ctx_stack.Pop();
 			if (ctx_stack.Count == 1)
+			{
 				has_reached_end = true;
+			}
 			else
 			{
 				context = ctx_stack.Peek();
@@ -483,7 +535,7 @@ namespace BestHTTP.JSON.LitJson
 		{
 			DoValidation(Condition.Property);
 			PutNewline();
-			string propertyName = (property_name == null || !lower_case_properties)
+			string propertyName = property_name == null || !lower_case_properties
 				? property_name
 				: property_name.ToLowerInvariant();
 
@@ -492,17 +544,23 @@ namespace BestHTTP.JSON.LitJson
 			if (pretty_print)
 			{
 				if (propertyName.Length > context.Padding)
+				{
 					context.Padding = propertyName.Length;
+				}
 
 				for (int i = context.Padding - propertyName.Length;
 				     i >= 0;
 				     i--)
+				{
 					writer.Write(' ');
+				}
 
 				writer.Write(": ");
 			}
 			else
+			{
 				writer.Write(':');
+			}
 
 			context.ExpectingValue = true;
 		}

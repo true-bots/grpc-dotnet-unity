@@ -4,7 +4,7 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal abstract class Asn1Type
+	abstract class Asn1Type
 	{
 		internal readonly Type m_platformType;
 

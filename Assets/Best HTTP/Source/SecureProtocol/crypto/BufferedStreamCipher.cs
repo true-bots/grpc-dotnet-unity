@@ -8,14 +8,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	public class BufferedStreamCipher
 		: BufferedCipherBase
 	{
-		private readonly IStreamCipher m_cipher;
+		readonly IStreamCipher m_cipher;
 
 		public BufferedStreamCipher(IStreamCipher cipher)
 		{
 			if (cipher == null)
+			{
 				throw new ArgumentNullException("cipher");
+			}
 
-			this.m_cipher = cipher;
+			m_cipher = cipher;
 		}
 
 		public override string AlgorithmName
@@ -56,7 +58,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public override int ProcessByte(byte input, byte[] output, int outOff)
 		{
 			if (outOff >= output.Length)
+			{
 				throw new DataLengthException("output buffer too short");
+			}
 
 			output[outOff] = m_cipher.ReturnByte(input);
 			return 1;
@@ -73,7 +77,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public override byte[] ProcessBytes(byte[] input, int inOff, int length)
 		{
 			if (length < 1)
+			{
 				return null;
+			}
 
 			byte[] output = new byte[length];
 			m_cipher.ProcessBytes(input, inOff, length, output, 0);
@@ -83,7 +89,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public override int ProcessBytes(byte[] input, int inOff, int length, byte[] output, int outOff)
 		{
 			if (length < 1)
+			{
 				return 0;
+			}
 
 			m_cipher.ProcessBytes(input, inOff, length, output, outOff);
 			return length;
@@ -107,7 +115,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public override byte[] DoFinal(byte[] input, int inOff, int length)
 		{
 			if (length < 1)
+			{
 				return EmptyBuffer;
+			}
 
 			byte[] output = new byte[length];
 			m_cipher.ProcessBytes(input, inOff, length, output, 0);

@@ -16,12 +16,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class Rfc3394WrapEngine
 		: IWrapper
 	{
-		private readonly IBlockCipher engine;
+		readonly IBlockCipher engine;
 
-		private KeyParameter param;
-		private bool forWrapping;
+		KeyParameter param;
+		bool forWrapping;
 
-		private byte[] iv =
+		byte[] iv =
 		{
 			0xa6, 0xa6, 0xa6, 0xa6,
 			0xa6, 0xa6, 0xa6, 0xa6
@@ -46,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			if (parameters is KeyParameter)
 			{
-				this.param = (KeyParameter)parameters;
+				param = (KeyParameter)parameters;
 			}
 			else if (parameters is ParametersWithIV)
 			{
@@ -54,10 +54,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				byte[] iv = pIV.GetIV();
 
 				if (iv.Length != 8)
+				{
 					throw new ArgumentException("IV length not equal to 8", "parameters");
+				}
 
 				this.iv = iv;
-				this.param = (KeyParameter)pIV.Parameters;
+				param = (KeyParameter)pIV.Parameters;
 			}
 			else
 			{
@@ -82,7 +84,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			int n = inLen / 8;
 
-			if ((n * 8) != inLen)
+			if (n * 8 != inLen)
 			{
 				throw new DataLengthException("wrap data must be a multiple of 8 bytes");
 			}
@@ -132,7 +134,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			int n = inLen / 8;
 
-			if ((n * 8) != inLen)
+			if (n * 8 != inLen)
 			{
 				throw new InvalidCipherTextException("unwrap data must be a multiple of 8 bytes");
 			}
@@ -171,7 +173,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			if (!Arrays.ConstantTimeAreEqual(a, iv))
+			{
 				throw new InvalidCipherTextException("checksum failed");
+			}
 
 			return block;
 		}

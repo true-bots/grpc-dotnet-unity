@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 
 namespace BestHTTP.PlatformSupport.Memory
 {
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	public static class BufferPool
 	{
 		public static readonly byte[] NoData = new byte[0];
@@ -27,11 +27,13 @@ namespace BestHTTP.PlatformSupport.Memory
 
 				// When set to non-enabled remove all stored entries
 				if (!_isEnabled)
+				{
 					Clear();
+				}
 			}
 		}
 
-		private static volatile bool _isEnabled = true;
+		static volatile bool _isEnabled = true;
 
 		/// <summary>
 		/// Buffer entries that released back to the pool and older than this value are moved when next maintenance is triggered.
@@ -69,21 +71,21 @@ namespace BestHTTP.PlatformSupport.Memory
 		public static bool IsDoubleReleaseCheckEnabled = false;
 
 		// It must be sorted by buffer size!
-		private readonly static List<BufferStore> FreeBuffers = new List<BufferStore>();
-		private static DateTime lastMaintenance = DateTime.MinValue;
+		static readonly List<BufferStore> FreeBuffers = new List<BufferStore>();
+		static DateTime lastMaintenance = DateTime.MinValue;
 
 		// Statistics
-		private static long PoolSize = 0;
-		private static long GetBuffers = 0;
-		private static long ReleaseBuffers = 0;
-		private static long Borrowed = 0;
-		private static long ArrayAllocations = 0;
+		static long PoolSize = 0;
+		static long GetBuffers = 0;
+		static long ReleaseBuffers = 0;
+		static long Borrowed = 0;
+		static long ArrayAllocations = 0;
 
 #if BESTHTTP_ENABLE_BUFFERPOOL_BORROWED_BUFFERS_COLLECTION
         private static Dictionary<byte[], string> BorrowedBuffers = new Dictionary<byte[], string>();
 #endif
 
-		private readonly static ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+		static readonly ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
 		static BufferPool()
 		{
@@ -100,24 +102,34 @@ namespace BestHTTP.PlatformSupport.Memory
 		public static byte[] Get(long size, bool canBeLarger)
 		{
 			if (!_isEnabled)
+			{
 				return new byte[size];
+			}
 
 			// Return a fix reference for 0 length requests. Any resize call (even Array.Resize) creates a new reference
 			//  so we are safe to expose it to multiple callers.
 			if (size == 0)
-				return BufferPool.NoData;
+			{
+				return NoData;
+			}
 
 			if (canBeLarger)
 			{
 				if (size < MinBufferSize)
+				{
 					size = MinBufferSize;
+				}
 				else if (!IsPowerOfTwo(size))
+				{
 					size = NextPowerOf2(size);
+				}
 			}
 			else
 			{
 				if (size < MinBufferSize)
+				{
 					return new byte[size];
+				}
 			}
 
 			if (FreeBuffers.Count == 0)
@@ -125,7 +137,7 @@ namespace BestHTTP.PlatformSupport.Memory
 				Interlocked.Add(ref Borrowed, size);
 				Interlocked.Increment(ref ArrayAllocations);
 
-				var result = new byte[size];
+				byte[] result = new byte[size];
 
 #if BESTHTTP_ENABLE_BUFFERPOOL_BORROWED_BUFFERS_COLLECTION
                 lock (FreeBuffers)
@@ -142,7 +154,7 @@ namespace BestHTTP.PlatformSupport.Memory
 				Interlocked.Add(ref Borrowed, size);
 				Interlocked.Increment(ref ArrayAllocations);
 
-				var result = new byte[size];
+				byte[] result = new byte[size];
 
 #if BESTHTTP_ENABLE_BUFFERPOOL_BORROWED_BUFFERS_COLLECTION
                 lock (FreeBuffers)
@@ -185,7 +197,9 @@ namespace BestHTTP.PlatformSupport.Memory
 		public static void Release(byte[] buffer)
 		{
 			if (!_isEnabled || buffer == null)
+			{
 				return;
+			}
 
 			int size = buffer.Length;
 
@@ -197,13 +211,17 @@ namespace BestHTTP.PlatformSupport.Memory
 			Interlocked.Add(ref Borrowed, -size);
 
 			if (size == 0 || size < MinBufferSize || size > MaxBufferSize)
+			{
 				return;
+			}
 
 			using (new WriteLock(rwLock))
 			{
-				var ps = Interlocked.Read(ref PoolSize);
+				long ps = Interlocked.Read(ref PoolSize);
 				if (ps + size > MaxPoolSize)
+				{
 					return;
+				}
 
 				Interlocked.Add(ref PoolSize, size);
 
@@ -224,16 +242,21 @@ namespace BestHTTP.PlatformSupport.Memory
 				return buffer;
 			}
 
-			byte[] newBuf = BufferPool.Get(newSize, canBeLarger);
+			byte[] newBuf = Get(newSize, canBeLarger);
 			if (buffer != null)
 			{
 				if (!clear)
+				{
 					Array.Copy(buffer, 0, newBuf, 0, Math.Min(newBuf.Length, buffer.Length));
-				BufferPool.Release(buffer);
+				}
+
+				Release(buffer);
 			}
 
 			if (clear)
+			{
 				Array.Clear(newBuf, 0, newSize);
+			}
 
 			return buffer = newBuf;
 		}
@@ -290,9 +313,13 @@ namespace BestHTTP.PlatformSupport.Memory
 
 				stats.FreeBufferCount = FreeBuffers.Count;
 				if (stats.FreeBufferStats == null)
+				{
 					stats.FreeBufferStats = new List<BufferStats>(FreeBuffers.Count);
+				}
 				else
+				{
 					stats.FreeBufferStats.Clear();
+				}
 
 				for (int i = 0; i < FreeBuffers.Count; ++i)
 				{
@@ -306,7 +333,7 @@ namespace BestHTTP.PlatformSupport.Memory
 					stats.FreeBufferStats.Add(bufferStats);
 				}
 
-				stats.NextMaintenance = (lastMaintenance + RunMaintenanceEvery) - DateTime.UtcNow;
+				stats.NextMaintenance = lastMaintenance + RunMaintenanceEvery - DateTime.UtcNow;
 			}
 		}
 #endif
@@ -330,7 +357,10 @@ namespace BestHTTP.PlatformSupport.Memory
 		{
 			DateTime now = DateTime.UtcNow;
 			if (!_isEnabled || lastMaintenance + RunMaintenanceEvery > now)
+			{
 				return;
+			}
+
 			lastMaintenance = now;
 
 			DateTime olderThan = now - RemoveOlderThan;
@@ -358,7 +388,9 @@ namespace BestHTTP.PlatformSupport.Memory
 					}
 
 					if (RemoveEmptyLists && buffers.Count == 0)
+					{
 						FreeBuffers.RemoveAt(i--);
+					}
 				}
 			}
 		}
@@ -380,14 +412,17 @@ namespace BestHTTP.PlatformSupport.Memory
 		{
 			long pow = 1;
 			while (pow <= x)
+			{
 				pow *= 2;
+			}
+
 			return pow;
 		}
 
 #if NET_STANDARD_2_0 || NETFX_CORE
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-		private static BufferDesc FindFreeBuffer(long size, bool canBeLarger)
+		static BufferDesc FindFreeBuffer(long size, bool canBeLarger)
 		{
 			// Previously it was an upgradable read lock, and later a write lock around store.buffers.RemoveAt.
 			// However, checking store.buffers.Count in the if statement, and then get the last buffer and finally write lock the RemoveAt call
@@ -427,7 +462,7 @@ namespace BestHTTP.PlatformSupport.Memory
 #if NET_STANDARD_2_0 || NETFX_CORE
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-		private static void AddFreeBuffer(byte[] buffer)
+		static void AddFreeBuffer(byte[] buffer)
 		{
 			int bufferLength = buffer.Length;
 
@@ -442,15 +477,17 @@ namespace BestHTTP.PlatformSupport.Memory
 					//  count of the store's elements.
 
 					if (IsDoubleReleaseCheckEnabled)
+					{
 						for (int cv = 0; cv < store.buffers.Count; ++cv)
 						{
-							var entry = store.buffers[cv];
-							if (System.Object.ReferenceEquals(entry.buffer, buffer))
+							BufferDesc entry = store.buffers[cv];
+							if (ReferenceEquals(entry.buffer, buffer))
 							{
 								HTTPManager.Logger.Error("BufferPool", string.Format("Buffer ({0}) already added to the pool!", entry.ToString()));
 								return;
 							}
 						}
+					}
 
 					store.buffers.Add(new BufferDesc(buffer));
 					return;

@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class ChaCha20Poly1305
 		: IAeadCipher
 	{
-		private enum State
+		enum State
 		{
 			Uninitialized = 0,
 			EncInit = 1,
@@ -22,32 +22,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			DecInit = 5,
 			DecAad = 6,
 			DecData = 7,
-			DecFinal = 8,
+			DecFinal = 8
 		}
 
-		private const int BufSize = 64;
-		private const int KeySize = 32;
-		private const int NonceSize = 12;
-		private const int MacSize = 16;
-		private static readonly byte[] Zeroes = new byte[MacSize - 1];
+		const int BufSize = 64;
+		const int KeySize = 32;
+		const int NonceSize = 12;
+		const int MacSize = 16;
+		static readonly byte[] Zeroes = new byte[MacSize - 1];
 
-		private const ulong AadLimit = ulong.MaxValue;
-		private const ulong DataLimit = ((1UL << 32) - 1) * 64;
+		const ulong AadLimit = ulong.MaxValue;
+		const ulong DataLimit = ((1UL << 32) - 1) * 64;
 
-		private readonly ChaCha7539Engine mChacha20;
-		private readonly IMac mPoly1305;
+		readonly ChaCha7539Engine mChacha20;
+		readonly IMac mPoly1305;
 
-		private readonly byte[] mKey = new byte[KeySize];
-		private readonly byte[] mNonce = new byte[NonceSize];
-		private readonly byte[] mBuf = new byte[BufSize + MacSize];
-		private readonly byte[] mMac = new byte[MacSize];
+		readonly byte[] mKey = new byte[KeySize];
+		readonly byte[] mNonce = new byte[NonceSize];
+		readonly byte[] mBuf = new byte[BufSize + MacSize];
+		readonly byte[] mMac = new byte[MacSize];
 
-		private byte[] mInitialAad;
+		byte[] mInitialAad;
 
-		private ulong mAadCount;
-		private ulong mDataCount;
-		private State mState = State.Uninitialized;
-		private int mBufPos;
+		ulong mAadCount;
+		ulong mDataCount;
+		State mState = State.Uninitialized;
+		int mBufPos;
 
 		public ChaCha20Poly1305()
 			: this(new Poly1305())
@@ -57,12 +57,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		public ChaCha20Poly1305(IMac poly1305)
 		{
 			if (null == poly1305)
+			{
 				throw new ArgumentNullException("poly1305");
-			if (MacSize != poly1305.GetMacSize())
-				throw new ArgumentException("must be a 128-bit MAC", "poly1305");
+			}
 
-			this.mChacha20 = new ChaCha7539Engine();
-			this.mPoly1305 = poly1305;
+			if (MacSize != poly1305.GetMacSize())
+			{
+				throw new ArgumentException("must be a 128-bit MAC", "poly1305");
+			}
+
+			mChacha20 = new ChaCha7539Engine();
+			mPoly1305 = poly1305;
 		}
 
 		public virtual string AlgorithmName
@@ -81,14 +86,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				AeadParameters aeadParams = (AeadParameters)parameters;
 
 				int macSizeBits = aeadParams.MacSize;
-				if ((MacSize * 8) != macSizeBits)
+				if (MacSize * 8 != macSizeBits)
+				{
 					throw new ArgumentException("Invalid value for MAC size: " + macSizeBits);
+				}
 
 				initKeyParam = aeadParams.Key;
 				initNonce = aeadParams.GetNonce();
 				chacha20Params = new ParametersWithIV(initKeyParam, initNonce);
 
-				this.mInitialAad = aeadParams.GetAssociatedText();
+				mInitialAad = aeadParams.GetAssociatedText();
 			}
 			else if (parameters is ParametersWithIV)
 			{
@@ -98,7 +105,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				initNonce = ivParams.GetIV();
 				chacha20Params = ivParams;
 
-				this.mInitialAad = null;
+				mInitialAad = null;
 			}
 			else
 			{
@@ -109,23 +116,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			if (null == initKeyParam)
 			{
 				if (State.Uninitialized == mState)
+				{
 					throw new ArgumentException("Key must be specified in initial init");
+				}
 			}
 			else
 			{
 				if (KeySize != initKeyParam.GetKey().Length)
+				{
 					throw new ArgumentException("Key must be 256 bits");
+				}
 			}
 
 			// Validate nonce
 			if (null == initNonce || NonceSize != initNonce.Length)
+			{
 				throw new ArgumentException("Nonce must be 96 bits");
+			}
 
 			// Check for encryption with reused nonce
 			if (State.Uninitialized != mState && forEncryption && Arrays.AreEqual(mNonce, initNonce))
 			{
 				if (null == initKeyParam || Arrays.AreEqual(mKey, initKeyParam.GetKey()))
+				{
 					throw new ArgumentException("cannot reuse nonce for ChaCha20Poly1305 encryption");
+				}
 			}
 
 			if (null != initKeyParam)
@@ -137,7 +152,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 
 			mChacha20.Init(true, chacha20Params);
 
-			this.mState = forEncryption ? State.EncInit : State.DecInit;
+			mState = forEncryption ? State.EncInit : State.DecInit;
 
 			Reset(true, false);
 		}
@@ -180,32 +195,41 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 					throw new InvalidOperationException();
 			}
 
-			return total - (total % BufSize);
+			return total - total % BufSize;
 		}
 
 		public virtual void ProcessAadByte(byte input)
 		{
 			CheckAad();
 
-			this.mAadCount = IncrementCount(mAadCount, 1, AadLimit);
+			mAadCount = IncrementCount(mAadCount, 1, AadLimit);
 			mPoly1305.Update(input);
 		}
 
 		public virtual void ProcessAadBytes(byte[] inBytes, int inOff, int len)
 		{
 			if (null == inBytes)
+			{
 				throw new ArgumentNullException("inBytes");
+			}
+
 			if (inOff < 0)
+			{
 				throw new ArgumentException("cannot be negative", "inOff");
+			}
+
 			if (len < 0)
+			{
 				throw new ArgumentException("cannot be negative", "len");
+			}
+
 			Check.DataLength(inBytes, inOff, len, "input buffer too short");
 
 			CheckAad();
 
 			if (len > 0)
 			{
-				this.mAadCount = IncrementCount(mAadCount, (uint)len, AadLimit);
+				mAadCount = IncrementCount(mAadCount, (uint)len, AadLimit);
 				mPoly1305.BlockUpdate(inBytes, inOff, len);
 			}
 		}
@@ -241,7 +265,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 						ProcessBlock(mBuf, 0, outBytes, outOff);
 #endif
 						Array.Copy(mBuf, BufSize, mBuf, 0, MacSize);
-						this.mBufPos = MacSize;
+						mBufPos = MacSize;
 						return BufSize;
 					}
 
@@ -258,7 +282,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 						ProcessBlock(mBuf, 0, outBytes, outOff);
 #endif
 						mPoly1305.BlockUpdate(outBytes, outOff, BufSize);
-						this.mBufPos = 0;
+						mBufPos = 0;
 						return BufSize;
 					}
 
@@ -312,7 +336,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		public virtual int ProcessBytes(byte[] inBytes, int inOff, int len, byte[] outBytes, int outOff)
 		{
 			if (null == inBytes)
+			{
 				throw new ArgumentNullException("inBytes");
+			}
+
 			/*
 			 * Following bc-java, we allow null when no output is expected (e.g. based on a
 			 * GetUpdateOutputSize call).
@@ -323,12 +350,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			}
 
 			if (inOff < 0)
+			{
 				throw new ArgumentException("cannot be negative", "inOff");
+			}
+
 			if (len < 0)
+			{
 				throw new ArgumentException("cannot be negative", "len");
+			}
+
 			Check.DataLength(inBytes, inOff, len, "input buffer too short");
 			if (outOff < 0)
+			{
 				throw new ArgumentException("cannot be negative", "outOff");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return ProcessBytes(inBytes.AsSpan(inOff, len), Spans.FromNullable(outBytes, outOff));
@@ -558,9 +593,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		public virtual int DoFinal(byte[] outBytes, int outOff)
 		{
 			if (null == outBytes)
+			{
 				throw new ArgumentNullException("outBytes");
+			}
+
 			if (outOff < 0)
+			{
 				throw new ArgumentException("cannot be negative", "outOff");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return DoFinal(outBytes.AsSpan(outOff));
@@ -576,7 +616,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				case State.DecData:
 				{
 					if (mBufPos < MacSize)
+					{
 						throw new InvalidCipherTextException("data too short");
+					}
 
 					resultLen = mBufPos - MacSize;
 
@@ -591,7 +633,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 					FinishData(State.DecFinal);
 
 					if (!Arrays.ConstantTimeAreEqual(MacSize, mMac, 0, mBuf, resultLen))
+					{
 						throw new InvalidCipherTextException("mac check in ChaCha20Poly1305 failed");
+					}
 
 					break;
 				}
@@ -692,15 +736,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			Reset(true, true);
 		}
 
-		private void CheckAad()
+		void CheckAad()
 		{
 			switch (mState)
 			{
 				case State.DecInit:
-					this.mState = State.DecAad;
+					mState = State.DecAad;
 					break;
 				case State.EncInit:
-					this.mState = State.EncAad;
+					mState = State.EncAad;
 					break;
 				case State.DecAad:
 				case State.EncAad:
@@ -712,7 +756,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			}
 		}
 
-		private void CheckData()
+		void CheckData()
 		{
 			switch (mState)
 			{
@@ -734,14 +778,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			}
 		}
 
-		private void FinishAad(State nextState)
+		void FinishAad(State nextState)
 		{
 			PadMac(mAadCount);
 
-			this.mState = nextState;
+			mState = nextState;
 		}
 
-		private void FinishData(State nextState)
+		void FinishData(State nextState)
 		{
 			PadMac(mDataCount);
 
@@ -752,18 +796,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 
 			mPoly1305.DoFinal(mMac, 0);
 
-			this.mState = nextState;
+			mState = nextState;
 		}
 
-		private ulong IncrementCount(ulong count, uint increment, ulong limit)
+		ulong IncrementCount(ulong count, uint increment, ulong limit)
 		{
-			if (count > (limit - increment))
+			if (count > limit - increment)
+			{
 				throw new InvalidOperationException("Limit exceeded");
+			}
 
 			return count + increment;
 		}
 
-		private void InitMac()
+		void InitMac()
 		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             Span<byte> firstBlock = stackalloc byte[64];
@@ -790,7 +836,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 #endif
 		}
 
-		private void PadMac(ulong count)
+		void PadMac(ulong count)
 		{
 			int partial = (int)count & (MacSize - 1);
 			if (0 != partial)
@@ -827,35 +873,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
             this.mDataCount = IncrementCount(mDataCount, (uint)input.Length, DataLimit);
         }
 #else
-		private void ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
+		void ProcessBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			Check.OutputLength(outBytes, outOff, 64, "output buffer too short");
 
 			mChacha20.ProcessBlock(inBytes, inOff, outBytes, outOff);
 
-			this.mDataCount = IncrementCount(mDataCount, 64U, DataLimit);
+			mDataCount = IncrementCount(mDataCount, 64U, DataLimit);
 		}
 
-		private void ProcessBlocks2(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
+		void ProcessBlocks2(byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			Check.OutputLength(outBytes, outOff, 128, "output buffer too short");
 
 			mChacha20.ProcessBlocks2(inBytes, inOff, outBytes, outOff);
 
-			this.mDataCount = IncrementCount(mDataCount, 128U, DataLimit);
+			mDataCount = IncrementCount(mDataCount, 128U, DataLimit);
 		}
 
-		private void ProcessData(byte[] inBytes, int inOff, int inLen, byte[] outBytes, int outOff)
+		void ProcessData(byte[] inBytes, int inOff, int inLen, byte[] outBytes, int outOff)
 		{
 			Check.OutputLength(outBytes, outOff, inLen, "output buffer too short");
 
 			mChacha20.ProcessBytes(inBytes, inOff, inLen, outBytes, outOff);
 
-			this.mDataCount = IncrementCount(mDataCount, (uint)inLen, DataLimit);
+			mDataCount = IncrementCount(mDataCount, (uint)inLen, DataLimit);
 		}
 #endif
 
-		private void Reset(bool clearMac, bool resetCipher)
+		void Reset(bool clearMac, bool resetCipher)
 		{
 			Array.Clear(mBuf, 0, mBuf.Length);
 
@@ -864,9 +910,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				Array.Clear(mMac, 0, mMac.Length);
 			}
 
-			this.mAadCount = 0UL;
-			this.mDataCount = 0UL;
-			this.mBufPos = 0;
+			mAadCount = 0UL;
+			mDataCount = 0UL;
+			mBufPos = 0;
 
 			switch (mState)
 			{
@@ -876,12 +922,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				case State.DecAad:
 				case State.DecData:
 				case State.DecFinal:
-					this.mState = State.DecInit;
+					mState = State.DecInit;
 					break;
 				case State.EncAad:
 				case State.EncData:
 				case State.EncFinal:
-					this.mState = State.EncFinal;
+					mState = State.EncFinal;
 					return;
 				default:
 					throw new InvalidOperationException();

@@ -14,7 +14,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(Asn1OctetString), Asn1Tags.OctetString)
+			Meta() : base(typeof(Asn1OctetString), Asn1Tags.OctetString)
 			{
 			}
 
@@ -40,16 +40,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1OctetString GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is Asn1OctetString asn1OctetString)
+			{
 				return asn1OctetString;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is Asn1OctetString converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -63,7 +69,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -86,7 +92,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal Asn1OctetString(byte[] contents)
 		{
 			if (null == contents)
+			{
 				throw new ArgumentNullException("contents");
+			}
 
 			this.contents = contents;
 		}
@@ -117,7 +125,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			DerOctetString other = asn1Object as DerOctetString;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Arrays.AreEqual(GetOctets(), other.GetOctets());
 		}

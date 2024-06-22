@@ -18,8 +18,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	{
 		internal static readonly CmsEnvelopedHelper Instance = new CmsEnvelopedHelper();
 
-		private static readonly IDictionary<string, int> KeySizes = new Dictionary<string, int>();
-		private static readonly IDictionary<string, string> BaseCipherNames = new Dictionary<string, string>();
+		static readonly IDictionary<string, int> KeySizes = new Dictionary<string, int>();
+		static readonly IDictionary<string, string> BaseCipherNames = new Dictionary<string, string>();
 
 		static CmsEnvelopedHelper()
 		{
@@ -34,7 +34,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			BaseCipherNames.Add(CmsEnvelopedGenerator.Aes256Cbc, "AES");
 		}
 
-		private string GetAsymmetricEncryptionAlgName(
+		string GetAsymmetricEncryptionAlgName(
 			string encryptionAlgOid)
 		{
 			if (Asn1.Pkcs.PkcsObjectIdentifiers.RsaEncryption.Id.Equals(encryptionAlgOid))
@@ -80,10 +80,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal string GetRfc3211WrapperName(string oid)
 		{
 			if (oid == null)
+			{
 				throw new ArgumentNullException(nameof(oid));
+			}
 
-			if (!BaseCipherNames.TryGetValue(oid, out var alg))
+			if (!BaseCipherNames.TryGetValue(oid, out string alg))
+			{
 				throw new ArgumentException("no name for " + oid, nameof(oid));
+			}
 
 			return alg + "RFC3211Wrap";
 		}
@@ -91,10 +95,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal int GetKeySize(string oid)
 		{
 			if (oid == null)
+			{
 				throw new ArgumentNullException(nameof(oid));
+			}
 
-			if (!KeySizes.TryGetValue(oid, out var keySize))
+			if (!KeySizes.TryGetValue(oid, out int keySize))
+			{
 				throw new ArgumentException("no keysize for " + oid, "oid");
+			}
 
 			return keySize;
 		}
@@ -102,7 +110,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal static RecipientInformationStore BuildRecipientInformationStore(
 			Asn1Set recipientInfos, CmsSecureReadable secureReadable)
 		{
-			var infos = new List<RecipientInformation>();
+			List<RecipientInformation> infos = new List<RecipientInformation>();
 			for (int i = 0; i != recipientInfos.Count; i++)
 			{
 				RecipientInfo info = RecipientInfo.GetInstance(recipientInfos[i]);
@@ -113,7 +121,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return new RecipientInformationStore(infos);
 		}
 
-		private static void ReadRecipientInfo(IList<RecipientInformation> infos, RecipientInfo info,
+		static void ReadRecipientInfo(IList<RecipientInformation> infos, RecipientInfo info,
 			CmsSecureReadable secureReadable)
 		{
 			Asn1Encodable recipInfo = info.Info;
@@ -137,9 +145,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal class CmsAuthenticatedSecureReadable : CmsSecureReadable
 		{
-			private AlgorithmIdentifier algorithm;
-			private IMac mac;
-			private CmsReadable readable;
+			AlgorithmIdentifier algorithm;
+			IMac mac;
+			CmsReadable readable;
 
 			internal CmsAuthenticatedSecureReadable(AlgorithmIdentifier algorithm, CmsReadable readable)
 			{
@@ -149,22 +157,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 			public AlgorithmIdentifier Algorithm
 			{
-				get { return this.algorithm; }
+				get { return algorithm; }
 			}
 
 			public object CryptoObject
 			{
-				get { return this.mac; }
+				get { return mac; }
 			}
 
 			public CmsReadable GetReadable(KeyParameter sKey)
 			{
-				string macAlg = this.algorithm.Algorithm.Id;
+				string macAlg = algorithm.Algorithm.Id;
 //				Asn1Object sParams = this.algorithm.Parameters.ToAsn1Object();
 
 				try
 				{
-					this.mac = MacUtilities.GetMac(macAlg);
+					mac = MacUtilities.GetMac(macAlg);
 
 					// FIXME Support for MAC algorithm parameters similar to cipher parameters
 //						ASN1Object sParams = (ASN1Object)macAlg.getParameters();
@@ -222,7 +230,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					return new CmsProcessableInputStream(
 						new TeeInputStream(
 							readable.GetInputStream(),
-							new MacSink(this.mac)));
+							new MacSink(mac)));
 				}
 				catch (IOException e)
 				{
@@ -233,9 +241,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal class CmsEnvelopedSecureReadable : CmsSecureReadable
 		{
-			private AlgorithmIdentifier algorithm;
-			private IBufferedCipher cipher;
-			private CmsReadable readable;
+			AlgorithmIdentifier algorithm;
+			IBufferedCipher cipher;
+			CmsReadable readable;
 
 			internal CmsEnvelopedSecureReadable(AlgorithmIdentifier algorithm, CmsReadable readable)
 			{
@@ -245,21 +253,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 			public AlgorithmIdentifier Algorithm
 			{
-				get { return this.algorithm; }
+				get { return algorithm; }
 			}
 
 			public object CryptoObject
 			{
-				get { return this.cipher; }
+				get { return cipher; }
 			}
 
 			public CmsReadable GetReadable(KeyParameter sKey)
 			{
 				try
 				{
-					this.cipher = CipherUtilities.GetCipher(this.algorithm.Algorithm);
+					cipher = CipherUtilities.GetCipher(algorithm.Algorithm);
 
-					Asn1Encodable asn1Enc = this.algorithm.Parameters;
+					Asn1Encodable asn1Enc = algorithm.Parameters;
 					Asn1Object asn1Params = asn1Enc == null ? null : asn1Enc.ToAsn1Object();
 
 					ICipherParameters cipherParameters = sKey;
@@ -267,14 +275,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					if (asn1Params != null && !(asn1Params is Asn1Null))
 					{
 						cipherParameters = ParameterUtilities.GetCipherParameters(
-							this.algorithm.Algorithm, cipherParameters, asn1Params);
+							algorithm.Algorithm, cipherParameters, asn1Params);
 					}
 					else
 					{
-						string alg = this.algorithm.Algorithm.Id;
-						if (alg.Equals(CmsEnvelopedDataGenerator.DesEde3Cbc)
-						    || alg.Equals(CmsEnvelopedDataGenerator.IdeaCbc)
-						    || alg.Equals(CmsEnvelopedDataGenerator.Cast5Cbc))
+						string alg = algorithm.Algorithm.Id;
+						if (alg.Equals(CmsEnvelopedGenerator.DesEde3Cbc)
+						    || alg.Equals(CmsEnvelopedGenerator.IdeaCbc)
+						    || alg.Equals(CmsEnvelopedGenerator.Cast5Cbc))
 						{
 							cipherParameters = new ParametersWithIV(cipherParameters, new byte[8]);
 						}

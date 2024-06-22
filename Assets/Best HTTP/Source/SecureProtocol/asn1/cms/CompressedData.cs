@@ -19,15 +19,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class CompressedData
 		: Asn1Encodable
 	{
-		private DerInteger version;
-		private AlgorithmIdentifier compressionAlgorithm;
-		private ContentInfo encapContentInfo;
+		DerInteger version;
+		AlgorithmIdentifier compressionAlgorithm;
+		ContentInfo encapContentInfo;
 
 		public CompressedData(
 			AlgorithmIdentifier compressionAlgorithm,
 			ContentInfo encapContentInfo)
 		{
-			this.version = new DerInteger(0);
+			version = new DerInteger(0);
 			this.compressionAlgorithm = compressionAlgorithm;
 			this.encapContentInfo = encapContentInfo;
 		}
@@ -35,9 +35,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public CompressedData(
 			Asn1Sequence seq)
 		{
-			this.version = (DerInteger)seq[0];
-			this.compressionAlgorithm = AlgorithmIdentifier.GetInstance(seq[1]);
-			this.encapContentInfo = ContentInfo.GetInstance(seq[2]);
+			version = (DerInteger)seq[0];
+			compressionAlgorithm = AlgorithmIdentifier.GetInstance(seq[1]);
+			encapContentInfo = ContentInfo.GetInstance(seq[2]);
 		}
 
 		/**
@@ -66,12 +66,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is CompressedData)
+			{
 				return (CompressedData)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CompressedData((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid CompressedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid CompressedData: " + Platform.GetTypeName(obj));
 		}
 
 		public DerInteger Version

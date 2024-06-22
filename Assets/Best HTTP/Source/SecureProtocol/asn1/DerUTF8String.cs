@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerUtf8String), Asn1Tags.Utf8String)
+			Meta() : base(typeof(DerUtf8String), Asn1Tags.Utf8String)
 			{
 			}
 
@@ -34,16 +34,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerUtf8String GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerUtf8String derUtf8String)
+			{
 				return derUtf8String;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerUtf8String converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -57,7 +63,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj));
 		}
 
 		/**
@@ -72,7 +78,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (DerUtf8String)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly byte[] m_contents;
+		readonly byte[] m_contents;
 
 		public DerUtf8String(string str)
 			: this(Strings.ToUtf8ByteArray(str), false)
@@ -87,7 +93,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal DerUtf8String(byte[] contents, bool clone)
 		{
 			if (null == contents)
+			{
 				throw new ArgumentNullException("contents");
+			}
 
 			m_contents = clone ? Arrays.Clone(contents) : contents;
 		}
@@ -101,7 +109,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			DerUtf8String that = asn1Object as DerUtf8String;
 			return null != that
-			       && Arrays.AreEqual(this.m_contents, that.m_contents);
+			       && Arrays.AreEqual(m_contents, that.m_contents);
 		}
 
 		protected override int Asn1GetHashCode()

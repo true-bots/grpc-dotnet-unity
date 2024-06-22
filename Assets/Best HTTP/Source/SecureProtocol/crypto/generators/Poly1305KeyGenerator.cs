@@ -23,8 +23,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class Poly1305KeyGenerator
 		: CipherKeyGenerator
 	{
-		private const byte R_MASK_LOW_2 = (byte)0xFC;
-		private const byte R_MASK_HIGH_4 = (byte)0x0F;
+		const byte R_MASK_LOW_2 = (byte)0xFC;
+		const byte R_MASK_HIGH_4 = (byte)0x0F;
 
 		/// <summary>
 		/// Initialises the key generator.
@@ -35,8 +35,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		protected override void EngineInit(KeyGenerationParameters param)
 		{
 			// Poly1305 keys are always 256 bits
-			this.random = param.Random;
-			this.strength = 32;
+			random = param.Random;
+			strength = 32;
 		}
 
 		/// <summary>
@@ -67,7 +67,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			 * Key is k[0] ... k[15], r[0] ... r[15] as per poly1305_aes_clamp in ref impl.
 			 */
 			if (key.Length != 32)
+			{
 				throw new ArgumentException("Poly1305 key must be 256 bits.");
+			}
 
 			/*
 			 * r[3], r[7], r[11], r[15] have top four bits clear (i.e., are {0, 1, . . . , 15})
@@ -96,7 +98,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		public static void CheckKey(byte[] key)
 		{
 			if (key.Length != 32)
+			{
 				throw new ArgumentException("Poly1305 key must be 256 bits.");
+			}
 
 			CheckMask(key[3], R_MASK_HIGH_4);
 			CheckMask(key[7], R_MASK_HIGH_4);
@@ -108,10 +112,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			CheckMask(key[12], R_MASK_LOW_2);
 		}
 
-		private static void CheckMask(byte b, byte mask)
+		static void CheckMask(byte b, byte mask)
 		{
-			if ((b & (~mask)) != 0)
+			if ((b & ~mask) != 0)
+			{
 				throw new ArgumentException("Invalid format for r portion of Poly1305 key.");
+			}
 		}
 	}
 }

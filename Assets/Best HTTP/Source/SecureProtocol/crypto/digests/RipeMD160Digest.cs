@@ -13,12 +13,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class RipeMD160Digest
 		: GeneralDigest
 	{
-		private const int DigestLength = 20;
+		const int DigestLength = 20;
 
-		private int H0, H1, H2, H3, H4; // IV's
+		int H0, H1, H2, H3, H4; // IV's
 
-		private int[] X = new int[16];
-		private int xOff;
+		int[] X = new int[16];
+		int xOff;
 
 		/**
 		* Standard constructor
@@ -37,7 +37,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			CopyIn(t);
 		}
 
-		private void CopyIn(RipeMD160Digest t)
+		void CopyIn(RipeMD160Digest t)
 		{
 			base.CopyIn(t);
 
@@ -151,7 +151,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rotate int x left n bits.
 		 */
-		private int RL(
+		int RL(
 			int x,
 			int n)
 		{
@@ -165,7 +165,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rounds 0-15
 		 */
-		private int F1(
+		int F1(
 			int x,
 			int y,
 			int z)
@@ -176,7 +176,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rounds 16-31
 		 */
-		private int F2(
+		int F2(
 			int x,
 			int y,
 			int z)
@@ -187,7 +187,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rounds 32-47
 		 */
-		private int F3(
+		int F3(
 			int x,
 			int y,
 			int z)
@@ -198,7 +198,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rounds 48-63
 		 */
-		private int F4(
+		int F4(
 			int x,
 			int y,
 			int z)
@@ -209,7 +209,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rounds 64-79
 		 */
-		private int F5(
+		int F5(
 			int x,
 			int y,
 			int z)

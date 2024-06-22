@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class GeneralNames
 		: Asn1Encodable
 	{
-		private static GeneralName[] Copy(GeneralName[] names)
+		static GeneralName[] Copy(GeneralName[] names)
 		{
 			return (GeneralName[])names.Clone();
 		}
@@ -17,9 +17,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static GeneralNames GetInstance(object obj)
 		{
 			if (obj is GeneralNames)
+			{
 				return (GeneralNames)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new GeneralNames(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -33,7 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return GetInstance(X509Extensions.GetExtensionParsedValue(extensions, extOid));
 		}
 
-		private readonly GeneralName[] names;
+		readonly GeneralName[] names;
 
 		/// <summary>Construct a GeneralNames object containing one GeneralName.</summary>
 		/// <param name="name">The name to be contained.</param>
@@ -49,10 +55,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			this.names = Copy(names);
 		}
 
-		private GeneralNames(
+		GeneralNames(
 			Asn1Sequence seq)
 		{
-			this.names = new GeneralName[seq.Count];
+			names = new GeneralName[seq.Count];
 
 			for (int i = 0; i != seq.Count; i++)
 			{

@@ -36,7 +36,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public const int PrivilegeWithdrawn = 9;
 		public const int AACompromise = 10;
 
-		private static readonly string[] ReasonString = new string[]
+		static readonly string[] ReasonString = new string[]
 		{
 			"Unspecified", "KeyCompromise", "CACompromise", "AffiliationChanged",
 			"Superseded", "CessationOfOperation", "CertificateHold", "Unknown",
@@ -57,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public override string ToString()
 		{
 			int reason = IntValueExact;
-			string str = (reason < 0 || reason > 10) ? "Invalid" : ReasonString[reason];
+			string str = reason < 0 || reason > 10 ? "Invalid" : ReasonString[reason];
 			return "CrlReason: " + str;
 		}
 	}

@@ -39,9 +39,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 {
-	internal sealed class InfCodes
+	sealed class InfCodes
 	{
-		private static readonly int[] inflate_mask =
+		static readonly int[] inflate_mask =
 		{
 			0x00000000, 0x00000001, 0x00000003, 0x00000007, 0x0000000f,
 			0x0000001f, 0x0000003f, 0x0000007f, 0x000000ff, 0x000001ff,
@@ -49,29 +49,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			0x00007fff, 0x0000ffff
 		};
 
-		private const int Z_OK = 0;
-		private const int Z_STREAM_END = 1;
-		private const int Z_NEED_DICT = 2;
-		private const int Z_ERRNO = -1;
-		private const int Z_STREAM_ERROR = -2;
-		private const int Z_DATA_ERROR = -3;
-		private const int Z_MEM_ERROR = -4;
-		private const int Z_BUF_ERROR = -5;
-		private const int Z_VERSION_ERROR = -6;
+		const int Z_OK = 0;
+		const int Z_STREAM_END = 1;
+		const int Z_NEED_DICT = 2;
+		const int Z_ERRNO = -1;
+		const int Z_STREAM_ERROR = -2;
+		const int Z_DATA_ERROR = -3;
+		const int Z_MEM_ERROR = -4;
+		const int Z_BUF_ERROR = -5;
+		const int Z_VERSION_ERROR = -6;
 
 		// waiting for "i:"=input,
 		//             "o:"=output,
 		//             "x:"=nothing
-		private const int START = 0; // x: set up for LEN
-		private const int LEN = 1; // i: get length/literal/eob next
-		private const int LENEXT = 2; // i: getting length extra (have base)
-		private const int DIST = 3; // i: get distance next
-		private const int DISTEXT = 4; // i: getting distance extra
-		private const int COPY = 5; // o: copying bytes in window, waiting for space
-		private const int LIT = 6; // o: got literal, waiting for output space
-		private const int WASH = 7; // o: got eob, possibly still output waiting
-		private const int END = 8; // x: got eob and all data flushed
-		private const int BADCODE = 9; // x: got error
+		const int START = 0; // x: set up for LEN
+		const int LEN = 1; // i: get length/literal/eob next
+		const int LENEXT = 2; // i: getting length extra (have base)
+		const int DIST = 3; // i: get distance next
+		const int DISTEXT = 4; // i: getting distance extra
+		const int COPY = 5; // o: copying bytes in window, waiting for space
+		const int LIT = 6; // o: got literal, waiting for output space
+		const int WASH = 7; // o: got eob, possibly still output waiting
+		const int END = 8; // x: got eob and all data flushed
+		const int BADCODE = 9; // x: got error
 
 		int mode; // current inflate_codes mode
 
@@ -177,9 +177,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					case LEN: // i: get length/literal/eob next
 						j = need;
 
-						while (k < (j))
+						while (k < j)
 						{
-							if (n != 0) r = Z_OK;
+							if (n != 0)
+							{
+								r = Z_OK;
+							}
 							else
 							{
 								s.bitb = b;
@@ -198,8 +201,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 						tindex = (tree_index + (b & inflate_mask[j])) * 3;
 
-						b >>= (tree[tindex + 1]);
-						k -= (tree[tindex + 1]);
+						b >>= tree[tindex + 1];
+						k -= tree[tindex + 1];
 
 						e = tree[tindex];
 
@@ -250,9 +253,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					case LENEXT: // i: getting length extra (have base)
 						j = get;
 
-						while (k < (j))
+						while (k < j)
 						{
-							if (n != 0) r = Z_OK;
+							if (n != 0)
+							{
+								r = Z_OK;
+							}
 							else
 							{
 								s.bitb = b;
@@ -269,7 +275,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 							k += 8;
 						}
 
-						len += (b & inflate_mask[j]);
+						len += b & inflate_mask[j];
 
 						b >>= j;
 						k -= j;
@@ -282,9 +288,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					case DIST: // i: get distance next
 						j = need;
 
-						while (k < (j))
+						while (k < j)
 						{
-							if (n != 0) r = Z_OK;
+							if (n != 0)
+							{
+								r = Z_OK;
+							}
 							else
 							{
 								s.bitb = b;
@@ -306,7 +315,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						b >>= tree[tindex + 1];
 						k -= tree[tindex + 1];
 
-						e = (tree[tindex]);
+						e = tree[tindex];
 						if ((e & 16) != 0)
 						{
 							// distance
@@ -339,9 +348,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					case DISTEXT: // i: getting distance extra
 						j = get;
 
-						while (k < (j))
+						while (k < j)
 						{
-							if (n != 0) r = Z_OK;
+							if (n != 0)
+							{
+								r = Z_OK;
+							}
 							else
 							{
 								s.bitb = b;
@@ -358,7 +370,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 							k += 8;
 						}
 
-						dist += (b & inflate_mask[j]);
+						dist += b & inflate_mask[j];
 
 						b >>= j;
 						k -= j;
@@ -413,7 +425,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 							m--;
 
 							if (f == s.end)
+							{
 								f = 0;
+							}
+
 							len--;
 						}
 
@@ -574,7 +589,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			{
 				// assume called with m >= 258 && n >= 10
 				// get literal/length code
-				while (k < (20))
+				while (k < 20)
 				{
 					// max bits for literal/length code
 					n--;
@@ -588,8 +603,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				tp_index_t_3 = (tp_index + t) * 3;
 				if ((e = tp[tp_index_t_3]) == 0)
 				{
-					b >>= (tp[tp_index_t_3 + 1]);
-					k -= (tp[tp_index_t_3 + 1]);
+					b >>= tp[tp_index_t_3 + 1];
+					k -= tp[tp_index_t_3 + 1];
 
 					s.window[q++] = (byte)tp[tp_index_t_3 + 2];
 					m--;
@@ -598,8 +613,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 				do
 				{
-					b >>= (tp[tp_index_t_3 + 1]);
-					k -= (tp[tp_index_t_3 + 1]);
+					b >>= tp[tp_index_t_3 + 1];
+					k -= tp[tp_index_t_3 + 1];
 
 					if ((e & 16) != 0)
 					{
@@ -610,7 +625,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						k -= e;
 
 						// decode distance base of block to copy
-						while (k < (15))
+						while (k < 15)
 						{
 							// max bits for distance code
 							n--;
@@ -626,14 +641,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 						do
 						{
-							b >>= (tp[tp_index_t_3 + 1]);
-							k -= (tp[tp_index_t_3 + 1]);
+							b >>= tp[tp_index_t_3 + 1];
+							k -= tp[tp_index_t_3 + 1];
 
 							if ((e & 16) != 0)
 							{
 								// get extra bits to add to distance base
 								e &= 15;
-								while (k < (e))
+								while (k < e)
 								{
 									// get extra bits (up to 13)
 									n--;
@@ -643,8 +658,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 								d = tp[tp_index_t_3 + 2] + (b & inflate_mask[e]);
 
-								b >>= (e);
-								k -= (e);
+								b >>= e;
+								k -= e;
 
 								// do the copy
 								m -= c;
@@ -653,7 +668,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 									// offset before dest
 									//  just copy
 									r = q - d;
-									if (q - r > 0 && 2 > (q - r))
+									if (q - r > 0 && 2 > q - r)
 									{
 										s.window[q++] = s.window[r++]; // minimum count is three,
 										s.window[q++] = s.window[r++]; // so unroll loop a little
@@ -661,7 +676,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 									}
 									else
 									{
-										System.Array.Copy(s.window, r, s.window, q, 2);
+										Array.Copy(s.window, r, s.window, q, 2);
 										q += 2;
 										r += 2;
 										c -= 2;
@@ -681,7 +696,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 									{
 										// if source crosses,
 										c -= e; // wrapped copy
-										if (q - r > 0 && e > (q - r))
+										if (q - r > 0 && e > q - r)
 										{
 											do
 											{
@@ -690,7 +705,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 										}
 										else
 										{
-											System.Array.Copy(s.window, r, s.window, q, e);
+											Array.Copy(s.window, r, s.window, q, e);
 											q += e;
 											r += e;
 											e = 0;
@@ -701,7 +716,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 								}
 
 								// copy all or what's left
-								if (q - r > 0 && c > (q - r))
+								if (q - r > 0 && c > q - r)
 								{
 									do
 									{
@@ -710,7 +725,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 								}
 								else
 								{
-									System.Array.Copy(s.window, r, s.window, q, c);
+									Array.Copy(s.window, r, s.window, q, c);
 									q += c;
 									r += c;
 									c = 0;
@@ -721,7 +736,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 							else if ((e & 64) == 0)
 							{
 								t += tp[tp_index_t_3 + 2];
-								t += (b & inflate_mask[e]);
+								t += b & inflate_mask[e];
 								tp_index_t_3 = (tp_index + t) * 3;
 								e = tp[tp_index_t_3];
 							}
@@ -730,7 +745,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 								z.msg = "invalid distance code";
 
 								c = z.avail_in - n;
-								c = (k >> 3) < c ? k >> 3 : c;
+								c = k >> 3 < c ? k >> 3 : c;
 								n += c;
 								p -= c;
 								k -= c << 3;
@@ -752,12 +767,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					if ((e & 64) == 0)
 					{
 						t += tp[tp_index_t_3 + 2];
-						t += (b & inflate_mask[e]);
+						t += b & inflate_mask[e];
 						tp_index_t_3 = (tp_index + t) * 3;
 						if ((e = tp[tp_index_t_3]) == 0)
 						{
-							b >>= (tp[tp_index_t_3 + 1]);
-							k -= (tp[tp_index_t_3 + 1]);
+							b >>= tp[tp_index_t_3 + 1];
+							k -= tp[tp_index_t_3 + 1];
 
 							s.window[q++] = (byte)tp[tp_index_t_3 + 2];
 							m--;
@@ -767,7 +782,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					else if ((e & 32) != 0)
 					{
 						c = z.avail_in - n;
-						c = (k >> 3) < c ? k >> 3 : c;
+						c = k >> 3 < c ? k >> 3 : c;
 						n += c;
 						p -= c;
 						k -= c << 3;
@@ -786,7 +801,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						z.msg = "invalid literal/length code";
 
 						c = z.avail_in - n;
-						c = (k >> 3) < c ? k >> 3 : c;
+						c = k >> 3 < c ? k >> 3 : c;
 						n += c;
 						p -= c;
 						k -= c << 3;
@@ -805,7 +820,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 			// not enough input or output--restore pointers and return
 			c = z.avail_in - n;
-			c = (k >> 3) < c ? k >> 3 : c;
+			c = k >> 3 < c ? k >> 3 : c;
 			n += c;
 			p -= c;
 			k -= c << 3;

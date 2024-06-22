@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class DHKeyGenerationParameters
 		: KeyGenerationParameters
 	{
-		private readonly DHParameters parameters;
+		readonly DHParameters parameters;
 
 		public DHKeyGenerationParameters(
 			SecureRandom random,

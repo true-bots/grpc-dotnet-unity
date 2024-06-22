@@ -20,16 +20,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			Certificate certificate, SignatureAndHashAlgorithm signatureAndHashAlgorithm)
 		{
 			if (certificate == null)
+			{
 				throw new ArgumentNullException("certificate");
-			if (certificate.IsEmpty)
-				throw new ArgumentException("cannot be empty", "certificate");
-			if (signer == null)
-				throw new ArgumentNullException("signer");
+			}
 
-			this.m_cryptoParams = cryptoParams;
-			this.m_certificate = certificate;
-			this.m_signatureAndHashAlgorithm = signatureAndHashAlgorithm;
-			this.m_signer = signer;
+			if (certificate.IsEmpty)
+			{
+				throw new ArgumentException("cannot be empty", "certificate");
+			}
+
+			if (signer == null)
+			{
+				throw new ArgumentNullException("signer");
+			}
+
+			m_cryptoParams = cryptoParams;
+			m_certificate = certificate;
+			m_signatureAndHashAlgorithm = signatureAndHashAlgorithm;
+			m_signer = signer;
 		}
 
 		public virtual Certificate Certificate
@@ -59,7 +67,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				algorithm = SignatureAndHashAlgorithm;
 				if (algorithm == null)
+				{
 					throw new InvalidOperationException("'signatureAndHashAlgorithm' cannot be null for (D)TLS 1.2+");
+				}
 			}
 
 			return algorithm;

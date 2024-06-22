@@ -10,8 +10,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class ParametersWithSalt
 		: ICipherParameters
 	{
-		private readonly ICipherParameters m_parameters;
-		private readonly byte[] m_salt;
+		readonly ICipherParameters m_parameters;
+		readonly byte[] m_salt;
 
 		public ParametersWithSalt(ICipherParameters parameters, byte[] salt)
 			: this(parameters, salt, 0, salt.Length)
@@ -37,7 +37,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			return m_salt;
 		}
 
-		public ICipherParameters Parameters => m_parameters;
+		public ICipherParameters Parameters
+		{
+			get { return m_parameters; }
+		}
 	}
 }
 #pragma warning restore

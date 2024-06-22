@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 	 *     2. Algs 9-10 specify reversal of the cipher key!
 	 * - Separate construction/initialization stage for "prerequisites"
 	 */
-	internal class SP80038G
+	class SP80038G
 	{
 		internal static readonly string FPE_DISABLED = "BestHTTP.SecureProtocol.Org.BouncyCastle.Fpe.Disable";
 		internal static readonly string FF1_DISABLED = "BestHTTP.SecureProtocol.Org.BouncyCastle.Fpe.Disable_Ff1";
@@ -58,11 +58,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			return decFF1(cipher, radix, tweak, n, u, v, A, B);
 		}
 
-		private static ushort[] decFF1(IBlockCipher cipher, int radix, byte[] T, int n, int u, int v, ushort[] A, ushort[] B)
+		static ushort[] decFF1(IBlockCipher cipher, int radix, byte[] T, int n, int u, int v, ushort[] A, ushort[] B)
 		{
 			int t = T.Length;
 			int b = ((int)Ceil(System.Math.Log((double)radix) * (double)v / LOG2) + 7) / 8;
-			int d = (((b + 3) / 4) * 4) + 4;
+			int d = (b + 3) / 4 * 4 + 4;
 
 			byte[] P = calculateP_FF1(radix, (byte)u, n, t);
 
@@ -164,12 +164,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			return encFF1(cipher, radix, tweak, n, u, v, A, B);
 		}
 
-		private static ushort[] encFF1(IBlockCipher cipher, int radix, byte[] T, int n, int u, int v, ushort[] A, ushort[] B)
+		static ushort[] encFF1(IBlockCipher cipher, int radix, byte[] T, int n, int u, int v, ushort[] A, ushort[] B)
 		{
 			int t = T.Length;
 
 			int b = ((int)Ceil(System.Math.Log((double)radix) * (double)v / LOG2) + 7) / 8;
-			int d = (((b + 3) / 4) * 4) + 4;
+			int d = (b + 3) / 4 * 4 + 4;
 
 			byte[] P = calculateP_FF1(radix, (byte)u, n, t);
 
@@ -363,7 +363,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 		protected static void checkArgs(IBlockCipher cipher, bool isFF1, int radix, ushort[] buf, int off, int len)
 		{
 			checkCipher(cipher);
-			if (radix < 2 || radix > (1 << 16))
+			if (radix < 2 || radix > 1 << 16)
 			{
 				throw new ArgumentException();
 			}
@@ -374,7 +374,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 		protected static void checkArgs(IBlockCipher cipher, bool isFF1, int radix, byte[] buf, int off, int len)
 		{
 			checkCipher(cipher);
-			if (radix < 2 || radix > (1 << 8))
+			if (radix < 2 || radix > 1 << 8)
 			{
 				throw new ArgumentException();
 			}
@@ -416,7 +416,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			}
 		}
 
-		private static void checkLength(bool isFF1, int radix, int len)
+		static void checkLength(bool isFF1, int radix, int len)
 		{
 			if (len < 2 || System.Math.Pow(radix, len) < 1000000)
 			{
@@ -425,7 +425,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 
 			if (!isFF1)
 			{
-				int maxLen = 2 * (int)(System.Math.Floor(System.Math.Log(TWO_TO_96) / System.Math.Log(radix)));
+				int maxLen = 2 * (int)System.Math.Floor(System.Math.Log(TWO_TO_96) / System.Math.Log(radix));
 				if (len > maxLen)
 				{
 					throw new ArgumentException("maximum input length is " + maxLen);
@@ -464,7 +464,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			return decFF3_1(cipher, radix, T, n, v, u, A, B);
 		}
 
-		private static ushort[] decFF3_1(IBlockCipher cipher, int radix, byte[] T, int n, int v, int u, ushort[] A, ushort[] B)
+		static ushort[] decFF3_1(IBlockCipher cipher, int radix, byte[] T, int n, int v, int u, ushort[] A, ushort[] B)
 		{
 			BigInteger bigRadix = BigInteger.ValueOf(radix);
 			BigInteger[] modVU = calculateModUV(bigRadix, v, u);
@@ -480,7 +480,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 				// i.
 				m = n - m;
 				BigInteger modulus = modVU[1 - (i & 1)];
-				int wOff = 4 - ((i & 1) * 4);
+				int wOff = 4 - (i & 1) * 4;
 
 				// ii. - iv.
 				BigInteger y = calculateY_FF3(cipher, bigRadix, T, wOff, (uint)i, A);
@@ -532,7 +532,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			return encFF3_1(cipher, radix, T, n, v, u, A, B);
 		}
 
-		private static ushort[] encFF3_1(IBlockCipher cipher, int radix, byte[] t, int n, int v, int u, ushort[] a, ushort[] b)
+		static ushort[] encFF3_1(IBlockCipher cipher, int radix, byte[] t, int n, int v, int u, ushort[] a, ushort[] b)
 		{
 			BigInteger bigRadix = BigInteger.ValueOf(radix);
 			BigInteger[] modVU = calculateModUV(bigRadix, v, u);
@@ -582,8 +582,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 
 		protected static byte[] prf(IBlockCipher c, byte[] x)
 		{
-			if ((x.Length % BLOCK_SIZE) != 0)
+			if (x.Length % BLOCK_SIZE != 0)
+			{
 				throw new ArgumentException();
+			}
 
 			int m = x.Length / BLOCK_SIZE;
 			byte[] y = new byte[BLOCK_SIZE];
@@ -600,7 +602,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 		protected static void str(BigInteger R, BigInteger x, int m, ushort[] output, int off)
 		{
 			if (x.SignValue < 0)
+			{
 				throw new ArgumentException();
+			}
 
 			for (int i = 1; i <= m; ++i)
 			{
@@ -610,7 +614,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			}
 
 			if (x.SignValue != 0)
+			{
 				throw new ArgumentException();
+			}
 		}
 
 		protected static void xor(byte[] x, int xOff, byte[] y, int yOff, int len)
@@ -621,7 +627,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			}
 		}
 
-		private static byte[] toByte(ushort[] buf)
+		static byte[] toByte(ushort[] buf)
 		{
 			byte[] s = new byte[buf.Length];
 
@@ -633,7 +639,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			return s;
 		}
 
-		private static ushort[] toShort(byte[] buf, int off, int len)
+		static ushort[] toShort(byte[] buf, int off, int len)
 		{
 			ushort[] s = new ushort[len];
 
@@ -645,11 +651,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 			return s;
 		}
 
-		private static int Ceil(double v)
+		static int Ceil(double v)
 		{
 			int rv = (int)v;
 			if ((double)rv < v)
+			{
 				return rv + 1;
+			}
 
 			return rv;
 		}

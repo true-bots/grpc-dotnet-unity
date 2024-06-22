@@ -8,13 +8,13 @@ namespace BestHTTP.Extensions
 	/// </summary>
 	public sealed class StreamList : System.IO.Stream
 	{
-		private System.IO.Stream[] Streams;
-		private int CurrentIdx;
+		System.IO.Stream[] Streams;
+		int CurrentIdx;
 
 		public StreamList(params System.IO.Stream[] streams)
 		{
-			this.Streams = streams;
-			this.CurrentIdx = 0;
+			Streams = streams;
+			CurrentIdx = 0;
 		}
 
 		public override bool CanRead
@@ -22,7 +22,10 @@ namespace BestHTTP.Extensions
 			get
 			{
 				if (CurrentIdx >= Streams.Length)
+				{
 					return false;
+				}
+
 				return Streams[CurrentIdx].CanRead;
 			}
 		}
@@ -37,7 +40,10 @@ namespace BestHTTP.Extensions
 			get
 			{
 				if (CurrentIdx >= Streams.Length)
+				{
 					return false;
+				}
+
 				return Streams[CurrentIdx].CanWrite;
 			}
 		}
@@ -45,11 +51,15 @@ namespace BestHTTP.Extensions
 		public override void Flush()
 		{
 			if (CurrentIdx >= Streams.Length)
+			{
 				return;
+			}
 
 			// We have to call the flush to all previous streams, as we may advanced the CurrentIdx
 			for (int i = 0; i <= CurrentIdx; ++i)
+			{
 				Streams[i].Flush();
+			}
 		}
 
 		public override long Length
@@ -57,11 +67,15 @@ namespace BestHTTP.Extensions
 			get
 			{
 				if (CurrentIdx >= Streams.Length)
+				{
 					return 0;
+				}
 
 				long length = 0;
 				for (int i = 0; i < Streams.Length; ++i)
+				{
 					length += Streams[i].Length;
+				}
 
 				return length;
 			}
@@ -70,7 +84,9 @@ namespace BestHTTP.Extensions
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			if (CurrentIdx >= Streams.Length)
+			{
 				return -1;
+			}
 
 			int readCount = Streams[CurrentIdx].Read(buffer, offset, count);
 
@@ -96,15 +112,17 @@ namespace BestHTTP.Extensions
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			if (CurrentIdx >= Streams.Length)
+			{
 				return;
+			}
 
 			Streams[CurrentIdx].Write(buffer, offset, count);
 		}
 
 		public void Write(string str)
 		{
-			var buffer = str.GetASCIIBytes();
-			this.Write(buffer.Data, buffer.Offset, buffer.Count);
+			BufferSegment buffer = str.GetASCIIBytes();
+			Write(buffer.Data, buffer.Offset, buffer.Count);
 			BufferPool.Release(buffer);
 		}
 
@@ -113,6 +131,7 @@ namespace BestHTTP.Extensions
 			if (disposing)
 			{
 				for (int i = 0; i < Streams.Length; ++i)
+				{
 					if (Streams[i] != null)
 					{
 						try
@@ -124,6 +143,7 @@ namespace BestHTTP.Extensions
 							HTTPManager.Logger.Exception("StreamList", "Dispose", ex);
 						}
 					}
+				}
 			}
 		}
 
@@ -136,7 +156,9 @@ namespace BestHTTP.Extensions
 		public override long Seek(long offset, System.IO.SeekOrigin origin)
 		{
 			if (CurrentIdx >= Streams.Length)
+			{
 				return 0;
+			}
 
 			return Streams[CurrentIdx].Seek(offset, origin);
 		}

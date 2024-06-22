@@ -26,9 +26,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
+
 			if (obj is CertificationRequest)
+			{
 				return (CertificationRequest)obj;
+			}
+
 			return new CertificationRequest(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -41,15 +47,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			AlgorithmIdentifier algorithm,
 			DerBitString signature)
 		{
-			this.reqInfo = requestInfo;
-			this.sigAlgId = algorithm;
-			this.sigBits = signature;
+			reqInfo = requestInfo;
+			sigAlgId = algorithm;
+			sigBits = signature;
 		}
 
 		internal CertificationRequest(Asn1Sequence seq)
 		{
 			if (seq.Count != 3)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
 			reqInfo = CertificationRequestInfo.GetInstance(seq[0]);
 			sigAlgId = AlgorithmIdentifier.GetInstance(seq[1]);

@@ -5,7 +5,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 {
-	internal class XofUtilities
+	class XofUtilities
 	{
 		internal static byte[] LeftEncode(long strLen)
 		{

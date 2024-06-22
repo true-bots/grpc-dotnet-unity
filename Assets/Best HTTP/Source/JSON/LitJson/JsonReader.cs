@@ -46,22 +46,22 @@ namespace BestHTTP.JSON.LitJson
 	{
 		#region Fields
 
-		private static readonly IDictionary<int, IDictionary<int, int[]>> parse_table;
+		static readonly IDictionary<int, IDictionary<int, int[]>> parse_table;
 
-		private Stack<int> automaton_stack;
-		private int current_input;
-		private int current_symbol;
-		private bool end_of_json;
-		private bool end_of_input;
-		private Lexer lexer;
-		private bool parser_in_string;
-		private bool parser_return;
-		private bool read_started;
-		private TextReader reader;
-		private bool reader_is_owned;
-		private bool skip_non_members;
-		private object token_value;
-		private JsonToken token;
+		Stack<int> automaton_stack;
+		int current_input;
+		int current_symbol;
+		bool end_of_json;
+		bool end_of_input;
+		Lexer lexer;
+		bool parser_in_string;
+		bool parser_return;
+		bool read_started;
+		TextReader reader;
+		bool reader_is_owned;
+		bool skip_non_members;
+		object token_value;
+		JsonToken token;
 
 		#endregion
 
@@ -126,10 +126,12 @@ namespace BestHTTP.JSON.LitJson
 		{
 		}
 
-		private JsonReader(TextReader reader, bool owned)
+		JsonReader(TextReader reader, bool owned)
 		{
 			if (reader == null)
+			{
 				throw new ArgumentNullException("reader");
+			}
 
 			parser_in_string = false;
 			parser_return = false;
@@ -155,7 +157,7 @@ namespace BestHTTP.JSON.LitJson
 
 		#region Static Methods
 
-		private static IDictionary<int, IDictionary<int, int[]>> PopulateParseTable()
+		static IDictionary<int, IDictionary<int, int[]>> PopulateParseTable()
 		{
 			// See section A.2. of the manual for details
 			IDictionary<int, IDictionary<int, int[]>> parse_table = new Dictionary<int, IDictionary<int, int[]>>();
@@ -263,13 +265,13 @@ namespace BestHTTP.JSON.LitJson
 			return parse_table;
 		}
 
-		private static void TableAddCol(IDictionary<int, IDictionary<int, int[]>> parse_table, ParserToken row, int col,
+		static void TableAddCol(IDictionary<int, IDictionary<int, int[]>> parse_table, ParserToken row, int col,
 			params int[] symbols)
 		{
 			parse_table[(int)row].Add(col, symbols);
 		}
 
-		private static void TableAddRow(IDictionary<int, IDictionary<int, int[]>> parse_table, ParserToken rule)
+		static void TableAddRow(IDictionary<int, IDictionary<int, int[]>> parse_table, ParserToken rule)
 		{
 			parse_table.Add((int)rule, new Dictionary<int, int[]>());
 		}
@@ -279,7 +281,7 @@ namespace BestHTTP.JSON.LitJson
 
 		#region Private Methods
 
-		private void ProcessNumber(string number)
+		void ProcessNumber(string number)
 		{
 			if (number.IndexOf('.') != -1 ||
 			    number.IndexOf('e') != -1 ||
@@ -327,7 +329,7 @@ namespace BestHTTP.JSON.LitJson
 			token_value = 0;
 		}
 
-		private void ProcessSymbol()
+		void ProcessSymbol()
 		{
 			if (current_symbol == '[')
 			{
@@ -360,7 +362,9 @@ namespace BestHTTP.JSON.LitJson
 				else
 				{
 					if (token == JsonToken.None)
+					{
 						token = JsonToken.String;
+					}
 
 					parser_in_string = true;
 				}
@@ -398,10 +402,12 @@ namespace BestHTTP.JSON.LitJson
 			}
 		}
 
-		private bool ReadToken()
+		bool ReadToken()
 		{
 			if (end_of_input)
+			{
 				return false;
+			}
 
 			lexer.NextToken();
 
@@ -423,7 +429,9 @@ namespace BestHTTP.JSON.LitJson
 		public void Close()
 		{
 			if (end_of_input)
+			{
 				return;
+			}
 
 			end_of_input = true;
 			end_of_json = true;
@@ -443,7 +451,9 @@ namespace BestHTTP.JSON.LitJson
 		public bool Read()
 		{
 			if (end_of_input)
+			{
 				return false;
+			}
 
 			if (end_of_json)
 			{
@@ -464,7 +474,9 @@ namespace BestHTTP.JSON.LitJson
 				read_started = true;
 
 				if (!ReadToken())
+				{
 					return false;
+				}
 			}
 
 
@@ -475,7 +487,9 @@ namespace BestHTTP.JSON.LitJson
 				if (parser_return)
 				{
 					if (automaton_stack.Peek() == (int)ParserToken.End)
+					{
 						end_of_json = true;
+					}
 
 					return true;
 				}
@@ -489,11 +503,15 @@ namespace BestHTTP.JSON.LitJson
 					if (!ReadToken())
 					{
 						if (automaton_stack.Peek() != (int)ParserToken.End)
+						{
 							throw new JsonException(
 								"Input doesn't evaluate to proper JSON text");
+						}
 
 						if (parser_return)
+						{
 							return true;
+						}
 
 						return false;
 					}
@@ -512,10 +530,14 @@ namespace BestHTTP.JSON.LitJson
 				}
 
 				if (entry_symbols[0] == (int)ParserToken.Epsilon)
+				{
 					continue;
+				}
 
 				for (int i = entry_symbols.Length - 1; i >= 0; i--)
+				{
 					automaton_stack.Push(entry_symbols[i]);
+				}
 			}
 		}
 	}

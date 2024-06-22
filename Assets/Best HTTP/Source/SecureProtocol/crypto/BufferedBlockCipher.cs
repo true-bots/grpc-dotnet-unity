@@ -44,7 +44,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public BufferedBlockCipher(IBlockCipherMode cipherMode)
 		{
 			if (cipherMode == null)
+			{
 				throw new ArgumentNullException(nameof(cipherMode));
+			}
 
 			m_cipherMode = cipherMode;
 			buf = new byte[cipherMode.GetBlockSize()];
@@ -135,8 +137,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 
 			if (bufOff == buf.Length)
 			{
-				if ((outOff + buf.Length) > output.Length)
+				if (outOff + buf.Length > output.Length)
+				{
 					throw new DataLengthException("output buffer too short");
+				}
 
 				bufOff = 0;
 				return m_cipherMode.ProcessBlock(buf, 0, output, outOff);
@@ -183,9 +187,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public override byte[] ProcessBytes(byte[] input, int inOff, int length)
 		{
 			if (input == null)
+			{
 				throw new ArgumentNullException(nameof(input));
+			}
+
 			if (length < 1)
+			{
 				return null;
+			}
 
 			int outLength = GetUpdateOutputSize(length);
 
@@ -220,7 +229,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			if (length < 1)
 			{
 				if (length < 0)
+				{
 					throw new ArgumentException("Can't have a negative input length!");
+				}
 
 				return 0;
 			}
@@ -317,7 +328,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public override byte[] DoFinal(byte[] input, int inOff, int inLen)
 		{
 			if (input == null)
+			{
 				throw new ArgumentNullException(nameof(input));
+			}
 
 			int length = GetOutputSize(inLen);
 
@@ -327,7 +340,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			{
 				outBytes = new byte[length];
 
-				int pos = (inLen > 0)
+				int pos = inLen > 0
 					? ProcessBytes(input, inOff, inLen, outBytes, 0)
 					: 0;
 

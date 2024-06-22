@@ -13,8 +13,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	/// <summary>RFC 3546 3.6</summary>
 	public sealed class OcspStatusRequest
 	{
-		private readonly IList<ResponderID> m_responderIDList;
-		private readonly X509Extensions m_requestExtensions;
+		readonly IList<ResponderID> m_responderIDList;
+		readonly X509Extensions m_requestExtensions;
 
 		/// <param name="responderIDList">an <see cref="IList{T}"/> of <see cref="ResponderID"/>, specifying the list of
 		/// trusted OCSP responders. An empty list has the special meaning that the responders are implicitly known to
@@ -23,8 +23,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// </param>
 		public OcspStatusRequest(IList<ResponderID> responderIDList, X509Extensions requestExtensions)
 		{
-			this.m_responderIDList = responderIDList;
-			this.m_requestExtensions = requestExtensions;
+			m_responderIDList = responderIDList;
+			m_requestExtensions = requestExtensions;
 		}
 
 		/// <returns>an <see cref="IList{T}"/> of <see cref="ResponderID"/>.</returns>
@@ -81,7 +81,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <exception cref="IOException"/>
 		public static OcspStatusRequest Parse(Stream input)
 		{
-			var responderIDList = new List<ResponderID>();
+			List<ResponderID> responderIDList = new List<ResponderID>();
 			{
 				byte[] data = TlsUtilities.ReadOpaque16(input);
 				if (data.Length > 0)

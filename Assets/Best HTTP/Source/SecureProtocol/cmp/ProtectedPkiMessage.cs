@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.IO;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
@@ -16,7 +17,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 	/// </summary>
 	public class ProtectedPkiMessage
 	{
-		private readonly PkiMessage m_pkiMessage;
+		readonly PkiMessage m_pkiMessage;
 
 		/// <summary>
 		/// Wrap a general message.
@@ -26,9 +27,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 		public ProtectedPkiMessage(GeneralPkiMessage pkiMessage)
 		{
 			if (!pkiMessage.HasProtection)
+			{
 				throw new ArgumentException("GeneralPkiMessage not protected");
+			}
 
-			this.m_pkiMessage = pkiMessage.ToAsn1Structure();
+			m_pkiMessage = pkiMessage.ToAsn1Structure();
 		}
 
 		// TODO[cmp] Make internal? (Has test that uses it)
@@ -40,22 +43,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 		public ProtectedPkiMessage(PkiMessage pkiMessage)
 		{
 			if (null == pkiMessage.Header.ProtectionAlg)
+			{
 				throw new ArgumentException("PkiMessage not protected");
+			}
 
-			this.m_pkiMessage = pkiMessage;
+			m_pkiMessage = pkiMessage;
 		}
 
 		/// <summary>Message header</summary>
-		public virtual PkiHeader Header => m_pkiMessage.Header;
+		public virtual PkiHeader Header
+		{
+			get { return m_pkiMessage.Header; }
+		}
 
 		/// <summary>Message body</summary>
-		public virtual PkiBody Body => m_pkiMessage.Body;
+		public virtual PkiBody Body
+		{
+			get { return m_pkiMessage.Body; }
+		}
 
 		/// <summary>
 		/// Return the underlying ASN.1 structure contained in this object.
 		/// </summary>
 		/// <returns>PkiMessage structure</returns>
-		public virtual PkiMessage ToAsn1Message() => m_pkiMessage;
+		public virtual PkiMessage ToAsn1Message()
+		{
+			return m_pkiMessage;
+		}
 
 		/// <summary>
 		/// Determine whether the message is protected by a password based MAC. Use verify(PKMACBuilder, char[])
@@ -75,7 +89,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 		{
 			CmpCertificate[] certs = m_pkiMessage.GetExtraCerts();
 			if (null == certs)
+			{
 				return new X509Certificate[0];
+			}
 
 			X509Certificate[] result = new X509Certificate[certs.Length];
 			for (int t = 0; t < certs.Length; t++)
@@ -110,7 +126,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 		public virtual bool Verify(PKMacBuilder pkMacBuilder, char[] password)
 		{
 			if (!CmpObjectIdentifiers.passwordBasedMac.Equals(m_pkiMessage.Header.ProtectionAlg.Algorithm))
+			{
 				throw new InvalidOperationException("protection algorithm is not mac based");
+			}
 
 			PbmParameter parameter = PbmParameter.GetInstance(m_pkiMessage.Header.ProtectionAlg.Parameters);
 
@@ -121,14 +139,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 			return Arrays.ConstantTimeAreEqual(result.Collect(), m_pkiMessage.Protection.GetBytes());
 		}
 
-		private TResult Process<TResult>(IStreamCalculator<TResult> streamCalculator)
+		TResult Process<TResult>(IStreamCalculator<TResult> streamCalculator)
 		{
 			Asn1EncodableVector avec = new Asn1EncodableVector();
 			avec.Add(m_pkiMessage.Header);
 			avec.Add(m_pkiMessage.Body);
 			byte[] enc = new DerSequence(avec).GetDerEncoded();
 
-			using (var stream = streamCalculator.Stream)
+			using (Stream stream = streamCalculator.Stream)
 			{
 				stream.Write(enc, 0, enc.Length);
 			}

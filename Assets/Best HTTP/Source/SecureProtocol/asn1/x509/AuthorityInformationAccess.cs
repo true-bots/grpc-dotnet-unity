@@ -25,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class AuthorityInformationAccess
 		: Asn1Encodable
 	{
-		private static AccessDescription[] Copy(AccessDescription[] descriptions)
+		static AccessDescription[] Copy(AccessDescription[] descriptions)
 		{
 			return (AccessDescription[])descriptions.Clone();
 		}
@@ -33,9 +33,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static AuthorityInformationAccess GetInstance(object obj)
 		{
 			if (obj is AuthorityInformationAccess)
+			{
 				return (AuthorityInformationAccess)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new AuthorityInformationAccess(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -44,15 +50,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return GetInstance(X509Extensions.GetExtensionParsedValue(extensions, X509Extensions.AuthorityInfoAccess));
 		}
 
-		private readonly AccessDescription[] descriptions;
+		readonly AccessDescription[] descriptions;
 
-		private AuthorityInformationAccess(
+		AuthorityInformationAccess(
 			Asn1Sequence seq)
 		{
 			if (seq.Count < 1)
+			{
 				throw new ArgumentException("sequence may not be empty");
+			}
 
-			this.descriptions = new AccessDescription[seq.Count];
+			descriptions = new AccessDescription[seq.Count];
 
 			for (int i = 0; i < seq.Count; ++i)
 			{
@@ -63,7 +71,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public AuthorityInformationAccess(
 			AccessDescription description)
 		{
-			this.descriptions = new AccessDescription[] { description };
+			descriptions = new AccessDescription[] { description };
 		}
 
 		public AuthorityInformationAccess(

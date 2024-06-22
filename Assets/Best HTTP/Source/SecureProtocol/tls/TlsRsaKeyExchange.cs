@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class TlsRsaKeyExchange
 		: AbstractTlsKeyExchange
 	{
-		private static int CheckKeyExchange(int keyExchange)
+		static int CheckKeyExchange(int keyExchange)
 		{
 			switch (keyExchange)
 			{
@@ -37,12 +37,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public override void ProcessServerCredentials(TlsCredentials serverCredentials)
 		{
-			this.m_serverCredentials = TlsUtilities.RequireDecryptorCredentials(serverCredentials);
+			m_serverCredentials = TlsUtilities.RequireDecryptorCredentials(serverCredentials);
 		}
 
 		public override void ProcessServerCertificate(Certificate serverCertificate)
 		{
-			this.m_serverEncryptor = serverCertificate.GetCertificateAt(0).CreateEncryptor(
+			m_serverEncryptor = serverCertificate.GetCertificateAt(0).CreateEncryptor(
 				TlsCertificateRole.RsaEncryption);
 		}
 
@@ -62,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public override void GenerateClientKeyExchange(Stream output)
 		{
-			this.m_preMasterSecret = TlsUtilities.GenerateEncryptedPreMasterSecret(m_context, m_serverEncryptor,
+			m_preMasterSecret = TlsUtilities.GenerateEncryptedPreMasterSecret(m_context, m_serverEncryptor,
 				output);
 		}
 
@@ -70,14 +70,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			byte[] encryptedPreMasterSecret = TlsUtilities.ReadEncryptedPms(m_context, input);
 
-			this.m_preMasterSecret = m_serverCredentials.Decrypt(new TlsCryptoParameters(m_context),
+			m_preMasterSecret = m_serverCredentials.Decrypt(new TlsCryptoParameters(m_context),
 				encryptedPreMasterSecret);
 		}
 
 		public override TlsSecret GeneratePreMasterSecret()
 		{
-			TlsSecret tmp = this.m_preMasterSecret;
-			this.m_preMasterSecret = null;
+			TlsSecret tmp = m_preMasterSecret;
+			m_preMasterSecret = null;
 			return tmp;
 		}
 	}

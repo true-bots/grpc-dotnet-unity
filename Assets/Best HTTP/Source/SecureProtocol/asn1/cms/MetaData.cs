@@ -7,10 +7,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class MetaData
 		: Asn1Encodable
 	{
-		private DerBoolean hashProtected;
-		private DerUtf8String fileName;
-		private DerIA5String mediaType;
-		private Attributes otherMetaData;
+		DerBoolean hashProtected;
+		DerUtf8String fileName;
+		DerIA5String mediaType;
+		Attributes otherMetaData;
 
 		public MetaData(
 			DerBoolean hashProtected,
@@ -24,35 +24,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			this.otherMetaData = otherMetaData;
 		}
 
-		private MetaData(Asn1Sequence seq)
+		MetaData(Asn1Sequence seq)
 		{
-			this.hashProtected = DerBoolean.GetInstance(seq[0]);
+			hashProtected = DerBoolean.GetInstance(seq[0]);
 
 			int index = 1;
 
 			if (index < seq.Count && seq[index] is DerUtf8String)
 			{
-				this.fileName = DerUtf8String.GetInstance(seq[index++]);
+				fileName = DerUtf8String.GetInstance(seq[index++]);
 			}
 
 			if (index < seq.Count && seq[index] is DerIA5String)
 			{
-				this.mediaType = DerIA5String.GetInstance(seq[index++]);
+				mediaType = DerIA5String.GetInstance(seq[index++]);
 			}
 
 			if (index < seq.Count)
 			{
-				this.otherMetaData = Attributes.GetInstance(seq[index++]);
+				otherMetaData = Attributes.GetInstance(seq[index++]);
 			}
 		}
 
 		public static MetaData GetInstance(object obj)
 		{
 			if (obj is MetaData)
+			{
 				return (MetaData)obj;
+			}
 
 			if (obj != null)
+			{
 				return new MetaData(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}

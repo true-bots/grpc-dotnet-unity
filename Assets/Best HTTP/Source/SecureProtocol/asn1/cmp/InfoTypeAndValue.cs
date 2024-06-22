@@ -51,10 +51,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class InfoTypeAndValue
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier m_infoType;
-		private readonly Asn1Encodable m_infoValue;
+		readonly DerObjectIdentifier m_infoType;
+		readonly Asn1Encodable m_infoValue;
 
-		private InfoTypeAndValue(Asn1Sequence seq)
+		InfoTypeAndValue(Asn1Sequence seq)
 		{
 			m_infoType = DerObjectIdentifier.GetInstance(seq[0]);
 
@@ -67,10 +67,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static InfoTypeAndValue GetInstance(object obj)
 		{
 			if (obj is InfoTypeAndValue infoTypeAndValue)
+			{
 				return infoTypeAndValue;
+			}
 
 			if (obj != null)
+			{
 				return new InfoTypeAndValue(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
@@ -83,15 +87,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public InfoTypeAndValue(DerObjectIdentifier infoType, Asn1Encodable infoValue)
 		{
 			if (infoType == null)
+			{
 				throw new ArgumentNullException(nameof(infoType));
+			}
 
 			m_infoType = infoType;
 			m_infoValue = infoValue;
 		}
 
-		public virtual DerObjectIdentifier InfoType => m_infoType;
+		public virtual DerObjectIdentifier InfoType
+		{
+			get { return m_infoType; }
+		}
 
-		public virtual Asn1Encodable InfoValue => m_infoValue;
+		public virtual Asn1Encodable InfoValue
+		{
+			get { return m_infoValue; }
+		}
 
 		/**
 		 * <pre>
@@ -105,7 +117,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public override Asn1Object ToAsn1Object()
 		{
 			if (m_infoValue == null)
+			{
 				return new DerSequence(m_infoType);
+			}
 
 			return new DerSequence(m_infoType, m_infoValue);
 		}

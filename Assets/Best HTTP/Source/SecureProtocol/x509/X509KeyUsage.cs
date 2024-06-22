@@ -37,7 +37,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		public const int EncipherOnly = 1 << 0;
 		public const int DecipherOnly = 1 << 15;
 
-		private readonly int usage;
+		readonly int usage;
 
 		/**
 		 * Basic constructor.

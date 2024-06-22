@@ -8,10 +8,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	/**
 	 * Parser for definite-length tagged objects.
 	 */
-	internal class DLTaggedObjectParser
+	class DLTaggedObjectParser
 		: BerTaggedObjectParser
 	{
-		private readonly bool m_constructed;
+		readonly bool m_constructed;
 
 		internal DLTaggedObjectParser(int tagClass, int tagNo, bool constructed, Asn1StreamParser parser)
 			: base(tagClass, tagNo, parser)
@@ -29,7 +29,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			if (declaredExplicit)
 			{
 				if (!m_constructed)
+				{
 					throw new IOException("Explicit tags must be constructed (see X.690 8.14.2)");
+				}
 
 				return m_parser.ParseObject(baseTagNo);
 			}
@@ -42,7 +44,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public override IAsn1Convertible ParseExplicitBaseObject()
 		{
 			if (!m_constructed)
+			{
 				throw new IOException("Explicit tags must be constructed (see X.690 8.14.2)");
+			}
 
 			return m_parser.ReadObject();
 		}
@@ -50,7 +54,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public override Asn1TaggedObjectParser ParseExplicitBaseTagged()
 		{
 			if (!m_constructed)
+			{
 				throw new IOException("Explicit tags must be constructed (see X.690 8.14.2)");
+			}
 
 			return m_parser.ParseTaggedObject();
 		}

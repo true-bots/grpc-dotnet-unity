@@ -16,15 +16,15 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes.Gcm
 {
-	internal abstract class GcmUtilities
+	abstract class GcmUtilities
 	{
 		internal struct FieldElement
 		{
 			internal ulong n0, n1;
 		}
 
-		private const uint E1 = 0xe1000000;
-		private const ulong E1UL = (ulong)E1 << 32;
+		const uint E1 = 0xe1000000;
+		const ulong E1UL = (ulong)E1 << 32;
 
 		internal static void One(out FieldElement x)
 		{
@@ -62,9 +62,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes.Gcm
 		{
 			ulong x0 = x.n0, x1 = x.n1;
 			ulong m = (ulong)((long)x0 >> 63);
-			x0 ^= (m & E1UL);
+			x0 ^= m & E1UL;
 			z.n0 = (x0 << 1) | (x1 >> 63);
-			z.n1 = (x1 << 1) | (ulong)(-(long)m);
+			z.n1 = (x1 << 1) | (ulong)-(long)m;
 		}
 
 		internal static void Multiply(byte[] x, byte[] y)
@@ -278,7 +278,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes.Gcm
         }
 #endif
 
-		private static ulong ImplMul64(ulong x, ulong y)
+		static ulong ImplMul64(ulong x, ulong y)
 		{
 			ulong x0 = x & 0x1111111111111111UL;
 			ulong x1 = x & 0x2222222222222222UL;

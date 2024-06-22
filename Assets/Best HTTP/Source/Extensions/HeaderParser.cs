@@ -9,10 +9,10 @@ namespace BestHTTP.Extensions
 	{
 		public HeaderParser(string headerStr)
 		{
-			base.Values = Parse(headerStr);
+			Values = Parse(headerStr);
 		}
 
-		private List<HeaderValue> Parse(string headerStr)
+		List<HeaderValue> Parse(string headerStr)
 		{
 			List<HeaderValue> result = new List<HeaderValue>();
 

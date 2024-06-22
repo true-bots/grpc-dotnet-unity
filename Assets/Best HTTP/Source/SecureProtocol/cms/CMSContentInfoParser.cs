@@ -17,7 +17,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			Stream data)
 		{
 			if (data == null)
+			{
 				throw new ArgumentNullException("data");
+			}
 
 			this.data = data;
 
@@ -25,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			{
 				Asn1StreamParser inStream = new Asn1StreamParser(data);
 
-				this.contentInfo = new ContentInfoParser((Asn1SequenceParser)inStream.ReadObject());
+				contentInfo = new ContentInfoParser((Asn1SequenceParser)inStream.ReadObject());
 			}
 			catch (IOException e)
 			{

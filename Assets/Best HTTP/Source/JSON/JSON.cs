@@ -17,20 +17,20 @@ namespace BestHTTP.JSON
 	/// </summary>
 	public class Json
 	{
-		private const int TOKEN_NONE = 0;
-		private const int TOKEN_CURLY_OPEN = 1;
-		private const int TOKEN_CURLY_CLOSE = 2;
-		private const int TOKEN_SQUARED_OPEN = 3;
-		private const int TOKEN_SQUARED_CLOSE = 4;
-		private const int TOKEN_COLON = 5;
-		private const int TOKEN_COMMA = 6;
-		private const int TOKEN_STRING = 7;
-		private const int TOKEN_NUMBER = 8;
-		private const int TOKEN_TRUE = 9;
-		private const int TOKEN_FALSE = 10;
-		private const int TOKEN_NULL = 11;
+		const int TOKEN_NONE = 0;
+		const int TOKEN_CURLY_OPEN = 1;
+		const int TOKEN_CURLY_CLOSE = 2;
+		const int TOKEN_SQUARED_OPEN = 3;
+		const int TOKEN_SQUARED_CLOSE = 4;
+		const int TOKEN_COLON = 5;
+		const int TOKEN_COMMA = 6;
+		const int TOKEN_STRING = 7;
+		const int TOKEN_NUMBER = 8;
+		const int TOKEN_TRUE = 9;
+		const int TOKEN_FALSE = 10;
+		const int TOKEN_NULL = 11;
 
-		private const int BUILDER_CAPACITY = 2000;
+		const int BUILDER_CAPACITY = 2000;
 
 		/// <summary>
 		/// Parses the string json into a value
@@ -77,7 +77,7 @@ namespace BestHTTP.JSON
 
 			bool success = SerializeValue(json, builder);
 
-			return (success ? StringBuilderPool.ReleaseAndGrab(builder) : null);
+			return success ? StringBuilderPool.ReleaseAndGrab(builder) : null;
 		}
 
 		protected static Dictionary<string, object> ParseObject(char[] json, ref int index, ref bool success)
@@ -92,16 +92,16 @@ namespace BestHTTP.JSON
 			while (!done)
 			{
 				token = LookAhead(json, index);
-				if (token == Json.TOKEN_NONE)
+				if (token == TOKEN_NONE)
 				{
 					success = false;
 					return null;
 				}
-				else if (token == Json.TOKEN_COMMA)
+				else if (token == TOKEN_COMMA)
 				{
 					NextToken(json, ref index);
 				}
-				else if (token == Json.TOKEN_CURLY_CLOSE)
+				else if (token == TOKEN_CURLY_CLOSE)
 				{
 					NextToken(json, ref index);
 					return table;
@@ -118,7 +118,7 @@ namespace BestHTTP.JSON
 
 					// :
 					token = NextToken(json, ref index);
-					if (token != Json.TOKEN_COLON)
+					if (token != TOKEN_COLON)
 					{
 						success = false;
 						return null;
@@ -150,16 +150,16 @@ namespace BestHTTP.JSON
 			while (!done)
 			{
 				int token = LookAhead(json, index);
-				if (token == Json.TOKEN_NONE)
+				if (token == TOKEN_NONE)
 				{
 					success = false;
 					return null;
 				}
-				else if (token == Json.TOKEN_COMMA)
+				else if (token == TOKEN_COMMA)
 				{
 					NextToken(json, ref index);
 				}
-				else if (token == Json.TOKEN_SQUARED_CLOSE)
+				else if (token == TOKEN_SQUARED_CLOSE)
 				{
 					NextToken(json, ref index);
 					break;
@@ -183,24 +183,24 @@ namespace BestHTTP.JSON
 		{
 			switch (LookAhead(json, index))
 			{
-				case Json.TOKEN_STRING:
+				case TOKEN_STRING:
 					return ParseString(json, ref index, ref success);
-				case Json.TOKEN_NUMBER:
+				case TOKEN_NUMBER:
 					return ParseNumber(json, ref index, ref success);
-				case Json.TOKEN_CURLY_OPEN:
+				case TOKEN_CURLY_OPEN:
 					return ParseObject(json, ref index, ref success);
-				case Json.TOKEN_SQUARED_OPEN:
+				case TOKEN_SQUARED_OPEN:
 					return ParseArray(json, ref index, ref success);
-				case Json.TOKEN_TRUE:
+				case TOKEN_TRUE:
 					NextToken(json, ref index);
 					return true;
-				case Json.TOKEN_FALSE:
+				case TOKEN_FALSE:
 					NextToken(json, ref index);
 					return false;
-				case Json.TOKEN_NULL:
+				case TOKEN_NULL:
 					NextToken(json, ref index);
 					return null;
-				case Json.TOKEN_NONE:
+				case TOKEN_NONE:
 					break;
 			}
 
@@ -280,13 +280,13 @@ namespace BestHTTP.JSON
 						{
 							// parse the 32 bit hex into an integer codepoint
 							uint codePoint;
-							if (!(success = UInt32.TryParse(new string(json, index, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out codePoint)))
+							if (!(success = uint.TryParse(new string(json, index, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out codePoint)))
 							{
 								return "";
 							}
 
 							// convert the integer codepoint to a unicode char and add to string
-							s.Append(Char.ConvertFromUtf32((int)codePoint));
+							s.Append(char.ConvertFromUtf32((int)codePoint));
 							// skip 4 chars
 							index += 4;
 						}
@@ -316,10 +316,10 @@ namespace BestHTTP.JSON
 			EatWhitespace(json, ref index);
 
 			int lastIndex = GetLastIndexOfNumber(json, index);
-			int charLength = (lastIndex - index) + 1;
+			int charLength = lastIndex - index + 1;
 
 			double number;
-			success = Double.TryParse(new string(json, index, charLength), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
+			success = double.TryParse(new string(json, index, charLength), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
 
 			index = lastIndex + 1;
 			return number;
@@ -363,7 +363,7 @@ namespace BestHTTP.JSON
 
 			if (index == json.Length)
 			{
-				return Json.TOKEN_NONE;
+				return TOKEN_NONE;
 			}
 
 			char c = json[index];
@@ -371,17 +371,17 @@ namespace BestHTTP.JSON
 			switch (c)
 			{
 				case '{':
-					return Json.TOKEN_CURLY_OPEN;
+					return TOKEN_CURLY_OPEN;
 				case '}':
-					return Json.TOKEN_CURLY_CLOSE;
+					return TOKEN_CURLY_CLOSE;
 				case '[':
-					return Json.TOKEN_SQUARED_OPEN;
+					return TOKEN_SQUARED_OPEN;
 				case ']':
-					return Json.TOKEN_SQUARED_CLOSE;
+					return TOKEN_SQUARED_CLOSE;
 				case ',':
-					return Json.TOKEN_COMMA;
+					return TOKEN_COMMA;
 				case '"':
-					return Json.TOKEN_STRING;
+					return TOKEN_STRING;
 				case '0':
 				case '1':
 				case '2':
@@ -393,9 +393,9 @@ namespace BestHTTP.JSON
 				case '8':
 				case '9':
 				case '-':
-					return Json.TOKEN_NUMBER;
+					return TOKEN_NUMBER;
 				case ':':
-					return Json.TOKEN_COLON;
+					return TOKEN_COLON;
 			}
 
 			index--;
@@ -412,7 +412,7 @@ namespace BestHTTP.JSON
 				    json[index + 4] == 'e')
 				{
 					index += 5;
-					return Json.TOKEN_FALSE;
+					return TOKEN_FALSE;
 				}
 			}
 
@@ -425,7 +425,7 @@ namespace BestHTTP.JSON
 				    json[index + 3] == 'e')
 				{
 					index += 4;
-					return Json.TOKEN_TRUE;
+					return TOKEN_TRUE;
 				}
 			}
 
@@ -438,11 +438,11 @@ namespace BestHTTP.JSON
 				    json[index + 3] == 'l')
 				{
 					index += 4;
-					return Json.TOKEN_NULL;
+					return TOKEN_NULL;
 				}
 			}
 
-			return Json.TOKEN_NONE;
+			return TOKEN_NONE;
 		}
 
 		protected static bool SerializeValue(object value, StringBuilder builder)
@@ -461,11 +461,11 @@ namespace BestHTTP.JSON
 			{
 				success = SerializeArray(value as IList, builder);
 			}
-			else if ((value is Boolean) && ((Boolean)value == true))
+			else if (value is bool && (bool)value == true)
 			{
 				builder.Append("true");
 			}
-			else if ((value is Boolean) && ((Boolean)value == false))
+			else if (value is bool && (bool)value == false)
 			{
 				builder.Append("false");
 			}
@@ -581,7 +581,7 @@ namespace BestHTTP.JSON
 				else
 				{
 					int codepoint = Convert.ToInt32(c);
-					if ((codepoint >= 32) && (codepoint <= 126))
+					if (codepoint >= 32 && codepoint <= 126)
 					{
 						builder.Append(c);
 					}

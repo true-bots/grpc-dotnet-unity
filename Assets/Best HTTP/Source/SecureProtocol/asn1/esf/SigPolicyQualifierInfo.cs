@@ -18,34 +18,43 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class SigPolicyQualifierInfo
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier sigPolicyQualifierId;
-		private readonly Asn1Object sigQualifier;
+		readonly DerObjectIdentifier sigPolicyQualifierId;
+		readonly Asn1Object sigQualifier;
 
 		public static SigPolicyQualifierInfo GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is SigPolicyQualifierInfo)
+			{
 				return (SigPolicyQualifierInfo)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new SigPolicyQualifierInfo((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'SigPolicyQualifierInfo' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
-		private SigPolicyQualifierInfo(
+		SigPolicyQualifierInfo(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
-			if (seq.Count != 2)
-				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
-			this.sigPolicyQualifierId = (DerObjectIdentifier)seq[0].ToAsn1Object();
-			this.sigQualifier = seq[1].ToAsn1Object();
+			if (seq.Count != 2)
+			{
+				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
+
+			sigPolicyQualifierId = (DerObjectIdentifier)seq[0].ToAsn1Object();
+			sigQualifier = seq[1].ToAsn1Object();
 		}
 
 		public SigPolicyQualifierInfo(

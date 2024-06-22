@@ -7,32 +7,32 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP521R1Curve
+	class SecP521R1Curve
 		: AbstractFpCurve
 	{
 		public static readonly BigInteger q = SecP521R1FieldElement.Q;
 
-		private const int SECP521R1_DEFAULT_COORDS = COORD_JACOBIAN;
-		private const int SECP521R1_FE_INTS = 17;
-		private static readonly ECFieldElement[] SECP521R1_AFFINE_ZS = new ECFieldElement[] { new SecP521R1FieldElement(BigInteger.One) };
+		const int SECP521R1_DEFAULT_COORDS = COORD_JACOBIAN;
+		const int SECP521R1_FE_INTS = 17;
+		static readonly ECFieldElement[] SECP521R1_AFFINE_ZS = new ECFieldElement[] { new SecP521R1FieldElement(BigInteger.One) };
 
 		protected readonly SecP521R1Point m_infinity;
 
 		public SecP521R1Curve()
 			: base(q)
 		{
-			this.m_infinity = new SecP521R1Point(this, null, null);
+			m_infinity = new SecP521R1Point(this, null, null);
 
-			this.m_a = FromBigInteger(new BigInteger(1,
+			m_a = FromBigInteger(new BigInteger(1,
 				Hex.DecodeStrict(
 					"01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC")));
-			this.m_b = FromBigInteger(new BigInteger(1,
+			m_b = FromBigInteger(new BigInteger(1,
 				Hex.DecodeStrict(
 					"0051953EB9618E1C9A1F929A21A0B68540EEA2DA725B99B315F3B8B489918EF109E156193951EC7E937B1652C0BD3BB1BF073573DF883D2C34F1EF451FD46B503F00")));
-			this.m_order = new BigInteger(1,
+			m_order = new BigInteger(1,
 				Hex.DecodeStrict("01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA51868783BF2F966B7FCC0148F709A5D03BB5C9B8899C47AEBB6FB71E91386409"));
-			this.m_cofactor = BigInteger.One;
-			this.m_coord = SECP521R1_DEFAULT_COORDS;
+			m_cofactor = BigInteger.One;
+			m_coord = SECP521R1_DEFAULT_COORDS;
 		}
 
 		protected override ECCurve CloneCurve()
@@ -113,18 +113,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			return new SecP521R1FieldElement(x);
 		}
 
-		private class SecP521R1LookupTable
+		class SecP521R1LookupTable
 			: AbstractECLookupTable
 		{
-			private readonly SecP521R1Curve m_outer;
-			private readonly uint[] m_table;
-			private readonly int m_size;
+			readonly SecP521R1Curve m_outer;
+			readonly uint[] m_table;
+			readonly int m_size;
 
 			internal SecP521R1LookupTable(SecP521R1Curve outer, uint[] table, int size)
 			{
-				this.m_outer = outer;
-				this.m_table = table;
-				this.m_size = size;
+				m_outer = outer;
+				m_table = table;
+				m_size = size;
 			}
 
 			public override int Size
@@ -147,7 +147,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 						y[j] ^= m_table[pos + SECP521R1_FE_INTS + j] & MASK;
 					}
 
-					pos += (SECP521R1_FE_INTS * 2);
+					pos += SECP521R1_FE_INTS * 2;
 				}
 
 				return CreatePoint(x, y);
@@ -167,7 +167,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 				return CreatePoint(x, y);
 			}
 
-			private ECPoint CreatePoint(uint[] x, uint[] y)
+			ECPoint CreatePoint(uint[] x, uint[] y)
 			{
 				return m_outer.CreateRawPoint(new SecP521R1FieldElement(x), new SecP521R1FieldElement(y), SECP521R1_AFFINE_ZS);
 			}

@@ -38,7 +38,7 @@ namespace BestHTTP
 	/// <summary>
 	///
 	/// </summary>
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	public static partial class HTTPManager
 	{
 		// Static constructor. Setup default values
@@ -66,7 +66,7 @@ namespace BestHTTP
 			RequestTimeout = TimeSpan.FromSeconds(60);
 
 			// Set the default logger mechanism
-			logger = new BestHTTP.Logger.ThreadedLogger();
+			logger = new ThreadedLogger();
 
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 			UseAlternateSSLDefaultValue = true;
@@ -101,18 +101,22 @@ namespace BestHTTP
 			set
 			{
 				if (value <= 0)
+				{
 					throw new ArgumentOutOfRangeException("MaxConnectionPerServer must be greater than 0!");
+				}
 
 				bool isGrowing = value > maxConnectionPerServer;
 				maxConnectionPerServer = value;
 
 				// If the allowed connections per server is growing, go through all hosts and try to send out queueud requests.
 				if (isGrowing)
+				{
 					HostManager.TryToSendQueuedRequests();
+				}
 			}
 		}
 
-		private static byte maxConnectionPerServer;
+		static byte maxConnectionPerServer;
 
 		/// <summary>
 		/// Default value of a HTTP request's IsKeepAlive value. Default value is true. If you make rare request to the server it should be changed to false.
@@ -163,13 +167,13 @@ namespace BestHTTP
 		/// You can assign a function to this delegate to return a custom root path to define a new path.
 		/// <remarks>This delegate will be called on a non Unity thread!</remarks>
 		/// </summary>
-		public static System.Func<string> RootCacheFolderProvider { get; set; }
+		public static Func<string> RootCacheFolderProvider { get; set; }
 
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
 
 		public static Proxies.Autodetect.ProxyDetector ProxyDetector
 		{
-			get => _proxyDetector;
+			get { return _proxyDetector; }
 			set
 			{
 				_proxyDetector?.Detach();
@@ -177,7 +181,7 @@ namespace BestHTTP
 			}
 		}
 
-		private static Proxies.Autodetect.ProxyDetector _proxyDetector;
+		static Proxies.Autodetect.ProxyDetector _proxyDetector;
 
 		/// <summary>
 		/// The global, default proxy for all HTTPRequests. The HTTPRequest's Proxy still can be changed per-request. Default value is null.
@@ -193,17 +197,20 @@ namespace BestHTTP
 			get
 			{
 				if (heartbeats == null)
+				{
 					heartbeats = new HeartbeatManager();
+				}
+
 				return heartbeats;
 			}
 		}
 
-		private static HeartbeatManager heartbeats;
+		static HeartbeatManager heartbeats;
 
 		/// <summary>
 		/// A basic BestHTTP.Logger.ILogger implementation to be able to log intelligently additional informations about the plugin's internal mechanism.
 		/// </summary>
-		public static BestHTTP.Logger.ILogger Logger
+		public static ILogger Logger
 		{
 			get
 			{
@@ -220,7 +227,7 @@ namespace BestHTTP
 			set { logger = value; }
 		}
 
-		private static BestHTTP.Logger.ILogger logger;
+		static ILogger logger;
 
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 
@@ -293,13 +300,13 @@ namespace BestHTTP
 			private set { _isQuitting = value; }
 		}
 
-		private static volatile bool _isQuitting;
+		static volatile bool _isQuitting;
 
 		#endregion
 
 		#region Manager variables
 
-		private static bool IsSetupCalled;
+		static bool IsSetupCalled;
 
 		#endregion
 
@@ -308,11 +315,14 @@ namespace BestHTTP
 		public static void Setup()
 		{
 			if (IsSetupCalled)
+			{
 				return;
+			}
+
 			IsSetupCalled = true;
 			IsQuitting = false;
 
-			HTTPManager.Logger.Information("HTTPManager", "Setup called! UserAgent: " + UserAgent);
+			Logger.Information("HTTPManager", "Setup called! UserAgent: " + UserAgent);
 
 			HTTPUpdateDelegator.CheckInstance();
 
@@ -321,8 +331,8 @@ namespace BestHTTP
 #endif
 
 #if !BESTHTTP_DISABLE_COOKIES
-			Cookies.CookieJar.SetupFolder();
-			Cookies.CookieJar.Load();
+			CookieJar.SetupFolder();
+			CookieJar.Load();
 #endif
 
 			HostManager.Load();
@@ -351,19 +361,23 @@ namespace BestHTTP
 		public static HTTPRequest SendRequest(HTTPRequest request)
 		{
 			if (!IsSetupCalled)
+			{
 				Setup();
+			}
 
 			if (request.IsCancellationRequested || IsQuitting)
+			{
 				return request;
+			}
 
 #if !BESTHTTP_DISABLE_CACHING
 			// If possible load the full response from cache.
-			if (Caching.HTTPCacheService.IsCachedEntityExpiresInTheFuture(request))
+			if (HTTPCacheService.IsCachedEntityExpiresInTheFuture(request))
 			{
 				DateTime started = DateTime.Now;
 				PlatformSupport.Threading.ThreadedRunner.RunShortLiving<HTTPRequest>((req) =>
 				{
-					if (Connections.ConnectionHelper.TryLoadAllFromCache("HTTPManager", req, req.Context))
+					if (ConnectionHelper.TryLoadAllFromCache("HTTPManager", req, req.Context))
 					{
 						req.Timing.Add("Full Cache Load", DateTime.Now - started);
 						req.State = HTTPRequestStates.Finished;
@@ -399,11 +413,13 @@ namespace BestHTTP
 			try
 			{
 				if (RootCacheFolderProvider != null)
+				{
 					return RootCacheFolderProvider();
+				}
 			}
 			catch (Exception ex)
 			{
-				HTTPManager.Logger.Exception("HTTPManager", "GetRootCacheFolder", ex);
+				Logger.Exception("HTTPManager", "GetRootCacheFolder", ex);
 			}
 
 #if NETFX_CORE
@@ -421,7 +437,7 @@ namespace BestHTTP
 		{
 			IsSetupCalled = false;
 			BufferedReadNetworkStream.ResetNetworkStats();
-			HTTPManager.Logger.Information("HTTPManager", "Reset called!");
+			Logger.Information("HTTPManager", "Reset called!");
 		}
 #endif
 
@@ -434,37 +450,53 @@ namespace BestHTTP
 		/// </summary>
 		public static void OnUpdate()
 		{
-			using (var _ = new ProfilerMarker(nameof(RequestEventHelper)).Auto())
+			using (ProfilerMarker.AutoScope _ = new ProfilerMarker(nameof(RequestEventHelper)).Auto())
+			{
 				RequestEventHelper.ProcessQueue();
+			}
 
-			using (var _ = new ProfilerMarker(nameof(ConnectionEventHelper)).Auto())
+			using (ProfilerMarker.AutoScope _ = new ProfilerMarker(nameof(ConnectionEventHelper)).Auto())
+			{
 				ConnectionEventHelper.ProcessQueue();
+			}
 
-			using (var _ = new ProfilerMarker(nameof(ProtocolEventHelper)).Auto())
+			using (ProfilerMarker.AutoScope _ = new ProfilerMarker(nameof(ProtocolEventHelper)).Auto())
+			{
 				ProtocolEventHelper.ProcessQueue();
+			}
 
-			using (var _ = new ProfilerMarker(nameof(PluginEventHelper)).Auto())
+			using (ProfilerMarker.AutoScope _ = new ProfilerMarker(nameof(PluginEventHelper)).Auto())
+			{
 				PluginEventHelper.ProcessQueue();
+			}
 
-			using (var _ = new ProfilerMarker(nameof(Timer)).Auto())
-				BestHTTP.Extensions.Timer.Process();
+			using (ProfilerMarker.AutoScope _ = new ProfilerMarker(nameof(Timer)).Auto())
+			{
+				Timer.Process();
+			}
 
 			if (heartbeats != null)
 			{
-				using (var _ = new ProfilerMarker(nameof(HeartbeatManager)).Auto())
+				using (ProfilerMarker.AutoScope _ = new ProfilerMarker(nameof(HeartbeatManager)).Auto())
+				{
 					heartbeats.Update();
+				}
 			}
 
-			using (var _ = new ProfilerMarker(nameof(BufferPool)).Auto())
+			using (ProfilerMarker.AutoScope _ = new ProfilerMarker(nameof(BufferPool)).Auto())
+			{
 				BufferPool.Maintain();
+			}
 
-			using (var _ = new ProfilerMarker(nameof(StringBuilderPool)).Auto())
+			using (ProfilerMarker.AutoScope _ = new ProfilerMarker(nameof(StringBuilderPool)).Auto())
+			{
 				StringBuilderPool.Maintain();
+			}
 		}
 
 		public static void OnQuit()
 		{
-			HTTPManager.Logger.Information("HTTPManager", "OnQuit called!");
+			Logger.Information("HTTPManager", "OnQuit called!");
 
 			IsQuitting = true;
 
@@ -487,7 +519,7 @@ namespace BestHTTP
 
 		public static void AbortAll()
 		{
-			HTTPManager.Logger.Information("HTTPManager", "AbortAll called!");
+			Logger.Information("HTTPManager", "AbortAll called!");
 
 			// This is an immediate shutdown request!
 

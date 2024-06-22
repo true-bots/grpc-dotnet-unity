@@ -15,7 +15,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(Asn1Sequence), Asn1Tags.Sequence)
+			Meta() : base(typeof(Asn1Sequence), Asn1Tags.Sequence)
 			{
 			}
 
@@ -34,16 +34,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1Sequence GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is Asn1Sequence asn1Sequence)
+			{
 				return asn1Sequence;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is Asn1Sequence converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -57,7 +63,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -84,31 +90,40 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		protected internal Asn1Sequence()
 		{
-			this.elements = Asn1EncodableVector.EmptyElements;
+			elements = Asn1EncodableVector.EmptyElements;
 		}
 
 		protected internal Asn1Sequence(Asn1Encodable element)
 		{
 			if (null == element)
+			{
 				throw new ArgumentNullException(nameof(element));
+			}
 
-			this.elements = new Asn1Encodable[] { element };
+			elements = new Asn1Encodable[] { element };
 		}
 
 		protected internal Asn1Sequence(Asn1Encodable element1, Asn1Encodable element2)
 		{
 			if (null == element1)
+			{
 				throw new ArgumentNullException(nameof(element1));
-			if (null == element2)
-				throw new ArgumentNullException(nameof(element2));
+			}
 
-			this.elements = new Asn1Encodable[] { element1, element2 };
+			if (null == element2)
+			{
+				throw new ArgumentNullException(nameof(element2));
+			}
+
+			elements = new Asn1Encodable[] { element1, element2 };
 		}
 
 		protected internal Asn1Sequence(params Asn1Encodable[] elements)
 		{
 			if (Arrays.IsNullOrContainsNull(elements))
+			{
 				throw new NullReferenceException("'elements' cannot be null, or contain null");
+			}
 
 			this.elements = Asn1EncodableVector.CloneElements(elements);
 		}
@@ -121,9 +136,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		protected internal Asn1Sequence(Asn1EncodableVector elementVector)
 		{
 			if (null == elementVector)
+			{
 				throw new ArgumentNullException("elementVector");
+			}
 
-			this.elements = elementVector.TakeElements();
+			elements = elementVector.TakeElements();
 		}
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -137,33 +154,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return e.GetEnumerator();
 		}
 
-		private class Asn1SequenceParserImpl
+		class Asn1SequenceParserImpl
 			: Asn1SequenceParser
 		{
-			private readonly Asn1Sequence outer;
-			private readonly int max;
-			private int index;
+			readonly Asn1Sequence outer;
+			readonly int max;
+			int index;
 
 			public Asn1SequenceParserImpl(
 				Asn1Sequence outer)
 			{
 				this.outer = outer;
 				// NOTE: Call Count here to 'force' a LazyDerSequence
-				this.max = outer.Count;
+				max = outer.Count;
 			}
 
 			public IAsn1Convertible ReadObject()
 			{
 				if (index == max)
+				{
 					return null;
+				}
 
 				Asn1Encodable obj = outer[index++];
 
 				if (obj is Asn1Sequence)
+				{
 					return ((Asn1Sequence)obj).Parser;
+				}
 
 				if (obj is Asn1Set)
+				{
 					return ((Asn1Set)obj).Parser;
+				}
 
 				// NB: Asn1OctetString implements Asn1OctetStringParser directly
 //				if (obj is Asn1OctetString)
@@ -236,20 +259,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			Asn1Sequence that = asn1Object as Asn1Sequence;
 			if (null == that)
+			{
 				return false;
+			}
 
 			// NOTE: Call Count here (on both) to 'force' a LazyDerSequence
-			int count = this.Count;
+			int count = Count;
 			if (that.Count != count)
+			{
 				return false;
+			}
 
 			for (int i = 0; i < count; ++i)
 			{
-				Asn1Object o1 = this.elements[i].ToAsn1Object();
+				Asn1Object o1 = elements[i].ToAsn1Object();
 				Asn1Object o2 = that.elements[i].ToAsn1Object();
 
 				if (!o1.Equals(o2))
+				{
 					return false;
+				}
 			}
 
 			return true;

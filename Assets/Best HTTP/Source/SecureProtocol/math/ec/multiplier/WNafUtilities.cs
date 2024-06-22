@@ -9,19 +9,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 	{
 		public static readonly string PRECOMP_NAME = "bc_wnaf";
 
-		private static readonly int[] DEFAULT_WINDOW_SIZE_CUTOFFS = new int[] { 13, 41, 121, 337, 897, 2305 };
-		private static readonly int MAX_WIDTH = 16;
+		static readonly int[] DEFAULT_WINDOW_SIZE_CUTOFFS = new int[] { 13, 41, 121, 337, 897, 2305 };
+		static readonly int MAX_WIDTH = 16;
 
-		private static readonly ECPoint[] EMPTY_POINTS = new ECPoint[0];
+		static readonly ECPoint[] EMPTY_POINTS = new ECPoint[0];
 
 		public static void ConfigureBasepoint(ECPoint p)
 		{
 			ECCurve c = p.Curve;
 			if (null == c)
+			{
 				return;
+			}
 
 			BigInteger n = c.Order;
-			int bits = (null == n) ? c.FieldSize + 1 : n.BitLength;
+			int bits = null == n ? c.FieldSize + 1 : n.BitLength;
 			int confWidth = System.Math.Min(MAX_WIDTH, GetWindowSize(bits) + 3);
 
 			c.Precompute(p, PRECOMP_NAME, new ConfigureBasepointCallback(c, confWidth));
@@ -29,10 +31,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 
 		public static int[] GenerateCompactNaf(BigInteger k)
 		{
-			if ((k.BitLength >> 16) != 0)
+			if (k.BitLength >> 16 != 0)
+			{
 				throw new ArgumentException("must have bitlength < 2^16", "k");
+			}
+
 			if (k.SignValue == 0)
+			{
 				return Arrays.EmptyInts;
+			}
 
 			BigInteger _3k = k.ShiftLeft(1).Add(k);
 
@@ -74,11 +81,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 			}
 
 			if (width < 2 || width > 16)
+			{
 				throw new ArgumentException("must be in the range [2, 16]", "width");
-			if ((k.BitLength >> 16) != 0)
+			}
+
+			if (k.BitLength >> 16 != 0)
+			{
 				throw new ArgumentException("must have bitlength < 2^16", "k");
+			}
+
 			if (k.SignValue == 0)
+			{
 				return Arrays.EmptyInts;
+			}
 
 			int[] wnaf = new int[k.BitLength / width + 1];
 
@@ -143,8 +158,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 				int u0 = n0 & 1;
 				if (u0 != 0)
 				{
-					u0 -= (n0 & 2);
-					if ((n0 + u0) == 4 && (n1 & 3) == 2)
+					u0 -= n0 & 2;
+					if (n0 + u0 == 4 && (n1 & 3) == 2)
 					{
 						u0 = -u0;
 					}
@@ -153,19 +168,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 				int u1 = n1 & 1;
 				if (u1 != 0)
 				{
-					u1 -= (n1 & 2);
-					if ((n1 + u1) == 4 && (n0 & 3) == 2)
+					u1 -= n1 & 2;
+					if (n1 + u1 == 4 && (n0 & 3) == 2)
 					{
 						u1 = -u1;
 					}
 				}
 
-				if ((d0 << 1) == 1 + u0)
+				if (d0 << 1 == 1 + u0)
 				{
 					d0 ^= 1;
 				}
 
-				if ((d1 << 1) == 1 + u1)
+				if (d1 << 1 == 1 + u1)
 				{
 					d1 ^= 1;
 				}
@@ -192,7 +207,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 		public static byte[] GenerateNaf(BigInteger k)
 		{
 			if (k.SignValue == 0)
+			{
 				return Arrays.EmptyBytes;
+			}
 
 			BigInteger _3k = k.ShiftLeft(1).Add(k);
 
@@ -235,9 +252,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 			}
 
 			if (width < 2 || width > 8)
+			{
 				throw new ArgumentException("must be in the range [2, 8]", "width");
+			}
+
 			if (k.SignValue == 0)
+			{
 				return Arrays.EmptyBytes;
+			}
 
 			byte[] wnaf = new byte[k.BitLength + 1];
 
@@ -271,7 +293,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 					digit -= pow2;
 				}
 
-				length += (length > 0) ? pos - 1 : pos;
+				length += length > 0 ? pos - 1 : pos;
 				wnaf[length++] = (byte)digit;
 				pos = width;
 			}
@@ -288,7 +310,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 		public static int GetNafWeight(BigInteger k)
 		{
 			if (k.SignValue == 0)
+			{
 				return 0;
+			}
 
 			BigInteger _3k = k.ShiftLeft(1).Add(k);
 			BigInteger diff = _3k.Xor(k);
@@ -376,37 +400,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 				new PrecomputeWithPointMapCallback(p, pointMap, fromWNaf, includeNegated));
 		}
 
-		private static byte[] Trim(byte[] a, int length)
+		static byte[] Trim(byte[] a, int length)
 		{
 			byte[] result = new byte[length];
 			Array.Copy(a, 0, result, 0, result.Length);
 			return result;
 		}
 
-		private static int[] Trim(int[] a, int length)
+		static int[] Trim(int[] a, int length)
 		{
 			int[] result = new int[length];
 			Array.Copy(a, 0, result, 0, result.Length);
 			return result;
 		}
 
-		private static ECPoint[] ResizeTable(ECPoint[] a, int length)
+		static ECPoint[] ResizeTable(ECPoint[] a, int length)
 		{
 			ECPoint[] result = new ECPoint[length];
 			Array.Copy(a, 0, result, 0, a.Length);
 			return result;
 		}
 
-		private class ConfigureBasepointCallback
+		class ConfigureBasepointCallback
 			: IPreCompCallback
 		{
-			private readonly ECCurve m_curve;
-			private readonly int m_confWidth;
+			readonly ECCurve m_curve;
+			readonly int m_confWidth;
 
 			internal ConfigureBasepointCallback(ECCurve curve, int confWidth)
 			{
-				this.m_curve = curve;
-				this.m_confWidth = confWidth;
+				m_curve = curve;
+				m_confWidth = confWidth;
 			}
 
 			public PreCompInfo Precompute(PreCompInfo existing)
@@ -436,18 +460,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 			}
 		}
 
-		private class MapPointCallback
+		class MapPointCallback
 			: IPreCompCallback
 		{
-			private readonly WNafPreCompInfo m_infoP;
-			private readonly bool m_includeNegated;
-			private readonly ECPointMap m_pointMap;
+			readonly WNafPreCompInfo m_infoP;
+			readonly bool m_includeNegated;
+			readonly ECPointMap m_pointMap;
 
 			internal MapPointCallback(WNafPreCompInfo infoP, bool includeNegated, ECPointMap pointMap)
 			{
-				this.m_infoP = infoP;
-				this.m_includeNegated = includeNegated;
-				this.m_pointMap = pointMap;
+				m_infoP = infoP;
+				m_includeNegated = includeNegated;
+				m_pointMap = pointMap;
 			}
 
 			public PreCompInfo Precompute(PreCompInfo existing)
@@ -488,18 +512,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 			}
 		}
 
-		private class PrecomputeCallback
+		class PrecomputeCallback
 			: IPreCompCallback
 		{
-			private readonly ECPoint m_p;
-			private readonly int m_minWidth;
-			private readonly bool m_includeNegated;
+			readonly ECPoint m_p;
+			readonly int m_minWidth;
+			readonly bool m_includeNegated;
 
 			internal PrecomputeCallback(ECPoint p, int minWidth, bool includeNegated)
 			{
-				this.m_p = p;
-				this.m_minWidth = minWidth;
-				this.m_includeNegated = includeNegated;
+				m_p = p;
+				m_minWidth = minWidth;
+				m_includeNegated = includeNegated;
 			}
 
 			public PreCompInfo Precompute(PreCompInfo existing)
@@ -549,7 +573,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 
 				if (iniPreCompLen < reqPreCompLen)
 				{
-					preComp = WNafUtilities.ResizeTable(preComp, reqPreCompLen);
+					preComp = ResizeTable(preComp, reqPreCompLen);
 
 					if (reqPreCompLen == 1)
 					{
@@ -644,7 +668,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 						pos = preCompNeg.Length;
 						if (pos < reqPreCompLen)
 						{
-							preCompNeg = WNafUtilities.ResizeTable(preCompNeg, reqPreCompLen);
+							preCompNeg = ResizeTable(preCompNeg, reqPreCompLen);
 						}
 					}
 
@@ -662,7 +686,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 				return result;
 			}
 
-			private bool CheckExisting(WNafPreCompInfo existingWNaf, int width, int reqPreCompLen, bool includeNegated)
+			bool CheckExisting(WNafPreCompInfo existingWNaf, int width, int reqPreCompLen, bool includeNegated)
 			{
 				return null != existingWNaf
 				       && existingWNaf.Width >= System.Math.Max(existingWNaf.ConfWidth, width)
@@ -670,27 +694,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 				       && (!includeNegated || CheckTable(existingWNaf.PreCompNeg, reqPreCompLen));
 			}
 
-			private bool CheckTable(ECPoint[] table, int reqLen)
+			bool CheckTable(ECPoint[] table, int reqLen)
 			{
 				return null != table && table.Length >= reqLen;
 			}
 		}
 
-		private class PrecomputeWithPointMapCallback
+		class PrecomputeWithPointMapCallback
 			: IPreCompCallback
 		{
-			private readonly ECPoint m_point;
-			private readonly ECPointMap m_pointMap;
-			private readonly WNafPreCompInfo m_fromWNaf;
-			private readonly bool m_includeNegated;
+			readonly ECPoint m_point;
+			readonly ECPointMap m_pointMap;
+			readonly WNafPreCompInfo m_fromWNaf;
+			readonly bool m_includeNegated;
 
 			internal PrecomputeWithPointMapCallback(ECPoint point, ECPointMap pointMap, WNafPreCompInfo fromWNaf,
 				bool includeNegated)
 			{
-				this.m_point = point;
-				this.m_pointMap = pointMap;
-				this.m_fromWNaf = fromWNaf;
-				this.m_includeNegated = includeNegated;
+				m_point = point;
+				m_pointMap = pointMap;
+				m_fromWNaf = fromWNaf;
+				m_includeNegated = includeNegated;
 			}
 
 			public PreCompInfo Precompute(PreCompInfo existing)
@@ -745,7 +769,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 				return result;
 			}
 
-			private bool CheckExisting(WNafPreCompInfo existingWNaf, int width, int reqPreCompLen, bool includeNegated)
+			bool CheckExisting(WNafPreCompInfo existingWNaf, int width, int reqPreCompLen, bool includeNegated)
 			{
 				return null != existingWNaf
 				       && existingWNaf.Width >= width
@@ -753,7 +777,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 				       && (!includeNegated || CheckTable(existingWNaf.PreCompNeg, reqPreCompLen));
 			}
 
-			private bool CheckTable(ECPoint[] table, int reqLen)
+			bool CheckTable(ECPoint[] table, int reqLen)
 			{
 				return null != table && table.Length >= reqLen;
 			}

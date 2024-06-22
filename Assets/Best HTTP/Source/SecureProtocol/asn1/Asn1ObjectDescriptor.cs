@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(Asn1ObjectDescriptor), Asn1Tags.ObjectDescriptor)
+			Meta() : base(typeof(Asn1ObjectDescriptor), Asn1Tags.ObjectDescriptor)
 			{
 			}
 
@@ -40,16 +40,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1ObjectDescriptor GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is Asn1ObjectDescriptor asn1ObjectDescriptor)
+			{
 				return asn1ObjectDescriptor;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is Asn1ObjectDescriptor converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -63,7 +69,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -79,14 +85,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (Asn1ObjectDescriptor)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly DerGraphicString m_baseGraphicString;
+		readonly DerGraphicString m_baseGraphicString;
 
 		public Asn1ObjectDescriptor(DerGraphicString baseGraphicString)
 		{
 			if (null == baseGraphicString)
+			{
 				throw new ArgumentNullException("baseGraphicString");
+			}
 
-			this.m_baseGraphicString = baseGraphicString;
+			m_baseGraphicString = baseGraphicString;
 		}
 
 		public DerGraphicString BaseGraphicString
@@ -113,7 +121,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			Asn1ObjectDescriptor that = asn1Object as Asn1ObjectDescriptor;
 			return null != that
-			       && this.m_baseGraphicString.Equals(that.m_baseGraphicString);
+			       && m_baseGraphicString.Equals(that.m_baseGraphicString);
 		}
 
 		internal static Asn1ObjectDescriptor CreatePrimitive(byte[] contents)

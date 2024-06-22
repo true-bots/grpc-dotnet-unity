@@ -37,10 +37,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class CmsEnvelopedDataStreamGenerator
 		: CmsEnvelopedGenerator
 	{
-		private object _originatorInfo = null;
-		private object _unprotectedAttributes = null;
-		private int _bufferSize;
-		private bool _berEncodeRecipientSet;
+		object _originatorInfo = null;
+		object _unprotectedAttributes = null;
+		int _bufferSize;
+		bool _berEncodeRecipientSet;
 
 		public CmsEnvelopedDataStreamGenerator()
 		{
@@ -68,11 +68,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			_berEncodeRecipientSet = berEncodeRecipientSet;
 		}
 
-		private DerInteger Version
+		DerInteger Version
 		{
 			get
 			{
-				int version = (_originatorInfo != null || _unprotectedAttributes != null)
+				int version = _originatorInfo != null || _unprotectedAttributes != null
 					? 2
 					: 0;
 
@@ -84,7 +84,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		/// Generate an enveloped object that contains an CMS Enveloped Data
 		/// object using the passed in key generator.
 		/// </summary>
-		private Stream Open(
+		Stream Open(
 			Stream outStream,
 			string encryptionOid,
 			CipherKeyGenerator keyGen)
@@ -119,7 +119,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return Open(outStream, encAlgID, cipherParameters, recipientInfos);
 		}
 
-		private Stream Open(
+		Stream Open(
 			Stream outStream,
 			AlgorithmIdentifier encAlgID,
 			ICipherParameters cipherParameters,
@@ -140,7 +140,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				BerSequenceGenerator envGen = new BerSequenceGenerator(
 					cGen.GetRawOutputStream(), 0, true);
 
-				envGen.AddObject(this.Version);
+				envGen.AddObject(Version);
 
 				Stream envRaw = envGen.GetRawOutputStream();
 				Asn1Generator recipGen = _berEncodeRecipientSet
@@ -212,15 +212,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return Open(outStream, encryptionOid, keyGen);
 		}
 
-		private class CmsEnvelopedDataOutputStream
+		class CmsEnvelopedDataOutputStream
 			: BaseOutputStream
 		{
-			private readonly CmsEnvelopedGenerator _outer;
+			readonly CmsEnvelopedGenerator _outer;
 
-			private readonly CipherStream _out;
-			private readonly BerSequenceGenerator _cGen;
-			private readonly BerSequenceGenerator _envGen;
-			private readonly BerSequenceGenerator _eiGen;
+			readonly CipherStream _out;
+			readonly BerSequenceGenerator _cGen;
+			readonly BerSequenceGenerator _envGen;
+			readonly BerSequenceGenerator _eiGen;
 
 			public CmsEnvelopedDataOutputStream(
 				CmsEnvelopedGenerator outer,

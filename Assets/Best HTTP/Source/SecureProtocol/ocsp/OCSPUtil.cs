@@ -14,15 +14,15 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 {
-	internal class OcspUtilities
+	class OcspUtilities
 	{
-		private static readonly Dictionary<string, DerObjectIdentifier> Algorithms =
+		static readonly Dictionary<string, DerObjectIdentifier> Algorithms =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly Dictionary<DerObjectIdentifier, string> Oids =
+		static readonly Dictionary<DerObjectIdentifier, string> Oids =
 			new Dictionary<DerObjectIdentifier, string>();
 
-		private static readonly HashSet<DerObjectIdentifier> NoParams = new HashSet<DerObjectIdentifier>();
+		static readonly HashSet<DerObjectIdentifier> NoParams = new HashSet<DerObjectIdentifier>();
 
 		static OcspUtilities()
 		{
@@ -119,16 +119,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 		internal static DerObjectIdentifier GetAlgorithmOid(string algorithmName)
 		{
-			if (Algorithms.TryGetValue(algorithmName, out var oid))
+			if (Algorithms.TryGetValue(algorithmName, out DerObjectIdentifier oid))
+			{
 				return oid;
+			}
 
 			return new DerObjectIdentifier(algorithmName);
 		}
 
 		internal static string GetAlgorithmName(DerObjectIdentifier oid)
 		{
-			if (Oids.TryGetValue(oid, out var algorithmName))
+			if (Oids.TryGetValue(oid, out string algorithmName))
+			{
 				return algorithmName;
+			}
 
 			return oid.Id;
 		}
@@ -136,7 +140,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		internal static AlgorithmIdentifier GetSigAlgID(DerObjectIdentifier sigOid)
 		{
 			if (NoParams.Contains(sigOid))
+			{
 				return new AlgorithmIdentifier(sigOid);
+			}
 
 			return new AlgorithmIdentifier(sigOid, DerNull.Instance);
 		}

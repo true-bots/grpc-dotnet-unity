@@ -16,16 +16,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 	/// </summary>
 	public class SM2KeyExchange
 	{
-		private readonly IDigest mDigest;
+		readonly IDigest mDigest;
 
-		private byte[] mUserID;
-		private ECPrivateKeyParameters mStaticKey;
-		private ECPoint mStaticPubPoint;
-		private ECPoint mEphemeralPubPoint;
-		private ECDomainParameters mECParams;
-		private int mW;
-		private ECPrivateKeyParameters mEphemeralKey;
-		private bool mInitiator;
+		byte[] mUserID;
+		ECPrivateKeyParameters mStaticKey;
+		ECPoint mStaticPubPoint;
+		ECPoint mEphemeralPubPoint;
+		ECDomainParameters mECParams;
+		int mW;
+		ECPrivateKeyParameters mEphemeralKey;
+		bool mInitiator;
 
 		public SM2KeyExchange()
 			: this(new SM3Digest())
@@ -34,7 +34,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 
 		public SM2KeyExchange(IDigest digest)
 		{
-			this.mDigest = digest;
+			mDigest = digest;
 		}
 
 		public virtual void Init(ICipherParameters privParam)
@@ -112,7 +112,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 			}
 
 			if (mInitiator && confirmationTag == null)
+			{
 				throw new ArgumentException("if initiating, confirmationTag must be set");
+			}
 
 			byte[] za = GetZ(mDigest, mUserID, mStaticPubPoint);
 			byte[] zb = GetZ(mDigest, otherUserID, otherPub.StaticPublicKey.Q);
@@ -129,7 +131,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 				byte[] s1 = S1(mDigest, U, inner);
 
 				if (!Arrays.ConstantTimeAreEqual(s1, confirmationTag))
+				{
 					throw new InvalidOperationException("confirmation tag mismatch");
+				}
 
 				return new byte[][] { rv, S2(mDigest, U, inner) };
 			}
@@ -207,12 +211,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 		}
 
 		//x1~=2^w+(x1 AND (2^w-1))
-		private BigInteger Reduce(BigInteger x)
+		BigInteger Reduce(BigInteger x)
 		{
 			return x.And(BigInteger.One.ShiftLeft(mW).Subtract(BigInteger.One)).SetBit(mW);
 		}
 
-		private byte[] S1(IDigest digest, ECPoint u, byte[] inner)
+		byte[] S1(IDigest digest, ECPoint u, byte[] inner)
 		{
 			digest.Update((byte)0x02);
 			AddFieldElement(digest, u.AffineYCoord);
@@ -221,7 +225,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 			return DigestUtilities.DoFinal(digest);
 		}
 
-		private byte[] CalculateInnerHash(IDigest digest, ECPoint u, byte[] za, byte[] zb, ECPoint p1, ECPoint p2)
+		byte[] CalculateInnerHash(IDigest digest, ECPoint u, byte[] za, byte[] zb, ECPoint p1, ECPoint p2)
 		{
 			AddFieldElement(digest, u.AffineXCoord);
 			digest.BlockUpdate(za, 0, za.Length);
@@ -234,7 +238,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 			return DigestUtilities.DoFinal(digest);
 		}
 
-		private byte[] S2(IDigest digest, ECPoint u, byte[] inner)
+		byte[] S2(IDigest digest, ECPoint u, byte[] inner)
 		{
 			digest.Update((byte)0x03);
 			AddFieldElement(digest, u.AffineYCoord);
@@ -243,7 +247,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 			return DigestUtilities.DoFinal(digest);
 		}
 
-		private byte[] GetZ(IDigest digest, byte[] userID, ECPoint pubPoint)
+		byte[] GetZ(IDigest digest, byte[] userID, ECPoint pubPoint)
 		{
 			AddUserID(digest, userID);
 
@@ -257,7 +261,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 			return DigestUtilities.DoFinal(digest);
 		}
 
-		private void AddUserID(IDigest digest, byte[] userID)
+		void AddUserID(IDigest digest, byte[] userID)
 		{
 			uint len = (uint)(userID.Length * 8);
 
@@ -266,7 +270,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 			digest.BlockUpdate(userID, 0, userID.Length);
 		}
 
-		private void AddFieldElement(IDigest digest, ECFieldElement v)
+		void AddFieldElement(IDigest digest, ECFieldElement v)
 		{
 			byte[] p = v.GetEncoded();
 			digest.BlockUpdate(p, 0, p.Length);

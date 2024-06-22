@@ -8,19 +8,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class ContentInfo
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier contentType;
-		private readonly Asn1Encodable content;
+		readonly DerObjectIdentifier contentType;
+		readonly Asn1Encodable content;
 
 		public static ContentInfo GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is ContentInfo)
+			{
 				return (ContentInfo)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new ContentInfo((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj));
 		}
 
 		public static ContentInfo GetInstance(Asn1TaggedObject obj, bool isExplicit)
@@ -28,11 +32,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			return GetInstance(Asn1Sequence.GetInstance(obj, isExplicit));
 		}
 
-		private ContentInfo(
+		ContentInfo(
 			Asn1Sequence seq)
 		{
 			if (seq.Count < 1 || seq.Count > 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
 			contentType = (DerObjectIdentifier)seq[0];
 
@@ -40,7 +46,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			{
 				Asn1TaggedObject tagged = (Asn1TaggedObject)seq[1];
 				if (!tagged.IsExplicit() || tagged.TagNo != 0)
+				{
 					throw new ArgumentException("Bad tag for 'content'", "seq");
+				}
 
 				content = tagged.GetObject();
 			}

@@ -17,9 +17,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	*/
 	public class X509V2CrlGenerator
 	{
-		private readonly X509ExtensionsGenerator extGenerator = new X509ExtensionsGenerator();
+		readonly X509ExtensionsGenerator extGenerator = new X509ExtensionsGenerator();
 
-		private V2TbsCertListGenerator tbsGen;
+		V2TbsCertListGenerator tbsGen;
 
 		public X509V2CrlGenerator()
 		{
@@ -103,9 +103,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		public void AddCrl(X509Crl other)
 		{
 			if (other == null)
+			{
 				throw new ArgumentNullException("other");
+			}
 
-			var revocations = other.GetRevokedCertificates();
+			ISet<X509CrlEntry> revocations = other.GetRevokedCertificates();
 
 			if (revocations != null)
 			{
@@ -177,7 +179,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		/// <returns>An <see cref="X509Crl"/>.</returns>
 		public X509Crl Generate(ISignatureFactory signatureFactory)
 		{
-			var sigAlgID = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
+			AlgorithmIdentifier sigAlgID = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
 
 			tbsGen.SetSignature(sigAlgID);
 
@@ -194,7 +196,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				tbsCertList.EncodeTo(sigStream, Asn1Encodable.Der);
 			}
 
-			var signature = streamCalculator.GetResult().Collect();
+			byte[] signature = streamCalculator.GetResult().Collect();
 
 			return new X509Crl(
 				CertificateList.GetInstance(new DerSequence(tbsCertList, sigAlgID, new DerBitString(signature))));

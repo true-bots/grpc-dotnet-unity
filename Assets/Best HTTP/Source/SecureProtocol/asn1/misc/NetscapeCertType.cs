@@ -21,14 +21,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Misc
 	public class NetscapeCertType
 		: DerBitString
 	{
-		public const int SslClient = (1 << 7);
-		public const int SslServer = (1 << 6);
-		public const int Smime = (1 << 5);
-		public const int ObjectSigning = (1 << 4);
-		public const int Reserved = (1 << 3);
-		public const int SslCA = (1 << 2);
-		public const int SmimeCA = (1 << 1);
-		public const int ObjectSigningCA = (1 << 0);
+		public const int SslClient = 1 << 7;
+		public const int SslServer = 1 << 6;
+		public const int Smime = 1 << 5;
+		public const int ObjectSigning = 1 << 4;
+		public const int Reserved = 1 << 3;
+		public const int SslCA = 1 << 2;
+		public const int SmimeCA = 1 << 1;
+		public const int ObjectSigningCA = 1 << 0;
 
 		/**
          * Basic constructor.

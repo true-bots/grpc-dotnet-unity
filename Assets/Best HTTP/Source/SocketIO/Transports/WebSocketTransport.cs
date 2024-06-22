@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 namespace BestHTTP.SocketIO.Transports
 {
-	using BestHTTP.Connections;
-	using BestHTTP.WebSocket;
+	using Connections;
+	using WebSocket;
 	using Extensions;
 
 	/// <summary>
 	/// A transport implementation that can communicate with a SocketIO server.
 	/// </summary>
-	internal sealed class WebSocketTransport : ITransport
+	sealed class WebSocketTransport : ITransport
 	{
 		public TransportTypes Type
 		{
@@ -35,8 +35,8 @@ namespace BestHTTP.SocketIO.Transports
 
 		public WebSocket Implementation { get; private set; }
 
-		private Packet PacketWithAttachment;
-		private byte[] Buffer;
+		Packet PacketWithAttachment;
+		byte[] Buffer;
 
 		public WebSocketTransport(SocketManager manager)
 		{
@@ -49,7 +49,9 @@ namespace BestHTTP.SocketIO.Transports
 		public void Open()
 		{
 			if (State != TransportStates.Closed)
+			{
 				return;
+			}
 
 			Uri uri = null;
 			string baseUrl = new UriBuilder(HTTPProtocolFactory.IsSecureProtocol(Manager.Uri) ? "wss" : "ws",
@@ -58,7 +60,9 @@ namespace BestHTTP.SocketIO.Transports
 				Manager.Uri.GetRequestPathAndQueryURL()).Uri.ToString();
 			string format = "{0}?EIO={1}&transport=websocket{3}";
 			if (Manager.Handshake != null)
+			{
 				format += "&sid={2}";
+			}
 
 			bool sendAdditionalQueryParams = !Manager.Options.QueryParamsOnlyForHandshake || (Manager.Options.QueryParamsOnlyForHandshake && Manager.Handshake == null);
 
@@ -73,8 +77,10 @@ namespace BestHTTP.SocketIO.Transports
 #if !UNITY_WEBGL || UNITY_EDITOR
 			Implementation.StartPingThread = true;
 
-			if (this.Manager.Options.HTTPRequestCustomizationCallback != null)
-				Implementation.OnInternalRequestCreated = (ws, internalRequest) => this.Manager.Options.HTTPRequestCustomizationCallback(this.Manager, internalRequest);
+			if (Manager.Options.HTTPRequestCustomizationCallback != null)
+			{
+				Implementation.OnInternalRequestCreated = (ws, internalRequest) => Manager.Options.HTTPRequestCustomizationCallback(Manager, internalRequest);
+			}
 #endif
 
 			Implementation.OnOpen = OnOpen;
@@ -94,14 +100,21 @@ namespace BestHTTP.SocketIO.Transports
 		public void Close()
 		{
 			if (State == TransportStates.Closed)
+			{
 				return;
+			}
 
 			State = TransportStates.Closed;
 
 			if (Implementation != null)
+			{
 				Implementation.Close();
+			}
 			else
+			{
 				HTTPManager.Logger.Warning("WebSocketTransport", "Close - WebSocket Implementation already null!");
+			}
+
 			Implementation = null;
 		}
 
@@ -119,10 +132,12 @@ namespace BestHTTP.SocketIO.Transports
 		/// <summary>
 		/// WebSocket implementation OnOpen event handler.
 		/// </summary>
-		private void OnOpen(WebSocket ws)
+		void OnOpen(WebSocket ws)
 		{
 			if (ws != Implementation)
+			{
 				return;
+			}
 
 			HTTPManager.Logger.Information("WebSocketTransport", "OnOpen");
 
@@ -130,19 +145,25 @@ namespace BestHTTP.SocketIO.Transports
 
 			// Send a Probe packet to test the transport. If we receive back a pong with the same payload we can upgrade
 			if (Manager.UpgradingTransport == this)
+			{
 				Send(new Packet(TransportEventTypes.Ping, SocketIOEventTypes.Unknown, "/", "probe"));
+			}
 		}
 
 		/// <summary>
 		/// WebSocket implementation OnMessage event handler.
 		/// </summary>
-		private void OnMessage(WebSocket ws, string message)
+		void OnMessage(WebSocket ws, string message)
 		{
 			if (ws != Implementation)
+			{
 				return;
+			}
 
-			if (HTTPManager.Logger.Level <= BestHTTP.Logger.Loglevels.All)
+			if (HTTPManager.Logger.Level <= Logger.Loglevels.All)
+			{
 				HTTPManager.Logger.Verbose("WebSocketTransport", "OnMessage: " + message);
+			}
 
 			Packet packet = null;
 			try
@@ -163,9 +184,13 @@ namespace BestHTTP.SocketIO.Transports
 			try
 			{
 				if (packet.AttachmentCount == 0)
+				{
 					OnPacket(packet);
+				}
 				else
+				{
 					PacketWithAttachment = packet;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -176,17 +201,21 @@ namespace BestHTTP.SocketIO.Transports
 		/// <summary>
 		/// WebSocket implementation OnBinary event handler.
 		/// </summary>
-		private void OnBinary(WebSocket ws, byte[] data)
+		void OnBinary(WebSocket ws, byte[] data)
 		{
 			if (ws != Implementation)
+			{
 				return;
+			}
 
-			if (HTTPManager.Logger.Level <= BestHTTP.Logger.Loglevels.All)
+			if (HTTPManager.Logger.Level <= Logger.Loglevels.All)
+			{
 				HTTPManager.Logger.Verbose("WebSocketTransport", "OnBinary");
+			}
 
 			if (PacketWithAttachment != null)
 			{
-				switch (this.Manager.Options.ServerVersion)
+				switch (Manager.Options.ServerVersion)
 				{
 					case SupportedSocketIOVersions.v2:
 						PacketWithAttachment.AddAttachmentFromServer(data, false);
@@ -199,7 +228,7 @@ namespace BestHTTP.SocketIO.Transports
 							"Binary packet received while the server's version is Unknown. Set SocketOption's ServerVersion to the correct value to avoid packet mishandling!");
 
 						// Fall back to V2 by default.
-						this.Manager.Options.ServerVersion = SupportedSocketIOVersions.v2;
+						Manager.Options.ServerVersion = SupportedSocketIOVersions.v2;
 						goto case SupportedSocketIOVersions.v2;
 				}
 
@@ -228,10 +257,12 @@ namespace BestHTTP.SocketIO.Transports
 		/// <summary>
 		/// WebSocket implementation OnError event handler.
 		/// </summary>
-		private void OnError(WebSocket ws, string error)
+		void OnError(WebSocket ws, string error)
 		{
 			if (ws != Implementation)
+			{
 				return;
+			}
 
 #if !UNITY_WEBGL || UNITY_EDITOR
 			if (string.IsNullOrEmpty(error))
@@ -241,19 +272,24 @@ namespace BestHTTP.SocketIO.Transports
 					// The request finished without any problem.
 					case HTTPRequestStates.Finished:
 						if (ws.InternalRequest.Response.IsSuccess || ws.InternalRequest.Response.StatusCode == 101)
+						{
 							error = string.Format("Request finished. Status Code: {0} Message: {1}", ws.InternalRequest.Response.StatusCode.ToString(),
 								ws.InternalRequest.Response.Message);
+						}
 						else
+						{
 							error = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}",
 								ws.InternalRequest.Response.StatusCode,
 								ws.InternalRequest.Response.Message,
 								ws.InternalRequest.Response.DataAsText);
+						}
+
 						break;
 
 					// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 					case HTTPRequestStates.Error:
 						error = "Request Finished with Error! : " + ws.InternalRequest.Exception != null
-							? (ws.InternalRequest.Exception.Message + " " + ws.InternalRequest.Exception.StackTrace)
+							? ws.InternalRequest.Exception.Message + " " + ws.InternalRequest.Exception.StackTrace
 							: string.Empty;
 						break;
 
@@ -276,27 +312,37 @@ namespace BestHTTP.SocketIO.Transports
 #endif
 
 			if (Manager.UpgradingTransport != this)
+			{
 				(Manager as IManager).OnTransportError(this, error);
+			}
 			else
+			{
 				Manager.UpgradingTransport = null;
+			}
 		}
 
 		/// <summary>
 		/// WebSocket implementation OnClosed event handler.
 		/// </summary>
-		private void OnClosed(WebSocket ws, ushort code, string message)
+		void OnClosed(WebSocket ws, ushort code, string message)
 		{
 			if (ws != Implementation)
+			{
 				return;
+			}
 
 			HTTPManager.Logger.Information("WebSocketTransport", "OnClosed");
 
 			Close();
 
 			if (Manager.UpgradingTransport != this)
+			{
 				(Manager as IManager).TryToReconnect();
+			}
 			else
+			{
 				Manager.UpgradingTransport = null;
+			}
 		}
 
 		#endregion
@@ -317,16 +363,22 @@ namespace BestHTTP.SocketIO.Transports
 
 			string encoded = packet.Encode();
 
-			if (HTTPManager.Logger.Level <= BestHTTP.Logger.Loglevels.All)
+			if (HTTPManager.Logger.Level <= Logger.Loglevels.All)
+			{
 				HTTPManager.Logger.Verbose("WebSocketTransport", "Send: " + encoded);
+			}
 
 			if (packet.AttachmentCount != 0 || (packet.Attachments != null && packet.Attachments.Count != 0))
 			{
 				if (packet.Attachments == null)
+				{
 					throw new ArgumentException("packet.Attachments are null!");
+				}
 
 				if (packet.AttachmentCount != packet.Attachments.Count)
+				{
 					throw new ArgumentException("packet.AttachmentCount != packet.Attachments.Count. Use the packet.AddAttachment function to add data to a packet!");
+				}
 			}
 
 			Implementation.Send(encoded);
@@ -335,11 +387,17 @@ namespace BestHTTP.SocketIO.Transports
 			{
 				int maxLength = packet.Attachments[0].Length + 1;
 				for (int cv = 1; cv < packet.Attachments.Count; ++cv)
-					if ((packet.Attachments[cv].Length + 1) > maxLength)
+				{
+					if (packet.Attachments[cv].Length + 1 > maxLength)
+					{
 						maxLength = packet.Attachments[cv].Length + 1;
+					}
+				}
 
 				if (Buffer == null || Buffer.Length < maxLength)
+				{
 					Array.Resize(ref Buffer, maxLength);
+				}
 
 				for (int i = 0; i < packet.AttachmentCount; i++)
 				{
@@ -358,7 +416,9 @@ namespace BestHTTP.SocketIO.Transports
 		public void Send(List<Packet> packets)
 		{
 			for (int i = 0; i < packets.Count; ++i)
+			{
 				Send(packets[i]);
+			}
 
 			packets.Clear();
 		}
@@ -370,15 +430,20 @@ namespace BestHTTP.SocketIO.Transports
 		/// <summary>
 		/// Will only process packets that need to upgrade. All other packets are passed to the Manager.
 		/// </summary>
-		private void OnPacket(Packet packet)
+		void OnPacket(Packet packet)
 		{
 			switch (packet.TransportEvent)
 			{
 				case TransportEventTypes.Open:
-					if (this.State != TransportStates.Opening)
+					if (State != TransportStates.Opening)
+					{
 						HTTPManager.Logger.Warning("WebSocketTransport", "Received 'Open' packet while state is '" + State.ToString() + "'");
+					}
 					else
+					{
 						State = TransportStates.Open;
+					}
+
 					goto default;
 
 				case TransportEventTypes.Pong:
@@ -393,7 +458,10 @@ namespace BestHTTP.SocketIO.Transports
 
 				default:
 					if (Manager.UpgradingTransport != this)
+					{
 						(Manager as IManager).OnPacket(packet);
+					}
+
 					break;
 			}
 		}

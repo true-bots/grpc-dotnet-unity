@@ -14,19 +14,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.GM
 	/// <summary>Elliptic curve registry for GM.</summary>
 	public static class GMNamedCurves
 	{
-		private static X9ECPoint ConfigureBasepoint(ECCurve curve, string encoding)
+		static X9ECPoint ConfigureBasepoint(ECCurve curve, string encoding)
 		{
 			X9ECPoint G = new X9ECPoint(curve, Hex.DecodeStrict(encoding));
 			WNafUtilities.ConfigureBasepoint(G.Point);
 			return G;
 		}
 
-		private static ECCurve ConfigureCurve(ECCurve curve)
+		static ECCurve ConfigureCurve(ECCurve curve)
 		{
 			return curve;
 		}
 
-		private static BigInteger FromHex(string hex)
+		static BigInteger FromHex(string hex)
 		{
 			return new BigInteger(1, Hex.DecodeStrict(hex));
 		}
@@ -34,7 +34,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.GM
 		internal class SM2P256V1Holder
 			: X9ECParametersHolder
 		{
-			private SM2P256V1Holder()
+			SM2P256V1Holder()
 			{
 			}
 
@@ -66,7 +66,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.GM
 		internal class WapiP192V1Holder
 			: X9ECParametersHolder
 		{
-			private WapiP192V1Holder()
+			WapiP192V1Holder()
 			{
 			}
 
@@ -95,16 +95,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.GM
 			}
 		}
 
-		private static readonly Dictionary<string, DerObjectIdentifier> objIds =
+		static readonly Dictionary<string, DerObjectIdentifier> objIds =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
+		static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
 			new Dictionary<DerObjectIdentifier, X9ECParametersHolder>();
 
-		private static readonly Dictionary<DerObjectIdentifier, string> names =
+		static readonly Dictionary<DerObjectIdentifier, string> names =
 			new Dictionary<DerObjectIdentifier, string>();
 
-		private static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
+		static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
 		{
 			objIds.Add(name, oid);
 			names.Add(oid, name);

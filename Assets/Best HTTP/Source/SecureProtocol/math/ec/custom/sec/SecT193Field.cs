@@ -11,10 +11,10 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecT193Field
+	class SecT193Field
 	{
-		private const ulong M01 = 1UL;
-		private const ulong M49 = ulong.MaxValue >> 15;
+		const ulong M01 = 1UL;
+		const ulong M49 = ulong.MaxValue >> 15;
 
 		public static void Add(ulong[] x, ulong[] y, ulong[] z)
 		{
@@ -43,7 +43,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			z[3] = x[3];
 		}
 
-		private static void AddTo(ulong[] x, ulong[] z)
+		static void AddTo(ulong[] x, ulong[] z)
 		{
 			z[0] ^= x[0];
 			z[1] ^= x[1];
@@ -74,7 +74,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public static void Invert(ulong[] x, ulong[] z)
 		{
 			if (Nat256.IsZero64(x))
+			{
 				throw new InvalidOperationException();
+			}
 
 			// Itoh-Tsujii inversion with bases { 2, 3 }
 
@@ -132,17 +134,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		{
 			ulong x0 = xx[0], x1 = xx[1], x2 = xx[2], x3 = xx[3], x4 = xx[4], x5 = xx[5], x6 = xx[6];
 
-			x2 ^= (x6 << 63);
+			x2 ^= x6 << 63;
 			x3 ^= (x6 >> 1) ^ (x6 << 14);
-			x4 ^= (x6 >> 50);
+			x4 ^= x6 >> 50;
 
-			x1 ^= (x5 << 63);
+			x1 ^= x5 << 63;
 			x2 ^= (x5 >> 1) ^ (x5 << 14);
-			x3 ^= (x5 >> 50);
+			x3 ^= x5 >> 50;
 
-			x0 ^= (x4 << 63);
+			x0 ^= x4 << 63;
 			x1 ^= (x4 >> 1) ^ (x4 << 14);
-			x2 ^= (x4 >> 50);
+			x2 ^= x4 >> 50;
 
 			ulong t = x3 >> 1;
 			z[0] = x0 ^ t ^ (t << 15);
@@ -155,7 +157,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		{
 			ulong z3 = z[zOff + 3], t = z3 >> 1;
 			z[zOff] ^= t ^ (t << 15);
-			z[zOff + 1] ^= (t >> 49);
+			z[zOff + 1] ^= t >> 49;
 			z[zOff + 3] = z3 & M01;
 		}
 
@@ -168,7 +170,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			z[0] = e0 ^ (c0 << 8);
 			z[1] = e1 ^ (c1 << 8) ^ (c0 >> 56) ^ (c0 << 33);
 			z[2] = (c1 >> 56) ^ (c1 << 33) ^ (c0 >> 31);
-			z[3] = (c1 >> 31);
+			z[3] = c1 >> 31;
 		}
 
 		public static void Square(ulong[] x, ulong[] z)
@@ -203,7 +205,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public static uint Trace(ulong[] x)
 		{
 			// Non-zero-trace bits: 0
-			return (uint)(x[0]) & 1U;
+			return (uint)x[0] & 1U;
 		}
 
 		protected static void ImplCompactExt(ulong[] zz)
@@ -217,7 +219,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			zz[4] = (z4 >> 60) ^ (z6 << 38)
 			                   ^ (z5 >> 11);
 			zz[5] = (z6 >> 26) ^ (z7 << 23);
-			zz[6] = (z7 >> 41);
+			zz[6] = z7 >> 41;
 			zz[7] = 0;
 		}
 
@@ -227,7 +229,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			z[0] = x0 & M49;
 			z[1] = ((x0 >> 49) ^ (x1 << 15)) & M49;
 			z[2] = ((x1 >> 34) ^ (x2 << 30)) & M49;
-			z[3] = ((x2 >> 19) ^ (x3 << 45));
+			z[3] = (x2 >> 19) ^ (x3 << 45);
 		}
 
 		protected static void ImplMultiply(ulong[] x, ulong[] y, ulong[] zz)
@@ -336,12 +338,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			{
 				j = (uint)(x >> k);
 				g = u[j & 7]
-				    ^ u[(j >> 3) & 7] << 3
-				    ^ u[(j >> 6) & 7] << 6
-				    ^ u[(j >> 9) & 7] << 9
-				    ^ u[(j >> 12) & 7] << 12;
-				l ^= (g << k);
-				h ^= (g >> -k);
+				    ^ (u[(j >> 3) & 7] << 3)
+				    ^ (u[(j >> 6) & 7] << 6)
+				    ^ (u[(j >> 9) & 7] << 9)
+				    ^ (u[(j >> 12) & 7] << 12);
+				l ^= g << k;
+				h ^= g >> -k;
 			} while ((k -= 15) > 0);
 
 			Debug.Assert(h >> 33 == 0);
@@ -353,7 +355,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		protected static void ImplSquare(ulong[] x, ulong[] zz)
 		{
 			Interleave.Expand64To128(x, 0, 3, zz, 0);
-			zz[6] = (x[3] & M01);
+			zz[6] = x[3] & M01;
 		}
 	}
 }

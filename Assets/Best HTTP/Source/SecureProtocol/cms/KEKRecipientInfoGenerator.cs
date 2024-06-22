@@ -15,18 +15,18 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal class KekRecipientInfoGenerator : RecipientInfoGenerator
+	class KekRecipientInfoGenerator : RecipientInfoGenerator
 	{
-		private static readonly CmsEnvelopedHelper Helper = CmsEnvelopedHelper.Instance;
+		static readonly CmsEnvelopedHelper Helper = CmsEnvelopedHelper.Instance;
 
-		private KeyParameter keyEncryptionKey;
+		KeyParameter keyEncryptionKey;
 
 		// TODO Can get this from keyEncryptionKey?		
-		private string keyEncryptionKeyOID;
-		private KekIdentifier kekIdentifier;
+		string keyEncryptionKeyOID;
+		KekIdentifier kekIdentifier;
 
 		// Derived
-		private AlgorithmIdentifier keyEncryptionAlgorithm;
+		AlgorithmIdentifier keyEncryptionAlgorithm;
 
 		internal KekRecipientInfoGenerator()
 		{
@@ -34,21 +34,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal KekIdentifier KekIdentifier
 		{
-			set { this.kekIdentifier = value; }
+			set { kekIdentifier = value; }
 		}
 
 		internal KeyParameter KeyEncryptionKey
 		{
 			set
 			{
-				this.keyEncryptionKey = value;
-				this.keyEncryptionAlgorithm = DetermineKeyEncAlg(keyEncryptionKeyOID, keyEncryptionKey);
+				keyEncryptionKey = value;
+				keyEncryptionAlgorithm = DetermineKeyEncAlg(keyEncryptionKeyOID, keyEncryptionKey);
 			}
 		}
 
 		internal string KeyEncryptionKeyOID
 		{
-			set { this.keyEncryptionKeyOID = value; }
+			set { keyEncryptionKeyOID = value; }
 		}
 
 		public RecipientInfo Generate(KeyParameter contentEncryptionKey, SecureRandom random)
@@ -63,22 +63,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return new RecipientInfo(new KekRecipientInfo(kekIdentifier, keyEncryptionAlgorithm, encryptedKey));
 		}
 
-		private static AlgorithmIdentifier DetermineKeyEncAlg(
+		static AlgorithmIdentifier DetermineKeyEncAlg(
 			string algorithm, KeyParameter key)
 		{
-			if (Org.BouncyCastle.Utilities.Platform.StartsWith(algorithm, "DES"))
+			if (Platform.StartsWith(algorithm, "DES"))
 			{
 				return new AlgorithmIdentifier(
 					PkcsObjectIdentifiers.IdAlgCms3DesWrap,
 					DerNull.Instance);
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(algorithm, "RC2"))
+			else if (Platform.StartsWith(algorithm, "RC2"))
 			{
 				return new AlgorithmIdentifier(
 					PkcsObjectIdentifiers.IdAlgCmsRC2Wrap,
 					new DerInteger(58));
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(algorithm, "AES"))
+			else if (Platform.StartsWith(algorithm, "AES"))
 			{
 				int length = key.GetKey().Length * 8;
 				DerObjectIdentifier wrapOid;
@@ -102,12 +102,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 				return new AlgorithmIdentifier(wrapOid); // parameters absent
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(algorithm, "SEED"))
+			else if (Platform.StartsWith(algorithm, "SEED"))
 			{
 				// parameters absent
 				return new AlgorithmIdentifier(KisaObjectIdentifiers.IdNpkiAppCmsSeedWrap);
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.StartsWith(algorithm, "CAMELLIA"))
+			else if (Platform.StartsWith(algorithm, "CAMELLIA"))
 			{
 				int length = key.GetKey().Length * 8;
 				DerObjectIdentifier wrapOid;

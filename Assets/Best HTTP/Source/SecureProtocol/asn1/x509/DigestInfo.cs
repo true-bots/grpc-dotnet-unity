@@ -16,8 +16,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class DigestInfo
 		: Asn1Encodable
 	{
-		private readonly byte[] digest;
-		private readonly AlgorithmIdentifier algID;
+		readonly byte[] digest;
+		readonly AlgorithmIdentifier algID;
 
 		public static DigestInfo GetInstance(
 			Asn1TaggedObject obj,
@@ -39,7 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new DigestInfo((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public DigestInfo(
@@ -50,11 +50,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			this.algID = algID;
 		}
 
-		private DigestInfo(
+		DigestInfo(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
 			algID = AlgorithmIdentifier.GetInstance(seq[0]);
 			digest = Asn1OctetString.GetInstance(seq[1]).GetOctets();

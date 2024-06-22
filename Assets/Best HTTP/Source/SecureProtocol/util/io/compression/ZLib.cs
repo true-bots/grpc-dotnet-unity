@@ -10,7 +10,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Compression
 {
-	internal static class ZLib
+	static class ZLib
 	{
 		internal static Stream CompressOutput(Stream stream, int zlibCompressionLevel, bool leaveOpen = false)
 		{

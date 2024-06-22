@@ -14,25 +14,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class HMac
 		: IMac
 	{
-		private const byte IPAD = (byte)0x36;
-		private const byte OPAD = (byte)0x5C;
+		const byte IPAD = (byte)0x36;
+		const byte OPAD = (byte)0x5C;
 
-		private readonly IDigest digest;
-		private readonly int digestSize;
-		private readonly int blockLength;
-		private IMemoable ipadState;
-		private IMemoable opadState;
+		readonly IDigest digest;
+		readonly int digestSize;
+		readonly int blockLength;
+		IMemoable ipadState;
+		IMemoable opadState;
 
-		private readonly byte[] inputPad;
-		private readonly byte[] outputBuf;
+		readonly byte[] inputPad;
+		readonly byte[] outputBuf;
 
 		public HMac(IDigest digest)
 		{
 			this.digest = digest;
-			this.digestSize = digest.GetDigestSize();
-			this.blockLength = digest.GetByteLength();
-			this.inputPad = new byte[blockLength];
-			this.outputBuf = new byte[blockLength + digestSize];
+			digestSize = digest.GetDigestSize();
+			blockLength = digest.GetByteLength();
+			inputPad = new byte[blockLength];
+			outputBuf = new byte[blockLength + digestSize];
 		}
 
 		public virtual string AlgorithmName
@@ -189,7 +189,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			}
 		}
 
-		private static void XorPad(byte[] pad, int len, byte n)
+		static void XorPad(byte[] pad, int len, byte n)
 		{
 			for (int i = 0; i < len; ++i)
 			{

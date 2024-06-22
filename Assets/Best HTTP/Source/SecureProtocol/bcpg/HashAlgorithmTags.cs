@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		Sha256 = 8, // SHA-256
 		Sha384 = 9, // SHA-384
 		Sha512 = 10, // SHA-512
-		Sha224 = 11, // SHA-224
+		Sha224 = 11 // SHA-224
 	}
 }
 #pragma warning restore

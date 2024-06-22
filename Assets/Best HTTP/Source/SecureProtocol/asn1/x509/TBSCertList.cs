@@ -17,7 +17,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public CrlEntry(Asn1Sequence seq)
 		{
 			if (seq.Count < 2 || seq.Count > 3)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
 			this.seq = seq;
 
@@ -78,10 +80,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class TbsCertificateList
 		: Asn1Encodable
 	{
-		private class RevokedCertificatesEnumeration
+		class RevokedCertificatesEnumeration
 			: IEnumerable<CrlEntry>
 		{
-			private readonly IEnumerable<Asn1Encodable> en;
+			readonly IEnumerable<Asn1Encodable> en;
 
 			internal RevokedCertificatesEnumeration(IEnumerable<Asn1Encodable> en)
 			{
@@ -98,10 +100,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new RevokedCertificatesEnumerator(en.GetEnumerator());
 			}
 
-			private class RevokedCertificatesEnumerator
+			class RevokedCertificatesEnumerator
 				: IEnumerator<CrlEntry>
 			{
-				private readonly IEnumerator<Asn1Encodable> e;
+				readonly IEnumerator<Asn1Encodable> e;
 
 				internal RevokedCertificatesEnumerator(IEnumerator<Asn1Encodable> e)
 				{
@@ -165,7 +167,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new TbsCertificateList((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		internal TbsCertificateList(
@@ -264,7 +266,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public IEnumerable<CrlEntry> GetRevokedCertificateEnumeration()
 		{
 			if (revokedCertificates == null)
+			{
 				return new List<CrlEntry>(0);
+			}
 
 			return new RevokedCertificatesEnumeration(revokedCertificates);
 		}

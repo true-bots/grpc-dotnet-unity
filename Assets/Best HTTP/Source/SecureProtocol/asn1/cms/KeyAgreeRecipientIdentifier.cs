@@ -34,10 +34,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is KeyAgreeRecipientIdentifier)
+			{
 				return (KeyAgreeRecipientIdentifier)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new KeyAgreeRecipientIdentifier(IssuerAndSerialNumber.GetInstance(obj));
+			}
 
 			if (obj is Asn1TaggedObject && ((Asn1TaggedObject)obj).TagNo == 0)
 			{
@@ -45,11 +49,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 					(Asn1TaggedObject)obj, false));
 			}
 
-			throw new ArgumentException("Invalid KeyAgreeRecipientIdentifier: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid KeyAgreeRecipientIdentifier: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private readonly IssuerAndSerialNumber issuerSerial;
-		private readonly RecipientKeyIdentifier rKeyID;
+		readonly IssuerAndSerialNumber issuerSerial;
+		readonly RecipientKeyIdentifier rKeyID;
 
 		public KeyAgreeRecipientIdentifier(
 			IssuerAndSerialNumber issuerSerial)

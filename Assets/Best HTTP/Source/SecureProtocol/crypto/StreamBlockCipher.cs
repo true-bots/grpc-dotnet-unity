@@ -12,8 +12,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	public class StreamBlockCipher
 		: IStreamCipher
 	{
-		private readonly IBlockCipherMode m_cipherMode;
-		private readonly byte[] oneByte = new byte[1];
+		readonly IBlockCipherMode m_cipherMode;
+		readonly byte[] oneByte = new byte[1];
 
 		/**
 		 * basic constructor.
@@ -25,9 +25,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public StreamBlockCipher(IBlockCipherMode cipherMode)
 		{
 			if (cipherMode == null)
+			{
 				throw new ArgumentNullException(nameof(cipherMode));
+			}
+
 			if (cipherMode.GetBlockSize() != 1)
+			{
 				throw new ArgumentException("block cipher block size != 1.", nameof(cipherMode));
+			}
 
 			m_cipherMode = cipherMode;
 		}

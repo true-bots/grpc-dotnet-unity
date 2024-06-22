@@ -10,13 +10,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public abstract class AbstractTlsPeer
 		: TlsPeer
 	{
-		private readonly TlsCrypto m_crypto;
+		readonly TlsCrypto m_crypto;
 
-		private volatile TlsCloseable m_closeHandle;
+		volatile TlsCloseable m_closeHandle;
 
 		protected AbstractTlsPeer(TlsCrypto crypto)
 		{
-			this.m_crypto = crypto;
+			m_crypto = crypto;
 		}
 
 		/// <summary>Get the <see cref="ProtocolVersion"/> values that are supported by this peer.</summary>
@@ -35,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <exception cref="IOException"/>
 		public virtual void Cancel()
 		{
-			TlsCloseable closeHandle = this.m_closeHandle;
+			TlsCloseable closeHandle = m_closeHandle;
 			if (null != closeHandle)
 			{
 				closeHandle.Close();
@@ -49,7 +49,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public virtual void NotifyCloseHandle(TlsCloseable closeHandle)
 		{
-			this.m_closeHandle = closeHandle;
+			m_closeHandle = closeHandle;
 		}
 
 		public abstract ProtocolVersion[] GetProtocolVersions();
@@ -126,7 +126,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual void NotifySecureRenegotiation(bool secureRenegotiation)
 		{
 			if (!secureRenegotiation)
+			{
 				throw new TlsFatalAlert(AlertDescription.handshake_failure);
+			}
 		}
 
 		/// <exception cref="IOException"/>
@@ -159,7 +161,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return HeartbeatMode.peer_not_allowed_to_send;
 		}
 
-		public virtual bool IgnoreCorruptDtlsRecords => false;
+		public virtual bool IgnoreCorruptDtlsRecords
+		{
+			get { return false; }
+		}
 	}
 }
 #pragma warning restore

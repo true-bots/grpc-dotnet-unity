@@ -15,7 +15,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		public static readonly int KeySize = X25519.ScalarSize;
 		public static readonly int SecretSize = X25519.PointSize;
 
-		private readonly byte[] data = new byte[KeySize];
+		readonly byte[] data = new byte[KeySize];
 
 		public X25519PrivateKeyParameters(SecureRandom random)
 			: base(true)
@@ -49,7 +49,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(true)
 		{
 			if (KeySize != Streams.ReadFully(input, data))
+			{
 				throw new EndOfStreamException("EOF encountered in middle of X25519 private key");
+			}
 		}
 
 		public void Encode(byte[] buf, int off)
@@ -90,7 +92,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			byte[] encoded = new byte[X25519.PointSize];
 			publicKey.Encode(encoded, 0);
 			if (!X25519.CalculateAgreement(data, 0, encoded, 0, buf, off))
+			{
 				throw new InvalidOperationException("X25519 agreement failed");
+			}
 #endif
 		}
 
@@ -104,10 +108,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
         }
 #endif
 
-		private static byte[] Validate(byte[] buf)
+		static byte[] Validate(byte[] buf)
 		{
 			if (buf.Length != KeySize)
+			{
 				throw new ArgumentException("must have length " + KeySize, nameof(buf));
+			}
 
 			return buf;
 		}

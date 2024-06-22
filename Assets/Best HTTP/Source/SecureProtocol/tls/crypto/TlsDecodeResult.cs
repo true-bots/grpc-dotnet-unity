@@ -18,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 			this.off = off;
 			this.len = len;
 			this.contentType = contentType;
-			this.fromBufferPool = false;
+			fromBufferPool = false;
 		}
 
 		public TlsDecodeResult(byte[] buf, int off, int len, short contentType, bool fromPool)
@@ -27,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 			this.off = off;
 			this.len = len;
 			this.contentType = contentType;
-			this.fromBufferPool = fromPool;
+			fromBufferPool = fromPool;
 		}
 	}
 }

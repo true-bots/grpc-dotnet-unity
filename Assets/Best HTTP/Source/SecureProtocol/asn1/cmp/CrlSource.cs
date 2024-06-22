@@ -21,18 +21,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static CrlSource GetInstance(object obj)
 		{
 			if (obj is CrlSource crlSource)
+			{
 				return crlSource;
+			}
 
 			if (obj != null)
+			{
 				return new CrlSource(Asn1TaggedObject.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly DistributionPointName m_dpn;
-		private readonly GeneralNames m_issuer;
+		readonly DistributionPointName m_dpn;
+		readonly GeneralNames m_issuer;
 
-		private CrlSource(Asn1TaggedObject taggedObject)
+		CrlSource(Asn1TaggedObject taggedObject)
 		{
 			switch (taggedObject.TagNo)
 			{
@@ -51,21 +55,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 
 		public CrlSource(DistributionPointName dpn, GeneralNames issuer)
 		{
-			if ((dpn == null) == (issuer == null))
+			if (dpn == null == (issuer == null))
+			{
 				throw new ArgumentException("either dpn or issuer must be set");
+			}
 
 			m_dpn = dpn;
 			m_issuer = issuer;
 		}
 
-		public virtual DistributionPointName Dpn => m_dpn;
+		public virtual DistributionPointName Dpn
+		{
+			get { return m_dpn; }
+		}
 
-		public virtual GeneralNames Issuer => m_issuer;
+		public virtual GeneralNames Issuer
+		{
+			get { return m_issuer; }
+		}
 
 		public override Asn1Object ToAsn1Object()
 		{
 			if (m_dpn != null)
+			{
 				return new DerTaggedObject(true, 0, m_dpn);
+			}
 
 			return new DerTaggedObject(true, 1, m_issuer);
 		}

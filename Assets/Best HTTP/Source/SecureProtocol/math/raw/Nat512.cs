@@ -10,7 +10,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 {
-	internal abstract class Nat512
+	abstract class Nat512
 	{
 		public static void Mul(uint[] x, uint[] y, uint[] zz)
 		{

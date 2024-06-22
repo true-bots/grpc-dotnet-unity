@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
 
 using System;
+using System.Net;
 
 namespace BestHTTP.Proxies.Autodetect
 {
@@ -12,10 +13,10 @@ namespace BestHTTP.Proxies.Autodetect
 	{
 		Proxy IProxyDetector.GetProxy(HTTPRequest request)
 		{
-			var detectedProxy = System.Net.WebRequest.GetSystemWebProxy() as System.Net.WebProxy;
+			WebProxy detectedProxy = System.Net.WebRequest.GetSystemWebProxy() as System.Net.WebProxy;
 			if (detectedProxy != null && detectedProxy.Address != null)
 			{
-				var proxyUri = detectedProxy.GetProxy(request.CurrentUri);
+				Uri proxyUri = detectedProxy.GetProxy(request.CurrentUri);
 				if (proxyUri != null && !proxyUri.Equals(request.CurrentUri))
 				{
 					if (proxyUri.Scheme.StartsWith("socks", StringComparison.OrdinalIgnoreCase))
@@ -37,7 +38,7 @@ namespace BestHTTP.Proxies.Autodetect
 			return null;
 		}
 
-		private Proxy SetExceptionList(Proxy proxy, System.Net.WebProxy detectedProxy)
+		Proxy SetExceptionList(Proxy proxy, System.Net.WebProxy detectedProxy)
 		{
 			if (detectedProxy.BypassProxyOnLocal)
 			{

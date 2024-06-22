@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
 		{
 		}
 
-		private static Asn1Sequence FromCertificate(
+		static Asn1Sequence FromCertificate(
 			X509Certificate certificate)
 		{
 			try
@@ -59,7 +59,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
 			}
 		}
 
-		private static Asn1Sequence FromKey(
+		static Asn1Sequence FromKey(
 			AsymmetricKeyParameter pubKey)
 		{
 			try

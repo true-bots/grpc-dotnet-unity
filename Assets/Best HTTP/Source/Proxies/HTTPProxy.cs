@@ -30,8 +30,8 @@ namespace BestHTTP
 
 		internal Proxy(Uri address, Credentials credentials)
 		{
-			this.Address = address;
-			this.Credentials = credentials;
+			Address = address;
+			Credentials = credentials;
 		}
 
 		internal abstract void Connect(Stream stream, HTTPRequest request);
@@ -41,8 +41,10 @@ namespace BestHTTP
 
 		internal bool UseProxyForAddress(Uri address)
 		{
-			if (this.Exceptions == null)
+			if (Exceptions == null)
+			{
 				return true;
+			}
 
 			string host = address.Host;
 
@@ -53,18 +55,22 @@ namespace BestHTTP
 			//
 			// If domain does not start with a dot (example: example.com):
 			//  1. It should be an exact match.
-			for (int i = 0; i < this.Exceptions.Count; ++i)
+			for (int i = 0; i < Exceptions.Count; ++i)
 			{
-				var exception = this.Exceptions[i];
+				string exception = Exceptions[i];
 
 				if (exception == "*")
+				{
 					return false;
+				}
 
 				if (exception.StartsWith("."))
 				{
 					// Use EndsWith to match any subdomain
 					if (host.EndsWith(exception))
+					{
 						return false;
+					}
 
 					// Remove the dot and
 					exception = exception.Substring(1);
@@ -72,7 +78,9 @@ namespace BestHTTP
 
 				// do an exact match
 				if (host.Equals(exception))
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -119,25 +127,27 @@ namespace BestHTTP
 		public HTTPProxy(Uri address, Credentials credentials, bool isTransparent, bool sendWholeUri, bool nonTransparentForHTTPS)
 			: base(address, credentials)
 		{
-			this.IsTransparent = isTransparent;
-			this.SendWholeUri = sendWholeUri;
-			this.NonTransparentForHTTPS = nonTransparentForHTTPS;
+			IsTransparent = isTransparent;
+			SendWholeUri = sendWholeUri;
+			NonTransparentForHTTPS = nonTransparentForHTTPS;
 		}
 
 		internal override string GetRequestPath(Uri uri)
 		{
-			return this.SendWholeUri ? uri.OriginalString : uri.GetRequestPathAndQueryURL();
+			return SendWholeUri ? uri.OriginalString : uri.GetRequestPathAndQueryURL();
 		}
 
 		internal override bool SetupRequest(HTTPRequest request)
 		{
-			if (request == null || request.Response == null || !this.IsTransparent)
+			if (request == null || request.Response == null || !IsTransparent)
+			{
 				return false;
+			}
 
 			string authHeader = DigestStore.FindBest(request.Response.GetHeaderValues("proxy-authenticate"));
 			if (!string.IsNullOrEmpty(authHeader))
 			{
-				var digest = DigestStore.GetOrCreate(request.Proxy.Address);
+				Digest digest = DigestStore.GetOrCreate(request.Proxy.Address);
 				digest.ParseChallange(authHeader);
 
 				if (request.Proxy.Credentials != null && digest.IsUriProtected(request.Proxy.Address) && (!request.HasHeader("Proxy-Authorization") || digest.Stale))
@@ -176,10 +186,10 @@ namespace BestHTTP
 		{
 			bool isSecure = HTTPProtocolFactory.IsSecureProtocol(request.CurrentUri);
 
-			if (!this.IsTransparent || (isSecure && this.NonTransparentForHTTPS))
+			if (!IsTransparent || (isSecure && NonTransparentForHTTPS))
 			{
-				using (var bufferedStream = new WriteOnlyBufferedStream(stream, HTTPRequest.UploadChunkSize))
-				using (var outStream = new BinaryWriter(bufferedStream, Encoding.UTF8))
+				using (WriteOnlyBufferedStream bufferedStream = new WriteOnlyBufferedStream(stream, HTTPRequest.UploadChunkSize))
+				using (BinaryWriter outStream = new BinaryWriter(bufferedStream, Encoding.UTF8))
 				{
 					bool retry;
 					do
@@ -204,16 +214,16 @@ namespace BestHTTP
 						outStream.Write(HTTPRequest.EOL);
 
 						// Proxy Authentication
-						if (this.Credentials != null)
+						if (Credentials != null)
 						{
-							switch (this.Credentials.Type)
+							switch (Credentials.Type)
 							{
 								case AuthenticationTypes.Basic:
 								{
 									// With Basic authentication we don't want to wait for a challenge, we will send the hash with the first request
-									var buff = string.Format("Proxy-Authorization: {0}",
+									BufferSegment buff = string.Format("Proxy-Authorization: {0}",
 										string.Concat("Basic ",
-											Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Credentials.UserName + ":" + this.Credentials.Password)))).GetASCIIBytes();
+											Convert.ToBase64String(Encoding.UTF8.GetBytes(Credentials.UserName + ":" + Credentials.Password)))).GetASCIIBytes();
 									outStream.Write(buff.Data, buff.Offset, buff.Count);
 									BufferPool.Release(buff);
 
@@ -224,17 +234,19 @@ namespace BestHTTP
 								case AuthenticationTypes.Unknown:
 								case AuthenticationTypes.Digest:
 								{
-									var digest = DigestStore.Get(this.Address);
+									Digest digest = DigestStore.Get(Address);
 									if (digest != null)
 									{
-										string authentication = digest.GenerateResponseHeader(request, this.Credentials, true);
+										string authentication = digest.GenerateResponseHeader(request, Credentials, true);
 										if (!string.IsNullOrEmpty(authentication))
 										{
 											string auth = string.Format("Proxy-Authorization: {0}", authentication);
 											if (HTTPManager.Logger.Level <= Logger.Loglevels.Information)
+											{
 												HTTPManager.Logger.Information("HTTPProxy", "Sending proxy authorization header: " + auth, request.Context);
+											}
 
-											var buff = auth.GetASCIIBytes();
+											BufferSegment buff = auth.GetASCIIBytes();
 											outStream.Write(buff.Data, buff.Offset, buff.Count);
 											BufferPool.Release(buff);
 
@@ -256,12 +268,16 @@ namespace BestHTTP
 
 						// Read back the response of the proxy
 						if (!request.ProxyResponse.Receive(-1, true))
+						{
 							throw new Exception("Connection to the Proxy Server failed!");
+						}
 
 						if (HTTPManager.Logger.Level <= Logger.Loglevels.Information)
+						{
 							HTTPManager.Logger.Information("HTTPProxy",
 								"Proxy returned - status code: " + request.ProxyResponse.StatusCode + " message: " + request.ProxyResponse.Message + " Body: " +
 								request.ProxyResponse.DataAsText, request.Context);
+						}
 
 						switch (request.ProxyResponse.StatusCode)
 						{
@@ -272,23 +288,31 @@ namespace BestHTTP
 								string authHeader = DigestStore.FindBest(request.ProxyResponse.GetHeaderValues("proxy-authenticate"));
 								if (!string.IsNullOrEmpty(authHeader))
 								{
-									var digest = DigestStore.GetOrCreate(this.Address);
+									Digest digest = DigestStore.GetOrCreate(Address);
 									digest.ParseChallange(authHeader);
 
-									if (this.Credentials != null && digest.IsUriProtected(this.Address) && (!request.HasHeader("Proxy-Authorization") || digest.Stale))
+									if (Credentials != null && digest.IsUriProtected(Address) && (!request.HasHeader("Proxy-Authorization") || digest.Stale))
+									{
 										retry = true;
+									}
 								}
 
 								if (!retry)
+								{
 									throw new Exception(string.Format("Can't authenticate Proxy! Status Code: \"{0}\", Message: \"{1}\" and Response: {2}",
 										request.ProxyResponse.StatusCode, request.ProxyResponse.Message, request.ProxyResponse.DataAsText));
+								}
+
 								break;
 							}
 
 							default:
 								if (!request.ProxyResponse.IsSuccess)
+								{
 									throw new Exception(string.Format("Proxy returned Status Code: \"{0}\", Message: \"{1}\" and Response: {2}",
 										request.ProxyResponse.StatusCode, request.ProxyResponse.Message, request.ProxyResponse.DataAsText));
+								}
+
 								break;
 						}
 					} while (retry);

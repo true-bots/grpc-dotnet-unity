@@ -8,14 +8,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class KdfDoublePipelineIterationParameters : IDerivationParameters
 	{
 		// could be any valid value, using 32, don't know why
-		private static readonly int UNUSED_R = 32;
+		static readonly int UNUSED_R = 32;
 
-		private readonly byte[] ki;
-		private readonly bool useCounter;
-		private readonly int r;
-		private readonly byte[] fixedInputData;
+		readonly byte[] ki;
+		readonly bool useCounter;
+		readonly int r;
+		readonly byte[] fixedInputData;
 
-		private KdfDoublePipelineIterationParameters(byte[] ki, byte[] fixedInputData, int r, bool useCounter)
+		KdfDoublePipelineIterationParameters(byte[] ki, byte[] fixedInputData, int r, bool useCounter)
 		{
 			if (ki == null)
 			{

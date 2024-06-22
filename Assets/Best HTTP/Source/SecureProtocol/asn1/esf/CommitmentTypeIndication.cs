@@ -8,21 +8,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class CommitmentTypeIndication
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier commitmentTypeId;
-		private readonly Asn1Sequence commitmentTypeQualifier;
+		readonly DerObjectIdentifier commitmentTypeId;
+		readonly Asn1Sequence commitmentTypeQualifier;
 
 		public static CommitmentTypeIndication GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is CommitmentTypeIndication)
+			{
 				return (CommitmentTypeIndication)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CommitmentTypeIndication((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'CommitmentTypeIndication' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
@@ -30,15 +34,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
-			if (seq.Count < 1 || seq.Count > 2)
-				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
-			this.commitmentTypeId = (DerObjectIdentifier)seq[0].ToAsn1Object();
+			if (seq.Count < 1 || seq.Count > 2)
+			{
+				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
+
+			commitmentTypeId = (DerObjectIdentifier)seq[0].ToAsn1Object();
 
 			if (seq.Count > 1)
 			{
-				this.commitmentTypeQualifier = (Asn1Sequence)seq[1].ToAsn1Object();
+				commitmentTypeQualifier = (Asn1Sequence)seq[1].ToAsn1Object();
 			}
 		}
 
@@ -53,7 +62,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			Asn1Sequence commitmentTypeQualifier)
 		{
 			if (commitmentTypeId == null)
+			{
 				throw new ArgumentNullException("commitmentTypeId");
+			}
 
 			this.commitmentTypeId = commitmentTypeId;
 

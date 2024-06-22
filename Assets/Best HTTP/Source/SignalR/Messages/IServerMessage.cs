@@ -12,7 +12,7 @@ namespace BestHTTP.SignalR.Messages
 
 	public interface IHubMessage
 	{
-		UInt64 InvocationId { get; }
+		ulong InvocationId { get; }
 	}
 }
 

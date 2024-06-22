@@ -115,15 +115,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		protected CmsEnvelopedGenerator(SecureRandom random)
 		{
 			if (random == null)
+			{
 				throw new ArgumentNullException(nameof(random));
+			}
 
 			m_random = random;
 		}
 
 		public CmsAttributeTableGenerator UnprotectedAttributeGenerator
 		{
-			get { return this.unprotectedAttributeGenerator; }
-			set { this.unprotectedAttributeGenerator = value; }
+			get { return unprotectedAttributeGenerator; }
+			set { unprotectedAttributeGenerator = value; }
 		}
 
 		/**
@@ -137,7 +139,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		{
 			TbsCertificateStructure recipientTbsCert = CmsUtilities.GetTbsCertificateStructure(cert);
 			SubjectPublicKeyInfo info = recipientTbsCert.SubjectPublicKeyInfo;
-			this.AddRecipientInfoGenerator(new KeyTransRecipientInfoGenerator(cert, new Asn1KeyWrapper(info.AlgorithmID.Algorithm, info.AlgorithmID.Parameters, cert)));
+			AddRecipientInfoGenerator(new KeyTransRecipientInfoGenerator(cert, new Asn1KeyWrapper(info.AlgorithmID.Algorithm, info.AlgorithmID.Parameters, cert)));
 		}
 
 		/**
@@ -152,7 +154,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			byte[] subKeyId)
 		{
 			SubjectPublicKeyInfo info = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(pubKey);
-			this.AddRecipientInfoGenerator(new KeyTransRecipientInfoGenerator(subKeyId,
+			AddRecipientInfoGenerator(new KeyTransRecipientInfoGenerator(subKeyId,
 				new Asn1KeyWrapper(info.AlgorithmID.Algorithm, info.AlgorithmID.Parameters, pubKey)));
 		}
 
@@ -219,7 +221,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			X509Certificate recipientCert,
 			string cekWrapAlgorithm)
 		{
-			var recipientCerts = new List<X509Certificate>(1);
+			List<X509Certificate> recipientCerts = new List<X509Certificate>(1);
 			recipientCerts.Add(recipientCert);
 
 			AddKeyAgreementRecipients(agreementAlgorithm, senderPrivateKey, senderPublicKey,
@@ -245,9 +247,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			string cekWrapAlgorithm)
 		{
 			if (!senderPrivateKey.IsPrivate)
+			{
 				throw new ArgumentException("Expected private key", "senderPrivateKey");
+			}
+
 			if (senderPublicKey.IsPrivate)
+			{
 				throw new ArgumentException("Expected public key", "senderPublicKey");
+			}
 
 			/* TODO
 			 * "a recipient X.509 version 3 certificate that contains a key usage extension MUST

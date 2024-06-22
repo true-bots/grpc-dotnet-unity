@@ -21,9 +21,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static V2Form GetInstance(object obj)
 		{
 			if (obj is V2Form)
+			{
 				return (V2Form)obj;
+			}
+
 			if (obj != null)
+			{
 				return new V2Form(Asn1Sequence.GetInstance(obj));
+			}
+
 			return null;
 		}
 
@@ -52,7 +58,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			this.objectDigestInfo = objectDigestInfo;
 		}
 
-		private V2Form(
+		V2Form(
 			Asn1Sequence seq)
 		{
 			if (seq.Count > 3)
@@ -65,7 +71,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			if (!(seq[0] is Asn1TaggedObject))
 			{
 				index++;
-				this.issuerName = GeneralNames.GetInstance(seq[0]);
+				issuerName = GeneralNames.GetInstance(seq[0]);
 			}
 
 			for (int i = index; i != seq.Count; i++)

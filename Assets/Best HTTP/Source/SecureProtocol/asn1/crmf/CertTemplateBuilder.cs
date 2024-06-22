@@ -7,16 +7,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 {
 	public class CertTemplateBuilder
 	{
-		private DerInteger version;
-		private DerInteger serialNumber;
-		private AlgorithmIdentifier signingAlg;
-		private X509Name issuer;
-		private OptionalValidity validity;
-		private X509Name subject;
-		private SubjectPublicKeyInfo publicKey;
-		private DerBitString issuerUID;
-		private DerBitString subjectUID;
-		private X509Extensions extensions;
+		DerInteger version;
+		DerInteger serialNumber;
+		AlgorithmIdentifier signingAlg;
+		X509Name issuer;
+		OptionalValidity validity;
+		X509Name subject;
+		SubjectPublicKeyInfo publicKey;
+		DerBitString issuerUID;
+		DerBitString subjectUID;
+		X509Extensions extensions;
 
 		/** Sets the X.509 version. Note: for X509v3, use 2 here. */
 		public virtual CertTemplateBuilder SetVersion(int ver)
@@ -115,7 +115,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 			return CertTemplate.GetInstance(new DerSequence(v));
 		}
 
-		private void AddOptional(Asn1EncodableVector v, int tagNo, bool isExplicit, Asn1Encodable obj)
+		void AddOptional(Asn1EncodableVector v, int tagNo, bool isExplicit, Asn1Encodable obj)
 		{
 			if (obj != null)
 			{

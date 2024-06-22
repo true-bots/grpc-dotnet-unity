@@ -18,8 +18,8 @@ namespace BestHTTP.SignalRCore.Messages
 
 		internal SupportedTransport(string transportName, List<string> transferFormats)
 		{
-			this.Name = transportName;
-			this.SupportedFormats = transferFormats;
+			Name = transportName;
+			SupportedFormats = transferFormats;
 		}
 	}
 
@@ -63,7 +63,7 @@ namespace BestHTTP.SignalRCore.Messages
 		{
 			error = null;
 
-			Dictionary<string, object> response = BestHTTP.JSON.Json.Decode(resp.DataAsText) as Dictionary<string, object>;
+			Dictionary<string, object> response = JSON.Json.Decode(resp.DataAsText) as Dictionary<string, object>;
 			if (response == null)
 			{
 				error = "Json decoding failed!";
@@ -81,14 +81,20 @@ namespace BestHTTP.SignalRCore.Messages
 				{
 					int version;
 					if (int.TryParse(value.ToString(), out version))
+					{
 						result.NegotiateVersion = version;
+					}
 				}
 
 				if (response.TryGetValue("connectionId", out value))
+				{
 					result.ConnectionId = value.ToString();
+				}
 
 				if (response.TryGetValue("connectionToken", out value))
+				{
 					result.ConnectionToken = value.ToString();
+				}
 
 				if (response.TryGetValue("availableTransports", out value))
 				{
@@ -103,7 +109,9 @@ namespace BestHTTP.SignalRCore.Messages
 							List<string> transferModes = null;
 
 							if (transport.TryGetValue("transport", out value))
+							{
 								transportName = value.ToString();
+							}
 
 							if (transport.TryGetValue("transferFormats", out value))
 							{
@@ -112,8 +120,10 @@ namespace BestHTTP.SignalRCore.Messages
 								if (transferFormats != null)
 								{
 									transferModes = new List<string>(transferFormats.Count);
-									foreach (var mode in transferFormats)
+									foreach (object mode in transferFormats)
+									{
 										transferModes.Add(mode.ToString());
+									}
 								}
 							}
 
@@ -134,7 +144,9 @@ namespace BestHTTP.SignalRCore.Messages
 					//  as it should be able to successfully parse whole (absolute) urls (like "https://server:url/path")
 					//  and relative ones (like "/path").
 					if (!Uri.TryCreate(uriStr, UriKind.RelativeOrAbsolute, out redirectUri))
+					{
 						throw new Exception(string.Format("Couldn't parse url: '{0}'", uriStr));
+					}
 
 					HTTPManager.Logger.Verbose("NegotiationResult",
 						string.Format("Parsed url({0}) into uri({1}). uri.IsAbsoluteUri: {2}, IsAbsolute: {3}", uriStr, redirectUri, redirectUri.IsAbsoluteUri,
@@ -144,15 +156,19 @@ namespace BestHTTP.SignalRCore.Messages
 					if (!IsAbsolute(uriStr))
 					{
 						Uri oldUri = hub.Uri;
-						var builder = new UriBuilder(oldUri);
+						UriBuilder builder = new UriBuilder(oldUri);
 
 						// ?, /
-						var pathAndQuery = uriStr.Split(new string[] { "?", "%3F", "%3f", "/", "%2F", "%2f" }, StringSplitOptions.RemoveEmptyEntries);
+						string[] pathAndQuery = uriStr.Split(new string[] { "?", "%3F", "%3f", "/", "%2F", "%2f" }, StringSplitOptions.RemoveEmptyEntries);
 
 						if (pathAndQuery.Length > 1)
+						{
 							builder.Query = pathAndQuery[1];
+						}
 						else
+						{
 							builder.Query = string.Empty;
+						}
 
 						builder.Path = pathAndQuery[0];
 
@@ -163,9 +179,13 @@ namespace BestHTTP.SignalRCore.Messages
 				}
 
 				if (response.TryGetValue("accessToken", out value))
+				{
 					result.AccessToken = value.ToString();
+				}
 				else if (hub.NegotiationResult != null)
+				{
 					result.AccessToken = hub.NegotiationResult.AccessToken;
+				}
 
 				return result;
 			}
@@ -176,7 +196,7 @@ namespace BestHTTP.SignalRCore.Messages
 			}
 		}
 
-		private static bool IsAbsolute(string url)
+		static bool IsAbsolute(string url)
 		{
 			// an url is absolute if contains a scheme, an authority, and a path.
 			return url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||

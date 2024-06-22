@@ -7,13 +7,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class NewSessionTicket
 	{
-		private readonly long m_ticketLifetimeHint;
-		private readonly byte[] m_ticket;
+		readonly long m_ticketLifetimeHint;
+		readonly byte[] m_ticket;
 
 		public NewSessionTicket(long ticketLifetimeHint, byte[] ticket)
 		{
-			this.m_ticketLifetimeHint = ticketLifetimeHint;
-			this.m_ticket = ticket;
+			m_ticketLifetimeHint = ticketLifetimeHint;
+			m_ticket = ticket;
 		}
 
 		public long TicketLifetimeHint

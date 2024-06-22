@@ -35,7 +35,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 		*
 		* @return second count for key validity.
 		*/
-		public long Time => (long)Pack.BE_To_UInt32(data);
+		public long Time
+		{
+			get { return (long)Pack.BE_To_UInt32(data); }
+		}
 	}
 }
 #pragma warning restore

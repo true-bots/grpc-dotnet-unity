@@ -21,9 +21,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public NonMemoableDigest(IDigest baseDigest)
 		{
 			if (baseDigest == null)
+			{
 				throw new ArgumentNullException("baseDigest");
+			}
 
-			this.mBaseDigest = baseDigest;
+			mBaseDigest = baseDigest;
 		}
 
 		public virtual string AlgorithmName

@@ -7,11 +7,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class CertReqMsg
 		: Asn1Encodable
 	{
-		private readonly CertRequest certReq;
-		private readonly ProofOfPossession popo;
-		private readonly Asn1Sequence regInfo;
+		readonly CertRequest certReq;
+		readonly ProofOfPossession popo;
+		readonly Asn1Sequence regInfo;
 
-		private CertReqMsg(Asn1Sequence seq)
+		CertReqMsg(Asn1Sequence seq)
 		{
 			certReq = CertRequest.GetInstance(seq[0]);
 
@@ -33,10 +33,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static CertReqMsg GetInstance(object obj)
 		{
 			if (obj is CertReqMsg)
+			{
 				return (CertReqMsg)obj;
+			}
 
 			if (obj != null)
+			{
 				return new CertReqMsg(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
@@ -60,7 +64,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 			AttributeTypeAndValue[] regInfo)
 		{
 			if (certReq == null)
+			{
 				throw new ArgumentNullException("certReq");
+			}
 
 			this.certReq = certReq;
 			this.popo = popo;
@@ -84,7 +90,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public virtual AttributeTypeAndValue[] GetRegInfo()
 		{
 			if (regInfo == null)
+			{
 				return null;
+			}
 
 			AttributeTypeAndValue[] results = new AttributeTypeAndValue[regInfo.Count];
 			for (int i = 0; i != results.Length; ++i)

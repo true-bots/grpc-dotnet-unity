@@ -126,15 +126,15 @@ namespace BestHTTP.Futures
 	/// <typeparam name="T">The type of object being retrieved.</typeparam>
 	public class Future<T> : IFuture<T>
 	{
-		private volatile FutureState _state;
-		private T _value;
-		private Exception _error;
-		private Func<T> _processFunc;
+		volatile FutureState _state;
+		T _value;
+		Exception _error;
+		Func<T> _processFunc;
 
-		private readonly List<FutureValueCallback<T>> _itemCallbacks = new List<FutureValueCallback<T>>();
-		private readonly List<FutureValueCallback<T>> _successCallbacks = new List<FutureValueCallback<T>>();
-		private readonly List<FutureErrorCallback> _errorCallbacks = new List<FutureErrorCallback>();
-		private readonly List<FutureCallback<T>> _complationCallbacks = new List<FutureCallback<T>>();
+		readonly List<FutureValueCallback<T>> _itemCallbacks = new List<FutureValueCallback<T>>();
+		readonly List<FutureValueCallback<T>> _successCallbacks = new List<FutureValueCallback<T>>();
+		readonly List<FutureErrorCallback> _errorCallbacks = new List<FutureErrorCallback>();
+		readonly List<FutureCallback<T>> _complationCallbacks = new List<FutureCallback<T>>();
 
 		/// <summary>
 		/// Gets the state of the future.
@@ -187,7 +187,9 @@ namespace BestHTTP.Futures
 		public IFuture<T> OnItem(FutureValueCallback<T> callback)
 		{
 			if (_state < FutureState.Success && !_itemCallbacks.Contains(callback))
+			{
 				_itemCallbacks.Add(callback);
+			}
 
 			return this;
 		}
@@ -201,7 +203,7 @@ namespace BestHTTP.Futures
 		{
 			if (_state == FutureState.Success)
 			{
-				callback(this.value);
+				callback(value);
 			}
 			else if (_state != FutureState.Error && !_successCallbacks.Contains(callback))
 			{
@@ -220,7 +222,7 @@ namespace BestHTTP.Futures
 		{
 			if (_state == FutureState.Error)
 			{
-				callback(this.error);
+				callback(error);
 			}
 			else if (_state != FutureState.Success && !_errorCallbacks.Contains(callback))
 			{
@@ -244,7 +246,9 @@ namespace BestHTTP.Futures
 			else
 			{
 				if (!_complationCallbacks.Contains(callback))
+				{
 					_complationCallbacks.Add(callback);
+				}
 			}
 
 			return this;
@@ -278,11 +282,10 @@ namespace BestHTTP.Futures
 			return this;
 		}
 
-		private
 #if NETFX_CORE
             async
 #endif
-			void ThreadFunc(object param)
+		void ThreadFunc(object param)
 		{
 			try
 			{
@@ -321,7 +324,7 @@ namespace BestHTTP.Futures
 			AssignImpl(value);
 		}
 
-		public void BeginProcess(T initialItem = default(T))
+		public void BeginProcess(T initialItem = default)
 		{
 			_state = FutureState.Processing;
 			_value = initialItem;
@@ -332,8 +335,10 @@ namespace BestHTTP.Futures
 			_value = value;
 			_error = null;
 
-			foreach (var callback in _itemCallbacks)
+			foreach (FutureValueCallback<T> callback in _itemCallbacks)
+			{
 				callback(this.value);
+			}
 		}
 
 		public void Finish()
@@ -361,7 +366,7 @@ namespace BestHTTP.Futures
 			FailImpl(error);
 		}
 
-		private void AssignImpl(T value)
+		void AssignImpl(T value)
 		{
 			_value = value;
 			_error = null;
@@ -370,39 +375,46 @@ namespace BestHTTP.Futures
 			FlushSuccessCallbacks();
 		}
 
-		private void FailImpl(Exception error)
+		void FailImpl(Exception error)
 		{
-			_value = default(T);
+			_value = default;
 			_error = error;
 			_state = FutureState.Error;
 
 			FlushErrorCallbacks();
 		}
 
-		private void FlushSuccessCallbacks()
+		void FlushSuccessCallbacks()
 		{
-			foreach (var callback in _successCallbacks)
-				callback(this.value);
+			foreach (FutureValueCallback<T> callback in _successCallbacks)
+			{
+				callback(value);
+			}
 
 			FlushComplationCallbacks();
 		}
 
-		private void FlushErrorCallbacks()
+		void FlushErrorCallbacks()
 		{
-			foreach (var callback in _errorCallbacks)
-				callback(this.error);
+			foreach (FutureErrorCallback callback in _errorCallbacks)
+			{
+				callback(error);
+			}
 
 			FlushComplationCallbacks();
 		}
 
-		private void FlushComplationCallbacks()
+		void FlushComplationCallbacks()
 		{
-			foreach (var callback in _complationCallbacks)
+			foreach (FutureCallback<T> callback in _complationCallbacks)
+			{
 				callback(this);
+			}
+
 			ClearCallbacks();
 		}
 
-		private void ClearCallbacks()
+		void ClearCallbacks()
 		{
 			_itemCallbacks.Clear();
 			_successCallbacks.Clear();

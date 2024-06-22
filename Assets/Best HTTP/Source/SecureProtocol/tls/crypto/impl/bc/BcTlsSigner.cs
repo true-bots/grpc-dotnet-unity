@@ -14,14 +14,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		protected BcTlsSigner(BcTlsCrypto crypto, AsymmetricKeyParameter privateKey)
 		{
 			if (crypto == null)
+			{
 				throw new ArgumentNullException("crypto");
-			if (privateKey == null)
-				throw new ArgumentNullException("privateKey");
-			if (!privateKey.IsPrivate)
-				throw new ArgumentException("must be private", "privateKey");
+			}
 
-			this.m_crypto = crypto;
-			this.m_privateKey = privateKey;
+			if (privateKey == null)
+			{
+				throw new ArgumentNullException("privateKey");
+			}
+
+			if (!privateKey.IsPrivate)
+			{
+				throw new ArgumentException("must be private", "privateKey");
+			}
+
+			m_crypto = crypto;
+			m_privateKey = privateKey;
 		}
 
 		public virtual byte[] GenerateRawSignature(SignatureAndHashAlgorithm algorithm, byte[] hash)

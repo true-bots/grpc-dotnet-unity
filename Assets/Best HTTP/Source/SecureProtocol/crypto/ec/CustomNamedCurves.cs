@@ -20,19 +20,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 	/// <summary>Elliptic curve registry for various customized curve implementations.</summary>
 	public static class CustomNamedCurves
 	{
-		private static X9ECPoint ConfigureBasepoint(ECCurve curve, string encoding)
+		static X9ECPoint ConfigureBasepoint(ECCurve curve, string encoding)
 		{
 			X9ECPoint G = new X9ECPoint(curve, Hex.DecodeStrict(encoding));
 			WNafUtilities.ConfigureBasepoint(G.Point);
 			return G;
 		}
 
-		private static ECCurve ConfigureCurve(ECCurve curve)
+		static ECCurve ConfigureCurve(ECCurve curve)
 		{
 			return curve;
 		}
 
-		private static ECCurve ConfigureCurveGlv(ECCurve c, GlvTypeBParameters p)
+		static ECCurve ConfigureCurveGlv(ECCurve c, GlvTypeBParameters p)
 		{
 			return c.Configure().SetEndomorphism(new GlvTypeBEndomorphism(c, p)).Create();
 		}
@@ -40,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP128R1Holder
 			: X9ECParametersHolder
 		{
-			private SecP128R1Holder()
+			SecP128R1Holder()
 			{
 			}
 
@@ -64,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP160K1Holder
 			: X9ECParametersHolder
 		{
-			private SecP160K1Holder()
+			SecP160K1Holder()
 			{
 			}
 
@@ -105,7 +105,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP160R1Holder
 			: X9ECParametersHolder
 		{
-			private SecP160R1Holder()
+			SecP160R1Holder()
 			{
 			}
 
@@ -129,7 +129,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP160R2Holder
 			: X9ECParametersHolder
 		{
-			private SecP160R2Holder()
+			SecP160R2Holder()
 			{
 			}
 
@@ -153,7 +153,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP192K1Holder
 			: X9ECParametersHolder
 		{
-			private SecP192K1Holder()
+			SecP192K1Holder()
 			{
 			}
 
@@ -194,7 +194,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP192R1Holder
 			: X9ECParametersHolder
 		{
-			private SecP192R1Holder()
+			SecP192R1Holder()
 			{
 			}
 
@@ -218,7 +218,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP224K1Holder
 			: X9ECParametersHolder
 		{
-			private SecP224K1Holder()
+			SecP224K1Holder()
 			{
 			}
 
@@ -259,7 +259,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP224R1Holder
 			: X9ECParametersHolder
 		{
-			private SecP224R1Holder()
+			SecP224R1Holder()
 			{
 			}
 
@@ -283,7 +283,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP256K1Holder
 			: X9ECParametersHolder
 		{
-			private SecP256K1Holder()
+			SecP256K1Holder()
 			{
 			}
 
@@ -324,7 +324,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP256R1Holder
 			: X9ECParametersHolder
 		{
-			private SecP256R1Holder()
+			SecP256R1Holder()
 			{
 			}
 
@@ -348,7 +348,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP384R1Holder
 			: X9ECParametersHolder
 		{
-			private SecP384R1Holder()
+			SecP384R1Holder()
 			{
 			}
 
@@ -373,7 +373,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecP521R1Holder
 			: X9ECParametersHolder
 		{
-			private SecP521R1Holder()
+			SecP521R1Holder()
 			{
 			}
 
@@ -398,7 +398,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT113R1Holder
 			: X9ECParametersHolder
 		{
-			private SecT113R1Holder()
+			SecT113R1Holder()
 			{
 			}
 
@@ -422,7 +422,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT113R2Holder
 			: X9ECParametersHolder
 		{
-			private SecT113R2Holder()
+			SecT113R2Holder()
 			{
 			}
 
@@ -446,7 +446,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT131R1Holder
 			: X9ECParametersHolder
 		{
-			private SecT131R1Holder()
+			SecT131R1Holder()
 			{
 			}
 
@@ -470,7 +470,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT131R2Holder
 			: X9ECParametersHolder
 		{
-			private SecT131R2Holder()
+			SecT131R2Holder()
 			{
 			}
 
@@ -494,7 +494,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT163K1Holder
 			: X9ECParametersHolder
 		{
-			private SecT163K1Holder()
+			SecT163K1Holder()
 			{
 			}
 
@@ -518,7 +518,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT163R1Holder
 			: X9ECParametersHolder
 		{
-			private SecT163R1Holder()
+			SecT163R1Holder()
 			{
 			}
 
@@ -542,7 +542,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT163R2Holder
 			: X9ECParametersHolder
 		{
-			private SecT163R2Holder()
+			SecT163R2Holder()
 			{
 			}
 
@@ -566,7 +566,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT193R1Holder
 			: X9ECParametersHolder
 		{
-			private SecT193R1Holder()
+			SecT193R1Holder()
 			{
 			}
 
@@ -590,7 +590,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT193R2Holder
 			: X9ECParametersHolder
 		{
-			private SecT193R2Holder()
+			SecT193R2Holder()
 			{
 			}
 
@@ -614,7 +614,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT233K1Holder
 			: X9ECParametersHolder
 		{
-			private SecT233K1Holder()
+			SecT233K1Holder()
 			{
 			}
 
@@ -638,7 +638,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT233R1Holder
 			: X9ECParametersHolder
 		{
-			private SecT233R1Holder()
+			SecT233R1Holder()
 			{
 			}
 
@@ -662,7 +662,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT239K1Holder
 			: X9ECParametersHolder
 		{
-			private SecT239K1Holder()
+			SecT239K1Holder()
 			{
 			}
 
@@ -686,7 +686,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT283K1Holder
 			: X9ECParametersHolder
 		{
-			private SecT283K1Holder()
+			SecT283K1Holder()
 			{
 			}
 
@@ -711,7 +711,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT283R1Holder
 			: X9ECParametersHolder
 		{
-			private SecT283R1Holder()
+			SecT283R1Holder()
 			{
 			}
 
@@ -736,7 +736,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT409K1Holder
 			: X9ECParametersHolder
 		{
-			private SecT409K1Holder()
+			SecT409K1Holder()
 			{
 			}
 
@@ -761,7 +761,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT409R1Holder
 			: X9ECParametersHolder
 		{
-			private SecT409R1Holder()
+			SecT409R1Holder()
 			{
 			}
 
@@ -786,7 +786,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT571K1Holder
 			: X9ECParametersHolder
 		{
-			private SecT571K1Holder()
+			SecT571K1Holder()
 			{
 			}
 
@@ -811,7 +811,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SecT571R1Holder
 			: X9ECParametersHolder
 		{
-			private SecT571R1Holder()
+			SecT571R1Holder()
 			{
 			}
 
@@ -836,7 +836,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 		internal class SM2P256V1Holder
 			: X9ECParametersHolder
 		{
-			private SM2P256V1Holder()
+			SM2P256V1Holder()
 			{
 			}
 
@@ -857,26 +857,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.EC
 			}
 		}
 
-		private static readonly Dictionary<string, DerObjectIdentifier> objIds =
+		static readonly Dictionary<string, DerObjectIdentifier> objIds =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
+		static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
 			new Dictionary<DerObjectIdentifier, X9ECParametersHolder>();
 
-		private static readonly Dictionary<DerObjectIdentifier, string> names =
+		static readonly Dictionary<DerObjectIdentifier, string> names =
 			new Dictionary<DerObjectIdentifier, string>();
 
-		private static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
+		static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
 		{
 			objIds.Add(name, oid);
 			names.Add(oid, name);
 			curves.Add(oid, holder);
 		}
 
-		private static void DefineCurveAlias(string name, DerObjectIdentifier oid)
+		static void DefineCurveAlias(string name, DerObjectIdentifier oid)
 		{
 			if (!curves.ContainsKey(oid))
+			{
 				throw new InvalidOperationException();
+			}
 
 			objIds.Add(name, oid);
 		}

@@ -16,22 +16,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static CrlStatus GetInstance(object obj)
 		{
 			if (obj is CrlStatus crlStatus)
+			{
 				return crlStatus;
+			}
 
 			if (obj != null)
+			{
 				return new CrlStatus(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly CrlSource m_source;
-		private readonly Time m_thisUpdate;
+		readonly CrlSource m_source;
+		readonly Time m_thisUpdate;
 
-		private CrlStatus(Asn1Sequence sequence)
+		CrlStatus(Asn1Sequence sequence)
 		{
 			int count = sequence.Count;
 			if (count < 1 || count > 2)
+			{
 				throw new ArgumentException("expected sequence size of 1 or 2, got " + count);
+			}
 
 			m_source = CrlSource.GetInstance(sequence[0]);
 
@@ -47,14 +53,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_thisUpdate = thisUpdate;
 		}
 
-		public virtual CrlSource Source => m_source;
+		public virtual CrlSource Source
+		{
+			get { return m_source; }
+		}
 
-		public virtual Time ThisUpdate => m_thisUpdate;
+		public virtual Time ThisUpdate
+		{
+			get { return m_thisUpdate; }
+		}
 
 		public override Asn1Object ToAsn1Object()
 		{
 			if (m_thisUpdate == null)
+			{
 				return new DerSequence(m_source);
+			}
 
 			return new DerSequence(m_source, m_thisUpdate);
 		}

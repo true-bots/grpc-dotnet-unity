@@ -7,11 +7,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class EnvelopedData
 		: Asn1Encodable
 	{
-		private DerInteger version;
-		private OriginatorInfo originatorInfo;
-		private Asn1Set recipientInfos;
-		private EncryptedContentInfo encryptedContentInfo;
-		private Asn1Set unprotectedAttrs;
+		DerInteger version;
+		OriginatorInfo originatorInfo;
+		Asn1Set recipientInfos;
+		EncryptedContentInfo encryptedContentInfo;
+		Asn1Set unprotectedAttrs;
 
 		public EnvelopedData(
 			OriginatorInfo originatorInfo,
@@ -19,7 +19,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			EncryptedContentInfo encryptedContentInfo,
 			Asn1Set unprotectedAttrs)
 		{
-			this.version = new DerInteger(CalculateVersion(originatorInfo, recipientInfos, unprotectedAttrs));
+			version = new DerInteger(CalculateVersion(originatorInfo, recipientInfos, unprotectedAttrs));
 			this.originatorInfo = originatorInfo;
 			this.recipientInfos = recipientInfos;
 			this.encryptedContentInfo = encryptedContentInfo;
@@ -32,14 +32,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			EncryptedContentInfo encryptedContentInfo,
 			Attributes unprotectedAttrs)
 		{
-			this.version = new DerInteger(CalculateVersion(originatorInfo, recipientInfos, Asn1Set.GetInstance(unprotectedAttrs)));
+			version = new DerInteger(CalculateVersion(originatorInfo, recipientInfos, Asn1Set.GetInstance(unprotectedAttrs)));
 			this.originatorInfo = originatorInfo;
 			this.recipientInfos = recipientInfos;
 			this.encryptedContentInfo = encryptedContentInfo;
 			this.unprotectedAttrs = Asn1Set.GetInstance(unprotectedAttrs);
 		}
 
-		private EnvelopedData(Asn1Sequence seq)
+		EnvelopedData(Asn1Sequence seq)
 		{
 			int index = 0;
 
@@ -88,9 +88,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj is EnvelopedData)
+			{
 				return (EnvelopedData)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new EnvelopedData(Asn1Sequence.GetInstance(obj));
 		}
 

@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class OcspResponse
 		: Asn1Encodable
 	{
-		private readonly OcspResponseStatus responseStatus;
-		private readonly ResponseBytes responseBytes;
+		readonly OcspResponseStatus responseStatus;
+		readonly ResponseBytes responseBytes;
 
 		public static OcspResponse GetInstance(
 			Asn1TaggedObject obj,
@@ -31,7 +31,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new OcspResponse((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public OcspResponse(
@@ -39,13 +39,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			ResponseBytes responseBytes)
 		{
 			if (responseStatus == null)
+			{
 				throw new ArgumentNullException("responseStatus");
+			}
 
 			this.responseStatus = responseStatus;
 			this.responseBytes = responseBytes;
 		}
 
-		private OcspResponse(
+		OcspResponse(
 			Asn1Sequence seq)
 		{
 			responseStatus = new OcspResponseStatus(

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections
 {
-	internal abstract class ReadOnlyDictionary<K, V>
+	abstract class ReadOnlyDictionary<K, V>
 		: IDictionary<K, V>
 	{
 		public V this[K key]
@@ -19,13 +19,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections
 			return GetEnumerator();
 		}
 
-		public bool IsReadOnly => true;
+		public bool IsReadOnly
+		{
+			get { return true; }
+		}
 
-		public void Add(K key, V value) => throw new NotSupportedException();
-		public void Add(KeyValuePair<K, V> item) => throw new NotSupportedException();
-		public void Clear() => throw new NotSupportedException();
-		public bool Remove(K key) => throw new NotSupportedException();
-		public bool Remove(KeyValuePair<K, V> item) => throw new NotSupportedException();
+		public void Add(K key, V value)
+		{
+			throw new NotSupportedException();
+		}
+
+		public void Add(KeyValuePair<K, V> item)
+		{
+			throw new NotSupportedException();
+		}
+
+		public void Clear()
+		{
+			throw new NotSupportedException();
+		}
+
+		public bool Remove(K key)
+		{
+			throw new NotSupportedException();
+		}
+
+		public bool Remove(KeyValuePair<K, V> item)
+		{
+			throw new NotSupportedException();
+		}
 
 		public abstract bool Contains(KeyValuePair<K, V> item);
 		public abstract bool ContainsKey(K key);
@@ -39,29 +61,65 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections
 		protected abstract V Lookup(K key);
 	}
 
-	internal class ReadOnlyDictionaryProxy<K, V>
+	class ReadOnlyDictionaryProxy<K, V>
 		: ReadOnlyDictionary<K, V>
 	{
-		private readonly IDictionary<K, V> m_target;
+		readonly IDictionary<K, V> m_target;
 
 		internal ReadOnlyDictionaryProxy(IDictionary<K, V> target)
 		{
 			if (target == null)
+			{
 				throw new ArgumentNullException(nameof(target));
+			}
 
 			m_target = target;
 		}
 
-		public override bool Contains(KeyValuePair<K, V> item) => m_target.Contains(item);
-		public override bool ContainsKey(K key) => m_target.ContainsKey(key);
-		public override void CopyTo(KeyValuePair<K, V>[] array, int arrayIndex) => m_target.CopyTo(array, arrayIndex);
-		public override int Count => m_target.Count;
-		public override IEnumerator<KeyValuePair<K, V>> GetEnumerator() => m_target.GetEnumerator();
-		public override ICollection<K> Keys => new ReadOnlyCollectionProxy<K>(m_target.Keys);
-		public override bool TryGetValue(K key, out V value) => m_target.TryGetValue(key, out value);
-		public override ICollection<V> Values => new ReadOnlyCollectionProxy<V>(m_target.Values);
+		public override bool Contains(KeyValuePair<K, V> item)
+		{
+			return m_target.Contains(item);
+		}
 
-		protected override V Lookup(K key) => m_target[key];
+		public override bool ContainsKey(K key)
+		{
+			return m_target.ContainsKey(key);
+		}
+
+		public override void CopyTo(KeyValuePair<K, V>[] array, int arrayIndex)
+		{
+			m_target.CopyTo(array, arrayIndex);
+		}
+
+		public override int Count
+		{
+			get { return m_target.Count; }
+		}
+
+		public override IEnumerator<KeyValuePair<K, V>> GetEnumerator()
+		{
+			return m_target.GetEnumerator();
+		}
+
+		public override ICollection<K> Keys
+		{
+			get { return new ReadOnlyCollectionProxy<K>(m_target.Keys); }
+		}
+
+		public override bool TryGetValue(K key, out V value)
+		{
+			return m_target.TryGetValue(key, out value);
+		}
+
+		public override ICollection<V> Values
+		{
+			get { return new ReadOnlyCollectionProxy<V>(m_target.Values); }
+		}
+
+		protected override V Lookup(K key)
+		{
+			return m_target[key];
+		}
 	}
 }
 #pragma warning restore

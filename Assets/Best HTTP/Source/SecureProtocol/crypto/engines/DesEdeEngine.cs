@@ -11,8 +11,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class DesEdeEngine
 		: DesEngine
 	{
-		private int[] workingKey1, workingKey2, workingKey3;
-		private bool forEncryption;
+		int[] workingKey1, workingKey2, workingKey3;
+		bool forEncryption;
 
 		/**
 		* initialise a DESede cipher.
@@ -27,11 +27,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
-				throw new ArgumentException("invalid parameter passed to DESede init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			{
+				throw new ArgumentException("invalid parameter passed to DESede init - " + Platform.GetTypeName(parameters));
+			}
 
 			byte[] keyMaster = ((KeyParameter)parameters).GetKey();
 			if (keyMaster.Length != 24 && keyMaster.Length != 16)
+			{
 				throw new ArgumentException("key size must be 16 or 24 bytes.");
+			}
 
 			this.forEncryption = forEncryption;
 
@@ -68,7 +72,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public override int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (workingKey1 == null)
+			{
 				throw new InvalidOperationException("DESede engine not initialised");
+			}
 
 			Check.DataLength(input, inOff, BLOCK_SIZE, "input buffer too short");
 			Check.OutputLength(output, outOff, BLOCK_SIZE, "output buffer too short");

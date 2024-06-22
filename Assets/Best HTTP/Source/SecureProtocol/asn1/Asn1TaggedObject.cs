@@ -14,27 +14,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public abstract class Asn1TaggedObject
 		: Asn1Object, Asn1TaggedObjectParser
 	{
-		private const int DeclaredExplicit = 1;
+		const int DeclaredExplicit = 1;
 
-		private const int DeclaredImplicit = 2;
+		const int DeclaredImplicit = 2;
 
 		// TODO It will probably be better to track parsing constructed vs primitive instead
-		private const int ParsedExplicit = 3;
-		private const int ParsedImplicit = 4;
+		const int ParsedExplicit = 3;
+		const int ParsedImplicit = 4;
 
 		public static Asn1TaggedObject GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is Asn1TaggedObject asn1TaggedObject)
+			{
 				return asn1TaggedObject;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is Asn1TaggedObject converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -48,17 +54,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static Asn1TaggedObject GetInstance(object obj, int tagClass)
 		{
 			if (obj == null)
+			{
 				throw new ArgumentNullException(nameof(obj));
+			}
 
 			Asn1TaggedObject taggedObject = GetInstance(obj);
 			if (tagClass != taggedObject.TagClass)
+			{
 				throw new ArgumentException("unexpected tag in GetInstance: " + Asn1Utilities.GetTagText(taggedObject));
+			}
 
 			return taggedObject;
 		}
@@ -66,11 +76,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1TaggedObject GetInstance(object obj, int tagClass, int tagNo)
 		{
 			if (obj == null)
+			{
 				throw new ArgumentNullException(nameof(obj));
+			}
 
 			Asn1TaggedObject taggedObject = GetInstance(obj);
 			if (!taggedObject.HasTag(tagClass, tagNo))
+			{
 				throw new ArgumentException("unexpected tag in GetInstance: " + Asn1Utilities.GetTagText(taggedObject));
+			}
 
 			return taggedObject;
 		}
@@ -78,10 +92,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1TaggedObject GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
 		{
 			if (Asn1Tags.ContextSpecific != taggedObject.TagClass)
+			{
 				throw new InvalidOperationException("this method only valid for CONTEXT_SPECIFIC tags");
+			}
 
 			if (declaredExplicit)
+			{
 				return taggedObject.GetExplicitBaseTagged();
+			}
 
 			throw new ArgumentException("this method not valid for implicitly tagged tagged objects");
 		}
@@ -109,11 +127,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal Asn1TaggedObject(int explicitness, int tagClass, int tagNo, Asn1Encodable obj)
 		{
 			if (null == obj)
+			{
 				throw new ArgumentNullException("obj");
-			if (Asn1Tags.Universal == tagClass || (tagClass & Asn1Tags.Private) != tagClass)
-				throw new ArgumentException("invalid tag class: " + tagClass, "tagClass");
+			}
 
-			this.explicitness = (obj is IAsn1Choice) ? DeclaredExplicit : explicitness;
+			if (Asn1Tags.Universal == tagClass || (tagClass & Asn1Tags.Private) != tagClass)
+			{
+				throw new ArgumentException("invalid tag class: " + tagClass, "tagClass");
+			}
+
+			this.explicitness = obj is IAsn1Choice ? DeclaredExplicit : explicitness;
 			this.tagClass = tagClass;
 			this.tagNo = tagNo;
 			this.obj = obj;
@@ -122,30 +145,36 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		protected override bool Asn1Equals(Asn1Object asn1Object)
 		{
 			Asn1TaggedObject that = asn1Object as Asn1TaggedObject;
-			if (null == that || this.tagNo != that.tagNo || this.tagClass != that.tagClass)
+			if (null == that || tagNo != that.tagNo || tagClass != that.tagClass)
+			{
 				return false;
+			}
 
-			if (this.explicitness != that.explicitness)
+			if (explicitness != that.explicitness)
 			{
 				/*
 				 * TODO This seems incorrect for some cases of implicit tags e.g. if one is a
 				 * declared-implicit SET and the other a parsed object.
 				 */
-				if (this.IsExplicit() != that.IsExplicit())
+				if (IsExplicit() != that.IsExplicit())
+				{
 					return false;
+				}
 			}
 
-			Asn1Object p1 = this.obj.ToAsn1Object();
+			Asn1Object p1 = obj.ToAsn1Object();
 			Asn1Object p2 = that.obj.ToAsn1Object();
 
 			if (p1 == p2)
+			{
 				return true;
+			}
 
-			if (!this.IsExplicit())
+			if (!IsExplicit())
 			{
 				try
 				{
-					byte[] d1 = this.GetEncoded();
+					byte[] d1 = GetEncoded();
 					byte[] d2 = that.GetEncoded();
 
 					return Arrays.AreEqual(d1, d2);
@@ -176,7 +205,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		public bool HasContextTag(int tagNo)
 		{
-			return this.tagClass == Asn1Tags.ContextSpecific && this.tagNo == tagNo;
+			return tagClass == Asn1Tags.ContextSpecific && this.tagNo == tagNo;
 		}
 
 		public bool HasTag(int tagClass, int tagNo)
@@ -228,7 +257,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public Asn1Object GetObject()
 		{
 			if (Asn1Tags.ContextSpecific != TagClass)
+			{
 				throw new InvalidOperationException("this method only valid for CONTEXT_SPECIFIC tags");
+			}
 
 			return obj.ToAsn1Object();
 		}
@@ -253,7 +284,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public Asn1Encodable GetExplicitBaseObject()
 		{
 			if (!IsExplicit())
+			{
 				throw new InvalidOperationException("object implicit - explicit expected.");
+			}
 
 			return obj;
 		}
@@ -261,7 +294,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public Asn1TaggedObject GetExplicitBaseTagged()
 		{
 			if (!IsExplicit())
+			{
 				throw new InvalidOperationException("object implicit - explicit expected.");
+			}
 
 			return CheckedCast(obj.ToAsn1Object());
 		}
@@ -269,7 +304,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public Asn1TaggedObject GetImplicitBaseTagged(int baseTagClass, int baseTagNo)
 		{
 			if (Asn1Tags.Universal == baseTagClass || (baseTagClass & Asn1Tags.Private) != baseTagClass)
+			{
 				throw new ArgumentException("invalid base tag class: " + baseTagClass, "baseTagClass");
+			}
 
 			switch (explicitness)
 			{
@@ -292,7 +329,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			Asn1UniversalType universalType = Asn1UniversalTypes.Get(tagNo);
 			if (null == universalType)
+			{
 				throw new ArgumentException("unsupported UNIVERSAL tag number: " + tagNo, "tagNo");
+			}
 
 			return GetBaseUniversal(declaredExplicit, universalType);
 		}
@@ -302,13 +341,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			if (declaredExplicit)
 			{
 				if (!IsExplicit())
+				{
 					throw new InvalidOperationException("object explicit - implicit expected.");
+				}
 
 				return universalType.CheckedCast(obj.ToAsn1Object());
 			}
 
 			if (DeclaredExplicit == explicitness)
+			{
 				throw new InvalidOperationException("object explicit - implicit expected.");
+			}
 
 			Asn1Object baseObject = obj.ToAsn1Object();
 			switch (explicitness)
@@ -318,7 +361,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				case ParsedImplicit:
 				{
 					if (baseObject is Asn1Sequence asn1Sequence)
+					{
 						return universalType.FromImplicitConstructed(asn1Sequence);
+					}
 
 					return universalType.FromImplicitPrimitive((DerOctetString)baseObject);
 				}
@@ -374,7 +419,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		internal static Asn1Object CreateConstructedDL(int tagClass, int tagNo, Asn1EncodableVector contentsElements)
 		{
-			bool maybeExplicit = (contentsElements.Count == 1);
+			bool maybeExplicit = contentsElements.Count == 1;
 
 			return maybeExplicit
 				? new DLTaggedObject(ParsedExplicit, tagClass, tagNo, contentsElements[0])
@@ -383,7 +428,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		internal static Asn1Object CreateConstructedIL(int tagClass, int tagNo, Asn1EncodableVector contentsElements)
 		{
-			bool maybeExplicit = (contentsElements.Count == 1);
+			bool maybeExplicit = contentsElements.Count == 1;
 
 			return maybeExplicit
 				? new BerTaggedObject(ParsedExplicit, tagClass, tagNo, contentsElements[0])
@@ -396,13 +441,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return new DLTaggedObject(ParsedImplicit, tagClass, tagNo, new DerOctetString(contentsOctets));
 		}
 
-		private static Asn1TaggedObject CheckedCast(Asn1Object asn1Object)
+		static Asn1TaggedObject CheckedCast(Asn1Object asn1Object)
 		{
 			Asn1TaggedObject taggedObject = asn1Object as Asn1TaggedObject;
 			if (null != taggedObject)
+			{
 				return taggedObject;
+			}
 
-			throw new InvalidOperationException("unexpected object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(asn1Object));
+			throw new InvalidOperationException("unexpected object: " + Platform.GetTypeName(asn1Object));
 		}
 	}
 }

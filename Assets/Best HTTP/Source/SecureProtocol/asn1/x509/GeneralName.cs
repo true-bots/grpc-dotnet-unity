@@ -52,8 +52,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public GeneralName(
 			X509Name directoryName)
 		{
-			this.obj = directoryName;
-			this.tag = 4;
+			obj = directoryName;
+			tag = 4;
 		}
 
 		/**
@@ -87,7 +87,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			Asn1Object name,
 			int tag)
 		{
-			this.obj = name;
+			obj = name;
 			this.tag = tag;
 		}
 
@@ -95,7 +95,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			int tag,
 			Asn1Encodable name)
 		{
-			this.obj = name;
+			obj = name;
 			this.tag = tag;
 		}
 
@@ -132,23 +132,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 			if (tag == Rfc822Name || tag == DnsName || tag == UniformResourceIdentifier)
 			{
-				this.obj = new DerIA5String(name);
+				obj = new DerIA5String(name);
 			}
 			else if (tag == RegisteredID)
 			{
-				this.obj = new DerObjectIdentifier(name);
+				obj = new DerObjectIdentifier(name);
 			}
 			else if (tag == DirectoryName)
 			{
-				this.obj = new X509Name(name);
+				obj = new X509Name(name);
 			}
 			else if (tag == IPAddress)
 			{
 				byte[] enc = toGeneralNameEncoding(name);
 				if (enc == null)
+				{
 					throw new ArgumentException("IP Address is invalid", "name");
+				}
 
-				this.obj = new DerOctetString(enc);
+				obj = new DerOctetString(enc);
 			}
 			else
 			{
@@ -205,7 +207,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				}
 			}
 
-			throw new ArgumentException("unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static GeneralName GetInstance(
@@ -249,7 +251,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return buf.ToString();
 		}
 
-		private byte[] toGeneralNameEncoding(
+		byte[] toGeneralNameEncoding(
 			string ip)
 		{
 			if (NetUtils.IPAddress.IsValidIPv6WithNetmask(ip) || NetUtils.IPAddress.IsValidIPv6(ip))
@@ -319,17 +321,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return null;
 		}
 
-		private void parseIPv4Mask(string mask, byte[] addr, int offset)
+		void parseIPv4Mask(string mask, byte[] addr, int offset)
 		{
 			int maskVal = int.Parse(mask);
 
 			for (int i = 0; i != maskVal; i++)
 			{
-				addr[(i / 8) + offset] |= (byte)(1 << (i % 8));
+				addr[i / 8 + offset] |= (byte)(1 << (i % 8));
 			}
 		}
 
-		private void parseIPv4(string ip, byte[] addr, int offset)
+		void parseIPv4(string ip, byte[] addr, int offset)
 		{
 			foreach (string token in ip.Split('.', '/'))
 			{
@@ -337,7 +339,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			}
 		}
 
-		private int[] parseMask(string mask)
+		int[] parseMask(string mask)
 		{
 			int[] res = new int[8];
 			int maskVal = int.Parse(mask);
@@ -350,28 +352,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return res;
 		}
 
-		private void copyInts(int[] parsedIp, byte[] addr, int offSet)
+		void copyInts(int[] parsedIp, byte[] addr, int offSet)
 		{
 			for (int i = 0; i != parsedIp.Length; i++)
 			{
-				addr[(i * 2) + offSet] = (byte)(parsedIp[i] >> 8);
-				addr[(i * 2 + 1) + offSet] = (byte)parsedIp[i];
+				addr[i * 2 + offSet] = (byte)(parsedIp[i] >> 8);
+				addr[i * 2 + 1 + offSet] = (byte)parsedIp[i];
 			}
 		}
 
-		private int[] parseIPv6(string ip)
+		int[] parseIPv6(string ip)
 		{
-			if (Org.BouncyCastle.Utilities.Platform.StartsWith(ip, "::"))
+			if (Platform.StartsWith(ip, "::"))
 			{
 				ip = ip.Substring(1);
 			}
-			else if (Org.BouncyCastle.Utilities.Platform.EndsWith(ip, "::"))
+			else if (Platform.EndsWith(ip, "::"))
 			{
 				ip = ip.Substring(0, ip.Length - 1);
 			}
 
 			IEnumerable<string> split = ip.Split(':');
-			var sEnum = split.GetEnumerator();
+			IEnumerator<string> sEnum = split.GetEnumerator();
 
 			int index = 0;
 			int[] val = new int[8];
@@ -418,7 +420,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public override Asn1Object ToAsn1Object()
 		{
 			// directoryName is explicitly tagged as it is a CHOICE
-			bool isExplicit = (tag == DirectoryName);
+			bool isExplicit = tag == DirectoryName;
 
 			return new DerTaggedObject(isExplicit, tag, obj);
 		}

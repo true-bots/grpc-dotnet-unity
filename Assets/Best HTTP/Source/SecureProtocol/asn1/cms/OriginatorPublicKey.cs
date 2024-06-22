@@ -9,21 +9,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class OriginatorPublicKey
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier mAlgorithm;
-		private readonly DerBitString mPublicKey;
+		readonly AlgorithmIdentifier mAlgorithm;
+		readonly DerBitString mPublicKey;
 
 		public OriginatorPublicKey(
 			AlgorithmIdentifier algorithm,
 			byte[] publicKey)
 		{
-			this.mAlgorithm = algorithm;
-			this.mPublicKey = new DerBitString(publicKey);
+			mAlgorithm = algorithm;
+			mPublicKey = new DerBitString(publicKey);
 		}
 
-		private OriginatorPublicKey(Asn1Sequence seq)
+		OriginatorPublicKey(Asn1Sequence seq)
 		{
-			this.mAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
-			this.mPublicKey = DerBitString.GetInstance(seq[1]);
+			mAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
+			mPublicKey = DerBitString.GetInstance(seq[1]);
 		}
 
 		/**
@@ -52,12 +52,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is OriginatorPublicKey)
+			{
 				return (OriginatorPublicKey)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new OriginatorPublicKey(Asn1Sequence.GetInstance(obj));
+			}
 
-			throw new ArgumentException("Invalid OriginatorPublicKey: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid OriginatorPublicKey: " + Platform.GetTypeName(obj));
 		}
 
 		public AlgorithmIdentifier Algorithm

@@ -15,9 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		public static readonly int KeySize = Ed25519.SecretKeySize;
 		public static readonly int SignatureSize = Ed25519.SignatureSize;
 
-		private readonly byte[] data = new byte[KeySize];
+		readonly byte[] data = new byte[KeySize];
 
-		private Ed25519PublicKeyParameters cachedPublicKey;
+		Ed25519PublicKeyParameters cachedPublicKey;
 
 		public Ed25519PrivateKeyParameters(SecureRandom random)
 			: base(true)
@@ -51,7 +51,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(true)
 		{
 			if (KeySize != Streams.ReadFully(input, data))
+			{
 				throw new EndOfStreamException("EOF encountered in middle of Ed25519 private key");
+			}
 		}
 
 		public void Encode(byte[] buf, int off)
@@ -105,7 +107,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 				case Ed25519.Algorithm.Ed25519:
 				{
 					if (null != ctx)
+					{
 						throw new ArgumentException("ctx");
+					}
 
 					Ed25519.Sign(data, 0, pk, 0, msg, msgOff, msgLen, sig, sigOff);
 					break;
@@ -118,7 +122,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 				case Ed25519.Algorithm.Ed25519ph:
 				{
 					if (Ed25519.PrehashSize != msgLen)
+					{
 						throw new ArgumentException("msgLen");
+					}
 
 					Ed25519.SignPrehash(data, 0, pk, 0, ctx, msg, msgOff, sig, sigOff);
 					break;
@@ -130,10 +136,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			}
 		}
 
-		private static byte[] Validate(byte[] buf)
+		static byte[] Validate(byte[] buf)
 		{
 			if (buf.Length != KeySize)
+			{
 				throw new ArgumentException("must have length " + KeySize, nameof(buf));
+			}
 
 			return buf;
 		}

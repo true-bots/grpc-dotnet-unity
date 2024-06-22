@@ -15,7 +15,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 
 		public BcX25519(BcTlsCrypto crypto)
 		{
-			this.m_crypto = crypto;
+			m_crypto = crypto;
 		}
 
 		public virtual byte[] GenerateEphemeral()
@@ -30,7 +30,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public virtual void ReceivePeerValue(byte[] peerValue)
 		{
 			if (peerValue == null || peerValue.Length != X25519.PointSize)
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			Array.Copy(peerValue, 0, m_peerPublicKey, 0, X25519.PointSize);
 		}
@@ -41,7 +43,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			{
 				byte[] secret = new byte[X25519.PointSize];
 				if (!X25519.CalculateAgreement(m_privateKey, 0, m_peerPublicKey, 0, secret, 0))
+				{
 					throw new TlsFatalAlert(AlertDescription.handshake_failure);
+				}
 
 				return m_crypto.AdoptLocalSecret(secret);
 			}

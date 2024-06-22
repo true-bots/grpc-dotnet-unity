@@ -7,16 +7,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class DigitallySigned
 	{
-		private readonly SignatureAndHashAlgorithm m_algorithm;
-		private readonly byte[] m_signature;
+		readonly SignatureAndHashAlgorithm m_algorithm;
+		readonly byte[] m_signature;
 
 		public DigitallySigned(SignatureAndHashAlgorithm algorithm, byte[] signature)
 		{
 			if (signature == null)
+			{
 				throw new ArgumentNullException("signature");
+			}
 
-			this.m_algorithm = algorithm;
-			this.m_signature = signature;
+			m_algorithm = algorithm;
+			m_signature = signature;
 		}
 
 		/// <returns>a <see cref="SignatureAndHashAlgorithm"/> (or null before TLS 1.2).</returns>
@@ -56,7 +58,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				algorithm = SignatureAndHashAlgorithm.Parse(input);
 
 				if (SignatureAlgorithm.anonymous == algorithm.Signature)
+				{
 					throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+				}
 			}
 
 			byte[] signature = TlsUtilities.ReadOpaque16(input);

@@ -10,8 +10,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class RsaKeyGenerationParameters
 		: KeyGenerationParameters
 	{
-		private readonly BigInteger publicExponent;
-		private readonly int certainty;
+		readonly BigInteger publicExponent;
+		readonly int certainty;
 
 		public RsaKeyGenerationParameters(
 			BigInteger publicExponent,

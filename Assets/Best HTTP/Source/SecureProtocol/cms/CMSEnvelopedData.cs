@@ -16,8 +16,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal RecipientInformationStore recipientInfoStore;
 		internal ContentInfo contentInfo;
 
-		private AlgorithmIdentifier encAlg;
-		private Asn1Set unprotectedAttributes;
+		AlgorithmIdentifier encAlg;
+		Asn1Set unprotectedAttributes;
 
 		public CmsEnvelopedData(
 			byte[] envelopedData)
@@ -47,18 +47,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			// read the encrypted content info
 			//
 			EncryptedContentInfo encInfo = envData.EncryptedContentInfo;
-			this.encAlg = encInfo.ContentEncryptionAlgorithm;
+			encAlg = encInfo.ContentEncryptionAlgorithm;
 			CmsReadable readable = new CmsProcessableByteArray(encInfo.EncryptedContent.GetOctets());
 			CmsSecureReadable secureReadable = new CmsEnvelopedHelper.CmsEnvelopedSecureReadable(
-				this.encAlg, readable);
+				encAlg, readable);
 
 			//
 			// build the RecipientInformationStore
 			//
-			this.recipientInfoStore = CmsEnvelopedHelper.BuildRecipientInformationStore(
+			recipientInfoStore = CmsEnvelopedHelper.BuildRecipientInformationStore(
 				recipientInfos, secureReadable);
 
-			this.unprotectedAttributes = envData.UnprotectedAttrs;
+			unprotectedAttributes = envData.UnprotectedAttrs;
 		}
 
 		public AlgorithmIdentifier EncryptionAlgorithmID
@@ -97,7 +97,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		public Asn1.Cms.AttributeTable GetUnprotectedAttributes()
 		{
 			if (unprotectedAttributes == null)
+			{
 				return null;
+			}
 
 			return new Asn1.Cms.AttributeTable(unprotectedAttributes);
 		}

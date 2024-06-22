@@ -47,7 +47,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 		internal int PromotionCountdown
 		{
 			get { return m_promotionCountdown; }
-			set { this.m_promotionCountdown = value; }
+			set { m_promotionCountdown = value; }
 		}
 
 		public virtual bool IsPromoted
@@ -58,31 +58,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 		public virtual int ConfWidth
 		{
 			get { return m_confWidth; }
-			set { this.m_confWidth = value; }
+			set { m_confWidth = value; }
 		}
 
 		public virtual ECPoint[] PreComp
 		{
 			get { return m_preComp; }
-			set { this.m_preComp = value; }
+			set { m_preComp = value; }
 		}
 
 		public virtual ECPoint[] PreCompNeg
 		{
 			get { return m_preCompNeg; }
-			set { this.m_preCompNeg = value; }
+			set { m_preCompNeg = value; }
 		}
 
 		public virtual ECPoint Twice
 		{
 			get { return m_twice; }
-			set { this.m_twice = value; }
+			set { m_twice = value; }
 		}
 
 		public virtual int Width
 		{
 			get { return m_width; }
-			set { this.m_width = value; }
+			set { m_width = value; }
 		}
 	}
 }

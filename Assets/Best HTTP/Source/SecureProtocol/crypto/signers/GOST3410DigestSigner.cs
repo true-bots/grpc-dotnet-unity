@@ -10,19 +10,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class Gost3410DigestSigner
 		: ISigner
 	{
-		private readonly IDigest digest;
-		private readonly IDsa dsaSigner;
-		private readonly int size;
-		private int halfSize;
-		private bool forSigning;
+		readonly IDigest digest;
+		readonly IDsa dsaSigner;
+		readonly int size;
+		int halfSize;
+		bool forSigning;
 
 		public Gost3410DigestSigner(IDsa signer, IDigest digest)
 		{
-			this.dsaSigner = signer;
+			dsaSigner = signer;
 			this.digest = digest;
 
 			halfSize = digest.GetDigestSize();
-			this.size = halfSize * 2;
+			size = halfSize * 2;
 		}
 
 		public virtual string AlgorithmName
@@ -80,7 +80,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual byte[] GenerateSignature()
 		{
 			if (!forSigning)
+			{
 				throw new InvalidOperationException("GOST3410DigestSigner not initialised for signature generation.");
+			}
 
 			byte[] hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
@@ -106,7 +108,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual bool VerifySignature(byte[] signature)
 		{
 			if (forSigning)
+			{
 				throw new InvalidOperationException("DSADigestSigner not initialised for verification");
+			}
 
 			byte[] hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);

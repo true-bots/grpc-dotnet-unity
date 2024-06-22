@@ -47,7 +47,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					nameof(pkixParams));
 			}
 
-			var attrCert = attrCertSelector.AttributeCert;
+			X509V2AttributeCertificate attrCert = attrCertSelector.AttributeCert;
 			PkixCertPath holderCertPath = Rfc3281CertPathUtilities.ProcessAttrCert1(attrCert, pkixParams);
 			PkixCertPathValidatorResult result = Rfc3281CertPathUtilities.ProcessAttrCert2(certPath, pkixParams);
 			X509Certificate issuerCert = (X509Certificate)certPath.Certificates[0];

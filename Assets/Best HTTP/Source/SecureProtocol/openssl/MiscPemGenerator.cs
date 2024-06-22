@@ -27,10 +27,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 	public class MiscPemGenerator
 		: PemObjectGenerator
 	{
-		private readonly object obj;
-		private readonly string algorithm;
-		private readonly char[] password;
-		private readonly SecureRandom random;
+		readonly object obj;
+		readonly string algorithm;
+		readonly char[] password;
+		readonly SecureRandom random;
 
 		public MiscPemGenerator(object obj)
 		{
@@ -49,10 +49,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			this.random = random;
 		}
 
-		private static PemObject CreatePemObject(object obj)
+		static PemObject CreatePemObject(object obj)
 		{
 			if (obj == null)
+			{
 				throw new ArgumentNullException("obj");
+			}
 
 			if (obj is AsymmetricCipherKeyPair keyPair)
 			{
@@ -63,10 +65,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			byte[] encoding;
 
 			if (obj is PemObject pemObject)
+			{
 				return pemObject;
+			}
 
 			if (obj is PemObjectGenerator pemObjectGenerator)
+			{
 				return pemObjectGenerator.Generate();
+			}
 
 			if (obj is X509Certificate certificate)
 			{
@@ -123,7 +129,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			}
 			else
 			{
-				throw new PemGenerationException("Object type not supported: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+				throw new PemGenerationException("Object type not supported: " + Platform.GetTypeName(obj));
 			}
 
 			return new PemObject(type, encoding);
@@ -143,20 +149,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 //			return new string(chars);
 //		}
 
-		private static PemObject CreatePemObject(
+		static PemObject CreatePemObject(
 			object obj,
 			string algorithm,
 			char[] password,
 			SecureRandom random)
 		{
 			if (obj == null)
+			{
 				throw new ArgumentNullException("obj");
+			}
+
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException("algorithm");
+			}
+
 			if (password == null)
+			{
 				throw new ArgumentNullException("password");
+			}
+
 			if (random == null)
+			{
 				throw new ArgumentNullException("random");
+			}
 
 			if (obj is AsymmetricCipherKeyPair keyPair)
 			{
@@ -177,7 +194,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			if (type == null || keyData == null)
 			{
 				// TODO Support other types?
-				throw new PemGenerationException("Object type not supported: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+				throw new PemGenerationException("Object type not supported: " + Platform.GetTypeName(obj));
 			}
 
 
@@ -189,21 +206,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 				dekAlgName = "DES-EDE3-CBC";
 			}
 
-			int ivLength = Org.BouncyCastle.Utilities.Platform.StartsWith(dekAlgName, "AES-") ? 16 : 8;
+			int ivLength = Platform.StartsWith(dekAlgName, "AES-") ? 16 : 8;
 
 			byte[] iv = new byte[ivLength];
 			random.NextBytes(iv);
 
 			byte[] encData = PemUtilities.Crypt(true, keyData, password, dekAlgName, iv);
 
-			var headers = new List<PemHeader>(2);
+			List<PemHeader> headers = new List<PemHeader>(2);
 			headers.Add(new PemHeader("Proc-Type", "4,ENCRYPTED"));
 			headers.Add(new PemHeader("DEK-Info", dekAlgName + "," + Hex.ToHexString(iv).ToUpperInvariant()));
 
 			return new PemObject(type, headers, encData);
 		}
 
-		private static byte[] EncodePrivateKey(
+		static byte[] EncodePrivateKey(
 			AsymmetricKeyParameter akp,
 			out string keyType)
 		{

@@ -16,8 +16,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
 	public class QCStatement
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier qcStatementId;
-		private readonly Asn1Encodable qcStatementInfo;
+		readonly DerObjectIdentifier qcStatementId;
+		readonly Asn1Encodable qcStatementInfo;
 
 		public static QCStatement GetInstance(
 			object obj)
@@ -32,10 +32,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
 				return new QCStatement(Asn1Sequence.GetInstance(obj));
 			}
 
-			throw new ArgumentException("unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private QCStatement(
+		QCStatement(
 			Asn1Sequence seq)
 		{
 			qcStatementId = DerObjectIdentifier.GetInstance(seq[0]);

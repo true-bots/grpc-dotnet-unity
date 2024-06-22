@@ -32,12 +32,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	 */
 	public class V2TbsCertListGenerator
 	{
-		private DerInteger version = new DerInteger(1);
-		private AlgorithmIdentifier signature;
-		private X509Name issuer;
-		private Time thisUpdate, nextUpdate;
-		private X509Extensions extensions;
-		private List<Asn1Sequence> crlEntries;
+		DerInteger version = new DerInteger(1);
+		AlgorithmIdentifier signature;
+		X509Name issuer;
+		Time thisUpdate, nextUpdate;
+		X509Extensions extensions;
+		List<Asn1Sequence> crlEntries;
 
 		public V2TbsCertListGenerator()
 		{
@@ -64,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public void SetNextUpdate(
 			Asn1UtcTime nextUpdate)
 		{
-			this.nextUpdate = (nextUpdate != null)
+			this.nextUpdate = nextUpdate != null
 				? new Time(nextUpdate)
 				: null;
 		}
@@ -104,8 +104,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public void AddCrlEntry(DerInteger userCertificate, Time revocationDate, int reason,
 			Asn1GeneralizedTime invalidityDate)
 		{
-			var extOids = new List<DerObjectIdentifier>();
-			var extValues = new List<X509Extension>();
+			List<DerObjectIdentifier> extOids = new List<DerObjectIdentifier>();
+			List<X509Extension> extValues = new List<X509Extension>();
 
 			if (reason != 0)
 			{
@@ -165,7 +165,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public TbsCertificateList GenerateTbsCertList()
 		{
-			if ((signature == null) || (issuer == null) || (thisUpdate == null))
+			if (signature == null || issuer == null || thisUpdate == null)
 			{
 				throw new InvalidOperationException("Not all mandatory fields set in V2 TbsCertList generator.");
 			}

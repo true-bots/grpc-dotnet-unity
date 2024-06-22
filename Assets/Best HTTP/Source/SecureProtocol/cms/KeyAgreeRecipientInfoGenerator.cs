@@ -16,14 +16,14 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal class KeyAgreeRecipientInfoGenerator : RecipientInfoGenerator
+	class KeyAgreeRecipientInfoGenerator : RecipientInfoGenerator
 	{
-		private static readonly CmsEnvelopedHelper Helper = CmsEnvelopedHelper.Instance;
+		static readonly CmsEnvelopedHelper Helper = CmsEnvelopedHelper.Instance;
 
-		private DerObjectIdentifier keyAgreementOID;
-		private DerObjectIdentifier keyEncryptionOID;
-		private IList<X509Certificate> recipientCerts;
-		private AsymmetricCipherKeyPair senderKeyPair;
+		DerObjectIdentifier keyAgreementOID;
+		DerObjectIdentifier keyEncryptionOID;
+		IList<X509Certificate> recipientCerts;
+		AsymmetricCipherKeyPair senderKeyPair;
 
 		internal KeyAgreeRecipientInfoGenerator()
 		{
@@ -31,22 +31,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal DerObjectIdentifier KeyAgreementOID
 		{
-			set { this.keyAgreementOID = value; }
+			set { keyAgreementOID = value; }
 		}
 
 		internal DerObjectIdentifier KeyEncryptionOID
 		{
-			set { this.keyEncryptionOID = value; }
+			set { keyEncryptionOID = value; }
 		}
 
 		internal IEnumerable<X509Certificate> RecipientCerts
 		{
-			set { this.recipientCerts = new List<X509Certificate>(value); }
+			set { recipientCerts = new List<X509Certificate>(value); }
 		}
 
 		internal AsymmetricCipherKeyPair SenderKeyPair
 		{
-			set { this.senderKeyPair = value; }
+			set { senderKeyPair = value; }
 		}
 
 		public RecipientInfo Generate(KeyParameter contentEncryptionKey, SecureRandom random)
@@ -159,7 +159,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				new DerSequence(recipientEncryptedKeys)));
 		}
 
-		private static OriginatorPublicKey CreateOriginatorPublicKey(
+		static OriginatorPublicKey CreateOriginatorPublicKey(
 			AsymmetricKeyParameter publicKey)
 		{
 			SubjectPublicKeyInfo spki = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(publicKey);

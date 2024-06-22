@@ -9,11 +9,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class Ed25519KeyPairGenerator
 		: IAsymmetricCipherKeyPairGenerator
 	{
-		private SecureRandom random;
+		SecureRandom random;
 
 		public virtual void Init(KeyGenerationParameters parameters)
 		{
-			this.random = parameters.Random;
+			random = parameters.Random;
 		}
 
 		public virtual AsymmetricCipherKeyPair GenerateKeyPair()

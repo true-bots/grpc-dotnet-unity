@@ -14,12 +14,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class TigerDigest
 		: IDigest, IMemoable
 	{
-		private const int MyByteLength = 64;
+		const int MyByteLength = 64;
 
 		/*
 		 * S-Boxes.
 		 */
-		private static readonly long[] t1 =
+		static readonly long[] t1 =
 		{
 			unchecked((long)0x02AAB17CF7E90C5EL) /*    0 */, unchecked((long)0xAC424B03E243A8ECL) /*    1 */,
 			unchecked((long)0x72CD5BE30DD5FCD3L) /*    2 */, unchecked((long)0x6D019B93F6F97F3AL) /*    3 */,
@@ -148,10 +148,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			unchecked((long)0x1F1A412891BC038EL) /*  248 */, unchecked((long)0xD6E2E71D82E56648L) /*  249 */,
 			unchecked((long)0x74036C3A497732B7L) /*  250 */, unchecked((long)0x89B67ED96361F5ABL) /*  251 */,
 			unchecked((long)0xFFED95D8F1EA02A2L) /*  252 */, unchecked((long)0xE72B3BD61464D43DL) /*  253 */,
-			unchecked((long)0xA6300F170BDC4820L) /*  254 */, unchecked((long)0xEBC18760ED78A77AL) /*  255 */,
+			unchecked((long)0xA6300F170BDC4820L) /*  254 */, unchecked((long)0xEBC18760ED78A77AL) /*  255 */
 		};
 
-		private static readonly long[] t2 =
+		static readonly long[] t2 =
 		{
 			unchecked((long)0xE6A6BE5A05A12138L) /*  256 */, unchecked((long)0xB5A122A5B4F87C98L) /*  257 */,
 			unchecked((long)0x563C6089140B6990L) /*  258 */, unchecked((long)0x4C46CB2E391F5DD5L) /*  259 */,
@@ -280,10 +280,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			unchecked((long)0x5DC9645506E55444L) /*  504 */, unchecked((long)0x50DE418F317DE40AL) /*  505 */,
 			unchecked((long)0x388CB31A69DDE259L) /*  506 */, unchecked((long)0x2DB4A83455820A86L) /*  507 */,
 			unchecked((long)0x9010A91E84711AE9L) /*  508 */, unchecked((long)0x4DF7F0B7B1498371L) /*  509 */,
-			unchecked((long)0xD62A2EABC0977179L) /*  510 */, unchecked((long)0x22FAC097AA8D5C0EL) /*  511 */,
+			unchecked((long)0xD62A2EABC0977179L) /*  510 */, unchecked((long)0x22FAC097AA8D5C0EL) /*  511 */
 		};
 
-		private static readonly long[] t3 =
+		static readonly long[] t3 =
 		{
 			unchecked((long)0xF49FCC2FF1DAF39BL) /*  512 */, unchecked((long)0x487FD5C66FF29281L) /*  513 */,
 			unchecked((long)0xE8A30667FCDCA83FL) /*  514 */, unchecked((long)0x2C9B4BE3D2FCCE63L) /*  515 */,
@@ -412,10 +412,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			unchecked((long)0x6F31238275655982L) /*  760 */, unchecked((long)0x5AE488713E45CF05L) /*  761 */,
 			unchecked((long)0xBF619F9954C21157L) /*  762 */, unchecked((long)0xEABAC46040A8EAE9L) /*  763 */,
 			unchecked((long)0x454C6FE9F2C0C1CDL) /*  764 */, unchecked((long)0x419CF6496412691CL) /*  765 */,
-			unchecked((long)0xD3DC3BEF265B0F70L) /*  766 */, unchecked((long)0x6D0E60F5C3578A9EL) /*  767 */,
+			unchecked((long)0xD3DC3BEF265B0F70L) /*  766 */, unchecked((long)0x6D0E60F5C3578A9EL) /*  767 */
 		};
 
-		private static readonly long[] t4 =
+		static readonly long[] t4 =
 		{
 			unchecked((long)0x5B0E608526323C55L) /*  768 */, unchecked((long)0x1A46C1A9FA1B59F5L) /*  769 */,
 			unchecked((long)0xA9E245A17C4C8FFAL) /*  770 */, unchecked((long)0x65CA5159DB2955D7L) /*  771 */,
@@ -547,22 +547,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			unchecked((long)0xC83223F1720AEF96L) /* 1022 */, unchecked((long)0xC3A0396F7363A51FL) /* 1023 */
 		};
 
-		private const int DigestLength = 24;
+		const int DigestLength = 24;
 
 		//
 		// registers
 		//
-		private long a, b, c;
-		private long byteCount;
+		long a, b, c;
+		long byteCount;
 
 		//
 		// buffers
 		//
-		private byte[] m_buffer = new byte[8];
-		private int bOff;
+		byte[] m_buffer = new byte[8];
+		int bOff;
 
-		private long[] x = new long[8];
-		private int xOff;
+		long[] x = new long[8];
+		int xOff;
 
 		/**
 		* Standard constructor
@@ -596,7 +596,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return MyByteLength;
 		}
 
-		private void ProcessWord(byte[] b, int off)
+		void ProcessWord(byte[] b, int off)
 		{
 			x[xOff++] = (long)Pack.LE_To_UInt64(b, off);
 
@@ -643,7 +643,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			//
 			// fill the current word
 			//
-			while ((bOff != 0) && (length > 0))
+			while (bOff != 0 && length > 0)
 			{
 				Update(input[inOff]);
 
@@ -716,7 +716,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-		private void RoundABC(
+		void RoundABC(
 			long x,
 			long mul)
 		{
@@ -728,7 +728,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			b *= mul;
 		}
 
-		private void RoundBCA(
+		void RoundBCA(
 			long x,
 			long mul)
 		{
@@ -740,7 +740,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			c *= mul;
 		}
 
-		private void RoundCAB(
+		void RoundCAB(
 			long x,
 			long mul)
 		{
@@ -752,27 +752,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			a *= mul;
 		}
 
-		private void KeySchedule()
+		void KeySchedule()
 		{
 			x[0] -= x[7] ^ unchecked((long)0xA5A5A5A5A5A5A5A5L);
 			x[1] ^= x[0];
 			x[2] += x[1];
-			x[3] -= x[2] ^ ((~x[1]) << 19);
+			x[3] -= x[2] ^ (~x[1] << 19);
 			x[4] ^= x[3];
 			x[5] += x[4];
-			x[6] -= x[5] ^ (long)((ulong)(~x[4]) >> 23);
+			x[6] -= x[5] ^ (long)((ulong)~x[4] >> 23);
 			x[7] ^= x[6];
 			x[0] += x[7];
-			x[1] -= x[0] ^ ((~x[7]) << 19);
+			x[1] -= x[0] ^ (~x[7] << 19);
 			x[2] ^= x[1];
 			x[3] += x[2];
-			x[4] -= x[3] ^ (long)((ulong)(~x[2]) >> 23);
+			x[4] -= x[3] ^ (long)((ulong)~x[2] >> 23);
 			x[5] ^= x[4];
 			x[6] += x[5];
 			x[7] -= x[6] ^ 0x0123456789ABCDEFL;
 		}
 
-		private void ProcessBlock()
+		void ProcessBlock()
 		{
 			//
 			// save abc
@@ -832,15 +832,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private void ProcessLength(
+		void ProcessLength(
 			long bitLength)
 		{
 			x[7] = bitLength;
 		}
 
-		private void Finish()
+		void Finish()
 		{
-			long bitLength = (byteCount << 3);
+			long bitLength = byteCount << 3;
 
 			Update((byte)0x01);
 

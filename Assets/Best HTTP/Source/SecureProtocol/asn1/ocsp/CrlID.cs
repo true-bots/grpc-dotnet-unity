@@ -7,9 +7,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class CrlID
 		: Asn1Encodable
 	{
-		private readonly DerIA5String crlUrl;
-		private readonly DerInteger crlNum;
-		private readonly Asn1GeneralizedTime crlTime;
+		readonly DerIA5String crlUrl;
+		readonly DerInteger crlNum;
+		readonly Asn1GeneralizedTime crlTime;
 
 		// TODO Add GetInstance method(s) and make this private?
 		public CrlID(Asn1Sequence seq)

@@ -74,7 +74,7 @@ using System;
 
 namespace BestHTTP.Decompression.Zlib
 {
-	internal enum BlockState
+	enum BlockState
 	{
 		NeedMore = 0, // block not completed, need more input or more output
 		BlockDone, // block flush performed
@@ -82,17 +82,17 @@ namespace BestHTTP.Decompression.Zlib
 		FinishDone // finish done, accept no more input or output
 	}
 
-	internal enum DeflateFlavor
+	enum DeflateFlavor
 	{
 		Store,
 		Fast,
 		Slow
 	}
 
-	internal sealed class DeflateManager
+	sealed class DeflateManager
 	{
-		private static readonly int MEM_LEVEL_MAX = 9;
-		private static readonly int MEM_LEVEL_DEFAULT = 8;
+		static readonly int MEM_LEVEL_MAX = 9;
+		static readonly int MEM_LEVEL_DEFAULT = 8;
 
 		internal delegate BlockState CompressFunc(FlushType flush);
 
@@ -117,13 +117,13 @@ namespace BestHTTP.Decompression.Zlib
 
 			internal DeflateFlavor Flavor;
 
-			private Config(int goodLength, int maxLazy, int niceLength, int maxChainLength, DeflateFlavor flavor)
+			Config(int goodLength, int maxLazy, int niceLength, int maxChainLength, DeflateFlavor flavor)
 			{
-				this.GoodLength = goodLength;
-				this.MaxLazy = maxLazy;
-				this.NiceLength = niceLength;
-				this.MaxChainLength = maxChainLength;
-				this.Flavor = flavor;
+				GoodLength = goodLength;
+				MaxLazy = maxLazy;
+				NiceLength = niceLength;
+				MaxChainLength = maxChainLength;
+				Flavor = flavor;
 			}
 
 			public static Config Lookup(CompressionLevel level)
@@ -146,17 +146,17 @@ namespace BestHTTP.Decompression.Zlib
 					new Config(8, 16, 128, 128, DeflateFlavor.Slow),
 					new Config(8, 32, 128, 256, DeflateFlavor.Slow),
 					new Config(32, 128, 258, 1024, DeflateFlavor.Slow),
-					new Config(32, 258, 258, 4096, DeflateFlavor.Slow),
+					new Config(32, 258, 258, 4096, DeflateFlavor.Slow)
 				};
 			}
 
-			private static readonly Config[] Table;
+			static readonly Config[] Table;
 		}
 
 
-		private CompressFunc DeflateFunction;
+		CompressFunc DeflateFunction;
 
-		private static readonly System.String[] _ErrorMessage = new System.String[]
+		static readonly string[] _ErrorMessage = new string[]
 		{
 			"need dictionary",
 			"stream end",
@@ -171,34 +171,34 @@ namespace BestHTTP.Decompression.Zlib
 		};
 
 		// preset dictionary flag in zlib header
-		private static readonly int PRESET_DICT = 0x20;
+		static readonly int PRESET_DICT = 0x20;
 
-		private static readonly int INIT_STATE = 42;
-		private static readonly int BUSY_STATE = 113;
-		private static readonly int FINISH_STATE = 666;
+		static readonly int INIT_STATE = 42;
+		static readonly int BUSY_STATE = 113;
+		static readonly int FINISH_STATE = 666;
 
 		// The deflate compression method
-		private static readonly int Z_DEFLATED = 8;
+		static readonly int Z_DEFLATED = 8;
 
-		private static readonly int STORED_BLOCK = 0;
-		private static readonly int STATIC_TREES = 1;
-		private static readonly int DYN_TREES = 2;
+		static readonly int STORED_BLOCK = 0;
+		static readonly int STATIC_TREES = 1;
+		static readonly int DYN_TREES = 2;
 
 		// The three kinds of block type
-		private static readonly int Z_BINARY = 0;
-		private static readonly int Z_ASCII = 1;
-		private static readonly int Z_UNKNOWN = 2;
+		static readonly int Z_BINARY = 0;
+		static readonly int Z_ASCII = 1;
+		static readonly int Z_UNKNOWN = 2;
 
-		private static readonly int Buf_size = 8 * 2;
+		static readonly int Buf_size = 8 * 2;
 
-		private static readonly int MIN_MATCH = 3;
-		private static readonly int MAX_MATCH = 258;
+		static readonly int MIN_MATCH = 3;
+		static readonly int MAX_MATCH = 258;
 
-		private static readonly int MIN_LOOKAHEAD = (MAX_MATCH + MIN_MATCH + 1);
+		static readonly int MIN_LOOKAHEAD = MAX_MATCH + MIN_MATCH + 1;
 
-		private static readonly int HEAP_SIZE = (2 * InternalConstants.L_CODES + 1);
+		static readonly int HEAP_SIZE = 2 * InternalConstants.L_CODES + 1;
 
-		private static readonly int END_BLOCK = 256;
+		static readonly int END_BLOCK = 256;
 
 		internal ZlibCodec _codec; // the zlib encoder/decoder
 		internal int status; // as the name implies
@@ -347,7 +347,7 @@ namespace BestHTTP.Decompression.Zlib
 
 
 		// lm_init
-		private void _InitializeLazyMatch()
+		void _InitializeLazyMatch()
 		{
 			window_size = 2 * w_size;
 
@@ -367,7 +367,7 @@ namespace BestHTTP.Decompression.Zlib
 		}
 
 		// Initialize the tree data structures for a new zlib stream.
-		private void _InitializeTreeData()
+		void _InitializeTreeData()
 		{
 			treeLiterals.dyn_tree = dyn_ltree;
 			treeLiterals.staticTree = StaticTree.Literals;
@@ -390,11 +390,19 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			// Initialize the trees.
 			for (int i = 0; i < InternalConstants.L_CODES; i++)
+			{
 				dyn_ltree[i * 2] = 0;
+			}
+
 			for (int i = 0; i < InternalConstants.D_CODES; i++)
+			{
 				dyn_dtree[i * 2] = 0;
+			}
+
 			for (int i = 0; i < InternalConstants.BL_CODES; i++)
+			{
 				bl_tree[i * 2] = 0;
+			}
 
 			dyn_ltree[END_BLOCK * 2] = 1;
 			opt_len = static_len = 0;
@@ -419,7 +427,9 @@ namespace BestHTTP.Decompression.Zlib
 
 				// Exit if v is smaller than both sons
 				if (_IsSmaller(tree, v, heap[j], depth))
+				{
 					break;
+				}
 
 				// Exchange v with the smallest son
 				heap[k] = heap[j];
@@ -435,7 +445,7 @@ namespace BestHTTP.Decompression.Zlib
 		{
 			short tn2 = tree[n * 2];
 			short tm2 = tree[m * 2];
-			return (tn2 < tm2 || (tn2 == tm2 && depth[n] <= depth[m]));
+			return tn2 < tm2 || (tn2 == tm2 && depth[n] <= depth[m]);
 		}
 
 
@@ -474,7 +484,10 @@ namespace BestHTTP.Decompression.Zlib
 				else if (curlen != 0)
 				{
 					if (curlen != prevlen)
+					{
 						bl_tree[curlen * 2]++;
+					}
+
 					bl_tree[InternalConstants.REP_3_6 * 2]++;
 				}
 				else if (count <= 10)
@@ -527,7 +540,9 @@ namespace BestHTTP.Decompression.Zlib
 			for (max_blindex = InternalConstants.BL_CODES - 1; max_blindex >= 3; max_blindex--)
 			{
 				if (bl_tree[ZTree.bl_order[max_blindex] * 2 + 1] != 0)
+				{
 					break;
+				}
 			}
 
 			// Update opt_len to include the bit length tree and counts
@@ -633,7 +648,7 @@ namespace BestHTTP.Decompression.Zlib
 
 		// Output a block of bytes on the stream.
 		// IN assertion: there is enough room in pending_buf.
-		private void put_bytes(byte[] p, int start, int len)
+		void put_bytes(byte[] p, int start, int len)
 		{
 			Array.Copy(p, start, pending, pendingCount, len);
 			pendingCount += len;
@@ -665,7 +680,7 @@ namespace BestHTTP.Decompression.Zlib
 		internal void send_code(int c, short[] tree)
 		{
 			int c2 = c * 2;
-			send_bits((tree[c2] & 0xffff), (tree[c2 + 1] & 0xffff));
+			send_bits(tree[c2] & 0xffff, tree[c2 + 1] & 0xffff);
 		}
 
 		internal void send_bits(int value, int length)
@@ -762,11 +777,13 @@ namespace BestHTTP.Decompression.Zlib
 				}
 
 				out_length >>= 3;
-				if ((matches < (last_lit / 2)) && out_length < in_length / 2)
+				if (matches < last_lit / 2 && out_length < in_length / 2)
+				{
 					return true;
+				}
 			}
 
-			return (last_lit == lit_bufsize - 1) || (last_lit == lit_bufsize);
+			return last_lit == lit_bufsize - 1 || last_lit == lit_bufsize;
 			// dinoch - wraparound?
 			// We avoid equality with lit_bufsize because of wraparound at 64K
 			// on 16 bit machines and because stored blocks are restricted to
@@ -790,7 +807,7 @@ namespace BestHTTP.Decompression.Zlib
 					int ix = _distanceOffset + lx * 2;
 					distance = ((pending[ix] << 8) & 0xff00) |
 					           (pending[ix + 1] & 0xff);
-					lc = (pending[_lengthOffset + lx]) & 0xff;
+					lc = pending[_lengthOffset + lx] & 0xff;
 					lx++;
 
 					if (distance == 0)
@@ -864,7 +881,7 @@ namespace BestHTTP.Decompression.Zlib
 				n++;
 			}
 
-			data_type = (sbyte)(bin_freq > (ascii_freq >> 2) ? Z_BINARY : Z_ASCII);
+			data_type = (sbyte)(bin_freq > ascii_freq >> 2 ? Z_BINARY : Z_ASCII);
 		}
 
 
@@ -913,6 +930,7 @@ namespace BestHTTP.Decompression.Zlib
 			last_eob_len = 8; // enough lookahead for inflate
 
 			if (header)
+			{
 				unchecked
 				{
 					//put_short((short)len);
@@ -922,6 +940,7 @@ namespace BestHTTP.Decompression.Zlib
 					pending[pendingCount++] = (byte)~len;
 					pending[pendingCount++] = (byte)(~len >> 8);
 				}
+			}
 
 			put_bytes(window, buf, len);
 		}
@@ -961,9 +980,14 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					_fillWindow();
 					if (lookahead == 0 && flush == FlushType.None)
+					{
 						return BlockState.NeedMore;
+					}
+
 					if (lookahead == 0)
+					{
 						break; // flush the current block
+					}
 				}
 
 				strstart += lookahead;
@@ -979,7 +1003,9 @@ namespace BestHTTP.Decompression.Zlib
 
 					flush_block_only(false);
 					if (_codec.AvailableBytesOut == 0)
+					{
 						return BlockState.NeedMore;
+					}
 				}
 
 				// Flush if we may have to slide, otherwise block_start may become
@@ -988,13 +1014,17 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					flush_block_only(false);
 					if (_codec.AvailableBytesOut == 0)
+					{
 						return BlockState.NeedMore;
+					}
 				}
 			}
 
 			flush_block_only(flush == FlushType.Finish);
 			if (_codec.AvailableBytesOut == 0)
-				return (flush == FlushType.Finish) ? BlockState.FinishStarted : BlockState.NeedMore;
+			{
+				return flush == FlushType.Finish ? BlockState.FinishStarted : BlockState.NeedMore;
+			}
 
 			return flush == FlushType.Finish ? BlockState.FinishDone : BlockState.BlockDone;
 		}
@@ -1019,7 +1049,9 @@ namespace BestHTTP.Decompression.Zlib
 			{
 				// Check if the file is ascii or binary
 				if (data_type == Z_UNKNOWN)
+				{
 					set_data_type();
+				}
 
 				// Construct the literal and distance trees
 				treeLiterals.build_tree(this);
@@ -1038,7 +1070,9 @@ namespace BestHTTP.Decompression.Zlib
 				static_lenb = (static_len + 3 + 7) >> 3;
 
 				if (static_lenb <= opt_lenb)
+				{
 					opt_lenb = static_lenb;
+				}
 			}
 			else
 			{
@@ -1086,7 +1120,7 @@ namespace BestHTTP.Decompression.Zlib
 		//    At least one byte has been read, or avail_in == 0; reads are
 		//    performed for at least two bytes (required for the zip translate_eol
 		//    option -- not supported here).
-		private void _fillWindow()
+		void _fillWindow()
 		{
 			int n, m;
 			int p;
@@ -1094,7 +1128,7 @@ namespace BestHTTP.Decompression.Zlib
 
 			do
 			{
-				more = (window_size - lookahead - strstart);
+				more = window_size - lookahead - strstart;
 
 				// Deal with !@#$% 64K limit:
 				if (more == 0 && strstart == 0 && lookahead == 0)
@@ -1127,16 +1161,16 @@ namespace BestHTTP.Decompression.Zlib
 					p = n;
 					do
 					{
-						m = (head[--p] & 0xffff);
-						head[p] = (short)((m >= w_size) ? (m - w_size) : 0);
+						m = head[--p] & 0xffff;
+						head[p] = (short)(m >= w_size ? m - w_size : 0);
 					} while (--n != 0);
 
 					n = w_size;
 					p = n;
 					do
 					{
-						m = (prev[--p] & 0xffff);
-						prev[p] = (short)((m >= w_size) ? (m - w_size) : 0);
+						m = prev[--p] & 0xffff;
+						prev[p] = (short)(m >= w_size ? m - w_size : 0);
 						// If n is not on any hash chain, prev[n] is garbage but
 						// its value will never be used.
 					} while (--n != 0);
@@ -1145,7 +1179,9 @@ namespace BestHTTP.Decompression.Zlib
 				}
 
 				if (_codec.AvailableBytesIn == 0)
+				{
 					return;
+				}
 
 				// If there was no sliding:
 				//    strstart <= WSIZE+MAX_DIST-1 && lookahead <= MIN_LOOKAHEAD - 1 &&
@@ -1165,7 +1201,7 @@ namespace BestHTTP.Decompression.Zlib
 				if (lookahead >= MIN_MATCH)
 				{
 					ins_h = window[strstart] & 0xff;
-					ins_h = (((ins_h) << hash_shift) ^ (window[strstart + 1] & 0xff)) & hash_mask;
+					ins_h = ((ins_h << hash_shift) ^ (window[strstart + 1] & 0xff)) & hash_mask;
 				}
 				// If the whole input has less than MIN_MATCH bytes, ins_h is garbage,
 				// but this is not important since only literal bytes will be emitted.
@@ -1198,17 +1234,19 @@ namespace BestHTTP.Decompression.Zlib
 					}
 
 					if (lookahead == 0)
+					{
 						break; // flush the current block
+					}
 				}
 
 				// Insert the string window[strstart .. strstart+2] in the
 				// dictionary, and set hash_head to the head of the hash chain:
 				if (lookahead >= MIN_MATCH)
 				{
-					ins_h = (((ins_h) << hash_shift) ^ (window[(strstart) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
+					ins_h = ((ins_h << hash_shift) ^ (window[strstart + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
 
 					//  prev[strstart&w_mask]=hash_head=head[ins_h];
-					hash_head = (head[ins_h] & 0xffff);
+					hash_head = head[ins_h] & 0xffff;
 					prev[strstart & w_mask] = head[ins_h];
 					head[ins_h] = unchecked((short)strstart);
 				}
@@ -1245,9 +1283,9 @@ namespace BestHTTP.Decompression.Zlib
 						{
 							strstart++;
 
-							ins_h = ((ins_h << hash_shift) ^ (window[(strstart) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
+							ins_h = ((ins_h << hash_shift) ^ (window[strstart + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
 							//      prev[strstart&w_mask]=hash_head=head[ins_h];
-							hash_head = (head[ins_h] & 0xffff);
+							hash_head = head[ins_h] & 0xffff;
 							prev[strstart & w_mask] = head[ins_h];
 							head[ins_h] = unchecked((short)strstart);
 
@@ -1263,7 +1301,7 @@ namespace BestHTTP.Decompression.Zlib
 						match_length = 0;
 						ins_h = window[strstart] & 0xff;
 
-						ins_h = (((ins_h) << hash_shift) ^ (window[strstart + 1] & 0xff)) & hash_mask;
+						ins_h = ((ins_h << hash_shift) ^ (window[strstart + 1] & 0xff)) & hash_mask;
 						// If lookahead < MIN_MATCH, ins_h is garbage, but it does not
 						// matter since it will be recomputed at next deflate call.
 					}
@@ -1281,7 +1319,9 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					flush_block_only(false);
 					if (_codec.AvailableBytesOut == 0)
+					{
 						return BlockState.NeedMore;
+					}
 				}
 			}
 
@@ -1289,9 +1329,13 @@ namespace BestHTTP.Decompression.Zlib
 			if (_codec.AvailableBytesOut == 0)
 			{
 				if (flush == FlushType.Finish)
+				{
 					return BlockState.FinishStarted;
+				}
 				else
+				{
 					return BlockState.NeedMore;
+				}
 			}
 
 			return flush == FlushType.Finish ? BlockState.FinishDone : BlockState.BlockDone;
@@ -1318,10 +1362,14 @@ namespace BestHTTP.Decompression.Zlib
 				{
 					_fillWindow();
 					if (lookahead < MIN_LOOKAHEAD && flush == FlushType.None)
+					{
 						return BlockState.NeedMore;
+					}
 
 					if (lookahead == 0)
+					{
 						break; // flush the current block
+					}
 				}
 
 				// Insert the string window[strstart .. strstart+2] in the
@@ -1329,9 +1377,9 @@ namespace BestHTTP.Decompression.Zlib
 
 				if (lookahead >= MIN_MATCH)
 				{
-					ins_h = (((ins_h) << hash_shift) ^ (window[(strstart) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
+					ins_h = ((ins_h << hash_shift) ^ (window[strstart + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
 					//  prev[strstart&w_mask]=hash_head=head[ins_h];
-					hash_head = (head[ins_h] & 0xffff);
+					hash_head = head[ins_h] & 0xffff;
 					prev[strstart & w_mask] = head[ins_h];
 					head[ins_h] = unchecked((short)strstart);
 				}
@@ -1378,15 +1426,15 @@ namespace BestHTTP.Decompression.Zlib
 					// strstart-1 and strstart are already inserted. If there is not
 					// enough lookahead, the last two strings are not inserted in
 					// the hash table.
-					lookahead -= (prev_length - 1);
+					lookahead -= prev_length - 1;
 					prev_length -= 2;
 					do
 					{
 						if (++strstart <= max_insert)
 						{
-							ins_h = (((ins_h) << hash_shift) ^ (window[(strstart) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
+							ins_h = ((ins_h << hash_shift) ^ (window[strstart + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
 							//prev[strstart&w_mask]=hash_head=head[ins_h];
-							hash_head = (head[ins_h] & 0xffff);
+							hash_head = head[ins_h] & 0xffff;
 							prev[strstart & w_mask] = head[ins_h];
 							head[ins_h] = unchecked((short)strstart);
 						}
@@ -1400,7 +1448,9 @@ namespace BestHTTP.Decompression.Zlib
 					{
 						flush_block_only(false);
 						if (_codec.AvailableBytesOut == 0)
+						{
 							return BlockState.NeedMore;
+						}
 					}
 				}
 				else if (match_available != 0)
@@ -1419,7 +1469,9 @@ namespace BestHTTP.Decompression.Zlib
 					strstart++;
 					lookahead--;
 					if (_codec.AvailableBytesOut == 0)
+					{
 						return BlockState.NeedMore;
+					}
 				}
 				else
 				{
@@ -1443,9 +1495,13 @@ namespace BestHTTP.Decompression.Zlib
 			if (_codec.AvailableBytesOut == 0)
 			{
 				if (flush == FlushType.Finish)
+				{
 					return BlockState.FinishStarted;
+				}
 				else
+				{
 					return BlockState.NeedMore;
+				}
 			}
 
 			return flush == FlushType.Finish ? BlockState.FinishDone : BlockState.BlockDone;
@@ -1459,7 +1515,7 @@ namespace BestHTTP.Decompression.Zlib
 			int match; // matched string
 			int len; // length of current match
 			int best_len = prev_length; // best match length so far
-			int limit = strstart > (w_size - MIN_LOOKAHEAD) ? strstart - (w_size - MIN_LOOKAHEAD) : 0;
+			int limit = strstart > w_size - MIN_LOOKAHEAD ? strstart - (w_size - MIN_LOOKAHEAD) : 0;
 
 			int niceLength = config.NiceLength;
 
@@ -1484,7 +1540,9 @@ namespace BestHTTP.Decompression.Zlib
 			// Do not look for matches beyond the end of the input. This is necessary
 			// to make deflate deterministic.
 			if (niceLength > lookahead)
+			{
 				niceLength = lookahead;
+			}
 
 			do
 			{
@@ -1496,7 +1554,9 @@ namespace BestHTTP.Decompression.Zlib
 				    window[match + best_len - 1] != scan_end1 ||
 				    window[match] != window[scan] ||
 				    window[++match] != window[scan + 1])
+				{
 					continue;
+				}
 
 				// The check at best_len-1 can be removed because it will be made
 				// again later. (This heuristic is not always a win.)
@@ -1527,20 +1587,26 @@ namespace BestHTTP.Decompression.Zlib
 					match_start = cur_match;
 					best_len = len;
 					if (len >= niceLength)
+					{
 						break;
+					}
+
 					scan_end1 = window[scan + best_len - 1];
 					scan_end = window[scan + best_len];
 				}
-			} while ((cur_match = (prev[cur_match & wmask] & 0xffff)) > limit && --chain_length != 0);
+			} while ((cur_match = prev[cur_match & wmask] & 0xffff) > limit && --chain_length != 0);
 
 			if (best_len <= lookahead)
+			{
 				return best_len;
+			}
+
 			return lookahead;
 		}
 
 
-		private bool Rfc1950BytesEmitted = false;
-		private bool _WantRfc1950HeaderBytes = true;
+		bool Rfc1950BytesEmitted = false;
+		bool _WantRfc1950HeaderBytes = true;
 
 		internal bool WantRfc1950HeaderBytes
 		{
@@ -1571,10 +1637,14 @@ namespace BestHTTP.Decompression.Zlib
 
 			// validation
 			if (windowBits < 9 || windowBits > 15)
+			{
 				throw new ZlibException("windowBits must be in the range 9..15.");
+			}
 
 			if (memLevel < 1 || memLevel > MEM_LEVEL_MAX)
-				throw new ZlibException(String.Format("memLevel must be in the range 1.. {0}", MEM_LEVEL_MAX));
+			{
+				throw new ZlibException(string.Format("memLevel must be in the range 1.. {0}", MEM_LEVEL_MAX));
+			}
 
 			_codec.dstate = this;
 
@@ -1585,7 +1655,7 @@ namespace BestHTTP.Decompression.Zlib
 			hash_bits = memLevel + 7;
 			hash_size = 1 << hash_bits;
 			hash_mask = hash_size - 1;
-			hash_shift = ((hash_bits + MIN_MATCH - 1) / MIN_MATCH);
+			hash_shift = (hash_bits + MIN_MATCH - 1) / MIN_MATCH;
 
 			window = new byte[w_size * 2]; // BufferPool.Get(w_size * 2, false);
 			prev = new short[w_size];
@@ -1607,8 +1677,8 @@ namespace BestHTTP.Decompression.Zlib
 			// The middle slice, of 32k, is used for distance codes.
 			// The final 16k are length codes.
 
-			this.compressionLevel = level;
-			this.compressionStrategy = strategy;
+			compressionLevel = level;
+			compressionStrategy = strategy;
 
 			Reset();
 			return ZlibConstants.Z_OK;
@@ -1626,7 +1696,7 @@ namespace BestHTTP.Decompression.Zlib
 
 			Rfc1950BytesEmitted = false;
 
-			status = (WantRfc1950HeaderBytes) ? INIT_STATE : BUSY_STATE;
+			status = WantRfc1950HeaderBytes ? INIT_STATE : BUSY_STATE;
 			_codec._Adler32 = Adler.Adler32(0, null, 0, 0);
 
 			last_flush = (int)FlushType.None;
@@ -1656,7 +1726,7 @@ namespace BestHTTP.Decompression.Zlib
 		}
 
 
-		private void SetDeflater()
+		void SetDeflater()
 		{
 			switch (config.Flavor)
 			{
@@ -1706,12 +1776,17 @@ namespace BestHTTP.Decompression.Zlib
 			int index = 0;
 
 			if (dictionary == null || status != INIT_STATE)
+			{
 				throw new ZlibException("Stream error.");
+			}
 
 			_codec._Adler32 = Adler.Adler32(_codec._Adler32, dictionary, 0, dictionary.Length);
 
 			if (length < MIN_MATCH)
+			{
 				return ZlibConstants.Z_OK;
+			}
+
 			if (length > w_size - MIN_LOOKAHEAD)
 			{
 				length = w_size - MIN_LOOKAHEAD;
@@ -1727,11 +1802,11 @@ namespace BestHTTP.Decompression.Zlib
 			// call of fill_window.
 
 			ins_h = window[0] & 0xff;
-			ins_h = (((ins_h) << hash_shift) ^ (window[1] & 0xff)) & hash_mask;
+			ins_h = ((ins_h << hash_shift) ^ (window[1] & 0xff)) & hash_mask;
 
 			for (int n = 0; n <= length - MIN_MATCH; n++)
 			{
-				ins_h = (((ins_h) << hash_shift) ^ (window[(n) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
+				ins_h = ((ins_h << hash_shift) ^ (window[n + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
 				prev[n & w_mask] = head[ins_h];
 				head[ins_h] = (short)n;
 			}
@@ -1748,13 +1823,13 @@ namespace BestHTTP.Decompression.Zlib
 			    (_codec.InputBuffer == null && _codec.AvailableBytesIn != 0) ||
 			    (status == FINISH_STATE && flush != FlushType.Finish))
 			{
-				_codec.Message = _ErrorMessage[ZlibConstants.Z_NEED_DICT - (ZlibConstants.Z_STREAM_ERROR)];
-				throw new ZlibException(String.Format("Something is fishy. [{0}]", _codec.Message));
+				_codec.Message = _ErrorMessage[ZlibConstants.Z_NEED_DICT - ZlibConstants.Z_STREAM_ERROR];
+				throw new ZlibException(string.Format("Something is fishy. [{0}]", _codec.Message));
 			}
 
 			if (_codec.AvailableBytesOut == 0)
 			{
-				_codec.Message = _ErrorMessage[ZlibConstants.Z_NEED_DICT - (ZlibConstants.Z_BUF_ERROR)];
+				_codec.Message = _ErrorMessage[ZlibConstants.Z_NEED_DICT - ZlibConstants.Z_BUF_ERROR];
 				throw new ZlibException("OutputBuffer is full (AvailableBytesOut == 0)");
 			}
 
@@ -1768,11 +1843,17 @@ namespace BestHTTP.Decompression.Zlib
 				int level_flags = (((int)compressionLevel - 1) & 0xff) >> 1;
 
 				if (level_flags > 3)
+				{
 					level_flags = 3;
-				header |= (level_flags << 6);
+				}
+
+				header |= level_flags << 6;
 				if (strstart != 0)
+				{
 					header |= PRESET_DICT;
-				header += 31 - (header % 31);
+				}
+
+				header += 31 - header % 31;
 
 				status = BUSY_STATE;
 				//putShortMSB(header);
@@ -1834,7 +1915,7 @@ namespace BestHTTP.Decompression.Zlib
 			// User must not provide more input after the first FINISH:
 			if (status == FINISH_STATE && _codec.AvailableBytesIn != 0)
 			{
-				_codec.Message = _ErrorMessage[ZlibConstants.Z_NEED_DICT - (ZlibConstants.Z_BUF_ERROR)];
+				_codec.Message = _ErrorMessage[ZlibConstants.Z_NEED_DICT - ZlibConstants.Z_BUF_ERROR];
 				throw new ZlibException("status == FINISH_STATE && _codec.AvailableBytesIn != 0");
 			}
 
@@ -1880,7 +1961,9 @@ namespace BestHTTP.Decompression.Zlib
 						{
 							// clear hash (forget the history)
 							for (int i = 0; i < hash_size; i++)
+							{
 								head[i] = 0;
+							}
 						}
 					}
 
@@ -1894,10 +1977,14 @@ namespace BestHTTP.Decompression.Zlib
 			}
 
 			if (flush != FlushType.Finish)
+			{
 				return ZlibConstants.Z_OK;
+			}
 
 			if (!WantRfc1950HeaderBytes || Rfc1950BytesEmitted)
+			{
 				return ZlibConstants.Z_STREAM_END;
+			}
 
 			// Write the zlib trailer (adler32)
 			pending[pendingCount++] = (byte)((_codec._Adler32 & 0xFF000000) >> 24);

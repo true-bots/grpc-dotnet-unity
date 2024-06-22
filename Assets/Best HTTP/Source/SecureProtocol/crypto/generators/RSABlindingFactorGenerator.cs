@@ -14,8 +14,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	*/
 	public class RsaBlindingFactorGenerator
 	{
-		private RsaKeyParameters key;
-		private SecureRandom random;
+		RsaKeyParameters key;
+		SecureRandom random;
 
 		/**
 		* Initialise the factor generator
@@ -36,7 +36,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			}
 
 			if (key.IsPrivate)
+			{
 				throw new ArgumentException("generator requires RSA public key");
+			}
 		}
 
 		/**
@@ -47,7 +49,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		public BigInteger GenerateBlindingFactor()
 		{
 			if (key == null)
+			{
 				throw new InvalidOperationException("generator not initialised");
+			}
 
 			BigInteger m = key.Modulus;
 			int length = m.BitLength - 1; // must be less than m.BitLength

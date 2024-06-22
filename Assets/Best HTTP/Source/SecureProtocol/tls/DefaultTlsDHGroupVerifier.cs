@@ -12,9 +12,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	{
 		public static readonly int DefaultMinimumPrimeBits = 2048;
 
-		private static readonly List<DHGroup> DefaultGroups = new List<DHGroup>();
+		static readonly List<DHGroup> DefaultGroups = new List<DHGroup>();
 
-		private static void AddDefaultGroup(DHGroup dhGroup)
+		static void AddDefaultGroup(DHGroup dhGroup)
 		{
 			DefaultGroups.Add(dhGroup);
 		}
@@ -65,8 +65,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <param name="minimumPrimeBits">the minimum bitlength of 'P'.</param>
 		public DefaultTlsDHGroupVerifier(IList<DHGroup> groups, int minimumPrimeBits)
 		{
-			this.m_groups = new List<DHGroup>(groups);
-			this.m_minimumPrimeBits = minimumPrimeBits;
+			m_groups = new List<DHGroup>(groups);
+			m_minimumPrimeBits = minimumPrimeBits;
 		}
 
 		public virtual bool Accept(DHGroup dhGroup)
@@ -94,7 +94,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			foreach (DHGroup group in m_groups)
 			{
 				if (AreGroupsEqual(dhGroup, group))
+				{
 					return true;
+				}
 			}
 
 			return false;

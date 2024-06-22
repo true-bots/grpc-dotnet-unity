@@ -7,11 +7,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 	public class DefaultSignatureResult
 		: IBlockResult
 	{
-		private readonly ISigner mSigner;
+		readonly ISigner mSigner;
 
 		public DefaultSignatureResult(ISigner signer)
 		{
-			this.mSigner = signer;
+			mSigner = signer;
 		}
 
 		public byte[] Collect()

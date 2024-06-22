@@ -13,7 +13,7 @@ namespace GRPC.NET
 {
 	public class GRPCBestHttpHandler : HttpClientHandler
 	{
-		private static readonly string ContentType = "Content-Type";
+		static readonly string ContentType = "Content-Type";
 
 		/**
 		 * This function is called by gRPC when establishing a new channel to a gRPC server.
@@ -22,7 +22,9 @@ namespace GRPC.NET
 		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage grpcRequest, CancellationToken cancellationToken)
 		{
 			if (grpcRequest.Method != HttpMethod.Post)
+			{
 				throw new NotSupportedException("gRPC only supports POST method.");
+			}
 
 			//
 			// Create outgoing HTTP2 request
@@ -37,9 +39,12 @@ namespace GRPC.NET
 			//
 
 			// Copy over all request headers
-			foreach (var kv in grpcRequest.Headers)
+			foreach (KeyValuePair<string, IEnumerable<string>> kv in grpcRequest.Headers)
 			{
-				foreach (var headerItem in kv.Value) bestRequest.AddHeader(kv.Key, headerItem);
+				foreach (string headerItem in kv.Value)
+				{
+					bestRequest.AddHeader(kv.Key, headerItem);
+				}
 			}
 
 			// Contained in grpcRequest.Content.Headers but we set it hardcoded here
@@ -135,7 +140,9 @@ namespace GRPC.NET
 
 				// Complete Response on first HEADER package (before DATA arrived) to trigger gRPC
 				if (!grpcResponseTask.Task.IsCompleted)
+				{
 					grpcResponseTask.SetResult(grpcResponseMessage);
+				}
 
 				// From now on everything we get are trailers
 				isHeader = false;
@@ -152,14 +159,14 @@ namespace GRPC.NET
 			};
 
 			// When gRPC call is canceled by the application we abort the request
-			var cancellationTokenRegistration = cancellationToken.Register(() => { bestRequest.Abort(); });
+			CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(() => { bestRequest.Abort(); });
 
 			bestRequest.Callback += (request, response) =>
 			{
 				// We might have to handle an error when his callback is called after the request completed
 				if (request.State != HTTPRequestStates.Finished)
 				{
-					var ex = request.Exception ?? new Exception($"Unknown error while processing grpc req/resp (state={request.State}).");
+					Exception ex = request.Exception ?? new Exception($"Unknown error while processing grpc req/resp (state={request.State}).");
 
 					// If the call was aborted instead we set the exception accordingly
 					if (request.State == HTTPRequestStates.Aborted)

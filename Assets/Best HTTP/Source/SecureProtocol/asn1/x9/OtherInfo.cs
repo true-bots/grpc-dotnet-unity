@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
@@ -9,9 +11,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 	public class OtherInfo
 		: Asn1Encodable
 	{
-		private KeySpecificInfo keyInfo;
-		private Asn1OctetString partyAInfo;
-		private Asn1OctetString suppPubInfo;
+		KeySpecificInfo keyInfo;
+		Asn1OctetString partyAInfo;
+		Asn1OctetString suppPubInfo;
 
 		public OtherInfo(
 			KeySpecificInfo keyInfo,
@@ -25,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 
 		public OtherInfo(Asn1Sequence seq)
 		{
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
 			e.MoveNext();
 			keyInfo = new KeySpecificInfo((Asn1Sequence)e.Current);

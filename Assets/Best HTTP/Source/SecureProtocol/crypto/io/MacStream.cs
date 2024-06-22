@@ -9,9 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 	public sealed class MacStream
 		: Stream
 	{
-		private readonly Stream m_stream;
-		private readonly IMac m_readMac;
-		private readonly IMac m_writeMac;
+		readonly Stream m_stream;
+		readonly IMac m_readMac;
+		readonly IMac m_writeMac;
 
 		public MacStream(Stream stream, IMac readMac, IMac writeMac)
 		{
@@ -20,9 +20,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 			m_writeMac = writeMac;
 		}
 
-		public IMac ReadMac => m_readMac;
+		public IMac ReadMac
+		{
+			get { return m_readMac; }
+		}
 
-		public IMac WriteMac => m_writeMac;
+		public IMac WriteMac
+		{
+			get { return m_writeMac; }
+		}
 
 		public override bool CanRead
 		{

@@ -12,10 +12,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	 */
 	public class X509NameTokenizer
 	{
-		private string value;
-		private int index;
-		private char separator;
-		private StringBuilder buffer = new StringBuilder();
+		string value;
+		int index;
+		char separator;
+		StringBuilder buffer = new StringBuilder();
 
 		public X509NameTokenizer(
 			string oid)
@@ -27,8 +27,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			string oid,
 			char separator)
 		{
-			this.value = oid;
-			this.index = -1;
+			value = oid;
+			index = -1;
 			this.separator = separator;
 		}
 

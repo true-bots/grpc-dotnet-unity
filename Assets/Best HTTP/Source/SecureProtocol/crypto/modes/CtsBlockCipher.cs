@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class CtsBlockCipher
 		: BufferedBlockCipher
 	{
-		private readonly int blockSize;
+		readonly int blockSize;
 
 		public CtsBlockCipher(IBlockCipher cipher)
 			: this(EcbBlockCipher.GetBlockCipherMode(cipher))
@@ -27,7 +27,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		public CtsBlockCipher(IBlockCipherMode cipherMode)
 		{
 			if (!(cipherMode is CbcBlockCipher || cipherMode is EcbBlockCipher))
+			{
 				throw new ArgumentException("CtsBlockCipher can only accept ECB, or CBC ciphers");
+			}
 
 			m_cipherMode = cipherMode;
 
@@ -135,7 +137,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		public override int ProcessBytes(byte[] input, int inOff, int length, byte[] output, int outOff)
 		{
 			if (length < 0)
+			{
 				throw new ArgumentException("Can't have a negative input length!");
+			}
 
 			int blockSize = GetBlockSize();
 			int outLength = GetUpdateOutputSize(length);
@@ -237,7 +241,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		public override int DoFinal(byte[] output, int outOff)
 		{
 			if (bufOff + outOff > output.Length)
+			{
 				throw new DataLengthException("output buffer too small in DoFinal");
+			}
 
 			int blockSize = m_cipherMode.GetBlockSize();
 			int length = bufOff - blockSize;
@@ -248,7 +254,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				m_cipherMode.ProcessBlock(buf, 0, block, 0);
 
 				if (bufOff < blockSize)
+				{
 					throw new DataLengthException("need at least one block of input for CTS");
+				}
 
 				for (int i = bufOff; i != buf.Length; i++)
 				{

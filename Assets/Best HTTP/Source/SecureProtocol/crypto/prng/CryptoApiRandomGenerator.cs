@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 	public sealed class CryptoApiRandomGenerator
 		: IRandomGenerator, IDisposable
 	{
-		private readonly RandomNumberGenerator m_randomNumberGenerator;
+		readonly RandomNumberGenerator m_randomNumberGenerator;
 
 		public CryptoApiRandomGenerator()
 			: this(RandomNumberGenerator.Create())
@@ -54,9 +54,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
             m_randomNumberGenerator.GetBytes(bytes, start, len);
 #else
 			if (start < 0)
+			{
 				throw new ArgumentException("Start offset cannot be negative", "start");
-			if (bytes.Length < (start + len))
+			}
+
+			if (bytes.Length < start + len)
+			{
 				throw new ArgumentException("Byte array too small for requested offset and length");
+			}
 
 			if (bytes.Length == len && start == 0)
 			{

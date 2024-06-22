@@ -9,9 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class EncryptedContentInfo
 		: Asn1Encodable
 	{
-		private DerObjectIdentifier contentType;
-		private AlgorithmIdentifier contentEncryptionAlgorithm;
-		private Asn1OctetString encryptedContent;
+		DerObjectIdentifier contentType;
+		AlgorithmIdentifier contentEncryptionAlgorithm;
+		Asn1OctetString encryptedContent;
 
 		public EncryptedContentInfo(
 			DerObjectIdentifier contentType,
@@ -46,12 +46,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is EncryptedContentInfo)
+			{
 				return (EncryptedContentInfo)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new EncryptedContentInfo((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid EncryptedContentInfo: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid EncryptedContentInfo: " + Platform.GetTypeName(obj));
 		}
 
 		public DerObjectIdentifier ContentType

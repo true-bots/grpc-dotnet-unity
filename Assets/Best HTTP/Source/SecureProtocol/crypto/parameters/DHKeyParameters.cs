@@ -10,8 +10,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class DHKeyParameters
 		: AsymmetricKeyParameter
 	{
-		private readonly DHParameters parameters;
-		private readonly DerObjectIdentifier algorithmOid;
+		readonly DHParameters parameters;
+		readonly DerObjectIdentifier algorithmOid;
 
 		protected DHKeyParameters(
 			bool isPrivate,
@@ -45,12 +45,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			DHKeyParameters other = obj as DHKeyParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

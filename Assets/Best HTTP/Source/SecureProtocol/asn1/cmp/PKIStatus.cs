@@ -14,7 +14,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		Waiting = 3,
 		RevocationWarning = 4,
 		RevocationNotification = 5,
-		KeyUpdateWarning = 6,
+		KeyUpdateWarning = 6
 	}
 
 	public class PkiStatusEncodable
@@ -28,14 +28,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static readonly PkiStatusEncodable revocationNotification = new PkiStatusEncodable(PkiStatus.RevocationNotification);
 		public static readonly PkiStatusEncodable keyUpdateWaiting = new PkiStatusEncodable(PkiStatus.KeyUpdateWarning);
 
-		private readonly DerInteger status;
+		readonly DerInteger status;
 
-		private PkiStatusEncodable(PkiStatus status)
+		PkiStatusEncodable(PkiStatus status)
 			: this(new DerInteger((int)status))
 		{
 		}
 
-		private PkiStatusEncodable(DerInteger status)
+		PkiStatusEncodable(DerInteger status)
 		{
 			this.status = status;
 		}
@@ -43,12 +43,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static PkiStatusEncodable GetInstance(object obj)
 		{
 			if (obj is PkiStatusEncodable)
+			{
 				return (PkiStatusEncodable)obj;
+			}
 
 			if (obj is DerInteger)
+			{
 				return new PkiStatusEncodable((DerInteger)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public virtual BigInteger Value

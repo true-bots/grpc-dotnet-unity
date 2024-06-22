@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 {
-	internal abstract class Nat384
+	abstract class Nat384
 	{
 		public static void Mul(uint[] x, uint[] y, uint[] zz)
 		{

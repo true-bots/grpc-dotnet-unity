@@ -9,9 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 	public sealed class DigestStream
 		: Stream
 	{
-		private readonly Stream m_stream;
-		private readonly IDigest m_readDigest;
-		private readonly IDigest m_writeDigest;
+		readonly Stream m_stream;
+		readonly IDigest m_readDigest;
+		readonly IDigest m_writeDigest;
 
 		public DigestStream(Stream stream, IDigest readDigest, IDigest writeDigest)
 		{
@@ -20,9 +20,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 			m_writeDigest = writeDigest;
 		}
 
-		public IDigest ReadDigest => m_readDigest;
+		public IDigest ReadDigest
+		{
+			get { return m_readDigest; }
+		}
 
-		public IDigest WriteDigest => m_writeDigest;
+		public IDigest WriteDigest
+		{
+			get { return m_writeDigest; }
+		}
 
 		public override bool CanRead
 		{

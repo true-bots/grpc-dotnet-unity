@@ -15,19 +15,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class ParallelHash
 		: IXof, IDigest
 	{
-		private static readonly byte[] N_PARALLEL_HASH = Strings.ToByteArray("ParallelHash");
+		static readonly byte[] N_PARALLEL_HASH = Strings.ToByteArray("ParallelHash");
 
-		private readonly CShakeDigest cshake;
-		private readonly CShakeDigest compressor;
-		private readonly int bitLength;
-		private readonly int outputLength;
-		private readonly int B;
-		private readonly byte[] buffer;
-		private readonly byte[] compressorBuffer;
+		readonly CShakeDigest cshake;
+		readonly CShakeDigest compressor;
+		readonly int bitLength;
+		readonly int outputLength;
+		readonly int B;
+		readonly byte[] buffer;
+		readonly byte[] compressorBuffer;
 
-		private bool firstOutput;
-		private int nCount;
-		private int bufOff;
+		bool firstOutput;
+		int nCount;
+		int bufOff;
 
 		/**
 		 * Base constructor.
@@ -43,26 +43,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 		public ParallelHash(int bitLength, byte[] S, int B, int outputSize)
 		{
-			this.cshake = new CShakeDigest(bitLength, N_PARALLEL_HASH, S);
-			this.compressor = new CShakeDigest(bitLength, new byte[0], new byte[0]);
+			cshake = new CShakeDigest(bitLength, N_PARALLEL_HASH, S);
+			compressor = new CShakeDigest(bitLength, new byte[0], new byte[0]);
 			this.bitLength = bitLength;
 			this.B = B;
-			this.outputLength = (outputSize + 7) / 8;
-			this.buffer = new byte[B];
-			this.compressorBuffer = new byte[bitLength * 2 / 8];
+			outputLength = (outputSize + 7) / 8;
+			buffer = new byte[B];
+			compressorBuffer = new byte[bitLength * 2 / 8];
 
 			Reset();
 		}
 
 		public ParallelHash(ParallelHash source)
 		{
-			this.cshake = new CShakeDigest(source.cshake);
-			this.compressor = new CShakeDigest(source.compressor);
-			this.bitLength = source.bitLength;
-			this.B = source.B;
-			this.outputLength = source.outputLength;
-			this.buffer = Arrays.Clone(source.buffer);
-			this.compressorBuffer = Arrays.Clone(source.compressorBuffer);
+			cshake = new CShakeDigest(source.cshake);
+			compressor = new CShakeDigest(source.compressor);
+			bitLength = source.bitLength;
+			B = source.B;
+			outputLength = source.outputLength;
+			buffer = Arrays.Clone(source.buffer);
+			compressorBuffer = Arrays.Clone(source.compressorBuffer);
 		}
 
 		public virtual string AlgorithmName
@@ -161,13 +161,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-		private void Compress()
+		void Compress()
 		{
 			Compress(buffer, 0, bufOff);
 			bufOff = 0;
 		}
 
-		private void Compress(byte[] buf, int offSet, int len)
+		void Compress(byte[] buf, int offSet, int len)
 		{
 			compressor.BlockUpdate(buf, offSet, len);
 			compressor.OutputFinal(compressorBuffer, 0, compressorBuffer.Length);
@@ -189,7 +189,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-		private void WrapUp(int outputSize)
+		void WrapUp(int outputSize)
 		{
 			if (bufOff != 0)
 			{

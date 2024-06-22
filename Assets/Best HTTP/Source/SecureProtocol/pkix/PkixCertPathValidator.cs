@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security.Certificates;
+using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
@@ -53,11 +54,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			//
 			// (a)
 			//
-			var certs = certPath.Certificates;
+			IList<X509Certificate> certs = certPath.Certificates;
 			int n = certs.Count;
 
 			if (n == 0)
+			{
 				throw new PkixCertPathValidatorException("Certification path is empty.", null, 0);
+			}
 
 			//
 			// (b)
@@ -67,7 +70,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			//
 			// (c)
 			//
-			var userInitialPolicySet = paramsPkix.GetInitialPolicies();
+			ISet<string> userInitialPolicySet = paramsPkix.GetInitialPolicies();
 
 			//
 			// (d)
@@ -79,7 +82,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					paramsPkix.GetTrustAnchors());
 
 				if (trust == null)
+				{
 					throw new PkixCertPathValidatorException("Trust anchor for certification path not found.", null, -1);
+				}
 
 				CheckCertificate(trust.TrustedCert);
 			}
@@ -102,17 +107,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			//
 			// (a)
 			//
-			var policyNodes = new List<PkixPolicyNode>[n + 1];
+			List<PkixPolicyNode>[] policyNodes = new List<PkixPolicyNode>[n + 1];
 			for (int j = 0; j < policyNodes.Length; j++)
 			{
 				policyNodes[j] = new List<PkixPolicyNode>();
 			}
 
-			var policySet = new HashSet<string>();
+			HashSet<string> policySet = new HashSet<string>();
 
 			policySet.Add(Rfc3280CertPathUtilities.ANY_POLICY);
 
-			var validPolicyTree = new PkixPolicyNode(new List<PkixPolicyNode>(), 0, policySet, null,
+			PkixPolicyNode validPolicyTree = new PkixPolicyNode(new List<PkixPolicyNode>(), 0, policySet, null,
 				new HashSet<PolicyQualifierInfo>(), Rfc3280CertPathUtilities.ANY_POLICY, false);
 
 			policyNodes[0].Add(validPolicyTree);
@@ -125,7 +130,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			// (d)
 			//
 			int explicitPolicy;
-			var acceptablePolicies = new HashSet<string>();
+			HashSet<string> acceptablePolicies = new HashSet<string>();
 
 			if (paramsPkix.IsExplicitPolicyRequired)
 			{
@@ -212,7 +217,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			// 6.1.3
 			//
 
-			var targetConstraints = paramsPkix.GetTargetConstraintsCert();
+			ISelector<X509Certificate> targetConstraints = paramsPkix.GetTargetConstraintsCert();
 			if (targetConstraints != null && !targetConstraints.Match((X509Certificate)certs[0]))
 			{
 				throw new PkixCertPathValidatorException(
@@ -222,7 +227,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			//
 			// initialize CertPathChecker's
 			//
-			var certPathCheckers = paramsPkix.GetCertPathCheckers();
+			IList<PkixCertPathChecker> certPathCheckers = paramsPkix.GetCertPathCheckers();
 			foreach (PkixCertPathChecker certPathChecker in certPathCheckers)
 			{
 				certPathChecker.Init(false);
@@ -281,8 +286,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					if (cert != null && cert.Version == 1)
 					{
 						// we've found the trust anchor at the top of the path, ignore and keep going
-						if ((i == 1) && cert.Equals(trust.TrustedCert))
+						if (i == 1 && cert.Equals(trust.TrustedCert))
+						{
 							continue;
+						}
 
 						throw new PkixCertPathValidatorException(
 							"Version 1 certificates can't be used as CA ones.", null, index);
@@ -321,7 +328,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					// (n)
 					Rfc3280CertPathUtilities.PrepareNextCertN(certPath, index);
 
-					var criticalExtensions1 = cert.GetCriticalExtensionOids();
+					ISet<string> criticalExtensions1 = cert.GetCriticalExtensionOids();
 
 					if (criticalExtensions1 != null)
 					{
@@ -386,7 +393,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			//
 			// (f)
 			//
-			var criticalExtensions = cert.GetCriticalExtensionOids();
+			ISet<string> criticalExtensions = cert.GetCriticalExtensionOids();
 
 			if (criticalExtensions != null)
 			{
@@ -416,7 +423,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			PkixPolicyNode intersection = Rfc3280CertPathUtilities.WrapupCertG(certPath, paramsPkix,
 				userInitialPolicySet, index + 1, policyNodes, validPolicyTree, acceptablePolicies);
 
-			if ((explicitPolicy > 0) || (intersection != null))
+			if (explicitPolicy > 0 || intersection != null)
 			{
 				return new PkixCertPathValidatorResult(trust, intersection, cert.GetPublicKey());
 			}

@@ -32,32 +32,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 				return new PkiStatusInfo((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public PkiStatusInfo(
 			Asn1Sequence seq)
 		{
-			this.status = DerInteger.GetInstance(seq[0]);
+			status = DerInteger.GetInstance(seq[0]);
 
-			this.statusString = null;
-			this.failInfo = null;
+			statusString = null;
+			failInfo = null;
 
 			if (seq.Count > 2)
 			{
-				this.statusString = PkiFreeText.GetInstance(seq[1]);
-				this.failInfo = DerBitString.GetInstance(seq[2]);
+				statusString = PkiFreeText.GetInstance(seq[1]);
+				failInfo = DerBitString.GetInstance(seq[2]);
 			}
 			else if (seq.Count > 1)
 			{
 				object obj = seq[1];
 				if (obj is DerBitString)
 				{
-					this.failInfo = DerBitString.GetInstance(obj);
+					failInfo = DerBitString.GetInstance(obj);
 				}
 				else
 				{
-					this.statusString = PkiFreeText.GetInstance(obj);
+					statusString = PkiFreeText.GetInstance(obj);
 				}
 			}
 		}

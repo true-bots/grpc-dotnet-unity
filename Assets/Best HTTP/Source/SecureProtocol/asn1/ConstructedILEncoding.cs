@@ -4,12 +4,12 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal class ConstructedILEncoding
+	class ConstructedILEncoding
 		: IAsn1Encoding
 	{
-		private readonly int m_tagClass;
-		private readonly int m_tagNo;
-		private readonly IAsn1Encoding[] m_contentsElements;
+		readonly int m_tagClass;
+		readonly int m_tagNo;
+		readonly IAsn1Encoding[] m_contentsElements;
 
 		internal ConstructedILEncoding(int tagClass, int tagNo, IAsn1Encoding[] contentsElements)
 		{

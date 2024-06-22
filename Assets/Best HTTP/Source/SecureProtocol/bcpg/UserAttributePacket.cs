@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class UserAttributePacket
 		: ContainedPacket
 	{
-		private readonly UserAttributeSubpacket[] subpackets;
+		readonly UserAttributeSubpacket[] subpackets;
 
 		public UserAttributePacket(
 			BcpgInputStream bcpgIn)
@@ -19,7 +19,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			UserAttributeSubpacketsParser sIn = new UserAttributeSubpacketsParser(bcpgIn);
 			UserAttributeSubpacket sub;
 
-			var v = new List<UserAttributeSubpacket>();
+			List<UserAttributeSubpacket> v = new List<UserAttributeSubpacket>();
 			while ((sub = sIn.ReadPacket()) != null)
 			{
 				v.Add(sub);

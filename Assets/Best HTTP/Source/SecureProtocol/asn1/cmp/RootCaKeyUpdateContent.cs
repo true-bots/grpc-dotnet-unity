@@ -25,32 +25,40 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static RootCaKeyUpdateContent GetInstance(object obj)
 		{
 			if (obj is RootCaKeyUpdateContent rootCaKeyUpdateContent)
+			{
 				return rootCaKeyUpdateContent;
+			}
 
 			if (obj != null)
+			{
 				return new RootCaKeyUpdateContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly CmpCertificate m_newWithNew;
-		private readonly CmpCertificate m_newWithOld;
-		private readonly CmpCertificate m_oldWithNew;
+		readonly CmpCertificate m_newWithNew;
+		readonly CmpCertificate m_newWithOld;
+		readonly CmpCertificate m_oldWithNew;
 
 		public RootCaKeyUpdateContent(CmpCertificate newWithNew, CmpCertificate newWithOld, CmpCertificate oldWithNew)
 		{
 			if (newWithNew == null)
+			{
 				throw new ArgumentNullException(nameof(newWithNew));
+			}
 
 			m_newWithNew = newWithNew;
 			m_newWithOld = newWithOld;
 			m_oldWithNew = oldWithNew;
 		}
 
-		private RootCaKeyUpdateContent(Asn1Sequence seq)
+		RootCaKeyUpdateContent(Asn1Sequence seq)
 		{
 			if (seq.Count < 1 || seq.Count > 3)
+			{
 				throw new ArgumentException("expected sequence of 1 to 3 elements only");
+			}
 
 			CmpCertificate newWithNew;
 			CmpCertificate newWithOld = null;
@@ -76,11 +84,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_oldWithNew = oldWithNew;
 		}
 
-		public virtual CmpCertificate NewWithNew => m_newWithNew;
+		public virtual CmpCertificate NewWithNew
+		{
+			get { return m_newWithNew; }
+		}
 
-		public virtual CmpCertificate NewWithOld => m_newWithOld;
+		public virtual CmpCertificate NewWithOld
+		{
+			get { return m_newWithOld; }
+		}
 
-		public virtual CmpCertificate OldWithNew => m_oldWithNew;
+		public virtual CmpCertificate OldWithNew
+		{
+			get { return m_oldWithNew; }
+		}
 
 		public override Asn1Object ToAsn1Object()
 		{

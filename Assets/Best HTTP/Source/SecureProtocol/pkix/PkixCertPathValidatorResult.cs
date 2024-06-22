@@ -13,32 +13,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 	public class PkixCertPathValidatorResult
 		//: ICertPathValidatorResult
 	{
-		private TrustAnchor trustAnchor;
-		private PkixPolicyNode policyTree;
-		private AsymmetricKeyParameter subjectPublicKey;
+		TrustAnchor trustAnchor;
+		PkixPolicyNode policyTree;
+		AsymmetricKeyParameter subjectPublicKey;
 
 		public PkixPolicyNode PolicyTree
 		{
-			get { return this.policyTree; }
+			get { return policyTree; }
 		}
 
 		public TrustAnchor TrustAnchor
 		{
-			get { return this.trustAnchor; }
+			get { return trustAnchor; }
 		}
 
 		public AsymmetricKeyParameter SubjectPublicKey
 		{
-			get { return this.subjectPublicKey; }
+			get { return subjectPublicKey; }
 		}
 
 		public PkixCertPathValidatorResult(TrustAnchor trustAnchor, PkixPolicyNode policyTree,
 			AsymmetricKeyParameter subjectPublicKey)
 		{
 			if (trustAnchor == null)
+			{
 				throw new ArgumentNullException(nameof(trustAnchor));
+			}
+
 			if (subjectPublicKey == null)
+			{
 				throw new ArgumentNullException(nameof(subjectPublicKey));
+			}
 
 			this.trustAnchor = trustAnchor;
 			this.policyTree = policyTree;
@@ -47,7 +52,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 
 		public object Clone()
 		{
-			return new PkixCertPathValidatorResult(this.TrustAnchor, this.PolicyTree, this.SubjectPublicKey);
+			return new PkixCertPathValidatorResult(TrustAnchor, PolicyTree, SubjectPublicKey);
 		}
 
 		public override string ToString()

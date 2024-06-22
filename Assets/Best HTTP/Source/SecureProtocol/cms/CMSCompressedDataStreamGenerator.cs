@@ -30,7 +30,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	{
 		public static readonly string ZLib = CmsObjectIdentifiers.ZlibCompress.Id;
 
-		private int _bufferSize;
+		int _bufferSize;
 
 		/**
 		* base constructor
@@ -62,8 +62,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		public Stream Open(Stream outStream, string contentOid, string compressionOid)
 		{
 			if (ZLib != compressionOid)
+			{
 				throw new ArgumentException("Unsupported compression algorithm: " + compressionOid,
 					nameof(compressionOid));
+			}
 
 			BerSequenceGenerator sGen = new BerSequenceGenerator(outStream);
 
@@ -95,13 +97,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				Utilities.IO.Compression.ZLib.CompressOutput(octetStream, -1), sGen, cGen, eiGen);
 		}
 
-		private class CmsCompressedOutputStream
+		class CmsCompressedOutputStream
 			: BaseOutputStream
 		{
-			private Stream _out;
-			private BerSequenceGenerator _sGen;
-			private BerSequenceGenerator _cGen;
-			private BerSequenceGenerator _eiGen;
+			Stream _out;
+			BerSequenceGenerator _sGen;
+			BerSequenceGenerator _cGen;
+			BerSequenceGenerator _eiGen;
 
 			internal CmsCompressedOutputStream(
 				Stream outStream,

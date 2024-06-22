@@ -15,19 +15,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 	/// <summary>Elliptic curve registry for GOST 3410-2001 / 2012.</summary>
 	public static class ECGost3410NamedCurves
 	{
-		private static X9ECPoint ConfigureBasepoint(ECCurve curve, BigInteger x, BigInteger y)
+		static X9ECPoint ConfigureBasepoint(ECCurve curve, BigInteger x, BigInteger y)
 		{
 			ECPoint G = curve.CreatePoint(x, y);
 			WNafUtilities.ConfigureBasepoint(G);
 			return new X9ECPoint(G, false);
 		}
 
-		private static ECCurve ConfigureCurve(ECCurve curve)
+		static ECCurve ConfigureCurve(ECCurve curve)
 		{
 			return curve;
 		}
 
-		private static BigInteger FromHex(string hex)
+		static BigInteger FromHex(string hex)
 		{
 			return new BigInteger(1, Hex.DecodeStrict(hex));
 		}
@@ -35,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 		internal class Holder_gostR3410_2001_CryptoPro_A
 			: X9ECParametersHolder
 		{
-			private Holder_gostR3410_2001_CryptoPro_A()
+			Holder_gostR3410_2001_CryptoPro_A()
 			{
 			}
 
@@ -69,7 +69,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 		internal class Holder_gostR3410_2001_CryptoPro_B
 			: X9ECParametersHolder
 		{
-			private Holder_gostR3410_2001_CryptoPro_B()
+			Holder_gostR3410_2001_CryptoPro_B()
 			{
 			}
 
@@ -103,7 +103,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 		internal class Holder_gostR3410_2001_CryptoPro_C
 			: X9ECParametersHolder
 		{
-			private Holder_gostR3410_2001_CryptoPro_C()
+			Holder_gostR3410_2001_CryptoPro_C()
 			{
 			}
 
@@ -137,7 +137,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 		internal class Holder_gostR3410_2001_CryptoPro_XchB
 			: X9ECParametersHolder
 		{
-			private Holder_gostR3410_2001_CryptoPro_XchB()
+			Holder_gostR3410_2001_CryptoPro_XchB()
 			{
 			}
 
@@ -171,7 +171,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 		internal class Holder_id_tc26_gost_3410_12_256_paramSetA
 			: X9ECParametersHolder
 		{
-			private Holder_id_tc26_gost_3410_12_256_paramSetA()
+			Holder_id_tc26_gost_3410_12_256_paramSetA()
 			{
 			}
 
@@ -205,7 +205,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 		internal class Holder_id_tc26_gost_3410_12_512_paramSetA
 			: X9ECParametersHolder
 		{
-			private Holder_id_tc26_gost_3410_12_512_paramSetA()
+			Holder_id_tc26_gost_3410_12_512_paramSetA()
 			{
 			}
 
@@ -241,7 +241,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 		internal class Holder_id_tc26_gost_3410_12_512_paramSetB
 			: X9ECParametersHolder
 		{
-			private Holder_id_tc26_gost_3410_12_512_paramSetB()
+			Holder_id_tc26_gost_3410_12_512_paramSetB()
 			{
 			}
 
@@ -277,7 +277,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 		internal class Holder_id_tc26_gost_3410_12_512_paramSetC
 			: X9ECParametersHolder
 		{
-			private Holder_id_tc26_gost_3410_12_512_paramSetC()
+			Holder_id_tc26_gost_3410_12_512_paramSetC()
 			{
 			}
 
@@ -310,16 +310,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 			}
 		};
 
-		private static readonly Dictionary<string, DerObjectIdentifier> objIds =
+		static readonly Dictionary<string, DerObjectIdentifier> objIds =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
+		static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
 			new Dictionary<DerObjectIdentifier, X9ECParametersHolder>();
 
-		private static readonly Dictionary<DerObjectIdentifier, string> names =
+		static readonly Dictionary<DerObjectIdentifier, string> names =
 			new Dictionary<DerObjectIdentifier, string>();
 
-		private static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
+		static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
 		{
 			objIds.Add(name, oid);
 			names.Add(oid, name);

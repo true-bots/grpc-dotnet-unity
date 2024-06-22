@@ -8,11 +8,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 	public class DefaultVerifierResult
 		: IVerifier
 	{
-		private readonly ISigner mSigner;
+		readonly ISigner mSigner;
 
 		public DefaultVerifierResult(ISigner signer)
 		{
-			this.mSigner = signer;
+			mSigner = signer;
 		}
 
 		public bool IsVerified(byte[] signature)

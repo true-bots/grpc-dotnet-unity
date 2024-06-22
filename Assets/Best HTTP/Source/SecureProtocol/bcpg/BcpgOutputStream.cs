@@ -22,12 +22,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			return new BcpgOutputStream(outStr);
 		}
 
-		private Stream outStr;
-		private byte[] partialBuffer;
-		private int partialBufferLength;
-		private int partialPower;
-		private int partialOffset;
-		private const int BufferSizePower = 16; // 2^16 size buffer on long files
+		Stream outStr;
+		byte[] partialBuffer;
+		int partialBufferLength;
+		int partialPower;
+		int partialOffset;
+		const int BufferSizePower = 16; // 2^16 size buffer on long files
 
 		/// <summary>Create a stream representing a general packet.</summary>
 		/// <param name="outStr">Output stream to write to.</param>
@@ -35,7 +35,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			Stream outStr)
 		{
 			if (outStr == null)
+			{
 				throw new ArgumentNullException("outStr");
+			}
 
 			this.outStr = outStr;
 		}
@@ -48,10 +50,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			PacketTag tag)
 		{
 			if (outStr == null)
+			{
 				throw new ArgumentNullException("outStr");
+			}
 
 			this.outStr = outStr;
-			this.WriteHeader(tag, true, true, 0);
+			WriteHeader(tag, true, true, 0);
 		}
 
 		/// <summary>Create a stream representing a general packet.</summary>
@@ -66,21 +70,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			bool oldFormat)
 		{
 			if (outStr == null)
+			{
 				throw new ArgumentNullException("outStr");
+			}
 
 			this.outStr = outStr;
 
 			if (length > 0xFFFFFFFFL)
 			{
-				this.WriteHeader(tag, false, true, 0);
-				this.partialBufferLength = 1 << BufferSizePower;
-				this.partialBuffer = new byte[partialBufferLength];
-				this.partialPower = BufferSizePower;
-				this.partialOffset = 0;
+				WriteHeader(tag, false, true, 0);
+				partialBufferLength = 1 << BufferSizePower;
+				partialBuffer = new byte[partialBufferLength];
+				partialPower = BufferSizePower;
+				partialOffset = 0;
 			}
 			else
 			{
-				this.WriteHeader(tag, oldFormat, false, length);
+				WriteHeader(tag, oldFormat, false, length);
 			}
 		}
 
@@ -94,10 +100,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			long length)
 		{
 			if (outStr == null)
+			{
 				throw new ArgumentNullException("outStr");
+			}
 
 			this.outStr = outStr;
-			this.WriteHeader(tag, false, false, length);
+			WriteHeader(tag, false, false, length);
 		}
 
 		/// <summary>Create a new style partial input stream buffered into chunks.</summary>
@@ -110,12 +118,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			byte[] buffer)
 		{
 			if (outStr == null)
+			{
 				throw new ArgumentNullException("outStr");
+			}
 
 			this.outStr = outStr;
-			this.WriteHeader(tag, false, true, 0);
+			WriteHeader(tag, false, true, 0);
 
-			this.partialBuffer = buffer;
+			partialBuffer = buffer;
 
 			uint length = (uint)partialBuffer.Length;
 			for (partialPower = 0; length != 1; partialPower++)
@@ -128,11 +138,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				throw new IOException("Buffer cannot be greater than 2^30 in length.");
 			}
 
-			this.partialBufferLength = 1 << partialPower;
-			this.partialOffset = 0;
+			partialBufferLength = 1 << partialPower;
+			partialOffset = 0;
 		}
 
-		private void WriteNewPacketLength(
+		void WriteNewPacketLength(
 			long bodyLen)
 		{
 			if (bodyLen < 192)
@@ -156,7 +166,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			}
 		}
 
-		private void WriteHeader(
+		void WriteHeader(
 			PacketTag tag,
 			bool oldPackets,
 			bool partial,
@@ -172,39 +182,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 
 			if (oldPackets)
 			{
-				hdr |= ((int)tag) << 2;
+				hdr |= (int)tag << 2;
 
 				if (partial)
 				{
-					this.WriteByte((byte)(hdr | 0x03));
+					WriteByte((byte)(hdr | 0x03));
 				}
 				else
 				{
 					if (bodyLen <= 0xff)
 					{
-						this.WriteByte((byte)hdr);
-						this.WriteByte((byte)bodyLen);
+						WriteByte((byte)hdr);
+						WriteByte((byte)bodyLen);
 					}
 					else if (bodyLen <= 0xffff)
 					{
-						this.WriteByte((byte)(hdr | 0x01));
-						this.WriteByte((byte)(bodyLen >> 8));
-						this.WriteByte((byte)(bodyLen));
+						WriteByte((byte)(hdr | 0x01));
+						WriteByte((byte)(bodyLen >> 8));
+						WriteByte((byte)bodyLen);
 					}
 					else
 					{
-						this.WriteByte((byte)(hdr | 0x02));
-						this.WriteByte((byte)(bodyLen >> 24));
-						this.WriteByte((byte)(bodyLen >> 16));
-						this.WriteByte((byte)(bodyLen >> 8));
-						this.WriteByte((byte)bodyLen);
+						WriteByte((byte)(hdr | 0x02));
+						WriteByte((byte)(bodyLen >> 24));
+						WriteByte((byte)(bodyLen >> 16));
+						WriteByte((byte)(bodyLen >> 8));
+						WriteByte((byte)bodyLen);
 					}
 				}
 			}
 			else
 			{
 				hdr |= 0x40 | (int)tag;
-				this.WriteByte((byte)hdr);
+				WriteByte((byte)hdr);
 
 				if (partial)
 				{
@@ -212,12 +222,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				}
 				else
 				{
-					this.WriteNewPacketLength(bodyLen);
+					WriteNewPacketLength(bodyLen);
 				}
 			}
 		}
 
-		private void PartialFlush()
+		void PartialFlush()
 		{
 			outStr.WriteByte((byte)(0xE0 | partialPower));
 			outStr.Write(partialBuffer, 0, partialBufferLength);
@@ -233,14 +243,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
         }
 #endif
 
-		private void PartialFlushLast()
+		void PartialFlushLast()
 		{
 			WriteNewPacketLength(partialOffset);
 			outStr.Write(partialBuffer, 0, partialOffset);
 			partialOffset = 0;
 		}
 
-		private void PartialWrite(byte[] buffer, int offset, int count)
+		void PartialWrite(byte[] buffer, int offset, int count)
 		{
 			Streams.ValidateBufferArguments(buffer, offset, count);
 
@@ -252,7 +262,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				PartialFlush();
 			}
 
-			if (count <= (partialBufferLength - partialOffset))
+			if (count <= partialBufferLength - partialOffset)
 			{
 				Array.Copy(buffer, offset, partialBuffer, partialOffset, count);
 				partialOffset += count;
@@ -305,7 +315,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
         }
 #endif
 
-		private void PartialWriteByte(byte value)
+		void PartialWriteByte(byte value)
 		{
 			if (partialOffset == partialBufferLength)
 			{
@@ -357,7 +367,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		internal virtual void WriteShort(
 			short n)
 		{
-			this.Write(
+			Write(
 				(byte)(n >> 8),
 				(byte)n);
 		}
@@ -365,7 +375,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		internal virtual void WriteInt(
 			int n)
 		{
-			this.Write(
+			Write(
 				(byte)(n >> 24),
 				(byte)(n >> 16),
 				(byte)(n >> 8),
@@ -375,7 +385,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		internal virtual void WriteLong(
 			long n)
 		{
-			this.Write(
+			Write(
 				(byte)(n >> 56),
 				(byte)(n >> 48),
 				(byte)(n >> 40),
@@ -397,8 +407,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			byte[] body,
 			bool oldFormat)
 		{
-			this.WriteHeader(tag, oldFormat, false, body.Length);
-			this.Write(body);
+			WriteHeader(tag, oldFormat, false, body.Length);
+			Write(body);
 		}
 
 		public void WriteObject(
@@ -437,7 +447,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		{
 			if (disposing)
 			{
-				this.Finish();
+				Finish();
 				outStr.Flush();
 				outStr.Dispose();
 			}

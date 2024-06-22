@@ -22,7 +22,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 	/// </remarks>
 	public static class MacUtilities
 	{
-		private static readonly IDictionary<string, string> Algorithms =
+		static readonly IDictionary<string, string> Algorithms =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 		static MacUtilities()
@@ -90,19 +90,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public static IMac GetMac(string algorithm)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException(nameof(algorithm));
+			}
 
 			string mechanism = CollectionUtilities.GetValueOrKey(Algorithms, algorithm).ToUpperInvariant();
 
-			if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "PBEWITH"))
+			if (Platform.StartsWith(mechanism, "PBEWITH"))
 			{
 				mechanism = mechanism.Substring("PBEWITH".Length);
 			}
 
-			if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "HMAC"))
+			if (Platform.StartsWith(mechanism, "HMAC"))
 			{
 				string digestName;
-				if (Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "HMAC-") || Org.BouncyCastle.Utilities.Platform.StartsWith(mechanism, "HMAC/"))
+				if (Platform.StartsWith(mechanism, "HMAC-") || Platform.StartsWith(mechanism, "HMAC/"))
 				{
 					digestName = mechanism.Substring(5);
 				}

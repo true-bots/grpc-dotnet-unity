@@ -44,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new DistributionPointName((Asn1TaggedObject)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public DistributionPointName(
@@ -74,15 +74,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public DistributionPointName(
 			Asn1TaggedObject obj)
 		{
-			this.type = obj.TagNo;
+			type = obj.TagNo;
 
 			if (type == FullName)
 			{
-				this.name = GeneralNames.GetInstance(obj, false);
+				name = GeneralNames.GetInstance(obj, false);
 			}
 			else
 			{
-				this.name = Asn1Set.GetInstance(obj, false);
+				name = Asn1Set.GetInstance(obj, false);
 			}
 		}
 
@@ -108,7 +108,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return buf.ToString();
 		}
 
-		private void AppendObject(StringBuilder buf, string name, string val)
+		void AppendObject(StringBuilder buf, string name, string val)
 		{
 			string indent = "    ";
 			buf.Append(indent);

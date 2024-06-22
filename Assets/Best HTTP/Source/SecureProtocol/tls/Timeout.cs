@@ -5,10 +5,10 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Date;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-	internal class Timeout
+	class Timeout
 	{
-		private long durationMillis;
-		private long startMillis;
+		long durationMillis;
+		long startMillis;
 
 		internal Timeout(long durationMillis)
 			: this(durationMillis, DateTimeUtilities.CurrentUnixMs())
@@ -18,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal Timeout(long durationMillis, long currentTimeMillis)
 		{
 			this.durationMillis = System.Math.Max(0, durationMillis);
-			this.startMillis = System.Math.Max(0, currentTimeMillis);
+			startMillis = System.Math.Max(0, currentTimeMillis);
 		}
 
 		//internal long RemainingMillis()
@@ -42,7 +42,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 				// Once timeout reached, lock it in
 				if (remaining <= 0)
+				{
 					return durationMillis = 0L;
+				}
 
 				return remaining;
 			}
@@ -56,17 +58,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static int ConstrainWaitMillis(int waitMillis, Timeout timeout, long currentTimeMillis)
 		{
 			if (waitMillis < 0)
+			{
 				return -1;
+			}
 
 			int timeoutMillis = GetWaitMillis(timeout, currentTimeMillis);
 			if (timeoutMillis < 0)
+			{
 				return -1;
+			}
 
 			if (waitMillis == 0)
+			{
 				return timeoutMillis;
+			}
 
 			if (timeoutMillis == 0)
+			{
 				return waitMillis;
+			}
 
 			return System.Math.Min(waitMillis, timeoutMillis);
 		}
@@ -79,10 +89,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static Timeout ForWaitMillis(int waitMillis, long currentTimeMillis)
 		{
 			if (waitMillis < 0)
+			{
 				throw new ArgumentException("cannot be negative", "waitMillis");
+			}
 
 			if (waitMillis > 0)
+			{
 				return new Timeout(waitMillis, currentTimeMillis);
+			}
 
 			return null;
 		}
@@ -95,14 +109,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal static int GetWaitMillis(Timeout timeout, long currentTimeMillis)
 		{
 			if (null == timeout)
+			{
 				return 0;
+			}
 
 			long remainingMillis = timeout.RemainingMillis(currentTimeMillis);
 			if (remainingMillis < 1L)
+			{
 				return -1;
+			}
 
 			if (remainingMillis > int.MaxValue)
+			{
 				return int.MaxValue;
+			}
 
 			return (int)remainingMillis;
 		}

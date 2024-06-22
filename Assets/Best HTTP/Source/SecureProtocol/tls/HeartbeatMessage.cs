@@ -21,22 +21,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return new HeartbeatMessage(type, payload, padding);
 		}
 
-		private readonly short m_type;
-		private readonly byte[] m_payload;
-		private readonly byte[] m_padding;
+		readonly short m_type;
+		readonly byte[] m_payload;
+		readonly byte[] m_padding;
 
 		public HeartbeatMessage(short type, byte[] payload, byte[] padding)
 		{
 			if (!HeartbeatMessageType.IsValid(type))
+			{
 				throw new ArgumentException("not a valid HeartbeatMessageType value", "type");
-			if (null == payload || payload.Length >= (1 << 16))
-				throw new ArgumentException("must have length < 2^16", "payload");
-			if (null == padding || padding.Length < 16)
-				throw new ArgumentException("must have length >= 16", "padding");
+			}
 
-			this.m_type = type;
-			this.m_payload = payload;
-			this.m_padding = padding;
+			if (null == payload || payload.Length >= 1 << 16)
+			{
+				throw new ArgumentException("must have length < 2^16", "payload");
+			}
+
+			if (null == padding || padding.Length < 16)
+			{
+				throw new ArgumentException("must have length >= 16", "padding");
+			}
+
+			m_type = type;
+			m_payload = payload;
+			m_padding = padding;
 		}
 
 		public int PaddingLength
@@ -79,7 +87,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			short type = TlsUtilities.ReadUint8(input);
 			if (!HeartbeatMessageType.IsValid(type))
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			int payload_length = TlsUtilities.ReadUint16(input);
 			byte[] payloadBuffer = Streams.ReadAll(input);
@@ -99,19 +109,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return new HeartbeatMessage(type, payload, padding);
 		}
 
-		private static byte[] GetPayload(byte[] payloadBuffer, int payloadLength)
+		static byte[] GetPayload(byte[] payloadBuffer, int payloadLength)
 		{
 			/*
 			 * RFC 6520 4. The padding_length MUST be at least 16.
 			 */
 			int maxPayloadLength = payloadBuffer.Length - 16;
 			if (payloadLength > maxPayloadLength)
+			{
 				return null;
+			}
 
 			return Arrays.CopyOf(payloadBuffer, payloadLength);
 		}
 
-		private static byte[] GetPadding(byte[] payloadBuffer, int payloadLength)
+		static byte[] GetPadding(byte[] payloadBuffer, int payloadLength)
 		{
 			return TlsUtilities.CopyOfRangeExact(payloadBuffer, payloadLength, payloadBuffer.Length);
 		}

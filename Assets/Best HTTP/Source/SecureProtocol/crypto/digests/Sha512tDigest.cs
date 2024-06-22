@@ -12,11 +12,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class Sha512tDigest
 		: LongDigest
 	{
-		private const ulong A5 = 0xa5a5a5a5a5a5a5a5UL;
+		const ulong A5 = 0xa5a5a5a5a5a5a5a5UL;
 
-		private readonly int digestLength;
+		readonly int digestLength;
 
-		private ulong H1t, H2t, H3t, H4t, H5t, H6t, H7t, H8t;
+		ulong H1t, H2t, H3t, H4t, H5t, H6t, H7t, H8t;
 
 		/**
 		 * Standard constructor
@@ -24,13 +24,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public Sha512tDigest(int bitLength)
 		{
 			if (bitLength >= 512)
+			{
 				throw new ArgumentException("cannot be >= 512", "bitLength");
-			if (bitLength % 8 != 0)
-				throw new ArgumentException("needs to be a multiple of 8", "bitLength");
-			if (bitLength == 384)
-				throw new ArgumentException("cannot be 384 use SHA384 instead", "bitLength");
+			}
 
-			this.digestLength = bitLength / 8;
+			if (bitLength % 8 != 0)
+			{
+				throw new ArgumentException("needs to be a multiple of 8", "bitLength");
+			}
+
+			if (bitLength == 384)
+			{
+				throw new ArgumentException("cannot be 384 use SHA384 instead", "bitLength");
+			}
+
+			digestLength = bitLength / 8;
 
 			tIvGenerate(digestLength * 8);
 
@@ -44,14 +52,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public Sha512tDigest(Sha512tDigest t)
 			: base(t)
 		{
-			this.digestLength = t.digestLength;
+			digestLength = t.digestLength;
 
 			Reset(t);
 		}
 
 		public override string AlgorithmName
 		{
-			get { return "SHA-512/" + (digestLength * 8); }
+			get { return "SHA-512/" + digestLength * 8; }
 		}
 
 		public override int GetDigestSize()
@@ -117,7 +125,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			H8 = H8t;
 		}
 
-		private void tIvGenerate(int bitLength)
+		void tIvGenerate(int bitLength)
 		{
 			H1 = 0x6a09e667f3bcc908UL ^ A5;
 			H2 = 0xbb67ae8584caa73bUL ^ A5;
@@ -168,7 +176,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			H8t = H8;
 		}
 
-		private static void UInt64_To_BE(ulong n, byte[] bs, int off, int max)
+		static void UInt64_To_BE(ulong n, byte[] bs, int off, int max)
 		{
 			if (max > 0)
 			{
@@ -181,7 +189,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private static void UInt32_To_BE(uint n, byte[] bs, int off, int max)
+		static void UInt32_To_BE(uint n, byte[] bs, int off, int max)
 		{
 			int num = System.Math.Min(4, max);
 			while (--num >= 0)
@@ -225,21 +233,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		{
 			Sha512tDigest t = (Sha512tDigest)other;
 
-			if (this.digestLength != t.digestLength)
+			if (digestLength != t.digestLength)
 			{
 				throw new MemoableResetException("digestLength inappropriate in other");
 			}
 
-			base.CopyIn(t);
+			CopyIn(t);
 
-			this.H1t = t.H1t;
-			this.H2t = t.H2t;
-			this.H3t = t.H3t;
-			this.H4t = t.H4t;
-			this.H5t = t.H5t;
-			this.H6t = t.H6t;
-			this.H7t = t.H7t;
-			this.H8t = t.H8t;
+			H1t = t.H1t;
+			H2t = t.H2t;
+			H3t = t.H3t;
+			H4t = t.H4t;
+			H5t = t.H5t;
+			H6t = t.H6t;
+			H7t = t.H7t;
+			H8t = t.H8t;
 		}
 	}
 }

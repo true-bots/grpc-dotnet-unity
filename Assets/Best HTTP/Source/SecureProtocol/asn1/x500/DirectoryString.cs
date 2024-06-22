@@ -8,12 +8,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 	public class DirectoryString
 		: Asn1Encodable, IAsn1Choice, IAsn1String
 	{
-		private readonly DerStringBase str;
+		readonly DerStringBase str;
 
 		public static DirectoryString GetInstance(object obj)
 		{
 			if (obj == null || obj is DirectoryString)
+			{
 				return (DirectoryString)obj;
+			}
 
 			if (obj is DerStringBase)
 			{
@@ -27,7 +29,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 				}
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static DirectoryString GetInstance(
@@ -35,12 +37,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500
 			bool isExplicit)
 		{
 			if (!isExplicit)
+			{
 				throw new ArgumentException("choice item must be explicitly tagged");
+			}
 
 			return GetInstance(obj.GetObject());
 		}
 
-		private DirectoryString(
+		DirectoryString(
 			DerStringBase str)
 		{
 			this.str = str;

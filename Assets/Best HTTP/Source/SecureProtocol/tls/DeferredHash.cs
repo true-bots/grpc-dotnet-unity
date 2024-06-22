@@ -8,25 +8,25 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto;
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	/// <summary>Buffers input until the hash algorithm is determined.</summary>
-	internal sealed class DeferredHash
+	sealed class DeferredHash
 		: TlsHandshakeHash
 	{
-		private const int BufferingHashLimit = 4;
+		const int BufferingHashLimit = 4;
 
-		private readonly TlsContext m_context;
+		readonly TlsContext m_context;
 
-		private DigestInputBuffer m_buf;
-		private IDictionary<int, TlsHash> m_hashes;
-		private bool m_forceBuffering;
-		private bool m_sealed;
+		DigestInputBuffer m_buf;
+		IDictionary<int, TlsHash> m_hashes;
+		bool m_forceBuffering;
+		bool m_sealed;
 
 		internal DeferredHash(TlsContext context)
 		{
-			this.m_context = context;
-			this.m_buf = new DigestInputBuffer();
-			this.m_hashes = new Dictionary<int, TlsHash>();
-			this.m_forceBuffering = false;
-			this.m_sealed = false;
+			m_context = context;
+			m_buf = new DigestInputBuffer();
+			m_hashes = new Dictionary<int, TlsHash>();
+			m_forceBuffering = false;
+			m_sealed = false;
 		}
 
 		/// <exception cref="IOException"/>
@@ -44,9 +44,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public void ForceBuffering()
 		{
 			if (m_sealed)
+			{
 				throw new InvalidOperationException("Too late to force buffering");
+			}
 
-			this.m_forceBuffering = true;
+			m_forceBuffering = true;
 		}
 
 		public void NotifyPrfDetermined()
@@ -73,7 +75,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public void TrackHashAlgorithm(int cryptoHashAlgorithm)
 		{
 			if (m_sealed)
+			{
 				throw new InvalidOperationException("Too late to track more hash algorithms");
+			}
 
 			CheckTrackingHash(cryptoHashAlgorithm);
 		}
@@ -81,9 +85,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public void SealHashAlgorithms()
 		{
 			if (m_sealed)
+			{
 				throw new InvalidOperationException("Already sealed");
+			}
 
-			this.m_sealed = true;
+			m_sealed = true;
 			CheckStopBuffering();
 		}
 
@@ -108,10 +114,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				}
 			}
 
-			this.m_buf = null;
-			this.m_hashes = newHashes;
-			this.m_forceBuffering = false;
-			this.m_sealed = true;
+			m_buf = null;
+			m_hashes = newHashes;
+			m_forceBuffering = false;
+			m_sealed = true;
 		}
 
 		public TlsHash ForkPrfHash()
@@ -148,9 +154,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public byte[] GetFinalHash(int cryptoHashAlgorithm)
 		{
-			if (!m_hashes.TryGetValue(cryptoHashAlgorithm, out var hash))
+			if (!m_hashes.TryGetValue(cryptoHashAlgorithm, out TlsHash hash))
+			{
 				throw new InvalidOperationException("CryptoHashAlgorithm." + cryptoHashAlgorithm
 				                                                           + " is not being tracked");
+			}
 
 			CheckStopBuffering();
 
@@ -217,7 +225,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 		}
 
-		private void CheckStopBuffering()
+		void CheckStopBuffering()
 		{
 			if (!m_forceBuffering && m_sealed && m_buf != null && m_hashes.Count <= BufferingHashLimit)
 			{
@@ -226,11 +234,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					m_buf.UpdateDigest(hash);
 				}
 
-				this.m_buf = null;
+				m_buf = null;
 			}
 		}
 
-		private void CheckTrackingHash(int cryptoHashAlgorithm)
+		void CheckTrackingHash(int cryptoHashAlgorithm)
 		{
 			if (!m_hashes.ContainsKey(cryptoHashAlgorithm))
 			{
@@ -239,12 +247,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 		}
 
-		private TlsHash CloneHash(int cryptoHashAlgorithm)
+		TlsHash CloneHash(int cryptoHashAlgorithm)
 		{
 			return m_hashes[cryptoHashAlgorithm].CloneHash();
 		}
 
-		private void CloneHash(IDictionary<int, TlsHash> newHashes, int cryptoHashAlgorithm)
+		void CloneHash(IDictionary<int, TlsHash> newHashes, int cryptoHashAlgorithm)
 		{
 			TlsHash hash = CloneHash(cryptoHashAlgorithm);
 			if (m_buf != null)

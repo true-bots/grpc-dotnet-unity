@@ -22,7 +22,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual bool VerifyRequests
 		{
 			get { return m_verifyRequests; }
-			set { this.m_verifyRequests = value; }
+			set { m_verifyRequests = value; }
 		}
 
 		/// <exception cref="IOException"/>
@@ -35,9 +35,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual DtlsTransport Accept(TlsServer server, DatagramTransport transport, DtlsRequest request)
 		{
 			if (server == null)
+			{
 				throw new ArgumentNullException("server");
+			}
+
 			if (transport == null)
+			{
 				throw new ArgumentNullException("transport");
+			}
 
 			ServerHandshakeState state = new ServerHandshakeState();
 			state.server = server;
@@ -148,7 +153,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			handshake.HandshakeHash.NotifyPrfDetermined();
 
-			var serverSupplementalData = state.server.GetServerSupplementalData();
+			IList<SupplementalDataEntry> serverSupplementalData = state.server.GetServerSupplementalData();
 			if (serverSupplementalData != null)
 			{
 				byte[] supplementalDataBody = GenerateSupplementalData(serverSupplementalData);
@@ -219,7 +224,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					 * server requests it.
 					 */
 					if (!state.keyExchange.RequiresCertificateVerify)
+					{
 						throw new TlsFatalAlert(AlertDescription.internal_error);
+					}
 				}
 				else
 				{
@@ -423,7 +430,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			ProtocolVersion server_version = state.server.GetServerVersion();
 			{
 				if (!ProtocolVersion.Contains(context.ClientSupportedVersions, server_version))
+				{
 					throw new TlsFatalAlert(AlertDescription.internal_error);
+				}
 
 				// TODO[dtls13] Read draft/RFC for guidance on the legacy_record_version field
 				//ProtocolVersion legacy_record_version = server_version.IsLaterVersionOf(ProtocolVersion.DTLSv12)
@@ -481,7 +490,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				byte[] renegExtData = TlsUtilities.GetExtensionData(state.serverExtensions,
 					ExtensionType.renegotiation_info);
-				bool noRenegExt = (null == renegExtData);
+				bool noRenegExt = null == renegExtData;
 
 				if (noRenegExt)
 				{
@@ -625,7 +634,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		protected virtual void NotifyClientCertificate(ServerHandshakeState state, Certificate clientCertificate)
 		{
 			if (null == state.certificateRequest)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			TlsUtilities.ProcessClientCertificate(state.serverContext, clientCertificate, state.keyExchange,
 				state.server);
@@ -640,7 +651,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				CertificateType = TlsExtensionsUtilities.GetClientCertificateTypeExtensionServer(
 					state.clientExtensions, CertificateType.X509),
-				MaxChainLength = state.server.GetMaxCertificateChainLength(),
+				MaxChainLength = state.server.GetMaxCertificateChainLength()
 			};
 
 			Certificate clientCertificate = Certificate.Parse(options, state.serverContext, buf, null);
@@ -655,7 +666,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			TlsHandshakeHash handshakeHash)
 		{
 			if (state.certificateRequest == null)
+			{
 				throw new InvalidOperationException();
+			}
 
 			MemoryStream buf = new MemoryStream(body, false);
 
@@ -694,7 +707,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			SecurityParameters securityParameters = context.SecurityParameters;
 
 			if (!legacy_version.IsDtls)
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			context.SetRsaPreMasterSecretVersion(legacy_version);
 
@@ -717,7 +732,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 
 			if (!ProtocolVersion.SERVER_EARLIEST_SUPPORTED_DTLS.IsEqualOrEarlierVersionOf(client_version))
+			{
 				throw new TlsFatalAlert(AlertDescription.protocol_version);
+			}
 
 			context.SetClientVersion(client_version);
 
@@ -832,14 +849,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		protected virtual void ProcessClientSupplementalData(ServerHandshakeState state, byte[] body)
 		{
 			MemoryStream buf = new MemoryStream(body, false);
-			var clientSupplementalData = TlsProtocol.ReadSupplementalDataMessage(buf);
+			IList<SupplementalDataEntry> clientSupplementalData = TlsProtocol.ReadSupplementalDataMessage(buf);
 			state.server.ProcessClientSupplementalData(clientSupplementalData);
 		}
 
 		protected virtual bool ExpectCertificateVerifyMessage(ServerHandshakeState state)
 		{
 			if (null == state.certificateRequest)
+			{
 				return false;
+			}
 
 			Certificate clientCertificate = state.serverContext.SecurityParameters.PeerCertificate;
 

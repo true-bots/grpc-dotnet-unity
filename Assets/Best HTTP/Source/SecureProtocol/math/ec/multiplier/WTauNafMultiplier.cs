@@ -27,7 +27,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 		{
 			AbstractF2mPoint p = point as AbstractF2mPoint;
 			if (p == null)
+			{
 				throw new ArgumentException("Only AbstractF2mPoint can be used in WTauNafMultiplier");
+			}
 
 			AbstractF2mCurve curve = (AbstractF2mCurve)p.Curve;
 			int m = curve.FieldSize;
@@ -50,10 +52,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 		* <code>[&#964;]</code>-adic NAF.
 		* @return <code>p</code> multiplied by <code>&#955;</code>.
 		*/
-		private AbstractF2mPoint MultiplyWTnaf(AbstractF2mPoint p, ZTauElement lambda,
+		AbstractF2mPoint MultiplyWTnaf(AbstractF2mPoint p, ZTauElement lambda,
 			sbyte a, sbyte mu)
 		{
-			ZTauElement[] alpha = (a == 0) ? Tnaf.Alpha0 : Tnaf.Alpha1;
+			ZTauElement[] alpha = a == 0 ? Tnaf.Alpha0 : Tnaf.Alpha1;
 
 			BigInteger tw = Tnaf.GetTw(mu, Tnaf.Width);
 
@@ -72,7 +74,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 		* @param u The the WTNAF of <code>&#955;</code>..
 		* @return <code>&#955; * p</code>
 		*/
-		private static AbstractF2mPoint MultiplyFromWTnaf(AbstractF2mPoint p, sbyte[] u)
+		static AbstractF2mPoint MultiplyFromWTnaf(AbstractF2mPoint p, sbyte[] u)
 		{
 			AbstractF2mCurve curve = (AbstractF2mCurve)p.Curve;
 			sbyte a = (sbyte)curve.A.ToBigInteger().IntValue;
@@ -102,7 +104,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 					q = q.TauPow(tauCount);
 					tauCount = 0;
 
-					ECPoint x = ui > 0 ? pu[ui >> 1] : puNeg[(-ui) >> 1];
+					ECPoint x = ui > 0 ? pu[ui >> 1] : puNeg[-ui >> 1];
 					q = (AbstractF2mPoint)q.Add(x);
 				}
 			}
@@ -115,22 +117,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 			return q;
 		}
 
-		private class WTauNafCallback
+		class WTauNafCallback
 			: IPreCompCallback
 		{
-			private readonly AbstractF2mPoint m_p;
-			private readonly sbyte m_a;
+			readonly AbstractF2mPoint m_p;
+			readonly sbyte m_a;
 
 			internal WTauNafCallback(AbstractF2mPoint p, sbyte a)
 			{
-				this.m_p = p;
-				this.m_a = a;
+				m_p = p;
+				m_a = a;
 			}
 
 			public PreCompInfo Precompute(PreCompInfo existing)
 			{
 				if (existing is WTauNafPreCompInfo)
+				{
 					return existing;
+				}
 
 				WTauNafPreCompInfo result = new WTauNafPreCompInfo();
 				result.PreComp = Tnaf.GetPreComp(m_p, m_a);

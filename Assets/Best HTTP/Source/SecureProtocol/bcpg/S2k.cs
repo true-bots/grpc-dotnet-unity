@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class S2k
 		: BcpgObject
 	{
-		private const int ExpBias = 6;
+		const int ExpBias = 6;
 
 		public const int Simple = 0;
 		public const int Salted = 1;
@@ -41,7 +41,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 				{
 					iv = new byte[8];
 					if (Streams.ReadFully(inStr, iv, 0, iv.Length) < iv.Length)
+					{
 						throw new EndOfStreamException();
+					}
 
 					if (type == 3)
 					{
@@ -61,7 +63,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public S2k(
 			HashAlgorithmTag algorithm)
 		{
-			this.type = 0;
+			type = 0;
 			this.algorithm = algorithm;
 		}
 
@@ -69,7 +71,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			HashAlgorithmTag algorithm,
 			byte[] iv)
 		{
-			this.type = 1;
+			type = 1;
 			this.algorithm = algorithm;
 			this.iv = iv;
 		}
@@ -79,7 +81,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			byte[] iv,
 			int itCount)
 		{
-			this.type = 3;
+			type = 3;
 			this.algorithm = algorithm;
 			this.iv = iv;
 			this.itCount = itCount;

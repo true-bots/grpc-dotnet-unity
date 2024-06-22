@@ -17,7 +17,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public override TlsStreamSigner GetStreamSigner(SignatureAndHashAlgorithm algorithm)
 		{
 			if (algorithm == null || SignatureScheme.From(algorithm) != SignatureScheme.ed25519)
+			{
 				throw new InvalidOperationException("Invalid algorithm: " + algorithm);
+			}
 
 			Ed25519Signer signer = new Ed25519Signer();
 			signer.Init(true, m_privateKey);

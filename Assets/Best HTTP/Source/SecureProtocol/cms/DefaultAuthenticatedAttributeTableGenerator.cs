@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class DefaultAuthenticatedAttributeTableGenerator
 		: CmsAttributeTableGenerator
 	{
-		private readonly IDictionary<DerObjectIdentifier, object> m_table;
+		readonly IDictionary<DerObjectIdentifier, object> m_table;
 
 		/**
 		 * Initialise to use all defaults
@@ -54,7 +54,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		protected virtual IDictionary<DerObjectIdentifier, object> CreateStandardAttributeTable(
 			IDictionary<CmsAttributeTableParameter, object> parameters)
 		{
-			var std = new Dictionary<DerObjectIdentifier, object>(m_table);
+			Dictionary<DerObjectIdentifier, object> std = new Dictionary<DerObjectIdentifier, object>(m_table);
 
 			if (!std.ContainsKey(CmsAttributes.ContentType))
 			{
@@ -82,7 +82,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 */
 		public virtual AttributeTable GetAttributes(IDictionary<CmsAttributeTableParameter, object> parameters)
 		{
-			var table = CreateStandardAttributeTable(parameters);
+			IDictionary<DerObjectIdentifier, object> table = CreateStandardAttributeTable(parameters);
 			return new AttributeTable(table);
 		}
 	}

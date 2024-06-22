@@ -24,7 +24,7 @@ namespace BestHTTP.Extensions
 
 		public override long Length
 		{
-			get { return this._length; }
+			get { return _length; }
 		}
 
 		protected long _length;
@@ -37,14 +37,16 @@ namespace BestHTTP.Extensions
 
 		protected List<BufferSegment> bufferList = new List<BufferSegment>();
 
-		private byte[] _tempByteArray = new byte[1];
+		byte[] _tempByteArray = new byte[1];
 
 		public override int ReadByte()
 		{
-			if (Read(this._tempByteArray, 0, 1) == 0)
+			if (Read(_tempByteArray, 0, 1) == 0)
+			{
 				return -1;
+			}
 
-			return this._tempByteArray[0];
+			return _tempByteArray[0];
 		}
 
 		public override int Read(byte[] buffer, int offset, int count)
@@ -53,7 +55,7 @@ namespace BestHTTP.Extensions
 
 			while (count > 0 && bufferList.Count > 0)
 			{
-				BufferSegment buff = this.bufferList[0];
+				BufferSegment buff = bufferList[0];
 
 				int readCount = Math.Min(count, buff.Count);
 
@@ -63,16 +65,16 @@ namespace BestHTTP.Extensions
 				offset += readCount;
 				count -= readCount;
 
-				this.bufferList[0] = buff = buff.Slice(buff.Offset + readCount);
+				bufferList[0] = buff = buff.Slice(buff.Offset + readCount);
 
 				if (buff.Count == 0)
 				{
-					this.bufferList.RemoveAt(0);
+					bufferList.RemoveAt(0);
 					BufferPool.Release(buff.Data);
 				}
 			}
 
-			this._length -= sumReadCount;
+			_length -= sumReadCount;
 
 			return sumReadCount;
 		}
@@ -84,16 +86,19 @@ namespace BestHTTP.Extensions
 
 		public virtual void Write(BufferSegment bufferSegment)
 		{
-			this.bufferList.Add(bufferSegment);
-			this._length += bufferSegment.Count;
+			bufferList.Add(bufferSegment);
+			_length += bufferSegment.Count;
 		}
 
 		public virtual void Reset()
 		{
-			for (int i = 0; i < this.bufferList.Count; ++i)
-				BufferPool.Release(this.bufferList[i]);
-			this.bufferList.Clear();
-			this._length = 0;
+			for (int i = 0; i < bufferList.Count; ++i)
+			{
+				BufferPool.Release(bufferList[i]);
+			}
+
+			bufferList.Clear();
+			_length = 0;
 		}
 
 		protected override void Dispose(bool disposing)

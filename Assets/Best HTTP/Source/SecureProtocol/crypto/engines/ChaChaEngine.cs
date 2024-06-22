@@ -59,8 +59,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		{
 			if (keyBytes != null)
 			{
-				if ((keyBytes.Length != 16) && (keyBytes.Length != 32))
+				if (keyBytes.Length != 16 && keyBytes.Length != 32)
+				{
 					throw new ArgumentException(AlgorithmName + " requires 128 bit or 256 bit key");
+				}
 
 				PackTauOrSigma(keyBytes.Length, engineState, 0);
 

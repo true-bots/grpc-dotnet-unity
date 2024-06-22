@@ -10,14 +10,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes.Gcm
 	{
 		// A lookup table of the power-of-two powers of 'x'
 		// - lookupPowX2[i] = x^(2^i)
-		private IList<GcmUtilities.FieldElement> lookupPowX2;
+		IList<GcmUtilities.FieldElement> lookupPowX2;
 
 		public void Init(byte[] x)
 		{
 			GcmUtilities.FieldElement y;
 			GcmUtilities.AsFieldElement(x, out y);
 			if (lookupPowX2 != null && y.Equals(lookupPowX2[0]))
+			{
 				return;
+			}
 
 			lookupPowX2 = new List<GcmUtilities.FieldElement>(8);
 			lookupPowX2.Add(y);
@@ -44,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes.Gcm
 			GcmUtilities.AsBytes(ref y, output);
 		}
 
-		private void EnsureAvailable(int bit)
+		void EnsureAvailable(int bit)
 		{
 			int count = lookupPowX2.Count;
 			if (count <= bit)

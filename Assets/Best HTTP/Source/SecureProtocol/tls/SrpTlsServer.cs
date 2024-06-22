@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class SrpTlsServer
 		: AbstractTlsServer
 	{
-		private static readonly int[] DefaultCipherSuites = new int[]
+		static readonly int[] DefaultCipherSuites = new int[]
 		{
 			CipherSuite.TLS_SRP_SHA_DSS_WITH_AES_256_CBC_SHA,
 			CipherSuite.TLS_SRP_SHA_DSS_WITH_AES_128_CBC_SHA,
@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public SrpTlsServer(TlsCrypto crypto, TlsSrpIdentityManager srpIdentityManager)
 			: base(crypto)
 		{
-			this.m_srpIdentityManager = srpIdentityManager;
+			m_srpIdentityManager = srpIdentityManager;
 		}
 
 		/// <exception cref="IOException"/>
@@ -57,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			base.ProcessClientExtensions(clientExtensions);
 
-			this.m_srpIdentity = TlsSrpUtilities.GetSrpExtension(clientExtensions);
+			m_srpIdentity = TlsSrpUtilities.GetSrpExtension(clientExtensions);
 		}
 
 		public override int GetSelectedCipherSuite()
@@ -68,11 +68,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				if (m_srpIdentity != null)
 				{
-					this.m_srpLoginParameters = m_srpIdentityManager.GetLoginParameters(m_srpIdentity);
+					m_srpLoginParameters = m_srpIdentityManager.GetLoginParameters(m_srpIdentity);
 				}
 
 				if (m_srpLoginParameters == null)
+				{
 					throw new TlsFatalAlert(AlertDescription.unknown_psk_identity);
+				}
 			}
 
 			return cipherSuite;

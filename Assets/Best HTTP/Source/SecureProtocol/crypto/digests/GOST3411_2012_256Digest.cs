@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 {
 	public class Gost3411_2012_256Digest : Gost3411_2012Digest
 	{
-		private readonly static byte[] IV =
+		static readonly byte[] IV =
 		{
 			0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
 			0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,

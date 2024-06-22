@@ -15,22 +15,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		: IStreamCipher
 	{
 		// Constants
-		private static readonly int sizeL = 8,
+		static readonly int sizeL = 8,
 			stateArraySize = sizeL << 5; // 256
 
 		// Cipher's internal state
-		private uint[] engineState = null, // mm                
+		uint[] engineState = null, // mm                
 			results = null; // randrsl
 
-		private uint a = 0, b = 0, c = 0;
+		uint a = 0, b = 0, c = 0;
 
 		// Engine state
-		private int index = 0;
+		int index = 0;
 
-		private byte[] keyStream = new byte[stateArraySize << 2], // results expanded into bytes
+		byte[] keyStream = new byte[stateArraySize << 2], // results expanded into bytes
 			workingKey = null;
 
-		private bool initialised = false;
+		bool initialised = false;
 
 		/**
 		* initialise an ISAAC cipher.
@@ -45,9 +45,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
+			{
 				throw new ArgumentException(
-					"invalid parameter passed to ISAAC Init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters),
+					"invalid parameter passed to ISAAC Init - " + Platform.GetTypeName(parameters),
 					"parameters");
+			}
 
 			/*
 			 * ISAAC encryption and decryption is completely
@@ -81,7 +83,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int outOff)
 		{
 			if (!initialised)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
 
 			Check.DataLength(input, inOff, len, "input buffer too short");
 			Check.OutputLength(output, outOff, len, "output buffer too short");
@@ -131,7 +135,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 
 		// Private implementation
-		private void setKey(
+		void setKey(
 			byte[] keyBytes)
 		{
 			workingKey = keyBytes;
@@ -186,7 +190,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					for (k = 0; k < sizeL; k++)
 					{
-						abcdefgh[k] += (i < 1) ? results[j + k] : engineState[j + k];
+						abcdefgh[k] += i < 1 ? results[j + k] : engineState[j + k];
 					}
 
 					mix(abcdefgh);
@@ -203,7 +207,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			initialised = true;
 		}
 
-		private void isaac()
+		void isaac()
 		{
 			uint x, y;
 
@@ -214,16 +218,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				switch (i & 3)
 				{
 					case 0:
-						a ^= (a << 13);
+						a ^= a << 13;
 						break;
 					case 1:
-						a ^= (a >> 6);
+						a ^= a >> 6;
 						break;
 					case 2:
-						a ^= (a << 2);
+						a ^= a << 2;
 						break;
 					case 3:
-						a ^= (a >> 16);
+						a ^= a >> 16;
 						break;
 				}
 
@@ -233,7 +237,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void mix(uint[] x)
+		void mix(uint[] x)
 		{
 			x[0] ^= x[1] << 11;
 			x[3] += x[0];

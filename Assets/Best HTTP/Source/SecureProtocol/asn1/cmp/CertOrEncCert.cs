@@ -12,18 +12,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static CertOrEncCert GetInstance(object obj)
 		{
 			if (obj is CertOrEncCert certOrEncCert)
+			{
 				return certOrEncCert;
+			}
 
 			if (obj is Asn1TaggedObject taggedObject)
+			{
 				return new CertOrEncCert(taggedObject);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), nameof(obj));
 		}
 
-		private readonly CmpCertificate m_certificate;
-		private readonly EncryptedKey m_encryptedCert;
+		readonly CmpCertificate m_certificate;
+		readonly EncryptedKey m_encryptedCert;
 
-		private CertOrEncCert(Asn1TaggedObject taggedObject)
+		CertOrEncCert(Asn1TaggedObject taggedObject)
 		{
 			if (taggedObject.TagNo == 0)
 			{
@@ -42,7 +46,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public CertOrEncCert(CmpCertificate certificate)
 		{
 			if (certificate == null)
+			{
 				throw new ArgumentNullException(nameof(certificate));
+			}
 
 			m_certificate = certificate;
 		}
@@ -50,7 +56,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public CertOrEncCert(EncryptedValue encryptedValue)
 		{
 			if (encryptedValue == null)
+			{
 				throw new ArgumentNullException(nameof(encryptedValue));
+			}
 
 			m_encryptedCert = new EncryptedKey(encryptedValue);
 		}
@@ -58,14 +66,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public CertOrEncCert(EncryptedKey encryptedKey)
 		{
 			if (encryptedKey == null)
+			{
 				throw new ArgumentNullException(nameof(encryptedKey));
+			}
 
 			m_encryptedCert = encryptedKey;
 		}
 
-		public virtual CmpCertificate Certificate => m_certificate;
+		public virtual CmpCertificate Certificate
+		{
+			get { return m_certificate; }
+		}
 
-		public virtual EncryptedKey EncryptedCert => m_encryptedCert;
+		public virtual EncryptedKey EncryptedCert
+		{
+			get { return m_encryptedCert; }
+		}
 
 		/**
 		 * <pre>
@@ -79,7 +95,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public override Asn1Object ToAsn1Object()
 		{
 			if (m_certificate != null)
+			{
 				return new DerTaggedObject(true, 0, m_certificate);
+			}
 
 			return new DerTaggedObject(true, 1, m_encryptedCert);
 		}

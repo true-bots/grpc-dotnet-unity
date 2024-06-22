@@ -22,39 +22,48 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class SignaturePolicyId
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier sigPolicyIdentifier;
-		private readonly OtherHashAlgAndValue sigPolicyHash;
-		private readonly Asn1Sequence sigPolicyQualifiers;
+		readonly DerObjectIdentifier sigPolicyIdentifier;
+		readonly OtherHashAlgAndValue sigPolicyHash;
+		readonly Asn1Sequence sigPolicyQualifiers;
 
 		public static SignaturePolicyId GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is SignaturePolicyId)
+			{
 				return (SignaturePolicyId)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new SignaturePolicyId((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'SignaturePolicyId' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
-		private SignaturePolicyId(
+		SignaturePolicyId(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
-			if (seq.Count < 2 || seq.Count > 3)
-				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
-			this.sigPolicyIdentifier = (DerObjectIdentifier)seq[0].ToAsn1Object();
-			this.sigPolicyHash = OtherHashAlgAndValue.GetInstance(seq[1].ToAsn1Object());
+			if (seq.Count < 2 || seq.Count > 3)
+			{
+				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
+
+			sigPolicyIdentifier = (DerObjectIdentifier)seq[0].ToAsn1Object();
+			sigPolicyHash = OtherHashAlgAndValue.GetInstance(seq[1].ToAsn1Object());
 
 			if (seq.Count > 2)
 			{
-				this.sigPolicyQualifiers = (Asn1Sequence)seq[2].ToAsn1Object();
+				sigPolicyQualifiers = (Asn1Sequence)seq[2].ToAsn1Object();
 			}
 		}
 
@@ -71,9 +80,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			params SigPolicyQualifierInfo[] sigPolicyQualifiers)
 		{
 			if (sigPolicyIdentifier == null)
+			{
 				throw new ArgumentNullException("sigPolicyIdentifier");
+			}
+
 			if (sigPolicyHash == null)
+			{
 				throw new ArgumentNullException("sigPolicyHash");
+			}
 
 			this.sigPolicyIdentifier = sigPolicyIdentifier;
 			this.sigPolicyHash = sigPolicyHash;
@@ -90,9 +104,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			IEnumerable<SigPolicyQualifierInfo> sigPolicyQualifiers)
 		{
 			if (sigPolicyIdentifier == null)
+			{
 				throw new ArgumentNullException("sigPolicyIdentifier");
+			}
+
 			if (sigPolicyHash == null)
+			{
 				throw new ArgumentNullException("sigPolicyHash");
+			}
 
 			this.sigPolicyIdentifier = sigPolicyIdentifier;
 			this.sigPolicyHash = sigPolicyHash;
@@ -117,7 +136,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 		public SigPolicyQualifierInfo[] GetSigPolicyQualifiers()
 		{
 			if (sigPolicyQualifiers == null)
+			{
 				return null;
+			}
 
 			SigPolicyQualifierInfo[] infos = new SigPolicyQualifierInfo[sigPolicyQualifiers.Count];
 			for (int i = 0; i < sigPolicyQualifiers.Count; ++i)

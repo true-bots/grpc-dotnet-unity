@@ -18,10 +18,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
 	public class BiometricData
 		: Asn1Encodable
 	{
-		private readonly TypeOfBiometricData typeOfBiometricData;
-		private readonly AlgorithmIdentifier hashAlgorithm;
-		private readonly Asn1OctetString biometricDataHash;
-		private readonly DerIA5String sourceDataUri;
+		readonly TypeOfBiometricData typeOfBiometricData;
+		readonly AlgorithmIdentifier hashAlgorithm;
+		readonly Asn1OctetString biometricDataHash;
+		readonly DerIA5String sourceDataUri;
 
 		public static BiometricData GetInstance(
 			object obj)
@@ -36,10 +36,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
 				return new BiometricData(Asn1Sequence.GetInstance(obj));
 			}
 
-			throw new ArgumentException("unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private BiometricData(
+		BiometricData(
 			Asn1Sequence seq)
 		{
 			typeOfBiometricData = TypeOfBiometricData.GetInstance(seq[0]);
@@ -72,7 +72,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
 			this.typeOfBiometricData = typeOfBiometricData;
 			this.hashAlgorithm = hashAlgorithm;
 			this.biometricDataHash = biometricDataHash;
-			this.sourceDataUri = null;
+			sourceDataUri = null;
 		}
 
 		public TypeOfBiometricData TypeOfBiometricData

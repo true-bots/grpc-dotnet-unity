@@ -32,10 +32,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		protected override void SetKey(byte[] keyBytes, byte[] ivBytes)
 		{
 			if (keyBytes == null)
+			{
 				throw new ArgumentException(AlgorithmName + " doesn't support re-init with null key");
+			}
 
 			if (keyBytes.Length != 32)
+			{
 				throw new ArgumentException(AlgorithmName + " requires a 256 bit key");
+			}
 
 			// Set key for HSalsa20
 			base.SetKey(keyBytes, ivBytes);

@@ -62,30 +62,30 @@ namespace BestHTTP.SignalRCore.Messages
 
 		public override string ToString()
 		{
-			switch (this.type)
+			switch (type)
 			{
 				case MessageTypes.Handshake:
-					return string.Format("[Handshake Error: '{0}'", this.error);
+					return string.Format("[Handshake Error: '{0}'", error);
 				case MessageTypes.Invocation:
-					return string.Format("[Invocation Id: {0}, Target: '{1}', Argument count: {2}, Stream Ids: {3}]", this.invocationId, this.target,
-						this.arguments != null ? this.arguments.Length : 0, this.streamIds != null ? this.streamIds.Length : 0);
+					return string.Format("[Invocation Id: {0}, Target: '{1}', Argument count: {2}, Stream Ids: {3}]", invocationId, target,
+						arguments != null ? arguments.Length : 0, streamIds != null ? streamIds.Length : 0);
 				case MessageTypes.StreamItem:
-					return string.Format("[StreamItem Id: {0}, Item: {1}]", this.invocationId, this.item.ToString());
+					return string.Format("[StreamItem Id: {0}, Item: {1}]", invocationId, item.ToString());
 				case MessageTypes.Completion:
-					return string.Format("[Completion Id: {0}, Result: {1}, Error: '{2}']", this.invocationId, this.result, this.error);
+					return string.Format("[Completion Id: {0}, Result: {1}, Error: '{2}']", invocationId, result, error);
 				case MessageTypes.StreamInvocation:
-					return string.Format("[StreamInvocation Id: {0}, Target: '{1}', Argument count: {2}]", this.invocationId, this.target,
-						this.arguments != null ? this.arguments.Length : 0);
+					return string.Format("[StreamInvocation Id: {0}, Target: '{1}', Argument count: {2}]", invocationId, target,
+						arguments != null ? arguments.Length : 0);
 				case MessageTypes.CancelInvocation:
-					return string.Format("[CancelInvocation Id: {0}]", this.invocationId);
+					return string.Format("[CancelInvocation Id: {0}]", invocationId);
 				case MessageTypes.Ping:
 					return "[Ping]";
 				case MessageTypes.Close:
-					return string.IsNullOrEmpty(this.error)
-						? string.Format("[Close allowReconnect: {0}]", this.allowReconnect)
-						: string.Format("[Close Error: '{0}', allowReconnect: {1}]", this.error, this.allowReconnect);
+					return string.IsNullOrEmpty(error)
+						? string.Format("[Close allowReconnect: {0}]", allowReconnect)
+						: string.Format("[Close Error: '{0}', allowReconnect: {1}]", error, allowReconnect);
 				default:
-					return "Unknown message! Type: " + this.type;
+					return "Unknown message! Type: " + type;
 			}
 		}
 	}

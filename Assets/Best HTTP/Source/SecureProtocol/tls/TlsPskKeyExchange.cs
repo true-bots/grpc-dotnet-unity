@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class TlsPskKeyExchange
 		: AbstractTlsKeyExchange
 	{
-		private static int CheckKeyExchange(int keyExchange)
+		static int CheckKeyExchange(int keyExchange)
 		{
 			switch (keyExchange)
 			{
@@ -51,77 +51,89 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 		}
 
-		private TlsPskKeyExchange(int keyExchange, TlsPskIdentity pskIdentity, TlsPskIdentityManager pskIdentityManager,
+		TlsPskKeyExchange(int keyExchange, TlsPskIdentity pskIdentity, TlsPskIdentityManager pskIdentityManager,
 			TlsDHGroupVerifier dhGroupVerifier, TlsDHConfig dhConfig, TlsECConfig ecConfig)
 			: base(CheckKeyExchange(keyExchange))
 		{
-			this.m_pskIdentity = pskIdentity;
-			this.m_pskIdentityManager = pskIdentityManager;
-			this.m_dhGroupVerifier = dhGroupVerifier;
-			this.m_dhConfig = dhConfig;
-			this.m_ecConfig = ecConfig;
+			m_pskIdentity = pskIdentity;
+			m_pskIdentityManager = pskIdentityManager;
+			m_dhGroupVerifier = dhGroupVerifier;
+			m_dhConfig = dhConfig;
+			m_ecConfig = ecConfig;
 		}
 
 		public override void SkipServerCredentials()
 		{
 			if (m_keyExchange == KeyExchangeAlgorithm.RSA_PSK)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 		}
 
 		public override void ProcessServerCredentials(TlsCredentials serverCredentials)
 		{
 			if (m_keyExchange != KeyExchangeAlgorithm.RSA_PSK)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
-			this.m_serverCredentials = TlsUtilities.RequireDecryptorCredentials(serverCredentials);
+			m_serverCredentials = TlsUtilities.RequireDecryptorCredentials(serverCredentials);
 		}
 
 		public override void ProcessServerCertificate(Certificate serverCertificate)
 		{
 			if (m_keyExchange != KeyExchangeAlgorithm.RSA_PSK)
+			{
 				throw new TlsFatalAlert(AlertDescription.unexpected_message);
+			}
 
-			this.m_serverEncryptor = serverCertificate.GetCertificateAt(0).CreateEncryptor(
+			m_serverEncryptor = serverCertificate.GetCertificateAt(0).CreateEncryptor(
 				TlsCertificateRole.RsaEncryption);
 		}
 
 		public override byte[] GenerateServerKeyExchange()
 		{
-			this.m_psk_identity_hint = m_pskIdentityManager.GetHint();
+			m_psk_identity_hint = m_pskIdentityManager.GetHint();
 
-			if (this.m_psk_identity_hint == null && !RequiresServerKeyExchange)
+			if (m_psk_identity_hint == null && !RequiresServerKeyExchange)
+			{
 				return null;
+			}
 
 			MemoryStream buf = new MemoryStream();
 
-			if (this.m_psk_identity_hint == null)
+			if (m_psk_identity_hint == null)
 			{
 				TlsUtilities.WriteOpaque16(TlsUtilities.EmptyBytes, buf);
 			}
 			else
 			{
-				TlsUtilities.WriteOpaque16(this.m_psk_identity_hint, buf);
+				TlsUtilities.WriteOpaque16(m_psk_identity_hint, buf);
 			}
 
-			if (this.m_keyExchange == KeyExchangeAlgorithm.DHE_PSK)
+			if (m_keyExchange == KeyExchangeAlgorithm.DHE_PSK)
 			{
-				if (this.m_dhConfig == null)
+				if (m_dhConfig == null)
+				{
 					throw new TlsFatalAlert(AlertDescription.internal_error);
+				}
 
 				TlsDHUtilities.WriteDHConfig(m_dhConfig, buf);
 
-				this.m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
+				m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
 
 				GenerateEphemeralDH(buf);
 			}
-			else if (this.m_keyExchange == KeyExchangeAlgorithm.ECDHE_PSK)
+			else if (m_keyExchange == KeyExchangeAlgorithm.ECDHE_PSK)
 			{
-				if (this.m_ecConfig == null)
+				if (m_ecConfig == null)
+				{
 					throw new TlsFatalAlert(AlertDescription.internal_error);
+				}
 
 				TlsEccUtilities.WriteECConfig(m_ecConfig, buf);
 
-				this.m_agreement = m_context.Crypto.CreateECDomain(m_ecConfig).CreateECDH();
+				m_agreement = m_context.Crypto.CreateECDomain(m_ecConfig).CreateECDH();
 
 				GenerateEphemeralECDH(buf);
 			}
@@ -146,25 +158,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public override void ProcessServerKeyExchange(Stream input)
 		{
-			this.m_psk_identity_hint = TlsUtilities.ReadOpaque16(input);
+			m_psk_identity_hint = TlsUtilities.ReadOpaque16(input);
 
-			if (this.m_keyExchange == KeyExchangeAlgorithm.DHE_PSK)
+			if (m_keyExchange == KeyExchangeAlgorithm.DHE_PSK)
 			{
-				this.m_dhConfig = TlsDHUtilities.ReceiveDHConfig(m_context, m_dhGroupVerifier, input);
+				m_dhConfig = TlsDHUtilities.ReceiveDHConfig(m_context, m_dhGroupVerifier, input);
 
 				byte[] y = TlsUtilities.ReadOpaque16(input, 1);
 
-				this.m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
+				m_agreement = m_context.Crypto.CreateDHDomain(m_dhConfig).CreateDH();
 
 				ProcessEphemeralDH(y);
 			}
-			else if (this.m_keyExchange == KeyExchangeAlgorithm.ECDHE_PSK)
+			else if (m_keyExchange == KeyExchangeAlgorithm.ECDHE_PSK)
 			{
-				this.m_ecConfig = TlsEccUtilities.ReceiveECDHConfig(m_context, input);
+				m_ecConfig = TlsEccUtilities.ReceiveECDHConfig(m_context, input);
 
 				byte[] point = TlsUtilities.ReadOpaque8(input, 1);
 
-				this.m_agreement = m_context.Crypto.CreateECDomain(m_ecConfig).CreateECDH();
+				m_agreement = m_context.Crypto.CreateECDomain(m_ecConfig).CreateECDH();
 
 				ProcessEphemeralECDH(point);
 			}
@@ -188,27 +200,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			byte[] psk_identity = m_pskIdentity.GetPskIdentity();
 			if (psk_identity == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
-			this.m_psk = m_pskIdentity.GetPsk();
+			m_psk = m_pskIdentity.GetPsk();
 			if (m_psk == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			TlsUtilities.WriteOpaque16(psk_identity, output);
 
 			m_context.SecurityParameters.m_pskIdentity = Arrays.Clone(psk_identity);
 
-			if (this.m_keyExchange == KeyExchangeAlgorithm.DHE_PSK)
+			if (m_keyExchange == KeyExchangeAlgorithm.DHE_PSK)
 			{
 				GenerateEphemeralDH(output);
 			}
-			else if (this.m_keyExchange == KeyExchangeAlgorithm.ECDHE_PSK)
+			else if (m_keyExchange == KeyExchangeAlgorithm.ECDHE_PSK)
 			{
 				GenerateEphemeralECDH(output);
 			}
-			else if (this.m_keyExchange == KeyExchangeAlgorithm.RSA_PSK)
+			else if (m_keyExchange == KeyExchangeAlgorithm.RSA_PSK)
 			{
-				this.m_preMasterSecret = TlsUtilities.GenerateEncryptedPreMasterSecret(m_context, m_serverEncryptor,
+				m_preMasterSecret = TlsUtilities.GenerateEncryptedPreMasterSecret(m_context, m_serverEncryptor,
 					output);
 			}
 		}
@@ -217,29 +233,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			byte[] psk_identity = TlsUtilities.ReadOpaque16(input);
 
-			this.m_psk = m_pskIdentityManager.GetPsk(psk_identity);
+			m_psk = m_pskIdentityManager.GetPsk(psk_identity);
 			if (m_psk == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.unknown_psk_identity);
+			}
 
 			m_context.SecurityParameters.m_pskIdentity = psk_identity;
 
-			if (this.m_keyExchange == KeyExchangeAlgorithm.DHE_PSK)
+			if (m_keyExchange == KeyExchangeAlgorithm.DHE_PSK)
 			{
 				byte[] y = TlsUtilities.ReadOpaque16(input, 1);
 
 				ProcessEphemeralDH(y);
 			}
-			else if (this.m_keyExchange == KeyExchangeAlgorithm.ECDHE_PSK)
+			else if (m_keyExchange == KeyExchangeAlgorithm.ECDHE_PSK)
 			{
 				byte[] point = TlsUtilities.ReadOpaque8(input, 1);
 
 				ProcessEphemeralECDH(point);
 			}
-			else if (this.m_keyExchange == KeyExchangeAlgorithm.RSA_PSK)
+			else if (m_keyExchange == KeyExchangeAlgorithm.RSA_PSK)
 			{
 				byte[] encryptedPreMasterSecret = TlsUtilities.ReadEncryptedPms(m_context, input);
 
-				this.m_preMasterSecret = m_serverCredentials.Decrypt(new TlsCryptoParameters(m_context),
+				m_preMasterSecret = m_serverCredentials.Decrypt(new TlsCryptoParameters(m_context),
 					encryptedPreMasterSecret);
 			}
 		}
@@ -253,7 +271,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			TlsUtilities.WriteOpaque16(m_psk, buf);
 
 			Array.Clear(m_psk, 0, m_psk.Length);
-			this.m_psk = null;
+			m_psk = null;
 
 			return m_context.Crypto.CreateSecret(buf.ToArray());
 		}
@@ -272,20 +290,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		protected virtual byte[] GenerateOtherSecret(int pskLength)
 		{
-			if (this.m_keyExchange == KeyExchangeAlgorithm.PSK)
-				return new byte[pskLength];
-
-			if (this.m_keyExchange == KeyExchangeAlgorithm.DHE_PSK ||
-			    this.m_keyExchange == KeyExchangeAlgorithm.ECDHE_PSK)
+			if (m_keyExchange == KeyExchangeAlgorithm.PSK)
 			{
-				if (m_agreement != null)
-					return m_agreement.CalculateSecret().Extract();
+				return new byte[pskLength];
 			}
 
-			if (this.m_keyExchange == KeyExchangeAlgorithm.RSA_PSK)
+			if (m_keyExchange == KeyExchangeAlgorithm.DHE_PSK ||
+			    m_keyExchange == KeyExchangeAlgorithm.ECDHE_PSK)
+			{
+				if (m_agreement != null)
+				{
+					return m_agreement.CalculateSecret().Extract();
+				}
+			}
+
+			if (m_keyExchange == KeyExchangeAlgorithm.RSA_PSK)
 			{
 				if (m_preMasterSecret != null)
-					return this.m_preMasterSecret.Extract();
+				{
+					return m_preMasterSecret.Extract();
+				}
 			}
 
 			throw new TlsFatalAlert(AlertDescription.internal_error);
@@ -293,14 +317,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		protected virtual void ProcessEphemeralDH(byte[] y)
 		{
-			this.m_agreement.ReceivePeerValue(y);
+			m_agreement.ReceivePeerValue(y);
 		}
 
 		protected virtual void ProcessEphemeralECDH(byte[] point)
 		{
 			TlsEccUtilities.CheckPointEncoding(m_ecConfig.NamedGroup, point);
 
-			this.m_agreement.ReceivePeerValue(point);
+			m_agreement.ReceivePeerValue(point);
 		}
 	}
 }

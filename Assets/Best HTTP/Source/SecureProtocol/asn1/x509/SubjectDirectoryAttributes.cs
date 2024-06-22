@@ -29,7 +29,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class SubjectDirectoryAttributes
 		: Asn1Encodable
 	{
-		private readonly IList<AttributeX509> m_attributes;
+		readonly IList<AttributeX509> m_attributes;
 
 		public static SubjectDirectoryAttributes GetInstance(
 			object obj)
@@ -44,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new SubjectDirectoryAttributes((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -68,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * @param seq
 		 *            The ASN.1 sequence.
 		 */
-		private SubjectDirectoryAttributes(
+		SubjectDirectoryAttributes(
 			Asn1Sequence seq)
 		{
 			m_attributes = new List<AttributeX509>();

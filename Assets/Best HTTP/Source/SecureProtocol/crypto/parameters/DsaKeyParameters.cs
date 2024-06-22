@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public abstract class DsaKeyParameters
 		: AsymmetricKeyParameter
 	{
-		private readonly DsaParameters parameters;
+		readonly DsaParameters parameters;
 
 		protected DsaKeyParameters(
 			bool isPrivate,
@@ -28,12 +28,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			DsaKeyParameters other = obj as DsaKeyParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

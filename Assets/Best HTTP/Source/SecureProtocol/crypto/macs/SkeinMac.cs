@@ -39,7 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		/// </summary>
 		public const int SKEIN_1024 = SkeinEngine.SKEIN_1024;
 
-		private readonly SkeinEngine engine;
+		readonly SkeinEngine engine;
 
 		/// <summary>
 		/// Constructs a Skein MAC with an internal state size and output size.
@@ -50,17 +50,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		///                      bytes.</param>
 		public SkeinMac(int stateSizeBits, int digestSizeBits)
 		{
-			this.engine = new SkeinEngine(stateSizeBits, digestSizeBits);
+			engine = new SkeinEngine(stateSizeBits, digestSizeBits);
 		}
 
 		public SkeinMac(SkeinMac mac)
 		{
-			this.engine = new SkeinEngine(mac.engine);
+			engine = new SkeinEngine(mac.engine);
 		}
 
 		public string AlgorithmName
 		{
-			get { return "Skein-MAC-" + (engine.BlockSize * 8) + "-" + (engine.OutputSize * 8); }
+			get { return "Skein-MAC-" + engine.BlockSize * 8 + "-" + engine.OutputSize * 8; }
 		}
 
 		/// <summary>
@@ -82,7 +82,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			else
 			{
 				throw new ArgumentException("Invalid parameter passed to Skein MAC init - "
-				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Platform.GetTypeName(parameters));
 			}
 
 			if (skeinParameters.GetKey() == null)

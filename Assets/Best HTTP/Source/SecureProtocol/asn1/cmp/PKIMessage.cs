@@ -7,12 +7,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 	public class PkiMessage
 		: Asn1Encodable
 	{
-		private readonly PkiHeader header;
-		private readonly PkiBody body;
-		private readonly DerBitString protection;
-		private readonly Asn1Sequence extraCerts;
+		readonly PkiHeader header;
+		readonly PkiBody body;
+		readonly DerBitString protection;
+		readonly Asn1Sequence extraCerts;
 
-		private PkiMessage(Asn1Sequence seq)
+		PkiMessage(Asn1Sequence seq)
 		{
 			header = PkiHeader.GetInstance(seq[0]);
 			body = PkiBody.GetInstance(seq[1]);
@@ -35,10 +35,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static PkiMessage GetInstance(object obj)
 		{
 			if (obj is PkiMessage)
+			{
 				return (PkiMessage)obj;
+			}
 
 			if (obj != null)
+			{
 				return new PkiMessage(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
@@ -99,7 +103,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public virtual CmpCertificate[] GetExtraCerts()
 		{
 			if (extraCerts == null)
+			{
 				return null;
+			}
 
 			CmpCertificate[] results = new CmpCertificate[extraCerts.Count];
 			for (int i = 0; i < results.Length; ++i)

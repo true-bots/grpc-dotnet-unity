@@ -72,16 +72,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		/// </summary>
 		public const int PARAM_TYPE_OUTPUT = 63;
 
-		private IDictionary<int, byte[]> m_parameters;
+		IDictionary<int, byte[]> m_parameters;
 
 		public SkeinParameters()
 			: this(new Dictionary<int, byte[]>())
 		{
 		}
 
-		private SkeinParameters(IDictionary<int, byte[]> parameters)
+		SkeinParameters(IDictionary<int, byte[]> parameters)
 		{
-			this.m_parameters = parameters;
+			m_parameters = parameters;
 		}
 
 		/// <summary>
@@ -143,7 +143,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		/// </summary>
 		public class Builder
 		{
-			private Dictionary<int, byte[]> m_parameters;
+			Dictionary<int, byte[]> m_parameters;
 
 			public Builder()
 			{
@@ -180,7 +180,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 					throw new ArgumentException("Parameter value must not be null.");
 				}
 
-				if ((type != PARAM_TYPE_KEY)
+				if (type != PARAM_TYPE_KEY
 				    && (type <= PARAM_TYPE_CONFIG || type >= PARAM_TYPE_OUTPUT || type == PARAM_TYPE_MESSAGE))
 				{
 					throw new ArgumentException("Parameter types must be in the range 0,5..47,49..62.");
@@ -228,7 +228,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 				try
 				{
 					MemoryStream bout = new MemoryStream();
-					using (var outBytes = new StreamWriter(bout, System.Text.Encoding.UTF8))
+					using (StreamWriter outBytes = new StreamWriter(bout, System.Text.Encoding.UTF8))
 					{
 						outBytes.Write(date.ToString("YYYYMMDD", CultureInfo.InvariantCulture));
 						outBytes.Write(" ");

@@ -10,33 +10,33 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	/// <summary>An implementation of the TLS 1.0/1.1/1.2 record layer.</summary>
-	internal sealed class RecordStream
+	sealed class RecordStream
 	{
-		private const int DefaultPlaintextLimit = (1 << 14);
+		const int DefaultPlaintextLimit = 1 << 14;
 
-		private readonly Record m_inputRecord = new Record();
-		private readonly SequenceNumber m_readSeqNo = new SequenceNumber(), m_writeSeqNo = new SequenceNumber();
+		readonly Record m_inputRecord = new Record();
+		readonly SequenceNumber m_readSeqNo = new SequenceNumber(), m_writeSeqNo = new SequenceNumber();
 
-		private readonly TlsProtocol m_handler;
-		private readonly Stream m_input;
-		private readonly Stream m_output;
+		readonly TlsProtocol m_handler;
+		readonly Stream m_input;
+		readonly Stream m_output;
 
-		private TlsCipher m_pendingCipher = null;
-		private TlsCipher m_readCipher = TlsNullNullCipher.Instance;
-		private TlsCipher m_readCipherDeferred = null;
-		private TlsCipher m_writeCipher = TlsNullNullCipher.Instance;
+		TlsCipher m_pendingCipher = null;
+		TlsCipher m_readCipher = TlsNullNullCipher.Instance;
+		TlsCipher m_readCipherDeferred = null;
+		TlsCipher m_writeCipher = TlsNullNullCipher.Instance;
 
-		private ProtocolVersion m_writeVersion = null;
+		ProtocolVersion m_writeVersion = null;
 
-		private int m_plaintextLimit = DefaultPlaintextLimit;
-		private int m_ciphertextLimit = DefaultPlaintextLimit;
-		private bool m_ignoreChangeCipherSpec = false;
+		int m_plaintextLimit = DefaultPlaintextLimit;
+		int m_ciphertextLimit = DefaultPlaintextLimit;
+		bool m_ignoreChangeCipherSpec = false;
 
 		internal RecordStream(TlsProtocol handler, Stream input, Stream output)
 		{
-			this.m_handler = handler;
-			this.m_input = input;
-			this.m_output = output;
+			m_handler = handler;
+			m_input = input;
+			m_output = output;
 		}
 
 		internal int PlaintextLimit
@@ -46,30 +46,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		internal void SetPlaintextLimit(int plaintextLimit)
 		{
-			this.m_plaintextLimit = plaintextLimit;
-			this.m_ciphertextLimit = m_readCipher.GetCiphertextDecodeLimit(plaintextLimit);
+			m_plaintextLimit = plaintextLimit;
+			m_ciphertextLimit = m_readCipher.GetCiphertextDecodeLimit(plaintextLimit);
 		}
 
 		internal void SetWriteVersion(ProtocolVersion writeVersion)
 		{
-			this.m_writeVersion = writeVersion;
+			m_writeVersion = writeVersion;
 		}
 
 		internal void SetIgnoreChangeCipherSpec(bool ignoreChangeCipherSpec)
 		{
-			this.m_ignoreChangeCipherSpec = ignoreChangeCipherSpec;
+			m_ignoreChangeCipherSpec = ignoreChangeCipherSpec;
 		}
 
 		internal void SetPendingCipher(TlsCipher tlsCipher)
 		{
-			this.m_pendingCipher = tlsCipher;
+			m_pendingCipher = tlsCipher;
 		}
 
 		/// <exception cref="IOException"/>
 		internal void NotifyChangeCipherSpecReceived()
 		{
 			if (m_pendingCipher == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.unexpected_message, "No pending cipher");
+			}
 
 			EnablePendingCipherRead(false);
 		}
@@ -78,19 +80,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal void EnablePendingCipherRead(bool deferred)
 		{
 			if (m_pendingCipher == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			if (m_readCipherDeferred != null)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			if (deferred)
 			{
-				this.m_readCipherDeferred = m_pendingCipher;
+				m_readCipherDeferred = m_pendingCipher;
 			}
 			else
 			{
-				this.m_readCipher = m_pendingCipher;
-				this.m_ciphertextLimit = m_readCipher.GetCiphertextDecodeLimit(m_plaintextLimit);
+				m_readCipher = m_pendingCipher;
+				m_ciphertextLimit = m_readCipher.GetCiphertextDecodeLimit(m_plaintextLimit);
 				m_readSeqNo.Reset();
 			}
 		}
@@ -99,9 +105,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal void EnablePendingCipherWrite()
 		{
 			if (m_pendingCipher == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
-			this.m_writeCipher = this.m_pendingCipher;
+			m_writeCipher = m_pendingCipher;
 			m_writeSeqNo.Reset();
 		}
 
@@ -109,14 +117,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal void FinaliseHandshake()
 		{
 			if (m_readCipher != m_pendingCipher || m_writeCipher != m_pendingCipher)
+			{
 				throw new TlsFatalAlert(AlertDescription.handshake_failure);
+			}
 
-			this.m_pendingCipher = null;
+			m_pendingCipher = null;
 		}
 
 		internal bool NeedsKeyUpdate()
 		{
-			return m_writeSeqNo.CurrentValue >= (1L << 20);
+			return m_writeSeqNo.CurrentValue >= 1L << 20;
 		}
 
 		/// <exception cref="IOException"/>
@@ -175,11 +185,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal bool ReadFullRecord(byte[] input, int inputOff, int inputLen)
 		{
 			if (inputLen < RecordFormat.FragmentOffset)
+			{
 				return false;
+			}
 
 			int length = TlsUtilities.ReadUint16(input, inputOff + RecordFormat.LengthOffset);
-			if (inputLen != (RecordFormat.FragmentOffset + length))
+			if (inputLen != RecordFormat.FragmentOffset + length)
+			{
 				return false;
+			}
 
 			short recordType = CheckRecordType(input, inputOff + RecordFormat.TypeOffset);
 
@@ -204,7 +218,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal bool ReadRecord()
 		{
 			if (!m_inputRecord.ReadHeader(m_input))
+			{
 				return false;
+			}
 
 			short recordType = CheckRecordType(m_inputRecord.m_buf, RecordFormat.TypeOffset);
 
@@ -232,7 +248,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				m_handler.ProcessRecord(decoded.contentType, decoded.buf, decoded.off, decoded.len);
 
 				if (decoded.fromBufferPool)
-					BestHTTP.PlatformSupport.Memory.BufferPool.Release(decoded.buf);
+				{
+					BufferPool.Release(decoded.buf);
+				}
 			}
 			finally
 			{
@@ -257,7 +275,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			 * or ChangeCipherSpec content types.
 			 */
 			if (decoded.len < 1 && decoded.contentType != ContentType.application_data)
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			return decoded;
 		}
@@ -270,7 +290,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 #else
 			// Never send anything until a valid ClientHello has been received
 			if (m_writeVersion == null)
+			{
 				return;
+			}
 
 			/*
 			 * RFC 5246 6.2.1 The length should not exceed 2^14.
@@ -282,7 +304,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			 * or ChangeCipherSpec content types.
 			 */
 			if (plaintextLength < 1 && contentType != ContentType.application_data)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			long seqNo = m_writeSeqNo.NextValue(AlertDescription.internal_error);
 			ProtocolVersion recordVersion = m_writeVersion;
@@ -309,7 +333,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			finally
 			{
 				if (encoded.fromBufferPool)
+				{
 					BufferPool.Release(encoded.buf);
+				}
 			}
 
 			m_output.Flush();
@@ -396,11 +422,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 
 			if (io != null)
+			{
 				throw io;
+			}
 		}
 
 		/// <exception cref="IOException"/>
-		private void CheckChangeCipherSpec(byte[] buf, int off, int len)
+		void CheckChangeCipherSpec(byte[] buf, int off, int len)
 		{
 			if (1 != len || (byte)ChangeCipherSpec.change_cipher_spec != buf[off])
 			{
@@ -410,15 +438,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private short CheckRecordType(byte[] buf, int off)
+		short CheckRecordType(byte[] buf, int off)
 		{
 			short recordType = TlsUtilities.ReadUint8(buf, off);
 
 			if (null != m_readCipherDeferred && recordType == ContentType.application_data)
 			{
-				this.m_readCipher = m_readCipherDeferred;
-				this.m_readCipherDeferred = null;
-				this.m_ciphertextLimit = m_readCipher.GetCiphertextDecodeLimit(m_plaintextLimit);
+				m_readCipher = m_readCipherDeferred;
+				m_readCipherDeferred = null;
+				m_ciphertextLimit = m_readCipher.GetCiphertextDecodeLimit(m_plaintextLimit);
 				m_readSeqNo.Reset();
 			}
 			else if (m_readCipher.UsesOpaqueRecordType)
@@ -465,23 +493,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private static void CheckLength(int length, int limit, short alertDescription)
+		static void CheckLength(int length, int limit, short alertDescription)
 		{
 			if (length > limit)
+			{
 				throw new TlsFatalAlert(alertDescription);
+			}
 		}
 
-		private sealed class Record
+		sealed class Record
 		{
-			private readonly byte[] m_header = new byte[RecordFormat.FragmentOffset];
+			readonly byte[] m_header = new byte[RecordFormat.FragmentOffset];
 
 			internal volatile byte[] m_buf;
 			internal volatile int m_pos;
 
 			internal Record()
 			{
-				this.m_buf = m_header;
-				this.m_pos = 0;
+				m_buf = m_header;
+				m_pos = 0;
 			}
 
 			/// <exception cref="IOException"/>
@@ -494,7 +524,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					//{
 					int numRead = input.Read(m_buf, m_pos, length - m_pos);
 					if (numRead < 1)
+					{
 						break;
+					}
 
 					m_pos += numRead;
 					//}
@@ -524,7 +556,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				Resize(recordLength);
 				FillTo(input, recordLength);
 				if (m_pos < recordLength)
+				{
 					throw new EndOfStreamException();
+				}
 			}
 
 			/// <exception cref="IOException"/>
@@ -532,10 +566,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				FillTo(input, RecordFormat.FragmentOffset);
 				if (m_pos == 0)
+				{
 					return false;
+				}
 
 				if (m_pos < RecordFormat.FragmentOffset)
+				{
 					throw new EndOfStreamException();
+				}
 
 				return true;
 			}
@@ -543,13 +581,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			internal void Reset()
 			{
 				if (m_buf != m_header)
+				{
 					BufferPool.Release(m_buf);
+				}
 
 				m_buf = m_header;
 				m_pos = 0;
 			}
 
-			private void Resize(int length)
+			void Resize(int length)
 			{
 				if (m_buf.Length < length)
 				{
@@ -561,22 +601,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					Array.Copy(m_buf, 0, tmp, 0, m_pos);
 
 					if (m_buf != m_header)
+					{
 						BufferPool.Release(m_buf);
+					}
+
 					m_buf = tmp;
 				}
 			}
 		}
 
-		private sealed class SequenceNumber
+		sealed class SequenceNumber
 		{
-			private long m_value = 0L;
-			private bool m_exhausted = false;
+			long m_value = 0L;
+			bool m_exhausted = false;
 
 			internal long CurrentValue
 			{
 				get
 				{
-					lock (this) return m_value;
+					lock (this)
+					{
+						return m_value;
+					}
 				}
 			}
 
@@ -586,12 +632,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				lock (this)
 				{
 					if (m_exhausted)
+					{
 						throw new TlsFatalAlert(alertDescription, "Sequence numbers exhausted");
+					}
 
 					long result = m_value;
 					if (++m_value == 0L)
 					{
-						this.m_exhausted = true;
+						m_exhausted = true;
 					}
 
 					return result;
@@ -602,8 +650,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				lock (this)
 				{
-					this.m_value = 0L;
-					this.m_exhausted = false;
+					m_value = 0L;
+					m_exhausted = false;
 				}
 			}
 		}

@@ -9,9 +9,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 	public class RegTokenControl
 		: IControl
 	{
-		private static readonly DerObjectIdentifier type = CrmfObjectIdentifiers.id_regCtrl_regToken;
+		static readonly DerObjectIdentifier type = CrmfObjectIdentifiers.id_regCtrl_regToken;
 
-		private readonly DerUtf8String token;
+		readonly DerUtf8String token;
 
 		/// <summary>
 		/// Basic constructor - build from a UTF-8 string representing the token.

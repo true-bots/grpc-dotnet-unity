@@ -4,7 +4,7 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Field
 {
-	internal class PrimeField
+	class PrimeField
 		: IFiniteField
 	{
 		protected readonly BigInteger characteristic;

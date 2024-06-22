@@ -58,7 +58,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 		}
 
-		private static SignatureAndHashAlgorithm GetInstanceIntrinsic(short signatureAlgorithm)
+		static SignatureAndHashAlgorithm GetInstanceIntrinsic(short signatureAlgorithm)
 		{
 			switch (signatureAlgorithm)
 			{
@@ -93,20 +93,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 		}
 
-		private static SignatureAndHashAlgorithm Create(int signatureScheme)
+		static SignatureAndHashAlgorithm Create(int signatureScheme)
 		{
 			short hashAlgorithm = SignatureScheme.GetHashAlgorithm(signatureScheme);
 			short signatureAlgorithm = SignatureScheme.GetSignatureAlgorithm(signatureScheme);
 			return Create(hashAlgorithm, signatureAlgorithm);
 		}
 
-		private static SignatureAndHashAlgorithm Create(short hashAlgorithm, short signatureAlgorithm)
+		static SignatureAndHashAlgorithm Create(short hashAlgorithm, short signatureAlgorithm)
 		{
 			return new SignatureAndHashAlgorithm(hashAlgorithm, signatureAlgorithm);
 		}
 
-		private readonly short m_hash;
-		private readonly short m_signature;
+		readonly short m_hash;
+		readonly short m_signature;
 
 		/// <param name="hash"><see cref="HashAlgorithm"/></param>
 		/// <param name="signature"><see cref="SignatureAlgorithm"/></param>
@@ -120,14 +120,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			//if (!TlsUtilities.IsValidUint8(hash))
 			if ((hash & 0xFF) != hash)
+			{
 				throw new ArgumentException("should be a uint8", "hash");
+			}
 
 			//if (!TlsUtilities.IsValidUint8(signature))
 			if ((signature & 0xFF) != signature)
+			{
 				throw new ArgumentException("should be a uint8", "signature");
+			}
 
-			this.m_hash = hash;
-			this.m_signature = signature;
+			m_hash = hash;
+			m_signature = signature;
 		}
 
 		/// <returns><see cref="HashAlgorithm"/></returns>
@@ -166,7 +170,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public override bool Equals(object obj)
 		{
 			if (!(obj is SignatureAndHashAlgorithm))
+			{
 				return false;
+			}
 
 			SignatureAndHashAlgorithm other = (SignatureAndHashAlgorithm)obj;
 			return other.Hash == Hash && other.Signature == Signature;

@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public sealed class BlowfishEngine
 		: IBlockCipher
 	{
-		private readonly static uint[] KP =
+		static readonly uint[] KP =
 			{
 				0x243F6A88, 0x85A308D3, 0x13198A2E, 0x03707344,
 				0xA4093822, 0x299F31D0, 0x082EFA98, 0xEC4E6C89,
@@ -297,17 +297,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		// Useful constants
 		//====================================
 
-		private static readonly int ROUNDS = 16;
-		private const int BLOCK_SIZE = 8; // bytes = 64 bits
-		private static readonly int SBOX_SK = 256;
-		private static readonly int P_SZ = ROUNDS + 2;
+		static readonly int ROUNDS = 16;
+		const int BLOCK_SIZE = 8; // bytes = 64 bits
+		static readonly int SBOX_SK = 256;
+		static readonly int P_SZ = ROUNDS + 2;
 
-		private readonly uint[] S0, S1, S2, S3; // the s-boxes
-		private readonly uint[] P; // the p-array
+		readonly uint[] S0, S1, S2, S3; // the s-boxes
+		readonly uint[] P; // the p-array
 
-		private bool encrypting;
+		bool encrypting;
 
-		private byte[] workingKey;
+		byte[] workingKey;
 
 		public BlowfishEngine()
 		{
@@ -331,11 +331,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
-				throw new ArgumentException("invalid parameter passed to Blowfish init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			{
+				throw new ArgumentException("invalid parameter passed to Blowfish init - " + Platform.GetTypeName(parameters));
+			}
 
-			this.encrypting = forEncryption;
-			this.workingKey = ((KeyParameter)parameters).GetKey();
-			SetKey(this.workingKey);
+			encrypting = forEncryption;
+			workingKey = ((KeyParameter)parameters).GetKey();
+			SetKey(workingKey);
 		}
 
 		public string AlgorithmName
@@ -346,7 +348,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (workingKey == null)
+			{
 				throw new InvalidOperationException("Blowfish not initialised");
+			}
 
 			Check.DataLength(input, inOff, BLOCK_SIZE, "input buffer too short");
 			Check.OutputLength(output, outOff, BLOCK_SIZE, "output buffer too short");
@@ -405,15 +409,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		// Private Implementation
 		//==================================
 
-		private uint F(uint x)
+		uint F(uint x)
 		{
-			return (((S0[x >> 24] + S1[(x >> 16) & 0xff]) ^ S2[(x >> 8) & 0xff]) + S3[x & 0xff]);
+			return ((S0[x >> 24] + S1[(x >> 16) & 0xff]) ^ S2[(x >> 8) & 0xff]) + S3[x & 0xff];
 		}
 
 		/**
 		* apply the encryption cycle to each value pair in the table.
 		*/
-		private void ProcessTable(
+		void ProcessTable(
 			uint xl,
 			uint xr,
 			uint[] table)
@@ -440,7 +444,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void SetKey(byte[] key)
+		void SetKey(byte[] key)
 		{
 			if (key.Length < 4 || key.Length > 56)
 			{
@@ -560,7 +564,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			Pack.UInt32_To_BE(xl, output[4..]);
 		}
 #else
-		private void EncryptBlock(byte[] src, int srcIndex, byte[] dst, int dstIndex)
+		void EncryptBlock(byte[] src, int srcIndex, byte[] dst, int dstIndex)
 		{
 			uint xl = Pack.BE_To_UInt32(src, srcIndex);
 			uint xr = Pack.BE_To_UInt32(src, srcIndex + 4);
@@ -579,7 +583,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			Pack.UInt32_To_BE(xl, dst, dstIndex + 4);
 		}
 
-		private void DecryptBlock(byte[] src, int srcIndex, byte[] dst, int dstIndex)
+		void DecryptBlock(byte[] src, int srcIndex, byte[] dst, int dstIndex)
 		{
 			uint xl = Pack.BE_To_UInt32(src, srcIndex);
 			uint xr = Pack.BE_To_UInt32(src, srcIndex + 4);

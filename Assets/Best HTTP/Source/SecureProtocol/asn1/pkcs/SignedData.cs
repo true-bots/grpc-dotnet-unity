@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 {
@@ -10,20 +11,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class SignedData
 		: Asn1Encodable
 	{
-		private readonly DerInteger version;
-		private readonly Asn1Set digestAlgorithms;
-		private readonly ContentInfo contentInfo;
-		private readonly Asn1Set certificates;
-		private readonly Asn1Set crls;
-		private readonly Asn1Set signerInfos;
+		readonly DerInteger version;
+		readonly Asn1Set digestAlgorithms;
+		readonly ContentInfo contentInfo;
+		readonly Asn1Set certificates;
+		readonly Asn1Set crls;
+		readonly Asn1Set signerInfos;
 
 		public static SignedData GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
+
 			SignedData existing = obj as SignedData;
 			if (existing != null)
+			{
 				return existing;
+			}
+
 			return new SignedData(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -43,10 +50,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			signerInfos = _signerInfos;
 		}
 
-		private SignedData(
+		SignedData(
 			Asn1Sequence seq)
 		{
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
 			e.MoveNext();
 			version = (DerInteger)e.Current;

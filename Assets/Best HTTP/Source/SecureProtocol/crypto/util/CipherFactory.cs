@@ -18,11 +18,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 {
 	public class CipherFactory
 	{
-		private CipherFactory()
+		CipherFactory()
 		{
 		}
 
-		private static readonly short[] rc2Ekb =
+		static readonly short[] rc2Ekb =
 		{
 			0x5d, 0xbe, 0x9b, 0x8b, 0x11, 0x99, 0x6e, 0x4d, 0x59, 0xf3, 0x85, 0xa6, 0x3f, 0xb7, 0x83, 0xc5,
 			0xe4, 0x73, 0x6b, 0x3a, 0x68, 0x5a, 0xc0, 0x47, 0xa0, 0x64, 0x34, 0x0c, 0xf1, 0xd0, 0x52, 0xa5,
@@ -110,7 +110,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 			}
 		}
 
-		private static BufferedBlockCipher CreateCipher(DerObjectIdentifier algorithm)
+		static BufferedBlockCipher CreateCipher(DerObjectIdentifier algorithm)
 		{
 			IBlockCipherMode cipher;
 

@@ -34,27 +34,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 	public class DataGroupHash
 		: Asn1Encodable
 	{
-		private readonly DerInteger dataGroupNumber;
-		private readonly Asn1OctetString dataGroupHashValue;
+		readonly DerInteger dataGroupNumber;
+		readonly Asn1OctetString dataGroupHashValue;
 
 		public static DataGroupHash GetInstance(object obj)
 		{
 			if (obj is DataGroupHash)
+			{
 				return (DataGroupHash)obj;
+			}
 
 			if (obj != null)
+			{
 				return new DataGroupHash(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private DataGroupHash(Asn1Sequence seq)
+		DataGroupHash(Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
-			this.dataGroupNumber = DerInteger.GetInstance(seq[0]);
-			this.dataGroupHashValue = Asn1OctetString.GetInstance(seq[1]);
+			dataGroupNumber = DerInteger.GetInstance(seq[0]);
+			dataGroupHashValue = Asn1OctetString.GetInstance(seq[1]);
 		}
 
 		public DataGroupHash(

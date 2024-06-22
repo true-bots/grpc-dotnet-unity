@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public class BerBitString
 		: DerBitString
 	{
-		private const int DefaultSegmentLimit = 1000;
+		const int DefaultSegmentLimit = 1000;
 
 		internal static byte[] FlattenBitStrings(DerBitString[] bitStrings)
 		{
@@ -27,7 +27,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 					{
 						byte[] elementContents = bitStrings[i].contents;
 						if (elementContents[0] != 0)
+						{
 							throw new ArgumentException("only the last nested bitstring can have padding", "bitStrings");
+						}
 
 						totalLength += elementContents.Length - 1;
 					}
@@ -55,14 +57,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private readonly int segmentLimit;
-		private readonly DerBitString[] elements;
+		readonly int segmentLimit;
+		readonly DerBitString[] elements;
 
 		public BerBitString(byte data, int padBits)
 			: base(data, padBits)
 		{
-			this.elements = null;
-			this.segmentLimit = DefaultSegmentLimit;
+			elements = null;
+			segmentLimit = DefaultSegmentLimit;
 		}
 
 		public BerBitString(byte[] data)
@@ -78,15 +80,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public BerBitString(byte[] data, int padBits, int segmentLimit)
 			: base(data, padBits)
 		{
-			this.elements = null;
+			elements = null;
 			this.segmentLimit = segmentLimit;
 		}
 
 		public BerBitString(int namedBits)
 			: base(namedBits)
 		{
-			this.elements = null;
-			this.segmentLimit = DefaultSegmentLimit;
+			elements = null;
+			segmentLimit = DefaultSegmentLimit;
 		}
 
 		public BerBitString(Asn1Encodable obj)
@@ -109,17 +111,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal BerBitString(byte[] contents, bool check)
 			: base(contents, check)
 		{
-			this.elements = null;
-			this.segmentLimit = DefaultSegmentLimit;
+			elements = null;
+			segmentLimit = DefaultSegmentLimit;
 		}
 
 		internal override IAsn1Encoding GetEncoding(int encoding)
 		{
 			if (Asn1OutputStream.EncodingBer != encoding)
+			{
 				return base.GetEncoding(encoding);
+			}
 
 			if (null == elements)
+			{
 				return new PrimitiveEncoding(Asn1Tags.Universal, Asn1Tags.BitString, contents);
+			}
 
 			return new ConstructedILEncoding(Asn1Tags.Universal, Asn1Tags.BitString,
 				Asn1OutputStream.GetContentsEncodings(encoding, elements));
@@ -128,10 +134,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncodingImplicit(int encoding, int tagClass, int tagNo)
 		{
 			if (Asn1OutputStream.EncodingBer != encoding)
+			{
 				return base.GetEncodingImplicit(encoding, tagClass, tagNo);
+			}
 
 			if (null == elements)
+			{
 				return new PrimitiveEncoding(tagClass, tagNo, contents);
+			}
 
 			return new ConstructedILEncoding(tagClass, tagNo,
 				Asn1OutputStream.GetContentsEncodings(encoding, elements));

@@ -32,64 +32,64 @@ namespace BestHTTP.Core
 
 		public ConnectionEventInfo(ConnectionBase sourceConn, ConnectionEvents @event)
 		{
-			this.Source = sourceConn;
-			this.Event = @event;
+			Source = sourceConn;
+			Event = @event;
 
-			this.State = HTTPConnectionStates.Initial;
+			State = HTTPConnectionStates.Initial;
 
-			this.ProtocolSupport = HostProtocolSupport.Unknown;
+			ProtocolSupport = HostProtocolSupport.Unknown;
 
-			this.Request = null;
+			Request = null;
 		}
 
 		public ConnectionEventInfo(ConnectionBase sourceConn, HTTPConnectionStates newState)
 		{
-			this.Source = sourceConn;
+			Source = sourceConn;
 
-			this.Event = ConnectionEvents.StateChange;
+			Event = ConnectionEvents.StateChange;
 
-			this.State = newState;
+			State = newState;
 
-			this.ProtocolSupport = HostProtocolSupport.Unknown;
+			ProtocolSupport = HostProtocolSupport.Unknown;
 
-			this.Request = null;
+			Request = null;
 		}
 
 		public ConnectionEventInfo(ConnectionBase sourceConn, HostProtocolSupport protocolSupport)
 		{
-			this.Source = sourceConn;
-			this.Event = ConnectionEvents.ProtocolSupport;
+			Source = sourceConn;
+			Event = ConnectionEvents.ProtocolSupport;
 
-			this.State = HTTPConnectionStates.Initial;
+			State = HTTPConnectionStates.Initial;
 
-			this.ProtocolSupport = protocolSupport;
+			ProtocolSupport = protocolSupport;
 
-			this.Request = null;
+			Request = null;
 		}
 
 		public ConnectionEventInfo(ConnectionBase sourceConn, HTTPRequest request)
 		{
-			this.Source = sourceConn;
+			Source = sourceConn;
 
-			this.Event = ConnectionEvents.StateChange;
+			Event = ConnectionEvents.StateChange;
 
-			this.State = HTTPConnectionStates.ClosedResendRequest;
+			State = HTTPConnectionStates.ClosedResendRequest;
 
-			this.ProtocolSupport = HostProtocolSupport.Unknown;
+			ProtocolSupport = HostProtocolSupport.Unknown;
 
-			this.Request = request;
+			Request = request;
 		}
 
 		public override string ToString()
 		{
 			return string.Format("[ConnectionEventInfo SourceConnection: {0}, Event: {1}, State: {2}, ProtocolSupport: {3}]",
-				this.Source.ToString(), this.Event, this.State, this.ProtocolSupport);
+				Source.ToString(), Event, State, ProtocolSupport);
 		}
 	}
 
 	public static class ConnectionEventHelper
 	{
-		private static ConcurrentQueue<ConnectionEventInfo> connectionEventQueue = new ConcurrentQueue<ConnectionEventInfo>();
+		static ConcurrentQueue<ConnectionEventInfo> connectionEventQueue = new ConcurrentQueue<ConnectionEventInfo>();
 
 #pragma warning disable 0649
 		public static Action<ConnectionEventInfo> OnEvent;
@@ -98,7 +98,9 @@ namespace BestHTTP.Core
 		public static void EnqueueConnectionEvent(ConnectionEventInfo @event)
 		{
 			if (HTTPManager.Logger.Level == Loglevels.All)
+			{
 				HTTPManager.Logger.Information("ConnectionEventHelper", "Enqueue connection event: " + @event.ToString(), @event.Source.Context);
+			}
 
 			connectionEventQueue.Enqueue(@event);
 		}
@@ -114,7 +116,9 @@ namespace BestHTTP.Core
 			while (connectionEventQueue.TryDequeue(out connectionEvent))
 			{
 				if (HTTPManager.Logger.Level == Loglevels.All)
+				{
 					HTTPManager.Logger.Information("ConnectionEventHelper", "Processing connection event: " + connectionEvent.ToString(), connectionEvent.Source.Context);
+				}
 
 				if (OnEvent != null)
 				{
@@ -131,7 +135,7 @@ namespace BestHTTP.Core
 				if (connectionEvent.Source.LastProcessedUri == null)
 				{
 					HTTPManager.Logger.Information("ConnectionEventHelper",
-						String.Format("Ignoring ConnectionEventInfo({0}) because its LastProcessedUri is null!", connectionEvent.ToString()),
+						string.Format("Ignoring ConnectionEventInfo({0}) because its LastProcessedUri is null!", connectionEvent.ToString()),
 						connectionEvent.Source.Context);
 					return;
 				}
@@ -151,11 +155,11 @@ namespace BestHTTP.Core
 			}
 		}
 
-		private static void HandleConnectionStateChange(ConnectionEventInfo @event)
+		static void HandleConnectionStateChange(ConnectionEventInfo @event)
 		{
 			try
 			{
-				var connection = @event.Source;
+				ConnectionBase connection = @event.Source;
 
 				switch (@event.State)
 				{
@@ -177,7 +181,9 @@ namespace BestHTTP.Core
 					case HTTPConnectionStates.ClosedResendRequest:
 						// in case of ClosedResendRequest
 						if (@event.Request != null)
+						{
 							RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(@event.Request, RequestEvents.Resend));
+						}
 
 						HostManager.GetHost(connection.LastProcessedUri.Host)
 							.GetHostDefinition(connection.ServerAddress)

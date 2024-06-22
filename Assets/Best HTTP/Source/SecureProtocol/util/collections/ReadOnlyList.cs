@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections
 {
-	internal abstract class ReadOnlyList<T>
+	abstract class ReadOnlyList<T>
 		: IList<T>
 	{
 		public T this[int index]
@@ -19,13 +19,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections
 			return GetEnumerator();
 		}
 
-		public bool IsReadOnly => true;
+		public bool IsReadOnly
+		{
+			get { return true; }
+		}
 
-		public void Add(T item) => throw new NotSupportedException();
-		public void Clear() => throw new NotSupportedException();
-		public void Insert(int index, T item) => throw new NotSupportedException();
-		public bool Remove(T item) => throw new NotSupportedException();
-		public void RemoveAt(int index) => throw new NotSupportedException();
+		public void Add(T item)
+		{
+			throw new NotSupportedException();
+		}
+
+		public void Clear()
+		{
+			throw new NotSupportedException();
+		}
+
+		public void Insert(int index, T item)
+		{
+			throw new NotSupportedException();
+		}
+
+		public bool Remove(T item)
+		{
+			throw new NotSupportedException();
+		}
+
+		public void RemoveAt(int index)
+		{
+			throw new NotSupportedException();
+		}
 
 
 		public abstract bool Contains(T item);
@@ -37,26 +59,50 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections
 		protected abstract T Lookup(int index);
 	}
 
-	internal class ReadOnlyListProxy<T>
+	class ReadOnlyListProxy<T>
 		: ReadOnlyList<T>
 	{
-		private readonly IList<T> m_target;
+		readonly IList<T> m_target;
 
 		internal ReadOnlyListProxy(IList<T> target)
 		{
 			if (target == null)
+			{
 				throw new ArgumentNullException(nameof(target));
+			}
 
 			m_target = target;
 		}
 
-		public override int Count => m_target.Count;
-		public override bool Contains(T item) => m_target.Contains(item);
-		public override void CopyTo(T[] array, int arrayIndex) => m_target.CopyTo(array, arrayIndex);
-		public override IEnumerator<T> GetEnumerator() => m_target.GetEnumerator();
-		public override int IndexOf(T item) => m_target.IndexOf(item);
+		public override int Count
+		{
+			get { return m_target.Count; }
+		}
 
-		protected override T Lookup(int index) => m_target[index];
+		public override bool Contains(T item)
+		{
+			return m_target.Contains(item);
+		}
+
+		public override void CopyTo(T[] array, int arrayIndex)
+		{
+			m_target.CopyTo(array, arrayIndex);
+		}
+
+		public override IEnumerator<T> GetEnumerator()
+		{
+			return m_target.GetEnumerator();
+		}
+
+		public override int IndexOf(T item)
+		{
+			return m_target.IndexOf(item);
+		}
+
+		protected override T Lookup(int index)
+		{
+			return m_target[index];
+		}
 	}
 }
 #pragma warning restore

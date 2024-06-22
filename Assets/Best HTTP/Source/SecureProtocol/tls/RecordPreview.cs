@@ -6,8 +6,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class RecordPreview
 	{
-		private readonly int recordSize;
-		private readonly int contentLimit;
+		readonly int recordSize;
+		readonly int contentLimit;
 
 		internal static RecordPreview CombineAppData(RecordPreview a, RecordPreview b)
 		{

@@ -36,12 +36,12 @@ namespace BestHTTP.SocketIO3.Transports
 		/// <summary>
 		/// The last POST request we sent to the server.
 		/// </summary>
-		private HTTPRequest LastRequest;
+		HTTPRequest LastRequest;
 
 		/// <summary>
 		/// Last GET request we sent to the server.
 		/// </summary>
-		private HTTPRequest PollRequest;
+		HTTPRequest PollRequest;
 
 		#endregion
 
@@ -54,7 +54,9 @@ namespace BestHTTP.SocketIO3.Transports
 		{
 			string format = "{0}?EIO={1}&transport=polling&t={2}-{3}{5}";
 			if (Manager.Handshake != null)
+			{
 				format += "&sid={4}";
+			}
 
 			bool sendAdditionalQueryParams = !Manager.Options.QueryParamsOnlyForHandshake || (Manager.Options.QueryParamsOnlyForHandshake && Manager.Handshake == null);
 
@@ -74,8 +76,10 @@ namespace BestHTTP.SocketIO3.Transports
 
 			request.MaxRetries = 0;
 
-			if (this.Manager.Options.HTTPRequestCustomizationCallback != null)
-				this.Manager.Options.HTTPRequestCustomizationCallback(this.Manager, request);
+			if (Manager.Options.HTTPRequestCustomizationCallback != null)
+			{
+				Manager.Options.HTTPRequestCustomizationCallback(Manager, request);
+			}
 
 			request.Send();
 
@@ -88,14 +92,16 @@ namespace BestHTTP.SocketIO3.Transports
 		public void Close()
 		{
 			if (State == TransportStates.Closed)
+			{
 				return;
+			}
 
 			State = TransportStates.Closed;
 		}
 
 		#region Packet Sending Implementation
 
-		private System.Collections.Generic.List<OutgoingPacket> lonelyPacketList = new System.Collections.Generic.List<OutgoingPacket>(1);
+		System.Collections.Generic.List<OutgoingPacket> lonelyPacketList = new System.Collections.Generic.List<OutgoingPacket>(1);
 
 		public void Send(OutgoingPacket packet)
 		{
@@ -113,10 +119,14 @@ namespace BestHTTP.SocketIO3.Transports
 		public void Send(System.Collections.Generic.List<OutgoingPacket> packets)
 		{
 			if (State != TransportStates.Opening && State != TransportStates.Open)
+			{
 				return;
+			}
 
 			if (IsRequestInProgress)
+			{
 				throw new Exception("Sending packets are still in progress!");
+			}
 
 
 			LastRequest = new HTTPRequest(new Uri(string.Format("{0}?EIO={1}&transport=polling&t={2}-{3}&sid={4}{5}",
@@ -136,21 +146,23 @@ namespace BestHTTP.SocketIO3.Transports
 #endif
 			EncodePackets(packets, LastRequest);
 
-			if (this.Manager.Options.HTTPRequestCustomizationCallback != null)
-				this.Manager.Options.HTTPRequestCustomizationCallback(this.Manager, LastRequest);
+			if (Manager.Options.HTTPRequestCustomizationCallback != null)
+			{
+				Manager.Options.HTTPRequestCustomizationCallback(Manager, LastRequest);
+			}
 
 			LastRequest.Send();
 		}
 
 		StringBuilder sendBuilder = new StringBuilder();
 
-		private void EncodePackets(System.Collections.Generic.List<OutgoingPacket> packets, HTTPRequest request)
+		void EncodePackets(System.Collections.Generic.List<OutgoingPacket> packets, HTTPRequest request)
 		{
 			sendBuilder.Length = 0;
 
 			for (int i = 0; i < packets.Count; ++i)
 			{
-				var packet = packets[i];
+				OutgoingPacket packet = packets[i];
 
 				if (packet.IsBinary)
 				{
@@ -174,18 +186,20 @@ namespace BestHTTP.SocketIO3.Transports
 				}
 
 				if (i < packets.Count - 1)
+				{
 					sendBuilder.Append((char)0x1E);
+				}
 
 				BufferPool.Release(packet.PayloadData);
 			}
 
 			string result = sendBuilder.ToString();
-			var length = System.Text.Encoding.UTF8.GetByteCount(result);
-			var buffer = BufferPool.Get(length, true);
+			int length = Encoding.UTF8.GetByteCount(result);
+			byte[] buffer = BufferPool.Get(length, true);
 
-			System.Text.Encoding.UTF8.GetBytes(result, 0, result.Length, buffer, 0);
+			Encoding.UTF8.GetBytes(result, 0, result.Length, buffer, 0);
 
-			var stream = new BufferSegmentStream();
+			BufferSegmentStream stream = new BufferSegmentStream();
 
 			stream.Write(new BufferSegment(buffer, 0, length));
 
@@ -193,13 +207,15 @@ namespace BestHTTP.SocketIO3.Transports
 			request.SetHeader("Content-Type", "text/plain; charset=UTF-8");
 		}
 
-		private void OnRequestFinished(HTTPRequest req, HTTPResponse resp)
+		void OnRequestFinished(HTTPRequest req, HTTPResponse resp)
 		{
 			// Clear out the LastRequest variable, so we can start sending out new packets
 			LastRequest = null;
 
 			if (State == TransportStates.Closed)
+			{
 				return;
+			}
 
 			string errorString = null;
 
@@ -207,27 +223,33 @@ namespace BestHTTP.SocketIO3.Transports
 			{
 				// The request finished without any problem.
 				case HTTPRequestStates.Finished:
-					if (HTTPManager.Logger.Level <= BestHTTP.Logger.Loglevels.All)
-						HTTPManager.Logger.Verbose("PollingTransport", "OnRequestFinished: " + resp.DataAsText, this.Manager.Context);
+					if (HTTPManager.Logger.Level <= Logger.Loglevels.All)
+					{
+						HTTPManager.Logger.Verbose("PollingTransport", "OnRequestFinished: " + resp.DataAsText, Manager.Context);
+					}
 
 					if (resp.IsSuccess)
 					{
 						// When we are sending data, the response is an 'ok' string
 						if (req.MethodType != HTTPMethods.Post)
+						{
 							ParseResponse(resp);
+						}
 					}
 					else
+					{
 						errorString = string.Format("Polling - Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText,
 							req.CurrentUri);
+					}
 
 					break;
 
 				// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 				case HTTPRequestStates.Error:
-					errorString = (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception");
+					errorString = req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception";
 					break;
 
 				// The request aborted, initiated by the user.
@@ -247,7 +269,9 @@ namespace BestHTTP.SocketIO3.Transports
 			}
 
 			if (!string.IsNullOrEmpty(errorString))
+			{
 				(Manager as IManager).OnTransportError(this, errorString);
+			}
 		}
 
 		#endregion
@@ -257,7 +281,9 @@ namespace BestHTTP.SocketIO3.Transports
 		public void Poll()
 		{
 			if (PollRequest != null || State == TransportStates.Paused)
+			{
 				return;
+			}
 
 			PollRequest = new HTTPRequest(new Uri(string.Format("{0}?EIO={1}&transport=polling&t={2}-{3}&sid={4}{5}",
 					Manager.Uri.ToString(),
@@ -276,19 +302,23 @@ namespace BestHTTP.SocketIO3.Transports
 
 			PollRequest.MaxRetries = 0;
 
-			if (this.Manager.Options.HTTPRequestCustomizationCallback != null)
-				this.Manager.Options.HTTPRequestCustomizationCallback(this.Manager, PollRequest);
+			if (Manager.Options.HTTPRequestCustomizationCallback != null)
+			{
+				Manager.Options.HTTPRequestCustomizationCallback(Manager, PollRequest);
+			}
 
 			PollRequest.Send();
 		}
 
-		private void OnPollRequestFinished(HTTPRequest req, HTTPResponse resp)
+		void OnPollRequestFinished(HTTPRequest req, HTTPResponse resp)
 		{
 			// Clear the PollRequest variable, so we can start a new poll.
 			PollRequest = null;
 
 			if (State == TransportStates.Closed)
+			{
 				return;
+			}
 
 			string errorString = null;
 
@@ -297,22 +327,29 @@ namespace BestHTTP.SocketIO3.Transports
 				// The request finished without any problem.
 				case HTTPRequestStates.Finished:
 
-					if (HTTPManager.Logger.Level <= BestHTTP.Logger.Loglevels.All)
-						HTTPManager.Logger.Verbose("PollingTransport", "OnPollRequestFinished: " + resp.DataAsText, this.Manager.Context);
+					if (HTTPManager.Logger.Level <= Logger.Loglevels.All)
+					{
+						HTTPManager.Logger.Verbose("PollingTransport", "OnPollRequestFinished: " + resp.DataAsText, Manager.Context);
+					}
 
 					if (resp.IsSuccess)
+					{
 						ParseResponse(resp);
+					}
 					else
+					{
 						errorString = string.Format("Polling - Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText,
 							req.CurrentUri);
+					}
+
 					break;
 
 				// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 				case HTTPRequestStates.Error:
-					errorString = req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception";
+					errorString = req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception";
 					break;
 
 				// The request aborted, initiated by the user.
@@ -332,7 +369,9 @@ namespace BestHTTP.SocketIO3.Transports
 			}
 
 			if (!string.IsNullOrEmpty(errorString))
+			{
 				(Manager as IManager).OnTransportError(this, errorString);
+			}
 		}
 
 		#endregion
@@ -342,20 +381,28 @@ namespace BestHTTP.SocketIO3.Transports
 		/// <summary>
 		/// Preprocessing and sending out packets to the manager.
 		/// </summary>
-		private void OnPacket(IncomingPacket packet)
+		void OnPacket(IncomingPacket packet)
 		{
 			switch (packet.TransportEvent)
 			{
 				case TransportEventTypes.Open:
-					if (this.State != TransportStates.Opening)
-						HTTPManager.Logger.Warning("PollingTransport", "Received 'Open' packet while state is '" + State.ToString() + "'", this.Manager.Context);
+					if (State != TransportStates.Opening)
+					{
+						HTTPManager.Logger.Warning("PollingTransport", "Received 'Open' packet while state is '" + State.ToString() + "'", Manager.Context);
+					}
 					else
+					{
 						State = TransportStates.Open;
+					}
+
 					goto default;
 
 				case TransportEventTypes.Message:
 					if (packet.SocketIOEvent == SocketIOEventTypes.Connect) //2:40
-						this.State = TransportStates.Open;
+					{
+						State = TransportStates.Open;
+					}
+
 					goto default;
 
 				default:
@@ -364,12 +411,14 @@ namespace BestHTTP.SocketIO3.Transports
 			}
 		}
 
-		private void ParseResponse(HTTPResponse resp)
+		void ParseResponse(HTTPResponse resp)
 		{
 			try
 			{
 				if (resp == null || resp.Data == null || resp.Data.Length < 1)
+				{
 					return;
+				}
 
 				int idx = 0;
 				while (idx < resp.Data.Length)
@@ -378,7 +427,9 @@ namespace BestHTTP.SocketIO3.Transports
 					int length = endIdx - idx;
 
 					if (length <= 0)
+					{
 						break;
+					}
 
 					IncomingPacket packet = IncomingPacket.Empty;
 
@@ -387,19 +438,19 @@ namespace BestHTTP.SocketIO3.Transports
 						// First byte is the binary indicator('b'). We must skip it, so we advance our idx and also have to decrease length
 						idx++;
 						length--;
-						var base64Encoded = System.Text.Encoding.UTF8.GetString(resp.Data, idx, length);
-						var byteData = Convert.FromBase64String(base64Encoded);
-						packet = this.Manager.Parser.Parse(this.Manager, new BufferSegment(byteData, 0, byteData.Length));
+						string base64Encoded = Encoding.UTF8.GetString(resp.Data, idx, length);
+						byte[] byteData = Convert.FromBase64String(base64Encoded);
+						packet = Manager.Parser.Parse(Manager, new BufferSegment(byteData, 0, byteData.Length));
 					}
 					else
 					{
 						// It's the handshake data?
-						if (this.State == TransportStates.Opening)
+						if (State == TransportStates.Opening)
 						{
 							TransportEventTypes transportEvent = (TransportEventTypes)(resp.Data[idx] - '0');
 							if (transportEvent == TransportEventTypes.Open)
 							{
-								var handshake = BestHTTP.JSON.LitJson.JsonMapper.ToObject<HandshakeData>(Encoding.UTF8.GetString(resp.Data, idx + 1, length - 1));
+								HandshakeData handshake = JSON.LitJson.JsonMapper.ToObject<HandshakeData>(Encoding.UTF8.GetString(resp.Data, idx + 1, length - 1));
 								packet = new IncomingPacket(TransportEventTypes.Open, SocketIOEventTypes.Unknown, "/", -1);
 								packet.DecodedArg = handshake;
 							}
@@ -410,7 +461,7 @@ namespace BestHTTP.SocketIO3.Transports
 						}
 						else
 						{
-							packet = this.Manager.Parser.Parse(this.Manager, System.Text.Encoding.UTF8.GetString(resp.Data, idx, length));
+							packet = Manager.Parser.Parse(Manager, Encoding.UTF8.GetString(resp.Data, idx, length));
 						}
 					}
 
@@ -422,7 +473,7 @@ namespace BestHTTP.SocketIO3.Transports
 						}
 						catch (Exception ex)
 						{
-							HTTPManager.Logger.Exception("PollingTransport", "ParseResponse - OnPacket", ex, this.Manager.Context);
+							HTTPManager.Logger.Exception("PollingTransport", "ParseResponse - OnPacket", ex, Manager.Context);
 							(Manager as IManager).EmitError(ex.Message + " " + ex.StackTrace);
 						}
 					}
@@ -434,16 +485,18 @@ namespace BestHTTP.SocketIO3.Transports
 			{
 				(Manager as IManager).EmitError(ex.Message + " " + ex.StackTrace);
 
-				HTTPManager.Logger.Exception("PollingTransport", "ParseResponse", ex, this.Manager.Context);
+				HTTPManager.Logger.Exception("PollingTransport", "ParseResponse", ex, Manager.Context);
 			}
 		}
 
-		private int FindNextRecordSeparator(byte[] data, int startIdx)
+		int FindNextRecordSeparator(byte[] data, int startIdx)
 		{
 			for (int i = startIdx; i < data.Length; ++i)
 			{
 				if (data[i] == 0x1E)
+				{
 					return i;
+				}
 			}
 
 			return data.Length;

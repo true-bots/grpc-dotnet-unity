@@ -48,10 +48,14 @@ namespace BestHTTP.Forms
 			get
 			{
 				if (Binary != null)
+				{
 					return Binary;
+				}
 
 				if (Encoding == null)
+				{
 					Encoding = Encoding.UTF8;
+				}
 
 				return Binary = Encoding.GetBytes(Text);
 			}

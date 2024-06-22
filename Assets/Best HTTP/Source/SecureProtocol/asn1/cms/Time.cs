@@ -12,15 +12,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public static Time GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
-			if (obj is Time time)
-				return time;
-			if (obj is Asn1UtcTime utcTime)
-				return new Time(utcTime);
-			if (obj is Asn1GeneralizedTime generalizedTime)
-				return new Time(generalizedTime);
+			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+			if (obj is Time time)
+			{
+				return time;
+			}
+
+			if (obj is Asn1UtcTime utcTime)
+			{
+				return new Time(utcTime);
+			}
+
+			if (obj is Asn1GeneralizedTime generalizedTime)
+			{
+				return new Time(generalizedTime);
+			}
+
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), nameof(obj));
 		}
 
 		public static Time GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
@@ -28,22 +39,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			return GetInstance(taggedObject.GetObject());
 		}
 
-		private readonly Asn1Object m_timeObject;
+		readonly Asn1Object m_timeObject;
 
 		public Time(Asn1GeneralizedTime generalizedTime)
 		{
-			this.m_timeObject = generalizedTime ?? throw new ArgumentNullException(nameof(generalizedTime));
+			m_timeObject = generalizedTime ?? throw new ArgumentNullException(nameof(generalizedTime));
 		}
 
 		public Time(Asn1UtcTime utcTime)
 		{
 			if (utcTime == null)
+			{
 				throw new ArgumentNullException(nameof(utcTime));
+			}
 
 			// Validate utcTime is in the appropriate year range
 			utcTime.ToDateTime(2049);
 
-			this.m_timeObject = utcTime;
+			m_timeObject = utcTime;
 		}
 
 		/**
@@ -70,7 +83,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			try
 			{
 				if (m_timeObject is Asn1UtcTime utcTime)
+				{
 					return utcTime.ToDateTime(2049);
+				}
 
 				return ((Asn1GeneralizedTime)m_timeObject).ToDateTime();
 			}
@@ -82,7 +97,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		}
 
 
-		public DateTime Date => ToDateTime();
+		public DateTime Date
+		{
+			get { return ToDateTime(); }
+		}
 
 		/**
          * Produce an object suitable for an Asn1OutputStream.
@@ -100,10 +118,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public override string ToString()
 		{
 			if (m_timeObject is Asn1UtcTime utcTime)
+			{
 				return utcTime.ToDateTime(2049).ToString(@"yyyyMMddHHmmssK", DateTimeFormatInfo.InvariantInfo);
+			}
 
 			if (m_timeObject is Asn1GeneralizedTime generalizedTime)
+			{
 				return generalizedTime.ToDateTime().ToString(@"yyyyMMddHHmmss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo);
+			}
 
 			throw new InvalidOperationException();
 		}

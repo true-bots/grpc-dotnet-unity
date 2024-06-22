@@ -6,7 +6,7 @@ namespace BestHTTP.Logger
 {
 	public sealed class LoggingContext
 	{
-		private enum LoggingContextFieldType
+		enum LoggingContextFieldType
 		{
 			Long,
 			Bool,
@@ -14,7 +14,7 @@ namespace BestHTTP.Logger
 			AnotherContext
 		}
 
-		private struct LoggingContextField
+		struct LoggingContextField
 		{
 			public string key;
 			public long longValue;
@@ -24,22 +24,25 @@ namespace BestHTTP.Logger
 			public LoggingContextFieldType fieldType;
 		}
 
-		private List<LoggingContextField> fields = null;
-		private static System.Random random = new System.Random();
+		List<LoggingContextField> fields = null;
+		static Random random = new Random();
 
-		private LoggingContext()
+		LoggingContext()
 		{
 		}
 
 		public LoggingContext(object boundto)
 		{
-			var name = boundto.GetType().Name;
+			string name = boundto.GetType().Name;
 			Add("TypeName", name);
 
 			long hash = 0;
 			lock (random)
-				hash = ((long)boundto.GetHashCode() << 32 | (long)name.GetHashCode()) ^ ((long)this.GetHashCode() << 16) | (long)(random.Next(int.MaxValue) << 32) |
+			{
+				hash = ((((long)boundto.GetHashCode() << 32) | (long)name.GetHashCode()) ^ ((long)GetHashCode() << 16)) | (long)(random.Next(int.MaxValue) << 32) |
 				       (long)random.Next(int.MaxValue);
+			}
+
 			Add("Hash", hash);
 		}
 
@@ -63,30 +66,32 @@ namespace BestHTTP.Logger
 			Add(new LoggingContextField { fieldType = LoggingContextFieldType.AnotherContext, key = key, loggingContextValue = value });
 		}
 
-		private void Add(LoggingContextField field)
+		void Add(LoggingContextField field)
 		{
-			if (this.fields == null)
-				this.fields = new List<LoggingContextField>();
+			if (fields == null)
+			{
+				fields = new List<LoggingContextField>();
+			}
 
 			Remove(field.key);
-			this.fields.Add(field);
+			fields.Add(field);
 		}
 
 		public void Remove(string key)
 		{
-			this.fields.RemoveAll(field => field.key == key);
+			fields.RemoveAll(field => field.key == key);
 		}
 
 		public LoggingContext Clone()
 		{
 			LoggingContext newContext = new LoggingContext();
 
-			if (this.fields != null && this.fields.Count > 0)
+			if (fields != null && fields.Count > 0)
 			{
-				newContext.fields = new List<LoggingContextField>(this.fields.Count);
-				for (int i = 0; i < this.fields.Count; ++i)
+				newContext.fields = new List<LoggingContextField>(fields.Count);
+				for (int i = 0; i < fields.Count; ++i)
 				{
-					var field = this.fields[i];
+					LoggingContextField field = fields[i];
 
 					switch (field.fieldType)
 					{
@@ -106,23 +111,25 @@ namespace BestHTTP.Logger
 			return newContext;
 		}
 
-		public void ToJson(System.Text.StringBuilder sb)
+		public void ToJson(StringBuilder sb)
 		{
-			if (this.fields == null || this.fields.Count == 0)
+			if (fields == null || fields.Count == 0)
 			{
 				sb.Append("null");
 				return;
 			}
 
 			sb.Append("{");
-			for (int i = 0; i < this.fields.Count; ++i)
+			for (int i = 0; i < fields.Count; ++i)
 			{
-				var field = this.fields[i];
+				LoggingContextField field = fields[i];
 
 				if (field.fieldType != LoggingContextFieldType.AnotherContext)
 				{
 					if (i > 0)
+					{
 						sb.Append(", ");
+					}
 
 					sb.AppendFormat("\"{0}\": ", field.key);
 				}
@@ -143,9 +150,9 @@ namespace BestHTTP.Logger
 
 			sb.Append("}");
 
-			for (int i = 0; i < this.fields.Count; ++i)
+			for (int i = 0; i < fields.Count; ++i)
 			{
-				var field = this.fields[i];
+				LoggingContextField field = fields[i];
 
 				switch (field.fieldType)
 				{

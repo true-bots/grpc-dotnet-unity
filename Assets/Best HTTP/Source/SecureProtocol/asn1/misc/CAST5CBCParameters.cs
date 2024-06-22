@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Misc
 	public class Cast5CbcParameters
 		: Asn1Encodable
 	{
-		private readonly DerInteger keyLength;
-		private readonly Asn1OctetString iv;
+		readonly DerInteger keyLength;
+		readonly Asn1OctetString iv;
 
 		public static Cast5CbcParameters GetInstance(
 			object o)
@@ -36,11 +36,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Misc
 			this.keyLength = new DerInteger(keyLength);
 		}
 
-		private Cast5CbcParameters(
+		Cast5CbcParameters(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
 			iv = (Asn1OctetString)seq[0];
 			keyLength = (DerInteger)seq[1];

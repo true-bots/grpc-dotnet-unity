@@ -17,20 +17,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static readonly int CMP_1999 = 1;
 		public static readonly int CMP_2000 = 2;
 
-		private readonly DerInteger pvno;
-		private readonly GeneralName sender;
-		private readonly GeneralName recipient;
-		private readonly Asn1GeneralizedTime messageTime;
-		private readonly AlgorithmIdentifier protectionAlg;
-		private readonly Asn1OctetString senderKID; // KeyIdentifier
-		private readonly Asn1OctetString recipKID; // KeyIdentifier
-		private readonly Asn1OctetString transactionID;
-		private readonly Asn1OctetString senderNonce;
-		private readonly Asn1OctetString recipNonce;
-		private readonly PkiFreeText freeText;
-		private readonly Asn1Sequence generalInfo;
+		readonly DerInteger pvno;
+		readonly GeneralName sender;
+		readonly GeneralName recipient;
+		readonly Asn1GeneralizedTime messageTime;
+		readonly AlgorithmIdentifier protectionAlg;
+		readonly Asn1OctetString senderKID; // KeyIdentifier
+		readonly Asn1OctetString recipKID; // KeyIdentifier
+		readonly Asn1OctetString transactionID;
+		readonly Asn1OctetString senderNonce;
+		readonly Asn1OctetString recipNonce;
+		readonly PkiFreeText freeText;
+		readonly Asn1Sequence generalInfo;
 
-		private PkiHeader(Asn1Sequence seq)
+		PkiHeader(Asn1Sequence seq)
 		{
 			pvno = DerInteger.GetInstance(seq[0]);
 			sender = GeneralName.GetInstance(seq[1]);
@@ -78,12 +78,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static PkiHeader GetInstance(object obj)
 		{
 			if (obj is PkiHeader)
+			{
 				return (PkiHeader)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new PkiHeader((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public PkiHeader(
@@ -94,7 +98,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		{
 		}
 
-		private PkiHeader(
+		PkiHeader(
 			DerInteger pvno,
 			GeneralName sender,
 			GeneralName recipient)

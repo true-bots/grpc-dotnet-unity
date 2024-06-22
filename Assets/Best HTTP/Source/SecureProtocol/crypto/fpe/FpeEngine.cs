@@ -31,13 +31,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 		public virtual int ProcessBlock(byte[] inBuf, int inOff, int length, byte[] outBuf, int outOff)
 		{
 			if (fpeParameters == null)
+			{
 				throw new InvalidOperationException("FPE engine not initialized");
+			}
+
 			if (length < 0)
+			{
 				throw new ArgumentException("cannot be negative", "length");
+			}
+
 			if (inBuf == null)
+			{
 				throw new ArgumentNullException("inBuf");
+			}
+
 			if (outBuf == null)
+			{
 				throw new ArgumentNullException("outBuf");
+			}
 
 			Check.DataLength(inBuf, inOff, length, "input buffer too short");
 			Check.OutputLength(outBuf, outOff, length, "output buffer too short");
@@ -54,9 +65,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Fpe
 
 		protected static bool IsOverrideSet(string propName)
 		{
-			string propValue = Org.BouncyCastle.Utilities.Platform.GetEnvironmentVariable(propName);
+			string propValue = Platform.GetEnvironmentVariable(propName);
 
-			return propValue != null && Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase("true", propValue);
+			return propValue != null && Platform.EqualsIgnoreCase("true", propValue);
 		}
 
 		/// <summary>

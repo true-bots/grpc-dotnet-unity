@@ -103,7 +103,7 @@ namespace BestHTTP.SocketIO
 		/// <summary>
 		/// A custom, server sent error, most probably from a Socket.IO middleware.
 		/// </summary>
-		Custom = 7,
+		Custom = 7
 	}
 }
 

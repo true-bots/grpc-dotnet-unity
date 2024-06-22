@@ -10,8 +10,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class Gost3410KeyGenerationParameters
 		: KeyGenerationParameters
 	{
-		private readonly Gost3410Parameters parameters;
-		private readonly DerObjectIdentifier publicKeyParamSet;
+		readonly Gost3410Parameters parameters;
+		readonly DerObjectIdentifier publicKeyParamSet;
 
 		public Gost3410KeyGenerationParameters(
 			SecureRandom random,
@@ -39,16 +39,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			get { return publicKeyParamSet; }
 		}
 
-		private static Gost3410Parameters LookupParameters(
+		static Gost3410Parameters LookupParameters(
 			DerObjectIdentifier publicKeyParamSet)
 		{
 			if (publicKeyParamSet == null)
+			{
 				throw new ArgumentNullException("publicKeyParamSet");
+			}
 
 			Gost3410ParamSetParameters p = Gost3410NamedParameters.GetByOid(publicKeyParamSet);
 
 			if (p == null)
+			{
 				throw new ArgumentException("OID is not a valid CryptoPro public key parameter set", "publicKeyParamSet");
+			}
 
 			return new Gost3410Parameters(p.P, p.Q, p.A);
 		}

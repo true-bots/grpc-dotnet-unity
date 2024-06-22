@@ -14,12 +14,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Attr
 			Jpeg = 1
 		}
 
-		private static readonly byte[] Zeroes = new byte[12];
+		static readonly byte[] Zeroes = new byte[12];
 
-		private int hdrLength;
-		private int _version;
-		private int _encoding;
-		private byte[] imageData;
+		int hdrLength;
+		int _version;
+		int _encoding;
+		byte[] imageData;
 
 		public ImageAttrib(byte[] data)
 			: this(false, data)
@@ -44,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Attr
 		{
 		}
 
-		private static byte[] ToByteArray(
+		static byte[] ToByteArray(
 			Format imageType,
 			byte[] imageData)
 		{

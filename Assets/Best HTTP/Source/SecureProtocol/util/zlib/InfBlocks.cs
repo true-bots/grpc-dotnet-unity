@@ -39,12 +39,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 {
-	internal sealed class InfBlocks
+	sealed class InfBlocks
 	{
-		private const int MANY = 1440;
+		const int MANY = 1440;
 
 		// And'ing with mask[n] masks the lower n bits
-		private static readonly int[] inflate_mask =
+		static readonly int[] inflate_mask =
 		{
 			0x00000000, 0x00000001, 0x00000003, 0x00000007, 0x0000000f,
 			0x0000001f, 0x0000003f, 0x0000007f, 0x000000ff, 0x000001ff,
@@ -59,26 +59,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
 		};
 
-		private const int Z_OK = 0;
-		private const int Z_STREAM_END = 1;
-		private const int Z_NEED_DICT = 2;
-		private const int Z_ERRNO = -1;
-		private const int Z_STREAM_ERROR = -2;
-		private const int Z_DATA_ERROR = -3;
-		private const int Z_MEM_ERROR = -4;
-		private const int Z_BUF_ERROR = -5;
-		private const int Z_VERSION_ERROR = -6;
+		const int Z_OK = 0;
+		const int Z_STREAM_END = 1;
+		const int Z_NEED_DICT = 2;
+		const int Z_ERRNO = -1;
+		const int Z_STREAM_ERROR = -2;
+		const int Z_DATA_ERROR = -3;
+		const int Z_MEM_ERROR = -4;
+		const int Z_BUF_ERROR = -5;
+		const int Z_VERSION_ERROR = -6;
 
-		private const int TYPE = 0; // get type bits (3, including end bit)
-		private const int LENS = 1; // get lengths for stored
-		private const int STORED = 2; // processing stored block
-		private const int TABLE = 3; // get table lengths
-		private const int BTREE = 4; // get bit lengths tree for a dynamic block
-		private const int DTREE = 5; // get length, distance trees for a dynamic block
-		private const int CODES = 6; // processing fixed or dynamic block
-		private const int DRY = 7; // output remaining window bytes
-		private const int DONE = 8; // finished last block, done
-		private const int BAD = 9; // ot a data error--stuck here
+		const int TYPE = 0; // get type bits (3, including end bit)
+		const int LENS = 1; // get lengths for stored
+		const int STORED = 2; // processing stored block
+		const int TABLE = 3; // get table lengths
+		const int BTREE = 4; // get bit lengths tree for a dynamic block
+		const int DTREE = 5; // get length, distance trees for a dynamic block
+		const int CODES = 6; // processing fixed or dynamic block
+		const int DRY = 7; // output remaining window bytes
+		const int DONE = 8; // finished last block, done
+		const int BAD = 9; // ot a data error--stuck here
 
 		internal int mode; // current inflate_block mode 
 
@@ -119,7 +119,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 		internal void reset(ZStream z, long[] c)
 		{
-			if (c != null) c[0] = check;
+			if (c != null)
+			{
+				c[0] = check;
+			}
+
 			if (mode == BTREE || mode == DTREE)
 			{
 			}
@@ -135,7 +139,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			read = write = 0;
 
 			if (checkfn != null)
+			{
 				z.adler = check = z._adler.adler32(0L, null, 0, 0);
+			}
 		}
 
 		internal int proc(ZStream z, int r)
@@ -168,7 +174,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				{
 					case TYPE:
 
-						while (k < (3))
+						while (k < 3)
 						{
 							if (n != 0)
 							{
@@ -199,15 +205,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 							case 0:
 							{
 								// stored 
-								b >>= (3);
-								k -= (3);
+								b >>= 3;
+								k -= 3;
 							}
 								t = k & 7;
 							{
 								// go to byte boundary
 
-								b >>= (t);
-								k -= (t);
+								b >>= t;
+								k -= t;
 							}
 								mode = LENS; // get length of stored block
 								break;
@@ -223,8 +229,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 								codes.init(bl[0], bd[0], tl[0], 0, td[0], 0, z);
 							}
 							{
-								b >>= (3);
-								k -= (3);
+								b >>= 3;
+								k -= 3;
 							}
 
 								mode = CODES;
@@ -233,8 +239,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 							{
 								// dynamic
 
-								b >>= (3);
-								k -= (3);
+								b >>= 3;
+								k -= 3;
 							}
 
 								mode = TABLE;
@@ -243,8 +249,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 							{
 								// illegal
 
-								b >>= (3);
-								k -= (3);
+								b >>= 3;
+								k -= 3;
 							}
 								mode = BAD;
 								z.msg = "invalid block type";
@@ -262,7 +268,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						break;
 					case LENS:
 
-						while (k < (32))
+						while (k < 32)
 						{
 							if (n != 0)
 							{
@@ -285,7 +291,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 							k += 8;
 						}
 
-						if ((((~b) >> 16) & 0xffff) != (b & 0xffff))
+						if (((~b >> 16) & 0xffff) != (b & 0xffff))
 						{
 							mode = BAD;
 							z.msg = "invalid stored block lengths";
@@ -300,9 +306,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 							return inflate_flush(z, r);
 						}
 
-						left = (b & 0xffff);
+						left = b & 0xffff;
 						b = k = 0; // dump bits
-						mode = left != 0 ? STORED : (last != 0 ? DRY : TYPE);
+						mode = left != 0 ? STORED : last != 0 ? DRY : TYPE;
 						break;
 					case STORED:
 						if (n == 0)
@@ -352,20 +358,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						r = Z_OK;
 
 						t = left;
-						if (t > n) t = n;
-						if (t > m) t = m;
-						System.Array.Copy(z.next_in, p, window, q, t);
+						if (t > n)
+						{
+							t = n;
+						}
+
+						if (t > m)
+						{
+							t = m;
+						}
+
+						Array.Copy(z.next_in, p, window, q, t);
 						p += t;
 						n -= t;
 						q += t;
 						m -= t;
 						if ((left -= t) != 0)
+						{
 							break;
+						}
+
 						mode = last != 0 ? DRY : TYPE;
 						break;
 					case TABLE:
 
-						while (k < (14))
+						while (k < 14)
 						{
 							if (n != 0)
 							{
@@ -388,7 +405,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 							k += 8;
 						}
 
-						table = t = (b & 0x3fff);
+						table = t = b & 0x3fff;
 						if ((t & 0x1f) > 29 || ((t >> 5) & 0x1f) > 29)
 						{
 							mode = BAD;
@@ -418,8 +435,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						}
 
 					{
-						b >>= (14);
-						k -= (14);
+						b >>= 14;
+						k -= 14;
 					}
 
 						index = 0;
@@ -428,7 +445,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					case BTREE:
 						while (index < 4 + (table >> 10))
 						{
-							while (k < (3))
+							while (k < 3)
 							{
 								if (n != 0)
 								{
@@ -453,8 +470,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 							blens[border[index++]] = b & 7;
 							{
-								b >>= (3);
-								k -= (3);
+								b >>= 3;
+								k -= 3;
 							}
 						}
 
@@ -499,7 +516,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 							t = bb[0];
 
-							while (k < (t))
+							while (k < t)
 							{
 								if (n != 0)
 								{
@@ -532,8 +549,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 							if (c < 16)
 							{
-								b >>= (t);
-								k -= (t);
+								b >>= t;
+								k -= t;
 								blens[index++] = c;
 							}
 							else
@@ -542,7 +559,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 								i = c == 18 ? 7 : c - 14;
 								j = c == 18 ? 11 : 3;
 
-								while (k < (t + i))
+								while (k < t + i)
 								{
 									if (n != 0)
 									{
@@ -565,13 +582,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 									k += 8;
 								}
 
-								b >>= (t);
-								k -= (t);
+								b >>= t;
+								k -= t;
 
-								j += (b & inflate_mask[i]);
+								j += b & inflate_mask[i];
 
-								b >>= (i);
-								k -= (i);
+								b >>= i;
+								k -= i;
 
 								i = index;
 								t = table;
@@ -733,7 +750,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 		internal void set_dictionary(byte[] d, int start, int n)
 		{
-			System.Array.Copy(d, start, window, 0, n);
+			Array.Copy(d, start, window, 0, n);
 			read = write = n;
 		}
 
@@ -757,8 +774,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 			// compute number of bytes to copy as far as end of window
 			n = (int)((q <= write ? write : end) - q);
-			if (n > z.avail_out) n = z.avail_out;
-			if (n != 0 && r == Z_BUF_ERROR) r = Z_OK;
+			if (n > z.avail_out)
+			{
+				n = z.avail_out;
+			}
+
+			if (n != 0 && r == Z_BUF_ERROR)
+			{
+				r = Z_OK;
+			}
 
 			// update counters
 			z.avail_out -= n;
@@ -766,10 +790,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 			// update check information
 			if (checkfn != null)
+			{
 				z.adler = check = z._adler.adler32(check, window, q, n);
+			}
 
 			// copy as far as end of window
-			System.Array.Copy(window, q, z.next_out, p, n);
+			Array.Copy(window, q, z.next_out, p, n);
 			p += n;
 			q += n;
 
@@ -779,12 +805,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				// wrap pointers
 				q = 0;
 				if (write == end)
+				{
 					write = 0;
+				}
 
 				// compute bytes to copy
 				n = write - q;
-				if (n > z.avail_out) n = z.avail_out;
-				if (n != 0 && r == Z_BUF_ERROR) r = Z_OK;
+				if (n > z.avail_out)
+				{
+					n = z.avail_out;
+				}
+
+				if (n != 0 && r == Z_BUF_ERROR)
+				{
+					r = Z_OK;
+				}
 
 				// update counters
 				z.avail_out -= n;
@@ -792,10 +827,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 				// update check information
 				if (checkfn != null)
+				{
 					z.adler = check = z._adler.adler32(check, window, q, n);
+				}
 
 				// copy
-				System.Array.Copy(window, q, z.next_out, p, n);
+				Array.Copy(window, q, z.next_out, p, n);
 				p += n;
 				q += n;
 			}

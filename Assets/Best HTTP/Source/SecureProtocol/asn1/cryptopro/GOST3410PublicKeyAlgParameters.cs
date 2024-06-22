@@ -7,9 +7,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 	public class Gost3410PublicKeyAlgParameters
 		: Asn1Encodable
 	{
-		private DerObjectIdentifier publicKeyParamSet;
-		private DerObjectIdentifier digestParamSet;
-		private DerObjectIdentifier encryptionParamSet;
+		DerObjectIdentifier publicKeyParamSet;
+		DerObjectIdentifier digestParamSet;
+		DerObjectIdentifier encryptionParamSet;
 
 		public static Gost3410PublicKeyAlgParameters GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
 		{
@@ -19,7 +19,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 		public static Gost3410PublicKeyAlgParameters GetInstance(object obj)
 		{
 			if (obj == null || obj is Gost3410PublicKeyAlgParameters)
+			{
 				return (Gost3410PublicKeyAlgParameters)obj;
+			}
 
 			return new Gost3410PublicKeyAlgParameters(Asn1Sequence.GetInstance(obj));
 		}
@@ -37,23 +39,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 			DerObjectIdentifier encryptionParamSet)
 		{
 			if (publicKeyParamSet == null)
+			{
 				throw new ArgumentNullException("publicKeyParamSet");
+			}
+
 			if (digestParamSet == null)
+			{
 				throw new ArgumentNullException("digestParamSet");
+			}
 
 			this.publicKeyParamSet = publicKeyParamSet;
 			this.digestParamSet = digestParamSet;
 			this.encryptionParamSet = encryptionParamSet;
 		}
 
-		private Gost3410PublicKeyAlgParameters(Asn1Sequence seq)
+		Gost3410PublicKeyAlgParameters(Asn1Sequence seq)
 		{
-			this.publicKeyParamSet = (DerObjectIdentifier)seq[0];
-			this.digestParamSet = (DerObjectIdentifier)seq[1];
+			publicKeyParamSet = (DerObjectIdentifier)seq[0];
+			digestParamSet = (DerObjectIdentifier)seq[1];
 
 			if (seq.Count > 2)
 			{
-				this.encryptionParamSet = (DerObjectIdentifier)seq[2];
+				encryptionParamSet = (DerObjectIdentifier)seq[2];
 			}
 		}
 

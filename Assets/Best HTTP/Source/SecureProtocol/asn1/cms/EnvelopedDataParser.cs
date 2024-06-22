@@ -18,16 +18,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	*/
 	public class EnvelopedDataParser
 	{
-		private Asn1SequenceParser _seq;
-		private DerInteger _version;
-		private IAsn1Convertible _nextObject;
-		private bool _originatorInfoCalled;
+		Asn1SequenceParser _seq;
+		DerInteger _version;
+		IAsn1Convertible _nextObject;
+		bool _originatorInfoCalled;
 
 		public EnvelopedDataParser(
 			Asn1SequenceParser seq)
 		{
-			this._seq = seq;
-			this._version = (DerInteger)seq.ReadObject();
+			_seq = seq;
+			_version = (DerInteger)seq.ReadObject();
 		}
 
 		public DerInteger Version

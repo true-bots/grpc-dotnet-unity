@@ -12,14 +12,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	 */
 	public class Dstu7624Mac : IMac
 	{
-		private int macSize;
+		int macSize;
 
-		private Dstu7624Engine engine;
-		private int blockSize;
+		Dstu7624Engine engine;
+		int blockSize;
 
-		private byte[] c, cTemp, kDelta;
-		private byte[] buf;
-		private int bufOff;
+		byte[] c, cTemp, kDelta;
+		byte[] buf;
+		int bufOff;
 
 		public Dstu7624Mac(int blockSizeBits, int q)
 		{
@@ -48,7 +48,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			else
 			{
 				throw new ArgumentException("invalid parameter passed to Dstu7624Mac init - "
-				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Platform.GetTypeName(parameters));
 			}
 		}
 
@@ -80,7 +80,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public void BlockUpdate(byte[] input, int inOff, int len)
 		{
 			if (len < 0)
+			{
 				throw new ArgumentException("Can't have a negative input length!");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             BlockUpdate(input.AsSpan(inOff, len));
@@ -157,7 +159,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
             }
         }
 #else
-		private void ProcessBlock(byte[] input, int inOff)
+		void ProcessBlock(byte[] input, int inOff)
 		{
 			Xor(c, 0, input, inOff, cTemp);
 
@@ -165,7 +167,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		}
 #endif
 
-		private void Xor(byte[] c, int cOff, byte[] input, int inOff, byte[] xorResult)
+		void Xor(byte[] c, int cOff, byte[] input, int inOff, byte[] xorResult)
 		{
 			for (int byteIndex = 0; byteIndex < blockSize; byteIndex++)
 			{
@@ -176,7 +178,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public int DoFinal(byte[] output, int outOff)
 		{
 			if (bufOff % buf.Length != 0)
+			{
 				throw new DataLengthException("Input must be a multiple of blocksize");
+			}
 
 			Check.OutputLength(output, outOff, macSize, "output buffer too short");
 

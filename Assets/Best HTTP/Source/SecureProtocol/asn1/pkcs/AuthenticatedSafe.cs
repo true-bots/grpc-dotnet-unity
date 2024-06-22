@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class AuthenticatedSafe
 		: Asn1Encodable
 	{
-		private static ContentInfo[] Copy(ContentInfo[] info)
+		static ContentInfo[] Copy(ContentInfo[] info)
 		{
 			return (ContentInfo[])info.Clone();
 		}
@@ -16,16 +16,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		public static AuthenticatedSafe GetInstance(object obj)
 		{
 			if (obj is AuthenticatedSafe)
+			{
 				return (AuthenticatedSafe)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new AuthenticatedSafe(Asn1Sequence.GetInstance(obj));
 		}
 
-		private readonly ContentInfo[] info;
-		private readonly bool isBer;
+		readonly ContentInfo[] info;
+		readonly bool isBer;
 
-		private AuthenticatedSafe(Asn1Sequence seq)
+		AuthenticatedSafe(Asn1Sequence seq)
 		{
 			info = new ContentInfo[seq.Count];
 
@@ -41,7 +47,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			ContentInfo[] info)
 		{
 			this.info = Copy(info);
-			this.isBer = true;
+			isBer = true;
 		}
 
 		public ContentInfo[] GetContentInfo()

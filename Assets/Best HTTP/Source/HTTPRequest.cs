@@ -6,19 +6,19 @@ using System.Text;
 
 namespace BestHTTP
 {
-	using BestHTTP.Authentication;
-	using BestHTTP.Extensions;
-	using BestHTTP.Forms;
+	using Authentication;
+	using Extensions;
+	using Forms;
 
 #if !BESTHTTP_DISABLE_COOKIES
-	using BestHTTP.Cookies;
+	using Cookies;
 #endif
 
-	using BestHTTP.Core;
-	using BestHTTP.PlatformSupport.Memory;
-	using BestHTTP.Connections;
-	using BestHTTP.Logger;
-	using BestHTTP.Timings;
+	using Core;
+	using PlatformSupport.Memory;
+	using Connections;
+	using Logger;
+	using Timings;
 
 	/// <summary>
 	/// Possible logical states of a HTTTPRequest object.
@@ -164,7 +164,10 @@ namespace BestHTTP
 			set
 			{
 				if (State == HTTPRequestStates.Processing)
+				{
 					throw new NotSupportedException("Changing the IsKeepAlive property while processing the request is not supported.");
+				}
+
 				isKeepAlive = value;
 			}
 		}
@@ -179,7 +182,10 @@ namespace BestHTTP
 			set
 			{
 				if (State == HTTPRequestStates.Processing)
+				{
 					throw new NotSupportedException("Changing the DisableCache property while processing the request is not supported.");
+				}
+
 				disableCache = value;
 			}
 		}
@@ -193,7 +199,10 @@ namespace BestHTTP
 			set
 			{
 				if (State == HTTPRequestStates.Processing)
+				{
 					throw new NotSupportedException("Changing the CacheOnly property while processing the request is not supported.");
+				}
+
 				cacheOnly = value;
 			}
 		}
@@ -208,10 +217,14 @@ namespace BestHTTP
 			set
 			{
 				if (State == HTTPRequestStates.Processing)
+				{
 					throw new NotSupportedException("Changing the StreamFragmentSize property while processing the request is not supported.");
+				}
 
 				if (value < 1)
-					throw new System.ArgumentException("StreamFragmentSize must be at least 1.");
+				{
+					throw new ArgumentException("StreamFragmentSize must be at least 1.");
+				}
 
 				streamFragmentSize = value;
 			}
@@ -244,7 +257,7 @@ namespace BestHTTP
 
 		public bool IsConnectTimedOut
 		{
-			get { return this.QueuedAt != DateTime.MinValue && DateTime.UtcNow - this.QueuedAt > this.ConnectTimeout; }
+			get { return QueuedAt != DateTime.MinValue && DateTime.UtcNow - QueuedAt > ConnectTimeout; }
 		}
 
 		/// <summary>
@@ -261,9 +274,9 @@ namespace BestHTTP
 			{
 				DateTime now = DateTime.UtcNow;
 
-				return (!this.UseStreaming || (this.UseStreaming && this.EnableTimoutForStreaming)) &&
-				       ((this.ProcessingStarted != DateTime.MinValue && now - this.ProcessingStarted > this.Timeout) ||
-				        this.IsConnectTimedOut);
+				return (!UseStreaming || (UseStreaming && EnableTimoutForStreaming)) &&
+				       ((ProcessingStarted != DateTime.MinValue && now - ProcessingStarted > Timeout) ||
+				        IsConnectTimedOut);
 			}
 		}
 
@@ -351,7 +364,7 @@ namespace BestHTTP
 		/// </summary>
 		public bool HasProxy
 		{
-			get { return Proxy != null && Proxy.UseProxyForAddress(this.CurrentUri); }
+			get { return Proxy != null && Proxy.UseProxyForAddress(CurrentUri); }
 		}
 
 		/// <summary>
@@ -380,13 +393,16 @@ namespace BestHTTP
 			get
 			{
 				if (customCookies == null)
+				{
 					customCookies = new List<Cookie>();
+				}
+
 				return customCookies;
 			}
 			set { customCookies = value; }
 		}
 
-		private List<Cookie> customCookies;
+		List<Cookie> customCookies;
 #endif
 
 		/// <summary>
@@ -399,25 +415,25 @@ namespace BestHTTP
 		/// </summary>
 		public HTTPRequestStates State
 		{
-			get { return this._state; }
+			get { return _state; }
 			internal set
 			{
 				lock (this)
 				{
-					if (this._state != value)
+					if (_state != value)
 					{
 						//if (this._state >= HTTPRequestStates.Finished && value >= HTTPRequestStates.Finished)
 						//    return;
 
-						this._state = value;
+						_state = value;
 
-						RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this, this._state));
+						RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this, _state));
 					}
 				}
 			}
 		}
 
-		private volatile HTTPRequestStates _state;
+		volatile HTTPRequestStates _state;
 
 		/// <summary>
 		/// How many times redirected.
@@ -455,7 +471,7 @@ namespace BestHTTP
 			remove { onBeforeRedirection -= value; }
 		}
 
-		private OnBeforeRedirectionDelegate onBeforeRedirection;
+		OnBeforeRedirectionDelegate onBeforeRedirection;
 
 		/// <summary>
 		/// This event will be fired before the plugin will write headers to the wire. New headers can be added in this callback. This event is called on a non-Unity thread!
@@ -466,7 +482,7 @@ namespace BestHTTP
 			remove { _onBeforeHeaderSend -= value; }
 		}
 
-		private OnBeforeHeaderSendDelegate _onBeforeHeaderSend;
+		OnBeforeHeaderSendDelegate _onBeforeHeaderSend;
 
 		/// <summary>
 		/// Logging context of the request.
@@ -499,7 +515,7 @@ namespace BestHTTP
 		/// </summary>
 		internal bool UseStreaming
 		{
-			get { return this.OnStreamingData != null; }
+			get { return OnStreamingData != null; }
 		}
 
 		/// <summary>
@@ -510,7 +526,9 @@ namespace BestHTTP
 			get
 			{
 				if (UploadStream == null || !UseUploadStreamLength)
+				{
 					return -1;
+				}
 
 				try
 				{
@@ -538,25 +556,25 @@ namespace BestHTTP
 
 		#region Privates
 
-		private bool isKeepAlive;
+		bool isKeepAlive;
 #if !BESTHTTP_DISABLE_CACHING
-		private bool disableCache;
-		private bool cacheOnly;
+		bool disableCache;
+		bool cacheOnly;
 #endif
-		private int streamFragmentSize;
+		int streamFragmentSize;
 
-		private Dictionary<string, List<string>> Headers { get; set; }
+		Dictionary<string, List<string>> Headers { get; set; }
 
 		/// <summary>
 		/// We will collect the fields and values to the FieldCollector through the AddField and AddBinaryData functions.
 		/// </summary>
-		private HTTPFormBase FieldCollector;
+		HTTPFormBase FieldCollector;
 
 		/// <summary>
 		/// When the request about to send the request we will create a specialized form implementation(url-encoded, multipart, or the legacy WWWForm based).
 		/// And we will use this instance to create the data that we will send to the server.
 		/// </summary>
-		private HTTPFormBase FormImpl;
+		HTTPFormBase FormImpl;
 
 		#endregion
 
@@ -640,44 +658,44 @@ namespace BestHTTP
 
 		public HTTPRequest(Uri uri, HTTPMethods methodType, bool isKeepAlive, bool disableCache, OnRequestFinishedDelegate callback)
 		{
-			this.Uri = uri;
-			this.MethodType = methodType;
-			this.IsKeepAlive = isKeepAlive;
+			Uri = uri;
+			MethodType = methodType;
+			IsKeepAlive = isKeepAlive;
 #if !BESTHTTP_DISABLE_CACHING
-			this.DisableCache = disableCache;
+			DisableCache = disableCache;
 #endif
-			this.Callback = callback;
-			this.StreamFragmentSize = 1024 * 1024;
-			this.MaxFragmentQueueLength = 10;
+			Callback = callback;
+			StreamFragmentSize = 1024 * 1024;
+			MaxFragmentQueueLength = 10;
 
-			this.MaxRetries = methodType == HTTPMethods.Get ? 1 : 0;
-			this.MaxRedirects = 10;
-			this.RedirectCount = 0;
+			MaxRetries = methodType == HTTPMethods.Get ? 1 : 0;
+			MaxRedirects = 10;
+			RedirectCount = 0;
 #if !BESTHTTP_DISABLE_COOKIES
-			this.IsCookiesEnabled = HTTPManager.IsCookiesEnabled;
+			IsCookiesEnabled = HTTPManager.IsCookiesEnabled;
 #endif
 
-			this.State = HTTPRequestStates.Initial;
+			State = HTTPRequestStates.Initial;
 
-			this.ConnectTimeout = HTTPManager.ConnectTimeout;
-			this.Timeout = HTTPManager.RequestTimeout;
-			this.EnableTimoutForStreaming = false;
+			ConnectTimeout = HTTPManager.ConnectTimeout;
+			Timeout = HTTPManager.RequestTimeout;
+			EnableTimoutForStreaming = false;
 
-			this.EnableSafeReadOnUnknownContentLength = true;
+			EnableSafeReadOnUnknownContentLength = true;
 
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
-			this.Proxy = HTTPManager.Proxy;
+			Proxy = HTTPManager.Proxy;
 #endif
 
-			this.UseUploadStreamLength = true;
-			this.DisposeUploadStream = true;
+			UseUploadStreamLength = true;
+			DisposeUploadStream = true;
 
 #if UNITY_WEBGL && !BESTHTTP_DISABLE_COOKIES
             this.WithCredentials = this.IsCookiesEnabled;
 #endif
 
-			this.Context = new LoggingContext(this);
-			this.Timing = new TimingCollector(this);
+			Context = new LoggingContext(this);
+			Timing = new TimingCollector(this);
 		}
 
 		#endregion
@@ -689,16 +707,18 @@ namespace BestHTTP
 		/// </summary>
 		public void AddField(string fieldName, string value)
 		{
-			AddField(fieldName, value, System.Text.Encoding.UTF8);
+			AddField(fieldName, value, Encoding.UTF8);
 		}
 
 		/// <summary>
 		/// Add a field with a given string value.
 		/// </summary>
-		public void AddField(string fieldName, string value, System.Text.Encoding e)
+		public void AddField(string fieldName, string value, Encoding e)
 		{
 			if (FieldCollector == null)
+			{
 				FieldCollector = new HTTPFormBase();
+			}
 
 			FieldCollector.AddField(fieldName, value, e);
 		}
@@ -725,7 +745,9 @@ namespace BestHTTP
 		public void AddBinaryData(string fieldName, byte[] content, string fileName, string mimeType)
 		{
 			if (FieldCollector == null)
+			{
 				FieldCollector = new HTTPFormBase();
+			}
 
 			FieldCollector.AddBinaryData(fieldName, content, fileName, mimeType);
 		}
@@ -743,10 +765,12 @@ namespace BestHTTP
 		/// </summary>
 		public List<HTTPFieldData> GetFormFields()
 		{
-			if (this.FieldCollector == null || this.FieldCollector.IsEmpty)
+			if (FieldCollector == null || FieldCollector.IsEmpty)
+			{
 				return null;
+			}
 
-			return new List<HTTPFieldData>(this.FieldCollector.Fields);
+			return new List<HTTPFieldData>(FieldCollector.Fields);
 		}
 
 		/// <summary>
@@ -761,15 +785,19 @@ namespace BestHTTP
 		/// <summary>
 		/// Will create the form implementation based on the value of the FormUsage property.
 		/// </summary>
-		private HTTPFormBase SelectFormImplementation()
+		HTTPFormBase SelectFormImplementation()
 		{
 			// Our form already created with a previous
 			if (FormImpl != null)
+			{
 				return FormImpl;
+			}
 
 			// No field added to this request yet
 			if (FieldCollector == null)
+			{
 				return null;
+			}
 
 			switch (FormUsage)
 			{
@@ -777,9 +805,13 @@ namespace BestHTTP
 					// A really simple decision making: if there are at least one field with binary data, or a 'long' string value then we will choose a Multipart form.
 					//  Otherwise Url Encoded form will be used.
 					if (FieldCollector.HasBinary || FieldCollector.HasLongValue)
+					{
 						goto case HTTPFormUsage.Multipart;
+					}
 					else
+					{
 						goto case HTTPFormUsage.UrlEncoded;
+					}
 
 				case HTTPFormUsage.UrlEncoded:
 					FormImpl = new HTTPUrlEncodedForm();
@@ -808,11 +840,15 @@ namespace BestHTTP
 		public void AddHeader(string name, string value)
 		{
 			if (Headers == null)
+			{
 				Headers = new Dictionary<string, List<string>>();
+			}
 
 			List<string> values;
 			if (!Headers.TryGetValue(name, out values))
+			{
 				Headers.Add(name, values = new List<string>(1));
+			}
 
 			values.Add(value);
 		}
@@ -823,11 +859,15 @@ namespace BestHTTP
 		public void SetHeader(string name, string value)
 		{
 			if (Headers == null)
+			{
 				Headers = new Dictionary<string, List<string>>();
+			}
 
 			List<string> values;
 			if (!Headers.TryGetValue(name, out values))
+			{
 				Headers.Add(name, values = new List<string>(1));
+			}
 
 			values.Clear();
 			values.Add(value);
@@ -841,7 +881,9 @@ namespace BestHTTP
 		public bool RemoveHeader(string name)
 		{
 			if (Headers == null)
+			{
 				return false;
+			}
 
 			return Headers.Remove(name);
 		}
@@ -860,11 +902,15 @@ namespace BestHTTP
 		public string GetFirstHeaderValue(string name)
 		{
 			if (Headers == null)
+			{
 				return null;
+			}
 
 			List<string> headers = null;
 			if (Headers.TryGetValue(name, out headers) && headers.Count > 0)
+			{
 				return headers[0];
+			}
 
 			return null;
 		}
@@ -875,11 +921,15 @@ namespace BestHTTP
 		public List<string> GetHeaderValues(string name)
 		{
 			if (Headers == null)
+			{
 				return null;
+			}
 
 			List<string> headers = null;
 			if (Headers.TryGetValue(name, out headers) && headers.Count > 0)
+			{
 				return headers;
+			}
 
 			return null;
 		}
@@ -890,7 +940,9 @@ namespace BestHTTP
 		public void RemoveHeaders()
 		{
 			if (Headers == null)
+			{
 				return;
+			}
 
 			Headers.Clear();
 		}
@@ -931,23 +983,33 @@ namespace BestHTTP
 			if (!HasHeader("Host"))
 			{
 				if (CurrentUri.Port == 80 || CurrentUri.Port == 443)
+				{
 					SetHeader("Host", CurrentUri.Host);
+				}
 				else
+				{
 					SetHeader("Host", CurrentUri.Authority);
+				}
 			}
 
 			if (IsRedirected && !HasHeader("Referer"))
+			{
 				AddHeader("Referer", Uri.ToString());
+			}
 
 			Decompression.DecompressorFactory.SetupHeaders(this);
 
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
-			if (!HTTPProtocolFactory.IsSecureProtocol(this.CurrentUri) && HasProxy && !HasHeader("Proxy-Connection"))
+			if (!HTTPProtocolFactory.IsSecureProtocol(CurrentUri) && HasProxy && !HasHeader("Proxy-Connection"))
+			{
 				AddHeader("Proxy-Connection", IsKeepAlive ? "Keep-Alive" : "Close");
+			}
 #endif
 
 			if (!HasHeader("Connection"))
+			{
 				AddHeader("Connection", IsKeepAlive ? "Keep-Alive, TE" : "Close, TE");
+			}
 
 			if (IsKeepAlive && !HasHeader("Keep-Alive"))
 			{
@@ -958,10 +1020,14 @@ namespace BestHTTP
 			}
 
 			if (!HasHeader("TE"))
+			{
 				AddHeader("TE", "identity");
+			}
 
 			if (!string.IsNullOrEmpty(HTTPManager.UserAgent) && !HasHeader("User-Agent"))
+			{
 				AddHeader("User-Agent", HTTPManager.UserAgent);
+			}
 #endif
 			long contentLength = -1;
 
@@ -974,7 +1040,9 @@ namespace BestHTTP
 				{
 					SelectFormImplementation();
 					if (FormImpl != null)
+					{
 						FormImpl.PrepareRequest(this);
+					}
 				}
 			}
 			else
@@ -982,10 +1050,14 @@ namespace BestHTTP
 				contentLength = UploadStreamLength;
 
 				if (contentLength == -1)
+				{
 					SetHeader("Transfer-Encoding", "Chunked");
+				}
 
 				if (!HasHeader("Content-Type"))
+				{
 					SetHeader("Content-Type", "application/octet-stream");
+				}
 			}
 
 			// Always set the Content-Length header if possible
@@ -1000,12 +1072,14 @@ namespace BestHTTP
 #endif
 				&& !HasHeader("Content-Length")
 				&& !HasHeader("Upgrade"))
+			{
 				SetHeader("Content-Length", contentLength.ToString());
+			}
 
 #if !UNITY_WEBGL || UNITY_EDITOR
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
 			// Proxy Authentication
-			if (!HTTPProtocolFactory.IsSecureProtocol(this.CurrentUri) && HasProxy && Proxy.Credentials != null)
+			if (!HTTPProtocolFactory.IsSecureProtocol(CurrentUri) && HasProxy && Proxy.Credentials != null)
 			{
 				switch (Proxy.Credentials.Type)
 				{
@@ -1017,12 +1091,14 @@ namespace BestHTTP
 
 					case AuthenticationTypes.Unknown:
 					case AuthenticationTypes.Digest:
-						var digest = DigestStore.Get(Proxy.Address);
+						Digest digest = DigestStore.Get(Proxy.Address);
 						if (digest != null)
 						{
 							string authentication = digest.GenerateResponseHeader(this, Proxy.Credentials);
 							if (!string.IsNullOrEmpty(authentication))
+							{
 								SetHeader("Proxy-Authorization", authentication);
+							}
 						}
 
 						break;
@@ -1045,12 +1121,14 @@ namespace BestHTTP
 
 					case AuthenticationTypes.Unknown:
 					case AuthenticationTypes.Digest:
-						var digest = DigestStore.Get(this.CurrentUri);
+						Digest digest = DigestStore.Get(CurrentUri);
 						if (digest != null)
 						{
 							string authentication = digest.GenerateResponseHeader(this, Credentials);
 							if (!string.IsNullOrEmpty(authentication))
+							{
 								SetHeader("Authorization", authentication);
+							}
 						}
 
 						break;
@@ -1064,20 +1142,26 @@ namespace BestHTTP
 
 			// Merge server sent cookies with user-set cookies
 			if (cookies == null || cookies.Count == 0)
-				cookies = this.customCookies;
-			else if (this.customCookies != null)
+			{
+				cookies = customCookies;
+			}
+			else if (customCookies != null)
 			{
 				// Merge
 				int idx = 0;
-				while (idx < this.customCookies.Count)
+				while (idx < customCookies.Count)
 				{
 					Cookie customCookie = customCookies[idx];
 
 					int foundIdx = cookies.FindIndex(c => c.Name.Equals(customCookie.Name));
 					if (foundIdx >= 0)
+					{
 						cookies[foundIdx] = customCookie;
+					}
 					else
+					{
 						cookies.Add(customCookie);
+					}
 
 					idx++;
 				}
@@ -1097,22 +1181,30 @@ namespace BestHTTP
 
 				bool isSecureProtocolInUse = HTTPProtocolFactory.IsSecureProtocol(CurrentUri);
 
-				foreach (var cookie in cookies)
+				foreach (Cookie cookie in cookies)
+				{
 					if (!cookie.IsSecure || (cookie.IsSecure && isSecureProtocolInUse))
 					{
 						if (!first)
+						{
 							cookieStr += "; ";
+						}
 						else
+						{
 							first = false;
+						}
 
 						cookieStr += cookie.ToString();
 
 						// 3. Update the last-access-time of each cookie in the cookie-list to the current date and time.
 						cookie.LastAccess = DateTime.UtcNow;
 					}
+				}
 
 				if (!string.IsNullOrEmpty(cookieStr))
+				{
 					SetHeader("Cookie", cookieStr);
+				}
 			}
 #endif
 
@@ -1124,40 +1216,48 @@ namespace BestHTTP
 				}
 				catch (Exception ex)
 				{
-					HTTPManager.Logger.Exception("HTTPRequest", "OnBeforeHeaderSend", ex, this.Context);
+					HTTPManager.Logger.Exception("HTTPRequest", "OnBeforeHeaderSend", ex, Context);
 				}
 			}
 
 			// Write out the headers to the stream
 			if (callback != null && Headers != null)
-				foreach (var kvp in Headers)
+			{
+				foreach (KeyValuePair<string, List<string>> kvp in Headers)
+				{
 					callback(kvp.Key, kvp.Value);
+				}
+			}
 		}
 
 		/// <summary>
 		/// Writes out the Headers to the stream.
 		/// </summary>
-		private void SendHeaders(Stream stream)
+		void SendHeaders(Stream stream)
 		{
 			EnumerateHeaders((header, values) =>
 			{
 				if (string.IsNullOrEmpty(header) || values == null)
+				{
 					return;
+				}
 
-				var headerName = string.Concat(header, ": ").GetASCIIBytes();
+				BufferSegment headerName = string.Concat(header, ": ").GetASCIIBytes();
 
 				for (int i = 0; i < values.Count; ++i)
 				{
 					if (string.IsNullOrEmpty(values[i]))
 					{
-						HTTPManager.Logger.Warning("HTTPRequest", string.Format("Null/empty value for header: {0}", header), this.Context);
+						HTTPManager.Logger.Warning("HTTPRequest", string.Format("Null/empty value for header: {0}", header), Context);
 						continue;
 					}
 
-					if (HTTPManager.Logger.Level <= Logger.Loglevels.Information)
+					if (HTTPManager.Logger.Level <= Loglevels.Information)
+					{
 						VerboseLogging("Header - '" + header + "': '" + values[i] + "'");
+					}
 
-					var valueBytes = values[i].GetASCIIBytes();
+					BufferSegment valueBytes = values[i].GetASCIIBytes();
 
 					stream.WriteBufferSegment(headerName);
 					stream.WriteBufferSegment(valueBytes);
@@ -1175,7 +1275,7 @@ namespace BestHTTP
 		/// </summary>
 		public string DumpHeaders()
 		{
-			using (var ms = new BufferPoolMemoryStream(5 * 1024))
+			using (BufferPoolMemoryStream ms = new BufferPoolMemoryStream(5 * 1024))
 			{
 				SendHeaders(ms);
 				return ms.ToArray().AsciiToString();
@@ -1189,13 +1289,17 @@ namespace BestHTTP
 		public byte[] GetEntityBody()
 		{
 			if (RawData != null)
+			{
 				return RawData;
+			}
 
 			if (FormImpl != null || (FieldCollector != null && !FieldCollector.IsEmpty))
 			{
 				SelectFormImplementation();
 				if (FormImpl != null)
+				{
 					return FormImpl.GetData();
+				}
 			}
 
 			return null;
@@ -1208,8 +1312,8 @@ namespace BestHTTP
 
 			public UploadStreamInfo(Stream stream, long length)
 			{
-				this.Stream = stream;
-				this.Length = length;
+				Stream = stream;
+				Length = length;
 			}
 		}
 
@@ -1219,7 +1323,9 @@ namespace BestHTTP
 
 			// We are sending forms? Then convert the form to a byte array
 			if (data == null && FormImpl != null)
+			{
 				data = FormImpl.GetData();
+			}
 
 			if (data != null || UploadStream != null)
 			{
@@ -1239,7 +1345,9 @@ namespace BestHTTP
 					UploadLength = data.Length;
 				}
 				else
+				{
 					UploadLength = UseUploadStreamLength ? UploadStreamLength : -1;
+				}
 
 				return new UploadStreamInfo(uploadStream, UploadLength);
 			}
@@ -1258,22 +1366,24 @@ namespace BestHTTP
 			string requestPathAndQuery =
 #if !BESTHTTP_DISABLE_PROXY && (!UNITY_WEBGL || UNITY_EDITOR)
 				HasProxy
-					? this.Proxy.GetRequestPath(CurrentUri)
+					? Proxy.GetRequestPath(CurrentUri)
 					:
 #endif
 					CurrentUri.GetRequestPathAndQueryURL();
 
 			string requestLine = string.Format("{0} {1} HTTP/1.1", MethodNames[(byte)MethodType], requestPathAndQuery);
 
-			if (HTTPManager.Logger.Level <= Logger.Loglevels.Information)
-				HTTPManager.Logger.Information("HTTPRequest", string.Format("Sending request: '{0}'", requestLine), this.Context);
+			if (HTTPManager.Logger.Level <= Loglevels.Information)
+			{
+				HTTPManager.Logger.Information("HTTPRequest", string.Format("Sending request: '{0}'", requestLine), Context);
+			}
 
 			// Create a buffer stream that will not close 'stream' when disposed or closed.
 			// buffersize should be larger than UploadChunkSize as it might be used for uploading user data and
 			//  it should have enough room for UploadChunkSize data and additional chunk information.
 			using (WriteOnlyBufferedStream bufferStream = new WriteOnlyBufferedStream(stream, (int)(UploadChunkSize * 1.5f)))
 			{
-				var requestLineBytes = requestLine.GetASCIIBytes();
+				BufferSegment requestLineBytes = requestLine.GetASCIIBytes();
 				bufferStream.WriteBufferSegment(requestLineBytes);
 				bufferStream.WriteArray(EOL);
 
@@ -1290,7 +1400,9 @@ namespace BestHTTP
 
 				// We are sending forms? Then convert the form to a byte array
 				if (data == null && FormImpl != null)
+				{
 					data = FormImpl.GetData();
+				}
 
 				if (data != null || UploadStream != null)
 				{
@@ -1310,7 +1422,9 @@ namespace BestHTTP
 						UploadLength = data.Length;
 					}
 					else
+					{
 						UploadLength = UseUploadStreamLength ? UploadStreamLength : -1;
+					}
 
 					// Initialize the progress report variables
 					long Uploaded = 0;
@@ -1325,7 +1439,7 @@ namespace BestHTTP
 						// If we don't know the size, send as chunked
 						if (!UseUploadStreamLength)
 						{
-							var countBytes = count.ToString("X").GetASCIIBytes();
+							BufferSegment countBytes = count.ToString("X").GetASCIIBytes();
 							bufferStream.WriteBufferSegment(countBytes);
 							bufferStream.WriteArray(EOL);
 
@@ -1337,7 +1451,9 @@ namespace BestHTTP
 
 						// chunk trailing EOL
 						if (!UseUploadStreamLength)
+						{
 							bufferStream.WriteArray(EOL);
+						}
 
 						// update how many bytes are uploaded
 						Uploaded += count;
@@ -1345,11 +1461,15 @@ namespace BestHTTP
 						// Write to the wire
 						bufferStream.Flush();
 
-						if (this.OnUploadProgress != null)
+						if (OnUploadProgress != null)
+						{
 							RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this, RequestEvents.UploadProgress, Uploaded, UploadLength));
+						}
 
-						if (this.IsCancellationRequested)
+						if (IsCancellationRequested)
+						{
 							return;
+						}
 					}
 
 					BufferPool.Release(buffer);
@@ -1371,13 +1491,17 @@ namespace BestHTTP
 
 					// Dispose the MemoryStream
 					if (UploadStream == null && uploadStream != null)
+					{
 						uploadStream.Dispose();
+					}
 				}
 				else
+				{
 					bufferStream.Flush();
+				}
 			} // bufferStream.Dispose
 
-			HTTPManager.Logger.Information("HTTPRequest", "'" + requestLine + "' sent out", this.Context);
+			HTTPManager.Logger.Information("HTTPRequest", "'" + requestLine + "' sent out", Context);
 #endif
 		}
 
@@ -1385,16 +1509,20 @@ namespace BestHTTP
 		internal void UpgradeCallback()
 		{
 			if (Response == null || !Response.IsUpgraded)
+			{
 				return;
+			}
 
 			try
 			{
 				if (OnUpgraded != null)
+				{
 					OnUpgraded(this, Response);
+				}
 			}
 			catch (Exception ex)
 			{
-				HTTPManager.Logger.Exception("HTTPRequest", "UpgradeCallback", ex, this.Context);
+				HTTPManager.Logger.Exception("HTTPRequest", "UpgradeCallback", ex, Context);
 			}
 		}
 #endif
@@ -1402,7 +1530,9 @@ namespace BestHTTP
 		internal bool CallOnBeforeRedirection(Uri redirectUri)
 		{
 			if (onBeforeRedirection != null)
-				return onBeforeRedirection(this, this.Response, redirectUri);
+			{
+				return onBeforeRedirection(this, Response, redirectUri);
+			}
 
 			return true;
 		}
@@ -1421,8 +1551,8 @@ namespace BestHTTP
 		/// </summary>
 		public HTTPRequest Send()
 		{
-			this.IsCancellationRequested = false;
-			this.Exception = null;
+			IsCancellationRequested = false;
+			Exception = null;
 
 			return HTTPManager.SendRequest(this);
 		}
@@ -1436,34 +1566,40 @@ namespace BestHTTP
 
 			lock (this)
 			{
-				if (this.State >= HTTPRequestStates.Finished)
+				if (State >= HTTPRequestStates.Finished)
+				{
 					return;
+				}
 
-				this.IsCancellationRequested = true;
+				IsCancellationRequested = true;
 
 				// If the response is an IProtocol implementation, call the protocol's cancellation.
-				IProtocol protocol = this.Response as IProtocol;
+				IProtocol protocol = Response as IProtocol;
 				if (protocol != null)
+				{
 					protocol.CancellationRequested();
+				}
 
 				// There's a race-condition here, another thread might set it too.
-				this.Response = null;
+				Response = null;
 
 				// There's a race-condition here too, another thread might set it too.
 				//  In this case, both state going to be queued up that we have to handle in RequestEvents.cs.
-				if (this.IsTimedOut)
+				if (IsTimedOut)
 				{
-					this.State = this.IsConnectTimedOut ? HTTPRequestStates.ConnectionTimedOut : HTTPRequestStates.TimedOut;
+					State = IsConnectTimedOut ? HTTPRequestStates.ConnectionTimedOut : HTTPRequestStates.TimedOut;
 				}
 				else
-					this.State = HTTPRequestStates.Aborted;
+				{
+					State = HTTPRequestStates.Aborted;
+				}
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-				if (this.OnCancellationRequested != null)
+				if (OnCancellationRequested != null)
 				{
 					try
 					{
-						this.OnCancellationRequested(this);
+						OnCancellationRequested(this);
 					}
 					catch
 					{
@@ -1481,14 +1617,14 @@ namespace BestHTTP
 			ClearForm();
 			RemoveHeaders();
 
-			this.IsRedirected = false;
-			this.RedirectCount = 0;
-			this.Exception = null;
+			IsRedirected = false;
+			RedirectCount = 0;
+			Exception = null;
 		}
 
-		private void VerboseLogging(string str)
+		void VerboseLogging(string str)
 		{
-			HTTPManager.Logger.Verbose("HTTPRequest", str, this.Context);
+			HTTPManager.Logger.Verbose("HTTPRequest", str, Context);
 		}
 
 		#region System.Collections.IEnumerator implementation
@@ -1500,7 +1636,7 @@ namespace BestHTTP
 
 		public bool MoveNext()
 		{
-			return this.State < HTTPRequestStates.Finished;
+			return State < HTTPRequestStates.Finished;
 		}
 
 		public void Reset()
@@ -1524,7 +1660,9 @@ namespace BestHTTP
 			}
 
 			if (Response != null)
+			{
 				Response.Dispose();
+			}
 		}
 	}
 }

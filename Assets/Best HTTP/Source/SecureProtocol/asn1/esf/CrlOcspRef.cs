@@ -18,30 +18,36 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class CrlOcspRef
 		: Asn1Encodable
 	{
-		private readonly CrlListID crlids;
-		private readonly OcspListID ocspids;
-		private readonly OtherRevRefs otherRev;
+		readonly CrlListID crlids;
+		readonly OcspListID ocspids;
+		readonly OtherRevRefs otherRev;
 
 		public static CrlOcspRef GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is CrlOcspRef)
+			{
 				return (CrlOcspRef)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CrlOcspRef((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'CrlOcspRef' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
-		private CrlOcspRef(
+		CrlOcspRef(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
+			}
 
 			foreach (Asn1TaggedObject taggedObj in seq)
 			{
@@ -50,13 +56,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 				switch (taggedObj.TagNo)
 				{
 					case 0:
-						this.crlids = CrlListID.GetInstance(asn1Obj);
+						crlids = CrlListID.GetInstance(asn1Obj);
 						break;
 					case 1:
-						this.ocspids = OcspListID.GetInstance(asn1Obj);
+						ocspids = OcspListID.GetInstance(asn1Obj);
 						break;
 					case 2:
-						this.otherRev = OtherRevRefs.GetInstance(asn1Obj);
+						otherRev = OtherRevRefs.GetInstance(asn1Obj);
 						break;
 					default:
 						throw new ArgumentException("Illegal tag in CrlOcspRef", "seq");

@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class TlsECDHKeyExchange
 		: AbstractTlsKeyExchange
 	{
-		private static int CheckKeyExchange(int keyExchange)
+		static int CheckKeyExchange(int keyExchange)
 		{
 			switch (keyExchange)
 			{
@@ -37,12 +37,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public override void ProcessServerCredentials(TlsCredentials serverCredentials)
 		{
-			this.m_agreementCredentials = TlsUtilities.RequireAgreementCredentials(serverCredentials);
+			m_agreementCredentials = TlsUtilities.RequireAgreementCredentials(serverCredentials);
 		}
 
 		public override void ProcessServerCertificate(Certificate serverCertificate)
 		{
-			this.m_ecdhPeerCertificate = serverCertificate.GetCertificateAt(0).CheckUsageInRole(
+			m_ecdhPeerCertificate = serverCertificate.GetCertificateAt(0).CheckUsageInRole(
 				TlsCertificateRole.ECDH);
 		}
 
@@ -64,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public override void ProcessClientCredentials(TlsCredentials clientCredentials)
 		{
-			this.m_agreementCredentials = TlsUtilities.RequireAgreementCredentials(clientCredentials);
+			m_agreementCredentials = TlsUtilities.RequireAgreementCredentials(clientCredentials);
 		}
 
 		public override void GenerateClientKeyExchange(Stream output)
@@ -74,7 +74,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public override void ProcessClientCertificate(Certificate clientCertificate)
 		{
-			this.m_ecdhPeerCertificate = clientCertificate.GetCertificateAt(0).CheckUsageInRole(
+			m_ecdhPeerCertificate = clientCertificate.GetCertificateAt(0).CheckUsageInRole(
 				TlsCertificateRole.ECDH);
 		}
 

@@ -17,14 +17,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class Gost3410KeyPairGenerator
 		: IAsymmetricCipherKeyPairGenerator
 	{
-		private Gost3410KeyGenerationParameters param;
+		Gost3410KeyGenerationParameters param;
 
 		public void Init(
 			KeyGenerationParameters parameters)
 		{
 			if (parameters is Gost3410KeyGenerationParameters)
 			{
-				this.param = (Gost3410KeyGenerationParameters)parameters;
+				param = (Gost3410KeyGenerationParameters)parameters;
 			}
 			else
 			{
@@ -37,7 +37,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 					// TODO Should we complain?
 				}
 
-				this.param = kgp;
+				param = kgp;
 			}
 		}
 
@@ -54,10 +54,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				x = new BigInteger(256, random);
 
 				if (x.SignValue < 1 || x.CompareTo(q) >= 0)
+				{
 					continue;
+				}
 
 				if (WNafUtilities.GetNafWeight(x) < minWeight)
+				{
 					continue;
+				}
 
 				break;
 			}

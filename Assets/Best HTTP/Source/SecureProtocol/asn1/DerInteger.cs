@@ -14,7 +14,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerInteger), Asn1Tags.Integer)
+			Meta() : base(typeof(DerInteger), Asn1Tags.Integer)
 			{
 			}
 
@@ -28,15 +28,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		internal static bool AllowUnsafe()
 		{
-			string allowUnsafeValue = Org.BouncyCastle.Utilities.Platform.GetEnvironmentVariable(AllowUnsafeProperty);
-			return allowUnsafeValue != null && Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase("true", allowUnsafeValue);
+			string allowUnsafeValue = Platform.GetEnvironmentVariable(AllowUnsafeProperty);
+			return allowUnsafeValue != null && Platform.EqualsIgnoreCase("true", allowUnsafeValue);
 		}
 
 		internal const int SignExtSigned = -1;
 		internal const int SignExtUnsigned = 0xFF;
 
-		private readonly byte[] bytes;
-		private readonly int start;
+		readonly byte[] bytes;
+		readonly int start;
 
 		/**
 		 * return an integer from the passed in object
@@ -46,16 +46,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerInteger GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerInteger derInteger)
+			{
 				return derInteger;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerInteger converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -69,7 +75,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj));
 		}
 
 		/**
@@ -86,23 +92,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		public DerInteger(int value)
 		{
-			this.bytes = BigInteger.ValueOf(value).ToByteArray();
-			this.start = 0;
+			bytes = BigInteger.ValueOf(value).ToByteArray();
+			start = 0;
 		}
 
 		public DerInteger(long value)
 		{
-			this.bytes = BigInteger.ValueOf(value).ToByteArray();
-			this.start = 0;
+			bytes = BigInteger.ValueOf(value).ToByteArray();
+			start = 0;
 		}
 
 		public DerInteger(BigInteger value)
 		{
 			if (value == null)
+			{
 				throw new ArgumentNullException("value");
+			}
 
-			this.bytes = value.ToByteArray();
-			this.start = 0;
+			bytes = value.ToByteArray();
+			start = 0;
 		}
 
 		public DerInteger(byte[] bytes)
@@ -113,10 +121,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal DerInteger(byte[] bytes, bool clone)
 		{
 			if (IsMalformed(bytes))
+			{
 				throw new ArgumentException("malformed integer", "bytes");
+			}
 
 			this.bytes = clone ? Arrays.Clone(bytes) : bytes;
-			this.start = SignBytesToSkip(bytes);
+			start = SignBytesToSkip(bytes);
 		}
 
 		/**
@@ -135,13 +145,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		public bool HasValue(int x)
 		{
-			return (bytes.Length - start) <= 4
+			return bytes.Length - start <= 4
 			       && IntValue(bytes, start, SignExtSigned) == x;
 		}
 
 		public bool HasValue(long x)
 		{
-			return (bytes.Length - start) <= 8
+			return bytes.Length - start <= 8
 			       && LongValue(bytes, start, SignExtSigned) == x;
 		}
 
@@ -159,7 +169,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				int count = bytes.Length - start;
 				if (count > 4 || (count == 4 && 0 != (bytes[start] & 0x80)))
+				{
 					throw new ArithmeticException("ASN.1 Integer out of positive int range");
+				}
 
 				return IntValue(bytes, start, SignExtUnsigned);
 			}
@@ -171,7 +183,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				int count = bytes.Length - start;
 				if (count > 4)
+				{
 					throw new ArithmeticException("ASN.1 Integer out of int range");
+				}
 
 				return IntValue(bytes, start, SignExtSigned);
 			}
@@ -183,7 +197,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				int count = bytes.Length - start;
 				if (count > 8)
+				{
 					throw new ArithmeticException("ASN.1 Integer out of long range");
+				}
 
 				return LongValue(bytes, start, SignExtSigned);
 			}
@@ -208,9 +224,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			DerInteger other = asn1Object as DerInteger;
 			if (other == null)
+			{
 				return false;
+			}
 
-			return Arrays.AreEqual(this.bytes, other.bytes);
+			return Arrays.AreEqual(bytes, other.bytes);
 		}
 
 		public override string ToString()
@@ -266,7 +284,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				case 1:
 					return false;
 				default:
-					return (sbyte)bytes[0] == ((sbyte)bytes[1] >> 7) && !AllowUnsafe();
+					return (sbyte)bytes[0] == (sbyte)bytes[1] >> 7 && !AllowUnsafe();
 			}
 		}
 
@@ -274,7 +292,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			int pos = 0, last = bytes.Length - 1;
 			while (pos < last
-			       && (sbyte)bytes[pos] == ((sbyte)bytes[pos + 1] >> 7))
+			       && (sbyte)bytes[pos] == (sbyte)bytes[pos + 1] >> 7)
 			{
 				++pos;
 			}

@@ -9,25 +9,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class SignerAttribute
 		: Asn1Encodable
 	{
-		private Asn1Sequence claimedAttributes;
-		private AttributeCertificate certifiedAttributes;
+		Asn1Sequence claimedAttributes;
+		AttributeCertificate certifiedAttributes;
 
 		public static SignerAttribute GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is SignerAttribute)
+			{
 				return (SignerAttribute)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new SignerAttribute(obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'SignerAttribute' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
-		private SignerAttribute(
+		SignerAttribute(
 			object obj)
 		{
 			Asn1Sequence seq = (Asn1Sequence)obj;

@@ -11,16 +11,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Nist
 	/// <summary>Elliptic curve registry for NIST curves.</summary>
 	public static class NistNamedCurves
 	{
-		private static readonly Dictionary<string, DerObjectIdentifier> objIds =
+		static readonly Dictionary<string, DerObjectIdentifier> objIds =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly Dictionary<DerObjectIdentifier, string> names =
+		static readonly Dictionary<DerObjectIdentifier, string> names =
 			new Dictionary<DerObjectIdentifier, string>();
 
-		private static void DefineCurveAlias(string name, DerObjectIdentifier oid)
+		static void DefineCurveAlias(string name, DerObjectIdentifier oid)
 		{
 			if (SecNamedCurves.GetByOidLazy(oid) == null)
+			{
 				throw new InvalidOperationException();
+			}
 
 			objIds.Add(name, oid);
 			names.Add(oid, name);

@@ -7,18 +7,18 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl;
 
 namespace BestHTTP.Connections.TLS.Crypto.Impl
 {
-	internal sealed class FastTlsBlockCipherImpl
+	sealed class FastTlsBlockCipherImpl
 		: TlsBlockCipherImpl
 	{
-		private readonly bool m_isEncrypting;
-		private readonly IBlockCipher m_cipher;
+		readonly bool m_isEncrypting;
+		readonly IBlockCipher m_cipher;
 
-		private KeyParameter key;
+		KeyParameter key;
 
 		internal FastTlsBlockCipherImpl(IBlockCipher cipher, bool isEncrypting)
 		{
-			this.m_cipher = cipher;
-			this.m_isEncrypting = isEncrypting;
+			m_cipher = cipher;
+			m_isEncrypting = isEncrypting;
 		}
 
 		public void SetKey(byte[] key, int keyOff, int keyLen)

@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 	public class TrustSignature
 		: SignatureSubpacket
 	{
-		private static byte[] IntToByteArray(
+		static byte[] IntToByteArray(
 			int v1,
 			int v2)
 		{

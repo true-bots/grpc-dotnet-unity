@@ -8,11 +8,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 	public class TlsMacSink
 		: BaseOutputStream
 	{
-		private readonly TlsMac m_mac;
+		readonly TlsMac m_mac;
 
 		public TlsMacSink(TlsMac mac)
 		{
-			this.m_mac = mac;
+			m_mac = mac;
 		}
 
 		public virtual TlsMac Mac

@@ -50,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public override int GetHashCode()
 		{
-			int vh = this.Value.GetHashCode();
+			int vh = Value.GetHashCode();
 
 			return IsCritical ? vh : ~vh;
 		}

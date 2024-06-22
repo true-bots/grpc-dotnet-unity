@@ -11,9 +11,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class CShakeDigest
 		: ShakeDigest
 	{
-		private static readonly byte[] padding = new byte[100];
+		static readonly byte[] padding = new byte[100];
 
-		private static byte[] EncodeString(byte[] str)
+		static byte[] EncodeString(byte[] str)
 		{
 			if (Arrays.IsNullOrEmpty(str))
 			{
@@ -23,7 +23,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return Arrays.Concatenate(XofUtilities.LeftEncode(str.Length * 8L), str);
 		}
 
-		private readonly byte[] diff;
+		readonly byte[] diff;
 
 		/// <summary>
 		/// Base constructor
@@ -48,11 +48,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public CShakeDigest(CShakeDigest source)
 			: base(source)
 		{
-			this.diff = Arrays.Clone(source.diff);
+			diff = Arrays.Clone(source.diff);
 		}
 
 		// bytepad in SP 800-185
-		private void DiffPadAndAbsorb()
+		void DiffPadAndAbsorb()
 		{
 			int blockSize = rate / 8;
 			Absorb(diff, 0, diff.Length);
@@ -91,7 +91,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 				AbsorbBits(0x00, 2);
 			}
 
-			Squeeze(output, outOff, ((long)outLen) << 3);
+			Squeeze(output, outOff, (long)outLen << 3);
 
 			return outLen;
 		}

@@ -24,7 +24,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 	/// </remarks>
 	public static class DigestUtilities
 	{
-		private enum DigestAlgorithm
+		enum DigestAlgorithm
 		{
 			BLAKE2B_160,
 			BLAKE2B_256,
@@ -69,13 +69,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			SHAKE256_512,
 			SM3,
 			TIGER,
-			WHIRLPOOL,
+			WHIRLPOOL
 		};
 
-		private static readonly IDictionary<string, string> Aliases =
+		static readonly IDictionary<string, string> Aliases =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly IDictionary<string, DerObjectIdentifier> Oids =
+		static readonly IDictionary<string, DerObjectIdentifier> Oids =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
 		static DigestUtilities()
@@ -207,7 +207,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public static DerObjectIdentifier GetObjectIdentifier(string mechanism)
 		{
 			if (mechanism == null)
+			{
 				throw new ArgumentNullException(nameof(mechanism));
+			}
 
 			mechanism = CollectionUtilities.GetValueOrKey(Aliases, mechanism).ToUpperInvariant();
 
@@ -222,7 +224,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public static IDigest GetDigest(string algorithm)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException(nameof(algorithm));
+			}
 
 			string mechanism = CollectionUtilities.GetValueOrKey(Aliases, algorithm).ToUpperInvariant();
 

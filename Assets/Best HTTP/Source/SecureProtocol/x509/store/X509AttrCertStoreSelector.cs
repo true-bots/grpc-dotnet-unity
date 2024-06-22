@@ -22,28 +22,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 	{
 		// TODO: name constraints???
 
-		private X509V2AttributeCertificate attributeCert;
-		private DateTime? attributeCertificateValid;
-		private AttributeCertificateHolder holder;
-		private AttributeCertificateIssuer issuer;
-		private BigInteger serialNumber;
-		private ISet<GeneralName> targetNames = new HashSet<GeneralName>();
-		private ISet<GeneralName> targetGroups = new HashSet<GeneralName>();
+		X509V2AttributeCertificate attributeCert;
+		DateTime? attributeCertificateValid;
+		AttributeCertificateHolder holder;
+		AttributeCertificateIssuer issuer;
+		BigInteger serialNumber;
+		ISet<GeneralName> targetNames = new HashSet<GeneralName>();
+		ISet<GeneralName> targetGroups = new HashSet<GeneralName>();
 
 		public X509AttrCertStoreSelector()
 		{
 		}
 
-		private X509AttrCertStoreSelector(
+		X509AttrCertStoreSelector(
 			X509AttrCertStoreSelector o)
 		{
-			this.attributeCert = o.attributeCert;
-			this.attributeCertificateValid = o.attributeCertificateValid;
-			this.holder = o.holder;
-			this.issuer = o.issuer;
-			this.serialNumber = o.serialNumber;
-			this.targetGroups = new HashSet<GeneralName>(o.targetGroups);
-			this.targetNames = new HashSet<GeneralName>(o.targetNames);
+			attributeCert = o.attributeCert;
+			attributeCertificateValid = o.attributeCertificateValid;
+			holder = o.holder;
+			issuer = o.issuer;
+			serialNumber = o.serialNumber;
+			targetGroups = new HashSet<GeneralName>(o.targetGroups);
+			targetNames = new HashSet<GeneralName>(o.targetNames);
 		}
 
 		/// <summary>
@@ -54,22 +54,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public bool Match(X509V2AttributeCertificate attrCert)
 		{
 			if (attrCert == null)
+			{
 				return false;
+			}
 
-			if (this.attributeCert != null && !this.attributeCert.Equals(attrCert))
+			if (attributeCert != null && !attributeCert.Equals(attrCert))
+			{
 				return false;
+			}
 
 			if (serialNumber != null && !attrCert.SerialNumber.Equals(serialNumber))
+			{
 				return false;
+			}
 
 			if (holder != null && !attrCert.Holder.Equals(holder))
+			{
 				return false;
+			}
 
 			if (issuer != null && !attrCert.Issuer.Equals(issuer))
+			{
 				return false;
+			}
 
 			if (attributeCertificateValid != null && !attrCert.IsValid(attributeCertificateValid.Value))
+			{
 				return false;
+			}
 
 			if (targetNames.Count > 0 || targetGroups.Count > 0)
 			{
@@ -158,7 +170,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public X509V2AttributeCertificate AttributeCert
 		{
 			get { return attributeCert; }
-			set { this.attributeCert = value; }
+			set { attributeCert = value; }
 		}
 
 		/// <summary>The criteria for validity</summary>
@@ -166,7 +178,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public DateTime? AttributeCertificateValid
 		{
 			get { return attributeCertificateValid; }
-			set { this.attributeCertificateValid = value; }
+			set { attributeCertificateValid = value; }
 		}
 
 		/// <summary>The holder.</summary>
@@ -174,7 +186,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public AttributeCertificateHolder Holder
 		{
 			get { return holder; }
-			set { this.holder = value; }
+			set { holder = value; }
 		}
 
 		/// <summary>The issuer.</summary>
@@ -182,7 +194,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public AttributeCertificateIssuer Issuer
 		{
 			get { return issuer; }
-			set { this.issuer = value; }
+			set { issuer = value; }
 		}
 
 		/// <summary>The serial number.</summary>
@@ -190,7 +202,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 		public BigInteger SerialNumber
 		{
 			get { return serialNumber; }
-			set { this.serialNumber = value; }
+			set { serialNumber = value; }
 		}
 
 		/**
@@ -332,9 +344,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store
 			return CollectionUtilities.Proxy(targetGroups);
 		}
 
-		private ISet<GeneralName> ExtractGeneralNames(IEnumerable<object> names)
+		ISet<GeneralName> ExtractGeneralNames(IEnumerable<object> names)
 		{
-			var result = new HashSet<GeneralName>();
+			HashSet<GeneralName> result = new HashSet<GeneralName>();
 
 			if (names != null)
 			{

@@ -38,10 +38,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new AttributeCertificateInfo((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private AttributeCertificateInfo(
+		AttributeCertificateInfo(
 			Asn1Sequence seq)
 		{
 			if (seq.Count < 6 || seq.Count > 9)
@@ -52,21 +52,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			int start;
 			if (seq[0] is DerInteger) // in version 1 certs version is DEFAULT  v1(0)
 			{
-				this.version = DerInteger.GetInstance(seq[0]);
+				version = DerInteger.GetInstance(seq[0]);
 				start = 1;
 			}
 			else
 			{
-				this.version = new DerInteger(0);
+				version = new DerInteger(0);
 				start = 0;
 			}
 
-			this.holder = Holder.GetInstance(seq[start]);
-			this.issuer = AttCertIssuer.GetInstance(seq[start + 1]);
-			this.signature = AlgorithmIdentifier.GetInstance(seq[start + 2]);
-			this.serialNumber = DerInteger.GetInstance(seq[start + 3]);
-			this.attrCertValidityPeriod = AttCertValidityPeriod.GetInstance(seq[start + 4]);
-			this.attributes = Asn1Sequence.GetInstance(seq[start + 5]);
+			holder = Holder.GetInstance(seq[start]);
+			issuer = AttCertIssuer.GetInstance(seq[start + 1]);
+			signature = AlgorithmIdentifier.GetInstance(seq[start + 2]);
+			serialNumber = DerInteger.GetInstance(seq[start + 3]);
+			attrCertValidityPeriod = AttCertValidityPeriod.GetInstance(seq[start + 4]);
+			attributes = Asn1Sequence.GetInstance(seq[start + 5]);
 
 			for (int i = start + 6; i < seq.Count; i++)
 			{
@@ -74,11 +74,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 				if (obj is DerBitString)
 				{
-					this.issuerUniqueID = DerBitString.GetInstance(seq[i]);
+					issuerUniqueID = DerBitString.GetInstance(seq[i]);
 				}
 				else if (obj is Asn1Sequence || obj is X509Extensions)
 				{
-					this.extensions = X509Extensions.GetInstance(seq[i]);
+					extensions = X509Extensions.GetInstance(seq[i]);
 				}
 			}
 		}

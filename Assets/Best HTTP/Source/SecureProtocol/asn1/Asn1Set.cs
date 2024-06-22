@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(Asn1Set), Asn1Tags.Set)
+			Meta() : base(typeof(Asn1Set), Asn1Tags.Set)
 			{
 			}
 
@@ -35,16 +35,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1Set GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is Asn1Set asn1Set)
+			{
 				return asn1Set;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is Asn1Set converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -58,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -86,23 +92,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		protected internal Asn1Set()
 		{
-			this.elements = Asn1EncodableVector.EmptyElements;
-			this.isSorted = true;
+			elements = Asn1EncodableVector.EmptyElements;
+			isSorted = true;
 		}
 
 		protected internal Asn1Set(Asn1Encodable element)
 		{
 			if (null == element)
+			{
 				throw new ArgumentNullException("element");
+			}
 
-			this.elements = new Asn1Encodable[] { element };
-			this.isSorted = true;
+			elements = new Asn1Encodable[] { element };
+			isSorted = true;
 		}
 
 		protected internal Asn1Set(Asn1Encodable[] elements, bool doSort)
 		{
 			if (Arrays.IsNullOrContainsNull(elements))
+			{
 				throw new NullReferenceException("'elements' cannot be null, or contain null");
+			}
 
 			Asn1Encodable[] tmp = Asn1EncodableVector.CloneElements(elements);
 			if (doSort && tmp.Length >= 2)
@@ -111,13 +121,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 
 			this.elements = tmp;
-			this.isSorted = doSort || tmp.Length < 2;
+			isSorted = doSort || tmp.Length < 2;
 		}
 
 		protected internal Asn1Set(Asn1EncodableVector elementVector, bool doSort)
 		{
 			if (null == elementVector)
+			{
 				throw new ArgumentNullException("elementVector");
+			}
 
 			Asn1Encodable[] tmp;
 			if (doSort && elementVector.Count >= 2)
@@ -129,8 +141,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				tmp = elementVector.TakeElements();
 			}
 
-			this.elements = tmp;
-			this.isSorted = doSort || tmp.Length < 2;
+			elements = tmp;
+			isSorted = doSort || tmp.Length < 2;
 		}
 
 		protected internal Asn1Set(bool isSorted, Asn1Encodable[] elements)
@@ -184,32 +196,38 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return Asn1EncodableVector.CloneElements(elements);
 		}
 
-		private class Asn1SetParserImpl
+		class Asn1SetParserImpl
 			: Asn1SetParser
 		{
-			private readonly Asn1Set outer;
-			private readonly int max;
-			private int index;
+			readonly Asn1Set outer;
+			readonly int max;
+			int index;
 
 			public Asn1SetParserImpl(
 				Asn1Set outer)
 			{
 				this.outer = outer;
 				// NOTE: Call Count here to 'force' a LazyDerSet
-				this.max = outer.Count;
+				max = outer.Count;
 			}
 
 			public IAsn1Convertible ReadObject()
 			{
 				if (index == max)
+				{
 					return null;
+				}
 
 				Asn1Encodable obj = outer[index++];
 				if (obj is Asn1Sequence)
+				{
 					return ((Asn1Sequence)obj).Parser;
+				}
 
 				if (obj is Asn1Set)
+				{
 					return ((Asn1Set)obj).Parser;
+				}
 
 				// NB: Asn1OctetString implements Asn1OctetStringParser directly
 //				if (obj is Asn1OctetString)
@@ -248,20 +266,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			Asn1Set that = asn1Object as Asn1Set;
 			if (null == that)
+			{
 				return false;
+			}
 
 			// NOTE: Call Count here (on both) to 'force' a LazyDerSet
-			int count = this.Count;
+			int count = Count;
 			if (that.Count != count)
+			{
 				return false;
+			}
 
 			for (int i = 0; i < count; ++i)
 			{
-				Asn1Object o1 = this.elements[i].ToAsn1Object();
+				Asn1Object o1 = elements[i].ToAsn1Object();
 				Asn1Object o2 = that.elements[i].ToAsn1Object();
 
 				if (!o1.Equals(o2))
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -276,7 +300,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			int count = elements.Length;
 			if (count < 2)
+			{
 				return elements;
+			}
 
 			byte[][] keys = new byte[count][];
 			for (int i = 0; i < count; ++i)
@@ -288,7 +314,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return elements;
 		}
 
-		private class DerComparer
+		class DerComparer
 			: IComparer<byte[]>
 		{
 			public int Compare(byte[] a, byte[] b)
@@ -310,7 +336,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				int a0 = a[0] & ~Asn1Tags.Constructed;
 				int b0 = b[0] & ~Asn1Tags.Constructed;
 				if (a0 != b0)
+				{
 					return a0 < b0 ? -1 : 1;
+				}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
                 int compareLength = System.Math.Min(a.Length, b.Length) - 1;
@@ -321,7 +349,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				{
 					byte ai = a[i], bi = b[i];
 					if (ai != bi)
+					{
 						return ai < bi ? -1 : 1;
+					}
 				}
 
 				Debug.Assert(a.Length == b.Length);

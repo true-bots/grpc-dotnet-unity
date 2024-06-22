@@ -12,11 +12,12 @@ using System;
 using System.Collections.Generic;
 using BestHTTP.Logger;
 using System.Collections.Concurrent;
+using BestHTTP.PlatformSupport.Memory;
 using BestHTTP.PlatformSupport.Threading;
 
 namespace BestHTTP.SignalRCore
 {
-	public sealed class HubConnection : BestHTTP.Extensions.IHeartbeat
+	public sealed class HubConnection : Extensions.IHeartbeat
 	{
 		public static readonly object[] EmptyArgs = new object[0];
 
@@ -30,11 +31,11 @@ namespace BestHTTP.SignalRCore
 		/// </summary>
 		public ConnectionStates State
 		{
-			get { return (ConnectionStates)this._state; }
-			private set { Interlocked.Exchange(ref this._state, (int)value); }
+			get { return (ConnectionStates)_state; }
+			private set { Interlocked.Exchange(ref _state, (int)value); }
 		}
 
-		private volatile int _state;
+		volatile int _state;
 
 		/// <summary>
 		/// Current, active ITransport instance.
@@ -119,42 +120,42 @@ namespace BestHTTP.SignalRCore
 		/// <summary>
 		/// This will be increment to add a unique id to every message the plugin will send.
 		/// </summary>
-		private long lastInvocationId = 1;
+		long lastInvocationId = 1;
 
 		/// <summary>
 		/// Id of the last streaming parameter.
 		/// </summary>
-		private int lastStreamId = 1;
+		int lastStreamId = 1;
 
 		/// <summary>
 		///  Store the callback for all sent message that expect a return value from the server. All sent message has
 		///  a unique invocationId that will be sent back from the server.
 		/// </summary>
-		private ConcurrentDictionary<long, InvocationDefinition> invocations = new ConcurrentDictionary<long, InvocationDefinition>();
+		ConcurrentDictionary<long, InvocationDefinition> invocations = new ConcurrentDictionary<long, InvocationDefinition>();
 
 		/// <summary>
 		/// This is where we store the methodname => callback mapping.
 		/// </summary>
-		private ConcurrentDictionary<string, Subscription> subscriptions = new ConcurrentDictionary<string, Subscription>(StringComparer.OrdinalIgnoreCase);
+		ConcurrentDictionary<string, Subscription> subscriptions = new ConcurrentDictionary<string, Subscription>(StringComparer.OrdinalIgnoreCase);
 
 		/// <summary>
 		/// When we sent out the last message to the server.
 		/// </summary>
-		private DateTime lastMessageSentAt;
+		DateTime lastMessageSentAt;
 
-		private DateTime lastMessageReceivedAt;
+		DateTime lastMessageReceivedAt;
 
-		private DateTime connectionStartedAt;
+		DateTime connectionStartedAt;
 
-		private RetryContext currentContext;
-		private DateTime reconnectStartTime = DateTime.MinValue;
-		private DateTime reconnectAt;
+		RetryContext currentContext;
+		DateTime reconnectStartTime = DateTime.MinValue;
+		DateTime reconnectAt;
 
-		private List<TransportTypes> triedoutTransports = new List<TransportTypes>();
+		List<TransportTypes> triedoutTransports = new List<TransportTypes>();
 
-		private ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+		ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
-		private bool pausedInLastFrame;
+		bool pausedInLastFrame;
 
 		public HubConnection(Uri hubUri, IProtocol protocol)
 			: this(hubUri, protocol, new HubOptions())
@@ -163,50 +164,52 @@ namespace BestHTTP.SignalRCore
 
 		public HubConnection(Uri hubUri, IProtocol protocol, HubOptions options)
 		{
-			this.Context = new LoggingContext(this);
+			Context = new LoggingContext(this);
 
-			this.Uri = hubUri;
-			this.State = ConnectionStates.Initial;
-			this.Options = options;
-			this.Protocol = protocol;
-			this.Protocol.Connection = this;
-			this.AuthenticationProvider = new DefaultAccessTokenAuthenticator(this);
+			Uri = hubUri;
+			State = ConnectionStates.Initial;
+			Options = options;
+			Protocol = protocol;
+			Protocol.Connection = this;
+			AuthenticationProvider = new DefaultAccessTokenAuthenticator(this);
 		}
 
 		public void StartConnect()
 		{
-			if (this.State != ConnectionStates.Initial &&
-			    this.State != ConnectionStates.Redirected &&
-			    this.State != ConnectionStates.Reconnecting)
+			if (State != ConnectionStates.Initial &&
+			    State != ConnectionStates.Redirected &&
+			    State != ConnectionStates.Reconnecting)
 			{
-				HTTPManager.Logger.Warning("HubConnection", "StartConnect - Expected Initial or Redirected state, got " + this.State.ToString(), this.Context);
+				HTTPManager.Logger.Warning("HubConnection", "StartConnect - Expected Initial or Redirected state, got " + State.ToString(), Context);
 				return;
 			}
 
-			if (this.State == ConnectionStates.Initial)
+			if (State == ConnectionStates.Initial)
 			{
-				this.connectionStartedAt = DateTime.Now;
+				connectionStartedAt = DateTime.Now;
 				HTTPManager.Heartbeats.Subscribe(this);
 			}
 
 			HTTPManager.Logger.Verbose("HubConnection",
-				$"StartConnect State: {this.State}, connectionStartedAt: {this.connectionStartedAt.ToString(System.Globalization.CultureInfo.InvariantCulture)}",
-				this.Context);
+				$"StartConnect State: {State}, connectionStartedAt: {connectionStartedAt.ToString(System.Globalization.CultureInfo.InvariantCulture)}",
+				Context);
 
-			if (this.AuthenticationProvider != null && this.AuthenticationProvider.IsPreAuthRequired)
+			if (AuthenticationProvider != null && AuthenticationProvider.IsPreAuthRequired)
 			{
-				HTTPManager.Logger.Information("HubConnection", "StartConnect - Authenticating", this.Context);
+				HTTPManager.Logger.Information("HubConnection", "StartConnect - Authenticating", Context);
 
-				SetState(ConnectionStates.Authenticating, null, this.defaultReconnect);
+				SetState(ConnectionStates.Authenticating, null, defaultReconnect);
 
-				this.AuthenticationProvider.OnAuthenticationSucceded += OnAuthenticationSucceded;
-				this.AuthenticationProvider.OnAuthenticationFailed += OnAuthenticationFailed;
+				AuthenticationProvider.OnAuthenticationSucceded += OnAuthenticationSucceded;
+				AuthenticationProvider.OnAuthenticationFailed += OnAuthenticationFailed;
 
 				// Start the authentication process
-				this.AuthenticationProvider.StartAuthentication();
+				AuthenticationProvider.StartAuthentication();
 			}
 			else
+			{
 				StartNegotiation();
+			}
 		}
 
 #if CSHARP_7_OR_LATER
@@ -215,183 +218,207 @@ namespace BestHTTP.SignalRCore
 
 		public Task<HubConnection> ConnectAsync()
 		{
-			if (this.State != ConnectionStates.Initial && this.State != ConnectionStates.Redirected && this.State != ConnectionStates.Reconnecting)
-				throw new Exception("HubConnection - ConnectAsync - Expected Initial or Redirected state, got " + this.State.ToString());
+			if (State != ConnectionStates.Initial && State != ConnectionStates.Redirected && State != ConnectionStates.Reconnecting)
+			{
+				throw new Exception("HubConnection - ConnectAsync - Expected Initial or Redirected state, got " + State.ToString());
+			}
 
-			if (this.connectAsyncTaskCompletionSource != null)
+			if (connectAsyncTaskCompletionSource != null)
+			{
 				throw new Exception("Connect process already started!");
+			}
 
-			this.connectAsyncTaskCompletionSource = new TaskCompletionSource<HubConnection>();
+			connectAsyncTaskCompletionSource = new TaskCompletionSource<HubConnection>();
 
-			this.OnConnected += OnAsyncConnectedCallback;
-			this.OnError += OnAsyncConnectFailedCallback;
+			OnConnected += OnAsyncConnectedCallback;
+			OnError += OnAsyncConnectFailedCallback;
 
-			this.StartConnect();
+			StartConnect();
 
 			return connectAsyncTaskCompletionSource.Task;
 		}
 
-		private void OnAsyncConnectedCallback(HubConnection hub)
+		void OnAsyncConnectedCallback(HubConnection hub)
 		{
-			this.OnConnected -= OnAsyncConnectedCallback;
-			this.OnError -= OnAsyncConnectFailedCallback;
+			OnConnected -= OnAsyncConnectedCallback;
+			OnError -= OnAsyncConnectFailedCallback;
 
-			this.connectAsyncTaskCompletionSource.TrySetResult(this);
-			this.connectAsyncTaskCompletionSource = null;
+			connectAsyncTaskCompletionSource.TrySetResult(this);
+			connectAsyncTaskCompletionSource = null;
 		}
 
-		private void OnAsyncConnectFailedCallback(HubConnection hub, string error)
+		void OnAsyncConnectFailedCallback(HubConnection hub, string error)
 		{
-			this.OnConnected -= OnAsyncConnectedCallback;
-			this.OnError -= OnAsyncConnectFailedCallback;
+			OnConnected -= OnAsyncConnectedCallback;
+			OnError -= OnAsyncConnectFailedCallback;
 
-			this.connectAsyncTaskCompletionSource.TrySetException(new Exception(error));
-			this.connectAsyncTaskCompletionSource = null;
+			connectAsyncTaskCompletionSource.TrySetException(new Exception(error));
+			connectAsyncTaskCompletionSource = null;
 		}
 
 #endif
 
-		private void OnAuthenticationSucceded(IAuthenticationProvider provider)
+		void OnAuthenticationSucceded(IAuthenticationProvider provider)
 		{
-			HTTPManager.Logger.Verbose("HubConnection", "OnAuthenticationSucceded", this.Context);
+			HTTPManager.Logger.Verbose("HubConnection", "OnAuthenticationSucceded", Context);
 
-			this.AuthenticationProvider.OnAuthenticationSucceded -= OnAuthenticationSucceded;
-			this.AuthenticationProvider.OnAuthenticationFailed -= OnAuthenticationFailed;
+			AuthenticationProvider.OnAuthenticationSucceded -= OnAuthenticationSucceded;
+			AuthenticationProvider.OnAuthenticationFailed -= OnAuthenticationFailed;
 
 			StartNegotiation();
 		}
 
-		private void OnAuthenticationFailed(IAuthenticationProvider provider, string reason)
+		void OnAuthenticationFailed(IAuthenticationProvider provider, string reason)
 		{
-			HTTPManager.Logger.Error("HubConnection", "OnAuthenticationFailed: " + reason, this.Context);
+			HTTPManager.Logger.Error("HubConnection", "OnAuthenticationFailed: " + reason, Context);
 
-			this.AuthenticationProvider.OnAuthenticationSucceded -= OnAuthenticationSucceded;
-			this.AuthenticationProvider.OnAuthenticationFailed -= OnAuthenticationFailed;
+			AuthenticationProvider.OnAuthenticationSucceded -= OnAuthenticationSucceded;
+			AuthenticationProvider.OnAuthenticationFailed -= OnAuthenticationFailed;
 
-			SetState(ConnectionStates.Closed, reason, this.defaultReconnect);
+			SetState(ConnectionStates.Closed, reason, defaultReconnect);
 		}
 
-		private void StartNegotiation()
+		void StartNegotiation()
 		{
-			HTTPManager.Logger.Verbose("HubConnection", "StartNegotiation", this.Context);
+			HTTPManager.Logger.Verbose("HubConnection", "StartNegotiation", Context);
 
-			if (this.State == ConnectionStates.CloseInitiated)
+			if (State == ConnectionStates.CloseInitiated)
 			{
-				SetState(ConnectionStates.Closed, null, this.defaultReconnect);
+				SetState(ConnectionStates.Closed, null, defaultReconnect);
 				return;
 			}
 
 #if !BESTHTTP_DISABLE_WEBSOCKET
-			if (this.Options.SkipNegotiation && this.Options.PreferedTransport == TransportTypes.WebSocket)
+			if (Options.SkipNegotiation && Options.PreferedTransport == TransportTypes.WebSocket)
 			{
-				HTTPManager.Logger.Verbose("HubConnection", "Skipping negotiation", this.Context);
-				ConnectImpl(this.Options.PreferedTransport);
+				HTTPManager.Logger.Verbose("HubConnection", "Skipping negotiation", Context);
+				ConnectImpl(Options.PreferedTransport);
 
 				return;
 			}
 #endif
 
-			SetState(ConnectionStates.Negotiating, null, this.defaultReconnect);
+			SetState(ConnectionStates.Negotiating, null, defaultReconnect);
 
 			// https://github.com/dotnet/aspnetcore/blob/master/src/SignalR/docs/specs/TransportProtocols.md#post-endpoint-basenegotiate-request
 			// Send out a negotiation request. While we could skip it and connect right with the websocket transport
 			//  it might return with additional information that could be useful.
 
-			UriBuilder builder = new UriBuilder(this.Uri);
+			UriBuilder builder = new UriBuilder(Uri);
 			if (builder.Path.EndsWith("/"))
+			{
 				builder.Path += "negotiate";
+			}
 			else
+			{
 				builder.Path += "/negotiate";
+			}
 
 			string query = builder.Query;
 			if (string.IsNullOrEmpty(query))
+			{
 				query = "negotiateVersion=1";
+			}
 			else
+			{
 				query = query.Remove(0, 1) + "&negotiateVersion=1";
+			}
 
 			builder.Query = query;
 
-			var request = new HTTPRequest(builder.Uri, HTTPMethods.Post, OnNegotiationRequestFinished);
-			request.Context.Add("Hub", this.Context);
+			HTTPRequest request = new HTTPRequest(builder.Uri, HTTPMethods.Post, OnNegotiationRequestFinished);
+			request.Context.Add("Hub", Context);
 
-			if (this.AuthenticationProvider != null)
-				this.AuthenticationProvider.PrepareRequest(request);
+			if (AuthenticationProvider != null)
+			{
+				AuthenticationProvider.PrepareRequest(request);
+			}
 
 			request.Send();
 		}
 
-		private void ConnectImpl(TransportTypes transport)
+		void ConnectImpl(TransportTypes transport)
 		{
-			HTTPManager.Logger.Verbose("HubConnection", "ConnectImpl - " + transport, this.Context);
+			HTTPManager.Logger.Verbose("HubConnection", "ConnectImpl - " + transport, Context);
 
 			switch (transport)
 			{
 #if !BESTHTTP_DISABLE_WEBSOCKET
 				case TransportTypes.WebSocket:
-					if (this.NegotiationResult != null && !IsTransportSupported("WebSockets"))
+					if (NegotiationResult != null && !IsTransportSupported("WebSockets"))
 					{
 						SetState(ConnectionStates.Closed, "Couldn't use preferred transport, as the 'WebSockets' transport isn't supported by the server!",
-							this.defaultReconnect);
+							defaultReconnect);
 						return;
 					}
 
-					this.Transport = new Transports.WebSocketTransport(this);
-					this.Transport.OnStateChanged += Transport_OnStateChanged;
+					Transport = new Transports.WebSocketTransport(this);
+					Transport.OnStateChanged += Transport_OnStateChanged;
 					break;
 #endif
 
 				case TransportTypes.LongPolling:
-					if (this.NegotiationResult != null && !IsTransportSupported("LongPolling"))
+					if (NegotiationResult != null && !IsTransportSupported("LongPolling"))
 					{
 						SetState(ConnectionStates.Closed, "Couldn't use preferred transport, as the 'LongPolling' transport isn't supported by the server!",
-							this.defaultReconnect);
+							defaultReconnect);
 						return;
 					}
 
-					this.Transport = new Transports.LongPollingTransport(this);
-					this.Transport.OnStateChanged += Transport_OnStateChanged;
+					Transport = new Transports.LongPollingTransport(this);
+					Transport.OnStateChanged += Transport_OnStateChanged;
 					break;
 
 				default:
-					SetState(ConnectionStates.Closed, "Unsupported transport: " + transport, this.defaultReconnect);
+					SetState(ConnectionStates.Closed, "Unsupported transport: " + transport, defaultReconnect);
 					break;
 			}
 
 			try
 			{
-				if (this.OnTransportEvent != null)
-					this.OnTransportEvent(this, this.Transport, TransportEvents.SelectedToConnect);
+				if (OnTransportEvent != null)
+				{
+					OnTransportEvent(this, Transport, TransportEvents.SelectedToConnect);
+				}
 			}
 			catch (Exception ex)
 			{
-				HTTPManager.Logger.Exception("HubConnection", "ConnectImpl - OnTransportEvent exception in user code!", ex, this.Context);
+				HTTPManager.Logger.Exception("HubConnection", "ConnectImpl - OnTransportEvent exception in user code!", ex, Context);
 			}
 
-			this.Transport.StartConnect();
+			Transport.StartConnect();
 		}
 
-		private bool IsTransportSupported(string transportName)
+		bool IsTransportSupported(string transportName)
 		{
 			// https://github.com/dotnet/aspnetcore/blob/master/src/SignalR/docs/specs/TransportProtocols.md#post-endpoint-basenegotiate-request
 			// If the negotiation response contains only the url and accessToken, no 'availableTransports' list is sent
-			if (this.NegotiationResult.SupportedTransports == null)
+			if (NegotiationResult.SupportedTransports == null)
+			{
 				return true;
+			}
 
-			for (int i = 0; i < this.NegotiationResult.SupportedTransports.Count; ++i)
-				if (this.NegotiationResult.SupportedTransports[i].Name.Equals(transportName, StringComparison.OrdinalIgnoreCase))
+			for (int i = 0; i < NegotiationResult.SupportedTransports.Count; ++i)
+			{
+				if (NegotiationResult.SupportedTransports[i].Name.Equals(transportName, StringComparison.OrdinalIgnoreCase))
+				{
 					return true;
+				}
+			}
 
 			return false;
 		}
 
-		private void OnNegotiationRequestFinished(HTTPRequest req, HTTPResponse resp)
+		void OnNegotiationRequestFinished(HTTPRequest req, HTTPResponse resp)
 		{
-			if (this.State == ConnectionStates.Closed)
-				return;
-
-			if (this.State == ConnectionStates.CloseInitiated)
+			if (State == ConnectionStates.Closed)
 			{
-				SetState(ConnectionStates.Closed, null, this.defaultReconnect);
+				return;
+			}
+
+			if (State == ConnectionStates.CloseInitiated)
+			{
+				SetState(ConnectionStates.Closed, null, defaultReconnect);
 				return;
 			}
 
@@ -403,10 +430,10 @@ namespace BestHTTP.SignalRCore
 				case HTTPRequestStates.Finished:
 					if (resp.IsSuccess)
 					{
-						HTTPManager.Logger.Information("HubConnection", "Negotiation Request Finished Successfully! Response: " + resp.DataAsText, this.Context);
+						HTTPManager.Logger.Information("HubConnection", "Negotiation Request Finished Successfully! Response: " + resp.DataAsText, Context);
 
 						// Parse negotiation
-						this.NegotiationResult = NegotiationResult.Parse(resp, out errorReason, this);
+						NegotiationResult = NegotiationResult.Parse(resp, out errorReason, this);
 
 						// Room for improvement: check validity of the negotiation result:
 						//  If url and accessToken is present, the other two must be null.
@@ -414,26 +441,28 @@ namespace BestHTTP.SignalRCore
 
 						if (string.IsNullOrEmpty(errorReason))
 						{
-							if (this.NegotiationResult.Url != null)
+							if (NegotiationResult.Url != null)
 							{
-								this.SetState(ConnectionStates.Redirected, null, this.defaultReconnect);
+								SetState(ConnectionStates.Redirected, null, defaultReconnect);
 
-								if (++this.RedirectCount >= this.Options.MaxRedirects)
-									errorReason = string.Format("MaxRedirects ({0:N0}) reached!", this.Options.MaxRedirects);
+								if (++RedirectCount >= Options.MaxRedirects)
+								{
+									errorReason = string.Format("MaxRedirects ({0:N0}) reached!", Options.MaxRedirects);
+								}
 								else
 								{
-									var oldUri = this.Uri;
-									this.Uri = this.NegotiationResult.Url;
+									Uri oldUri = Uri;
+									Uri = NegotiationResult.Url;
 
-									if (this.OnRedirected != null)
+									if (OnRedirected != null)
 									{
 										try
 										{
-											this.OnRedirected(this, oldUri, Uri);
+											OnRedirected(this, oldUri, Uri);
 										}
 										catch (Exception ex)
 										{
-											HTTPManager.Logger.Exception("HubConnection", "OnNegotiationRequestFinished - OnRedirected", ex, this.Context);
+											HTTPManager.Logger.Exception("HubConnection", "OnNegotiationRequestFinished - OnRedirected", ex, Context);
 										}
 									}
 
@@ -441,21 +470,25 @@ namespace BestHTTP.SignalRCore
 								}
 							}
 							else
-								ConnectImpl(this.Options.PreferedTransport);
+							{
+								ConnectImpl(Options.PreferedTransport);
+							}
 						}
 					}
 					else // Internal server error?
+					{
 						errorReason = string.Format("Negotiation Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText);
+					}
 
 					break;
 
 				// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 				case HTTPRequestStates.Error:
 					errorReason = "Negotiation Request Finished with Error! " +
-					              (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception");
+					              (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception");
 					break;
 
 				// The request aborted, initiated by the user.
@@ -476,33 +509,33 @@ namespace BestHTTP.SignalRCore
 
 			if (errorReason != null)
 			{
-				this.NegotiationResult = new NegotiationResult();
-				this.NegotiationResult.NegotiationResponse = resp;
+				NegotiationResult = new NegotiationResult();
+				NegotiationResult.NegotiationResponse = resp;
 
-				SetState(ConnectionStates.Closed, errorReason, this.defaultReconnect);
+				SetState(ConnectionStates.Closed, errorReason, defaultReconnect);
 			}
 		}
 
 		public void StartClose()
 		{
-			HTTPManager.Logger.Verbose("HubConnection", "StartClose", this.Context);
-			this.defaultReconnect = false;
+			HTTPManager.Logger.Verbose("HubConnection", "StartClose", Context);
+			defaultReconnect = false;
 
-			switch (this.State)
+			switch (State)
 			{
 				case ConnectionStates.Initial:
-					SetState(ConnectionStates.Closed, null, this.defaultReconnect);
+					SetState(ConnectionStates.Closed, null, defaultReconnect);
 					break;
 
 				case ConnectionStates.Authenticating:
-					this.AuthenticationProvider.OnAuthenticationSucceded -= OnAuthenticationSucceded;
-					this.AuthenticationProvider.OnAuthenticationFailed -= OnAuthenticationFailed;
-					this.AuthenticationProvider.Cancel();
-					SetState(ConnectionStates.Closed, null, this.defaultReconnect);
+					AuthenticationProvider.OnAuthenticationSucceded -= OnAuthenticationSucceded;
+					AuthenticationProvider.OnAuthenticationFailed -= OnAuthenticationFailed;
+					AuthenticationProvider.Cancel();
+					SetState(ConnectionStates.Closed, null, defaultReconnect);
 					break;
 
 				case ConnectionStates.Reconnecting:
-					SetState(ConnectionStates.Closed, null, this.defaultReconnect);
+					SetState(ConnectionStates.Closed, null, defaultReconnect);
 					break;
 
 				case ConnectionStates.CloseInitiated:
@@ -513,14 +546,16 @@ namespace BestHTTP.SignalRCore
 				default:
 					if (HTTPManager.IsQuitting)
 					{
-						SetState(ConnectionStates.Closed, null, this.defaultReconnect);
+						SetState(ConnectionStates.Closed, null, defaultReconnect);
 					}
 					else
 					{
-						SetState(ConnectionStates.CloseInitiated, null, this.defaultReconnect);
+						SetState(ConnectionStates.CloseInitiated, null, defaultReconnect);
 
-						if (this.Transport != null)
-							this.Transport.StartClose();
+						if (Transport != null)
+						{
+							Transport.StartClose();
+						}
 					}
 
 					break;
@@ -533,41 +568,43 @@ namespace BestHTTP.SignalRCore
 
 		public Task<HubConnection> CloseAsync()
 		{
-			if (this.closeAsyncTaskCompletionSource != null)
+			if (closeAsyncTaskCompletionSource != null)
+			{
 				throw new Exception("CloseAsync already called!");
+			}
 
-			this.closeAsyncTaskCompletionSource = new TaskCompletionSource<HubConnection>();
+			closeAsyncTaskCompletionSource = new TaskCompletionSource<HubConnection>();
 
-			this.OnClosed += OnClosedAsyncCallback;
-			this.OnError += OnClosedAsyncErrorCallback;
+			OnClosed += OnClosedAsyncCallback;
+			OnError += OnClosedAsyncErrorCallback;
 
 			// Avoid race condition by caching task prior to StartClose,
 			// which asynchronously calls OnClosedAsyncCallback, which nulls
 			// this.closeAsyncTaskCompletionSource immediately before we have
 			// a chance to read from it.
-			var task = this.closeAsyncTaskCompletionSource.Task;
+			Task<HubConnection> task = closeAsyncTaskCompletionSource.Task;
 
-			this.StartClose();
+			StartClose();
 
 			return task;
 		}
 
 		void OnClosedAsyncCallback(HubConnection hub)
 		{
-			this.OnClosed -= OnClosedAsyncCallback;
-			this.OnError -= OnClosedAsyncErrorCallback;
+			OnClosed -= OnClosedAsyncCallback;
+			OnError -= OnClosedAsyncErrorCallback;
 
-			this.closeAsyncTaskCompletionSource.TrySetResult(this);
-			this.closeAsyncTaskCompletionSource = null;
+			closeAsyncTaskCompletionSource.TrySetResult(this);
+			closeAsyncTaskCompletionSource = null;
 		}
 
 		void OnClosedAsyncErrorCallback(HubConnection hub, string error)
 		{
-			this.OnClosed -= OnClosedAsyncCallback;
-			this.OnError -= OnClosedAsyncErrorCallback;
+			OnClosed -= OnClosedAsyncCallback;
+			OnError -= OnClosedAsyncErrorCallback;
 
-			this.closeAsyncTaskCompletionSource.TrySetException(new Exception(error));
-			this.closeAsyncTaskCompletionSource = null;
+			closeAsyncTaskCompletionSource.TrySetException(new Exception(error));
+			closeAsyncTaskCompletionSource = null;
 		}
 
 #endif
@@ -582,14 +619,20 @@ namespace BestHTTP.SignalRCore
 				{
 					bool isSuccess = string.IsNullOrEmpty(message.error);
 					if (isSuccess)
-						future.Assign((TResult)this.Protocol.ConvertTo(typeof(TResult), message.result));
+					{
+						future.Assign((TResult)Protocol.ConvertTo(typeof(TResult), message.result));
+					}
 					else
+					{
 						future.Fail(new Exception(message.error));
+					}
 				},
 				typeof(TResult));
 
 			if (id < 0)
-				future.Fail(new Exception("Not in Connected state! Current state: " + this.State));
+			{
+				future.Fail(new Exception("Not in Connected state! Current state: " + State));
+			}
 
 			return future;
 		}
@@ -598,7 +641,7 @@ namespace BestHTTP.SignalRCore
 
 		public Task<TResult> InvokeAsync<TResult>(string target, params object[] args)
 		{
-			return InvokeAsync<TResult>(target, default(CancellationToken), args);
+			return InvokeAsync<TResult>(target, default, args);
 		}
 
 		public Task<TResult> InvokeAsync<TResult>(string target, CancellationToken cancellationToken = default, params object[] args)
@@ -616,16 +659,24 @@ namespace BestHTTP.SignalRCore
 
 					bool isSuccess = string.IsNullOrEmpty(message.error);
 					if (isSuccess)
-						tcs.TrySetResult((TResult)this.Protocol.ConvertTo(typeof(TResult), message.result));
+					{
+						tcs.TrySetResult((TResult)Protocol.ConvertTo(typeof(TResult), message.result));
+					}
 					else
+					{
 						tcs.TrySetException(new Exception(message.error));
+					}
 				},
 				typeof(TResult));
 
 			if (id < 0)
-				tcs.TrySetException(new Exception("Not in Connected state! Current state: " + this.State));
+			{
+				tcs.TrySetException(new Exception("Not in Connected state! Current state: " + State));
+			}
 			else
+			{
 				cancellationToken.Register(() => tcs.TrySetCanceled());
+			}
 
 			return tcs.Task;
 		}
@@ -642,14 +693,20 @@ namespace BestHTTP.SignalRCore
 				{
 					bool isSuccess = string.IsNullOrEmpty(message.error);
 					if (isSuccess)
+					{
 						future.Assign(message.item);
+					}
 					else
+					{
 						future.Fail(new Exception(message.error));
+					}
 				},
 				typeof(object));
 
 			if (id < 0)
-				future.Fail(new Exception("Not in Connected state! Current state: " + this.State));
+			{
+				future.Fail(new Exception("Not in Connected state! Current state: " + State));
+			}
 
 			return future;
 		}
@@ -658,7 +715,7 @@ namespace BestHTTP.SignalRCore
 
 		public Task<object> SendAsync(string target, params object[] args)
 		{
-			return SendAsync(target, default(CancellationToken), args);
+			return SendAsync(target, default, args);
 		}
 
 		public Task<object> SendAsync(string target, CancellationToken cancellationToken = default, params object[] args)
@@ -677,44 +734,58 @@ namespace BestHTTP.SignalRCore
 
 					bool isSuccess = string.IsNullOrEmpty(message.error);
 					if (isSuccess)
+					{
 						tcs.TrySetResult(message.item);
+					}
 					else
+					{
 						tcs.TrySetException(new Exception(message.error));
+					}
 				},
 				typeof(object));
 
 			if (id < 0)
-				tcs.TrySetException(new Exception("Not in Connected state! Current state: " + this.State));
+			{
+				tcs.TrySetException(new Exception("Not in Connected state! Current state: " + State));
+			}
 			else
+			{
 				cancellationToken.Register(() => tcs.TrySetCanceled());
+			}
 
 			return tcs.Task;
 		}
 
 #endif
 
-		private long InvokeImp(string target, object[] args, Action<Message> callback, Type itemType, bool isStreamingInvocation = false)
+		long InvokeImp(string target, object[] args, Action<Message> callback, Type itemType, bool isStreamingInvocation = false)
 		{
-			if (this.State != ConnectionStates.Connected)
+			if (State != ConnectionStates.Connected)
+			{
 				return -1;
+			}
 
 			bool blockingInvocation = callback == null;
 
-			long invocationId = blockingInvocation ? 0 : System.Threading.Interlocked.Increment(ref this.lastInvocationId);
-			var message = new Message
+			long invocationId = blockingInvocation ? 0 : Interlocked.Increment(ref lastInvocationId);
+			Message message = new Message
 			{
 				type = isStreamingInvocation ? MessageTypes.StreamInvocation : MessageTypes.Invocation,
 				invocationId = blockingInvocation ? null : invocationId.ToString(),
 				target = target,
 				arguments = args,
-				nonblocking = callback == null,
+				nonblocking = callback == null
 			};
 
 			SendMessage(message);
 
 			if (!blockingInvocation)
-				if (!this.invocations.TryAdd(invocationId, new InvocationDefinition { callback = callback, returnType = itemType }))
-					HTTPManager.Logger.Warning("HubConnection", "InvokeImp - invocations already contains id: " + invocationId, this.Context);
+			{
+				if (!invocations.TryAdd(invocationId, new InvocationDefinition { callback = callback, returnType = itemType }))
+				{
+					HTTPManager.Logger.Warning("HubConnection", "InvokeImp - invocations already contains id: " + invocationId, Context);
+				}
+			}
 
 			return invocationId;
 		}
@@ -722,38 +793,42 @@ namespace BestHTTP.SignalRCore
 		internal void SendMessage(Message message)
 		{
 			// https://github.com/Benedicht/BestHTTP-Issues/issues/146
-			if (this.State == ConnectionStates.Closed)
+			if (State == ConnectionStates.Closed)
+			{
 				return;
+			}
 
-			if (HTTPManager.Logger.Level == Logger.Loglevels.All)
-				HTTPManager.Logger.Verbose("HubConnection", "SendMessage: " + message.ToString(), this.Context);
+			if (HTTPManager.Logger.Level == Loglevels.All)
+			{
+				HTTPManager.Logger.Verbose("HubConnection", "SendMessage: " + message.ToString(), Context);
+			}
 
 			try
 			{
-				using (new WriteLock(this.rwLock))
+				using (new WriteLock(rwLock))
 				{
-					var encoded = this.Protocol.EncodeMessage(message);
+					BufferSegment encoded = Protocol.EncodeMessage(message);
 					if (encoded.Data != null)
 					{
-						this.lastMessageSentAt = DateTime.Now;
-						this.Transport.Send(encoded);
+						lastMessageSentAt = DateTime.Now;
+						Transport.Send(encoded);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				HTTPManager.Logger.Exception("HubConnection", "SendMessage", ex, this.Context);
+				HTTPManager.Logger.Exception("HubConnection", "SendMessage", ex, Context);
 			}
 		}
 
 		public DownStreamItemController<TDown> GetDownStreamController<TDown>(string target, params object[] args)
 		{
-			long invocationId = System.Threading.Interlocked.Increment(ref this.lastInvocationId);
+			long invocationId = Interlocked.Increment(ref lastInvocationId);
 
-			var future = new Future<TDown>();
+			Future<TDown> future = new Future<TDown>();
 			future.BeginProcess();
 
-			var controller = new DownStreamItemController<TDown>(this, invocationId, future);
+			DownStreamItemController<TDown> controller = new DownStreamItemController<TDown>(this, invocationId, future);
 
 			Action<Message> callback = (Message msg) =>
 			{
@@ -763,9 +838,11 @@ namespace BestHTTP.SignalRCore
 					case MessageTypes.StreamItem:
 					{
 						if (controller.IsCanceled)
+						{
 							break;
+						}
 
-						TDown item = (TDown)this.Protocol.ConvertTo(typeof(TDown), msg.item);
+						TDown item = (TDown)Protocol.ConvertTo(typeof(TDown), msg.item);
 
 						future.AssignItem(item);
 						break;
@@ -779,7 +856,7 @@ namespace BestHTTP.SignalRCore
 							// While completion message must not contain any result, this should be future-proof
 							if (!controller.IsCanceled && msg.result != null)
 							{
-								TDown result = (TDown)this.Protocol.ConvertTo(typeof(TDown), msg.result);
+								TDown result = (TDown)Protocol.ConvertTo(typeof(TDown), msg.result);
 
 								future.AssignItem(result);
 							}
@@ -787,27 +864,33 @@ namespace BestHTTP.SignalRCore
 							future.Finish();
 						}
 						else
+						{
 							future.Fail(new Exception(msg.error));
+						}
 
 						break;
 					}
 				}
 			};
 
-			var message = new Message
+			Message message = new Message
 			{
 				type = MessageTypes.StreamInvocation,
 				invocationId = invocationId.ToString(),
 				target = target,
 				arguments = args,
-				nonblocking = false,
+				nonblocking = false
 			};
 
 			SendMessage(message);
 
 			if (callback != null)
-				if (!this.invocations.TryAdd(invocationId, new InvocationDefinition { callback = callback, returnType = typeof(TDown) }))
-					HTTPManager.Logger.Warning("HubConnection", "GetDownStreamController - invocations already contains id: " + invocationId, this.Context);
+			{
+				if (!invocations.TryAdd(invocationId, new InvocationDefinition { callback = callback, returnType = typeof(TDown) }))
+				{
+					HTTPManager.Logger.Warning("HubConnection", "GetDownStreamController - invocations already contains id: " + invocationId, Context);
+				}
+			}
 
 			return controller;
 		}
@@ -817,13 +900,15 @@ namespace BestHTTP.SignalRCore
 			Future<TResult> future = new Future<TResult>();
 			future.BeginProcess();
 
-			long invocationId = System.Threading.Interlocked.Increment(ref this.lastInvocationId);
+			long invocationId = Interlocked.Increment(ref lastInvocationId);
 
 			string[] streamIds = new string[paramCount];
 			for (int i = 0; i < paramCount; i++)
-				streamIds[i] = System.Threading.Interlocked.Increment(ref this.lastStreamId).ToString();
+			{
+				streamIds[i] = Interlocked.Increment(ref lastStreamId).ToString();
+			}
 
-			var controller = new UpStreamItemController<TResult>(this, invocationId, streamIds, future);
+			UpStreamItemController<TResult> controller = new UpStreamItemController<TResult>(this, invocationId, streamIds, future);
 
 			Action<Message> callback = (Message msg) =>
 			{
@@ -833,9 +918,11 @@ namespace BestHTTP.SignalRCore
 					case MessageTypes.StreamItem:
 					{
 						if (controller.IsCanceled)
+						{
 							break;
+						}
 
-						TResult item = (TResult)this.Protocol.ConvertTo(typeof(TResult), msg.item);
+						TResult item = (TResult)Protocol.ConvertTo(typeof(TResult), msg.item);
 
 						future.AssignItem(item);
 						break;
@@ -849,7 +936,7 @@ namespace BestHTTP.SignalRCore
 							// While completion message must not contain any result, this should be future-proof
 							if (!controller.IsCanceled && msg.result != null)
 							{
-								TResult result = (TResult)this.Protocol.ConvertTo(typeof(TResult), msg.result);
+								TResult result = (TResult)Protocol.ConvertTo(typeof(TResult), msg.result);
 
 								future.AssignItem(result);
 							}
@@ -858,7 +945,7 @@ namespace BestHTTP.SignalRCore
 						}
 						else
 						{
-							var ex = new Exception(msg.error);
+							Exception ex = new Exception(msg.error);
 							future.Fail(ex);
 						}
 
@@ -867,20 +954,22 @@ namespace BestHTTP.SignalRCore
 				}
 			};
 
-			var messageToSend = new Message
+			Message messageToSend = new Message
 			{
 				type = downStream ? MessageTypes.StreamInvocation : MessageTypes.Invocation,
 				invocationId = invocationId.ToString(),
 				target = target,
 				arguments = args,
 				streamIds = streamIds,
-				nonblocking = false,
+				nonblocking = false
 			};
 
 			SendMessage(messageToSend);
 
-			if (!this.invocations.TryAdd(invocationId, new InvocationDefinition { callback = callback, returnType = typeof(TResult) }))
-				HTTPManager.Logger.Warning("HubConnection", "GetUpStreamController - invocations already contains id: " + invocationId, this.Context);
+			if (!invocations.TryAdd(invocationId, new InvocationDefinition { callback = callback, returnType = typeof(TResult) }))
+			{
+				HTTPManager.Logger.Warning("HubConnection", "GetUpStreamController - invocations already contains id: " + invocationId, Context);
+			}
 
 			return controller;
 		}
@@ -916,12 +1005,14 @@ namespace BestHTTP.SignalRCore
 				(args) => callback((T1)args[0], (T2)args[1], (T3)args[2], (T4)args[3]));
 		}
 
-		private void On(string methodName, Type[] paramTypes, Action<object[]> callback)
+		void On(string methodName, Type[] paramTypes, Action<object[]> callback)
 		{
-			if (this.State >= ConnectionStates.CloseInitiated)
+			if (State >= ConnectionStates.CloseInitiated)
+			{
 				throw new Exception("Hub connection already closing or closed!");
+			}
 
-			this.subscriptions.GetOrAdd(methodName, _ => new Subscription())
+			subscriptions.GetOrAdd(methodName, _ => new Subscription())
 				.Add(paramTypes, callback);
 		}
 
@@ -952,9 +1043,9 @@ namespace BestHTTP.SignalRCore
 		}
 
 		// https://github.com/dotnet/aspnetcore/issues/5280
-		private void OnFunc<Result>(string methodName, Type[] paramTypes, Func<object[], object> callback)
+		void OnFunc<Result>(string methodName, Type[] paramTypes, Func<object[], object> callback)
 		{
-			this.subscriptions.GetOrAdd(methodName, _ => new Subscription())
+			subscriptions.GetOrAdd(methodName, _ => new Subscription())
 				.AddFunc(typeof(Result), paramTypes, callback);
 		}
 
@@ -963,24 +1054,26 @@ namespace BestHTTP.SignalRCore
 		/// </summary>
 		public void Remove(string methodName)
 		{
-			if (this.State >= ConnectionStates.CloseInitiated)
+			if (State >= ConnectionStates.CloseInitiated)
+			{
 				throw new Exception("Hub connection already closing or closed!");
+			}
 
 			Subscription _;
-			this.subscriptions.TryRemove(methodName, out _);
+			subscriptions.TryRemove(methodName, out _);
 		}
 
 		internal Subscription GetSubscription(string methodName)
 		{
 			Subscription subscribtion = null;
-			this.subscriptions.TryGetValue(methodName, out subscribtion);
+			subscriptions.TryGetValue(methodName, out subscribtion);
 			return subscribtion;
 		}
 
 		internal Type GetItemType(long invocationId)
 		{
 			InvocationDefinition def;
-			this.invocations.TryGetValue(invocationId, out def);
+			invocations.TryGetValue(invocationId, out def);
 			return def.returnType;
 		}
 
@@ -988,32 +1081,39 @@ namespace BestHTTP.SignalRCore
 
 		internal void OnMessages(List<Message> messages)
 		{
-			this.lastMessageReceivedAt = DateTime.Now;
+			lastMessageReceivedAt = DateTime.Now;
 
 			if (pausedInLastFrame)
 			{
-				if (this.delayedMessages == null)
-					this.delayedMessages = new List<Message>(messages.Count);
-				foreach (var msg in messages)
+				if (delayedMessages == null)
+				{
+					delayedMessages = new List<Message>(messages.Count);
+				}
+
+				foreach (Message msg in messages)
+				{
 					delayedMessages.Add(msg);
+				}
 
 				messages.Clear();
 			}
 
 			for (int messageIdx = 0; messageIdx < messages.Count; ++messageIdx)
 			{
-				var message = messages[messageIdx];
+				Message message = messages[messageIdx];
 
-				if (this.OnMessage != null)
+				if (OnMessage != null)
 				{
 					try
 					{
-						if (!this.OnMessage(this, message))
+						if (!OnMessage(this, message))
+						{
 							continue;
+						}
 					}
 					catch (Exception ex)
 					{
-						HTTPManager.Logger.Exception("HubConnection", "Exception in OnMessage user code!", ex, this.Context);
+						HTTPManager.Logger.Exception("HubConnection", "Exception in OnMessage user code!", ex, Context);
 					}
 				}
 
@@ -1025,23 +1125,25 @@ namespace BestHTTP.SignalRCore
 					case MessageTypes.Invocation:
 					{
 						Subscription subscribtion = null;
-						if (this.subscriptions.TryGetValue(message.target, out subscribtion))
+						if (subscriptions.TryGetValue(message.target, out subscribtion))
 						{
 							if (subscribtion.callbacks?.Count == 0)
-								HTTPManager.Logger.Warning("HubConnection", $"No callback for invocation '{message.ToString()}'", this.Context);
+							{
+								HTTPManager.Logger.Warning("HubConnection", $"No callback for invocation '{message.ToString()}'", Context);
+							}
 
 							for (int i = 0; i < subscribtion.callbacks.Count; ++i)
 							{
-								var callbackDesc = subscribtion.callbacks[i];
+								CallbackDescriptor callbackDesc = subscribtion.callbacks[i];
 
 								object[] realArgs = null;
 								try
 								{
-									realArgs = this.Protocol.GetRealArguments(callbackDesc.ParamTypes, message.arguments);
+									realArgs = Protocol.GetRealArguments(callbackDesc.ParamTypes, message.arguments);
 								}
 								catch (Exception ex)
 								{
-									HTTPManager.Logger.Exception("HubConnection", "OnMessages - Invocation - GetRealArguments", ex, this.Context);
+									HTTPManager.Logger.Exception("HubConnection", "OnMessages - Invocation - GetRealArguments", ex, Context);
 								}
 
 								try
@@ -1050,32 +1152,34 @@ namespace BestHTTP.SignalRCore
 								}
 								catch (Exception ex)
 								{
-									HTTPManager.Logger.Exception("HubConnection", "OnMessages - Invocation - Invoke", ex, this.Context);
+									HTTPManager.Logger.Exception("HubConnection", "OnMessages - Invocation - Invoke", ex, Context);
 								}
 							}
 
 							if (subscribtion.functionCallbacks?.Count == 0)
-								HTTPManager.Logger.Warning("HubConnection", $"No function callback for invocation '{message.ToString()}'", this.Context);
+							{
+								HTTPManager.Logger.Warning("HubConnection", $"No function callback for invocation '{message.ToString()}'", Context);
+							}
 
 							if (subscribtion.functionCallbacks != null)
 							{
 								for (int i = 0; i < subscribtion.functionCallbacks.Count; ++i)
 								{
-									var callbackDesc = subscribtion.functionCallbacks[i];
+									FunctionCallbackDescriptor callbackDesc = subscribtion.functionCallbacks[i];
 
 									object[] realArgs = null;
 									try
 									{
-										realArgs = this.Protocol.GetRealArguments(callbackDesc.ParamTypes, message.arguments);
+										realArgs = Protocol.GetRealArguments(callbackDesc.ParamTypes, message.arguments);
 									}
 									catch (Exception ex)
 									{
-										HTTPManager.Logger.Exception("HubConnection", "OnMessages - Function Invocation - GetRealArguments", ex, this.Context);
+										HTTPManager.Logger.Exception("HubConnection", "OnMessages - Function Invocation - GetRealArguments", ex, Context);
 									}
 
 									try
 									{
-										var result = callbackDesc.Callback(realArgs);
+										object result = callbackDesc.Callback(realArgs);
 
 										SendMessage(new Message
 										{
@@ -1086,7 +1190,7 @@ namespace BestHTTP.SignalRCore
 									}
 									catch (Exception ex)
 									{
-										HTTPManager.Logger.Exception("HubConnection", "OnMessages - Function Invocation - Invoke", ex, this.Context);
+										HTTPManager.Logger.Exception("HubConnection", "OnMessages - Function Invocation - Invoke", ex, Context);
 
 										SendMessage(new Message
 										{
@@ -1099,7 +1203,9 @@ namespace BestHTTP.SignalRCore
 							}
 						}
 						else
-							HTTPManager.Logger.Warning("HubConnection", $"No subscription could be found for invocation '{message.ToString()}'", this.Context);
+						{
+							HTTPManager.Logger.Warning("HubConnection", $"No subscription could be found for invocation '{message.ToString()}'", Context);
+						}
 
 						break;
 					}
@@ -1110,7 +1216,7 @@ namespace BestHTTP.SignalRCore
 						if (long.TryParse(message.invocationId, out invocationId))
 						{
 							InvocationDefinition def;
-							if (this.invocations.TryGetValue(invocationId, out def) && def.callback != null)
+							if (invocations.TryGetValue(invocationId, out def) && def.callback != null)
 							{
 								try
 								{
@@ -1118,7 +1224,7 @@ namespace BestHTTP.SignalRCore
 								}
 								catch (Exception ex)
 								{
-									HTTPManager.Logger.Exception("HubConnection", "OnMessages - StreamItem - callback", ex, this.Context);
+									HTTPManager.Logger.Exception("HubConnection", "OnMessages - StreamItem - callback", ex, Context);
 								}
 							}
 						}
@@ -1132,7 +1238,7 @@ namespace BestHTTP.SignalRCore
 						if (long.TryParse(message.invocationId, out invocationId))
 						{
 							InvocationDefinition def;
-							if (this.invocations.TryRemove(invocationId, out def) && def.callback != null)
+							if (invocations.TryRemove(invocationId, out def) && def.callback != null)
 							{
 								try
 								{
@@ -1140,7 +1246,7 @@ namespace BestHTTP.SignalRCore
 								}
 								catch (Exception ex)
 								{
-									HTTPManager.Logger.Exception("HubConnection", "OnMessages - Completion - callback", ex, this.Context);
+									HTTPManager.Logger.Exception("HubConnection", "OnMessages - Completion - callback", ex, Context);
 								}
 							}
 						}
@@ -1155,21 +1261,24 @@ namespace BestHTTP.SignalRCore
 
 					case MessageTypes.Close:
 						SetState(ConnectionStates.Closed, message.error, message.allowReconnect);
-						if (this.Transport != null)
-							this.Transport.StartClose();
+						if (Transport != null)
+						{
+							Transport.StartClose();
+						}
+
 						return;
 				}
 			}
 		}
 
-		private void Transport_OnStateChanged(TransportStates oldState, TransportStates newState)
+		void Transport_OnStateChanged(TransportStates oldState, TransportStates newState)
 		{
 			HTTPManager.Logger.Verbose("HubConnection", string.Format("Transport_OnStateChanged - oldState: {0} newState: {1}", oldState.ToString(), newState.ToString()),
-				this.Context);
+				Context);
 
-			if (this.State == ConnectionStates.Closed)
+			if (State == ConnectionStates.Closed)
 			{
-				HTTPManager.Logger.Verbose("HubConnection", "Transport_OnStateChanged - already closed!", this.Context);
+				HTTPManager.Logger.Verbose("HubConnection", "Transport_OnStateChanged - already closed!", Context);
 				return;
 			}
 
@@ -1178,59 +1287,67 @@ namespace BestHTTP.SignalRCore
 				case TransportStates.Connected:
 					try
 					{
-						if (this.OnTransportEvent != null)
-							this.OnTransportEvent(this, this.Transport, TransportEvents.Connected);
+						if (OnTransportEvent != null)
+						{
+							OnTransportEvent(this, Transport, TransportEvents.Connected);
+						}
 					}
 					catch (Exception ex)
 					{
-						HTTPManager.Logger.Exception("HubConnection", "Exception in OnTransportEvent user code!", ex, this.Context);
+						HTTPManager.Logger.Exception("HubConnection", "Exception in OnTransportEvent user code!", ex, Context);
 					}
 
-					SetState(ConnectionStates.Connected, null, this.defaultReconnect);
+					SetState(ConnectionStates.Connected, null, defaultReconnect);
 					break;
 
 				case TransportStates.Failed:
-					if (this.State == ConnectionStates.Negotiating && !HTTPManager.IsQuitting)
+					if (State == ConnectionStates.Negotiating && !HTTPManager.IsQuitting)
 					{
 						try
 						{
-							if (this.OnTransportEvent != null)
-								this.OnTransportEvent(this, this.Transport, TransportEvents.FailedToConnect);
+							if (OnTransportEvent != null)
+							{
+								OnTransportEvent(this, Transport, TransportEvents.FailedToConnect);
+							}
 						}
 						catch (Exception ex)
 						{
-							HTTPManager.Logger.Exception("HubConnection", "Exception in OnTransportEvent user code!", ex, this.Context);
+							HTTPManager.Logger.Exception("HubConnection", "Exception in OnTransportEvent user code!", ex, Context);
 						}
 
-						this.triedoutTransports.Add(this.Transport.TransportType);
+						triedoutTransports.Add(Transport.TransportType);
 
-						var nextTransport = GetNextTransportToTry();
+						TransportTypes? nextTransport = GetNextTransportToTry();
 						if (nextTransport == null)
 						{
-							var reason = this.Transport.ErrorReason;
-							this.Transport = null;
+							string reason = Transport.ErrorReason;
+							Transport = null;
 
-							SetState(ConnectionStates.Closed, reason, this.defaultReconnect);
+							SetState(ConnectionStates.Closed, reason, defaultReconnect);
 						}
 						else
+						{
 							ConnectImpl(nextTransport.Value);
+						}
 					}
 					else
 					{
 						try
 						{
-							if (this.OnTransportEvent != null)
-								this.OnTransportEvent(this, this.Transport, TransportEvents.ClosedWithError);
+							if (OnTransportEvent != null)
+							{
+								OnTransportEvent(this, Transport, TransportEvents.ClosedWithError);
+							}
 						}
 						catch (Exception ex)
 						{
-							HTTPManager.Logger.Exception("HubConnection", "Exception in OnTransportEvent user code!", ex, this.Context);
+							HTTPManager.Logger.Exception("HubConnection", "Exception in OnTransportEvent user code!", ex, Context);
 						}
 
-						var reason = this.Transport.ErrorReason;
-						this.Transport = null;
+						string reason = Transport.ErrorReason;
+						Transport = null;
 
-						SetState(ConnectionStates.Closed, HTTPManager.IsQuitting ? null : reason, this.defaultReconnect);
+						SetState(ConnectionStates.Closed, HTTPManager.IsQuitting ? null : reason, defaultReconnect);
 					}
 
 					break;
@@ -1239,45 +1356,55 @@ namespace BestHTTP.SignalRCore
 				{
 					try
 					{
-						if (this.OnTransportEvent != null)
-							this.OnTransportEvent(this, this.Transport, TransportEvents.Closed);
+						if (OnTransportEvent != null)
+						{
+							OnTransportEvent(this, Transport, TransportEvents.Closed);
+						}
 					}
 					catch (Exception ex)
 					{
-						HTTPManager.Logger.Exception("HubConnection", "Exception in OnTransportEvent user code!", ex, this.Context);
+						HTTPManager.Logger.Exception("HubConnection", "Exception in OnTransportEvent user code!", ex, Context);
 					}
 
 					// Check wheter we have any delayed message and a Close message among them. If there's one, delay the SetState(Close) too.
-					if (this.delayedMessages == null || this.delayedMessages.FindLast(dm => dm.type == MessageTypes.Close).type != MessageTypes.Close)
-						SetState(ConnectionStates.Closed, null, this.defaultReconnect);
+					if (delayedMessages == null || delayedMessages.FindLast(dm => dm.type == MessageTypes.Close).type != MessageTypes.Close)
+					{
+						SetState(ConnectionStates.Closed, null, defaultReconnect);
+					}
 				}
 					break;
 			}
 		}
 
-		private TransportTypes? GetNextTransportToTry()
+		TransportTypes? GetNextTransportToTry()
 		{
 			foreach (TransportTypes val in Enum.GetValues(typeof(TransportTypes)))
-				if (!this.triedoutTransports.Contains(val) && IsTransportSupported(val.ToString()))
+			{
+				if (!triedoutTransports.Contains(val) && IsTransportSupported(val.ToString()))
+				{
 					return val;
+				}
+			}
 
 			return null;
 		}
 
 		bool defaultReconnect = true;
 
-		private void SetState(ConnectionStates state, string errorReason, bool allowReconnect)
+		void SetState(ConnectionStates state, string errorReason, bool allowReconnect)
 		{
 			HTTPManager.Logger.Information("HubConnection",
-				string.Format("SetState - from State: '{0}' to State: '{1}', errorReason: '{2}', allowReconnect: {3}, isQuitting: {4}", this.State, state, errorReason,
-					allowReconnect, HTTPManager.IsQuitting), this.Context);
+				string.Format("SetState - from State: '{0}' to State: '{1}', errorReason: '{2}', allowReconnect: {3}, isQuitting: {4}", State, state, errorReason,
+					allowReconnect, HTTPManager.IsQuitting), Context);
 
-			if (this.State == state)
+			if (State == state)
+			{
 				return;
+			}
 
-			var previousState = this.State;
+			ConnectionStates previousState = State;
 
-			this.State = state;
+			State = state;
 
 			switch (state)
 			{
@@ -1292,51 +1419,55 @@ namespace BestHTTP.SignalRCore
 
 				case ConnectionStates.Connected:
 					// If reconnectStartTime isn't its default value we reconnected
-					if (this.reconnectStartTime != DateTime.MinValue)
+					if (reconnectStartTime != DateTime.MinValue)
 					{
 						try
 						{
-							if (this.OnReconnected != null)
-								this.OnReconnected(this);
+							if (OnReconnected != null)
+							{
+								OnReconnected(this);
+							}
 						}
 						catch (Exception ex)
 						{
-							HTTPManager.Logger.Exception("HubConnection", "OnReconnected", ex, this.Context);
+							HTTPManager.Logger.Exception("HubConnection", "OnReconnected", ex, Context);
 						}
 					}
 					else
 					{
 						try
 						{
-							if (this.OnConnected != null)
-								this.OnConnected(this);
+							if (OnConnected != null)
+							{
+								OnConnected(this);
+							}
 						}
 						catch (Exception ex)
 						{
-							HTTPManager.Logger.Exception("HubConnection", "Exception in OnConnected user code!", ex, this.Context);
+							HTTPManager.Logger.Exception("HubConnection", "Exception in OnConnected user code!", ex, Context);
 						}
 					}
 
-					this.lastMessageSentAt = DateTime.Now;
-					this.lastMessageReceivedAt = DateTime.Now;
+					lastMessageSentAt = DateTime.Now;
+					lastMessageReceivedAt = DateTime.Now;
 
 					// Clean up reconnect related fields
-					this.currentContext = new RetryContext();
-					this.reconnectStartTime = DateTime.MinValue;
-					this.reconnectAt = DateTime.MinValue;
+					currentContext = new RetryContext();
+					reconnectStartTime = DateTime.MinValue;
+					reconnectAt = DateTime.MinValue;
 
-					HTTPUpdateDelegator.OnApplicationForegroundStateChanged -= this.OnApplicationForegroundStateChanged;
-					HTTPUpdateDelegator.OnApplicationForegroundStateChanged += this.OnApplicationForegroundStateChanged;
+					HTTPUpdateDelegator.OnApplicationForegroundStateChanged -= OnApplicationForegroundStateChanged;
+					HTTPUpdateDelegator.OnApplicationForegroundStateChanged += OnApplicationForegroundStateChanged;
 
 					break;
 
 				case ConnectionStates.Closed:
 					// Go through all invocations and cancel them.
-					var error = new Message();
+					Message error = new Message();
 					error.type = MessageTypes.Close;
 					error.error = errorReason;
 
-					foreach (var kvp in this.invocations)
+					foreach (KeyValuePair<long, InvocationDefinition> kvp in invocations)
 					{
 						try
 						{
@@ -1347,96 +1478,98 @@ namespace BestHTTP.SignalRCore
 						}
 					}
 
-					this.invocations.Clear();
+					invocations.Clear();
 
 					// No errorReason? It's an expected closure.
 					if (errorReason == null && (!allowReconnect || HTTPManager.IsQuitting))
 					{
-						if (this.OnClosed != null)
+						if (OnClosed != null)
 						{
 							try
 							{
-								this.OnClosed(this);
+								OnClosed(this);
 							}
 							catch (Exception ex)
 							{
-								HTTPManager.Logger.Exception("HubConnection", "Exception in OnClosed user code!", ex, this.Context);
+								HTTPManager.Logger.Exception("HubConnection", "Exception in OnClosed user code!", ex, Context);
 							}
 						}
 					}
 					else
 					{
 						// If possible, try to reconnect
-						if (allowReconnect && this.ReconnectPolicy != null &&
-						    (previousState == ConnectionStates.Connected || this.reconnectStartTime != DateTime.MinValue))
+						if (allowReconnect && ReconnectPolicy != null &&
+						    (previousState == ConnectionStates.Connected || reconnectStartTime != DateTime.MinValue))
 						{
 							// It's the first attempt after a successful connection
-							if (this.reconnectStartTime == DateTime.MinValue)
+							if (reconnectStartTime == DateTime.MinValue)
 							{
-								this.connectionStartedAt = this.reconnectStartTime = DateTime.Now;
+								connectionStartedAt = reconnectStartTime = DateTime.Now;
 
 								try
 								{
-									if (this.OnReconnecting != null)
-										this.OnReconnecting(this, errorReason);
+									if (OnReconnecting != null)
+									{
+										OnReconnecting(this, errorReason);
+									}
 								}
 								catch (Exception ex)
 								{
-									HTTPManager.Logger.Exception("HubConnection", "SetState - ConnectionStates.Reconnecting", ex, this.Context);
+									HTTPManager.Logger.Exception("HubConnection", "SetState - ConnectionStates.Reconnecting", ex, Context);
 								}
 							}
 
 							RetryContext context = new RetryContext
 							{
-								ElapsedTime = DateTime.Now - this.reconnectStartTime,
-								PreviousRetryCount = this.currentContext.PreviousRetryCount,
+								ElapsedTime = DateTime.Now - reconnectStartTime,
+								PreviousRetryCount = currentContext.PreviousRetryCount,
 								RetryReason = errorReason
 							};
 
 							TimeSpan? nextAttempt = null;
 							try
 							{
-								nextAttempt = this.ReconnectPolicy.GetNextRetryDelay(context);
+								nextAttempt = ReconnectPolicy.GetNextRetryDelay(context);
 							}
 							catch (Exception ex)
 							{
-								HTTPManager.Logger.Exception("HubConnection", "ReconnectPolicy.GetNextRetryDelay", ex, this.Context);
+								HTTPManager.Logger.Exception("HubConnection", "ReconnectPolicy.GetNextRetryDelay", ex, Context);
 							}
 
 							// No more reconnect attempt, we are closing
 							if (nextAttempt == null)
 							{
-								HTTPManager.Logger.Warning("HubConnection", "No more reconnect attempt!", this.Context);
+								HTTPManager.Logger.Warning("HubConnection", "No more reconnect attempt!", Context);
 
 								// Clean up everything
-								this.currentContext = new RetryContext();
-								this.reconnectStartTime = DateTime.MinValue;
-								this.reconnectAt = DateTime.MinValue;
+								currentContext = new RetryContext();
+								reconnectStartTime = DateTime.MinValue;
+								reconnectAt = DateTime.MinValue;
 							}
 							else
 							{
-								HTTPManager.Logger.Information("HubConnection", "Next reconnect attempt after " + nextAttempt.Value.ToString(), this.Context);
+								HTTPManager.Logger.Information("HubConnection", "Next reconnect attempt after " + nextAttempt.Value.ToString(), Context);
 
-								this.currentContext = context;
-								this.currentContext.PreviousRetryCount += 1;
+								currentContext = context;
+								currentContext.PreviousRetryCount += 1;
 
-								this.reconnectAt = DateTime.Now + nextAttempt.Value;
+								reconnectAt = DateTime.Now + nextAttempt.Value;
 
-								this.SetState(ConnectionStates.Reconnecting, null, this.defaultReconnect);
+								SetState(ConnectionStates.Reconnecting, null, defaultReconnect);
 
 								return;
 							}
 						}
 
-						if (this.OnError != null)
+						if (OnError != null)
 						{
 							try
 							{
-								this.OnError(this, errorReason);
+								OnError(this, errorReason);
 							}
 							catch (Exception ex)
 							{
-								HTTPManager.Logger.Exception("HubConnection", "Exception in OnError user code!", ex, this.Context);
+								HTTPManager.Logger.Exception("HubConnection", "Exception in OnError user code!", ex, Context);
 							}
 						}
 					}
@@ -1445,99 +1578,103 @@ namespace BestHTTP.SignalRCore
 			}
 		}
 
-		private void OnApplicationForegroundStateChanged(bool isPaused)
+		void OnApplicationForegroundStateChanged(bool isPaused)
 		{
 			pausedInLastFrame = !isPaused;
 
 			HTTPManager.Logger.Information("HubConnection", $"OnApplicationForegroundStateChanged isPaused: {isPaused} pausedInLastFrame: {pausedInLastFrame}",
-				this.Context);
+				Context);
 		}
 
-		void BestHTTP.Extensions.IHeartbeat.OnHeartbeatUpdate(TimeSpan dif)
+		void Extensions.IHeartbeat.OnHeartbeatUpdate(TimeSpan dif)
 		{
-			switch (this.State)
+			switch (State)
 			{
 				case ConnectionStates.Negotiating:
 				case ConnectionStates.Authenticating:
 				case ConnectionStates.Redirected:
-					if (DateTime.Now >= this.connectionStartedAt + this.Options.ConnectTimeout)
+					if (DateTime.Now >= connectionStartedAt + Options.ConnectTimeout)
 					{
-						if (this.AuthenticationProvider != null)
+						if (AuthenticationProvider != null)
 						{
-							this.AuthenticationProvider.OnAuthenticationSucceded -= OnAuthenticationSucceded;
-							this.AuthenticationProvider.OnAuthenticationFailed -= OnAuthenticationFailed;
+							AuthenticationProvider.OnAuthenticationSucceded -= OnAuthenticationSucceded;
+							AuthenticationProvider.OnAuthenticationFailed -= OnAuthenticationFailed;
 
 							try
 							{
-								this.AuthenticationProvider.Cancel();
+								AuthenticationProvider.Cancel();
 							}
 							catch (Exception ex)
 							{
-								HTTPManager.Logger.Exception("HubConnection", "Exception in AuthenticationProvider.Cancel !", ex, this.Context);
+								HTTPManager.Logger.Exception("HubConnection", "Exception in AuthenticationProvider.Cancel !", ex, Context);
 							}
 						}
 
-						if (this.Transport != null)
+						if (Transport != null)
 						{
-							this.Transport.OnStateChanged -= Transport_OnStateChanged;
-							this.Transport.StartClose();
+							Transport.OnStateChanged -= Transport_OnStateChanged;
+							Transport.StartClose();
 						}
 
-						SetState(ConnectionStates.Closed, string.Format("Couldn't connect in the given time({0})!", this.Options.ConnectTimeout), this.defaultReconnect);
+						SetState(ConnectionStates.Closed, string.Format("Couldn't connect in the given time({0})!", Options.ConnectTimeout), defaultReconnect);
 					}
 
 					break;
 
 				case ConnectionStates.Connected:
-					if (this.delayedMessages?.Count > 0)
+					if (delayedMessages?.Count > 0)
 					{
 						pausedInLastFrame = false;
 						try
 						{
 							// if there's any Close message clear any other one.
-							int idx = this.delayedMessages.FindLastIndex(dm => dm.type == MessageTypes.Close);
+							int idx = delayedMessages.FindLastIndex(dm => dm.type == MessageTypes.Close);
 							if (idx > 0)
-								this.delayedMessages.RemoveRange(0, idx);
+							{
+								delayedMessages.RemoveRange(0, idx);
+							}
 
-							OnMessages(this.delayedMessages);
+							OnMessages(delayedMessages);
 						}
 						finally
 						{
-							this.delayedMessages.Clear();
+							delayedMessages.Clear();
 						}
 					}
 
 					// Still connected? Check pinging.
-					if (this.State == ConnectionStates.Connected)
+					if (State == ConnectionStates.Connected)
 					{
-						if (this.Options.PingInterval != TimeSpan.Zero && DateTime.Now - this.lastMessageReceivedAt >= this.Options.PingTimeoutInterval)
+						if (Options.PingInterval != TimeSpan.Zero && DateTime.Now - lastMessageReceivedAt >= Options.PingTimeoutInterval)
 						{
 							// The transport itself can be in a failure state or in a completely valid one, so while we do not want to receive anything from it, we have to try to close it
-							if (this.Transport != null)
+							if (Transport != null)
 							{
-								this.Transport.OnStateChanged -= Transport_OnStateChanged;
-								this.Transport.StartClose();
+								Transport.OnStateChanged -= Transport_OnStateChanged;
+								Transport.StartClose();
 							}
 
 							SetState(ConnectionStates.Closed,
-								string.Format("PingInterval set to '{0}' and no message is received since '{1}'. PingTimeoutInterval: '{2}'", this.Options.PingInterval,
-									this.lastMessageReceivedAt, this.Options.PingTimeoutInterval),
-								this.defaultReconnect);
+								string.Format("PingInterval set to '{0}' and no message is received since '{1}'. PingTimeoutInterval: '{2}'", Options.PingInterval,
+									lastMessageReceivedAt, Options.PingTimeoutInterval),
+								defaultReconnect);
 						}
-						else if (this.Options.PingInterval != TimeSpan.Zero && DateTime.Now - this.lastMessageSentAt >= this.Options.PingInterval)
+						else if (Options.PingInterval != TimeSpan.Zero && DateTime.Now - lastMessageSentAt >= Options.PingInterval)
+						{
 							SendMessage(new Message() { type = MessageTypes.Ping });
+						}
 					}
 
 					break;
 
 				case ConnectionStates.Reconnecting:
-					if (this.reconnectAt != DateTime.MinValue && DateTime.Now >= this.reconnectAt)
+					if (reconnectAt != DateTime.MinValue && DateTime.Now >= reconnectAt)
 					{
-						this.delayedMessages?.Clear();
-						this.connectionStartedAt = DateTime.Now;
-						this.reconnectAt = DateTime.MinValue;
-						this.triedoutTransports.Clear();
-						this.StartConnect();
+						delayedMessages?.Clear();
+						connectionStartedAt = DateTime.Now;
+						reconnectAt = DateTime.MinValue;
+						triedoutTransports.Clear();
+						StartConnect();
 					}
 
 					break;
@@ -1548,16 +1685,16 @@ namespace BestHTTP.SignalRCore
 			}
 		}
 
-		private void CleanUp()
+		void CleanUp()
 		{
-			HTTPManager.Logger.Information("HubConnection", "CleanUp", this.Context);
+			HTTPManager.Logger.Information("HubConnection", "CleanUp", Context);
 
-			this.delayedMessages?.Clear();
+			delayedMessages?.Clear();
 			HTTPManager.Heartbeats.Unsubscribe(this);
-			HTTPUpdateDelegator.OnApplicationForegroundStateChanged -= this.OnApplicationForegroundStateChanged;
+			HTTPUpdateDelegator.OnApplicationForegroundStateChanged -= OnApplicationForegroundStateChanged;
 
-			this.rwLock?.Dispose();
-			this.rwLock = null;
+			rwLock?.Dispose();
+			rwLock = null;
 		}
 	}
 }

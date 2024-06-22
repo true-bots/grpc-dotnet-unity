@@ -16,7 +16,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public static BcTlsSecret Convert(BcTlsCrypto crypto, TlsSecret secret)
 		{
 			if (secret is BcTlsSecret)
+			{
 				return (BcTlsSecret)secret;
+			}
 
 			if (secret is AbstractTlsSecret)
 			{
@@ -25,13 +27,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 				return crypto.AdoptLocalSecret(CopyData(abstractTlsSecret));
 			}
 
-			throw new ArgumentException("unrecognized TlsSecret - cannot copy data: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(secret));
+			throw new ArgumentException("unrecognized TlsSecret - cannot copy data: " + Platform.GetTypeName(secret));
 		}
 
 		// SSL3 magic mix constants ("A", "BB", "CCC", ...)
-		private static readonly byte[] Ssl3Const = GenerateSsl3Constants();
+		static readonly byte[] Ssl3Const = GenerateSsl3Constants();
 
-		private static byte[] GenerateSsl3Constants()
+		static byte[] GenerateSsl3Constants()
 		{
 			int n = 15;
 			byte[] result = new byte[n * (n + 1) / 2];
@@ -53,7 +55,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public BcTlsSecret(BcTlsCrypto crypto, byte[] data)
 			: base(data)
 		{
-			this.m_crypto = crypto;
+			m_crypto = crypto;
 		}
 
 		public override TlsSecret DeriveUsingPrf(int prfAlgorithm, string label, byte[] seed, int length)
@@ -107,11 +109,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			lock (this)
 			{
 				if (length < 1)
+				{
 					return m_crypto.AdoptLocalSecret(TlsUtilities.EmptyBytes);
+				}
 
 				int hashLen = TlsCryptoUtilities.GetHashOutputSize(cryptoHashAlgorithm);
-				if (length > (255 * hashLen))
+				if (length > 255 * hashLen)
+				{
 					throw new ArgumentException("must be <= 255 * (output size of 'hashAlgorithm')", "length");
+				}
 
 				CheckAlive();
 
@@ -206,7 +212,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 				CheckAlive();
 
 				byte[] salt = m_data;
-				this.m_data = null;
+				m_data = null;
 
 				HMac hmac = new HMac(m_crypto.CreateDigest(cryptoHashAlgorithm));
 				hmac.Init(new KeyParameter(salt));
@@ -256,12 +262,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		protected virtual byte[] Prf(int prfAlgorithm, string label, byte[] seed, int length)
 		{
 			if (PrfAlgorithm.ssl_prf_legacy == prfAlgorithm)
+			{
 				return Prf_Ssl(seed, length);
+			}
 
 			byte[] labelSeed = Arrays.Concatenate(Strings.ToByteArray(label), seed);
 
 			if (PrfAlgorithm.tls_prf_legacy == prfAlgorithm)
+			{
 				return Prf_1_0(labelSeed, length);
+			}
 
 			return Prf_1_2(prfAlgorithm, labelSeed, length);
 		}

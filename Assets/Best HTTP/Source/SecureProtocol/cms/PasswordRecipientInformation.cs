@@ -18,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class PasswordRecipientInformation
 		: RecipientInformation
 	{
-		private readonly PasswordRecipientInfo info;
+		readonly PasswordRecipientInfo info;
 
 		internal PasswordRecipientInformation(
 			PasswordRecipientInfo info,
@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			: base(info.KeyEncryptionAlgorithm, secureReadable)
 		{
 			this.info = info;
-			this.rid = new RecipientID();
+			rid = new RecipientID();
 		}
 
 		/**

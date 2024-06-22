@@ -12,24 +12,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class Dstu7624Engine
 		: IBlockCipher
 	{
-		private ulong[] internalState;
-		private ulong[] workingKey;
-		private ulong[][] roundKeys;
+		ulong[] internalState;
+		ulong[] workingKey;
+		ulong[][] roundKeys;
 
 		/* Number of 64-bit words in block */
-		private int wordsInBlock;
+		int wordsInBlock;
 
 		/* Number of 64-bit words in key */
-		private int wordsInKey;
+		int wordsInKey;
 
 		/* Number of encryption rounds depending on key length */
-		private const int ROUNDS_128 = 10;
-		private const int ROUNDS_256 = 14;
-		private const int ROUNDS_512 = 18;
+		const int ROUNDS_128 = 10;
+		const int ROUNDS_256 = 14;
+		const int ROUNDS_512 = 18;
 
-		private int roundsAmount;
+		int roundsAmount;
 
-		private bool forEncryption;
+		bool forEncryption;
 
 		public Dstu7624Engine(int blockSizeBits)
 		{
@@ -48,7 +48,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
+			{
 				throw new ArgumentException("Invalid parameter passed to Dstu7624Engine Init");
+			}
 
 			this.forEncryption = forEncryption;
 
@@ -62,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			/* Limitations on key lengths depending on block lengths. See table 6.1 in standard */
-			if (keyBitLength != blockBitLength && keyBitLength != (2 * blockBitLength))
+			if (keyBitLength != blockBitLength && keyBitLength != 2 * blockBitLength)
 			{
 				throw new ArgumentException("Unsupported key length");
 			}
@@ -107,7 +109,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			WorkingKeyExpandOdd();
 		}
 
-		private void WorkingKeyExpandKT(ulong[] workingKey, ulong[] tempKeys)
+		void WorkingKeyExpandKT(ulong[] workingKey, ulong[] tempKeys)
 		{
 			ulong[] k0 = new ulong[wordsInBlock];
 			ulong[] k1 = new ulong[wordsInBlock];
@@ -151,7 +153,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			Array.Copy(internalState, 0, tempKeys, 0, wordsInBlock);
 		}
 
-		private void WorkingKeyExpandEven(ulong[] workingKey, ulong[] tempKey)
+		void WorkingKeyExpandEven(ulong[] workingKey, ulong[] tempKey)
 		{
 			ulong[] initialData = new ulong[wordsInKey];
 			ulong[] tempRoundKey = new ulong[wordsInBlock];
@@ -245,7 +247,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void WorkingKeyExpandOdd()
+		void WorkingKeyExpandOdd()
 		{
 			for (int roundIndex = 1; roundIndex < roundsAmount; roundIndex += 2)
 			{
@@ -258,7 +260,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (workingKey == null)
+			{
 				throw new InvalidOperationException("Dstu7624Engine not initialised");
+			}
 
 			Check.DataLength(input, inOff, GetBlockSize(), "input buffer too short");
 			Check.OutputLength(output, outOff, GetBlockSize(), "output buffer too short");
@@ -419,14 +423,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         }
 #endif
 
-		private void EncryptionRound()
+		void EncryptionRound()
 		{
 			SubBytes();
 			ShiftRows();
 			MixColumns();
 		}
 
-		private void DecryptionRound()
+		void DecryptionRound()
 		{
 			MixColumnsInv();
 			InvShiftRows();
@@ -560,7 +564,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             Pack.UInt64_To_LE(c1, output[8..]);
         }
 #else
-		private void DecryptBlock_128(byte[] input, int inOff, byte[] output, int outOff)
+		void DecryptBlock_128(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			ulong c0 = Pack.LE_To_UInt64(input, inOff);
 			ulong c1 = Pack.LE_To_UInt64(input, inOff + 8);
@@ -623,7 +627,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			Pack.UInt64_To_LE(c1, output, outOff + 8);
 		}
 
-		private void EncryptBlock_128(byte[] input, int inOff, byte[] output, int outOff)
+		void EncryptBlock_128(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			ulong c0 = Pack.LE_To_UInt64(input, inOff);
 			ulong c1 = Pack.LE_To_UInt64(input, inOff + 8);
@@ -687,7 +691,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 #endif
 
-		private void SubBytes()
+		void SubBytes()
 		{
 			for (int i = 0; i < wordsInBlock; i++)
 			{
@@ -707,7 +711,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void InvSubBytes()
+		void InvSubBytes()
 		{
 			for (int i = 0; i < wordsInBlock; i++)
 			{
@@ -727,7 +731,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void ShiftRows()
+		void ShiftRows()
 		{
 			switch (wordsInBlock)
 			{
@@ -831,7 +835,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void InvShiftRows()
+		void InvShiftRows()
 		{
 			switch (wordsInBlock)
 			{
@@ -935,7 +939,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void AddRoundKey(int round)
+		void AddRoundKey(int round)
 		{
 			ulong[] roundKey = roundKeys[round];
 			for (int i = 0; i < wordsInBlock; ++i)
@@ -944,7 +948,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void SubRoundKey(int round)
+		void SubRoundKey(int round)
 		{
 			ulong[] roundKey = roundKeys[round];
 			for (int i = 0; i < wordsInBlock; ++i)
@@ -953,7 +957,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void XorRoundKey(int round)
+		void XorRoundKey(int round)
 		{
 			ulong[] roundKey = roundKeys[round];
 			for (int i = 0; i < wordsInBlock; i++)
@@ -962,7 +966,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private static ulong MixColumn(ulong c)
+		static ulong MixColumn(ulong c)
 		{
 			//// Calculate column multiplied by powers of 'x'
 			//ulong x0 = c;
@@ -1002,7 +1006,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return u ^ Rotate(32, v) ^ Rotate(40, x1) ^ Rotate(48, x1);
 		}
 
-		private void MixColumns()
+		void MixColumns()
 		{
 			for (int col = 0; col < wordsInBlock; ++col)
 			{
@@ -1010,7 +1014,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private static ulong MixColumnInv(ulong c)
+		static ulong MixColumnInv(ulong c)
 		{
 /*
             // Calculate column multiplied by powers of 'x'
@@ -1085,7 +1089,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return u0;
 		}
 
-		private void MixColumnsInv()
+		void MixColumnsInv()
 		{
 			for (int col = 0; col < wordsInBlock; ++col)
 			{
@@ -1093,12 +1097,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private static ulong MulX(ulong n)
+		static ulong MulX(ulong n)
 		{
 			return ((n & 0x7F7F7F7F7F7F7F7FUL) << 1) ^ (((n & 0x8080808080808080UL) >> 7) * 0x1DUL);
 		}
 
-		private static ulong MulX2(ulong n)
+		static ulong MulX2(ulong n)
 		{
 			return ((n & 0x3F3F3F3F3F3F3F3FUL) << 2) ^ (((n & 0x8080808080808080UL) >> 6) * 0x1DUL) ^ (((n & 0x4040404040404040UL) >> 6) * 0x1DUL);
 		}
@@ -1142,12 +1146,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		//    return r;
 		//}
 
-		private static ulong Rotate(int n, ulong x)
+		static ulong Rotate(int n, ulong x)
 		{
 			return (x >> n) | (x << -n);
 		}
 
-		private void RotateLeft(ulong[] x, ulong[] z)
+		void RotateLeft(ulong[] x, ulong[] z)
 		{
 			switch (wordsInBlock)
 			{
@@ -1190,10 +1194,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		#region TABLES AND S-BOXES
 
-		private const ulong mdsMatrix = 0x0407060801050101UL;
-		private const ulong mdsInvMatrix = 0xCAD7492FA87695ADUL;
+		const ulong mdsMatrix = 0x0407060801050101UL;
+		const ulong mdsInvMatrix = 0xCAD7492FA87695ADUL;
 
-		private static readonly byte[] S0 = new byte[]
+		static readonly byte[] S0 = new byte[]
 		{
 			0xa8, 0x43, 0x5f, 0x06, 0x6b, 0x75, 0x6c, 0x59, 0x71, 0xdf, 0x87, 0x95, 0x17, 0xf0, 0xd8, 0x09,
 			0x6d, 0xf3, 0x1d, 0xcb, 0xc9, 0x4d, 0x2c, 0xaf, 0x79, 0xe0, 0x97, 0xfd, 0x6f, 0x4b, 0x45, 0x39,
@@ -1213,7 +1217,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x81, 0x54, 0xc0, 0xed, 0x4e, 0x44, 0xa7, 0x2a, 0x85, 0x25, 0xe6, 0xca, 0x7c, 0x8b, 0x56, 0x80
 		};
 
-		private static readonly byte[] S1 = new byte[]
+		static readonly byte[] S1 = new byte[]
 		{
 			0xce, 0xbb, 0xeb, 0x92, 0xea, 0xcb, 0x13, 0xc1, 0xe9, 0x3a, 0xd6, 0xb2, 0xd2, 0x90, 0x17, 0xf8,
 			0x42, 0x15, 0x56, 0xb4, 0x65, 0x1c, 0x88, 0x43, 0xc5, 0x5c, 0x36, 0xba, 0xf5, 0x57, 0x67, 0x8d,
@@ -1233,7 +1237,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0xb6, 0xc2, 0x01, 0xf0, 0x5a, 0xed, 0xa7, 0x66, 0x21, 0x7f, 0x8a, 0x27, 0xc7, 0xc0, 0x29, 0xd7
 		};
 
-		private static readonly byte[] S2 = new byte[]
+		static readonly byte[] S2 = new byte[]
 		{
 			0x93, 0xd9, 0x9a, 0xb5, 0x98, 0x22, 0x45, 0xfc, 0xba, 0x6a, 0xdf, 0x02, 0x9f, 0xdc, 0x51, 0x59,
 			0x4a, 0x17, 0x2b, 0xc2, 0x94, 0xf4, 0xbb, 0xa3, 0x62, 0xe4, 0x71, 0xd4, 0xcd, 0x70, 0x16, 0xe1,
@@ -1253,7 +1257,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x42, 0x04, 0xa0, 0xdb, 0x39, 0x86, 0x54, 0xaa, 0x8c, 0x34, 0x21, 0x8b, 0xf8, 0x0c, 0x74, 0x67
 		};
 
-		private static readonly byte[] S3 = new byte[]
+		static readonly byte[] S3 = new byte[]
 		{
 			0x68, 0x8d, 0xca, 0x4d, 0x73, 0x4b, 0x4e, 0x2a, 0xd4, 0x52, 0x26, 0xb3, 0x54, 0x1e, 0x19, 0x1f,
 			0x22, 0x03, 0x46, 0x3d, 0x2d, 0x4a, 0x53, 0x83, 0x13, 0x8a, 0xb7, 0xd5, 0x25, 0x79, 0xf5, 0xbd,
@@ -1273,7 +1277,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x64, 0x6d, 0xdc, 0xf0, 0x59, 0xa9, 0x4c, 0x17, 0x7f, 0x91, 0xb8, 0xc9, 0x57, 0x1b, 0xe0, 0x61
 		};
 
-		private static readonly byte[] T0 = new byte[]
+		static readonly byte[] T0 = new byte[]
 		{
 			0xa4, 0xa2, 0xa9, 0xc5, 0x4e, 0xc9, 0x03, 0xd9, 0x7e, 0x0f, 0xd2, 0xad, 0xe7, 0xd3, 0x27, 0x5b,
 			0xe3, 0xa1, 0xe8, 0xe6, 0x7c, 0x2a, 0x55, 0x0c, 0x86, 0x39, 0xd7, 0x8d, 0xb8, 0x12, 0x6f, 0x28,
@@ -1293,7 +1297,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x0d, 0xba, 0x41, 0x11, 0x38, 0x7b, 0xbe, 0xd0, 0xd5, 0x69, 0x36, 0xc8, 0x62, 0x1b, 0x82, 0x8f
 		};
 
-		private static readonly byte[] T1 = new byte[]
+		static readonly byte[] T1 = new byte[]
 		{
 			0x83, 0xf2, 0x2a, 0xeb, 0xe9, 0xbf, 0x7b, 0x9c, 0x34, 0x96, 0x8d, 0x98, 0xb9, 0x69, 0x8c, 0x29,
 			0x3d, 0x88, 0x68, 0x06, 0x39, 0x11, 0x4c, 0x0e, 0xa0, 0x56, 0x40, 0x92, 0x15, 0xbc, 0xb3, 0xdc,
@@ -1313,7 +1317,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0xf3, 0xc0, 0xce, 0x43, 0x25, 0x1c, 0x21, 0x33, 0x0f, 0xaf, 0x47, 0xed, 0x66, 0x63, 0x93, 0xaa
 		};
 
-		private static readonly byte[] T2 = new byte[]
+		static readonly byte[] T2 = new byte[]
 		{
 			0x45, 0xd4, 0x0b, 0x43, 0xf1, 0x72, 0xed, 0xa4, 0xc2, 0x38, 0xe6, 0x71, 0xfd, 0xb6, 0x3a, 0x95,
 			0x50, 0x44, 0x4b, 0xe2, 0x74, 0x6b, 0x1e, 0x11, 0x5a, 0xc6, 0xb4, 0xd8, 0xa5, 0x8a, 0x70, 0xa3,
@@ -1333,7 +1337,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x82, 0xe4, 0xba, 0xc3, 0x15, 0xd1, 0xe0, 0x89, 0xfc, 0xb1, 0xb9, 0xb5, 0x07, 0x79, 0xb8, 0xe1
 		};
 
-		private static readonly byte[] T3 = new byte[]
+		static readonly byte[] T3 = new byte[]
 		{
 			0xb2, 0xb6, 0x23, 0x11, 0xa7, 0x88, 0xc5, 0xa6, 0x39, 0x8f, 0xc4, 0xe8, 0x73, 0x22, 0x43, 0xc3,
 			0x82, 0x27, 0xcd, 0x18, 0x51, 0x62, 0x2d, 0xf7, 0x5c, 0x0e, 0x3b, 0xfd, 0xca, 0x9b, 0x0d, 0x0f,

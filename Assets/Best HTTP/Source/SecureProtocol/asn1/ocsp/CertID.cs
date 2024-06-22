@@ -10,10 +10,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class CertID
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier hashAlgorithm;
-		private readonly Asn1OctetString issuerNameHash;
-		private readonly Asn1OctetString issuerKeyHash;
-		private readonly DerInteger serialNumber;
+		readonly AlgorithmIdentifier hashAlgorithm;
+		readonly Asn1OctetString issuerNameHash;
+		readonly Asn1OctetString issuerKeyHash;
+		readonly DerInteger serialNumber;
 
 		public static CertID GetInstance(
 			Asn1TaggedObject obj,
@@ -35,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new CertID((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public CertID(
@@ -50,16 +50,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			this.serialNumber = serialNumber;
 		}
 
-		private CertID(
+		CertID(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 4)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
-			this.hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
-			this.issuerNameHash = Asn1OctetString.GetInstance(seq[1]);
-			this.issuerKeyHash = Asn1OctetString.GetInstance(seq[2]);
-			this.serialNumber = DerInteger.GetInstance(seq[3]);
+			hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
+			issuerNameHash = Asn1OctetString.GetInstance(seq[1]);
+			issuerKeyHash = Asn1OctetString.GetInstance(seq[2]);
+			serialNumber = DerInteger.GetInstance(seq[3]);
 		}
 
 		public AlgorithmIdentifier HashAlgorithm

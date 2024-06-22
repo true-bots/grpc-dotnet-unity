@@ -32,7 +32,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		{
 		}
 
-		private static byte[] CreateData(
+		static byte[] CreateData(
 			RevocationKeyTag signatureClass,
 			PublicKeyAlgorithmTag keyAlgorithm,
 			byte[] fingerprint)
@@ -46,17 +46,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 
 		public virtual RevocationKeyTag SignatureClass
 		{
-			get { return (RevocationKeyTag)this.GetData()[0]; }
+			get { return (RevocationKeyTag)GetData()[0]; }
 		}
 
 		public virtual PublicKeyAlgorithmTag Algorithm
 		{
-			get { return (PublicKeyAlgorithmTag)this.GetData()[1]; }
+			get { return (PublicKeyAlgorithmTag)GetData()[1]; }
 		}
 
 		public virtual byte[] GetFingerprint()
 		{
-			byte[] data = this.GetData();
+			byte[] data = GetData();
 			byte[] fingerprint = new byte[data.Length - 2];
 			Array.Copy(data, 2, fingerprint, 0, fingerprint.Length);
 			return fingerprint;

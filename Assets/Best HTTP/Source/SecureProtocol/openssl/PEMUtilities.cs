@@ -9,9 +9,9 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 {
-	internal sealed class PemUtilities
+	sealed class PemUtilities
 	{
-		private enum PemBaseAlg
+		enum PemBaseAlg
 		{
 			AES_128,
 			AES_192,
@@ -25,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			RC2_64
 		};
 
-		private enum PemMode
+		enum PemMode
 		{
 			CBC,
 			CFB,
@@ -40,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			Enums.GetArbitraryValue<PemMode>().ToString();
 		}
 
-		private static void ParseDekAlgName(
+		static void ParseDekAlgName(
 			string dekAlgName,
 			out PemBaseAlg baseAlg,
 			out PemMode mode)
@@ -146,7 +146,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			return cipher.DoFinal(bytes);
 		}
 
-		private static ICipherParameters GetCipherParameters(
+		static ICipherParameters GetCipherParameters(
 			char[] password,
 			PemBaseAlg baseAlg,
 			byte[] salt)

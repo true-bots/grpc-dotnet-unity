@@ -15,13 +15,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 	{
 		public const string HashSha1 = "1.3.14.3.2.26";
 
-		private readonly CertID id;
+		readonly CertID id;
 
 		public CertificateID(
 			CertID id)
 		{
 			if (id == null)
+			{
 				throw new ArgumentNullException("id");
+			}
 
 			this.id = id;
 		}
@@ -39,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			AlgorithmIdentifier hashAlg = new AlgorithmIdentifier(
 				new DerObjectIdentifier(hashAlgorithm), DerNull.Instance);
 
-			this.id = CreateCertID(hashAlg, issuerCert, new DerInteger(serialNumber));
+			id = CreateCertID(hashAlg, issuerCert, new DerInteger(serialNumber));
 		}
 
 		public string HashAlgOid
@@ -81,12 +83,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			CertificateID other = obj as CertificateID;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return id.ToAsn1Object().Equals(other.id.ToAsn1Object());
 		}
@@ -112,7 +118,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 				original.id.IssuerKeyHash, new DerInteger(newSerialNumber)));
 		}
 
-		private static CertID CreateCertID(
+		static CertID CreateCertID(
 			AlgorithmIdentifier hashAlg,
 			X509Certificate issuerCert,
 			DerInteger serialNumber)

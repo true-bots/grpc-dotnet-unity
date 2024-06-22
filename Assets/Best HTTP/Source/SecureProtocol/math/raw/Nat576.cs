@@ -6,7 +6,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 {
-	internal abstract class Nat576
+	abstract class Nat576
 	{
 		public static void Copy64(ulong[] x, ulong[] z)
 		{

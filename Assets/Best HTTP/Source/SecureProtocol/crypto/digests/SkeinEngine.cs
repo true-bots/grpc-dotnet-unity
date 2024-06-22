@@ -61,9 +61,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public const int SKEIN_1024 = ThreefishEngine.BLOCKSIZE_1024;
 
 		// Minimal at present, but more complex when tree hashing is implemented
-		private class Configuration
+		class Configuration
 		{
-			private byte[] bytes = new byte[32];
+			byte[] bytes = new byte[32];
 
 			public Configuration(long outputSizeBits)
 			{
@@ -89,8 +89,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 		public class Parameter
 		{
-			private int type;
-			private byte[] value;
+			int type;
+			byte[] value;
 
 			public Parameter(int type, byte[] value)
 			{
@@ -112,28 +112,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * The parameter type for the Skein key.
 		 */
-		private const int PARAM_TYPE_KEY = 0;
+		const int PARAM_TYPE_KEY = 0;
 
 		/**
 		 * The parameter type for the Skein configuration block.
 		 */
-		private const int PARAM_TYPE_CONFIG = 4;
+		const int PARAM_TYPE_CONFIG = 4;
 
 		/**
 		 * The parameter type for the message.
 		 */
-		private const int PARAM_TYPE_MESSAGE = 48;
+		const int PARAM_TYPE_MESSAGE = 48;
 
 		/**
 		 * The parameter type for the output transformation.
 		 */
-		private const int PARAM_TYPE_OUTPUT = 63;
+		const int PARAM_TYPE_OUTPUT = 63;
 
 		/**
 		 * Precalculated UBI(CFG) states for common state/output combinations without key or other
 		 * pre-message params.
 		 */
-		private static readonly IDictionary<int, ulong[]> InitialStates = new Dictionary<int, ulong[]>();
+		static readonly IDictionary<int, ulong[]> InitialStates = new Dictionary<int, ulong[]>();
 
 		static SkeinEngine()
 		{
@@ -231,42 +231,42 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			});
 		}
 
-		private static void InitialState(int blockSize, int outputSize, ulong[] state)
+		static void InitialState(int blockSize, int outputSize, ulong[] state)
 		{
 			InitialStates.Add(VariantIdentifier(blockSize / 8, outputSize / 8), state);
 		}
 
-		private static int VariantIdentifier(int blockSizeBytes, int outputSizeBytes)
+		static int VariantIdentifier(int blockSizeBytes, int outputSizeBytes)
 		{
 			return (outputSizeBytes << 16) | blockSizeBytes;
 		}
 
-		private class UbiTweak
+		class UbiTweak
 		{
 			/**
 			 * Point at which position might overflow long, so switch to add with carry logic
 			 */
-			private const ulong LOW_RANGE = ulong.MaxValue - uint.MaxValue;
+			const ulong LOW_RANGE = ulong.MaxValue - uint.MaxValue;
 
 			/**
 			 * Bit 127 = final
 			 */
-			private const ulong T1_FINAL = 1UL << 63;
+			const ulong T1_FINAL = 1UL << 63;
 
 			/**
 			 * Bit 126 = first
 			 */
-			private const ulong T1_FIRST = 1UL << 62;
+			const ulong T1_FIRST = 1UL << 62;
 
 			/**
 			 * UBI uses a 128 bit tweak
 			 */
-			private ulong[] tweak = new ulong[2];
+			ulong[] tweak = new ulong[2];
 
 			/**
 			 * Whether 64 bit position exceeded
 			 */
-			private bool extendedPosition;
+			bool extendedPosition;
 
 			public UbiTweak()
 			{
@@ -276,7 +276,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			public void Reset(UbiTweak tweak)
 			{
 				this.tweak = Arrays.Clone(tweak.tweak, this.tweak);
-				this.extendedPosition = tweak.extendedPosition;
+				extendedPosition = tweak.extendedPosition;
 			}
 
 			public void Reset()
@@ -300,7 +300,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 			public bool First
 			{
-				get { return ((tweak[1] & T1_FIRST) != 0); }
+				get { return (tweak[1] & T1_FIRST) != 0; }
 				set
 				{
 					if (value)
@@ -316,7 +316,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 			public bool Final
 			{
-				get { return ((tweak[1] & T1_FINAL) != 0); }
+				get { return (tweak[1] & T1_FINAL) != 0; }
 				set
 				{
 					if (value)
@@ -381,26 +381,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 * The Unique Block Iteration chaining mode.
 		 */
 		// TODO: This might be better as methods...
-		private class UBI
+		class UBI
 		{
-			private readonly UbiTweak tweak = new UbiTweak();
+			readonly UbiTweak tweak = new UbiTweak();
 
-			private readonly SkeinEngine engine;
+			readonly SkeinEngine engine;
 
 			/**
 			 * Buffer for the current block of message data
 			 */
-			private byte[] currentBlock;
+			byte[] currentBlock;
 
 			/**
 			 * Offset into the current message block
 			 */
-			private int currentOffset;
+			int currentOffset;
 
 			/**
 			 * Buffer for message words for feedback into encrypted block
 			 */
-			private ulong[] message;
+			ulong[] message;
 
 			public UBI(SkeinEngine engine, int blockSize)
 			{
@@ -413,7 +413,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			{
 				currentBlock = Arrays.Clone(ubi.currentBlock, currentBlock);
 				currentOffset = ubi.currentOffset;
-				message = Arrays.Clone(ubi.message, this.message);
+				message = Arrays.Clone(ubi.message, message);
 				tweak.Reset(ubi.tweak);
 			}
 
@@ -474,7 +474,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
             }
 #endif
 
-			private void ProcessBlock(ulong[] output)
+			void ProcessBlock(ulong[] output)
 			{
 				engine.threefish.Init(true, engine.chain, tweak.GetWords());
 				Pack.LE_To_UInt64(currentBlock, 0, message);
@@ -503,47 +503,47 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Underlying Threefish tweakable block cipher
 		 */
-		private readonly ThreefishEngine threefish;
+		readonly ThreefishEngine threefish;
 
 		/**
 		 * Size of the digest output, in bytes
 		 */
-		private readonly int outputSizeBytes;
+		readonly int outputSizeBytes;
 
 		/**
 		 * The current chaining/state value
 		 */
-		private ulong[] chain;
+		ulong[] chain;
 
 		/**
 		 * The initial state value
 		 */
-		private ulong[] initialState;
+		ulong[] initialState;
 
 		/**
 		 * The (optional) key parameter
 		 */
-		private byte[] key;
+		byte[] key;
 
 		/**
 		 * Parameters to apply prior to the message
 		 */
-		private Parameter[] preMessageParameters;
+		Parameter[] preMessageParameters;
 
 		/**
 		 * Parameters to apply after the message, but prior to output
 		 */
-		private Parameter[] postMessageParameters;
+		Parameter[] postMessageParameters;
 
 		/**
 		 * The current UBI operation
 		 */
-		private readonly UBI ubi;
+		readonly UBI ubi;
 
 		/**
 		 * Buffer for single byte update method
 		 */
-		private readonly byte[] singleByte = new byte[1];
+		readonly byte[] singleByte = new byte[1];
 
 		/// <summary>
 		/// Constructs a Skein digest with an internal state size and output size.
@@ -560,10 +560,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 
 			// TODO: Prevent digest sizes > block size?
-			this.outputSizeBytes = outputSizeBits / 8;
+			outputSizeBytes = outputSizeBits / 8;
 
-			this.threefish = new ThreefishEngine(blockSizeBits);
-			this.ubi = new UBI(this, threefish.GetBlockSize());
+			threefish = new ThreefishEngine(blockSizeBits);
+			ubi = new UBI(this, threefish.GetBlockSize());
 		}
 
 		/// <summary>
@@ -575,24 +575,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			CopyIn(engine);
 		}
 
-		private void CopyIn(SkeinEngine engine)
+		void CopyIn(SkeinEngine engine)
 		{
-			this.ubi.Reset(engine.ubi);
-			this.chain = Arrays.Clone(engine.chain, this.chain);
-			this.initialState = Arrays.Clone(engine.initialState, this.initialState);
-			this.key = Arrays.Clone(engine.key, this.key);
-			this.preMessageParameters = Clone(engine.preMessageParameters, this.preMessageParameters);
-			this.postMessageParameters = Clone(engine.postMessageParameters, this.postMessageParameters);
+			ubi.Reset(engine.ubi);
+			chain = Arrays.Clone(engine.chain, chain);
+			initialState = Arrays.Clone(engine.initialState, initialState);
+			key = Arrays.Clone(engine.key, key);
+			preMessageParameters = Clone(engine.preMessageParameters, preMessageParameters);
+			postMessageParameters = Clone(engine.postMessageParameters, postMessageParameters);
 		}
 
-		private static Parameter[] Clone(Parameter[] data, Parameter[] existing)
+		static Parameter[] Clone(Parameter[] data, Parameter[] existing)
 		{
 			if (data == null)
 			{
 				return null;
 			}
 
-			if ((existing == null) || (existing.Length != data.Length))
+			if (existing == null || existing.Length != data.Length)
 			{
 				existing = new Parameter[data.Length];
 			}
@@ -609,7 +609,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public void Reset(IMemoable other)
 		{
 			SkeinEngine s = (SkeinEngine)other;
-			if ((BlockSize != s.BlockSize) || (outputSizeBytes != s.outputSizeBytes))
+			if (BlockSize != s.BlockSize || outputSizeBytes != s.outputSizeBytes)
 			{
 				throw new MemoableResetException("Incompatible parameters in provided SkeinEngine.");
 			}
@@ -634,10 +634,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/// <param name="parameters">the parameters to apply to this engine, or <code>null</code> to use no parameters.</param>
 		public void Init(SkeinParameters parameters)
 		{
-			this.chain = null;
+			chain = null;
 			this.key = null;
-			this.preMessageParameters = null;
-			this.postMessageParameters = null;
+			preMessageParameters = null;
+			postMessageParameters = null;
 
 			if (parameters != null)
 			{
@@ -656,21 +656,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			UbiInit(PARAM_TYPE_MESSAGE);
 		}
 
-		private void InitParams(IDictionary<int, byte[]> parameters)
+		void InitParams(IDictionary<int, byte[]> parameters)
 		{
 			//IEnumerator keys = parameters.Keys.GetEnumerator();
-			var pre = new List<Parameter>();
-			var post = new List<Parameter>();
+			List<Parameter> pre = new List<Parameter>();
+			List<Parameter> post = new List<Parameter>();
 
 			//while (keys.MoveNext())
-			foreach (var parameter in parameters)
+			foreach (KeyValuePair<int, byte[]> parameter in parameters)
 			{
 				int type = parameter.Key;
 				byte[] value = parameter.Value;
 
 				if (type == PARAM_TYPE_KEY)
 				{
-					this.key = value;
+					key = value;
 				}
 				else if (type < PARAM_TYPE_MESSAGE)
 				{
@@ -694,10 +694,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/**
 		 * Calculate the initial (pre message block) chaining state.
 		 */
-		private void CreateInitialState()
+		void CreateInitialState()
 		{
-			var precalc = CollectionUtilities.GetValueOrNull(InitialStates, VariantIdentifier(BlockSize, OutputSize));
-			if ((key == null) && (precalc != null))
+			ulong[] precalc = CollectionUtilities.GetValueOrNull(InitialStates, VariantIdentifier(BlockSize, OutputSize));
+			if (key == null && precalc != null)
 			{
 				// Precalculated UBI(CFG)
 				chain = Arrays.Clone(precalc);
@@ -741,26 +741,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			UbiInit(PARAM_TYPE_MESSAGE);
 		}
 
-		private void UbiComplete(int type, byte[] value)
+		void UbiComplete(int type, byte[] value)
 		{
 			UbiInit(type);
-			this.ubi.Update(value, 0, value.Length, chain);
+			ubi.Update(value, 0, value.Length, chain);
 			UbiFinal();
 		}
 
-		private void UbiInit(int type)
+		void UbiInit(int type)
 		{
-			this.ubi.Reset(type);
+			ubi.Reset(type);
 		}
 
-		private void UbiFinal()
+		void UbiFinal()
 		{
 			ubi.DoFinal(chain);
 		}
 
-		private void CheckInitialised()
+		void CheckInitialised()
 		{
-			if (this.ubi == null)
+			if (ubi == null)
 			{
 				throw new ArgumentException("Skein engine is not initialised.");
 			}
@@ -789,7 +789,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public int DoFinal(byte[] outBytes, int outOff)
 		{
 			CheckInitialised();
-			if (outBytes.Length < (outOff + outputSizeBytes))
+			if (outBytes.Length < outOff + outputSizeBytes)
 			{
 				throw new DataLengthException("Output buffer is too short to hold output");
 			}
@@ -809,11 +809,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 			// Perform the output transform
 			int blockSize = BlockSize;
-			int blocksRequired = ((outputSizeBytes + blockSize - 1) / blockSize);
+			int blocksRequired = (outputSizeBytes + blockSize - 1) / blockSize;
 			for (int i = 0; i < blocksRequired; i++)
 			{
-				int toWrite = System.Math.Min(blockSize, outputSizeBytes - (i * blockSize));
-				Output((ulong)i, outBytes, outOff + (i * blockSize), toWrite);
+				int toWrite = System.Math.Min(blockSize, outputSizeBytes - i * blockSize);
+				Output((ulong)i, outBytes, outOff + i * blockSize, toWrite);
 			}
 
 			Reset();
@@ -857,7 +857,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-		private void Output(ulong outputSequence, byte[] outBytes, int outOff, int outputBytes)
+		void Output(ulong outputSequence, byte[] outBytes, int outOff, int outputBytes)
 		{
 			byte[] currentBytes = new byte[8];
 			Pack.UInt64_To_LE(outputSequence, currentBytes, 0);
@@ -865,21 +865,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			// Output is a sequence of UBI invocations all of which use and preserve the pre-output state
 			ulong[] outputWords = new ulong[chain.Length];
 			UbiInit(PARAM_TYPE_OUTPUT);
-			this.ubi.Update(currentBytes, 0, currentBytes.Length, outputWords);
+			ubi.Update(currentBytes, 0, currentBytes.Length, outputWords);
 			ubi.DoFinal(outputWords);
 
 			int wordsRequired = (outputBytes + 8 - 1) / 8;
 			for (int i = 0; i < wordsRequired; i++)
 			{
-				int toWrite = System.Math.Min(8, outputBytes - (i * 8));
+				int toWrite = System.Math.Min(8, outputBytes - i * 8);
 				if (toWrite == 8)
 				{
-					Pack.UInt64_To_LE(outputWords[i], outBytes, outOff + (i * 8));
+					Pack.UInt64_To_LE(outputWords[i], outBytes, outOff + i * 8);
 				}
 				else
 				{
 					Pack.UInt64_To_LE(outputWords[i], currentBytes, 0);
-					Array.Copy(currentBytes, 0, outBytes, outOff + (i * 8), toWrite);
+					Array.Copy(currentBytes, 0, outBytes, outOff + i * 8, toWrite);
 				}
 			}
 		}

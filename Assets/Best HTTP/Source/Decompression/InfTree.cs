@@ -66,17 +66,17 @@ namespace BestHTTP.Decompression.Zlib
 {
 	sealed class InfTree
 	{
-		private const int MANY = 1440;
+		const int MANY = 1440;
 
-		private const int Z_OK = 0;
-		private const int Z_STREAM_END = 1;
-		private const int Z_NEED_DICT = 2;
-		private const int Z_ERRNO = -1;
-		private const int Z_STREAM_ERROR = -2;
-		private const int Z_DATA_ERROR = -3;
-		private const int Z_MEM_ERROR = -4;
-		private const int Z_BUF_ERROR = -5;
-		private const int Z_VERSION_ERROR = -6;
+		const int Z_OK = 0;
+		const int Z_STREAM_END = 1;
+		const int Z_NEED_DICT = 2;
+		const int Z_ERRNO = -1;
+		const int Z_STREAM_ERROR = -2;
+		const int Z_DATA_ERROR = -3;
+		const int Z_MEM_ERROR = -4;
+		const int Z_BUF_ERROR = -5;
+		const int Z_VERSION_ERROR = -6;
 
 		internal const int fixed_bl = 9;
 		internal const int fixed_bd = 5;
@@ -155,7 +155,7 @@ namespace BestHTTP.Decompression.Zlib
 		internal int[] u = null; // table stack
 		internal int[] x = null; // bit offsets, then code stack
 
-		private int huft_build(int[] b, int bindex, int n, int s, int[] d, int[] e, int[] t, int[] m, int[] hp, int[] hn, int[] v)
+		int huft_build(int[] b, int bindex, int n, int s, int[] d, int[] e, int[] t, int[] m, int[] hp, int[] hn, int[] v)
 		{
 			// Given a list of code lengths and a maximum table size, make a set of
 			// tables to decode that set of codes.  Return Z_OK on success, Z_BUF_ERROR
@@ -201,8 +201,13 @@ namespace BestHTTP.Decompression.Zlib
 			// Find minimum and maximum length, bound *m by those
 			l = m[0];
 			for (j = 1; j <= BMAX; j++)
+			{
 				if (c[j] != 0)
+				{
 					break;
+				}
+			}
+
 			k = j; // minimum code length
 			if (l < j)
 			{
@@ -212,7 +217,9 @@ namespace BestHTTP.Decompression.Zlib
 			for (i = BMAX; i != 0; i--)
 			{
 				if (c[i] != 0)
+				{
 					break;
+				}
 			}
 
 			g = i; // maximum code length
@@ -246,7 +253,7 @@ namespace BestHTTP.Decompression.Zlib
 			while (--i != 0)
 			{
 				// note that i == g from above
-				x[xp] = (j += c[p]);
+				x[xp] = j += c[p];
 				xp++;
 				p++;
 			}
@@ -289,12 +296,12 @@ namespace BestHTTP.Decompression.Zlib
 						w += l; // previous table always l bits
 						// compute minimum size table less than or equal to l bits
 						z = g - w;
-						z = (z > l) ? l : z; // table size upper limit
+						z = z > l ? l : z; // table size upper limit
 						if ((f = 1 << (j = k - w)) > a + 1)
 						{
 							// try a k-w bit table
 							// too few codes for k-w bit table
-							f -= (a + 1); // deduct codes from patterns left
+							f -= a + 1; // deduct codes from patterns left
 							xp = k;
 							if (j < z)
 							{
@@ -302,7 +309,10 @@ namespace BestHTTP.Decompression.Zlib
 								{
 									// try smaller tables up to z bits
 									if ((f <<= 1) <= c[++xp])
+									{
 										break; // enough codes to use up j bits
+									}
+
 									f -= c[xp]; // else deduct codes from patterns
 								}
 							}
@@ -326,7 +336,7 @@ namespace BestHTTP.Decompression.Zlib
 							x[h] = i; // save pattern for backing up
 							r[0] = (sbyte)j; // bits in this table
 							r[1] = (sbyte)l; // bits to dump before this table
-							j = SharedUtils.URShift(i, (w - l));
+							j = SharedUtils.URShift(i, w - l);
 							r[2] = (int)(q - u[h - 1] - j); // offset to this table
 							Array.Copy(r, 0, hp, (u[h - 1] + j) * 3, 3); // connect to last table
 						}
@@ -462,7 +472,7 @@ namespace BestHTTP.Decompression.Zlib
 			return Z_OK;
 		}
 
-		private void initWorkArea(int vsize)
+		void initWorkArea(int vsize)
 		{
 			if (hn == null)
 			{

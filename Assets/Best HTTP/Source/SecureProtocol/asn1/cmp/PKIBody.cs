@@ -72,21 +72,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static PkiBody GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is PkiBody pkiBody)
+			{
 				return pkiBody;
+			}
 
 			if (obj is Asn1TaggedObject taggedObject)
+			{
 				return new PkiBody(taggedObject);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), nameof(obj));
 		}
 
-		private readonly int m_tagNo;
-		private readonly Asn1Encodable m_body;
+		readonly int m_tagNo;
+		readonly Asn1Encodable m_body;
 
-		private PkiBody(Asn1TaggedObject taggedObject)
+		PkiBody(Asn1TaggedObject taggedObject)
 		{
 			m_tagNo = taggedObject.TagNo;
 			m_body = GetBodyForType(m_tagNo, taggedObject.GetObject());
@@ -103,7 +109,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_body = GetBodyForType(type, content);
 		}
 
-		private static Asn1Encodable GetBodyForType(int type, Asn1Encodable o)
+		static Asn1Encodable GetBodyForType(int type, Asn1Encodable o)
 		{
 			switch (type)
 			{
@@ -166,9 +172,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			}
 		}
 
-		public virtual Asn1Encodable Content => m_body;
+		public virtual Asn1Encodable Content
+		{
+			get { return m_body; }
+		}
 
-		public virtual int Type => m_tagNo;
+		public virtual int Type
+		{
+			get { return m_tagNo; }
+		}
 
 		/**
 		 * <pre>

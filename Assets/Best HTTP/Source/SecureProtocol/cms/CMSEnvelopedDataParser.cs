@@ -47,9 +47,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal RecipientInformationStore recipientInfoStore;
 		internal EnvelopedDataParser envelopedData;
 
-		private AlgorithmIdentifier _encAlg;
-		private Asn1.Cms.AttributeTable _unprotectedAttributes;
-		private bool _attrNotRead;
+		AlgorithmIdentifier _encAlg;
+		Asn1.Cms.AttributeTable _unprotectedAttributes;
+		bool _attrNotRead;
 
 		public CmsEnvelopedDataParser(
 			byte[] envelopedData)
@@ -61,9 +61,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			Stream envelopedData)
 			: base(envelopedData)
 		{
-			this._attrNotRead = true;
+			_attrNotRead = true;
 			this.envelopedData = new EnvelopedDataParser(
-				(Asn1SequenceParser)this.contentInfo.GetContent(Asn1Tags.Sequence));
+				(Asn1SequenceParser)contentInfo.GetContent(Asn1Tags.Sequence));
 
 			// TODO Validate version?
 			//DerInteger version = this.envelopedData.Version;
@@ -77,16 +77,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			// read the encrypted content info
 			//
 			EncryptedContentInfoParser encInfo = this.envelopedData.GetEncryptedContentInfo();
-			this._encAlg = encInfo.ContentEncryptionAlgorithm;
+			_encAlg = encInfo.ContentEncryptionAlgorithm;
 			CmsReadable readable = new CmsProcessableInputStream(
 				((Asn1OctetStringParser)encInfo.GetEncryptedContent(Asn1Tags.OctetString)).GetOctetStream());
 			CmsSecureReadable secureReadable = new CmsEnvelopedHelper.CmsEnvelopedSecureReadable(
-				this._encAlg, readable);
+				_encAlg, readable);
 
 			//
 			// build the RecipientInformationStore
 			//
-			this.recipientInfoStore = CmsEnvelopedHelper.BuildRecipientInformationStore(
+			recipientInfoStore = CmsEnvelopedHelper.BuildRecipientInformationStore(
 				recipientInfos, secureReadable);
 		}
 
@@ -122,7 +122,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 */
 		public RecipientInformationStore GetRecipientInfos()
 		{
-			return this.recipientInfoStore;
+			return recipientInfoStore;
 		}
 
 		/**
@@ -134,7 +134,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		{
 			if (_unprotectedAttributes == null && _attrNotRead)
 			{
-				Asn1SetParser asn1Set = this.envelopedData.GetUnprotectedAttrs();
+				Asn1SetParser asn1Set = envelopedData.GetUnprotectedAttrs();
 
 				_attrNotRead = false;
 

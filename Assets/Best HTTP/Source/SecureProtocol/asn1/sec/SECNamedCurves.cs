@@ -15,24 +15,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 	/// <summary>Elliptic curve registry for the SEC standard.</summary>
 	public static class SecNamedCurves
 	{
-		private static X9ECPoint ConfigureBasepoint(ECCurve curve, string encoding)
+		static X9ECPoint ConfigureBasepoint(ECCurve curve, string encoding)
 		{
 			X9ECPoint G = new X9ECPoint(curve, Hex.DecodeStrict(encoding));
 			WNafUtilities.ConfigureBasepoint(G.Point);
 			return G;
 		}
 
-		private static ECCurve ConfigureCurve(ECCurve curve)
+		static ECCurve ConfigureCurve(ECCurve curve)
 		{
 			return curve;
 		}
 
-		private static ECCurve ConfigureCurveGlv(ECCurve c, GlvTypeBParameters p)
+		static ECCurve ConfigureCurveGlv(ECCurve c, GlvTypeBParameters p)
 		{
 			return c.Configure().SetEndomorphism(new GlvTypeBEndomorphism(c, p)).Create();
 		}
 
-		private static BigInteger FromHex(string hex)
+		static BigInteger FromHex(string hex)
 		{
 			return new BigInteger(1, Hex.DecodeStrict(hex));
 		}
@@ -40,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp112r1Holder
 			: X9ECParametersHolder
 		{
-			private Secp112r1Holder()
+			Secp112r1Holder()
 			{
 			}
 
@@ -73,7 +73,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp112r2Holder
 			: X9ECParametersHolder
 		{
-			private Secp112r2Holder()
+			Secp112r2Holder()
 			{
 			}
 
@@ -106,7 +106,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp128r1Holder
 			: X9ECParametersHolder
 		{
-			private Secp128r1Holder()
+			Secp128r1Holder()
 			{
 			}
 
@@ -139,7 +139,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp128r2Holder
 			: X9ECParametersHolder
 		{
-			private Secp128r2Holder()
+			Secp128r2Holder()
 			{
 			}
 
@@ -172,7 +172,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp160k1Holder
 			: X9ECParametersHolder
 		{
-			private Secp160k1Holder()
+			Secp160k1Holder()
 			{
 			}
 
@@ -223,7 +223,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp160r1Holder
 			: X9ECParametersHolder
 		{
-			private Secp160r1Holder()
+			Secp160r1Holder()
 			{
 			}
 
@@ -256,7 +256,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp160r2Holder
 			: X9ECParametersHolder
 		{
-			private Secp160r2Holder()
+			Secp160r2Holder()
 			{
 			}
 
@@ -289,7 +289,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp192k1Holder
 			: X9ECParametersHolder
 		{
-			private Secp192k1Holder()
+			Secp192k1Holder()
 			{
 			}
 
@@ -340,7 +340,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp192r1Holder
 			: X9ECParametersHolder
 		{
-			private Secp192r1Holder()
+			Secp192r1Holder()
 			{
 			}
 
@@ -373,7 +373,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp224k1Holder
 			: X9ECParametersHolder
 		{
-			private Secp224k1Holder()
+			Secp224k1Holder()
 			{
 			}
 
@@ -424,7 +424,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp224r1Holder
 			: X9ECParametersHolder
 		{
-			private Secp224r1Holder()
+			Secp224r1Holder()
 			{
 			}
 
@@ -457,7 +457,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp256k1Holder
 			: X9ECParametersHolder
 		{
-			private Secp256k1Holder()
+			Secp256k1Holder()
 			{
 			}
 
@@ -508,7 +508,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp256r1Holder
 			: X9ECParametersHolder
 		{
-			private Secp256r1Holder()
+			Secp256r1Holder()
 			{
 			}
 
@@ -541,7 +541,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp384r1Holder
 			: X9ECParametersHolder
 		{
-			private Secp384r1Holder()
+			Secp384r1Holder()
 			{
 			}
 
@@ -575,7 +575,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Secp521r1Holder
 			: X9ECParametersHolder
 		{
-			private Secp521r1Holder()
+			Secp521r1Holder()
 			{
 			}
 
@@ -613,14 +613,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect113r1Holder
 			: X9ECParametersHolder
 		{
-			private Sect113r1Holder()
+			Sect113r1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect113r1Holder();
 
-			private const int m = 113;
-			private const int k = 9;
+			const int m = 113;
+			const int k = 9;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -647,14 +647,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect113r2Holder
 			: X9ECParametersHolder
 		{
-			private Sect113r2Holder()
+			Sect113r2Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect113r2Holder();
 
-			private const int m = 113;
-			private const int k = 9;
+			const int m = 113;
+			const int k = 9;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -681,16 +681,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect131r1Holder
 			: X9ECParametersHolder
 		{
-			private Sect131r1Holder()
+			Sect131r1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect131r1Holder();
 
-			private const int m = 131;
-			private const int k1 = 2;
-			private const int k2 = 3;
-			private const int k3 = 8;
+			const int m = 131;
+			const int k1 = 2;
+			const int k2 = 3;
+			const int k3 = 8;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -717,16 +717,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect131r2Holder
 			: X9ECParametersHolder
 		{
-			private Sect131r2Holder()
+			Sect131r2Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect131r2Holder();
 
-			private const int m = 131;
-			private const int k1 = 2;
-			private const int k2 = 3;
-			private const int k3 = 8;
+			const int m = 131;
+			const int k1 = 2;
+			const int k2 = 3;
+			const int k3 = 8;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -753,16 +753,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect163k1Holder
 			: X9ECParametersHolder
 		{
-			private Sect163k1Holder()
+			Sect163k1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect163k1Holder();
 
-			private const int m = 163;
-			private const int k1 = 3;
-			private const int k2 = 6;
-			private const int k3 = 7;
+			const int m = 163;
+			const int k1 = 3;
+			const int k2 = 6;
+			const int k3 = 7;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -789,16 +789,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect163r1Holder
 			: X9ECParametersHolder
 		{
-			private Sect163r1Holder()
+			Sect163r1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect163r1Holder();
 
-			private const int m = 163;
-			private const int k1 = 3;
-			private const int k2 = 6;
-			private const int k3 = 7;
+			const int m = 163;
+			const int k1 = 3;
+			const int k2 = 6;
+			const int k3 = 7;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -825,16 +825,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect163r2Holder
 			: X9ECParametersHolder
 		{
-			private Sect163r2Holder()
+			Sect163r2Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect163r2Holder();
 
-			private const int m = 163;
-			private const int k1 = 3;
-			private const int k2 = 6;
-			private const int k3 = 7;
+			const int m = 163;
+			const int k1 = 3;
+			const int k2 = 6;
+			const int k3 = 7;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -861,14 +861,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect193r1Holder
 			: X9ECParametersHolder
 		{
-			private Sect193r1Holder()
+			Sect193r1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect193r1Holder();
 
-			private const int m = 193;
-			private const int k = 15;
+			const int m = 193;
+			const int k = 15;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -895,14 +895,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect193r2Holder
 			: X9ECParametersHolder
 		{
-			private Sect193r2Holder()
+			Sect193r2Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect193r2Holder();
 
-			private const int m = 193;
-			private const int k = 15;
+			const int m = 193;
+			const int k = 15;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -929,14 +929,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect233k1Holder
 			: X9ECParametersHolder
 		{
-			private Sect233k1Holder()
+			Sect233k1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect233k1Holder();
 
-			private const int m = 233;
-			private const int k = 74;
+			const int m = 233;
+			const int k = 74;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -963,14 +963,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect233r1Holder
 			: X9ECParametersHolder
 		{
-			private Sect233r1Holder()
+			Sect233r1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect233r1Holder();
 
-			private const int m = 233;
-			private const int k = 74;
+			const int m = 233;
+			const int k = 74;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -997,14 +997,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect239k1Holder
 			: X9ECParametersHolder
 		{
-			private Sect239k1Holder()
+			Sect239k1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect239k1Holder();
 
-			private const int m = 239;
-			private const int k = 158;
+			const int m = 239;
+			const int k = 158;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -1031,16 +1031,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect283k1Holder
 			: X9ECParametersHolder
 		{
-			private Sect283k1Holder()
+			Sect283k1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect283k1Holder();
 
-			private const int m = 283;
-			private const int k1 = 5;
-			private const int k2 = 7;
-			private const int k3 = 12;
+			const int m = 283;
+			const int k1 = 5;
+			const int k2 = 7;
+			const int k3 = 12;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -1068,16 +1068,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect283r1Holder
 			: X9ECParametersHolder
 		{
-			private Sect283r1Holder()
+			Sect283r1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect283r1Holder();
 
-			private const int m = 283;
-			private const int k1 = 5;
-			private const int k2 = 7;
-			private const int k3 = 12;
+			const int m = 283;
+			const int k1 = 5;
+			const int k2 = 7;
+			const int k3 = 12;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -1105,14 +1105,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect409k1Holder
 			: X9ECParametersHolder
 		{
-			private Sect409k1Holder()
+			Sect409k1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect409k1Holder();
 
-			private const int m = 409;
-			private const int k = 87;
+			const int m = 409;
+			const int k = 87;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -1140,14 +1140,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect409r1Holder
 			: X9ECParametersHolder
 		{
-			private Sect409r1Holder()
+			Sect409r1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect409r1Holder();
 
-			private const int m = 409;
-			private const int k = 87;
+			const int m = 409;
+			const int k = 87;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -1175,16 +1175,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect571k1Holder
 			: X9ECParametersHolder
 		{
-			private Sect571k1Holder()
+			Sect571k1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect571k1Holder();
 
-			private const int m = 571;
-			private const int k1 = 2;
-			private const int k2 = 5;
-			private const int k3 = 10;
+			const int m = 571;
+			const int k1 = 2;
+			const int k2 = 5;
+			const int k3 = 10;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -1213,16 +1213,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 		internal class Sect571r1Holder
 			: X9ECParametersHolder
 		{
-			private Sect571r1Holder()
+			Sect571r1Holder()
 			{
 			}
 
 			internal static readonly X9ECParametersHolder Instance = new Sect571r1Holder();
 
-			private const int m = 571;
-			private const int k1 = 2;
-			private const int k2 = 5;
-			private const int k3 = 10;
+			const int m = 571;
+			const int k1 = 2;
+			const int k2 = 5;
+			const int k3 = 10;
 
 			protected override ECCurve CreateCurve()
 			{
@@ -1249,16 +1249,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Sec
 			}
 		}
 
-		private static readonly Dictionary<string, DerObjectIdentifier> objIds =
+		static readonly Dictionary<string, DerObjectIdentifier> objIds =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
+		static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
 			new Dictionary<DerObjectIdentifier, X9ECParametersHolder>();
 
-		private static readonly Dictionary<DerObjectIdentifier, string> names =
+		static readonly Dictionary<DerObjectIdentifier, string> names =
 			new Dictionary<DerObjectIdentifier, string>();
 
-		private static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
+		static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
 		{
 			objIds.Add(name, oid);
 			names.Add(oid, name);

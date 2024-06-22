@@ -12,8 +12,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	{
 		protected internal SecureRandom random;
 		protected internal int strength;
-		private bool uninitialised = true;
-		private int defaultStrength;
+		bool uninitialised = true;
+		int defaultStrength;
 
 		public CipherKeyGenerator()
 		{
@@ -23,7 +23,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			int defaultStrength)
 		{
 			if (defaultStrength < 1)
+			{
 				throw new ArgumentException("strength must be a positive value", "defaultStrength");
+			}
 
 			this.defaultStrength = defaultStrength;
 		}
@@ -41,17 +43,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public void Init(KeyGenerationParameters parameters)
 		{
 			if (parameters == null)
+			{
 				throw new ArgumentNullException(nameof(parameters));
+			}
 
-			this.uninitialised = false;
+			uninitialised = false;
 
 			EngineInit(parameters);
 		}
 
 		protected virtual void EngineInit(KeyGenerationParameters parameters)
 		{
-			this.random = parameters.Random;
-			this.strength = (parameters.Strength + 7) / 8;
+			random = parameters.Random;
+			strength = (parameters.Strength + 7) / 8;
 		}
 
 		/**
@@ -64,7 +68,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			if (uninitialised)
 			{
 				if (defaultStrength < 1)
+				{
 					throw new InvalidOperationException("Generator has not been initialised");
+				}
 
 				uninitialised = false;
 

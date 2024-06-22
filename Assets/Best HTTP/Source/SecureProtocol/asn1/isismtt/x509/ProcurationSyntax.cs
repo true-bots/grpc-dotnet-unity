@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
@@ -44,20 +45,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 	public class ProcurationSyntax
 		: Asn1Encodable
 	{
-		private readonly string country;
-		private readonly DirectoryString typeOfSubstitution;
-		private readonly GeneralName thirdPerson;
-		private readonly IssuerSerial certRef;
+		readonly string country;
+		readonly DirectoryString typeOfSubstitution;
+		readonly GeneralName thirdPerson;
+		readonly IssuerSerial certRef;
 
 		public static ProcurationSyntax GetInstance(object obj)
 		{
 			if (obj == null || obj is ProcurationSyntax)
+			{
 				return (ProcurationSyntax)obj;
+			}
 
 			if (obj is Asn1Sequence seq)
+			{
 				return new ProcurationSyntax(seq);
+			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -81,12 +86,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		*
 		* @param seq The ASN.1 sequence.
 		*/
-		private ProcurationSyntax(Asn1Sequence seq)
+		ProcurationSyntax(Asn1Sequence seq)
 		{
 			if (seq.Count < 1 || seq.Count > 3)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
 			while (e.MoveNext())
 			{
@@ -135,7 +142,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		{
 			this.country = country;
 			this.typeOfSubstitution = typeOfSubstitution;
-			this.thirdPerson = null;
+			thirdPerson = null;
 			this.certRef = certRef;
 		}
 
@@ -158,7 +165,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 			this.country = country;
 			this.typeOfSubstitution = typeOfSubstitution;
 			this.thirdPerson = thirdPerson;
-			this.certRef = null;
+			certRef = null;
 		}
 
 		public virtual string Country

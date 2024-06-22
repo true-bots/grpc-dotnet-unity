@@ -10,20 +10,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static CertResponse GetInstance(object obj)
 		{
 			if (obj is CertResponse certResponse)
+			{
 				return certResponse;
+			}
 
 			if (obj != null)
+			{
 				return new CertResponse(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly DerInteger m_certReqId;
-		private readonly PkiStatusInfo m_status;
-		private readonly CertifiedKeyPair m_certifiedKeyPair;
-		private readonly Asn1OctetString m_rspInfo;
+		readonly DerInteger m_certReqId;
+		readonly PkiStatusInfo m_status;
+		readonly CertifiedKeyPair m_certifiedKeyPair;
+		readonly Asn1OctetString m_rspInfo;
 
-		private CertResponse(Asn1Sequence seq)
+		CertResponse(Asn1Sequence seq)
 		{
 			m_certReqId = DerInteger.GetInstance(seq[0]);
 			m_status = PkiStatusInfo.GetInstance(seq[1]);
@@ -59,10 +63,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			Asn1OctetString rspInfo)
 		{
 			if (certReqId == null)
+			{
 				throw new ArgumentNullException(nameof(certReqId));
+			}
 
 			if (status == null)
+			{
 				throw new ArgumentNullException(nameof(status));
+			}
 
 			m_certReqId = certReqId;
 			m_status = status;
@@ -70,11 +78,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_rspInfo = rspInfo;
 		}
 
-		public virtual DerInteger CertReqID => m_certReqId;
+		public virtual DerInteger CertReqID
+		{
+			get { return m_certReqId; }
+		}
 
-		public virtual PkiStatusInfo Status => m_status;
+		public virtual PkiStatusInfo Status
+		{
+			get { return m_status; }
+		}
 
-		public virtual CertifiedKeyPair CertifiedKeyPair => m_certifiedKeyPair;
+		public virtual CertifiedKeyPair CertifiedKeyPair
+		{
+			get { return m_certifiedKeyPair; }
+		}
 
 		/**
 		 * <pre>

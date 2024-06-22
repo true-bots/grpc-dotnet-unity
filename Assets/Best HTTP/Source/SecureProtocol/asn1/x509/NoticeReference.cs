@@ -24,10 +24,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class NoticeReference
 		: Asn1Encodable
 	{
-		private readonly DisplayText organization;
-		private readonly Asn1Sequence noticeNumbers;
+		readonly DisplayText organization;
+		readonly Asn1Sequence noticeNumbers;
 
-		private static Asn1EncodableVector ConvertVector(IList<object> numbers)
+		static Asn1EncodableVector ConvertVector(IList<object> numbers)
 		{
 			Asn1EncodableVector av = new Asn1EncodableVector();
 
@@ -97,10 +97,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * calling @{link ToAsn1Object()} for a <code>NoticeReference</code>
 		 * instance or from parsing it from a Der-encoded stream.
 		 */
-		private NoticeReference(Asn1Sequence seq)
+		NoticeReference(Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
 			organization = DisplayText.GetInstance(seq[0]);
 			noticeNumbers = Asn1Sequence.GetInstance(seq[1]);
@@ -109,9 +111,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static NoticeReference GetInstance(object obj)
 		{
 			if (obj is NoticeReference)
+			{
 				return (NoticeReference)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new NoticeReference(Asn1Sequence.GetInstance(obj));
 		}
 

@@ -14,25 +14,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static PkiConfirmContent GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is PkiConfirmContent pkiConfirmContent)
+			{
 				return pkiConfirmContent;
+			}
 
 			if (obj is Asn1Null asn1Null)
+			{
 				return new PkiConfirmContent(asn1Null);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), nameof(obj));
 		}
 
-		private readonly Asn1Null m_val;
+		readonly Asn1Null m_val;
 
 		public PkiConfirmContent()
 			: this(DerNull.Instance)
 		{
 		}
 
-		private PkiConfirmContent(Asn1Null val)
+		PkiConfirmContent(Asn1Null val)
 		{
 			m_val = val;
 		}

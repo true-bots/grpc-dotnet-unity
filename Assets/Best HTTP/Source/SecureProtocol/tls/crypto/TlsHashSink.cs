@@ -8,11 +8,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 	public class TlsHashSink
 		: BaseOutputStream
 	{
-		private readonly TlsHash m_hash;
+		readonly TlsHash m_hash;
 
 		public TlsHashSink(TlsHash hash)
 		{
-			this.m_hash = hash;
+			m_hash = hash;
 		}
 
 		public virtual TlsHash Hash

@@ -11,12 +11,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 	 */
 	public class SP800SecureRandomBuilder
 	{
-		private readonly SecureRandom mRandom;
-		private readonly IEntropySourceProvider mEntropySourceProvider;
+		readonly SecureRandom mRandom;
+		readonly IEntropySourceProvider mEntropySourceProvider;
 
-		private byte[] mPersonalizationString = null;
-		private int mSecurityStrength = 256;
-		private int mEntropyBitsRequired = 256;
+		byte[] mPersonalizationString = null;
+		int mSecurityStrength = 256;
+		int mEntropyBitsRequired = 256;
 
 		/**
 		 * Basic constructor, creates a builder using an EntropySourceProvider based on the default SecureRandom with
@@ -44,10 +44,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		public SP800SecureRandomBuilder(SecureRandom entropySource, bool predictionResistant)
 		{
 			if (entropySource == null)
+			{
 				throw new ArgumentNullException(nameof(entropySource));
+			}
 
-			this.mRandom = entropySource;
-			this.mEntropySourceProvider = new BasicEntropySourceProvider(entropySource, predictionResistant);
+			mRandom = entropySource;
+			mEntropySourceProvider = new BasicEntropySourceProvider(entropySource, predictionResistant);
 		}
 
 		/**
@@ -59,8 +61,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		 */
 		public SP800SecureRandomBuilder(IEntropySourceProvider entropySourceProvider)
 		{
-			this.mRandom = null;
-			this.mEntropySourceProvider = entropySourceProvider;
+			mRandom = null;
+			mEntropySourceProvider = entropySourceProvider;
 		}
 
 		/**
@@ -70,7 +72,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		 */
 		public SP800SecureRandomBuilder SetPersonalizationString(byte[] personalizationString)
 		{
-			this.mPersonalizationString = personalizationString;
+			mPersonalizationString = personalizationString;
 			return this;
 		}
 
@@ -82,7 +84,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		 */
 		public SP800SecureRandomBuilder SetSecurityStrength(int securityStrength)
 		{
-			this.mSecurityStrength = securityStrength;
+			mSecurityStrength = securityStrength;
 			return this;
 		}
 
@@ -94,7 +96,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		 */
 		public SP800SecureRandomBuilder SetEntropyBitsRequired(int entropyBitsRequired)
 		{
-			this.mEntropyBitsRequired = entropyBitsRequired;
+			mEntropyBitsRequired = entropyBitsRequired;
 			return this;
 		}
 
@@ -141,20 +143,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 				new HMacDrbgProvider(hMac, nonce, mPersonalizationString, mSecurityStrength), predictionResistant);
 		}
 
-		private class HashDrbgProvider
+		class HashDrbgProvider
 			: IDrbgProvider
 		{
-			private readonly IDigest mDigest;
-			private readonly byte[] mNonce;
-			private readonly byte[] mPersonalizationString;
-			private readonly int mSecurityStrength;
+			readonly IDigest mDigest;
+			readonly byte[] mNonce;
+			readonly byte[] mPersonalizationString;
+			readonly int mSecurityStrength;
 
 			public HashDrbgProvider(IDigest digest, byte[] nonce, byte[] personalizationString, int securityStrength)
 			{
-				this.mDigest = digest;
-				this.mNonce = nonce;
-				this.mPersonalizationString = personalizationString;
-				this.mSecurityStrength = securityStrength;
+				mDigest = digest;
+				mNonce = nonce;
+				mPersonalizationString = personalizationString;
+				mSecurityStrength = securityStrength;
 			}
 
 			public ISP80090Drbg Get(IEntropySource entropySource)
@@ -163,20 +165,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 			}
 		}
 
-		private class HMacDrbgProvider
+		class HMacDrbgProvider
 			: IDrbgProvider
 		{
-			private readonly IMac mHMac;
-			private readonly byte[] mNonce;
-			private readonly byte[] mPersonalizationString;
-			private readonly int mSecurityStrength;
+			readonly IMac mHMac;
+			readonly byte[] mNonce;
+			readonly byte[] mPersonalizationString;
+			readonly int mSecurityStrength;
 
 			public HMacDrbgProvider(IMac hMac, byte[] nonce, byte[] personalizationString, int securityStrength)
 			{
-				this.mHMac = hMac;
-				this.mNonce = nonce;
-				this.mPersonalizationString = personalizationString;
-				this.mSecurityStrength = securityStrength;
+				mHMac = hMac;
+				mNonce = nonce;
+				mPersonalizationString = personalizationString;
+				mSecurityStrength = securityStrength;
 			}
 
 			public ISP80090Drbg Get(IEntropySource entropySource)
@@ -185,22 +187,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 			}
 		}
 
-		private class CtrDrbgProvider
+		class CtrDrbgProvider
 			: IDrbgProvider
 		{
-			private readonly IBlockCipher mBlockCipher;
-			private readonly int mKeySizeInBits;
-			private readonly byte[] mNonce;
-			private readonly byte[] mPersonalizationString;
-			private readonly int mSecurityStrength;
+			readonly IBlockCipher mBlockCipher;
+			readonly int mKeySizeInBits;
+			readonly byte[] mNonce;
+			readonly byte[] mPersonalizationString;
+			readonly int mSecurityStrength;
 
 			public CtrDrbgProvider(IBlockCipher blockCipher, int keySizeInBits, byte[] nonce, byte[] personalizationString, int securityStrength)
 			{
-				this.mBlockCipher = blockCipher;
-				this.mKeySizeInBits = keySizeInBits;
-				this.mNonce = nonce;
-				this.mPersonalizationString = personalizationString;
-				this.mSecurityStrength = securityStrength;
+				mBlockCipher = blockCipher;
+				mKeySizeInBits = keySizeInBits;
+				mNonce = nonce;
+				mPersonalizationString = personalizationString;
+				mSecurityStrength = securityStrength;
 			}
 
 			public ISP80090Drbg Get(IEntropySource entropySource)

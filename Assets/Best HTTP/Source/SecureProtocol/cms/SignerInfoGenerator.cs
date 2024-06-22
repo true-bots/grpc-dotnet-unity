@@ -9,7 +9,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal interface ISignerInfoGenerator
+	interface ISignerInfoGenerator
 	{
 		SignerInfo Generate(DerObjectIdentifier contentType, AlgorithmIdentifier digestAlgorithm,
 			byte[] calculatedDigest);
@@ -22,7 +22,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal SignerIdentifier sigId;
 		internal CmsAttributeTableGenerator signedGen;
 		internal CmsAttributeTableGenerator unsignedGen;
-		private bool isDirectSignature;
+		bool isDirectSignature;
 
 		internal SignerInfoGenerator(SignerIdentifier sigId, ISignatureFactory signerFactory) : this(sigId, signerFactory, false)
 		{
@@ -31,17 +31,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal SignerInfoGenerator(SignerIdentifier sigId, ISignatureFactory signerFactory, bool isDirectSignature)
 		{
 			this.sigId = sigId;
-			this.contentSigner = signerFactory;
+			contentSigner = signerFactory;
 			this.isDirectSignature = isDirectSignature;
 			if (this.isDirectSignature)
 			{
-				this.signedGen = null;
-				this.unsignedGen = null;
+				signedGen = null;
+				unsignedGen = null;
 			}
 			else
 			{
-				this.signedGen = new DefaultSignedAttributeTableGenerator();
-				this.unsignedGen = null;
+				signedGen = new DefaultSignedAttributeTableGenerator();
+				unsignedGen = null;
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			this.contentSigner = contentSigner;
 			this.signedGen = signedGen;
 			this.unsignedGen = unsignedGen;
-			this.isDirectSignature = false;
+			isDirectSignature = false;
 		}
 
 		internal void setAssociatedCertificate(X509Certificate certificate)
@@ -72,9 +72,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 	public class SignerInfoGeneratorBuilder
 	{
-		private bool directSignature;
-		private CmsAttributeTableGenerator signedGen;
-		private CmsAttributeTableGenerator unsignedGen;
+		bool directSignature;
+		CmsAttributeTableGenerator signedGen;
+		CmsAttributeTableGenerator unsignedGen;
 
 		public SignerInfoGeneratorBuilder()
 		{
@@ -89,7 +89,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 */
 		public SignerInfoGeneratorBuilder SetDirectSignature(bool hasNoSignedAttributes)
 		{
-			this.directSignature = hasNoSignedAttributes;
+			directSignature = hasNoSignedAttributes;
 
 			return this;
 		}
@@ -154,7 +154,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return CreateGenerator(signerFactory, sigId);
 		}
 
-		private SignerInfoGenerator CreateGenerator(ISignatureFactory contentSigner, SignerIdentifier sigId)
+		SignerInfoGenerator CreateGenerator(ISignatureFactory contentSigner, SignerIdentifier sigId)
 		{
 			if (directSignature)
 			{

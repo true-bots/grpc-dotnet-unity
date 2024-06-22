@@ -23,12 +23,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return DigestLength;
 		}
 
-		private const int DigestLength = 32;
+		const int DigestLength = 32;
 
-		private int H0, H1, H2, H3, H4, H5, H6, H7; // IV's
+		int H0, H1, H2, H3, H4, H5, H6, H7; // IV's
 
-		private int[] X = new int[16];
-		private int xOff;
+		int[] X = new int[16];
+		int xOff;
 
 		/// <summary> Standard constructor</summary>
 		public RipeMD256Digest()
@@ -44,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			CopyIn(t);
 		}
 
-		private void CopyIn(RipeMD256Digest t)
+		void CopyIn(RipeMD256Digest t)
 		{
 			base.CopyIn(t);
 
@@ -158,7 +158,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rotate int x left n bits.
 		 */
-		private int RL(
+		int RL(
 			int x,
 			int n)
 		{
@@ -172,7 +172,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * F
 		 */
-		private int F1(int x, int y, int z)
+		int F1(int x, int y, int z)
 		{
 			return x ^ y ^ z;
 		}
@@ -180,7 +180,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * G
 		 */
-		private int F2(int x, int y, int z)
+		int F2(int x, int y, int z)
 		{
 			return (x & y) | (~ x & z);
 		}
@@ -188,7 +188,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * H
 		 */
-		private int F3(int x, int y, int z)
+		int F3(int x, int y, int z)
 		{
 			return (x | ~ y) ^ z;
 		}
@@ -196,47 +196,47 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * I
 		 */
-		private int F4(int x, int y, int z)
+		int F4(int x, int y, int z)
 		{
 			return (x & z) | (y & ~ z);
 		}
 
-		private int F1(int a, int b, int c, int d, int x, int s)
+		int F1(int a, int b, int c, int d, int x, int s)
 		{
 			return RL(a + F1(b, c, d) + x, s);
 		}
 
-		private int F2(int a, int b, int c, int d, int x, int s)
+		int F2(int a, int b, int c, int d, int x, int s)
 		{
 			return RL(a + F2(b, c, d) + x + unchecked((int)0x5a827999), s);
 		}
 
-		private int F3(int a, int b, int c, int d, int x, int s)
+		int F3(int a, int b, int c, int d, int x, int s)
 		{
 			return RL(a + F3(b, c, d) + x + unchecked((int)0x6ed9eba1), s);
 		}
 
-		private int F4(int a, int b, int c, int d, int x, int s)
+		int F4(int a, int b, int c, int d, int x, int s)
 		{
 			return RL(a + F4(b, c, d) + x + unchecked((int)0x8f1bbcdc), s);
 		}
 
-		private int FF1(int a, int b, int c, int d, int x, int s)
+		int FF1(int a, int b, int c, int d, int x, int s)
 		{
 			return RL(a + F1(b, c, d) + x, s);
 		}
 
-		private int FF2(int a, int b, int c, int d, int x, int s)
+		int FF2(int a, int b, int c, int d, int x, int s)
 		{
 			return RL(a + F2(b, c, d) + x + unchecked((int)0x6d703ef3), s);
 		}
 
-		private int FF3(int a, int b, int c, int d, int x, int s)
+		int FF3(int a, int b, int c, int d, int x, int s)
 		{
 			return RL(a + F3(b, c, d) + x + unchecked((int)0x5c4dd124), s);
 		}
 
-		private int FF4(int a, int b, int c, int d, int x, int s)
+		int FF4(int a, int b, int c, int d, int x, int s)
 		{
 			return RL(a + F4(b, c, d) + x + unchecked((int)0x50a28be6), s);
 		}

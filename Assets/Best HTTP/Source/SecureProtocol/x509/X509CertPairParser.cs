@@ -12,9 +12,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 {
 	public class X509CertPairParser
 	{
-		private Stream currentStream;
+		Stream currentStream;
 
-		private X509CertificatePair ReadDerCrossCertificatePair(
+		X509CertificatePair ReadDerCrossCertificatePair(
 			Stream inStream)
 		{
 			Asn1InputStream dIn = new Asn1InputStream(inStream); //, ProviderUtil.getReadLimit(in));
@@ -44,9 +44,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		public X509CertificatePair ReadCertPair(Stream inStream)
 		{
 			if (inStream == null)
+			{
 				throw new ArgumentNullException("inStream");
+			}
+
 			if (!inStream.CanRead)
+			{
 				throw new ArgumentException("inStream must be read-able", "inStream");
+			}
 
 			if (currentStream == null)
 			{
@@ -61,7 +66,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			{
 				int tag = inStream.ReadByte();
 				if (tag < 0)
+				{
 					return null;
+				}
 
 				if (inStream.CanSeek)
 				{
@@ -84,7 +91,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 		public IList<X509CertificatePair> ReadCertPairs(Stream inStream)
 		{
-			var certPairs = new List<X509CertificatePair>();
+			List<X509CertificatePair> certPairs = new List<X509CertificatePair>();
 
 			X509CertificatePair certPair;
 			while ((certPair = ReadCertPair(inStream)) != null)

@@ -13,10 +13,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 	 * computation and modular inversion" by Daniel J. Bernstein and Bo-Yin Yang.
 	 */
 
-	internal static class Mod
+	static class Mod
 	{
-		private const int M30 = 0x3FFFFFFF;
-		private const ulong M32UL = 0xFFFFFFFFUL;
+		const int M30 = 0x3FFFFFFF;
+		const ulong M32UL = 0xFFFFFFFFUL;
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         public static void CheckedModOddInverse(ReadOnlySpan<uint> m, ReadOnlySpan<uint> x, Span<uint> z)
@@ -25,7 +25,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #endif
 		{
 			if (0 == ModOddInverse(m, x, z))
+			{
 				throw new ArithmeticException("Inverse does not exist.");
+			}
 		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
@@ -35,7 +37,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #endif
 		{
 			if (!ModOddInverseVar(m, x, z))
+			{
 				throw new ArithmeticException("Inverse does not exist.");
+			}
 		}
 
 		public static uint Inverse32(uint d)
@@ -210,7 +214,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			while (!IsZero(lenFG, G))
 			{
 				if (divsteps >= maxDivsteps)
+				{
 					return false;
+				}
 
 				divsteps += 30;
 
@@ -255,7 +261,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			Debug.Assert(0 == signF);
 
 			if (!IsOne(lenFG, F))
+			{
 				return false;
+			}
 
 			if (signD < 0)
 			{
@@ -422,7 +430,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static int Add30(int len30, Span<int> D, ReadOnlySpan<int> M)
 #else
-		private static int Add30(int len30, int[] D, int[] M)
+		static int Add30(int len30, int[] D, int[] M)
 #endif
 		{
 			Debug.Assert(len30 > 0);
@@ -446,7 +454,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static void CNegate30(int len30, int cond, Span<int> D)
 #else
-		private static void CNegate30(int len30, int cond, int[] D)
+		static void CNegate30(int len30, int cond, int[] D)
 #endif
 		{
 			Debug.Assert(len30 > 0);
@@ -467,7 +475,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static void CNormalize30(int len30, int condNegate, Span<int> D, ReadOnlySpan<int> M)
 #else
-		private static void CNormalize30(int len30, int condNegate, int[] D, int[] M)
+		static void CNormalize30(int len30, int condNegate, int[] D, int[] M)
 #endif
 		{
 			Debug.Assert(len30 > 0);
@@ -537,7 +545,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
             }
         }
 #else
-		private static void Decode30(int bits, int[] x, int xOff, uint[] z, int zOff)
+		static void Decode30(int bits, int[] x, int xOff, uint[] z, int zOff)
 		{
 			Debug.Assert(bits > 0);
 
@@ -563,7 +571,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static int Divsteps30(int delta, int f0, int g0, Span<int> t)
 #else
-		private static int Divsteps30(int delta, int f0, int g0, int[] t)
+		static int Divsteps30(int delta, int f0, int g0, int[] t)
 #endif
 		{
 			int u = 1 << 30, v = 0, q = 0, r = 1 << 30;
@@ -572,8 +580,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			for (int i = 0; i < 30; ++i)
 			{
 				Debug.Assert((f & 1) == 1);
-				Debug.Assert(((u >> (30 - i)) * f0 + (v >> (30 - i)) * g0) == f << i);
-				Debug.Assert(((q >> (30 - i)) * f0 + (r >> (30 - i)) * g0) == g << i);
+				Debug.Assert((u >> (30 - i)) * f0 + (v >> (30 - i)) * g0 == f << i);
+				Debug.Assert((q >> (30 - i)) * f0 + (r >> (30 - i)) * g0 == g << i);
 
 				int c1 = delta >> 31;
 				int c2 = -(g & 1);
@@ -609,7 +617,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static int Divsteps30Var(int eta, int f0, int g0, Span<int> t)
 #else
-		private static int Divsteps30Var(int eta, int f0, int g0, int[] t)
+		static int Divsteps30Var(int eta, int f0, int g0, int[] t)
 #endif
 		{
 			int u = 1, v = 0, q = 0, r = 1;
@@ -628,12 +636,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 				i -= zeros;
 
 				if (i <= 0)
+				{
 					break;
+				}
 
 				Debug.Assert((f & 1) == 1);
 				Debug.Assert((g & 1) == 1);
-				Debug.Assert((u * f0 + v * g0) == f << (30 - i));
-				Debug.Assert((q * f0 + r * g0) == g << (30 - i));
+				Debug.Assert(u * f0 + v * g0 == f << (30 - i));
+				Debug.Assert(q * f0 + r * g0 == g << (30 - i));
 
 				if (eta < 0)
 				{
@@ -649,7 +659,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 					r = -z;
 
 					// Handle up to 6 divsteps at once, subject to eta and i.
-					limit = (eta + 1) > i ? i : (eta + 1);
+					limit = eta + 1 > i ? i : eta + 1;
 					m = (int)((uint.MaxValue >> (32 - limit)) & 63U);
 
 					w = (f * g * (f * f - 2)) & m;
@@ -657,7 +667,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 				else
 				{
 					// Handle up to 4 divsteps at once, subject to eta and i.
-					limit = (eta + 1) > i ? i : (eta + 1);
+					limit = eta + 1 > i ? i : eta + 1;
 					m = (int)((uint.MaxValue >> (32 - limit)) & 15U);
 
 					w = f + (((f + 1) & 4) << 1);
@@ -702,7 +712,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
             }
         }
 #else
-		private static void Encode30(int bits, uint[] x, int xOff, int[] z, int zOff)
+		static void Encode30(int bits, uint[] x, int xOff, int[] z, int zOff)
 		{
 			Debug.Assert(bits > 0);
 
@@ -728,7 +738,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static int EqualTo(int len, ReadOnlySpan<int> x, int y)
 #else
-		private static int EqualTo(int len, int[] x, int y)
+		static int EqualTo(int len, int[] x, int y)
 #endif
 		{
 			int d = x[0] ^ y;
@@ -744,7 +754,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static int EqualToZero(int len, ReadOnlySpan<int> x)
 #else
-		private static int EqualToZero(int len, int[] x)
+		static int EqualToZero(int len, int[] x)
 #endif
 		{
 			int d = 0;
@@ -757,7 +767,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			return (d - 1) >> 31;
 		}
 
-		private static int GetMaximumDivsteps(int bits)
+		static int GetMaximumDivsteps(int bits)
 		{
 			return (49 * bits + (bits < 46 ? 80 : 47)) / 17;
 		}
@@ -765,7 +775,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static bool IsOne(int len, ReadOnlySpan<int> x)
 #else
-		private static bool IsOne(int len, int[] x)
+		static bool IsOne(int len, int[] x)
 #endif
 		{
 			if (x[0] != 1)
@@ -787,7 +797,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static bool IsZero(int len, ReadOnlySpan<int> x)
 #else
-		private static bool IsZero(int len, int[] x)
+		static bool IsZero(int len, int[] x)
 #endif
 		{
 			if (x[0] != 0)
@@ -809,7 +819,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static int Negate30(int len30, Span<int> D)
 #else
-		private static int Negate30(int len30, int[] D)
+		static int Negate30(int len30, int[] D)
 #endif
 		{
 			Debug.Assert(len30 > 0);
@@ -833,7 +843,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
         private static void UpdateDE30(int len30, Span<int> D, Span<int> E, ReadOnlySpan<int> t, int m0Inv32,
             ReadOnlySpan<int> M)
 #else
-		private static void UpdateDE30(int len30, int[] D, int[] E, int[] t, int m0Inv32, int[] M)
+		static void UpdateDE30(int len30, int[] D, int[] E, int[] t, int m0Inv32, int[] M)
 #endif
 		{
 			Debug.Assert(len30 > 0);
@@ -903,7 +913,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private static void UpdateFG30(int len30, Span<int> F, Span<int> G, ReadOnlySpan<int> t)
 #else
-		private static void UpdateFG30(int len30, int[] F, int[] G, int[] t)
+		static void UpdateFG30(int len30, int[] F, int[] G, int[] t)
 #endif
 		{
 			Debug.Assert(len30 > 0);

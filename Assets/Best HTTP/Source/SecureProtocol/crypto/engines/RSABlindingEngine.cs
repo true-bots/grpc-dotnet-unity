@@ -16,12 +16,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class RsaBlindingEngine
 		: IAsymmetricBlockCipher
 	{
-		private readonly IRsa core;
+		readonly IRsa core;
 
-		private RsaKeyParameters key;
-		private BigInteger blindingFactor;
+		RsaKeyParameters key;
+		BigInteger blindingFactor;
 
-		private bool forEncryption;
+		bool forEncryption;
 
 		public RsaBlindingEngine()
 			: this(new RsaCoreEngine())
@@ -30,7 +30,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		public RsaBlindingEngine(IRsa rsa)
 		{
-			this.core = rsa;
+			core = rsa;
 		}
 
 		public virtual string AlgorithmName
@@ -64,8 +64,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			core.Init(forEncryption, p.PublicKey);
 
 			this.forEncryption = forEncryption;
-			this.key = p.PublicKey;
-			this.blindingFactor = p.BlindingFactor;
+			key = p.PublicKey;
+			blindingFactor = p.BlindingFactor;
 		}
 
 		/**
@@ -123,7 +123,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/*
 		 * Blind message with the blind factor.
 		 */
-		private BigInteger BlindMessage(
+		BigInteger BlindMessage(
 			BigInteger msg)
 		{
 			BigInteger blindMsg = blindingFactor;
@@ -136,7 +136,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/*
 		 * Unblind the message blinded with the blind factor.
 		 */
-		private BigInteger UnblindMessage(
+		BigInteger UnblindMessage(
 			BigInteger blindedMsg)
 		{
 			BigInteger m = key.Modulus;

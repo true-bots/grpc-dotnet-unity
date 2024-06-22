@@ -7,9 +7,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
 	public class DsaValidationParameters
 	{
-		private readonly byte[] seed;
-		private readonly int counter;
-		private readonly int usageIndex;
+		readonly byte[] seed;
+		readonly int counter;
+		readonly int usageIndex;
 
 		public DsaValidationParameters(byte[] seed, int counter)
 			: this(seed, counter, -1)
@@ -22,7 +22,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			int usageIndex)
 		{
 			if (seed == null)
+			{
 				throw new ArgumentNullException("seed");
+			}
 
 			this.seed = (byte[])seed.Clone();
 			this.counter = counter;
@@ -48,12 +50,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			DsaValidationParameters other = obj as DsaValidationParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

@@ -14,19 +14,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static PollRepContent GetInstance(object obj)
 		{
 			if (obj is PollRepContent pollRepContent)
+			{
 				return pollRepContent;
+			}
 
 			if (obj != null)
+			{
 				return new PollRepContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly DerInteger[] m_certReqID;
-		private readonly DerInteger[] m_checkAfter;
-		private readonly PkiFreeText[] m_reason;
+		readonly DerInteger[] m_certReqID;
+		readonly DerInteger[] m_checkAfter;
+		readonly PkiFreeText[] m_reason;
 
-		private PollRepContent(Asn1Sequence seq)
+		PollRepContent(Asn1Sequence seq)
 		{
 			int count = seq.Count;
 			m_certReqID = new DerInteger[count];
@@ -59,13 +63,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_reason = new PkiFreeText[1] { reason };
 		}
 
-		public virtual int Count => m_certReqID.Length;
+		public virtual int Count
+		{
+			get { return m_certReqID.Length; }
+		}
 
-		public virtual DerInteger GetCertReqID(int index) => m_certReqID[index];
+		public virtual DerInteger GetCertReqID(int index)
+		{
+			return m_certReqID[index];
+		}
 
-		public virtual DerInteger GetCheckAfter(int index) => m_checkAfter[index];
+		public virtual DerInteger GetCheckAfter(int index)
+		{
+			return m_checkAfter[index];
+		}
 
-		public virtual PkiFreeText GetReason(int index) => m_reason[index];
+		public virtual PkiFreeText GetReason(int index)
+		{
+			return m_reason[index];
+		}
 
 		/**
 		 * <pre>

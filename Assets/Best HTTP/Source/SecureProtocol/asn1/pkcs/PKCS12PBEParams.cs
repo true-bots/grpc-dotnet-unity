@@ -9,22 +9,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class Pkcs12PbeParams
 		: Asn1Encodable
 	{
-		private readonly DerInteger iterations;
-		private readonly Asn1OctetString iv;
+		readonly DerInteger iterations;
+		readonly Asn1OctetString iv;
 
 		public Pkcs12PbeParams(
 			byte[] salt,
 			int iterations)
 		{
-			this.iv = new DerOctetString(salt);
+			iv = new DerOctetString(salt);
 			this.iterations = new DerInteger(iterations);
 		}
 
-		private Pkcs12PbeParams(
+		Pkcs12PbeParams(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
 			iv = Asn1OctetString.GetInstance(seq[0]);
 			iterations = DerInteger.GetInstance(seq[1]);
@@ -43,7 +45,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				return new Pkcs12PbeParams((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public BigInteger Iterations

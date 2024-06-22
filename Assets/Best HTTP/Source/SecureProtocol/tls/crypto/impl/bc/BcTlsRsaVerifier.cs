@@ -29,7 +29,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			if (algorithm != null)
 			{
 				if (algorithm.Signature != SignatureAlgorithm.rsa)
+				{
 					throw new InvalidOperationException("Invalid algorithm: " + algorithm);
+				}
 
 				/*
 				 * RFC 5246 4.7. In RSA signing, the opaque vector contains the signature generated

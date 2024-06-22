@@ -17,10 +17,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal RecipientInformationStore recipientInfoStore;
 		internal ContentInfo contentInfo;
 
-		private AlgorithmIdentifier macAlg;
-		private Asn1Set authAttrs;
-		private Asn1Set unauthAttrs;
-		private byte[] mac;
+		AlgorithmIdentifier macAlg;
+		Asn1Set authAttrs;
+		Asn1Set unauthAttrs;
+		byte[] mac;
 
 		public CmsAuthenticatedData(
 			byte[] authData)
@@ -46,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			//
 			Asn1Set recipientInfos = authData.RecipientInfos;
 
-			this.macAlg = authData.MacAlgorithm;
+			macAlg = authData.MacAlgorithm;
 
 			//
 			// read the authenticated content info
@@ -55,17 +55,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			CmsReadable readable = new CmsProcessableByteArray(
 				Asn1OctetString.GetInstance(encInfo.Content).GetOctets());
 			CmsSecureReadable secureReadable = new CmsEnvelopedHelper.CmsAuthenticatedSecureReadable(
-				this.macAlg, readable);
+				macAlg, readable);
 
 			//
 			// build the RecipientInformationStore
 			//
-			this.recipientInfoStore = CmsEnvelopedHelper.BuildRecipientInformationStore(
+			recipientInfoStore = CmsEnvelopedHelper.BuildRecipientInformationStore(
 				recipientInfos, secureReadable);
 
-			this.authAttrs = authData.AuthAttrs;
-			this.mac = authData.Mac.GetOctets();
-			this.unauthAttrs = authData.UnauthAttrs;
+			authAttrs = authData.AuthAttrs;
+			mac = authData.Mac.GetOctets();
+			unauthAttrs = authData.UnauthAttrs;
 		}
 
 		public byte[] GetMac()
@@ -109,7 +109,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		public Asn1.Cms.AttributeTable GetAuthAttrs()
 		{
 			if (authAttrs == null)
+			{
 				return null;
+			}
 
 			return new Asn1.Cms.AttributeTable(authAttrs);
 		}
@@ -121,7 +123,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		public Asn1.Cms.AttributeTable GetUnauthAttrs()
 		{
 			if (unauthAttrs == null)
+			{
 				return null;
+			}
 
 			return new Asn1.Cms.AttributeTable(unauthAttrs);
 		}

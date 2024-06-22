@@ -15,23 +15,23 @@ namespace BestHTTP.Examples
 	/// where it will receive the token and will receive the new url (/HubWithAuthorization) to connect to.
 	/// HubWithAuthorization without the token would throw an error.
 	/// </summary>
-	public sealed class HubWithAuthorizationSample : BestHTTP.Examples.Helpers.SampleBase
+	public sealed class HubWithAuthorizationSample : SampleBase
 	{
 #pragma warning disable 0649
 
-		[SerializeField] private string _path = "/redirect";
+		[SerializeField] string _path = "/redirect";
 
-		[SerializeField] private ScrollRect _scrollRect;
+		[SerializeField] ScrollRect _scrollRect;
 
-		[SerializeField] private RectTransform _contentRoot;
+		[SerializeField] RectTransform _contentRoot;
 
-		[SerializeField] private TextListItem _listItemPrefab;
+		[SerializeField] TextListItem _listItemPrefab;
 
-		[SerializeField] private int _maxListItemEntries = 100;
+		[SerializeField] int _maxListItemEntries = 100;
 
-		[SerializeField] private Button _connectButton;
+		[SerializeField] Button _connectButton;
 
-		[SerializeField] private Button _closeButton;
+		[SerializeField] Button _closeButton;
 
 #pragma warning restore
 
@@ -48,7 +48,9 @@ namespace BestHTTP.Examples
 		void OnDestroy()
 		{
 			if (hub != null)
+			{
 				hub.StartClose();
+			}
 		}
 
 		public void OnConnectButton()
@@ -84,7 +86,7 @@ namespace BestHTTP.Examples
 #endif
 
 			// Crete the HubConnection
-			hub = new HubConnection(new Uri(base.sampleSelector.BaseURL + this._path), protocol);
+			hub = new HubConnection(new Uri(sampleSelector.BaseURL + _path), protocol);
 
 			// Subscribe to hub events
 			hub.OnConnected += Hub_OnConnected;
@@ -114,7 +116,7 @@ namespace BestHTTP.Examples
 			}
 		}
 
-		private void Hub_Redirected(HubConnection hub, Uri oldUri, Uri newUri)
+		void Hub_Redirected(HubConnection hub, Uri oldUri, Uri newUri)
 		{
 			AddText(string.Format("Hub connection redirected to '<color=green>{0}</color>' with Access Token: '<color=green>{1}</color>'", hub.Uri,
 				hub.NegotiationResult.AccessToken));
@@ -123,7 +125,7 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This callback is called when the plugin is connected to the server successfully. Messages can be sent to the server after this point.
 		/// </summary>
-		private void Hub_OnConnected(HubConnection hub)
+		void Hub_OnConnected(HubConnection hub)
 		{
 			AddText(string.Format("Hub Connected with <color=green>{0}</color> transport using the <color=green>{1}</color> encoder.",
 				hub.Transport.TransportType.ToString(), hub.Protocol.Name));
@@ -140,7 +142,7 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// This is called when the hub is closed after a StartClose() call.
 		/// </summary>
-		private void Hub_OnClosed(HubConnection hub)
+		void Hub_OnClosed(HubConnection hub)
 		{
 			AddText("Hub Closed");
 			SetButtons(true, false);
@@ -149,24 +151,28 @@ namespace BestHTTP.Examples
 		/// <summary>
 		/// Called when an unrecoverable error happen. After this event the hub will not send or receive any messages.
 		/// </summary>
-		private void Hub_OnError(HubConnection hub, string error)
+		void Hub_OnError(HubConnection hub, string error)
 		{
 			AddText(string.Format("Hub Error: <color=red>{0}</color>", error));
 			SetButtons(true, false);
 		}
 
-		private void SetButtons(bool connect, bool close)
+		void SetButtons(bool connect, bool close)
 		{
-			if (this._connectButton != null)
-				this._connectButton.interactable = connect;
+			if (_connectButton != null)
+			{
+				_connectButton.interactable = connect;
+			}
 
-			if (this._closeButton != null)
-				this._closeButton.interactable = close;
+			if (_closeButton != null)
+			{
+				_closeButton.interactable = close;
+			}
 		}
 
-		private TextListItem AddText(string text)
+		TextListItem AddText(string text)
 		{
-			return GUIHelper.AddText(this._listItemPrefab, this._contentRoot, text, this._maxListItemEntries, this._scrollRect);
+			return GUIHelper.AddText(_listItemPrefab, _contentRoot, text, _maxListItemEntries, _scrollRect);
 		}
 	}
 }

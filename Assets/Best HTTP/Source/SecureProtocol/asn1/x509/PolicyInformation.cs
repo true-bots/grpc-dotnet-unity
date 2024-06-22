@@ -7,10 +7,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class PolicyInformation
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier policyIdentifier;
-		private readonly Asn1Sequence policyQualifiers;
+		readonly DerObjectIdentifier policyIdentifier;
+		readonly Asn1Sequence policyQualifiers;
 
-		private PolicyInformation(
+		PolicyInformation(
 			Asn1Sequence seq)
 		{
 			if (seq.Count < 1 || seq.Count > 2)

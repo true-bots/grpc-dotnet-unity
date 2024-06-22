@@ -11,19 +11,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static CertifiedKeyPair GetInstance(object obj)
 		{
 			if (obj is CertifiedKeyPair certifiedKeyPair)
+			{
 				return certifiedKeyPair;
+			}
 
 			if (obj != null)
+			{
 				return new CertifiedKeyPair(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly CertOrEncCert m_certOrEncCert;
-		private readonly EncryptedKey m_privateKey;
-		private readonly PkiPublicationInfo m_publicationInfo;
+		readonly CertOrEncCert m_certOrEncCert;
+		readonly EncryptedKey m_privateKey;
+		readonly PkiPublicationInfo m_publicationInfo;
 
-		private CertifiedKeyPair(Asn1Sequence seq)
+		CertifiedKeyPair(Asn1Sequence seq)
 		{
 			m_certOrEncCert = CertOrEncCert.GetInstance(seq[0]);
 
@@ -64,18 +68,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			PkiPublicationInfo publicationInfo)
 		{
 			if (certOrEncCert == null)
+			{
 				throw new ArgumentNullException(nameof(certOrEncCert));
+			}
 
 			m_certOrEncCert = certOrEncCert;
 			m_privateKey = privateKey;
 			m_publicationInfo = publicationInfo;
 		}
 
-		public virtual CertOrEncCert CertOrEncCert => m_certOrEncCert;
+		public virtual CertOrEncCert CertOrEncCert
+		{
+			get { return m_certOrEncCert; }
+		}
 
-		public virtual EncryptedKey PrivateKey => m_privateKey;
+		public virtual EncryptedKey PrivateKey
+		{
+			get { return m_privateKey; }
+		}
 
-		public virtual PkiPublicationInfo PublicationInfo => m_publicationInfo;
+		public virtual PkiPublicationInfo PublicationInfo
+		{
+			get { return m_publicationInfo; }
+		}
 
 		/**
 		 * <pre>

@@ -38,9 +38,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public static PrivateKeyInfo CreatePrivateKeyInfo(AsymmetricKeyParameter privateKey, Asn1Set attributes)
 		{
 			if (privateKey == null)
+			{
 				throw new ArgumentNullException("privateKey");
+			}
+
 			if (!privateKey.IsPrivate)
+			{
 				throw new ArgumentException("Public key passed - private key expected", "privateKey");
+			}
 
 			if (privateKey is ElGamalPrivateKeyParameters)
 			{
@@ -126,14 +131,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 					ECGost3410Parameters domainParameters = (ECGost3410Parameters)dp;
 
 					Gost3410PublicKeyAlgParameters gostParams = new Gost3410PublicKeyAlgParameters(
-						(domainParameters).PublicKeyParamSet,
-						(domainParameters).DigestParamSet,
-						(domainParameters).EncryptionParamSet);
+						domainParameters.PublicKeyParamSet,
+						domainParameters.DigestParamSet,
+						domainParameters.EncryptionParamSet);
 
 					bool is512 = priv.D.BitLength > 256;
 					DerObjectIdentifier identifier =
-						(is512) ? RosstandartObjectIdentifiers.id_tc26_gost_3410_12_512 : RosstandartObjectIdentifiers.id_tc26_gost_3410_12_256;
-					int size = (is512) ? 64 : 32;
+						is512 ? RosstandartObjectIdentifiers.id_tc26_gost_3410_12_512 : RosstandartObjectIdentifiers.id_tc26_gost_3410_12_256;
+					int size = is512 ? 64 : 32;
 
 					byte[] encKey = new byte[size];
 
@@ -151,7 +156,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				if (priv.AlgorithmName == "ECGOST3410")
 				{
 					if (priv.PublicKeyParamSet == null)
+					{
 						throw new NotImplementedException("Not a CryptoPro parameter set");
+					}
 
 					Gost3410PublicKeyAlgParameters gostParams = new Gost3410PublicKeyAlgParameters(
 						priv.PublicKeyParamSet, CryptoProObjectIdentifiers.GostR3411x94CryptoProParamSet);
@@ -188,7 +195,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				Gost3410PrivateKeyParameters _key = (Gost3410PrivateKeyParameters)privateKey;
 
 				if (_key.PublicKeyParamSet == null)
+				{
 					throw new NotImplementedException("Not a CryptoPro parameter set");
+				}
 
 				byte[] keyEnc = _key.X.ToByteArrayUnsigned();
 				byte[] keyBytes = new byte[keyEnc.Length];
@@ -240,7 +249,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 					new DerOctetString(key.GetEncoded()), attributes, key.GeneratePublicKey().GetEncoded());
 			}
 
-			throw new ArgumentException("Class provided is not convertible: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(privateKey));
+			throw new ArgumentException("Class provided is not convertible: " + Platform.GetTypeName(privateKey));
 		}
 
 		public static PrivateKeyInfo CreatePrivateKeyInfo(
@@ -259,7 +268,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 			IBufferedCipher cipher = PbeUtilities.CreateEngine(algID) as IBufferedCipher;
 			if (cipher == null)
+			{
 				throw new Exception("Unknown encryption algorithm: " + algID.Algorithm);
+			}
 
 			ICipherParameters cipherParameters = PbeUtilities.GenerateCipherParameters(
 				algID, passPhrase, wrongPkcs12Zero);
@@ -269,7 +280,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			return PrivateKeyInfo.GetInstance(keyBytes);
 		}
 
-		private static void ExtractBytes(byte[] encKey, int size, int offSet, BigInteger bI)
+		static void ExtractBytes(byte[] encKey, int size, int offSet, BigInteger bI)
 		{
 			byte[] val = bI.ToByteArray();
 			if (val.Length < size)

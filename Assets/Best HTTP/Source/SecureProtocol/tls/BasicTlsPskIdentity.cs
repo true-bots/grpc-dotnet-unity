@@ -14,14 +14,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public BasicTlsPskIdentity(byte[] identity, byte[] psk)
 		{
-			this.m_identity = Arrays.Clone(identity);
-			this.m_psk = Arrays.Clone(psk);
+			m_identity = Arrays.Clone(identity);
+			m_psk = Arrays.Clone(psk);
 		}
 
 		public BasicTlsPskIdentity(string identity, byte[] psk)
 		{
-			this.m_identity = Strings.ToUtf8ByteArray(identity);
-			this.m_psk = Arrays.Clone(psk);
+			m_identity = Strings.ToUtf8ByteArray(identity);
+			m_psk = Arrays.Clone(psk);
 		}
 
 		public virtual void SkipIdentityHint()

@@ -20,9 +20,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual DtlsTransport Connect(TlsClient client, DatagramTransport transport)
 		{
 			if (client == null)
+			{
 				throw new ArgumentNullException("client");
+			}
+
 			if (transport == null)
+			{
 				throw new ArgumentNullException("transport");
+			}
 
 			ClientHandshakeState state = new ClientHandshakeState();
 			state.client = client;
@@ -208,7 +213,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			if (serverMessage.Type == HandshakeType.certificate_status)
 			{
 				if (securityParameters.StatusRequestVersion < 1)
+				{
 					throw new TlsFatalAlert(AlertDescription.unexpected_message);
+				}
 
 				ProcessCertificateStatus(state, serverMessage.Body);
 				serverMessage = handshake.ReceiveMessage();
@@ -308,7 +315,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				state.keyExchange.ProcessClientCredentials(clientAuthCredentials);
 			}
 
-			var clientSupplementalData = state.client.GetClientSupplementalData();
+			IList<SupplementalDataEntry> clientSupplementalData = state.client.GetClientSupplementalData();
 			if (clientSupplementalData != null)
 			{
 				byte[] supplementalDataBody = GenerateSupplementalData(clientSupplementalData);
@@ -415,7 +422,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			ProtocolVersion client_version = ProtocolVersion.GetLatestDtls(context.ClientSupportedVersions);
 			if (!ProtocolVersion.IsSupportedDtlsVersionClient(client_version))
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			context.SetClientVersion(client_version);
 
@@ -486,8 +495,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				 * or the TLS_EMPTY_RENEGOTIATION_INFO_SCSV signaling cipher suite value in the
 				 * ClientHello. Including both is NOT RECOMMENDED.
 				 */
-				bool noRenegExt = (null == TlsUtilities.GetExtensionData(state.clientExtensions,
-					ExtensionType.renegotiation_info));
+				bool noRenegExt = null == TlsUtilities.GetExtensionData(state.clientExtensions,
+					ExtensionType.renegotiation_info);
 				bool noRenegScsv = !Arrays.Contains(state.offeredCipherSuites,
 					CipherSuite.TLS_EMPTY_RENEGOTIATION_INFO_SCSV);
 
@@ -616,7 +625,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			// TODO Seems this behaviour is not yet in line with OpenSSL for DTLS 1.2
 			//ReportServerVersion(state, server_version);
 			if (!server_version.IsEqualOrEarlierVersionOf(state.clientContext.ClientVersion))
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			return cookie;
 		}
@@ -725,7 +736,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				if (acceptedExtendedMasterSecret)
 				{
 					if (!state.resumedSession && !state.client.ShouldUseExtendedMasterSecret())
+					{
 						throw new TlsFatalAlert(AlertDescription.handshake_failure);
+					}
 				}
 				else
 				{
@@ -757,7 +770,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					 * extension via the TLS_EMPTY_RENEGOTIATION_INFO_SCSV SCSV.
 					 */
 					if (extType == ExtensionType.renegotiation_info)
+					{
 						continue;
+					}
 
 					/*
 					 * RFC 5246 7.4.1.4 An extension type MUST NOT appear in the ServerHello unless the
@@ -767,7 +782,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					 * fatal alert.
 					 */
 					if (null == TlsUtilities.GetExtensionData(state.clientExtensions, extType))
+					{
 						throw new TlsFatalAlert(AlertDescription.unsupported_extension);
+					}
 
 					/*
 					 * RFC 3546 2.3. If [...] the older session is resumed, then the server MUST ignore
@@ -840,8 +857,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 
 
-			var sessionClientExtensions = state.clientExtensions;
-			var sessionServerExtensions = state.serverExtensions;
+			IDictionary<int, byte[]> sessionClientExtensions = state.clientExtensions;
+			IDictionary<int, byte[]> sessionServerExtensions = state.serverExtensions;
 
 			if (state.resumedSession)
 			{
@@ -867,7 +884,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					bool serverSentEncryptThenMac = TlsExtensionsUtilities.HasEncryptThenMacExtension(
 						sessionServerExtensions);
 					if (serverSentEncryptThenMac && !TlsUtilities.IsBlockCipherSuite(securityParameters.CipherSuite))
+					{
 						throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+					}
 
 					securityParameters.m_encryptThenMac = serverSentEncryptThenMac;
 				}
@@ -916,7 +935,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		protected virtual void ProcessServerSupplementalData(ClientHandshakeState state, byte[] body)
 		{
 			MemoryStream buf = new MemoryStream(body, false);
-			var serverSupplementalData = TlsProtocol.ReadSupplementalDataMessage(buf);
+			IList<SupplementalDataEntry> serverSupplementalData = TlsProtocol.ReadSupplementalDataMessage(buf);
 			state.client.ProcessServerSupplementalData(serverSupplementalData);
 		}
 
@@ -930,13 +949,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			if (null != currentServerVersion)
 			{
 				if (!currentServerVersion.Equals(server_version))
+				{
 					throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+				}
 
 				return;
 			}
 
 			if (!ProtocolVersion.Contains(context.ClientSupportedVersions, server_version))
+			{
 				throw new TlsFatalAlert(AlertDescription.protocol_version);
+			}
 
 			securityParameters.m_negotiatedVersion = server_version;
 

@@ -10,15 +10,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class ECKeyGenerationParameters
 		: KeyGenerationParameters
 	{
-		private readonly ECDomainParameters domainParams;
-		private readonly DerObjectIdentifier publicKeyParamSet;
+		readonly ECDomainParameters domainParams;
+		readonly DerObjectIdentifier publicKeyParamSet;
 
 		public ECKeyGenerationParameters(
 			ECDomainParameters domainParameters,
 			SecureRandom random)
 			: base(random, domainParameters.N.BitLength)
 		{
-			this.domainParams = domainParameters;
+			domainParams = domainParameters;
 		}
 
 		public ECKeyGenerationParameters(

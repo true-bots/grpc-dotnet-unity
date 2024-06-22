@@ -20,12 +20,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class Sha224Digest
 		: GeneralDigest
 	{
-		private const int DigestLength = 28;
+		const int DigestLength = 28;
 
-		private uint H1, H2, H3, H4, H5, H6, H7, H8;
+		uint H1, H2, H3, H4, H5, H6, H7, H8;
 
-		private uint[] X = new uint[64];
-		private int xOff;
+		uint[] X = new uint[64];
+		int xOff;
 
 		/**
          * Standard constructor
@@ -46,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			CopyIn(t);
 		}
 
-		private void CopyIn(Sha224Digest t)
+		void CopyIn(Sha224Digest t)
 		{
 			base.CopyIn(t);
 
@@ -104,7 +104,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 
 			X[14] = (uint)((ulong)bitLength >> 32);
-			X[15] = (uint)((ulong)bitLength);
+			X[15] = (uint)(ulong)bitLength;
 		}
 
 		public override int DoFinal(byte[] output, int outOff)
@@ -256,32 +256,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		}
 
 		/* SHA-224 functions */
-		private static uint Ch(uint x, uint y, uint z)
+		static uint Ch(uint x, uint y, uint z)
 		{
 			return (x & y) ^ (~x & z);
 		}
 
-		private static uint Maj(uint x, uint y, uint z)
+		static uint Maj(uint x, uint y, uint z)
 		{
 			return (x & y) ^ (x & z) ^ (y & z);
 		}
 
-		private static uint Sum0(uint x)
+		static uint Sum0(uint x)
 		{
 			return ((x >> 2) | (x << 30)) ^ ((x >> 13) | (x << 19)) ^ ((x >> 22) | (x << 10));
 		}
 
-		private static uint Sum1(uint x)
+		static uint Sum1(uint x)
 		{
 			return ((x >> 6) | (x << 26)) ^ ((x >> 11) | (x << 21)) ^ ((x >> 25) | (x << 7));
 		}
 
-		private static uint Theta0(uint x)
+		static uint Theta0(uint x)
 		{
 			return ((x >> 7) | (x << 25)) ^ ((x >> 18) | (x << 14)) ^ (x >> 3);
 		}
 
-		private static uint Theta1(uint x)
+		static uint Theta1(uint x)
 		{
 			return ((x >> 17) | (x << 15)) ^ ((x >> 19) | (x << 13)) ^ (x >> 10);
 		}

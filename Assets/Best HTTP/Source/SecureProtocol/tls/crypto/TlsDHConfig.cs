@@ -13,16 +13,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto
 
 		public TlsDHConfig(DHGroup explicitGroup)
 		{
-			this.m_explicitGroup = explicitGroup;
-			this.m_namedGroup = -1;
-			this.m_padded = false;
+			m_explicitGroup = explicitGroup;
+			m_namedGroup = -1;
+			m_padded = false;
 		}
 
 		public TlsDHConfig(int namedGroup, bool padded)
 		{
-			this.m_explicitGroup = null;
-			this.m_namedGroup = namedGroup;
-			this.m_padded = padded;
+			m_explicitGroup = null;
+			m_namedGroup = namedGroup;
+			m_padded = padded;
 		}
 
 		public virtual DHGroup ExplicitGroup

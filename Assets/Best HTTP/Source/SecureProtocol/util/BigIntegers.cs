@@ -15,7 +15,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 		public static readonly BigInteger Zero = BigInteger.Zero;
 		public static readonly BigInteger One = BigInteger.One;
 
-		private const int MaxIterations = 1000;
+		const int MaxIterations = 1000;
 
 		/**
 		* Return the passed in value as an unsigned byte array.
@@ -51,10 +51,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 			int bytesLength = bytes.Length;
 
 			if (bytesLength == length)
+			{
 				return bytes;
+			}
 
 			if (bytesLength > length)
+			{
 				throw new ArgumentException("standard length exceeded", nameof(n));
+			}
 
 			byte[] tmp = new byte[length];
 			Array.Copy(bytes, 0, tmp, length - bytesLength, bytesLength);
@@ -84,7 +88,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 			int bytesLength = bytes.Length;
 
 			if (bytesLength > len)
+			{
 				throw new ArgumentException("standard length exceeded", nameof(n));
+			}
 
 			int padLen = len - bytesLength;
 			Arrays.Fill(buf, off, off + padLen, 0);
@@ -134,7 +140,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 			if (cmp >= 0)
 			{
 				if (cmp > 0)
+				{
 					throw new ArgumentException("'min' may not be greater than 'max'");
+				}
 
 				return min;
 			}
@@ -160,9 +168,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 		public static BigInteger ModOddInverse(BigInteger M, BigInteger X)
 		{
 			if (!M.TestBit(0))
+			{
 				throw new ArgumentException("must be odd", "M");
+			}
+
 			if (M.SignValue != 1)
+			{
 				throw new ArithmeticException("BigInteger: modulus not positive");
+			}
+
 			if (X.SignValue < 0 || X.CompareTo(M) >= 0)
 			{
 				X = X.Mod(M);
@@ -191,7 +205,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 				int len = m.Length;
 				uint[] z = Nat.Create(len);
 				if (0 == Mod.ModOddInverse(m, x, z))
+				{
 					throw new ArithmeticException("BigInteger not invertible");
+				}
+
 				return Nat.ToBigInteger(len, z);
 			}
 		}
@@ -199,18 +216,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 		public static BigInteger ModOddInverseVar(BigInteger M, BigInteger X)
 		{
 			if (!M.TestBit(0))
+			{
 				throw new ArgumentException("must be odd", "M");
+			}
+
 			if (M.SignValue != 1)
+			{
 				throw new ArithmeticException("BigInteger: modulus not positive");
+			}
+
 			if (M.Equals(One))
+			{
 				return Zero;
+			}
+
 			if (X.SignValue < 0 || X.CompareTo(M) >= 0)
 			{
 				X = X.Mod(M);
 			}
 
 			if (X.Equals(One))
+			{
 				return One;
+			}
 
 			int bits = M.BitLength;
 
@@ -235,7 +263,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 				int len = m.Length;
 				uint[] z = Nat.Create(len);
 				if (!Mod.ModOddInverseVar(m, x, z))
+				{
 					throw new ArithmeticException("BigInteger not invertible");
+				}
+
 				return Nat.ToBigInteger(len, z);
 			}
 		}

@@ -12,13 +12,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public sealed class WhirlpoolDigest
 		: IDigest, IMemoable
 	{
-		private const int BITCOUNT_ARRAY_SIZE = 32;
-		private const int BYTE_LENGTH = 64;
-		private const int DIGEST_LENGTH_BYTES = 512 / 8;
-		private const int REDUCTION_POLYNOMIAL = 0x011d; // 2^8 + 2^4 + 2^3 + 2 + 1;
-		private const int ROUNDS = 10;
+		const int BITCOUNT_ARRAY_SIZE = 32;
+		const int BYTE_LENGTH = 64;
+		const int DIGEST_LENGTH_BYTES = 512 / 8;
+		const int REDUCTION_POLYNOMIAL = 0x011d; // 2^8 + 2^4 + 2^3 + 2 + 1;
+		const int ROUNDS = 10;
 
-		private static readonly int[] SBOX =
+		static readonly int[] SBOX =
 		{
 			0x18, 0x23, 0xc6, 0xe8, 0x87, 0xb8, 0x01, 0x4f, 0x36, 0xa6, 0xd2, 0xf5, 0x79, 0x6f, 0x91, 0x52,
 			0x60, 0xbc, 0x9b, 0x8e, 0xa3, 0x0c, 0x7b, 0x35, 0x1d, 0xe0, 0xd7, 0xc2, 0x2e, 0x4b, 0xfe, 0x57,
@@ -38,14 +38,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			0x16, 0x3a, 0x69, 0x09, 0x70, 0xb6, 0xd0, 0xed, 0xcc, 0x42, 0x98, 0xa4, 0x28, 0x5c, 0xf8, 0x86
 		};
 
-		private static readonly ulong[] C0 = new ulong[256];
-		private static readonly ulong[] C1 = new ulong[256];
-		private static readonly ulong[] C2 = new ulong[256];
-		private static readonly ulong[] C3 = new ulong[256];
-		private static readonly ulong[] C4 = new ulong[256];
-		private static readonly ulong[] C5 = new ulong[256];
-		private static readonly ulong[] C6 = new ulong[256];
-		private static readonly ulong[] C7 = new ulong[256];
+		static readonly ulong[] C0 = new ulong[256];
+		static readonly ulong[] C1 = new ulong[256];
+		static readonly ulong[] C2 = new ulong[256];
+		static readonly ulong[] C3 = new ulong[256];
+		static readonly ulong[] C4 = new ulong[256];
+		static readonly ulong[] C5 = new ulong[256];
+		static readonly ulong[] C6 = new ulong[256];
+		static readonly ulong[] C7 = new ulong[256];
 
 		/*
 		 * increment() can be implemented in this way using 2 arrays or
@@ -55,7 +55,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 * not having done any timing, this seems likely to be faster
 		 * at the slight expense of 32*(sizeof short) bytes
 		 */
-		private static readonly short[] EIGHT = new short[BITCOUNT_ARRAY_SIZE];
+		static readonly short[] EIGHT = new short[BITCOUNT_ARRAY_SIZE];
 
 		static WhirlpoolDigest()
 		{
@@ -82,12 +82,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		}
 
 		// int's are used to prevent sign extension. The values that are really being used are actually just 0..255
-		private static int MulX(int input)
+		static int MulX(int input)
 		{
 			return (input << 1) ^ (-(input >> 7) & REDUCTION_POLYNOMIAL);
 		}
 
-		private static ulong PackIntoUInt64(int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0)
+		static ulong PackIntoUInt64(int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0)
 		{
 			return ((ulong)b7 << 56) ^
 			       ((ulong)b6 << 48) ^
@@ -99,7 +99,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			       (ulong)b0;
 		}
 
-		private readonly ulong[] _rc = new ulong[ROUNDS + 1];
+		readonly ulong[] _rc = new ulong[ROUNDS + 1];
 
 		public WhirlpoolDigest()
 		{
@@ -122,16 +122,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		// --------------------------------------------------------------------------------------//
 
 		// -- buffer information --
-		private byte[] _buffer = new byte[64];
-		private int _bufferPos;
-		private short[] _bitCount = new short[BITCOUNT_ARRAY_SIZE];
+		byte[] _buffer = new byte[64];
+		int _bufferPos;
+		short[] _bitCount = new short[BITCOUNT_ARRAY_SIZE];
 
 		// -- internal hash state --
-		private ulong[] _hash = new ulong[8];
-		private ulong[] _K = new ulong[8]; // the round key
-		private ulong[] _L = new ulong[8];
-		private ulong[] _block = new ulong[8]; // mu (buffer)
-		private ulong[] _state = new ulong[8]; // the current "cipher" state
+		ulong[] _hash = new ulong[8];
+		ulong[] _K = new ulong[8]; // the round key
+		ulong[] _L = new ulong[8];
+		ulong[] _block = new ulong[8]; // mu (buffer)
+		ulong[] _state = new ulong[8]; // the current "cipher" state
 
 		/**
 		* Copy constructor. This will copy the state of the provided message digest.
@@ -194,7 +194,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		}
 
 		// this takes a buffer of information and fills the block
-		private void ProcessFilledBuffer()
+		void ProcessFilledBuffer()
 		{
 			// copies into the block...
 			Pack.BE_To_UInt64(_buffer, 0, _block);
@@ -203,7 +203,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			Array.Clear(_buffer, 0, _buffer.Length);
 		}
 
-		private void ProcessBlock()
+		void ProcessBlock()
 		{
 			// buffer contents have been transferred to the _block[] array via ProcessFilledBuffer
 
@@ -225,7 +225,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 					_L[i] ^= C4[(int)(_K[(i - 4) & 7] >> 24) & 0xff];
 					_L[i] ^= C5[(int)(_K[(i - 5) & 7] >> 16) & 0xff];
 					_L[i] ^= C6[(int)(_K[(i - 6) & 7] >> 8) & 0xff];
-					_L[i] ^= C7[(int)(_K[(i - 7) & 7]) & 0xff];
+					_L[i] ^= C7[(int)_K[(i - 7) & 7] & 0xff];
 				}
 
 				Array.Copy(_L, 0, _K, 0, _K.Length);
@@ -244,7 +244,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 					_L[i] ^= C4[(int)(_state[(i - 4) & 7] >> 24) & 0xff];
 					_L[i] ^= C5[(int)(_state[(i - 5) & 7] >> 16) & 0xff];
 					_L[i] ^= C6[(int)(_state[(i - 6) & 7] >> 8) & 0xff];
-					_L[i] ^= C7[(int)(_state[(i - 7) & 7]) & 0xff];
+					_L[i] ^= C7[(int)_state[(i - 7) & 7] & 0xff];
 				}
 
 				// save the current state
@@ -269,7 +269,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			Increment();
 		}
 
-		private void Increment()
+		void Increment()
 		{
 			int carry = 0;
 			for (int i = _bitCount.Length - 1; i >= 0; i--)
@@ -301,7 +301,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		}
 #endif
 
-		private void Finish()
+		void Finish()
 		{
 			/*
 			 * this makes a copy of the current bit length. at the expense of an
@@ -341,7 +341,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			ProcessFilledBuffer();
 		}
 
-		private byte[] CopyBitLength()
+		byte[] CopyBitLength()
 		{
 			byte[] rv = new byte[BITCOUNT_ARRAY_SIZE];
 			for (int i = 0; i < rv.Length; i++)
@@ -370,7 +370,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 			Array.Copy(originalDigest._buffer, 0, _buffer, 0, _buffer.Length);
 
-			this._bufferPos = originalDigest._bufferPos;
+			_bufferPos = originalDigest._bufferPos;
 			Array.Copy(originalDigest._bitCount, 0, _bitCount, 0, _bitCount.Length);
 
 			// -- internal hash state --

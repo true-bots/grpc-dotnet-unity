@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_SOCKETIO
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 using BestHTTP.PlatformSupport.Text;
 using PlatformSupport.Collections.ObjectModel;
@@ -63,7 +64,7 @@ namespace BestHTTP.SocketIO
 			set { randomizationFactor = Math.Min(1.0f, Math.Max(0.0f, value)); }
 		}
 
-		private float randomizationFactor;
+		float randomizationFactor;
 
 		/// <summary>
 		/// Connection timeout before a connect_error and connect_timeout events are emitted (default 20000ms)
@@ -86,7 +87,9 @@ namespace BestHTTP.SocketIO
 			{
 				// Unsubscribe from previous dictionary's events
 				if (additionalQueryParams != null)
+				{
 					additionalQueryParams.CollectionChanged -= AdditionalQueryParams_CollectionChanged;
+				}
 
 				additionalQueryParams = value;
 
@@ -95,11 +98,13 @@ namespace BestHTTP.SocketIO
 
 				// Subscribe to the collection changed event
 				if (value != null)
+				{
 					value.CollectionChanged += AdditionalQueryParams_CollectionChanged;
+				}
 			}
 		}
 
-		private ObservableDictionary<string, string> additionalQueryParams;
+		ObservableDictionary<string, string> additionalQueryParams;
 
 		/// <summary>
 		/// If it's false, the parameters in the AdditionalQueryParams will be passed for all HTTP requests. Its default value is true.
@@ -126,7 +131,7 @@ namespace BestHTTP.SocketIO
 		/// <summary>
 		/// The cached value of the result of the BuildQueryParams() call.
 		/// </summary>
-		private string BuiltQueryParams;
+		string BuiltQueryParams;
 
 		/// <summary>
 		/// Constructor, setting the default option values.
@@ -152,14 +157,18 @@ namespace BestHTTP.SocketIO
 		internal string BuildQueryParams()
 		{
 			if (AdditionalQueryParams == null || AdditionalQueryParams.Count == 0)
+			{
 				return string.Empty;
+			}
 
 			if (!string.IsNullOrEmpty(BuiltQueryParams))
+			{
 				return BuiltQueryParams;
+			}
 
 			StringBuilder sb = StringBuilderPool.Get(AdditionalQueryParams.Count * 4); //new StringBuilder(AdditionalQueryParams.Count * 4);
 
-			foreach (var kvp in AdditionalQueryParams)
+			foreach (KeyValuePair<string, string> kvp in AdditionalQueryParams)
 			{
 				sb.Append("&");
 				sb.Append(kvp.Key);
@@ -177,7 +186,7 @@ namespace BestHTTP.SocketIO
 		/// <summary>
 		/// This event will be called when the AdditonalQueryPrams dictionary changed. We have to reset the cached values.
 		/// </summary>
-		private void AdditionalQueryParams_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		void AdditionalQueryParams_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			BuiltQueryParams = null;
 		}

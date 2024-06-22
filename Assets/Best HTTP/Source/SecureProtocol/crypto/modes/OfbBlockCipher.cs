@@ -11,12 +11,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class OfbBlockCipher
 		: IBlockCipherMode
 	{
-		private byte[] IV;
-		private byte[] ofbV;
-		private byte[] ofbOutV;
+		byte[] IV;
+		byte[] ofbV;
+		byte[] ofbOutV;
 
-		private readonly int blockSize;
-		private readonly IBlockCipher cipher;
+		readonly int blockSize;
+		readonly IBlockCipher cipher;
 
 		/**
 		* Basic constructor.
@@ -32,9 +32,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			this.cipher = cipher;
 			this.blockSize = blockSize / 8;
 
-			this.IV = new byte[cipher.GetBlockSize()];
-			this.ofbV = new byte[cipher.GetBlockSize()];
-			this.ofbOutV = new byte[cipher.GetBlockSize()];
+			IV = new byte[cipher.GetBlockSize()];
+			ofbV = new byte[cipher.GetBlockSize()];
+			ofbOutV = new byte[cipher.GetBlockSize()];
 		}
 
 		/**
@@ -42,7 +42,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		*
 		* @return the underlying block cipher that we are wrapping.
 		*/
-		public IBlockCipher UnderlyingCipher => cipher;
+		public IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		/**
 		* Initialise the cipher and, possibly, the initialisation vector (IV).
@@ -97,7 +100,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		*/
 		public string AlgorithmName
 		{
-			get { return cipher.AlgorithmName + "/OFB" + (blockSize * 8); }
+			get { return cipher.AlgorithmName + "/OFB" + blockSize * 8; }
 		}
 
 		public bool IsPartialBlockOkay

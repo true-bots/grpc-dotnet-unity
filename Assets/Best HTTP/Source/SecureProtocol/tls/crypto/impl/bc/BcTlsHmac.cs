@@ -6,14 +6,14 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 {
-	internal sealed class BcTlsHmac
+	sealed class BcTlsHmac
 		: TlsHmac
 	{
-		private readonly HMac m_hmac;
+		readonly HMac m_hmac;
 
 		internal BcTlsHmac(HMac hmac)
 		{
-			this.m_hmac = hmac;
+			m_hmac = hmac;
 		}
 
 		public void SetKey(byte[] key, int keyOff, int keyLen)

@@ -24,73 +24,92 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class OcbBlockCipher
 		: IAeadBlockCipher
 	{
-		private const int BLOCK_SIZE = 16;
+		const int BLOCK_SIZE = 16;
 
-		private readonly IBlockCipher hashCipher;
-		private readonly IBlockCipher mainCipher;
+		readonly IBlockCipher hashCipher;
+		readonly IBlockCipher mainCipher;
 
 		/*
 		 * CONFIGURATION
 		 */
-		private bool forEncryption;
-		private int macSize;
-		private byte[] initialAssociatedText;
+		bool forEncryption;
+		int macSize;
+		byte[] initialAssociatedText;
 
 		/*
 		 * KEY-DEPENDENT
 		 */
 		// NOTE: elements are lazily calculated
-		private IList<byte[]> L;
-		private byte[] L_Asterisk, L_Dollar;
+		IList<byte[]> L;
+		byte[] L_Asterisk, L_Dollar;
 
 		/*
 		 * NONCE-DEPENDENT
 		 */
-		private byte[] KtopInput = null;
-		private byte[] Stretch = new byte[24];
-		private byte[] OffsetMAIN_0 = new byte[16];
+		byte[] KtopInput = null;
+		byte[] Stretch = new byte[24];
+		byte[] OffsetMAIN_0 = new byte[16];
 
 		/*
 		 * PER-ENCRYPTION/DECRYPTION
 		 */
-		private byte[] hashBlock, mainBlock;
-		private int hashBlockPos, mainBlockPos;
-		private long hashBlockCount, mainBlockCount;
-		private byte[] OffsetHASH;
-		private byte[] Sum;
-		private byte[] OffsetMAIN = new byte[16];
-		private byte[] Checksum;
+		byte[] hashBlock, mainBlock;
+		int hashBlockPos, mainBlockPos;
+		long hashBlockCount, mainBlockCount;
+		byte[] OffsetHASH;
+		byte[] Sum;
+		byte[] OffsetMAIN = new byte[16];
+		byte[] Checksum;
 
 		// NOTE: The MAC value is preserved after doFinal
-		private byte[] macBlock;
+		byte[] macBlock;
 
 		public OcbBlockCipher(IBlockCipher hashCipher, IBlockCipher mainCipher)
 		{
 			if (hashCipher == null)
+			{
 				throw new ArgumentNullException("hashCipher");
+			}
+
 			if (hashCipher.GetBlockSize() != BLOCK_SIZE)
+			{
 				throw new ArgumentException("must have a block size of " + BLOCK_SIZE, "hashCipher");
+			}
+
 			if (mainCipher == null)
+			{
 				throw new ArgumentNullException("mainCipher");
+			}
+
 			if (mainCipher.GetBlockSize() != BLOCK_SIZE)
+			{
 				throw new ArgumentException("must have a block size of " + BLOCK_SIZE, "mainCipher");
+			}
 
 			if (!hashCipher.AlgorithmName.Equals(mainCipher.AlgorithmName))
+			{
 				throw new ArgumentException("'hashCipher' and 'mainCipher' must be the same algorithm");
+			}
 
 			this.hashCipher = hashCipher;
 			this.mainCipher = mainCipher;
 		}
 
-		public virtual string AlgorithmName => mainCipher.AlgorithmName + "/OCB";
+		public virtual string AlgorithmName
+		{
+			get { return mainCipher.AlgorithmName + "/OCB"; }
+		}
 
-		public virtual IBlockCipher UnderlyingCipher => mainCipher;
+		public virtual IBlockCipher UnderlyingCipher
+		{
+			get { return mainCipher; }
+		}
 
 		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			bool oldForEncryption = this.forEncryption;
 			this.forEncryption = forEncryption;
-			this.macBlock = null;
+			macBlock = null;
 
 			KeyParameter keyParameter;
 
@@ -102,7 +121,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 
 				int macSizeBits = aeadParameters.MacSize;
 				if (macSizeBits < 64 || macSizeBits > 128 || macSizeBits % 8 != 0)
+				{
 					throw new ArgumentException("Invalid value for MAC size: " + macSizeBits);
+				}
 
 				macSize = macSizeBits / 8;
 				keyParameter = aeadParameters.Key;
@@ -119,8 +140,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				throw new ArgumentException("invalid parameters passed to OCB");
 			}
 
-			this.hashBlock = new byte[16];
-			this.mainBlock = new byte[forEncryption ? BLOCK_SIZE : (BLOCK_SIZE + macSize)];
+			hashBlock = new byte[16];
+			mainBlock = new byte[forEncryption ? BLOCK_SIZE : BLOCK_SIZE + macSize];
 
 			if (N == null)
 			{
@@ -148,13 +169,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				throw new ArgumentException("cannot change encrypting state without providing key.");
 			}
 
-			this.L_Asterisk = new byte[16];
+			L_Asterisk = new byte[16];
 			hashCipher.ProcessBlock(L_Asterisk, 0, L_Asterisk, 0);
 
-			this.L_Dollar = OCB_double(L_Asterisk);
+			L_Dollar = OCB_double(L_Asterisk);
 
-			this.L = new List<byte[]>();
-			this.L.Add(OCB_double(L_Dollar));
+			L = new List<byte[]>();
+			L.Add(OCB_double(L_Dollar));
 
 			/*
 			 * NONCE-DEPENDENT AND PER-ENCRYPTION/DECRYPTION INITIALISATION
@@ -173,20 +194,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				{
 					uint b1 = Stretch[bytes];
 					uint b2 = Stretch[++bytes];
-					this.OffsetMAIN_0[i] = (byte)((b1 << bits) | (b2 >> (8 - bits)));
+					OffsetMAIN_0[i] = (byte)((b1 << bits) | (b2 >> (8 - bits)));
 				}
 			}
 
-			this.hashBlockPos = 0;
-			this.mainBlockPos = 0;
+			hashBlockPos = 0;
+			mainBlockPos = 0;
 
-			this.hashBlockCount = 0;
-			this.mainBlockCount = 0;
+			hashBlockCount = 0;
+			mainBlockCount = 0;
 
-			this.OffsetHASH = new byte[16];
-			this.Sum = new byte[16];
+			OffsetHASH = new byte[16];
+			Sum = new byte[16];
 			Array.Copy(OffsetMAIN_0, 0, OffsetMAIN, 0, 16);
-			this.Checksum = new byte[16];
+			Checksum = new byte[16];
 
 			if (initialAssociatedText != null)
 			{
@@ -374,7 +395,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			if (!forEncryption)
 			{
 				if (mainBlockPos < macSize)
+				{
 					throw new InvalidCipherTextException("data too short");
+				}
 
 				mainBlockPos -= macSize;
 				tag = new byte[macSize];
@@ -426,7 +449,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			hashCipher.ProcessBlock(Checksum, 0, Checksum, 0);
 			Xor(Checksum, Sum);
 
-			this.macBlock = new byte[macSize];
+			macBlock = new byte[macSize];
 			Array.Copy(Checksum, 0, macBlock, 0, macSize);
 
 			/*
@@ -446,7 +469,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			{
 				// Compare the tag from the message with the calculated one
 				if (!Arrays.ConstantTimeAreEqual(macBlock, tag))
+				{
 					throw new InvalidCipherTextException("mac check in OCB failed");
+				}
 			}
 
 			Reset(false);

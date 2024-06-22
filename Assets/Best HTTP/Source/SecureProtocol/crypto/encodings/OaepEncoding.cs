@@ -15,12 +15,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 	public class OaepEncoding
 		: IAsymmetricBlockCipher
 	{
-		private byte[] defHash;
-		private IDigest mgf1Hash;
+		byte[] defHash;
+		IDigest mgf1Hash;
 
-		private IAsymmetricBlockCipher engine;
-		private SecureRandom random;
-		private bool forEncryption;
+		IAsymmetricBlockCipher engine;
+		SecureRandom random;
+		bool forEncryption;
 
 		public OaepEncoding(
 			IAsymmetricBlockCipher cipher)
@@ -49,9 +49,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			IDigest mgf1Hash,
 			byte[] encodingParams)
 		{
-			this.engine = cipher;
+			engine = cipher;
 			this.mgf1Hash = mgf1Hash;
-			this.defHash = new byte[hash.GetDigestSize()];
+			defHash = new byte[hash.GetDigestSize()];
 
 			hash.Reset();
 
@@ -63,19 +63,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			hash.DoFinal(defHash, 0);
 		}
 
-		public string AlgorithmName => engine.AlgorithmName + "/OAEPPadding";
+		public string AlgorithmName
+		{
+			get { return engine.AlgorithmName + "/OAEPPadding"; }
+		}
 
-		public IAsymmetricBlockCipher UnderlyingCipher => engine;
+		public IAsymmetricBlockCipher UnderlyingCipher
+		{
+			get { return engine; }
+		}
 
 		public void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			if (parameters is ParametersWithRandom withRandom)
 			{
-				this.random = withRandom.Random;
+				random = withRandom.Random;
 			}
 			else
 			{
-				this.random = CryptoServicesRegistrar.GetSecureRandom();
+				random = CryptoServicesRegistrar.GetSecureRandom();
 			}
 
 			engine.Init(forEncryption, parameters);
@@ -126,7 +132,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			}
 		}
 
-		private byte[] EncodeBlock(
+		byte[] EncodeBlock(
 			byte[] inBytes,
 			int inOff,
 			int inLen)
@@ -192,7 +198,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		* @exception InvalidCipherTextException if the decrypted block turns out to
 		* be badly formatted.
 		*/
-		private byte[] DecodeBlock(
+		byte[] DecodeBlock(
 			byte[] inBytes,
 			int inOff,
 			int inLen)
@@ -206,7 +212,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			// the same size.
 			//
 			// i.e. wrong when block.length < (2 * defHash.length) + 1
-			int wrongMask = (block.Length - ((2 * defHash.Length) + 1)) >> 31;
+			int wrongMask = (block.Length - (2 * defHash.Length + 1)) >> 31;
 
 			if (data.Length <= block.Length)
 			{
@@ -286,7 +292,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 			return output;
 		}
 
-		private byte[] MaskGeneratorFunction(
+		byte[] MaskGeneratorFunction(
 			byte[] Z,
 			int zOff,
 			int zLen,
@@ -309,7 +315,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 		/**
 		* mask generator function, as described in PKCS1v2.
 		*/
-		private byte[] MaskGeneratorFunction1(
+		byte[] MaskGeneratorFunction1(
 			byte[] Z,
 			int zOff,
 			int zLen,
@@ -322,7 +328,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 
 			mgf1Hash.Reset();
 
-			while (counter < (length / hashBuf.Length))
+			while (counter < length / hashBuf.Length)
 			{
 				Pack.UInt32_To_BE((uint)counter, C);
 
@@ -335,7 +341,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 				counter++;
 			}
 
-			if ((counter * hashBuf.Length) < length)
+			if (counter * hashBuf.Length < length)
 			{
 				Pack.UInt32_To_BE((uint)counter, C);
 
@@ -343,7 +349,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Encodings
 				mgf1Hash.BlockUpdate(C, 0, C.Length);
 				mgf1Hash.DoFinal(hashBuf, 0);
 
-				Array.Copy(hashBuf, 0, mask, counter * hashBuf.Length, mask.Length - (counter * hashBuf.Length));
+				Array.Copy(hashBuf, 0, mask, counter * hashBuf.Length, mask.Length - counter * hashBuf.Length);
 			}
 
 			return mask;

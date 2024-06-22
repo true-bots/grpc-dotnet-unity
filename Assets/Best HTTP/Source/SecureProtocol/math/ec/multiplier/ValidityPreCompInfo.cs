@@ -4,14 +4,14 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 {
-	internal class ValidityPreCompInfo
+	class ValidityPreCompInfo
 		: PreCompInfo
 	{
 		internal static readonly string PRECOMP_NAME = "bc_validity";
 
-		private bool failed = false;
-		private bool curveEquationPassed = false;
-		private bool orderPassed = false;
+		bool failed = false;
+		bool curveEquationPassed = false;
+		bool orderPassed = false;
 
 		internal bool HasFailed()
 		{

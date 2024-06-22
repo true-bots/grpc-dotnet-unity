@@ -17,7 +17,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(Asn1UtcTime), Asn1Tags.UtcTime)
+			Meta() : base(typeof(Asn1UtcTime), Asn1Tags.UtcTime)
 			{
 			}
 
@@ -35,16 +35,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1UtcTime GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is Asn1UtcTime asn1UtcTime)
+			{
 				return asn1UtcTime;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is Asn1UtcTime converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -58,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), nameof(obj));
 		}
 
 		public static Asn1UtcTime GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
@@ -66,10 +72,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (Asn1UtcTime)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly string m_timeString;
-		private readonly DateTime m_dateTime;
-		private readonly bool m_dateTimeLocked;
-		private readonly int m_twoDigitYearMax;
+		readonly string m_timeString;
+		readonly DateTime m_dateTime;
+		readonly bool m_dateTimeLocked;
+		readonly int m_twoDigitYearMax;
 
 		public Asn1UtcTime(string timeString)
 		{
@@ -114,7 +120,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 		}
 
-		public string TimeString => m_timeString;
+		public string TimeString
+		{
+			get { return m_timeString; }
+		}
 
 		public DateTime ToDateTime()
 		{
@@ -124,10 +133,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public DateTime ToDateTime(int twoDigitYearMax)
 		{
 			if (InRange(m_dateTime, twoDigitYearMax))
+			{
 				return m_dateTime;
+			}
 
 			if (m_dateTimeLocked)
+			{
 				throw new InvalidOperationException();
+			}
 
 			int twoDigitYear = m_dateTime.Year % 100;
 			int twoDigitYearCutoff = twoDigitYearMax % 100;
@@ -153,7 +166,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return ToDateTime(2049);
 		}
 
-		public int TwoDigitYearMax => m_twoDigitYearMax;
+		public int TwoDigitYearMax
+		{
+			get { return m_twoDigitYearMax; }
+		}
 
 		internal byte[] GetContents(int encoding)
 		{
@@ -179,11 +195,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		protected override bool Asn1Equals(Asn1Object asn1Object)
 		{
 			if (!(asn1Object is Asn1UtcTime that))
+			{
 				return false;
+			}
 
 			// TODO Performance
 			return Arrays.AreEqual(
-				this.GetContents(Asn1OutputStream.EncodingDer),
+				GetContents(Asn1OutputStream.EncodingDer),
 				that.GetContents(Asn1OutputStream.EncodingDer));
 		}
 
@@ -191,7 +209,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			// TODO Performance
 			return Arrays.GetHashCode(
-				this.GetContents(Asn1OutputStream.EncodingDer));
+				GetContents(Asn1OutputStream.EncodingDer));
 		}
 
 		public override string ToString()
@@ -204,9 +222,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return new Asn1UtcTime(contents);
 		}
 
-		private static DateTime FromString(string s, out int twoDigitYearMax)
+		static DateTime FromString(string s, out int twoDigitYearMax)
 		{
-			var provider = DateTimeFormatInfo.InvariantInfo;
+			DateTimeFormatInfo provider = DateTimeFormatInfo.InvariantInfo;
 			twoDigitYearMax = provider.Calendar.TwoDigitYearMax;
 
 			switch (s.Length)
@@ -226,14 +244,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private static bool InRange(DateTime dateTime, int twoDigitYearMax)
+		static bool InRange(DateTime dateTime, int twoDigitYearMax)
 		{
 			return (uint)(twoDigitYearMax - dateTime.Year) < 100;
 		}
 
-		private static string ToStringCanonical(DateTime dateTime, out int twoDigitYearMax)
+		static string ToStringCanonical(DateTime dateTime, out int twoDigitYearMax)
 		{
-			var provider = DateTimeFormatInfo.InvariantInfo;
+			DateTimeFormatInfo provider = DateTimeFormatInfo.InvariantInfo;
 			twoDigitYearMax = provider.Calendar.TwoDigitYearMax;
 
 			Validate(dateTime, twoDigitYearMax);
@@ -241,15 +259,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return dateTime.ToString(@"yyMMddHHmmss\Z", provider);
 		}
 
-		private static string ToStringCanonical(DateTime dateTime)
+		static string ToStringCanonical(DateTime dateTime)
 		{
 			return dateTime.ToString(@"yyMMddHHmmss\Z", DateTimeFormatInfo.InvariantInfo);
 		}
 
-		private static void Validate(DateTime dateTime, int twoDigitYearMax)
+		static void Validate(DateTime dateTime, int twoDigitYearMax)
 		{
 			if (!InRange(dateTime, twoDigitYearMax))
+			{
 				throw new ArgumentOutOfRangeException(nameof(dateTime));
+			}
 		}
 	}
 }

@@ -38,12 +38,15 @@ namespace BestHTTP.SignalR.Hubs
 			get
 			{
 				if (state == null)
+				{
 					state = new Dictionary<string, object>();
+				}
+
 				return state;
 			}
 		}
 
-		private Dictionary<string, object> state;
+		Dictionary<string, object> state;
 
 		/// <summary>
 		/// Event called every time when the server sends an order to call a method on the client.
@@ -57,17 +60,17 @@ namespace BestHTTP.SignalR.Hubs
 		/// <summary>
 		/// Table of the sent messages. These messages will be removed from this table when a Result message is received from the server.
 		/// </summary>
-		private Dictionary<UInt64, ClientMessage> SentMessages = new Dictionary<ulong, ClientMessage>();
+		Dictionary<ulong, ClientMessage> SentMessages = new Dictionary<ulong, ClientMessage>();
 
 		/// <summary>
 		/// Methodname -> callback delegate mapping. This table stores the server callable functions.
 		/// </summary>
-		private Dictionary<string, OnMethodCallCallbackDelegate> MethodTable = new Dictionary<string, OnMethodCallCallbackDelegate>();
+		Dictionary<string, OnMethodCallCallbackDelegate> MethodTable = new Dictionary<string, OnMethodCallCallbackDelegate>();
 
 		/// <summary>
 		/// A reusable StringBuilder to save some GC allocs
 		/// </summary>
-		private StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 
 		#endregion
 
@@ -80,7 +83,7 @@ namespace BestHTTP.SignalR.Hubs
 
 		public Hub(string name, Connection manager)
 		{
-			this.Name = name;
+			Name = name;
 			(this as IHub).Connection = manager;
 		}
 
@@ -162,7 +165,7 @@ namespace BestHTTP.SignalR.Hubs
 			do
 			{
 				originalValue = thisHub.Connection.ClientMessageCounter;
-				newValue = (originalValue % long.MaxValue) + 1;
+				newValue = originalValue % long.MaxValue + 1;
 			} while (System.Threading.Interlocked.CompareExchange(ref thisHub.Connection.ClientMessageCounter, newValue, originalValue) != originalValue);
 
 			// Create and send the client message
@@ -178,7 +181,9 @@ namespace BestHTTP.SignalR.Hubs
 			IHub thisHub = this as IHub;
 
 			if (!thisHub.Connection.SendJson(BuildMessage(msg)))
+			{
 				return false;
+			}
 
 			SentMessages.Add(msg.CallIdx, msg);
 
@@ -188,7 +193,7 @@ namespace BestHTTP.SignalR.Hubs
 		/// <summary>
 		/// Return true if this hub sent the message with the given id.
 		/// </summary>
-		bool IHub.HasSentMessageId(UInt64 id)
+		bool IHub.HasSentMessageId(ulong id)
 		{
 			return SentMessages.ContainsKey(id);
 		}
@@ -217,7 +222,7 @@ namespace BestHTTP.SignalR.Hubs
 				}
 				catch (Exception ex)
 				{
-					HTTPManager.Logger.Exception("Hub - " + this.Name, "IHub.OnMethod - OnMethodCall", ex);
+					HTTPManager.Logger.Exception("Hub - " + Name, "IHub.OnMethod - OnMethodCall", ex);
 				}
 			}
 
@@ -230,11 +235,13 @@ namespace BestHTTP.SignalR.Hubs
 				}
 				catch (Exception ex)
 				{
-					HTTPManager.Logger.Exception("Hub - " + this.Name, "IHub.OnMethod - callback", ex);
+					HTTPManager.Logger.Exception("Hub - " + Name, "IHub.OnMethod - callback", ex);
 				}
 			}
 			else if (OnMethodCall == null)
-				HTTPManager.Logger.Warning("Hub - " + this.Name, string.Format("[Client] {0}.{1} (args: {2})", this.Name, msg.Method, msg.Arguments.Length));
+			{
+				HTTPManager.Logger.Warning("Hub - " + Name, string.Format("[Client] {0}.{1} (args: {2})", Name, msg.Method, msg.Arguments.Length));
+			}
 		}
 
 		/// <summary>
@@ -244,12 +251,12 @@ namespace BestHTTP.SignalR.Hubs
 		{
 			ClientMessage originalMsg;
 
-			UInt64 id = (msg as IHubMessage).InvocationId;
+			ulong id = (msg as IHubMessage).InvocationId;
 			if (!SentMessages.TryGetValue(id, out originalMsg))
 			{
 				// This can happen when a result message removes the ClientMessage from the SentMessages dictionary,
 				//  then a late come progress message tries to access it
-				HTTPManager.Logger.Warning("Hub - " + this.Name, "OnMessage - Sent message not found with id: " + id.ToString());
+				HTTPManager.Logger.Warning("Hub - " + Name, "OnMessage - Sent message not found with id: " + id.ToString());
 				return;
 			}
 
@@ -269,7 +276,7 @@ namespace BestHTTP.SignalR.Hubs
 						}
 						catch (Exception ex)
 						{
-							HTTPManager.Logger.Exception("Hub " + this.Name, "IHub.OnMessage - ResultCallback", ex);
+							HTTPManager.Logger.Exception("Hub " + Name, "IHub.OnMessage - ResultCallback", ex);
 						}
 					}
 
@@ -291,7 +298,7 @@ namespace BestHTTP.SignalR.Hubs
 						}
 						catch (Exception ex)
 						{
-							HTTPManager.Logger.Exception("Hub " + this.Name, "IHub.OnMessage - ResultErrorCallback", ex);
+							HTTPManager.Logger.Exception("Hub " + Name, "IHub.OnMessage - ResultErrorCallback", ex);
 						}
 					}
 
@@ -307,7 +314,7 @@ namespace BestHTTP.SignalR.Hubs
 						}
 						catch (Exception ex)
 						{
-							HTTPManager.Logger.Exception("Hub " + this.Name, "IHub.OnMessage - ProgressCallback", ex);
+							HTTPManager.Logger.Exception("Hub " + Name, "IHub.OnMessage - ProgressCallback", ex);
 						}
 					}
 
@@ -325,23 +332,27 @@ namespace BestHTTP.SignalR.Hubs
 #if BESTHTTP_SIGNALR_WITH_JSONDOTNET
         private void MergeState(IDictionary<string, Newtonsoft.Json.Linq.JToken> state)
 #else
-		private void MergeState(IDictionary<string, object> state)
+		void MergeState(IDictionary<string, object> state)
 #endif
 		{
 			if (state != null && state.Count > 0)
-				foreach (var kvp in state)
-					this.State[kvp.Key] = kvp.Value;
+			{
+				foreach (KeyValuePair<string, object> kvp in state)
+				{
+					State[kvp.Key] = kvp.Value;
+				}
+			}
 		}
 
 		/// <summary>
 		/// Builds a JSon string from the given message.
 		/// </summary>
-		private string BuildMessage(ClientMessage msg)
+		string BuildMessage(ClientMessage msg)
 		{
 			try
 			{
 				builder.Append("{\"H\":\"");
-				builder.Append(this.Name);
+				builder.Append(Name);
 				builder.Append("\",\"M\":\"");
 				builder.Append(msg.Method);
 				builder.Append("\",\"A\":");
@@ -350,9 +361,13 @@ namespace BestHTTP.SignalR.Hubs
 
 				// Arguments
 				if (msg.Args != null && msg.Args.Length > 0)
+				{
 					jsonEncoded = (this as IHub).Connection.JsonEncoder.Encode(msg.Args);
+				}
 				else
+				{
 					jsonEncoded = "[]";
+				}
 
 				builder.Append(jsonEncoded);
 
@@ -375,7 +390,7 @@ namespace BestHTTP.SignalR.Hubs
 			}
 			catch (Exception ex)
 			{
-				HTTPManager.Logger.Exception("Hub - " + this.Name, "Send", ex);
+				HTTPManager.Logger.Exception("Hub - " + Name, "Send", ex);
 
 				return null;
 			}

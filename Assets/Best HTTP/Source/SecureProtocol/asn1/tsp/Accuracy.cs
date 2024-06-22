@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 	public class Accuracy
 		: Asn1Encodable
 	{
-		private readonly DerInteger seconds;
-		private readonly DerInteger millis;
-		private readonly DerInteger micros;
+		readonly DerInteger seconds;
+		readonly DerInteger millis;
+		readonly DerInteger micros;
 
 		// constants
 		protected const int MinMillis = 1;
@@ -27,14 +27,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 			{
 				int millisValue = millis.IntValueExact;
 				if (millisValue < MinMillis || millisValue > MaxMillis)
+				{
 					throw new ArgumentException("Invalid millis field : not in (1..999)");
+				}
 			}
 
 			if (null != micros)
 			{
 				int microsValue = micros.IntValueExact;
 				if (microsValue < MinMicros || microsValue > MaxMicros)
+				{
 					throw new ArgumentException("Invalid micros field : not in (1..999)");
+				}
 			}
 
 			this.seconds = seconds;
@@ -42,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 			this.micros = micros;
 		}
 
-		private Accuracy(
+		Accuracy(
 			Asn1Sequence seq)
 		{
 			for (int i = 0; i < seq.Count; ++i)
@@ -62,13 +66,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 							millis = DerInteger.GetInstance(extra, false);
 							int millisValue = millis.IntValueExact;
 							if (millisValue < MinMillis || millisValue > MaxMillis)
+							{
 								throw new ArgumentException("Invalid millis field : not in (1..999)");
+							}
+
 							break;
 						case 1:
 							micros = DerInteger.GetInstance(extra, false);
 							int microsValue = micros.IntValueExact;
 							if (microsValue < MinMicros || microsValue > MaxMicros)
+							{
 								throw new ArgumentException("Invalid micros field : not in (1..999)");
+							}
+
 							break;
 						default:
 							throw new ArgumentException("Invalid tag number");
@@ -80,9 +90,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 		public static Accuracy GetInstance(object obj)
 		{
 			if (obj is Accuracy)
+			{
 				return (Accuracy)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new Accuracy(Asn1Sequence.GetInstance(obj));
 		}
 

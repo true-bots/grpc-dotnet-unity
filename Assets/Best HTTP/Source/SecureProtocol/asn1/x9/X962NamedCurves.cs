@@ -13,19 +13,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 	/// <summary>Elliptic curve registry for the curves defined in X.962 EC-DSA.</summary>
 	public static class X962NamedCurves
 	{
-		private static X9ECPoint ConfigureBasepoint(ECCurve curve, string encoding)
+		static X9ECPoint ConfigureBasepoint(ECCurve curve, string encoding)
 		{
 			X9ECPoint G = new X9ECPoint(curve, Hex.DecodeStrict(encoding));
 			WNafUtilities.ConfigureBasepoint(G.Point);
 			return G;
 		}
 
-		private static ECCurve ConfigureCurve(ECCurve curve)
+		static ECCurve ConfigureCurve(ECCurve curve)
 		{
 			return curve;
 		}
 
-		private static BigInteger FromHex(string hex)
+		static BigInteger FromHex(string hex)
 		{
 			return new BigInteger(1, Hex.DecodeStrict(hex));
 		}
@@ -33,7 +33,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class Prime192v1Holder
 			: X9ECParametersHolder
 		{
-			private Prime192v1Holder()
+			Prime192v1Holder()
 			{
 			}
 
@@ -66,7 +66,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class Prime192v2Holder
 			: X9ECParametersHolder
 		{
-			private Prime192v2Holder()
+			Prime192v2Holder()
 			{
 			}
 
@@ -99,7 +99,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class Prime192v3Holder
 			: X9ECParametersHolder
 		{
-			private Prime192v3Holder()
+			Prime192v3Holder()
 			{
 			}
 
@@ -132,7 +132,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class Prime239v1Holder
 			: X9ECParametersHolder
 		{
-			private Prime239v1Holder()
+			Prime239v1Holder()
 			{
 			}
 
@@ -165,7 +165,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class Prime239v2Holder
 			: X9ECParametersHolder
 		{
-			private Prime239v2Holder()
+			Prime239v2Holder()
 			{
 			}
 
@@ -198,7 +198,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class Prime239v3Holder
 			: X9ECParametersHolder
 		{
-			private Prime239v3Holder()
+			Prime239v3Holder()
 			{
 			}
 
@@ -231,7 +231,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class Prime256v1Holder
 			: X9ECParametersHolder
 		{
-			private Prime256v1Holder()
+			Prime256v1Holder()
 			{
 			}
 
@@ -264,7 +264,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2pnb163v1Holder
 			: X9ECParametersHolder
 		{
-			private C2pnb163v1Holder()
+			C2pnb163v1Holder()
 			{
 			}
 
@@ -298,7 +298,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2pnb163v2Holder
 			: X9ECParametersHolder
 		{
-			private C2pnb163v2Holder()
+			C2pnb163v2Holder()
 			{
 			}
 
@@ -332,7 +332,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2pnb163v3Holder
 			: X9ECParametersHolder
 		{
-			private C2pnb163v3Holder()
+			C2pnb163v3Holder()
 			{
 			}
 
@@ -366,7 +366,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2pnb176w1Holder
 			: X9ECParametersHolder
 		{
-			private C2pnb176w1Holder()
+			C2pnb176w1Holder()
 			{
 			}
 
@@ -400,7 +400,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2tnb191v1Holder
 			: X9ECParametersHolder
 		{
-			private C2tnb191v1Holder()
+			C2tnb191v1Holder()
 			{
 			}
 
@@ -434,7 +434,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2tnb191v2Holder
 			: X9ECParametersHolder
 		{
-			private C2tnb191v2Holder()
+			C2tnb191v2Holder()
 			{
 			}
 
@@ -468,7 +468,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2tnb191v3Holder
 			: X9ECParametersHolder
 		{
-			private C2tnb191v3Holder()
+			C2tnb191v3Holder()
 			{
 			}
 
@@ -502,7 +502,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2pnb208w1Holder
 			: X9ECParametersHolder
 		{
-			private C2pnb208w1Holder()
+			C2pnb208w1Holder()
 			{
 			}
 
@@ -536,7 +536,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2tnb239v1Holder
 			: X9ECParametersHolder
 		{
-			private C2tnb239v1Holder()
+			C2tnb239v1Holder()
 			{
 			}
 
@@ -570,7 +570,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2tnb239v2Holder
 			: X9ECParametersHolder
 		{
-			private C2tnb239v2Holder()
+			C2tnb239v2Holder()
 			{
 			}
 
@@ -604,7 +604,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2tnb239v3Holder
 			: X9ECParametersHolder
 		{
-			private C2tnb239v3Holder()
+			C2tnb239v3Holder()
 			{
 			}
 
@@ -638,7 +638,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2pnb272w1Holder
 			: X9ECParametersHolder
 		{
-			private C2pnb272w1Holder()
+			C2pnb272w1Holder()
 			{
 			}
 
@@ -672,7 +672,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2pnb304w1Holder
 			: X9ECParametersHolder
 		{
-			private C2pnb304w1Holder()
+			C2pnb304w1Holder()
 			{
 			}
 
@@ -706,7 +706,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2tnb359v1Holder
 			: X9ECParametersHolder
 		{
-			private C2tnb359v1Holder()
+			C2tnb359v1Holder()
 			{
 			}
 
@@ -740,7 +740,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2pnb368w1Holder
 			: X9ECParametersHolder
 		{
-			private C2pnb368w1Holder()
+			C2pnb368w1Holder()
 			{
 			}
 
@@ -774,7 +774,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		internal class C2tnb431r1Holder
 			: X9ECParametersHolder
 		{
-			private C2tnb431r1Holder()
+			C2tnb431r1Holder()
 			{
 			}
 
@@ -805,16 +805,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 			}
 		}
 
-		private static readonly Dictionary<string, DerObjectIdentifier> objIds =
+		static readonly Dictionary<string, DerObjectIdentifier> objIds =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
+		static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
 			new Dictionary<DerObjectIdentifier, X9ECParametersHolder>();
 
-		private static readonly Dictionary<DerObjectIdentifier, string> names =
+		static readonly Dictionary<DerObjectIdentifier, string> names =
 			new Dictionary<DerObjectIdentifier, string>();
 
-		private static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
+		static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
 		{
 			objIds.Add(name, oid);
 			names.Add(oid, name);

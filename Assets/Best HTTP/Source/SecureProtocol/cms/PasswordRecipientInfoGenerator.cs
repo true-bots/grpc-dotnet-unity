@@ -12,16 +12,16 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal class PasswordRecipientInfoGenerator : RecipientInfoGenerator
+	class PasswordRecipientInfoGenerator : RecipientInfoGenerator
 	{
-		private static readonly CmsEnvelopedHelper Helper = CmsEnvelopedHelper.Instance;
+		static readonly CmsEnvelopedHelper Helper = CmsEnvelopedHelper.Instance;
 
-		private AlgorithmIdentifier keyDerivationAlgorithm;
+		AlgorithmIdentifier keyDerivationAlgorithm;
 
-		private KeyParameter keyEncryptionKey;
+		KeyParameter keyEncryptionKey;
 
 		// TODO Can get this from keyEncryptionKey?		
-		private string keyEncryptionKeyOID;
+		string keyEncryptionKeyOID;
 
 		internal PasswordRecipientInfoGenerator()
 		{
@@ -29,17 +29,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal AlgorithmIdentifier KeyDerivationAlgorithm
 		{
-			set { this.keyDerivationAlgorithm = value; }
+			set { keyDerivationAlgorithm = value; }
 		}
 
 		internal KeyParameter KeyEncryptionKey
 		{
-			set { this.keyEncryptionKey = value; }
+			set { keyEncryptionKey = value; }
 		}
 
 		internal string KeyEncryptionKeyOID
 		{
-			set { this.keyEncryptionKeyOID = value; }
+			set { keyEncryptionKeyOID = value; }
 		}
 
 		public RecipientInfo Generate(KeyParameter contentEncryptionKey, SecureRandom random)
@@ -50,7 +50,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			IWrapper keyWrapper = Helper.CreateWrapper(rfc3211WrapperName);
 
 			// Note: In Java build, the IV is automatically generated in JCE layer
-			int ivLength = Org.BouncyCastle.Utilities.Platform.StartsWith(rfc3211WrapperName, "DESEDE") ? 8 : 16;
+			int ivLength = Platform.StartsWith(rfc3211WrapperName, "DESEDE") ? 8 : 16;
 			byte[] iv = new byte[ivLength];
 			random.NextBytes(iv);
 

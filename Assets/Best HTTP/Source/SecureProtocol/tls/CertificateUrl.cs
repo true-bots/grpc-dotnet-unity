@@ -11,23 +11,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	/// <summary>RFC 3546 3.3</summary>
 	public sealed class CertificateUrl
 	{
-		private readonly short m_type;
-		private readonly IList<UrlAndHash> m_urlAndHashList;
+		readonly short m_type;
+		readonly IList<UrlAndHash> m_urlAndHashList;
 
 		/// <param name="type">see <see cref="CertChainType"/> for valid constants.</param>
 		/// <param name="urlAndHashList">an <see cref="IList{T}"/> of <see cref="UrlAndHash"/>.</param>
 		public CertificateUrl(short type, IList<UrlAndHash> urlAndHashList)
 		{
 			if (!CertChainType.IsValid(type))
+			{
 				throw new ArgumentException("not a valid CertChainType value", "type");
+			}
+
 			if (urlAndHashList == null || urlAndHashList.Count < 1)
+			{
 				throw new ArgumentException("must have length > 0", "urlAndHashList");
+			}
+
 			if (type == CertChainType.pkipath && urlAndHashList.Count != 1)
+			{
 				throw new ArgumentException("must contain exactly one entry when type is "
 				                            + CertChainType.GetText(type), "urlAndHashList");
+			}
 
-			this.m_type = type;
-			this.m_urlAndHashList = urlAndHashList;
+			m_type = type;
+			m_urlAndHashList = urlAndHashList;
 		}
 
 		/// <returns><see cref="CertChainType"/></returns>
@@ -67,17 +75,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			short type = TlsUtilities.ReadUint8(input);
 			if (!CertChainType.IsValid(type))
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			int totalLength = TlsUtilities.ReadUint16(input);
 			if (totalLength < 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			byte[] urlAndHashListData = TlsUtilities.ReadFully(totalLength, input);
 
 			MemoryStream buf = new MemoryStream(urlAndHashListData, false);
 
-			var url_and_hash_list = new List<UrlAndHash>();
+			List<UrlAndHash> url_and_hash_list = new List<UrlAndHash>();
 			while (buf.Position < buf.Length)
 			{
 				UrlAndHash url_and_hash = UrlAndHash.Parse(context, buf);
@@ -85,7 +97,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 
 			if (type == CertChainType.pkipath && url_and_hash_list.Count != 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			return new CertificateUrl(type, url_and_hash_list);
 		}

@@ -10,10 +10,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
 	public class CmsTypedStream
 	{
-		private const int BufferSize = 32 * 1024;
+		const int BufferSize = 32 * 1024;
 
-		private readonly string _oid;
-		private readonly Stream _in;
+		readonly string _oid;
+		readonly Stream _in;
 
 		public CmsTypedStream(
 			Stream inStream)
@@ -53,7 +53,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			_in.Dispose();
 		}
 
-		private class FullReaderStream : FilterStream
+		class FullReaderStream : FilterStream
 		{
 			internal FullReaderStream(Stream input)
 				: base(input)

@@ -55,9 +55,9 @@
 		/// </summary>
 		public Credentials(AuthenticationTypes type, string userName, string password)
 		{
-			this.Type = type;
-			this.UserName = userName;
-			this.Password = password;
+			Type = type;
+			UserName = userName;
+			Password = password;
 		}
 	}
 }

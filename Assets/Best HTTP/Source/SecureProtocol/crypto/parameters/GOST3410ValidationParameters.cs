@@ -6,10 +6,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
 	public class Gost3410ValidationParameters
 	{
-		private int x0;
-		private int c;
-		private long x0L;
-		private long cL;
+		int x0;
+		int c;
+		long x0L;
+		long cL;
 
 		public Gost3410ValidationParameters(
 			int x0,
@@ -53,10 +53,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			Gost3410ValidationParameters other = obj as Gost3410ValidationParameters;
 
 			return other != null
-			       && other.c == this.c
-			       && other.x0 == this.x0
-			       && other.cL == this.cL
-			       && other.x0L == this.x0L;
+			       && other.c == c
+			       && other.x0 == x0
+			       && other.cL == cL
+			       && other.x0L == x0L;
 		}
 
 		public override int GetHashCode()

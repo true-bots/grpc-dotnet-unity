@@ -15,8 +15,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class OtherName
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier typeID;
-		private readonly Asn1Encodable value;
+		readonly DerObjectIdentifier typeID;
+		readonly Asn1Encodable value;
 
 		/**
 		 * OtherName factory method.
@@ -32,9 +32,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static OtherName GetInstance(object obj)
 		{
 			if (obj is OtherName)
+			{
 				return (OtherName)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new OtherName(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -49,10 +55,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			this.value = value;
 		}
 
-		private OtherName(Asn1Sequence seq)
+		OtherName(Asn1Sequence seq)
 		{
-			this.typeID = DerObjectIdentifier.GetInstance(seq[0]);
-			this.value = DerTaggedObject.GetInstance(seq[1]).GetObject(); // explicitly tagged
+			typeID = DerObjectIdentifier.GetInstance(seq[0]);
+			value = Asn1TaggedObject.GetInstance(seq[1]).GetObject(); // explicitly tagged
 		}
 
 		public virtual DerObjectIdentifier TypeID

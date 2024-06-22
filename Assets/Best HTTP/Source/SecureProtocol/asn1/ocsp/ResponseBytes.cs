@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class ResponseBytes
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier responseType;
-		private readonly Asn1OctetString response;
+		readonly DerObjectIdentifier responseType;
+		readonly Asn1OctetString response;
 
 		public static ResponseBytes GetInstance(
 			Asn1TaggedObject obj,
@@ -31,7 +31,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new ResponseBytes((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public ResponseBytes(
@@ -39,22 +39,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			Asn1OctetString response)
 		{
 			if (responseType == null)
+			{
 				throw new ArgumentNullException("responseType");
+			}
+
 			if (response == null)
+			{
 				throw new ArgumentNullException("response");
+			}
 
 			this.responseType = responseType;
 			this.response = response;
 		}
 
-		private ResponseBytes(
+		ResponseBytes(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
-			this.responseType = DerObjectIdentifier.GetInstance(seq[0]);
-			this.response = Asn1OctetString.GetInstance(seq[1]);
+			responseType = DerObjectIdentifier.GetInstance(seq[0]);
+			response = Asn1OctetString.GetInstance(seq[1]);
 		}
 
 		public DerObjectIdentifier ResponseType

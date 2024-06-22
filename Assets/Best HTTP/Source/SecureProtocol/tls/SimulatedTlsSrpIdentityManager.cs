@@ -13,8 +13,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class SimulatedTlsSrpIdentityManager
 		: TlsSrpIdentityManager
 	{
-		private static readonly byte[] PrefixPassword = Strings.ToByteArray("password");
-		private static readonly byte[] PrefixSalt = Strings.ToByteArray("salt");
+		static readonly byte[] PrefixPassword = Strings.ToByteArray("password");
+		static readonly byte[] PrefixSalt = Strings.ToByteArray("salt");
 
 		/// <summary>Create a <see cref="SimulatedTlsSrpIdentityManager"/> that implements the algorithm from RFC 5054
 		/// 2.5.1.3.</summary>
@@ -42,9 +42,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public SimulatedTlsSrpIdentityManager(Srp6Group group, TlsSrp6VerifierGenerator verifierGenerator, TlsMac mac)
 		{
-			this.m_group = group;
-			this.m_verifierGenerator = verifierGenerator;
-			this.m_mac = mac;
+			m_group = group;
+			m_verifierGenerator = verifierGenerator;
+			m_mac = mac;
 		}
 
 		public virtual TlsSrpLoginParameters GetLoginParameters(byte[] identity)

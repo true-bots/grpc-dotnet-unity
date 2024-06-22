@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class ElGamalKeyParameters
 		: AsymmetricKeyParameter
 	{
-		private readonly ElGamalParameters parameters;
+		readonly ElGamalParameters parameters;
 
 		protected ElGamalKeyParameters(
 			bool isPrivate,
@@ -28,12 +28,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			ElGamalKeyParameters other = obj as ElGamalKeyParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

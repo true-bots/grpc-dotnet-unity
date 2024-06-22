@@ -57,7 +57,7 @@ namespace BestHTTP.SocketIO
 		/// </summary>
 		public int ProtocolVersion
 		{
-			get { return this.Options.ServerVersion == SupportedSocketIOVersions.v3 ? 4 : 3; }
+			get { return Options.ServerVersion == SupportedSocketIOVersions.v3 ? 4 : 3; }
 		}
 
 		#region Public Properties
@@ -75,7 +75,7 @@ namespace BestHTTP.SocketIO
 			}
 		}
 
-		private States state;
+		States state;
 
 		/// <summary>
 		/// The SocketOptions instance that this manager will use.
@@ -135,9 +135,9 @@ namespace BestHTTP.SocketIO
 		/// <summary>
 		/// Timestamp support to the request based transports.
 		/// </summary>
-		internal UInt64 Timestamp
+		internal ulong Timestamp
 		{
-			get { return (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds; }
+			get { return (ulong)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds; }
 		}
 
 		/// <summary>
@@ -148,7 +148,7 @@ namespace BestHTTP.SocketIO
 			get { return System.Threading.Interlocked.Increment(ref nextAckId); }
 		}
 
-		private int nextAckId;
+		int nextAckId;
 
 		/// <summary>
 		/// Internal property to store the previous state of the manager.
@@ -167,47 +167,47 @@ namespace BestHTTP.SocketIO
 		/// <summary>
 		/// Namespace name -> Socket mapping
 		/// </summary>
-		private Dictionary<string, Socket> Namespaces = new Dictionary<string, Socket>();
+		Dictionary<string, Socket> Namespaces = new Dictionary<string, Socket>();
 
 		/// <summary>
 		/// List of the sockets to able to iterate over them easily.
 		/// </summary>
-		private List<Socket> Sockets = new List<Socket>();
+		List<Socket> Sockets = new List<Socket>();
 
 		/// <summary>
 		/// List of unsent packets. Only instantiated when we have to use it.
 		/// </summary>
-		private List<Packet> OfflinePackets;
+		List<Packet> OfflinePackets;
 
 		/// <summary>
 		/// When we sent out the last heartbeat(Ping) message.
 		/// </summary>
-		private DateTime LastHeartbeat = DateTime.MinValue;
+		DateTime LastHeartbeat = DateTime.MinValue;
 
 		/// <summary>
 		/// When we have to try to do a reconnect attempt
 		/// </summary>
-		private DateTime ReconnectAt;
+		DateTime ReconnectAt;
 
 		/// <summary>
 		/// When we started to connect to the server.
 		/// </summary>
-		private DateTime ConnectionStarted;
+		DateTime ConnectionStarted;
 
 		/// <summary>
 		/// Private flag to avoid multiple Close call
 		/// </summary>
-		private bool closing;
+		bool closing;
 
 		/// <summary>
 		/// Whether the connection is waiting for a ping response.
 		/// </summary>
-		private bool IsWaitingPong;
+		bool IsWaitingPong;
 
 		/// <summary>
 		/// In Engine.io v4 / socket.io v3 the server sends the ping messages, not the client.
 		/// </summary>
-		private DateTime lastPingReceived;
+		DateTime lastPingReceived;
 
 		#endregion
 
@@ -230,7 +230,7 @@ namespace BestHTTP.SocketIO
 			Options = options ?? new SocketOptions();
 			State = States.Initial;
 			PreviousState = States.Initial;
-			Encoder = SocketManager.DefaultEncoder;
+			Encoder = DefaultEncoder;
 		}
 
 		#endregion
@@ -249,7 +249,9 @@ namespace BestHTTP.SocketIO
 		public Socket GetSocket(string nsp)
 		{
 			if (string.IsNullOrEmpty(nsp))
+			{
 				throw new ArgumentNullException("Namespace parameter is null or empty!");
+			}
 
 			/*if (nsp[0] != '/')
 			    nsp = "/" + nsp;*/
@@ -279,7 +281,9 @@ namespace BestHTTP.SocketIO
 			Sockets.Remove(socket);
 
 			if (Sockets.Count == 0)
+			{
 				Close();
+			}
 		}
 
 		#region Connection to the server, and upgrading
@@ -293,7 +297,9 @@ namespace BestHTTP.SocketIO
 			if (State != States.Initial &&
 			    State != States.Closed &&
 			    State != States.Reconnecting)
+			{
 				return;
+			}
 
 			HTTPManager.Logger.Information("SocketManager", "Opening");
 
@@ -340,7 +346,10 @@ namespace BestHTTP.SocketIO
 		void IManager.Close(bool removeSockets)
 		{
 			if (State == States.Closed || closing)
+			{
 				return;
+			}
+
 			closing = true;
 
 			HTTPManager.Logger.Information("SocketManager", "Closing");
@@ -349,11 +358,19 @@ namespace BestHTTP.SocketIO
 
 			// Disconnect the sockets. The Disconnect function will call the Remove function to remove it from the Sockets list.
 			if (removeSockets)
+			{
 				while (Sockets.Count > 0)
+				{
 					(Sockets[Sockets.Count - 1] as ISocket).Disconnect(removeSockets);
+				}
+			}
 			else
+			{
 				for (int i = 0; i < Sockets.Count; ++i)
+				{
 					(Sockets[i] as ISocket).Disconnect(removeSockets);
+				}
+			}
 
 			// Set to Closed after Socket's Disconnect. This way we can send the disconnect events to the server.
 			State = States.Closed;
@@ -363,20 +380,30 @@ namespace BestHTTP.SocketIO
 			lastPingReceived = DateTime.MinValue;
 
 			if (removeSockets && OfflinePackets != null)
+			{
 				OfflinePackets.Clear();
+			}
 
 			// Remove the references from the dictionary too.
 			if (removeSockets)
+			{
 				Namespaces.Clear();
+			}
 
 			Handshake = null;
 
 			if (Transport != null)
+			{
 				Transport.Close();
+			}
+
 			Transport = null;
 
 			if (UpgradingTransport != null)
+			{
 				UpgradingTransport.Close();
+			}
+
 			UpgradingTransport = null;
 
 			closing = false;
@@ -389,7 +416,9 @@ namespace BestHTTP.SocketIO
 		{
 			if (State == States.Reconnecting ||
 			    State == States.Closed)
+			{
 				return;
+			}
 
 			if (!Options.Reconnection || HTTPManager.IsQuitting)
 			{
@@ -411,8 +440,8 @@ namespace BestHTTP.SocketIO
 			int delay = (int)Options.ReconnectionDelay.TotalMilliseconds * ReconnectAttempts;
 
 			ReconnectAt = DateTime.UtcNow +
-			              TimeSpan.FromMilliseconds(Math.Min(rand.Next( /*rand min:*/(int)(delay - (delay * Options.RandomizationFactor)),
-					              /*rand max:*/(int)(delay + (delay * Options.RandomizationFactor))),
+			              TimeSpan.FromMilliseconds(Math.Min(rand.Next( /*rand min:*/(int)(delay - delay * Options.RandomizationFactor),
+					              /*rand max:*/(int)(delay + delay * Options.RandomizationFactor)),
 				              (int)Options.ReconnectionDelayMax.TotalMilliseconds));
 
 			(this as IManager).Close(false);
@@ -420,7 +449,9 @@ namespace BestHTTP.SocketIO
 			State = States.Reconnecting;
 
 			for (int i = 0; i < Sockets.Count; ++i)
+			{
 				(Sockets[i] as ISocket).Open();
+			}
 
 			// In the Close() function we unregistered
 			HTTPManager.Heartbeats.Subscribe(this);
@@ -434,25 +465,33 @@ namespace BestHTTP.SocketIO
 		bool IManager.OnTransportConnected(ITransport trans)
 		{
 			HTTPManager.Logger.Information("SocketManager",
-				string.Format("OnTransportConnected State: {0}, PreviousState: {1}, Current Transport: {2}, Upgrading Transport: {3}", this.State, this.PreviousState,
+				string.Format("OnTransportConnected State: {0}, PreviousState: {1}, Current Transport: {2}, Upgrading Transport: {3}", State, PreviousState,
 					trans.Type, UpgradingTransport != null ? UpgradingTransport.Type.ToString() : "null"));
 
 			if (State != States.Opening)
+			{
 				return false;
+			}
 
 			if (PreviousState == States.Reconnecting)
+			{
 				(this as IManager).EmitEvent("reconnect");
+			}
 
 			State = States.Open;
 
 			if (PreviousState == States.Reconnecting)
+			{
 				(this as IManager).EmitEvent("reconnect_before_offline_packets");
+			}
 
 			for (int i = 0; i < Sockets.Count; ++i)
 			{
-				var socket = Sockets[i];
+				Socket socket = Sockets[i];
 				if (socket != null)
+				{
 					socket.OnTransportOpen();
+				}
 			}
 
 			ReconnectAttempts = 0;
@@ -499,10 +538,12 @@ namespace BestHTTP.SocketIO
 		/// <summary>
 		/// Select the best transport to send out packets.
 		/// </summary>
-		private ITransport SelectTransport()
+		ITransport SelectTransport()
 		{
 			if (State != States.Open || Transport == null)
+			{
 				return null;
+			}
 
 			return Transport.IsRequestInProgress ? null : Transport;
 		}
@@ -510,7 +551,7 @@ namespace BestHTTP.SocketIO
 		/// <summary>
 		/// Will select the best transport and sends out all packets that are in the OfflinePackets list.
 		/// </summary>
-		private void SendOfflinePackets()
+		void SendOfflinePackets()
 		{
 			ITransport trans = SelectTransport();
 
@@ -550,7 +591,9 @@ namespace BestHTTP.SocketIO
 				HTTPManager.Logger.Information("SocketManager", "SendPacket - Offline stashing packet");
 
 				if (OfflinePackets == null)
+				{
 					OfflinePackets = new List<Packet>();
+				}
 
 				// The same packet can be sent through multiple Sockets.
 				OfflinePackets.Add(packet.Clone());
@@ -575,22 +618,26 @@ namespace BestHTTP.SocketIO
 					{
 						Handshake = new HandshakeData();
 						if (!Handshake.Parse(packet.Payload))
+						{
 							HTTPManager.Logger.Warning("SocketManager", "Expected handshake data, but wasn't able to parse. Payload: " + packet.Payload);
+						}
 
 						(this as IManager).OnTransportConnected(Transport);
 
 						return;
 					}
 					else
+					{
 						HTTPManager.Logger.Information("SocketManager", "OnPacket - Already received handshake data!");
+					}
 
 					break;
 
 				case TransportEventTypes.Ping:
-					if (this.Options.ServerVersion == SupportedSocketIOVersions.Unknown)
+					if (Options.ServerVersion == SupportedSocketIOVersions.Unknown)
 					{
 						HTTPManager.Logger.Information("SocketManager", "Received Ping packet from server, setting ServerVersion to v3!");
-						this.Options.ServerVersion = SupportedSocketIOVersions.v3;
+						Options.ServerVersion = SupportedSocketIOVersions.v3;
 					}
 
 					lastPingReceived = DateTime.UtcNow;
@@ -604,9 +651,13 @@ namespace BestHTTP.SocketIO
 
 			Socket socket = null;
 			if (Namespaces.TryGetValue(packet.Namespace, out socket))
+			{
 				(socket as ISocket).OnPacket(packet);
+			}
 			else
+			{
 				HTTPManager.Logger.Warning("SocketManager", "Namespace \"" + packet.Namespace + "\" not found!");
+			}
 		}
 
 		#endregion
@@ -617,7 +668,9 @@ namespace BestHTTP.SocketIO
 		public void EmitAll(string eventName, params object[] args)
 		{
 			for (int i = 0; i < Sockets.Count; ++i)
+			{
 				Sockets[i].Emit(eventName, args);
+			}
 		}
 
 		/// <summary>
@@ -627,7 +680,9 @@ namespace BestHTTP.SocketIO
 		{
 			Socket socket = null;
 			if (Namespaces.TryGetValue("/", out socket))
+			{
 				(socket as ISocket).EmitEvent(eventName, args);
+			}
 		}
 
 		/// <summary>
@@ -646,7 +701,9 @@ namespace BestHTTP.SocketIO
 		void IManager.EmitAll(string eventName, params object[] args)
 		{
 			for (int i = 0; i < Sockets.Count; ++i)
+			{
 				(Sockets[i] as ISocket).EmitEvent(eventName, args);
+			}
 		}
 
 		#region IHeartbeat Implementation
@@ -707,11 +764,15 @@ namespace BestHTTP.SocketIO
 
 					// Select transport to use
 					if (Transport != null && Transport.State == TransportStates.Open)
+					{
 						trans = Transport;
+					}
 
 					// not yet open?
 					if (trans == null || trans.State != TransportStates.Open)
+					{
 						return;
+					}
 
 					// Start to poll the server for events
 					trans.Poll();
@@ -724,7 +785,7 @@ namespace BestHTTP.SocketIO
 					{
 						LastHeartbeat = DateTime.UtcNow;
 						lastPingReceived = DateTime.UtcNow;
-						if (this.Options.ServerVersion == SupportedSocketIOVersions.Unknown)
+						if (Options.ServerVersion == SupportedSocketIOVersions.Unknown)
 						{
 							(this as IManager).SendPacket(new Packet(TransportEventTypes.Ping, SocketIOEventTypes.Unknown, "/", string.Empty));
 							IsWaitingPong = true;
@@ -733,7 +794,7 @@ namespace BestHTTP.SocketIO
 						return;
 					}
 
-					switch (this.Options.ServerVersion)
+					switch (Options.ServerVersion)
 					{
 						case SupportedSocketIOVersions.v2:
 							// It's time to send out a ping event to the server
@@ -763,10 +824,10 @@ namespace BestHTTP.SocketIO
 							break;
 
 						case SupportedSocketIOVersions.Unknown:
-							var diff = DateTime.UtcNow - LastHeartbeat;
+							TimeSpan diff = DateTime.UtcNow - LastHeartbeat;
 							if (diff > Handshake.PingTimeout)
 							{
-								this.Options.ServerVersion = IsWaitingPong ? SupportedSocketIOVersions.v3 : SupportedSocketIOVersions.v2;
+								Options.ServerVersion = IsWaitingPong ? SupportedSocketIOVersions.v3 : SupportedSocketIOVersions.v2;
 							}
 
 							break;

@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		//
 		// the values we use for key expansion (based on the digits of PI)
 		//
-		private static readonly byte[] piTable =
+		static readonly byte[] piTable =
 		{
 			(byte)0xd9, (byte)0x78, (byte)0xf9, (byte)0xc4, (byte)0x19, (byte)0xdd, (byte)0xb5, (byte)0xed,
 			(byte)0x28, (byte)0xe9, (byte)0xfd, (byte)0x79, (byte)0x4a, (byte)0xa0, (byte)0xd8, (byte)0x9d,
@@ -52,12 +52,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			(byte)0xa, (byte)0xa6, (byte)0x20, (byte)0x68, (byte)0xfe, (byte)0x7f, (byte)0xc1, (byte)0xad
 		};
 
-		private const int BLOCK_SIZE = 8;
+		const int BLOCK_SIZE = 8;
 
-		private int[] workingKey;
-		private bool encrypting;
+		int[] workingKey;
+		bool encrypting;
 
-		private int[] GenerateWorkingKey(
+		int[] GenerateWorkingKey(
 			byte[] key,
 			int bits)
 		{
@@ -101,7 +101,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			for (int i = 0; i != newKey.Length; i++)
 			{
-				newKey[i] = (xKey[2 * i] + (xKey[2 * i + 1] << 8));
+				newKey[i] = xKey[2 * i] + (xKey[2 * i + 1] << 8);
 			}
 
 			return newKey;
@@ -119,7 +119,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			bool forEncryption,
 			ICipherParameters parameters)
 		{
-			this.encrypting = forEncryption;
+			encrypting = forEncryption;
 
 			if (parameters is RC2Parameters)
 			{
@@ -136,7 +136,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 			else
 			{
-				throw new ArgumentException("invalid parameter passed to RC2 init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				throw new ArgumentException("invalid parameter passed to RC2 init - " + Platform.GetTypeName(parameters));
 			}
 		}
 
@@ -153,7 +153,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (workingKey == null)
+			{
 				throw new InvalidOperationException("RC2 engine not initialised");
+			}
 
 			Check.DataLength(input, inOff, BLOCK_SIZE, "input buffer too short");
 			Check.OutputLength(output, outOff, BLOCK_SIZE, "output buffer too short");
@@ -206,7 +208,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 		* return the result rotating the 16 bit number in x left by y
 		*/
-		private static int RotateWordLeft(int x, int y)
+		static int RotateWordLeft(int x, int y)
 		{
 			x &= 0xffff;
 			return (x << y) | (x >> (16 - y));
@@ -319,7 +321,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             output[7] = (byte)(x76 >> 8);
         }
 #else
-		private void EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		void EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			int x76, x54, x32, x10;
 
@@ -372,7 +374,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			outBytes[outOff + 7] = (byte)(x76 >> 8);
 		}
 
-		private void DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		void DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			int x76, x54, x32, x10;
 

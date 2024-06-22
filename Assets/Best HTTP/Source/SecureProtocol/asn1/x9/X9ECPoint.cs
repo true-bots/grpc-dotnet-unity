@@ -11,15 +11,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 	public class X9ECPoint
 		: Asn1Encodable
 	{
-		private readonly Asn1OctetString encoding;
+		readonly Asn1OctetString encoding;
 
-		private ECCurve c;
-		private ECPoint p;
+		ECCurve c;
+		ECPoint p;
 
 		public X9ECPoint(ECPoint p, bool compressed)
 		{
 			this.p = p.Normalize();
-			this.encoding = new DerOctetString(p.GetEncoded(compressed));
+			encoding = new DerOctetString(p.GetEncoded(compressed));
 		}
 
 		public X9ECPoint(ECCurve c, byte[] encoding)

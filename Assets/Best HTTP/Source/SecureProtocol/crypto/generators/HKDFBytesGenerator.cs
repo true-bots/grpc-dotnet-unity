@@ -17,13 +17,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public sealed class HkdfBytesGenerator
 		: IDerivationFunction
 	{
-		private HMac hMacHash;
-		private int hashLen;
+		HMac hMacHash;
+		int hashLen;
 
-		private byte[] info;
-		private byte[] currentT;
+		byte[] info;
+		byte[] currentT;
 
-		private int generatedBytes;
+		int generatedBytes;
 
 		/**
 		 * Creates a HKDFBytesGenerator based on the given hash function.
@@ -32,14 +32,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 */
 		public HkdfBytesGenerator(IDigest hash)
 		{
-			this.hMacHash = new HMac(hash);
-			this.hashLen = hash.GetDigestSize();
+			hMacHash = new HMac(hash);
+			hashLen = hash.GetDigestSize();
 		}
 
 		public void Init(IDerivationParameters parameters)
 		{
 			if (!(parameters is HkdfParameters hkdfParameters))
+			{
 				throw new ArgumentException("HKDF parameters required for HkdfBytesGenerator", "parameters");
+			}
 
 			if (hkdfParameters.SkipExtract)
 			{
@@ -64,7 +66,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * @param ikm  the input keying material
 		 * @return the PRK as KeyParameter
 		 */
-		private KeyParameter Extract(byte[] salt, byte[] ikm)
+		KeyParameter Extract(byte[] salt, byte[] ikm)
 		{
 			if (salt == null)
 			{
@@ -90,7 +92,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * @throws DataLengthException if the total number of bytes generated is larger than the one
 		 * specified by RFC 5869 (255 * HashLen)
 		 */
-		private void ExpandNext()
+		void ExpandNext()
 		{
 			int n = generatedBytes / hashLen + 1;
 			if (n >= 256)
@@ -110,7 +112,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			hMacHash.DoFinal(currentT, 0);
 		}
 
-		public IDigest Digest => hMacHash.GetUnderlyingDigest();
+		public IDigest Digest
+		{
+			get { return hMacHash.GetUnderlyingDigest(); }
+		}
 
 		public int GenerateBytes(byte[] output, int outOff, int length)
 		{
@@ -118,7 +123,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
             return GenerateBytes(output.AsSpan(outOff, length));
 #else
 			if (generatedBytes > 255 * hashLen - length)
+			{
 				throw new DataLengthException("HKDF may only be used for 255 * HashLen bytes of output");
+			}
 
 			int toGenerate = length;
 			int posInT = generatedBytes % hashLen;

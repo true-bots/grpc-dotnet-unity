@@ -15,14 +15,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 	 */
 	public class TimeStampRequestGenerator
 	{
-		private DerObjectIdentifier reqPolicy;
+		DerObjectIdentifier reqPolicy;
 
-		private DerBoolean certReq;
+		DerBoolean certReq;
 
-		private Dictionary<DerObjectIdentifier, X509Extension> m_extensions =
+		Dictionary<DerObjectIdentifier, X509Extension> m_extensions =
 			new Dictionary<DerObjectIdentifier, X509Extension>();
 
-		private List<DerObjectIdentifier> m_ordering = new List<DerObjectIdentifier>();
+		List<DerObjectIdentifier> m_ordering = new List<DerObjectIdentifier>();
 
 		public void SetReqPolicy(string reqPolicy)
 		{
@@ -40,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		 */
 		public virtual void AddExtension(DerObjectIdentifier oid, bool critical, Asn1Encodable extValue)
 		{
-			this.AddExtension(oid, critical, extValue.GetEncoded());
+			AddExtension(oid, critical, extValue.GetEncoded());
 		}
 
 		/**
@@ -62,7 +62,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		public TimeStampRequest Generate(string digestAlgorithmOid, byte[] digest, BigInteger nonce)
 		{
 			if (digestAlgorithmOid == null)
+			{
 				throw new ArgumentException("No digest algorithm specified");
+			}
 
 			DerObjectIdentifier digestAlgOid = new DerObjectIdentifier(digestAlgorithmOid);
 

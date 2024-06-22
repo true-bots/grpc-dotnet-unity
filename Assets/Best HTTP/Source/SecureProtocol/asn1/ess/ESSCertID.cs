@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 	public class EssCertID
 		: Asn1Encodable
 	{
-		private Asn1OctetString certHash;
-		private IssuerSerial issuerSerial;
+		Asn1OctetString certHash;
+		IssuerSerial issuerSerial;
 
 		public static EssCertID GetInstance(
 			object o)
@@ -27,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 
 			throw new ArgumentException(
 				"unknown object in 'EssCertID' factory : "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
+				+ Platform.GetTypeName(o) + ".");
 		}
 
 		/**
@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
 			}
 
-			this.certHash = Asn1OctetString.GetInstance(seq[0]);
+			certHash = Asn1OctetString.GetInstance(seq[0]);
 
 			if (seq.Count > 1)
 			{
@@ -59,7 +59,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 			byte[] hash,
 			IssuerSerial issuerSerial)
 		{
-			this.certHash = new DerOctetString(hash);
+			certHash = new DerOctetString(hash);
 			this.issuerSerial = issuerSerial;
 		}
 

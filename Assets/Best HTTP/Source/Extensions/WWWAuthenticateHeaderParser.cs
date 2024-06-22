@@ -16,7 +16,7 @@ namespace BestHTTP.Extensions
 			Values = ParseQuotedHeader(headerValue);
 		}
 
-		private List<HeaderValue> ParseQuotedHeader(string str)
+		List<HeaderValue> ParseQuotedHeader(string str)
 		{
 			List<HeaderValue> result = new List<HeaderValue>();
 

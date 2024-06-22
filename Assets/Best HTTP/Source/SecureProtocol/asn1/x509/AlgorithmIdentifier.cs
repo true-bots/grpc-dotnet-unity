@@ -7,8 +7,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class AlgorithmIdentifier
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier algorithm;
-		private readonly Asn1Encodable parameters;
+		readonly DerObjectIdentifier algorithm;
+		readonly Asn1Encodable parameters;
 
 		public static AlgorithmIdentifier GetInstance(
 			Asn1TaggedObject obj,
@@ -21,9 +21,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
+
 			if (obj is AlgorithmIdentifier)
+			{
 				return (AlgorithmIdentifier)obj;
+			}
+
 			return new AlgorithmIdentifier(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -45,10 +51,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			Asn1Sequence seq)
 		{
 			if (seq.Count < 1 || seq.Count > 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
+			}
 
-			this.algorithm = DerObjectIdentifier.GetInstance(seq[0]);
-			this.parameters = seq.Count < 2 ? null : seq[1];
+			algorithm = DerObjectIdentifier.GetInstance(seq[0]);
+			parameters = seq.Count < 2 ? null : seq[1];
 		}
 
 		/// <summary>

@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	/// </summary>
 	public class X509V1CertificateGenerator
 	{
-		private V1TbsCertificateGenerator tbsGen;
+		V1TbsCertificateGenerator tbsGen;
 
 		/// <summary>
 		/// Default Constructor.
@@ -119,7 +119,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		/// <returns>An <see cref="X509Certificate"/>.</returns>
 		public X509Certificate Generate(ISignatureFactory signatureFactory)
 		{
-			var sigAlgID = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
+			AlgorithmIdentifier sigAlgID = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
 
 			tbsGen.SetSignature(sigAlgID);
 
@@ -131,7 +131,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				tbsCert.EncodeTo(sigStream, Asn1Encodable.Der);
 			}
 
-			var signature = streamCalculator.GetResult().Collect();
+			byte[] signature = streamCalculator.GetResult().Collect();
 
 			return new X509Certificate(
 				new X509CertificateStructure(tbsCert, sigAlgID, new DerBitString(signature)));

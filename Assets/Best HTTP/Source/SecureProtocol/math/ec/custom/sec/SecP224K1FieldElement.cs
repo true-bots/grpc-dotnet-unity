@@ -8,14 +8,14 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP224K1FieldElement
+	class SecP224K1FieldElement
 		: AbstractFpFieldElement
 	{
 		public static readonly BigInteger Q = new BigInteger(1,
 			Hex.DecodeStrict("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFE56D"));
 
 		// Calculated as BigInteger.Two.ModPow(Q.ShiftRight(2), Q)
-		private static readonly uint[] PRECOMP_POW2 = new uint[]
+		static readonly uint[] PRECOMP_POW2 = new uint[]
 		{
 			0x33bfd202, 0xdcfad133, 0x2287624a, 0xc3811ba8,
 			0xa85558fc, 0x1eaef5d7, 0x8edf154c
@@ -26,14 +26,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public SecP224K1FieldElement(BigInteger x)
 		{
 			if (x == null || x.SignValue < 0 || x.CompareTo(Q) >= 0)
+			{
 				throw new ArgumentException("value invalid for SecP224K1FieldElement", "x");
+			}
 
 			this.x = SecP224K1Field.FromBigInteger(x);
 		}
 
 		public SecP224K1FieldElement()
 		{
-			this.x = Nat224.Create();
+			x = Nat224.Create();
 		}
 
 		protected internal SecP224K1FieldElement(uint[] x)
@@ -147,9 +149,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			 * We use: [1], 2, [3], 4, 8, 11, [19], 23, 42, 84, 107, [191]
 			 */
 
-			uint[] x1 = this.x;
+			uint[] x1 = x;
 			if (Nat224.IsZero(x1) || Nat224.IsOne(x1))
+			{
 				return this;
+			}
 
 			uint[] x2 = Nat224.Create();
 			SecP224K1Field.Square(x1, x2);
@@ -233,9 +237,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public virtual bool Equals(SecP224K1FieldElement other)
 		{
 			if (this == other)
+			{
 				return true;
+			}
+
 			if (null == other)
+			{
 				return false;
+			}
+
 			return Nat224.Eq(x, other.x);
 		}
 

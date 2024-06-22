@@ -13,10 +13,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class Dstu7564Mac
 		: IMac
 	{
-		private Dstu7564Digest engine;
-		private int macSize;
+		Dstu7564Digest engine;
+		int macSize;
 
-		private ulong inputLength;
+		ulong inputLength;
 
 		byte[] paddedKey;
 		byte[] invertedKey;
@@ -65,7 +65,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			Check.DataLength(input, inOff, len, "input buffer too short");
 
 			if (paddedKey == null)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
 
 			engine.BlockUpdate(input, inOff, len);
 			inputLength += (ulong)len;
@@ -91,7 +93,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public int DoFinal(byte[] output, int outOff)
 		{
 			if (paddedKey == null)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
 
 			Check.OutputLength(output, outOff, macSize, "output buffer too short");
 
@@ -132,7 +136,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			}
 		}
 
-		private void Pad()
+		void Pad()
 		{
 			int extra = engine.GetByteLength() - (int)(inputLength % (ulong)engine.GetByteLength());
 			if (extra < 13) // terminator byte + 96 bits of length
@@ -150,9 +154,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			engine.BlockUpdate(padded, 0, padded.Length);
 		}
 
-		private byte[] PadKey(byte[] input)
+		byte[] PadKey(byte[] input)
 		{
-			int paddedLen = ((input.Length + engine.GetByteLength() - 1) / engine.GetByteLength()) * engine.GetByteLength();
+			int paddedLen = (input.Length + engine.GetByteLength() - 1) / engine.GetByteLength() * engine.GetByteLength();
 
 			int extra = engine.GetByteLength() - (int)(input.Length % engine.GetByteLength());
 			if (extra < 13) // terminator byte + 96 bits of length

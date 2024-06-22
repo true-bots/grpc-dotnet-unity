@@ -13,7 +13,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 			foreach (string candidate in candidates)
 			{
 				if (s == candidate)
+				{
 					return true;
+				}
 			}
 
 			return false;

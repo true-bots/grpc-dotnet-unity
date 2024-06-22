@@ -18,17 +18,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class CcmBlockCipher
 		: IAeadBlockCipher
 	{
-		private static readonly int BlockSize = 16;
+		static readonly int BlockSize = 16;
 
-		private readonly IBlockCipher cipher;
-		private readonly byte[] macBlock;
-		private bool forEncryption;
-		private byte[] nonce;
-		private byte[] initialAssociatedText;
-		private int macSize;
-		private ICipherParameters keyParam;
-		private readonly MemoryStream associatedText = new MemoryStream();
-		private readonly MemoryStream data = new MemoryStream();
+		readonly IBlockCipher cipher;
+		readonly byte[] macBlock;
+		bool forEncryption;
+		byte[] nonce;
+		byte[] initialAssociatedText;
+		int macSize;
+		ICipherParameters keyParam;
+		readonly MemoryStream associatedText = new MemoryStream();
+		readonly MemoryStream data = new MemoryStream();
 
 		/**
 		* Basic constructor.
@@ -39,10 +39,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			IBlockCipher cipher)
 		{
 			this.cipher = cipher;
-			this.macBlock = new byte[BlockSize];
+			macBlock = new byte[BlockSize];
 
 			if (cipher.GetBlockSize() != BlockSize)
+			{
 				throw new ArgumentException("cipher required with a block size of " + BlockSize + ".");
+			}
 		}
 
 		/**
@@ -50,7 +52,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		*
 		* @return the underlying block cipher that we are wrapping.
 		*/
-		public virtual IBlockCipher UnderlyingCipher => cipher;
+		public virtual IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
@@ -83,12 +88,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			}
 
 			if (nonce == null || nonce.Length < 7 || nonce.Length > 13)
+			{
 				throw new ArgumentException("nonce must have length from 7 to 13 octets");
+			}
 
 			Reset();
 		}
 
-		public virtual string AlgorithmName => cipher.AlgorithmName + "/CCM";
+		public virtual string AlgorithmName
+		{
+			get { return cipher.AlgorithmName + "/CCM"; }
+		}
 
 		public virtual int GetBlockSize()
 		{
@@ -233,7 +243,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			else
 			{
 				if (inLen < macSize)
+				{
 					throw new InvalidCipherTextException("data too short");
+				}
 
 				output = new byte[inLen - macSize];
 			}
@@ -261,7 +273,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			// TODO: handle null keyParam (e.g. via RepeatedKeySpec)
 			// Need to keep the CTR and CBC Mac parts around and reset
 			if (keyParam == null)
+			{
 				throw new InvalidOperationException("CCM cipher unitialized.");
+			}
 
 			int n = nonce.Length;
 			int q = 15 - n;
@@ -269,7 +283,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			{
 				int limitLen = 1 << (8 * q);
 				if (inLen >= limitLen)
+				{
 					throw new InvalidOperationException("CCM packet too large for choice of q.");
+				}
 			}
 
 			byte[] iv = new byte[BlockSize];
@@ -293,7 +309,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				byte[] encMac = new byte[BlockSize];
 				ctrCipher.ProcessBlock(macBlock, 0, encMac, 0); // S0
 
-				while (inIndex < (inOff + inLen - BlockSize)) // S1...
+				while (inIndex < inOff + inLen - BlockSize) // S1...
 				{
 					ctrCipher.ProcessBlock(input, inIndex, output, outIndex);
 					outIndex += BlockSize;
@@ -313,7 +329,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			else
 			{
 				if (inLen < macSize)
+				{
 					throw new InvalidCipherTextException("data too short");
+				}
 
 				outputLen = inLen - macSize;
 				Check.OutputLength(output, outOff, outputLen, "Output buffer too short.");
@@ -327,7 +345,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 					macBlock[i] = 0;
 				}
 
-				while (inIndex < (inOff + outputLen - BlockSize))
+				while (inIndex < inOff + outputLen - BlockSize)
 				{
 					ctrCipher.ProcessBlock(input, inIndex, output, outIndex);
 					outIndex += BlockSize;
@@ -347,7 +365,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				CalculateMac(output, outOff, outputLen, calculatedMacBlock);
 
 				if (!Arrays.ConstantTimeAreEqual(macBlock, calculatedMacBlock))
+				{
 					throw new InvalidCipherTextException("mac check in CCM failed");
+				}
 			}
 
 			return outputLen;
@@ -448,7 +468,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         }
 #endif
 
-		private int CalculateMac(byte[] data, int dataOff, int dataLen, byte[] macBlock)
+		int CalculateMac(byte[] data, int dataOff, int dataLen, byte[] macBlock)
 		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             return CalculateMac(data.AsSpan(dataOff, dataLen), macBlock);
@@ -469,7 +489,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 
 			b0[0] |= (byte)((((cMac.GetMacSize() - 2) / 2) & 0x7) << 3);
 
-			b0[0] |= (byte)(((15 - nonce.Length) - 1) & 0x7);
+			b0[0] |= (byte)((15 - nonce.Length - 1) & 0x7);
 
 			Array.Copy(nonce, 0, b0, 1, nonce.Length);
 
@@ -492,7 +512,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				int extra;
 
 				int textLength = GetAssociatedTextLength();
-				if (textLength < ((1 << 16) - (1 << 8)))
+				if (textLength < (1 << 16) - (1 << 8))
 				{
 					cMac.Update((byte)(textLength >> 8));
 					cMac.Update((byte)textLength);
@@ -635,21 +655,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         }
 #endif
 
-		private int GetMacSize(bool forEncryption, int requestedMacBits)
+		int GetMacSize(bool forEncryption, int requestedMacBits)
 		{
 			if (forEncryption && (requestedMacBits < 32 || requestedMacBits > 128 || 0 != (requestedMacBits & 15)))
+			{
 				throw new ArgumentException("tag length in octets must be one of {4,6,8,10,12,14,16}");
+			}
 
 			return requestedMacBits >> 3;
 		}
 
-		private int GetAssociatedTextLength()
+		int GetAssociatedTextLength()
 		{
 			return Convert.ToInt32(associatedText.Length) +
 			       (initialAssociatedText == null ? 0 : initialAssociatedText.Length);
 		}
 
-		private bool HasAssociatedText()
+		bool HasAssociatedText()
 		{
 			return GetAssociatedTextLength() > 0;
 		}

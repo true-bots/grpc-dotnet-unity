@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	{
 		internal static readonly DHKeyGeneratorHelper Instance = new DHKeyGeneratorHelper();
 
-		private DHKeyGeneratorHelper()
+		DHKeyGeneratorHelper()
 		{
 		}
 

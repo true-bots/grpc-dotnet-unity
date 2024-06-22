@@ -8,12 +8,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	/// <remarks>Generator for X.509 extensions</remarks>
 	public class X509ExtensionsGenerator
 	{
-		private Dictionary<DerObjectIdentifier, X509Extension> m_extensions =
+		Dictionary<DerObjectIdentifier, X509Extension> m_extensions =
 			new Dictionary<DerObjectIdentifier, X509Extension>();
 
-		private List<DerObjectIdentifier> m_ordering = new List<DerObjectIdentifier>();
+		List<DerObjectIdentifier> m_ordering = new List<DerObjectIdentifier>();
 
-		private static readonly ISet<DerObjectIdentifier> m_dupsAllowed = new HashSet<DerObjectIdentifier>()
+		static readonly ISet<DerObjectIdentifier> m_dupsAllowed = new HashSet<DerObjectIdentifier>()
 		{
 			X509Extensions.SubjectAlternativeName,
 			X509Extensions.IssuerAlternativeName,
@@ -47,7 +47,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				throw new ArgumentException("error encoding value: " + e);
 			}
 
-			this.AddExtension(oid, critical, encoded);
+			AddExtension(oid, critical, encoded);
 		}
 
 		/// <summary>
@@ -62,7 +62,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			if (m_extensions.TryGetValue(oid, out X509Extension existingExtension))
 			{
 				if (!m_dupsAllowed.Contains(oid))
+				{
 					throw new ArgumentException("extension " + oid + " already added");
+				}
 
 				Asn1Sequence seq1 = Asn1Sequence.GetInstance(
 					Asn1OctetString.GetInstance(existingExtension.Value).GetOctets());
@@ -111,7 +113,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		internal void AddExtension(DerObjectIdentifier oid, X509Extension x509Extension)
 		{
 			if (m_extensions.ContainsKey(oid))
+			{
 				throw new ArgumentException("extension " + oid + " already added");
+			}
 
 			m_ordering.Add(oid);
 			m_extensions.Add(oid, x509Extension);

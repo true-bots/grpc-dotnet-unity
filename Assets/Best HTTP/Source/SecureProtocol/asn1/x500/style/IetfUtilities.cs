@@ -134,7 +134,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500.Style
 			return Canonicalize(ValueToString(value));
 		}
 
-		private static Asn1Object DecodeObject(string oValue)
+		static Asn1Object DecodeObject(string oValue)
 		{
 			try
 			{
@@ -149,7 +149,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500.Style
 		public static string StripInternalSpaces(string str)
 		{
 			if (str.IndexOf("  ") < 0)
+			{
 				return str;
+			}
 
 			StringBuilder res = new StringBuilder();
 
@@ -172,41 +174,56 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X500.Style
 		public static bool RdnAreEqual(Rdn rdn1, Rdn rdn2)
 		{
 			if (rdn1.Count != rdn2.Count)
+			{
 				return false;
+			}
 
 			AttributeTypeAndValue[] atvs1 = rdn1.GetTypesAndValues();
 			AttributeTypeAndValue[] atvs2 = rdn2.GetTypesAndValues();
 
 			if (atvs1.Length != atvs2.Length)
+			{
 				return false;
+			}
 
 			for (int i = 0; i != atvs1.Length; i++)
 			{
 				if (!AtvAreEqual(atvs1[i], atvs2[i]))
+				{
 					return false;
+				}
 			}
 
 			return true;
 		}
 
-		private static bool AtvAreEqual(AttributeTypeAndValue atv1, AttributeTypeAndValue atv2)
+		static bool AtvAreEqual(AttributeTypeAndValue atv1, AttributeTypeAndValue atv2)
 		{
 			if (atv1 == atv2)
+			{
 				return true;
+			}
+
 			if (null == atv1 || null == atv2)
+			{
 				return false;
+			}
 
 			DerObjectIdentifier o1 = atv1.Type;
 			DerObjectIdentifier o2 = atv2.Type;
 
 			if (!o1.Equals(o2))
+			{
 				return false;
+			}
 
 			string v1 = CanonicalString(atv1.Value);
 			string v2 = CanonicalString(atv2.Value);
 
 			if (!v1.Equals(v2))
+			{
 				return false;
+			}
 
 			return true;
 		}

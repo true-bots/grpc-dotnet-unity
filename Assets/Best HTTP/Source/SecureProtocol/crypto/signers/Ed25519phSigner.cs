@@ -11,12 +11,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class Ed25519phSigner
 		: ISigner
 	{
-		private readonly IDigest prehash = Ed25519.CreatePrehash();
-		private readonly byte[] context;
+		readonly IDigest prehash = Ed25519.CreatePrehash();
+		readonly byte[] context;
 
-		private bool forSigning;
-		private Ed25519PrivateKeyParameters privateKey;
-		private Ed25519PublicKeyParameters publicKey;
+		bool forSigning;
+		Ed25519PrivateKeyParameters privateKey;
+		Ed25519PublicKeyParameters publicKey;
 
 		public Ed25519phSigner(byte[] context)
 		{
@@ -34,13 +34,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 			if (forSigning)
 			{
-				this.privateKey = (Ed25519PrivateKeyParameters)parameters;
-				this.publicKey = null;
+				privateKey = (Ed25519PrivateKeyParameters)parameters;
+				publicKey = null;
 			}
 			else
 			{
-				this.privateKey = null;
-				this.publicKey = (Ed25519PublicKeyParameters)parameters;
+				privateKey = null;
+				publicKey = (Ed25519PublicKeyParameters)parameters;
 			}
 
 			Reset();
@@ -66,11 +66,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual byte[] GenerateSignature()
 		{
 			if (!forSigning || null == privateKey)
+			{
 				throw new InvalidOperationException("Ed25519phSigner not initialised for signature generation.");
+			}
 
 			byte[] msg = new byte[Ed25519.PrehashSize];
 			if (Ed25519.PrehashSize != prehash.DoFinal(msg, 0))
+			{
 				throw new InvalidOperationException("Prehash digest failed");
+			}
 
 			byte[] signature = new byte[Ed25519PrivateKeyParameters.SignatureSize];
 			privateKey.Sign(Ed25519.Algorithm.Ed25519ph, context, msg, 0, Ed25519.PrehashSize, signature, 0);
@@ -80,7 +84,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual bool VerifySignature(byte[] signature)
 		{
 			if (forSigning || null == publicKey)
+			{
 				throw new InvalidOperationException("Ed25519phSigner not initialised for verification");
+			}
+
 			if (Ed25519.SignatureSize != signature.Length)
 			{
 				prehash.Reset();

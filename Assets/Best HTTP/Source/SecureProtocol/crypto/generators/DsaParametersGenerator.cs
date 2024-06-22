@@ -15,12 +15,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	 */
 	public class DsaParametersGenerator
 	{
-		private IDigest digest;
-		private int L, N;
-		private int certainty;
-		private SecureRandom random;
-		private bool use186_3;
-		private int usageIndex;
+		IDigest digest;
+		int L, N;
+		int certainty;
+		SecureRandom random;
+		bool use186_3;
+		int usageIndex;
 
 		public DsaParametersGenerator()
 			: this(new Sha1Digest())
@@ -43,11 +43,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			SecureRandom random)
 		{
 			if (!IsValidDsaStrength(size))
+			{
 				throw new ArgumentException("size must be from 512 - 1024 and a multiple of 64", "size");
+			}
 
-			this.use186_3 = false;
-			this.L = size;
-			this.N = GetDefaultN(size);
+			use186_3 = false;
+			L = size;
+			N = GetDefaultN(size);
 			this.certainty = certainty;
 			this.random = random;
 		}
@@ -58,24 +60,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		public virtual void Init(DsaParameterGenerationParameters parameters)
 		{
 			// TODO Should we enforce the minimum 'certainty' values as per C.3 Table C.1?
-			this.use186_3 = true;
-			this.L = parameters.L;
-			this.N = parameters.N;
-			this.certainty = parameters.Certainty;
-			this.random = parameters.Random;
-			this.usageIndex = parameters.UsageIndex;
+			use186_3 = true;
+			L = parameters.L;
+			N = parameters.N;
+			certainty = parameters.Certainty;
+			random = parameters.Random;
+			usageIndex = parameters.UsageIndex;
 
-			if ((L < 1024 || L > 3072) || L % 1024 != 0)
+			if (L < 1024 || L > 3072 || L % 1024 != 0)
+			{
 				throw new ArgumentException("Values must be between 1024 and 3072 and a multiple of 1024", "L");
+			}
+
 			if (L == 1024 && N != 160)
+			{
 				throw new ArgumentException("N must be 160 for L = 1024");
-			if (L == 2048 && (N != 224 && N != 256))
+			}
+
+			if (L == 2048 && N != 224 && N != 256)
+			{
 				throw new ArgumentException("N must be 224 or 256 for L = 2048");
+			}
+
 			if (L == 3072 && N != 256)
+			{
 				throw new ArgumentException("N must be 256 for L = 3072");
+			}
 
 			if (digest.GetDigestSize() * 8 < N)
+			{
 				throw new InvalidOperationException("Digest output size too small for value of N");
+			}
 		}
 
 		/// <summary>Generates a set of <c>DsaParameters</c></summary>
@@ -97,7 +112,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			byte[] w = new byte[L / 8];
 
 			if (!(digest is Sha1Digest))
+			{
 				throw new InvalidOperationException("can only use SHA-1 for generating FIPS 186-2 parameters");
+			}
 
 			for (;;)
 			{
@@ -119,7 +136,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				BigInteger q = new BigInteger(1, u);
 
 				if (!q.IsProbablePrime(certainty))
+				{
 					continue;
+				}
 
 				byte[] offset = Arrays.Clone(seed);
 				Inc(offset);
@@ -135,7 +154,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 					Inc(offset);
 					Hash(digest, offset, part1);
-					Array.Copy(part1, part1.Length - ((w.Length - (n) * part1.Length)), w, 0, w.Length - n * part1.Length);
+					Array.Copy(part1, part1.Length - (w.Length - n * part1.Length), w, 0, w.Length - n * part1.Length);
 
 					w[0] |= (byte)0x80;
 
@@ -146,7 +165,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 					BigInteger p = x.Subtract(c.Subtract(BigInteger.One));
 
 					if (p.BitLength != L)
+					{
 						continue;
+					}
 
 					if (p.IsProbablePrime(certainty))
 					{
@@ -169,7 +190,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				BigInteger g = h.ModPow(e, p);
 
 				if (g.BitLength > 1)
+				{
 					return g;
+				}
 			}
 		}
 
@@ -257,9 +280,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 					// 11.6 If (p < 2^(L - 1)), then go to step 11.9
 					if (p.BitLength != L)
+					{
 						continue;
+					}
 
-// 11.7 Test whether or not p is prime as specified in Appendix C.3.
+					// 11.7 Test whether or not p is prime as specified in Appendix C.3.
 					// TODO Review C.3 for primality checking
 					if (p.IsProbablePrime(certainty))
 					{
@@ -271,7 +296,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 						{
 							BigInteger g = CalculateGenerator_FIPS186_3_Verifiable(d, p, q, seed, usageIndex);
 							if (g != null)
+							{
 								return new DsaParameters(p, q, g, new DsaValidationParameters(seed, counter, usageIndex));
+							}
 						}
 
 						{
@@ -310,7 +337,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			U[U.Length - 3] = (byte)index;
 
 			byte[] w = new byte[d.GetDigestSize()];
-			for (int count = 1; count < (1 << 16); ++count)
+			for (int count = 1; count < 1 << 16; ++count)
 			{
 				Inc(U);
 				Hash(d, U, w);
@@ -318,13 +345,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				BigInteger g = W.ModPow(e, p);
 
 				if (g.CompareTo(BigInteger.Two) >= 0)
+				{
 					return g;
+				}
 			}
 
 			return null;
 		}
 
-		private static bool IsValidDsaStrength(
+		static bool IsValidDsaStrength(
 			int strength)
 		{
 			return strength >= 512 && strength <= 1024 && strength % 64 == 0;
@@ -336,7 +365,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			d.DoFinal(output, 0);
 		}
 
-		private static int GetDefaultN(int L)
+		static int GetDefaultN(int L)
 		{
 			return L > 1024 ? 256 : 160;
 		}
@@ -349,7 +378,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				buf[i] = b;
 
 				if (b != 0)
+				{
 					break;
+				}
 			}
 		}
 	}

@@ -14,8 +14,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class Gost3410Signer
 		: IDsa
 	{
-		private Gost3410KeyParameters key;
-		private SecureRandom random;
+		Gost3410KeyParameters key;
+		SecureRandom random;
 
 		public virtual string AlgorithmName
 		{
@@ -28,25 +28,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			{
 				if (parameters is ParametersWithRandom rParam)
 				{
-					this.random = rParam.Random;
+					random = rParam.Random;
 					parameters = rParam.Parameters;
 				}
 				else
 				{
-					this.random = CryptoServicesRegistrar.GetSecureRandom();
+					random = CryptoServicesRegistrar.GetSecureRandom();
 				}
 
 				if (!(parameters is Gost3410PrivateKeyParameters))
+				{
 					throw new InvalidKeyException("GOST3410 private key required for signing");
+				}
 
-				this.key = (Gost3410PrivateKeyParameters)parameters;
+				key = (Gost3410PrivateKeyParameters)parameters;
 			}
 			else
 			{
 				if (!(parameters is Gost3410PublicKeyParameters))
+				{
 					throw new InvalidKeyException("GOST3410 public key required for signing");
+				}
 
-				this.key = (Gost3410PublicKeyParameters)parameters;
+				key = (Gost3410PublicKeyParameters)parameters;
 			}
 		}
 
@@ -109,7 +113,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			BigInteger v = m.ModPow(parameters.Q.Subtract(BigInteger.Two), parameters.Q);
 
 			BigInteger z1 = s.Multiply(v).Mod(parameters.Q);
-			BigInteger z2 = (parameters.Q.Subtract(r)).Multiply(v).Mod(parameters.Q);
+			BigInteger z2 = parameters.Q.Subtract(r).Multiply(v).Mod(parameters.Q);
 
 			z1 = parameters.A.ModPow(z1, parameters.P);
 			z2 = ((Gost3410PublicKeyParameters)key).Y.ModPow(z2, parameters.P);

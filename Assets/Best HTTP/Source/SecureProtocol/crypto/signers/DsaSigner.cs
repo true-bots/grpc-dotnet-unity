@@ -25,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		 */
 		public DsaSigner()
 		{
-			this.kCalculator = new RandomDsaKCalculator();
+			kCalculator = new RandomDsaKCalculator();
 		}
 
 		/**
@@ -58,19 +58,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				}
 
 				if (!(parameters is DsaPrivateKeyParameters))
+				{
 					throw new InvalidKeyException("DSA private key required for signing");
+				}
 
-				this.key = (DsaPrivateKeyParameters)parameters;
+				key = (DsaPrivateKeyParameters)parameters;
 			}
 			else
 			{
 				if (!(parameters is DsaPublicKeyParameters))
+				{
 					throw new InvalidKeyException("DSA public key required for verification");
+				}
 
-				this.key = (DsaPublicKeyParameters)parameters;
+				key = (DsaPublicKeyParameters)parameters;
 			}
 
-			this.random = InitSecureRandom(forSigning && !kCalculator.IsDeterministic, providedRandom);
+			random = InitSecureRandom(forSigning && !kCalculator.IsDeterministic, providedRandom);
 		}
 
 		public virtual BigInteger Order

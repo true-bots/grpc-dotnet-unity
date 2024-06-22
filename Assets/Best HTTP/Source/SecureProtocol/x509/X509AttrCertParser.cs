@@ -13,13 +13,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 {
 	public class X509AttrCertParser
 	{
-		private static readonly PemParser PemAttrCertParser = new PemParser("ATTRIBUTE CERTIFICATE");
+		static readonly PemParser PemAttrCertParser = new PemParser("ATTRIBUTE CERTIFICATE");
 
-		private Asn1Set sData;
-		private int sDataObjectCount;
-		private Stream currentStream;
+		Asn1Set sData;
+		int sDataObjectCount;
+		Stream currentStream;
 
-		private X509V2AttributeCertificate ReadDerCertificate(
+		X509V2AttributeCertificate ReadDerCertificate(
 			Asn1InputStream dIn)
 		{
 			Asn1Sequence seq = (Asn1Sequence)dIn.ReadObject();
@@ -38,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			return new X509V2AttributeCertificate(AttributeCertificate.GetInstance(seq));
 		}
 
-		private X509V2AttributeCertificate GetCertificate()
+		X509V2AttributeCertificate GetCertificate()
 		{
 			if (sData != null)
 			{
@@ -57,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			return null;
 		}
 
-		private X509V2AttributeCertificate ReadPemCertificate(
+		X509V2AttributeCertificate ReadPemCertificate(
 			Stream inStream)
 		{
 			Asn1Sequence seq = PemAttrCertParser.ReadPemObject(inStream);
@@ -93,9 +93,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			Stream inStream)
 		{
 			if (inStream == null)
+			{
 				throw new ArgumentNullException("inStream");
+			}
+
 			if (!inStream.CanRead)
+			{
 				throw new ArgumentException("inStream must be read-able", "inStream");
+			}
 
 			if (currentStream == null)
 			{
@@ -126,7 +131,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 				int tag = inStream.ReadByte();
 				if (tag < 0)
+				{
 					return null;
+				}
 
 				if (inStream.CanSeek)
 				{
@@ -158,7 +165,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		 */
 		public IList<X509V2AttributeCertificate> ReadAttrCerts(Stream inStream)
 		{
-			var attrCerts = new List<X509V2AttributeCertificate>();
+			List<X509V2AttributeCertificate> attrCerts = new List<X509V2AttributeCertificate>();
 
 			X509V2AttributeCertificate attrCert;
 			while ((attrCert = ReadAttrCert(inStream)) != null)

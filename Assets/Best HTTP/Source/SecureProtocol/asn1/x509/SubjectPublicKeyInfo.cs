@@ -14,8 +14,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class SubjectPublicKeyInfo
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier algID;
-		private readonly DerBitString keyData;
+		readonly AlgorithmIdentifier algID;
+		readonly DerBitString keyData;
 
 		public static SubjectPublicKeyInfo GetInstance(
 			Asn1TaggedObject obj,
@@ -28,10 +28,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj is SubjectPublicKeyInfo)
+			{
 				return (SubjectPublicKeyInfo)obj;
+			}
 
 			if (obj != null)
+			{
 				return new SubjectPublicKeyInfo(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
@@ -40,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			AlgorithmIdentifier algID,
 			Asn1Encodable publicKey)
 		{
-			this.keyData = new DerBitString(publicKey);
+			keyData = new DerBitString(publicKey);
 			this.algID = algID;
 		}
 
@@ -48,18 +52,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			AlgorithmIdentifier algID,
 			byte[] publicKey)
 		{
-			this.keyData = new DerBitString(publicKey);
+			keyData = new DerBitString(publicKey);
 			this.algID = algID;
 		}
 
-		private SubjectPublicKeyInfo(
+		SubjectPublicKeyInfo(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
-			this.algID = AlgorithmIdentifier.GetInstance(seq[0]);
-			this.keyData = DerBitString.GetInstance(seq[1]);
+			algID = AlgorithmIdentifier.GetInstance(seq[0]);
+			keyData = DerBitString.GetInstance(seq[1]);
 		}
 
 		public AlgorithmIdentifier AlgorithmID

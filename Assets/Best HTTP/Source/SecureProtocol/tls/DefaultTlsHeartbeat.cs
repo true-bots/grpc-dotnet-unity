@@ -8,16 +8,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class DefaultTlsHeartbeat
 		: TlsHeartbeat
 	{
-		private readonly int idleMillis, timeoutMillis;
+		readonly int idleMillis, timeoutMillis;
 
-		private uint counter = 0U;
+		uint counter = 0U;
 
 		public DefaultTlsHeartbeat(int idleMillis, int timeoutMillis)
 		{
 			if (idleMillis <= 0)
+			{
 				throw new ArgumentException("must be > 0", "idleMillis");
+			}
+
 			if (timeoutMillis <= 0)
+			{
 				throw new ArgumentException("must be > 0", "timeoutMillis");
+			}
 
 			this.idleMillis = idleMillis;
 			this.timeoutMillis = timeoutMillis;

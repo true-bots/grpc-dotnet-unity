@@ -55,7 +55,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static int From(SignatureAndHashAlgorithm sigAndHashAlg)
 		{
 			if (null == sigAndHashAlg)
+			{
 				throw new ArgumentNullException();
+			}
 
 			return From(sigAndHashAlg.Hash, sigAndHashAlg.Signature);
 		}
@@ -90,7 +92,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				{
 					short hashAlgorithm = GetHashAlgorithm(signatureScheme);
 					if (HashAlgorithm.Intrinsic == hashAlgorithm || !HashAlgorithm.IsRecognized(hashAlgorithm))
+					{
 						return -1;
+					}
 
 					return TlsCryptoUtilities.GetHash(hashAlgorithm);
 				}
@@ -205,7 +209,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public static bool IsPrivate(int signatureScheme)
 		{
-			return (signatureScheme >> 9) == 0xFE;
+			return signatureScheme >> 9 == 0xFE;
 		}
 
 		public static bool IsECDsa(int signatureScheme)

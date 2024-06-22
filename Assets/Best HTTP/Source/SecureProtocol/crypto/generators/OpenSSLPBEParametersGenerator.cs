@@ -15,7 +15,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class OpenSslPbeParametersGenerator
 		: PbeParametersGenerator
 	{
-		private readonly IDigest digest;
+		readonly IDigest digest;
 
 		///
 		/// <description>
@@ -62,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		/**
 		 * the derived key function, the ith hash of the password and the salt.
 		 */
-		private byte[] GenerateDerivedKey(
+		byte[] GenerateDerivedKey(
 			int bytesNeeded)
 		{
 			byte[] buf = new byte[digest.GetDigestSize()];
@@ -76,7 +76,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 				digest.DoFinal(buf, 0);
 
-				int len = (bytesNeeded > buf.Length) ? buf.Length : bytesNeeded;
+				int len = bytesNeeded > buf.Length ? buf.Length : bytesNeeded;
 				Array.Copy(buf, 0, key, offset, len);
 				offset += len;
 

@@ -12,7 +12,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(key)
 		{
 			if (IsWeakKey(key))
+			{
 				throw new ArgumentException("attempt to create weak DES key");
+			}
 		}
 
 		public DesParameters(
@@ -22,7 +24,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(key, keyOff, keyLen)
 		{
 			if (IsWeakKey(key, keyOff))
+			{
 				throw new ArgumentException("attempt to create weak DES key");
+			}
 		}
 
 		/*
@@ -33,9 +37,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		/*
 		 * Table of weak and semi-weak keys taken from Schneier pp281
 		 */
-		private const int N_DES_WEAK_KEYS = 16;
+		const int N_DES_WEAK_KEYS = 16;
 
-		private static readonly byte[] DES_weak_keys =
+		static readonly byte[] DES_weak_keys =
 		{
 			/* weak keys */
 			(byte)0x01, (byte)0x01, (byte)0x01, (byte)0x01, (byte)0x01, (byte)0x01, (byte)0x01, (byte)0x01,
@@ -74,7 +78,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			int offset)
 		{
 			if (key.Length - offset < DesKeyLength)
+			{
 				throw new ArgumentException("key material too short.");
+			}
 
 			//nextkey:
 			for (int i = 0; i < N_DES_WEAK_KEYS; i++)
@@ -108,9 +114,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		public static byte SetOddParity(byte b)
 		{
 			uint parity = b ^ 1U;
-			parity ^= (parity >> 4);
-			parity ^= (parity >> 2);
-			parity ^= (parity >> 1);
+			parity ^= parity >> 4;
+			parity ^= parity >> 2;
+			parity ^= parity >> 1;
 			parity &= 1U;
 
 			return (byte)(b ^ parity);

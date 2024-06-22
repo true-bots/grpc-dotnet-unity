@@ -13,11 +13,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	{
 		internal static readonly Asn1Encodable[] EmptyElements = new Asn1Encodable[0];
 
-		private const int DefaultCapacity = 10;
+		const int DefaultCapacity = 10;
 
-		private Asn1Encodable[] elements;
-		private int elementCount;
-		private bool copyOnWrite;
+		Asn1Encodable[] elements;
+		int elementCount;
+		bool copyOnWrite;
 
 		public static Asn1EncodableVector FromEnumerable(IEnumerable<Asn1Encodable> e)
 		{
@@ -38,11 +38,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public Asn1EncodableVector(int initialCapacity)
 		{
 			if (initialCapacity < 0)
+			{
 				throw new ArgumentException("must not be negative", "initialCapacity");
+			}
 
-			this.elements = (initialCapacity == 0) ? EmptyElements : new Asn1Encodable[initialCapacity];
-			this.elementCount = 0;
-			this.copyOnWrite = false;
+			elements = initialCapacity == 0 ? EmptyElements : new Asn1Encodable[initialCapacity];
+			elementCount = 0;
+			copyOnWrite = false;
 		}
 
 		public Asn1EncodableVector(Asn1Encodable element)
@@ -67,7 +69,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public void Add(Asn1Encodable element)
 		{
 			if (null == element)
+			{
 				throw new ArgumentNullException("element");
+			}
 
 			int capacity = elements.Length;
 			int minCapacity = elementCount + 1;
@@ -76,8 +80,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				Reallocate(minCapacity);
 			}
 
-			this.elements[elementCount] = element;
-			this.elementCount = minCapacity;
+			elements[elementCount] = element;
+			elementCount = minCapacity;
 		}
 
 		public void Add(Asn1Encodable element1, Asn1Encodable element2)
@@ -119,7 +123,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			if (elements != null)
 			{
-				foreach (var element in elements)
+				foreach (Asn1Encodable element in elements)
 				{
 					if (element != null)
 					{
@@ -148,11 +152,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public void AddAll(Asn1EncodableVector other)
 		{
 			if (null == other)
+			{
 				throw new ArgumentNullException("other");
+			}
 
 			int otherElementCount = other.Count;
 			if (otherElementCount < 1)
+			{
 				return;
+			}
 
 			int capacity = elements.Length;
 			int minCapacity = elementCount + otherElementCount;
@@ -166,12 +174,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				Asn1Encodable otherElement = other[i];
 				if (null == otherElement)
+				{
 					throw new NullReferenceException("'other' elements cannot be null");
+				}
 
-				this.elements[elementCount + i] = otherElement;
+				elements[elementCount + i] = otherElement;
 			} while (++i < otherElementCount);
 
-			this.elementCount = minCapacity;
+			elementCount = minCapacity;
 		}
 
 		public Asn1Encodable this[int index]
@@ -179,7 +189,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			get
 			{
 				if (index >= elementCount)
+				{
 					throw new IndexOutOfRangeException(index + " >= " + elementCount);
+				}
 
 				return elements[index];
 			}
@@ -204,7 +216,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal Asn1Encodable[] CopyElements()
 		{
 			if (0 == elementCount)
+			{
 				return EmptyElements;
+			}
 
 			Asn1Encodable[] copy = new Asn1Encodable[elementCount];
 			Array.Copy(elements, 0, copy, 0, elementCount);
@@ -214,11 +228,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal Asn1Encodable[] TakeElements()
 		{
 			if (0 == elementCount)
+			{
 				return EmptyElements;
+			}
 
 			if (elements.Length == elementCount)
 			{
-				this.copyOnWrite = true;
+				copyOnWrite = true;
 				return elements;
 			}
 
@@ -227,7 +243,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return copy;
 		}
 
-		private void Reallocate(int minCapacity)
+		void Reallocate(int minCapacity)
 		{
 			int oldCapacity = elements.Length;
 			int newCapacity = System.Math.Max(oldCapacity, minCapacity + (minCapacity >> 1));
@@ -235,8 +251,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			Asn1Encodable[] copy = new Asn1Encodable[newCapacity];
 			Array.Copy(elements, 0, copy, 0, elementCount);
 
-			this.elements = copy;
-			this.copyOnWrite = false;
+			elements = copy;
+			copyOnWrite = false;
 		}
 
 		internal static Asn1Encodable[] CloneElements(Asn1Encodable[] elements)

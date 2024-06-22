@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class SignerIdentifier
 		: Asn1Encodable, IAsn1Choice
 	{
-		private Asn1Encodable id;
+		Asn1Encodable id;
 
 		public SignerIdentifier(
 			IssuerAndSerialNumber id)
@@ -38,24 +38,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object o)
 		{
 			if (o == null || o is SignerIdentifier)
+			{
 				return (SignerIdentifier)o;
+			}
 
 			if (o is IssuerAndSerialNumber)
+			{
 				return new SignerIdentifier((IssuerAndSerialNumber)o);
+			}
 
 			if (o is Asn1OctetString)
+			{
 				return new SignerIdentifier((Asn1OctetString)o);
+			}
 
 			if (o is Asn1Object)
+			{
 				return new SignerIdentifier((Asn1Object)o);
+			}
 
 			throw new ArgumentException(
-				"Illegal object in SignerIdentifier: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(o));
+				"Illegal object in SignerIdentifier: " + Platform.GetTypeName(o));
 		}
 
 		public bool IsTagged
 		{
-			get { return (id is Asn1TaggedObject); }
+			get { return id is Asn1TaggedObject; }
 		}
 
 		public Asn1Encodable ID

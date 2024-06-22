@@ -103,7 +103,7 @@ namespace BestHTTP.Connections.HTTP2
 			frame.ReservedBit = BufferHelper.ReadBit(header.Payload[1], 0);
 			frame.PromisedStreamId = BufferHelper.ReadUInt31(header.Payload, 1);
 
-			frame.HeaderBlockFragmentIdx = (UInt32)(isPadded ? 5 : 4);
+			frame.HeaderBlockFragmentIdx = (uint)(isPadded ? 5 : 4);
 			frame.HeaderBlockFragment = header.Payload;
 			header.Payload = null;
 
@@ -156,7 +156,9 @@ namespace BestHTTP.Connections.HTTP2
 
 				uint subLength = (uint)(1 + (frame.PadLength ?? 0));
 				if (subLength <= frame.HeaderBlockFragmentLength)
+				{
 					frame.HeaderBlockFragmentLength -= subLength;
+				}
 				//else
 				//    throw PROTOCOL_ERROR;
 			}
@@ -170,12 +172,14 @@ namespace BestHTTP.Connections.HTTP2
 
 				uint subLength = 5;
 				if (subLength <= frame.HeaderBlockFragmentLength)
+				{
 					frame.HeaderBlockFragmentLength -= subLength;
+				}
 				//else
 				//    throw PROTOCOL_ERROR;
 			}
 
-			frame.HeaderBlockFragmentIdx = (UInt32)payloadIdx;
+			frame.HeaderBlockFragmentIdx = (uint)payloadIdx;
 			frame.HeaderBlockFragment = header.Payload;
 
 			return frame;
@@ -196,12 +200,14 @@ namespace BestHTTP.Connections.HTTP2
 
 				uint subLength = (uint)(1 + (frame.PadLength ?? 0));
 				if (subLength <= frame.DataLength)
+				{
 					frame.DataLength -= subLength;
+				}
 				//else
 				//    throw PROTOCOL_ERROR;
 			}
 
-			frame.DataIdx = (UInt32)(isPadded ? 1 : 0);
+			frame.DataIdx = (uint)(isPadded ? 1 : 0);
 			frame.Data = header.Payload;
 			header.Payload = null;
 
@@ -220,7 +226,9 @@ namespace BestHTTP.Connections.HTTP2
 		public static void StreamRead(Stream stream, byte[] buffer, int offset, uint count)
 		{
 			if (count == 0)
+			{
 				return;
+			}
 
 			uint sumRead = 0;
 			do
@@ -228,7 +236,10 @@ namespace BestHTTP.Connections.HTTP2
 				int readCount = (int)(count - sumRead);
 				int streamReadCount = stream.Read(buffer, (int)(offset + sumRead), readCount);
 				if (streamReadCount <= 0 && readCount > 0)
+				{
 					throw new Exception("TCP Stream closed!");
+				}
+
 				sumRead += (uint)streamReadCount;
 			} while (sumRead < count);
 		}
@@ -237,7 +248,7 @@ namespace BestHTTP.Connections.HTTP2
 		{
 			// https://httpwg.org/specs/rfc7540.html#FrameHeader
 
-			var buffer = BufferPool.Get(9, true);
+			byte[] buffer = BufferPool.Get(9, true);
 
 			BufferHelper.SetUInt24(buffer, 0, header.PayloadLength);
 			buffer[3] = (byte)header.Type;
@@ -297,7 +308,7 @@ namespace BestHTTP.Connections.HTTP2
 				for (int i = 0; i < kvpCount; ++i)
 				{
 					HTTP2Settings key = (HTTP2Settings)BufferHelper.ReadUInt16(header.Payload, i * 6);
-					UInt32 value = BufferHelper.ReadUInt32(header.Payload, (i * 6) + 2);
+					uint value = BufferHelper.ReadUInt32(header.Payload, i * 6 + 2);
 
 					frame.Settings.Add(new KeyValuePair<HTTP2Settings, uint>(key, value));
 				}
@@ -315,19 +326,19 @@ namespace BestHTTP.Connections.HTTP2
 			return frame;
 		}
 
-		public static HTTP2FrameHeaderAndPayload CreateSettingsFrame(List<KeyValuePair<HTTP2Settings, UInt32>> settings)
+		public static HTTP2FrameHeaderAndPayload CreateSettingsFrame(List<KeyValuePair<HTTP2Settings, uint>> settings)
 		{
 			HTTP2FrameHeaderAndPayload frame = new HTTP2FrameHeaderAndPayload();
 			frame.Type = HTTP2FrameTypes.SETTINGS;
 			frame.Flags = 0;
-			frame.PayloadLength = (UInt32)settings.Count * 6;
+			frame.PayloadLength = (uint)settings.Count * 6;
 
 			frame.Payload = BufferPool.Get(frame.PayloadLength, true);
 
 			for (int i = 0; i < settings.Count; ++i)
 			{
-				BufferHelper.SetUInt16(frame.Payload, i * 6, (UInt16)settings[i].Key);
-				BufferHelper.SetUInt32(frame.Payload, (i * 6) + 2, settings[i].Value);
+				BufferHelper.SetUInt16(frame.Payload, i * 6, (ushort)settings[i].Key);
+				BufferHelper.SetUInt32(frame.Payload, i * 6 + 2, settings[i].Value);
 			}
 
 			return frame;
@@ -347,7 +358,7 @@ namespace BestHTTP.Connections.HTTP2
 			return frame;
 		}
 
-		public static HTTP2FrameHeaderAndPayload CreateWindowUpdateFrame(UInt32 streamId, UInt32 windowSizeIncrement)
+		public static HTTP2FrameHeaderAndPayload CreateWindowUpdateFrame(uint streamId, uint windowSizeIncrement)
 		{
 			// https://httpwg.org/specs/rfc7540.html#WINDOW_UPDATE
 
@@ -364,7 +375,7 @@ namespace BestHTTP.Connections.HTTP2
 			return frame;
 		}
 
-		public static HTTP2FrameHeaderAndPayload CreateGoAwayFrame(UInt32 lastStreamId, HTTP2ErrorCodes error)
+		public static HTTP2FrameHeaderAndPayload CreateGoAwayFrame(uint lastStreamId, HTTP2ErrorCodes error)
 		{
 			// https://httpwg.org/specs/rfc7540.html#GOAWAY
 
@@ -376,12 +387,12 @@ namespace BestHTTP.Connections.HTTP2
 			frame.PayloadLength = 8;
 
 			BufferHelper.SetUInt31(frame.Payload, 0, lastStreamId);
-			BufferHelper.SetUInt31(frame.Payload, 4, (UInt32)error);
+			BufferHelper.SetUInt31(frame.Payload, 4, (uint)error);
 
 			return frame;
 		}
 
-		public static HTTP2FrameHeaderAndPayload CreateRSTFrame(UInt32 streamId, HTTP2ErrorCodes errorCode)
+		public static HTTP2FrameHeaderAndPayload CreateRSTFrame(uint streamId, HTTP2ErrorCodes errorCode)
 		{
 			// https://httpwg.org/specs/rfc7540.html#RST_STREAM
 
@@ -392,7 +403,7 @@ namespace BestHTTP.Connections.HTTP2
 			frame.Payload = BufferPool.Get(4, true);
 			frame.PayloadLength = 4;
 
-			BufferHelper.SetUInt32(frame.Payload, 0, (UInt32)errorCode);
+			BufferHelper.SetUInt32(frame.Payload, 0, (uint)errorCode);
 
 			return frame;
 		}

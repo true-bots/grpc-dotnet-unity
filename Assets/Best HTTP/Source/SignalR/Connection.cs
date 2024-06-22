@@ -98,11 +98,13 @@ namespace BestHTTP.SignalR
 				_state = value;
 
 				if (OnStateChanged != null)
+				{
 					OnStateChanged(this, old, _state);
+				}
 			}
 		}
 
-		private ConnectionStates _state;
+		ConnectionStates _state;
 
 		/// <summary>
 		/// Result of the negotiation request from the server.
@@ -135,7 +137,9 @@ namespace BestHTTP.SignalR
 			{
 				// Unsubscribe from previous dictionary's events
 				if (additionalQueryParams != null)
+				{
 					additionalQueryParams.CollectionChanged -= AdditionalQueryParams_CollectionChanged;
+				}
 
 				additionalQueryParams = value;
 
@@ -144,11 +148,13 @@ namespace BestHTTP.SignalR
 
 				// Subscribe to the collection changed event
 				if (value != null)
+				{
 					value.CollectionChanged += AdditionalQueryParams_CollectionChanged;
+				}
 			}
 		}
 
-		private ObservableDictionary<string, string> additionalQueryParams;
+		ObservableDictionary<string, string> additionalQueryParams;
 
 		/// <summary>
 		/// If it's false, the parameters in the AdditionalQueryParams will be passed for all http requests. Its default value is true.
@@ -242,7 +248,9 @@ namespace BestHTTP.SignalR
 				{
 					Hub hub = Hubs[i] as Hub;
 					if (hub.Name.Equals(hubName, StringComparison.OrdinalIgnoreCase))
+					{
 						return hub;
+					}
 				}
 
 				return null;
@@ -265,87 +273,90 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// Supported client protocol versions.
 		/// </summary>
-		private readonly string[] ClientProtocols = new string[] { "1.3", "1.4", "1.5" };
+		readonly string[] ClientProtocols = new string[] { "1.3", "1.4", "1.5" };
 
 		/// <summary>
 		/// A timestamp that will be sent with all request for easier debugging.
 		/// </summary>
-		private UInt32 Timestamp
+		uint Timestamp
 		{
-			get { return (UInt32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).Ticks; }
+			get { return (uint)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).Ticks; }
 		}
 
 		/// <summary>
 		/// Request counter sent with all request for easier debugging.
 		/// </summary>
-		private long RequestCounter;
+		long RequestCounter;
 
 		/// <summary>
 		/// Instance of the last received message. Used for its MessageId.
 		/// </summary>
-		private MultiMessage LastReceivedMessage;
+		MultiMessage LastReceivedMessage;
 
 		/// <summary>
 		/// The GroupsToken sent by the server that stores what groups we are joined to.
 		/// We will send it with the reconnect request.
 		/// </summary>
-		private string GroupsToken;
+		string GroupsToken;
 
 		/// <summary>
 		/// Received messages before the Start request finishes.
 		/// </summary>
-		private List<IServerMessage> BufferedMessages;
+		List<IServerMessage> BufferedMessages;
 
 		/// <summary>
 		/// When the last message received from the server. Used for reconnecting.
 		/// </summary>
-		private DateTime LastMessageReceivedAt;
+		DateTime LastMessageReceivedAt;
 
 		/// <summary>
 		/// When we started to reconnect. When too much time passes without a successful reconnect, we will close the connection.
 		/// </summary>
-		private DateTime ReconnectStartedAt;
+		DateTime ReconnectStartedAt;
 
-		private DateTime ReconnectDelayStartedAt;
+		DateTime ReconnectDelayStartedAt;
 
 		/// <summary>
 		/// True, if the reconnect process started.
 		/// </summary>
-		private bool ReconnectStarted;
+		bool ReconnectStarted;
 
 		/// <summary>
 		/// When the last ping request sent out.
 		/// </summary>
-		private DateTime LastPingSentAt;
+		DateTime LastPingSentAt;
 
 		/// <summary>
 		/// Reference to the ping request.
 		/// </summary>
-		private HTTPRequest PingRequest;
+		HTTPRequest PingRequest;
 
 		/// <summary>
 		/// When the transport started the connection process
 		/// </summary>
-		private DateTime? TransportConnectionStartedAt;
+		DateTime? TransportConnectionStartedAt;
 
 		/// <summary>
 		/// Cached StringBuilder instance used in BuildUri
 		/// </summary>
-		private StringBuilder queryBuilder = new StringBuilder();
+		StringBuilder queryBuilder = new StringBuilder();
 
 		/// <summary>
 		/// Builds and returns with the connection data made from the hub names.
 		/// </summary>
-		private string ConnectionData
+		string ConnectionData
 		{
 			get
 			{
 				if (!string.IsNullOrEmpty(BuiltConnectionData))
+				{
 					return BuiltConnectionData;
+				}
 
 				StringBuilder sb = new StringBuilder("[", Hubs.Length * 4);
 
 				if (Hubs != null)
+				{
 					for (int i = 0; i < Hubs.Length; ++i)
 					{
 						sb.Append(@"{""Name"":""");
@@ -353,8 +364,11 @@ namespace BestHTTP.SignalR
 						sb.Append(@"""}");
 
 						if (i < Hubs.Length - 1)
+						{
 							sb.Append(",");
+						}
 					}
+				}
 
 				sb.Append("]");
 
@@ -365,24 +379,28 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// The cached value of the result of the ConnectionData property call.
 		/// </summary>
-		private string BuiltConnectionData;
+		string BuiltConnectionData;
 
 		/// <summary>
 		/// Builds the keys and values from the AdditionalQueryParams to an key=value form. If AdditionalQueryParams is null or empty, it will return an empty string.
 		/// </summary>
-		private string QueryParams
+		string QueryParams
 		{
 			get
 			{
 				if (AdditionalQueryParams == null || AdditionalQueryParams.Count == 0)
+				{
 					return string.Empty;
+				}
 
 				if (!string.IsNullOrEmpty(BuiltQueryParams))
+				{
 					return BuiltQueryParams;
+				}
 
 				StringBuilder sb = StringBuilderPool.Get(AdditionalQueryParams.Count * 4); //new StringBuilder(AdditionalQueryParams.Count * 4);
 
-				foreach (var kvp in AdditionalQueryParams)
+				foreach (KeyValuePair<string, string> kvp in AdditionalQueryParams)
 				{
 					sb.Append("&");
 					sb.Append(kvp.Key);
@@ -401,9 +419,9 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// The cached value of the result of the QueryParams property call.
 		/// </summary>
-		private string BuiltQueryParams;
+		string BuiltQueryParams;
 
-		private SupportedProtocols NextProtocolToTry;
+		SupportedProtocols NextProtocolToTry;
 
 		#endregion
 
@@ -414,34 +432,40 @@ namespace BestHTTP.SignalR
 		{
 			if (hubNames != null && hubNames.Length > 0)
 			{
-				this.Hubs = new Hub[hubNames.Length];
+				Hubs = new Hub[hubNames.Length];
 
 				for (int i = 0; i < hubNames.Length; ++i)
-					this.Hubs[i] = new Hub(hubNames[i], this);
+				{
+					Hubs[i] = new Hub(hubNames[i], this);
+				}
 			}
 		}
 
 		public Connection(Uri uri, params Hub[] hubs)
 			: this(uri)
 		{
-			this.Hubs = hubs;
+			Hubs = hubs;
 			if (hubs != null)
+			{
 				for (int i = 0; i < hubs.Length; ++i)
+				{
 					(hubs[i] as IHub).Connection = this;
+				}
+			}
 		}
 
 		public Connection(Uri uri)
 		{
-			this.State = ConnectionStates.Initial;
-			this.Uri = uri;
+			State = ConnectionStates.Initial;
+			Uri = uri;
 
-			this.JsonEncoder = Connection.DefaultEncoder;
-			this.PingInterval = TimeSpan.FromMinutes(5);
+			JsonEncoder = DefaultEncoder;
+			PingInterval = TimeSpan.FromMinutes(5);
 
 			// Expected protocol
-			this.Protocol = ProtocolVersions.Protocol_2_2;
+			Protocol = ProtocolVersions.Protocol_2_2;
 
-			this.ReconnectDelay = TimeSpan.FromSeconds(5);
+			ReconnectDelay = TimeSpan.FromSeconds(5);
 		}
 
 		#endregion
@@ -454,11 +478,13 @@ namespace BestHTTP.SignalR
 		public void Open()
 		{
 			if (State != ConnectionStates.Initial && State != ConnectionStates.Closed)
+			{
 				return;
+			}
 
 			if (AuthenticationProvider != null && AuthenticationProvider.IsPreAuthRequired)
 			{
-				this.State = ConnectionStates.Authenticating;
+				State = ConnectionStates.Authenticating;
 
 				AuthenticationProvider.OnAuthenticationSucceded += OnAuthenticationSucceded;
 				AuthenticationProvider.OnAuthenticationFailed += OnAuthenticationFailed;
@@ -467,14 +493,16 @@ namespace BestHTTP.SignalR
 				AuthenticationProvider.StartAuthentication();
 			}
 			else
+			{
 				StartImpl();
+			}
 		}
 
 		/// <summary>
 		/// Called when the authentication succeeded.
 		/// </summary>
 		/// <param name="provider"></param>
-		private void OnAuthenticationSucceded(IAuthenticationProvider provider)
+		void OnAuthenticationSucceded(IAuthenticationProvider provider)
 		{
 			provider.OnAuthenticationSucceded -= OnAuthenticationSucceded;
 			provider.OnAuthenticationFailed -= OnAuthenticationFailed;
@@ -485,7 +513,7 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// Called when the authentication failed.
 		/// </summary>
-		private void OnAuthenticationFailed(IAuthenticationProvider provider, string reason)
+		void OnAuthenticationFailed(IAuthenticationProvider provider, string reason)
 		{
 			provider.OnAuthenticationSucceded -= OnAuthenticationSucceded;
 			provider.OnAuthenticationFailed -= OnAuthenticationFailed;
@@ -496,9 +524,9 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// It's the real Start implementation. It will start the negotiation
 		/// </summary>
-		private void StartImpl()
+		void StartImpl()
 		{
-			this.State = ConnectionStates.Negotiating;
+			State = ConnectionStates.Negotiating;
 
 			NegotiationResult = new NegotiationData(this);
 			NegotiationResult.OnReceived = OnNegotiationDataReceived;
@@ -511,13 +539,17 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// Protocol negotiation finished successfully.
 		/// </summary>
-		private void OnNegotiationDataReceived(NegotiationData data)
+		void OnNegotiationDataReceived(NegotiationData data)
 		{
 			// Find out what supported protocol the server speak
 			int protocolIdx = -1;
 			for (int i = 0; i < ClientProtocols.Length && protocolIdx == -1; ++i)
+			{
 				if (data.ProtocolVersion == ClientProtocols[i])
+				{
 					protocolIdx = i;
+				}
+			}
 
 			// No supported protocol found? Try using the latest one.
 			if (protocolIdx == -1)
@@ -526,7 +558,7 @@ namespace BestHTTP.SignalR
 				HTTPManager.Logger.Warning("SignalR Connection", "Unknown protocol version: " + data.ProtocolVersion);
 			}
 
-			this.Protocol = (ProtocolVersions)protocolIdx;
+			Protocol = (ProtocolVersions)protocolIdx;
 
 #if !BESTHTTP_DISABLE_WEBSOCKET
 			if (data.TryWebSockets)
@@ -554,7 +586,7 @@ namespace BestHTTP.SignalR
 #endif
 			}
 
-			this.State = ConnectionStates.Connecting;
+			State = ConnectionStates.Connecting;
 			TransportConnectionStartedAt = DateTime.UtcNow;
 
 			Transport.Connect();
@@ -563,7 +595,7 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// Protocol negotiation failed.
 		/// </summary>
-		private void OnNegotiationError(NegotiationData data, string error)
+		void OnNegotiationError(NegotiationData data, string error)
 		{
 			(this as IConnection).Error(error);
 		}
@@ -579,10 +611,12 @@ namespace BestHTTP.SignalR
 		/// </summary>
 		public void Close()
 		{
-			if (this.State == ConnectionStates.Closed)
+			if (State == ConnectionStates.Closed)
+			{
 				return;
+			}
 
-			this.State = ConnectionStates.Closed;
+			State = ConnectionStates.Closed;
 
 			//ReconnectStartedAt = null;
 			ReconnectStarted = false;
@@ -602,8 +636,12 @@ namespace BestHTTP.SignalR
 			LastReceivedMessage = null;
 
 			if (Hubs != null)
+			{
 				for (int i = 0; i < Hubs.Length; ++i)
+				{
 					(Hubs[i] as IHub).Close();
+				}
+			}
 
 			if (BufferedMessages != null)
 			{
@@ -631,22 +669,29 @@ namespace BestHTTP.SignalR
 		{
 			// Return if reconnect process already started.
 			if (ReconnectStarted)
+			{
 				return;
+			}
+
 			ReconnectStarted = true;
 
 			// Set ReconnectStartedAt only when the previous State is not Reconnecting,
 			// so we keep the first date&time when we started reconnecting
-			if (this.State != ConnectionStates.Reconnecting)
+			if (State != ConnectionStates.Reconnecting)
+			{
 				ReconnectStartedAt = DateTime.UtcNow;
+			}
 
-			this.State = ConnectionStates.Reconnecting;
+			State = ConnectionStates.Reconnecting;
 
 			HTTPManager.Logger.Warning("SignalR Connection", "Reconnecting");
 
 			Transport.Reconnect();
 
 			if (PingRequest != null)
+			{
 				PingRequest.Abort();
+			}
 
 			if (OnReconnecting != null)
 			{
@@ -669,18 +714,26 @@ namespace BestHTTP.SignalR
 		public bool Send(object arg)
 		{
 			if (arg == null)
+			{
 				throw new ArgumentNullException("arg");
+			}
 
-			if (this.State != ConnectionStates.Connected)
+			if (State != ConnectionStates.Connected)
+			{
 				return false;
+			}
 
 			string json = JsonEncoder.Encode(arg);
 
 			if (string.IsNullOrEmpty(json))
+			{
 				HTTPManager.Logger.Error("SignalR Connection",
 					"Failed to JSon encode the given argument. Please try to use an advanced JSon encoder(check the documentation how you can do it).");
+			}
 			else
+			{
 				Transport.Send(json);
+			}
 
 			return true;
 		}
@@ -692,10 +745,14 @@ namespace BestHTTP.SignalR
 		public bool SendJson(string json)
 		{
 			if (json == null)
+			{
 				throw new ArgumentNullException("json");
+			}
 
-			if (this.State != ConnectionStates.Connected)
+			if (State != ConnectionStates.Connected)
+			{
 				return false;
+			}
 
 			Transport.Send(json);
 
@@ -711,14 +768,18 @@ namespace BestHTTP.SignalR
 		/// </summary>
 		void IConnection.OnMessage(IServerMessage msg)
 		{
-			if (this.State == ConnectionStates.Closed)
+			if (State == ConnectionStates.Closed)
+			{
 				return;
+			}
 
 			// Store messages that we receive while we are connecting
-			if (this.State == ConnectionStates.Connecting)
+			if (State == ConnectionStates.Connecting)
 			{
 				if (BufferedMessages == null)
+				{
 					BufferedMessages = new List<IServerMessage>();
+				}
 
 				BufferedMessages.Add(msg);
 
@@ -734,10 +795,14 @@ namespace BestHTTP.SignalR
 
 					// Not received in the reconnect process, so we can't rely on it
 					if (LastReceivedMessage.IsInitialization)
+					{
 						HTTPManager.Logger.Information("SignalR Connection", "OnMessage - Init");
+					}
 
 					if (LastReceivedMessage.GroupsToken != null)
+					{
 						GroupsToken = LastReceivedMessage.GroupsToken;
+					}
 
 					if (LastReceivedMessage.ShouldReconnect)
 					{
@@ -750,8 +815,12 @@ namespace BestHTTP.SignalR
 					}
 
 					if (LastReceivedMessage.Data != null)
+					{
 						for (int i = 0; i < LastReceivedMessage.Data.Count; ++i)
+						{
 							(this as IConnection).OnMessage(LastReceivedMessage.Data[i]);
+						}
+					}
 
 					break;
 
@@ -761,26 +830,38 @@ namespace BestHTTP.SignalR
 					Hub hub = this[methodCall.Hub];
 
 					if (hub != null)
+					{
 						(hub as IHub).OnMethod(methodCall);
+					}
 					else
+					{
 						HTTPManager.Logger.Warning("SignalR Connection", string.Format("Hub \"{0}\" not found!", methodCall.Hub));
+					}
 
 					break;
 
 				case MessageTypes.Result:
 				case MessageTypes.Failure:
 				case MessageTypes.Progress:
-					UInt64 id = (msg as IHubMessage).InvocationId;
+					ulong id = (msg as IHubMessage).InvocationId;
 					hub = FindHub(id);
 					if (hub != null)
+					{
 						(hub as IHub).OnMessage(msg);
+					}
 					else
+					{
 						HTTPManager.Logger.Warning("SignalR Connection", string.Format("No Hub found for Progress message! Id: {0}", id.ToString()));
+					}
+
 					break;
 
 				case MessageTypes.Data:
 					if (OnNonHubMessage != null)
+					{
 						OnNonHubMessage(this, (msg as DataMessage).Data);
+					}
+
 					break;
 
 				case MessageTypes.KeepAlive:
@@ -797,8 +878,10 @@ namespace BestHTTP.SignalR
 		/// </summary>
 		void IConnection.TransportStarted()
 		{
-			if (this.State != ConnectionStates.Connecting)
+			if (State != ConnectionStates.Connecting)
+			{
 				return;
+			}
 
 			InitOnStart();
 
@@ -819,7 +902,9 @@ namespace BestHTTP.SignalR
 			if (BufferedMessages != null)
 			{
 				for (int i = 0; i < BufferedMessages.Count; ++i)
+				{
 					(this as IConnection).OnMessage(BufferedMessages[i]);
+				}
 
 				BufferedMessages.Clear();
 				BufferedMessages = null;
@@ -831,8 +916,10 @@ namespace BestHTTP.SignalR
 		/// </summary>
 		void IConnection.TransportReconnected()
 		{
-			if (this.State != ConnectionStates.Reconnecting)
+			if (State != ConnectionStates.Reconnecting)
+			{
 				return;
+			}
 
 			HTTPManager.Logger.Information("SignalR Connection", "Transport Reconnected");
 
@@ -865,8 +952,10 @@ namespace BestHTTP.SignalR
 		void IConnection.Error(string reason)
 		{
 			// Not interested about errors we received after we already closed
-			if (this.State == ConnectionStates.Closed)
+			if (State == ConnectionStates.Closed)
+			{
 				return;
+			}
 
 			// If we are just quitting, don't try to reconnect.
 			if (HTTPManager.IsQuitting)
@@ -880,21 +969,27 @@ namespace BestHTTP.SignalR
 			ReconnectStarted = false;
 
 			if (OnError != null)
-				OnError(this, reason);
-
-			if (this.State == ConnectionStates.Connected || this.State == ConnectionStates.Reconnecting)
 			{
-				this.ReconnectDelayStartedAt = DateTime.UtcNow;
-				if (this.State != ConnectionStates.Reconnecting)
-					this.ReconnectStartedAt = DateTime.UtcNow;
+				OnError(this, reason);
+			}
+
+			if (State == ConnectionStates.Connected || State == ConnectionStates.Reconnecting)
+			{
+				ReconnectDelayStartedAt = DateTime.UtcNow;
+				if (State != ConnectionStates.Reconnecting)
+				{
+					ReconnectStartedAt = DateTime.UtcNow;
+				}
 
 				//Reconnect();
 			}
 			else
 			{
 				// Fall back if possible
-				if (this.State != ConnectionStates.Connecting || !TryFallbackTransport())
+				if (State != ConnectionStates.Connecting || !TryFallbackTransport())
+				{
 					Close();
+				}
 			}
 		}
 
@@ -917,14 +1012,16 @@ namespace BestHTTP.SignalR
 			UriBuilder uriBuilder = new UriBuilder(Uri);
 
 			if (!uriBuilder.Path.EndsWith("/"))
+			{
 				uriBuilder.Path += "/";
+			}
 
 			long newValue, originalValue;
 			do
 			{
-				originalValue = this.RequestCounter;
+				originalValue = RequestCounter;
 				newValue = originalValue % long.MaxValue;
-			} while (System.Threading.Interlocked.CompareExchange(ref this.RequestCounter, newValue, originalValue) != originalValue);
+			} while (System.Threading.Interlocked.CompareExchange(ref RequestCounter, newValue, originalValue) != originalValue);
 
 			switch (type)
 			{
@@ -935,7 +1032,9 @@ namespace BestHTTP.SignalR
 				case RequestTypes.Connect:
 #if !BESTHTTP_DISABLE_WEBSOCKET
 					if (transport != null && transport.Type == TransportTypes.WebSocket)
+					{
 						uriBuilder.Scheme = HTTPProtocolFactory.IsSecureProtocol(Uri) ? "wss" : "ws";
+					}
 #endif
 
 					uriBuilder.Path += "connect";
@@ -948,16 +1047,18 @@ namespace BestHTTP.SignalR
 				case RequestTypes.Poll:
 					uriBuilder.Path += "poll";
 
-					if (this.LastReceivedMessage != null)
+					if (LastReceivedMessage != null)
 					{
 						queryBuilder.Append("messageId=");
-						queryBuilder.Append(this.LastReceivedMessage.MessageId);
+						queryBuilder.Append(LastReceivedMessage.MessageId);
 					}
 
 					if (!string.IsNullOrEmpty(GroupsToken))
 					{
 						if (queryBuilder.Length > 0)
+						{
 							queryBuilder.Append("&");
+						}
 
 						queryBuilder.Append("groupsToken=");
 						queryBuilder.Append(GroupsToken);
@@ -972,21 +1073,25 @@ namespace BestHTTP.SignalR
 				case RequestTypes.Reconnect:
 #if !BESTHTTP_DISABLE_WEBSOCKET
 					if (transport != null && transport.Type == TransportTypes.WebSocket)
+					{
 						uriBuilder.Scheme = HTTPProtocolFactory.IsSecureProtocol(Uri) ? "wss" : "ws";
+					}
 #endif
 
 					uriBuilder.Path += "reconnect";
 
-					if (this.LastReceivedMessage != null)
+					if (LastReceivedMessage != null)
 					{
 						queryBuilder.Append("messageId=");
-						queryBuilder.Append(this.LastReceivedMessage.MessageId);
+						queryBuilder.Append(LastReceivedMessage.MessageId);
 					}
 
 					if (!string.IsNullOrEmpty(GroupsToken))
 					{
 						if (queryBuilder.Length > 0)
+						{
 							queryBuilder.Append("&");
+						}
 
 						queryBuilder.Append("groupsToken=");
 						queryBuilder.Append(GroupsToken);
@@ -1002,7 +1107,7 @@ namespace BestHTTP.SignalR
 					uriBuilder.Path += "ping";
 
 					queryBuilder.Append("&tid=");
-					queryBuilder.Append(System.Threading.Interlocked.Increment(ref this.RequestCounter).ToString());
+					queryBuilder.Append(System.Threading.Interlocked.Increment(ref RequestCounter).ToString());
 
 					queryBuilder.Append("&_=");
 					queryBuilder.Append(Timestamp.ToString());
@@ -1011,10 +1116,12 @@ namespace BestHTTP.SignalR
 
 				default:
 					if (queryBuilder.Length > 0)
+					{
 						queryBuilder.Append("&");
+					}
 
 					queryBuilder.Append("tid=");
-					queryBuilder.Append(System.Threading.Interlocked.Increment(ref this.RequestCounter).ToString());
+					queryBuilder.Append(System.Threading.Interlocked.Increment(ref RequestCounter).ToString());
 
 					queryBuilder.Append("&_=");
 					queryBuilder.Append(Timestamp.ToString());
@@ -1028,24 +1135,26 @@ namespace BestHTTP.SignalR
 					queryBuilder.Append("&clientProtocol=");
 					queryBuilder.Append(ClientProtocols[(byte)Protocol]);
 
-					if (NegotiationResult != null && !string.IsNullOrEmpty(this.NegotiationResult.ConnectionToken))
+					if (NegotiationResult != null && !string.IsNullOrEmpty(NegotiationResult.ConnectionToken))
 					{
 						queryBuilder.Append("&connectionToken=");
-						queryBuilder.Append(this.NegotiationResult.ConnectionToken);
+						queryBuilder.Append(NegotiationResult.ConnectionToken);
 					}
 
-					if (this.Hubs != null && this.Hubs.Length > 0)
+					if (Hubs != null && Hubs.Length > 0)
 					{
 						queryBuilder.Append("&connectionData=");
-						queryBuilder.Append(this.ConnectionData);
+						queryBuilder.Append(ConnectionData);
 					}
 
 					break;
 			}
 
 			// Query params are added to all uri
-			if (this.AdditionalQueryParams != null && this.AdditionalQueryParams.Count > 0)
-				queryBuilder.Append(this.QueryParams);
+			if (AdditionalQueryParams != null && AdditionalQueryParams.Count > 0)
+			{
+				queryBuilder.Append(QueryParams);
+			}
 
 			uriBuilder.Query = queryBuilder.ToString();
 
@@ -1061,10 +1170,14 @@ namespace BestHTTP.SignalR
 		HTTPRequest IConnection.PrepareRequest(HTTPRequest req, RequestTypes type)
 		{
 			if (req != null && AuthenticationProvider != null)
+			{
 				AuthenticationProvider.PrepareRequest(req, type);
+			}
 
 			if (RequestPreparator != null)
+			{
 				RequestPreparator(this, req, type);
+			}
 
 			return req;
 		}
@@ -1101,15 +1214,19 @@ namespace BestHTTP.SignalR
 		/// </summary>
 		void IHeartbeat.OnHeartbeatUpdate(TimeSpan dif)
 		{
-			switch (this.State)
+			switch (State)
 			{
 				case ConnectionStates.Connected:
 					if (Transport.SupportsKeepAlive && NegotiationResult.KeepAliveTimeout != null &&
 					    DateTime.UtcNow - LastMessageReceivedAt >= NegotiationResult.KeepAliveTimeout)
+					{
 						Reconnect();
+					}
 
 					if (PingRequest == null && DateTime.UtcNow - LastPingSentAt >= PingInterval)
+					{
 						Ping();
+					}
 
 					break;
 
@@ -1123,8 +1240,11 @@ namespace BestHTTP.SignalR
 					else if (DateTime.UtcNow - ReconnectDelayStartedAt >= ReconnectDelay)
 					{
 						if (HTTPManager.Logger.Level <= Logger.Loglevels.Warning)
+						{
 							HTTPManager.Logger.Warning("SignalR Connection",
-								this.ReconnectStarted.ToString() + " " + this.ReconnectStartedAt.ToString() + " " + NegotiationResult.DisconnectTimeout.ToString());
+								ReconnectStarted.ToString() + " " + ReconnectStartedAt.ToString() + " " + NegotiationResult.DisconnectTimeout.ToString());
+						}
+
 						Reconnect();
 					}
 
@@ -1151,9 +1271,9 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// Init function to set the connected states and set up other variables.
 		/// </summary>
-		private void InitOnStart()
+		void InitOnStart()
 		{
-			this.State = ConnectionStates.Connected;
+			State = ConnectionStates.Connected;
 
 			//ReconnectStartedAt = null;
 			ReconnectStarted = false;
@@ -1168,24 +1288,33 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// Find and return with a Hub that has the message id.
 		/// </summary>
-		private Hub FindHub(UInt64 msgId)
+		Hub FindHub(ulong msgId)
 		{
 			if (Hubs != null)
+			{
 				for (int i = 0; i < Hubs.Length; ++i)
+				{
 					if ((Hubs[i] as IHub).HasSentMessageId(msgId))
+					{
 						return Hubs[i];
+					}
+				}
+			}
+
 			return null;
 		}
 
 		/// <summary>
 		/// Try to fall back to next transport. If no more transport to try, it will return false.
 		/// </summary>
-		private bool TryFallbackTransport()
+		bool TryFallbackTransport()
 		{
-			if (this.State == ConnectionStates.Connecting)
+			if (State == ConnectionStates.Connecting)
 			{
 				if (BufferedMessages != null)
+				{
 					BufferedMessages.Clear();
+				}
 
 				// stop the current transport
 				Transport.Stop();
@@ -1220,7 +1349,9 @@ namespace BestHTTP.SignalR
 				Transport.Connect();
 
 				if (PingRequest != null)
+				{
 					PingRequest.Abort();
+				}
 
 				return true;
 			}
@@ -1231,7 +1362,7 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// This event will be called when the AdditonalQueryPrams dictionary changed. We have to reset the cached values.
 		/// </summary>
-		private void AdditionalQueryParams_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		void AdditionalQueryParams_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			BuiltQueryParams = null;
 		}
@@ -1243,7 +1374,7 @@ namespace BestHTTP.SignalR
 		/// <summary>
 		/// Sends a Ping request to the SignalR server.
 		/// </summary>
-		private void Ping()
+		void Ping()
 		{
 			HTTPManager.Logger.Information("SignalR Connection", "Sending Ping request.");
 
@@ -1276,22 +1407,28 @@ namespace BestHTTP.SignalR
 						string response = (this as IConnection).ParseResponse(resp.DataAsText);
 
 						if (response != "pong")
+						{
 							reason = "Wrong answer for ping request: " + response;
+						}
 						else
+						{
 							HTTPManager.Logger.Information("SignalR Connection", "Pong received.");
+						}
 					}
 					else
+					{
 						reason = string.Format("Ping - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText);
+					}
 
 					break;
 
 				// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 				case HTTPRequestStates.Error:
 					reason = "Ping - Request Finished with Error! " +
-					         (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception");
+					         (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception");
 					break;
 
 				// Connecting to the server is timed out.
@@ -1306,7 +1443,9 @@ namespace BestHTTP.SignalR
 			}
 
 			if (!string.IsNullOrEmpty(reason))
+			{
 				(this as IConnection).Error(reason);
+			}
 		}
 
 		#endregion

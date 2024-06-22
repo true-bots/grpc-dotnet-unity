@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class ElGamalParameters
 		: ICipherParameters
 	{
-		private readonly BigInteger p, g;
-		private readonly int l;
+		readonly BigInteger p, g;
+		readonly int l;
 
 		public ElGamalParameters(
 			BigInteger p,
@@ -24,9 +24,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			int l)
 		{
 			if (p == null)
+			{
 				throw new ArgumentNullException("p");
+			}
+
 			if (g == null)
+			{
 				throw new ArgumentNullException("g");
+			}
 
 			this.p = p;
 			this.g = g;
@@ -58,12 +63,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			ElGamalParameters other = obj as ElGamalParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

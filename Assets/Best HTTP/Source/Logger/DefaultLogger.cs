@@ -6,25 +6,28 @@ namespace BestHTTP.Logger
 	/// <summary>
 	/// A basic logger implementation to be able to log intelligently additional informations about the plugin's internal mechanism.
 	/// </summary>
-	public class DefaultLogger : BestHTTP.Logger.ILogger
+	public class DefaultLogger : ILogger
 	{
 		public Loglevels Level { get; set; }
 
 		public ILogOutput Output
 		{
-			get { return this._output; }
+			get { return _output; }
 			set
 			{
-				if (this._output != value)
+				if (_output != value)
 				{
-					if (this._output != null)
-						this._output.Dispose();
-					this._output = value;
+					if (_output != null)
+					{
+						_output.Dispose();
+					}
+
+					_output = value;
 				}
 			}
 		}
 
-		private ILogOutput _output;
+		ILogOutput _output;
 
 		public string FormatVerbose { get; set; }
 		public string FormatInfo { get; set; }
@@ -41,7 +44,7 @@ namespace BestHTTP.Logger
 			FormatEx = "[{0}] Ex [{1}]: {2} - Message: {3}  StackTrace: {4}";
 
 			Level = UnityEngine.Debug.isDebugBuild ? Loglevels.Warning : Loglevels.Error;
-			this.Output = new UnityOutput();
+			Output = new UnityOutput();
 		}
 
 		public void Verbose(string division, string msg, LoggingContext context1 = null, LoggingContext context2 = null, LoggingContext context3 = null)
@@ -50,7 +53,7 @@ namespace BestHTTP.Logger
 			{
 				try
 				{
-					this.Output.Write(Loglevels.All, string.Format(FormatVerbose, GetFormattedTime(), division, msg));
+					Output.Write(Loglevels.All, string.Format(FormatVerbose, GetFormattedTime(), division, msg));
 				}
 				catch
 				{
@@ -64,7 +67,7 @@ namespace BestHTTP.Logger
 			{
 				try
 				{
-					this.Output.Write(Loglevels.Information, string.Format(FormatInfo, GetFormattedTime(), division, msg));
+					Output.Write(Loglevels.Information, string.Format(FormatInfo, GetFormattedTime(), division, msg));
 				}
 				catch
 				{
@@ -78,7 +81,7 @@ namespace BestHTTP.Logger
 			{
 				try
 				{
-					this.Output.Write(Loglevels.Warning, string.Format(FormatWarn, GetFormattedTime(), division, msg));
+					Output.Write(Loglevels.Warning, string.Format(FormatWarn, GetFormattedTime(), division, msg));
 				}
 				catch
 				{
@@ -92,7 +95,7 @@ namespace BestHTTP.Logger
 			{
 				try
 				{
-					this.Output.Write(Loglevels.Error, string.Format(FormatErr, GetFormattedTime(), division, msg));
+					Output.Write(Loglevels.Error, string.Format(FormatErr, GetFormattedTime(), division, msg));
 				}
 				catch
 				{
@@ -108,7 +111,9 @@ namespace BestHTTP.Logger
 				{
 					string exceptionMessage = string.Empty;
 					if (ex == null)
+					{
 						exceptionMessage = "null";
+					}
 					else
 					{
 						StringBuilder sb = new StringBuilder();
@@ -122,13 +127,15 @@ namespace BestHTTP.Logger
 							exception = exception.InnerException;
 
 							if (exception != null)
+							{
 								sb.AppendLine();
+							}
 						}
 
 						exceptionMessage = sb.ToString();
 					}
 
-					this.Output.Write(Loglevels.Exception, string.Format(FormatEx,
+					Output.Write(Loglevels.Exception, string.Format(FormatEx,
 						GetFormattedTime(),
 						division,
 						msg,
@@ -141,7 +148,7 @@ namespace BestHTTP.Logger
 			}
 		}
 
-		private string GetFormattedTime()
+		string GetFormattedTime()
 		{
 			return DateTime.Now.Ticks.ToString();
 		}

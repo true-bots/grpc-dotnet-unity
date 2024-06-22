@@ -9,15 +9,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Utilities
 {
 	public static class Asn1Dump
 	{
-		private const string Tab = "    ";
-		private const int SampleSize = 32;
+		const string Tab = "    ";
+		const int SampleSize = 32;
 
 		/**
 		 * dump a Der object as a formatted string with indentation
 		 *
 		 * @param obj the Asn1Object to be dumped out.
 		 */
-		private static void AsString(string indent, bool verbose, Asn1Object obj, StringBuilder buf)
+		static void AsString(string indent, bool verbose, Asn1Object obj, StringBuilder buf)
 		{
 			if (obj is Asn1Null)
 			{
@@ -293,10 +293,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Utilities
 			return buf.ToString();
 		}
 
-		private static void DumpBinaryDataAsString(StringBuilder buf, string indent, byte[] bytes)
+		static void DumpBinaryDataAsString(StringBuilder buf, string indent, byte[] bytes)
 		{
 			if (bytes.Length < 1)
+			{
 				return;
+			}
 
 			indent += Tab;
 
@@ -318,7 +320,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Utilities
 			}
 		}
 
-		private static void AppendAscString(StringBuilder buf, byte[] bytes, int off, int len)
+		static void AppendAscString(StringBuilder buf, byte[] bytes, int off, int len)
 		{
 			for (int i = off; i != off + len; i++)
 			{

@@ -33,11 +33,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static AuthorityKeyIdentifier GetInstance(object obj)
 		{
 			if (obj is AuthorityKeyIdentifier)
+			{
 				return (AuthorityKeyIdentifier)obj;
+			}
+
 			if (obj is X509Extension)
+			{
 				return GetInstance(X509Extension.ConvertValueToObject((X509Extension)obj));
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new AuthorityKeyIdentifier(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -46,9 +55,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return GetInstance(X509Extensions.GetExtensionParsedValue(extensions, X509Extensions.AuthorityKeyIdentifier));
 		}
 
-		private readonly Asn1OctetString keyidentifier;
-		private readonly GeneralNames certissuer;
-		private readonly DerInteger certserno;
+		readonly Asn1OctetString keyidentifier;
+		readonly GeneralNames certissuer;
+		readonly DerInteger certserno;
 
 		protected internal AuthorityKeyIdentifier(
 			Asn1Sequence seq)
@@ -60,13 +69,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				switch (obj.TagNo)
 				{
 					case 0:
-						this.keyidentifier = Asn1OctetString.GetInstance(obj, false);
+						keyidentifier = Asn1OctetString.GetInstance(obj, false);
 						break;
 					case 1:
-						this.certissuer = GeneralNames.GetInstance(obj, false);
+						certissuer = GeneralNames.GetInstance(obj, false);
 						break;
 					case 2:
-						this.certserno = DerInteger.GetInstance(obj, false);
+						certserno = DerInteger.GetInstance(obj, false);
 						break;
 					default:
 						throw new ArgumentException("illegal tag");
@@ -108,9 +117,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			digest.BlockUpdate(bytes, 0, bytes.Length);
 			digest.DoFinal(resBuf, 0);
 
-			this.keyidentifier = new DerOctetString(resBuf);
-			this.certissuer = name;
-			this.certserno = serialNumber == null ? null : new DerInteger(serialNumber);
+			keyidentifier = new DerOctetString(resBuf);
+			certissuer = name;
+			certserno = serialNumber == null ? null : new DerInteger(serialNumber);
 		}
 
 		/**
@@ -142,9 +151,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			GeneralNames name,
 			BigInteger serialNumber)
 		{
-			this.keyidentifier = keyIdentifier == null ? null : new DerOctetString(keyIdentifier);
-			this.certissuer = name;
-			this.certserno = serialNumber == null ? null : new DerInteger(serialNumber);
+			keyidentifier = keyIdentifier == null ? null : new DerOctetString(keyIdentifier);
+			certissuer = name;
+			certserno = serialNumber == null ? null : new DerInteger(serialNumber);
 		}
 
 		public byte[] GetKeyIdentifier()
@@ -176,7 +185,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public override string ToString()
 		{
-			string keyID = (keyidentifier != null) ? Hex.ToHexString(keyidentifier.GetOctets()) : "null";
+			string keyID = keyidentifier != null ? Hex.ToHexString(keyidentifier.GetOctets()) : "null";
 
 			return "AuthorityKeyIdentifier: KeyID(" + keyID + ")";
 		}

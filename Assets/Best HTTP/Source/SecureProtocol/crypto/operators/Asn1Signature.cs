@@ -16,15 +16,15 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 {
-	internal class X509Utilities
+	class X509Utilities
 	{
-		private static readonly IDictionary<string, DerObjectIdentifier> m_algorithms =
+		static readonly IDictionary<string, DerObjectIdentifier> m_algorithms =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly IDictionary<string, Asn1Encodable> m_exParams =
+		static readonly IDictionary<string, Asn1Encodable> m_exParams =
 			new Dictionary<string, Asn1Encodable>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly HashSet<DerObjectIdentifier> noParams = new HashSet<DerObjectIdentifier>();
+		static readonly HashSet<DerObjectIdentifier> noParams = new HashSet<DerObjectIdentifier>();
 
 		static X509Utilities()
 		{
@@ -146,7 +146,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 		 * Return the digest algorithm using one of the standard JCA string
 		 * representations rather than the algorithm identifier (if possible).
 		 */
-		private static string GetDigestAlgName(
+		static string GetDigestAlgName(
 			DerObjectIdentifier digestAlgOID)
 		{
 			if (PkcsObjectIdentifiers.MD5.Equals(digestAlgOID))
@@ -235,7 +235,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 			return sigAlgId.Algorithm.Id;
 		}
 
-		private static RsassaPssParameters CreatePssParams(
+		static RsassaPssParameters CreatePssParams(
 			AlgorithmIdentifier hashAlgId,
 			int saltSize)
 		{
@@ -248,8 +248,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 
 		internal static DerObjectIdentifier GetAlgorithmOid(string algorithmName)
 		{
-			if (m_algorithms.TryGetValue(algorithmName, out var oid))
+			if (m_algorithms.TryGetValue(algorithmName, out DerObjectIdentifier oid))
+			{
 				return oid;
+			}
 
 			return new DerObjectIdentifier(algorithmName);
 		}
@@ -257,10 +259,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 		internal static AlgorithmIdentifier GetSigAlgID(DerObjectIdentifier sigOid, string algorithmName)
 		{
 			if (noParams.Contains(sigOid))
+			{
 				return new AlgorithmIdentifier(sigOid);
+			}
 
-			if (m_exParams.TryGetValue(algorithmName, out var explicitParameters))
+			if (m_exParams.TryGetValue(algorithmName, out Asn1Encodable explicitParameters))
+			{
 				return new AlgorithmIdentifier(sigOid, explicitParameters);
+			}
 
 			return new AlgorithmIdentifier(sigOid, DerNull.Instance);
 		}
@@ -279,10 +285,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 	public class Asn1SignatureFactory
 		: ISignatureFactory
 	{
-		private readonly AlgorithmIdentifier algID;
-		private readonly string algorithm;
-		private readonly AsymmetricKeyParameter privateKey;
-		private readonly SecureRandom random;
+		readonly AlgorithmIdentifier algID;
+		readonly string algorithm;
+		readonly AsymmetricKeyParameter privateKey;
+		readonly SecureRandom random;
 
 		/// <summary>
 		/// Base constructor.
@@ -303,23 +309,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 		public Asn1SignatureFactory(string algorithm, AsymmetricKeyParameter privateKey, SecureRandom random)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException("algorithm");
+			}
+
 			if (privateKey == null)
+			{
 				throw new ArgumentNullException("privateKey");
+			}
+
 			if (!privateKey.IsPrivate)
+			{
 				throw new ArgumentException("Key for signing must be private", "privateKey");
+			}
 
 			DerObjectIdentifier sigOid = X509Utilities.GetAlgorithmOid(algorithm);
 
 			this.algorithm = algorithm;
 			this.privateKey = privateKey;
 			this.random = random;
-			this.algID = X509Utilities.GetSigAlgID(sigOid, algorithm);
+			algID = X509Utilities.GetSigAlgID(sigOid, algorithm);
 		}
 
 		public object AlgorithmDetails
 		{
-			get { return this.algID; }
+			get { return algID; }
 		}
 
 		public IStreamCalculator<IBlockResult> CreateCalculator()
@@ -345,8 +359,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 	public class Asn1VerifierFactory
 		: IVerifierFactory
 	{
-		private readonly AlgorithmIdentifier algID;
-		private readonly AsymmetricKeyParameter publicKey;
+		readonly AlgorithmIdentifier algID;
+		readonly AsymmetricKeyParameter publicKey;
 
 		/// <summary>
 		/// Base constructor.
@@ -356,27 +370,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 		public Asn1VerifierFactory(string algorithm, AsymmetricKeyParameter publicKey)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException("algorithm");
+			}
+
 			if (publicKey == null)
+			{
 				throw new ArgumentNullException("publicKey");
+			}
+
 			if (publicKey.IsPrivate)
+			{
 				throw new ArgumentException("Key for verifying must be public", "publicKey");
+			}
 
 			DerObjectIdentifier sigOid = X509Utilities.GetAlgorithmOid(algorithm);
 
 			this.publicKey = publicKey;
-			this.algID = X509Utilities.GetSigAlgID(sigOid, algorithm);
+			algID = X509Utilities.GetSigAlgID(sigOid, algorithm);
 		}
 
 		public Asn1VerifierFactory(AlgorithmIdentifier algorithm, AsymmetricKeyParameter publicKey)
 		{
 			this.publicKey = publicKey;
-			this.algID = algorithm;
+			algID = algorithm;
 		}
 
 		public object AlgorithmDetails
 		{
-			get { return this.algID; }
+			get { return algID; }
 		}
 
 		public IStreamCalculator<IVerifier> CreateCalculator()
@@ -392,7 +414,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Operators
 	/// </summary>
 	public class Asn1VerifierFactoryProvider : IVerifierFactoryProvider
 	{
-		private readonly AsymmetricKeyParameter publicKey;
+		readonly AsymmetricKeyParameter publicKey;
 
 		/// <summary>
 		/// Base constructor - specify the public key to be used in verification.

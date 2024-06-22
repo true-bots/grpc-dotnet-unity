@@ -8,13 +8,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class AuthEnvelopedData
 		: Asn1Encodable
 	{
-		private DerInteger version;
-		private OriginatorInfo originatorInfo;
-		private Asn1Set recipientInfos;
-		private EncryptedContentInfo authEncryptedContentInfo;
-		private Asn1Set authAttrs;
-		private Asn1OctetString mac;
-		private Asn1Set unauthAttrs;
+		DerInteger version;
+		OriginatorInfo originatorInfo;
+		Asn1Set recipientInfos;
+		EncryptedContentInfo authEncryptedContentInfo;
+		Asn1Set authAttrs;
+		Asn1OctetString mac;
+		Asn1Set unauthAttrs;
 
 		public AuthEnvelopedData(
 			OriginatorInfo originatorInfo,
@@ -25,14 +25,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			Asn1Set unauthAttrs)
 		{
 			// "It MUST be set to 0."
-			this.version = new DerInteger(0);
+			version = new DerInteger(0);
 
 			this.originatorInfo = originatorInfo;
 
 			// "There MUST be at least one element in the collection."
 			this.recipientInfos = recipientInfos;
 			if (this.recipientInfos.Count < 1)
+			{
 				throw new ArgumentException("AuthEnvelopedData requires at least 1 RecipientInfo");
+			}
 
 			this.authEncryptedContentInfo = authEncryptedContentInfo;
 
@@ -42,7 +44,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			if (!authEncryptedContentInfo.ContentType.Equals(CmsObjectIdentifiers.Data))
 			{
 				if (authAttrs == null || authAttrs.Count < 1)
+				{
 					throw new ArgumentException("authAttrs must be present with non-data content");
+				}
 			}
 
 			this.mac = mac;
@@ -50,7 +54,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			this.unauthAttrs = unauthAttrs;
 		}
 
-		private AuthEnvelopedData(
+		AuthEnvelopedData(
 			Asn1Sequence seq)
 		{
 			int index = 0;
@@ -59,7 +63,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			Asn1Object tmp = seq[index++].ToAsn1Object();
 			version = DerInteger.GetInstance(tmp);
 			if (!version.HasValue(0))
+			{
 				throw new ArgumentException("AuthEnvelopedData version number must be 0");
+			}
 
 			tmp = seq[index++].ToAsn1Object();
 			if (tmp is Asn1TaggedObject)
@@ -71,7 +77,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			// "There MUST be at least one element in the collection."
 			recipientInfos = Asn1Set.GetInstance(tmp);
 			if (recipientInfos.Count < 1)
+			{
 				throw new ArgumentException("AuthEnvelopedData requires at least 1 RecipientInfo");
+			}
 
 			tmp = seq[index++].ToAsn1Object();
 			authEncryptedContentInfo = EncryptedContentInfo.GetInstance(tmp);
@@ -89,7 +97,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 				if (!authEncryptedContentInfo.ContentType.Equals(CmsObjectIdentifiers.Data))
 				{
 					if (authAttrs == null || authAttrs.Count < 1)
+					{
 						throw new ArgumentException("authAttrs must be present with non-data content");
+					}
 				}
 			}
 
@@ -128,12 +138,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is AuthEnvelopedData)
+			{
 				return (AuthEnvelopedData)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new AuthEnvelopedData((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid AuthEnvelopedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid AuthEnvelopedData: " + Platform.GetTypeName(obj));
 		}
 
 		public DerInteger Version

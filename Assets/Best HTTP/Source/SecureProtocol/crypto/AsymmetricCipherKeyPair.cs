@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	 */
 	public class AsymmetricCipherKeyPair
 	{
-		private readonly AsymmetricKeyParameter publicParameter;
-		private readonly AsymmetricKeyParameter privateParameter;
+		readonly AsymmetricKeyParameter publicParameter;
+		readonly AsymmetricKeyParameter privateParameter;
 
 		/**
          * basic constructor.
@@ -23,9 +23,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			AsymmetricKeyParameter privateParameter)
 		{
 			if (publicParameter.IsPrivate)
+			{
 				throw new ArgumentException("Expected a public key", "publicParameter");
+			}
+
 			if (!privateParameter.IsPrivate)
+			{
 				throw new ArgumentException("Expected a private key", "privateParameter");
+			}
 
 			this.publicParameter = publicParameter;
 			this.privateParameter = privateParameter;

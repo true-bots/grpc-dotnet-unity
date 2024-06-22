@@ -12,7 +12,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	{
 		public static readonly DerNull Instance = new DerNull();
 
-		private static readonly byte[] ZeroBytes = new byte[0];
+		static readonly byte[] ZeroBytes = new byte[0];
 
 		protected internal DerNull()
 		{

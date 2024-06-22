@@ -7,10 +7,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
 	public class Asn1StreamParser
 	{
-		private readonly Stream _in;
-		private readonly int _limit;
+		readonly Stream _in;
+		readonly int _limit;
 
-		private readonly byte[][] tmpBuffers;
+		readonly byte[][] tmpBuffers;
 
 		public Asn1StreamParser(Stream input)
 			: this(input, Asn1InputStream.FindLimit(input))
@@ -30,10 +30,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal Asn1StreamParser(Stream input, int limit, byte[][] tmpBuffers)
 		{
 			if (!input.CanRead)
+			{
 				throw new ArgumentException("Expected stream to be readable", "input");
+			}
 
-			this._in = input;
-			this._limit = limit;
+			_in = input;
+			_limit = limit;
 			this.tmpBuffers = tmpBuffers;
 		}
 
@@ -41,7 +43,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			int tagHdr = _in.ReadByte();
 			if (tagHdr < 0)
+			{
 				return null;
+			}
 
 			return ImplParseObject(tagHdr);
 		}
@@ -66,14 +70,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			if (length < 0) // indefinite-length method
 			{
 				if (0 == (tagHdr & Asn1Tags.Constructed))
+				{
 					throw new IOException("indefinite-length primitive encoding encountered");
+				}
 
 				IndefiniteLengthInputStream indIn = new IndefiniteLengthInputStream(_in, _limit);
 				Asn1StreamParser sp = new Asn1StreamParser(indIn, _limit, tmpBuffers);
 
 				int tagClass = tagHdr & Asn1Tags.Private;
 				if (0 != tagClass)
+				{
 					return new BerTaggedObjectParser(tagClass, tagNo, sp);
+				}
 
 				return sp.ParseImplicitConstructedIL(tagNo);
 			}
@@ -82,7 +90,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				DefiniteLengthInputStream defIn = new DefiniteLengthInputStream(_in, length, _limit);
 
 				if (0 == (tagHdr & Asn1Tags.Flags))
+				{
 					return ParseImplicitPrimitive(tagNo, defIn);
+				}
 
 				Asn1StreamParser sp = new Asn1StreamParser(defIn, defIn.Remaining, tmpBuffers);
 
@@ -192,14 +202,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal IAsn1Convertible ParseObject(int univTagNo)
 		{
 			if (univTagNo < 0 || univTagNo > 30)
+			{
 				throw new ArgumentException("invalid universal tag number: " + univTagNo, "univTagNo");
+			}
 
 			int tagHdr = _in.ReadByte();
 			if (tagHdr < 0)
+			{
 				return null;
+			}
 
 			if ((tagHdr & ~Asn1Tags.Constructed) != univTagNo)
+			{
 				throw new IOException("unexpected identifier encountered: " + tagHdr);
+			}
 
 			return ImplParseObject(tagHdr);
 		}
@@ -208,11 +224,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			int tagHdr = _in.ReadByte();
 			if (tagHdr < 0)
+			{
 				return null;
+			}
 
 			int tagClass = tagHdr & Asn1Tags.Private;
 			if (0 == tagClass)
+			{
 				throw new Asn1Exception("no tagged object found");
+			}
 
 			return (Asn1TaggedObjectParser)ImplParseObject(tagHdr);
 		}
@@ -222,7 +242,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			int tagHdr = _in.ReadByte();
 			if (tagHdr < 0)
+			{
 				return new Asn1EncodableVector(0);
+			}
 
 			Asn1EncodableVector v = new Asn1EncodableVector();
 			do
@@ -235,7 +257,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return v;
 		}
 
-		private void Set00Check(bool enabled)
+		void Set00Check(bool enabled)
 		{
 			if (_in is IndefiniteLengthInputStream indef)
 			{

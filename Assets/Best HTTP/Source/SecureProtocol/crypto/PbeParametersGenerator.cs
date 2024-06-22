@@ -36,13 +36,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			int iterationCount)
 		{
 			if (password == null)
+			{
 				throw new ArgumentNullException("password");
-			if (salt == null)
-				throw new ArgumentNullException("salt");
+			}
 
-			this.mPassword = Arrays.Clone(password);
-			this.mSalt = Arrays.Clone(salt);
-			this.mIterationCount = iterationCount;
+			if (salt == null)
+			{
+				throw new ArgumentNullException("salt");
+			}
+
+			mPassword = Arrays.Clone(password);
+			mSalt = Arrays.Clone(salt);
+			mIterationCount = iterationCount;
 		}
 
 		public virtual byte[] Password
@@ -88,7 +93,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			char[] password)
 		{
 			if (password == null)
+			{
 				return new byte[0];
+			}
 
 			return Strings.ToByteArray(password);
 		}
@@ -104,7 +111,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			char[] password)
 		{
 			if (password == null)
+			{
 				return new byte[0];
+			}
 
 			return Encoding.UTF8.GetBytes(password);
 		}

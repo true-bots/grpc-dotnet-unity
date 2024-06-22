@@ -14,17 +14,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		: IBlockCipher
 	{
 		// Block and key size, as well as the amount of rounds.
-		private const int Size = 16;
+		const int Size = 16;
 
-		private static readonly byte[] RoundConstants =
+		static readonly byte[] RoundConstants =
 		{
 			0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e,
 			0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4
 		};
 
-		private readonly uint[] k = new uint[4];
+		readonly uint[] k = new uint[4];
 
-		private bool _initialised, _forEncryption;
+		bool _initialised, _forEncryption;
 
 		/**
 		* Create an instance of the Noekeon encryption algorithm
@@ -56,13 +56,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter))
+			{
 				throw new ArgumentException("Invalid parameters passed to Noekeon init - "
-				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters), "parameters");
+				                            + Platform.GetTypeName(parameters), "parameters");
+			}
 
 			KeyParameter p = (KeyParameter)parameters;
 			byte[] key = p.GetKey();
 			if (key.Length != 16)
+			{
 				throw new ArgumentException("Key length not 128 bits.");
+			}
 
 			Pack.BE_To_UInt32(key, 0, k, 0, 4);
 
@@ -90,14 +94,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				}
 			}
 
-			this._forEncryption = forEncryption;
-			this._initialised = true;
+			_forEncryption = forEncryption;
+			_initialised = true;
 		}
 
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (!_initialised)
+			{
 				throw new InvalidOperationException(AlgorithmName + " not initialised");
+			}
 
 			Check.DataLength(input, inOff, Size, "input buffer too short");
 			Check.OutputLength(output, outOff, Size, "output buffer too short");
@@ -271,7 +277,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return Size;
 		}
 #else
-		private int EncryptBlock(byte[] input, int inOff, byte[] output, int outOff)
+		int EncryptBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			uint a0 = Pack.BE_To_UInt32(input, inOff);
 			uint a1 = Pack.BE_To_UInt32(input, inOff + 4);
@@ -305,7 +311,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				}
 
 				if (++round > Size)
+				{
 					break;
+				}
 
 				// pi1(a);
 				{
@@ -342,7 +350,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return Size;
 		}
 
-		private int DecryptBlock(byte[] input, int inOff, byte[] output, int outOff)
+		int DecryptBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			uint a0 = Pack.BE_To_UInt32(input, inOff);
 			uint a1 = Pack.BE_To_UInt32(input, inOff + 4);
@@ -376,7 +384,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				a0 ^= RoundConstants[round];
 
 				if (--round < 0)
+				{
 					break;
+				}
 
 				// pi1(a);
 				{

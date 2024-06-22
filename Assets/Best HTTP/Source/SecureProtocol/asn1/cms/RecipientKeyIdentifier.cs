@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class RecipientKeyIdentifier
 		: Asn1Encodable
 	{
-		private Asn1OctetString subjectKeyIdentifier;
-		private Asn1GeneralizedTime date;
-		private OtherKeyAttribute other;
+		Asn1OctetString subjectKeyIdentifier;
+		Asn1GeneralizedTime date;
+		OtherKeyAttribute other;
 
 		public RecipientKeyIdentifier(
 			Asn1OctetString subjectKeyIdentifier,
@@ -94,12 +94,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is RecipientKeyIdentifier)
+			{
 				return (RecipientKeyIdentifier)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new RecipientKeyIdentifier((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid RecipientKeyIdentifier: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid RecipientKeyIdentifier: " + Platform.GetTypeName(obj));
 		}
 
 		public Asn1OctetString SubjectKeyIdentifier

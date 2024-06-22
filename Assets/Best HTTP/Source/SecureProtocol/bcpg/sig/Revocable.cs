@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 	public class Revocable
 		: SignatureSubpacket
 	{
-		private static byte[] BooleanToByteArray(bool value)
+		static byte[] BooleanToByteArray(bool value)
 		{
 			return new byte[1] { Convert.ToByte(value) };
 		}

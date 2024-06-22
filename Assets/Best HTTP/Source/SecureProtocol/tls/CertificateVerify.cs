@@ -7,18 +7,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class CertificateVerify
 	{
-		private readonly int m_algorithm;
-		private readonly byte[] m_signature;
+		readonly int m_algorithm;
+		readonly byte[] m_signature;
 
 		public CertificateVerify(int algorithm, byte[] signature)
 		{
 			if (!TlsUtilities.IsValidUint16(algorithm))
+			{
 				throw new ArgumentException("algorithm");
-			if (signature == null)
-				throw new ArgumentNullException("signature");
+			}
 
-			this.m_algorithm = algorithm;
-			this.m_signature = signature;
+			if (signature == null)
+			{
+				throw new ArgumentNullException("signature");
+			}
+
+			m_algorithm = algorithm;
+			m_signature = signature;
 		}
 
 		/// <returns>a <see cref="SignatureScheme"/> value.</returns>
@@ -49,7 +54,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static CertificateVerify Parse(TlsContext context, Stream input)
 		{
 			if (!TlsUtilities.IsTlsV13(context))
+			{
 				throw new InvalidOperationException();
+			}
 
 			int algorithm = TlsUtilities.ReadUint16(input);
 			byte[] signature = TlsUtilities.ReadOpaque16(input);

@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Math;
 
@@ -26,28 +27,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 	{
 		public const int UBDataGroups = 16;
 
-		private DerInteger version = new DerInteger(0);
-		private AlgorithmIdentifier digestAlgorithmIdentifier;
-		private DataGroupHash[] datagroupHash;
-		private LdsVersionInfo versionInfo;
+		DerInteger version = new DerInteger(0);
+		AlgorithmIdentifier digestAlgorithmIdentifier;
+		DataGroupHash[] datagroupHash;
+		LdsVersionInfo versionInfo;
 
 		public static LdsSecurityObject GetInstance(object obj)
 		{
 			if (obj is LdsSecurityObject)
+			{
 				return (LdsSecurityObject)obj;
+			}
 
 			if (obj != null)
+			{
 				return new LdsSecurityObject(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private LdsSecurityObject(Asn1Sequence seq)
+		LdsSecurityObject(Asn1Sequence seq)
 		{
 			if (seq == null || seq.Count == 0)
+			{
 				throw new ArgumentException("null or empty sequence passed.");
+			}
 
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
 			// version
 			e.MoveNext();
@@ -78,7 +85,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 			AlgorithmIdentifier digestAlgorithmIdentifier,
 			DataGroupHash[] datagroupHash)
 		{
-			this.version = new DerInteger(0);
+			version = new DerInteger(0);
 			this.digestAlgorithmIdentifier = digestAlgorithmIdentifier;
 			this.datagroupHash = datagroupHash;
 
@@ -91,7 +98,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 			DataGroupHash[] datagroupHash,
 			LdsVersionInfo versionInfo)
 		{
-			this.version = new DerInteger(1);
+			version = new DerInteger(1);
 			this.digestAlgorithmIdentifier = digestAlgorithmIdentifier;
 			this.datagroupHash = datagroupHash;
 			this.versionInfo = versionInfo;
@@ -99,10 +106,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Icao
 			CheckDatagroupHashSeqSize(datagroupHash.Length);
 		}
 
-		private void CheckDatagroupHashSeqSize(int size)
+		void CheckDatagroupHashSeqSize(int size)
 		{
 			if (size < 2 || size > UBDataGroups)
+			{
 				throw new ArgumentException("wrong size in DataGroupHashValues : not in (2.." + UBDataGroups + ")");
+			}
 		}
 
 		public BigInteger Version

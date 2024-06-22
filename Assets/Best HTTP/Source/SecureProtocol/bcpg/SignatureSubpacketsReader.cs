@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	*/
 	public class SignatureSubpacketsParser
 	{
-		private readonly Stream input;
+		readonly Stream input;
 
 		public SignatureSubpacketsParser(
 			Stream input)
@@ -25,7 +25,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		{
 			int l = input.ReadByte();
 			if (l < 0)
+			{
 				return null;
+			}
 
 			int bodyLen = 0;
 			bool isLongLength = false;
@@ -36,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			}
 			else if (l <= 223)
 			{
-				bodyLen = ((l - 192) << 8) + (input.ReadByte()) + 192;
+				bodyLen = ((l - 192) << 8) + input.ReadByte() + 192;
 			}
 			else if (l == 255)
 			{
@@ -51,10 +53,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 
 			int tag = input.ReadByte();
 			if (tag < 0)
+			{
 				throw new EndOfStreamException("unexpected EOF reading signature sub packet");
+			}
 
 			if (bodyLen <= 0)
+			{
 				throw new EndOfStreamException("out of range data found in signature sub packet");
+			}
 
 			byte[] data = new byte[bodyLen - 1];
 
@@ -65,7 +71,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			//
 			int bytesRead = Streams.ReadFully(input, data);
 
-			bool isCritical = ((tag & 0x80) != 0);
+			bool isCritical = (tag & 0x80) != 0;
 			SignatureSubpacketTag type = (SignatureSubpacketTag)(tag & 0x7f);
 
 			if (bytesRead != data.Length)
@@ -126,10 +132,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			return new SignatureSubpacket(type, isCritical, isLongLength, data);
 		}
 
-		private byte[] CheckData(byte[] data, int expected, int bytesRead, string name)
+		byte[] CheckData(byte[] data, int expected, int bytesRead, string name)
 		{
 			if (bytesRead != expected)
+			{
 				throw new EndOfStreamException("truncated " + name + " subpacket data.");
+			}
 
 			return Arrays.CopyOfRange(data, 0, expected);
 		}

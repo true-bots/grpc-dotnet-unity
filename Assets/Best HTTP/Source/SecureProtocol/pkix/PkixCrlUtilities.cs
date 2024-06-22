@@ -25,7 +25,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 				throw new Exception("Exception obtaining complete CRLs.", e);
 			}
 
-			var finalSet = new HashSet<X509Crl>();
+			HashSet<X509Crl> finalSet = new HashSet<X509Crl>();
 			DateTime validityDate = currentDate;
 
 			if (paramsPkix.Date != null)
@@ -77,14 +77,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// <returns>a Collection of all found {@link X509CRL X509CRL} objects. May be
 		/// empty but never <code>null</code>.
 		/// </returns>
-		private HashSet<X509Crl> FindCrls(ISelector<X509Crl> crlSelector, IList<IStore<X509Crl>> crlStores)
+		HashSet<X509Crl> FindCrls(ISelector<X509Crl> crlSelector, IList<IStore<X509Crl>> crlStores)
 		{
-			var crls = new HashSet<X509Crl>();
+			HashSet<X509Crl> crls = new HashSet<X509Crl>();
 
 			Exception lastException = null;
 			bool foundValidStore = false;
 
-			foreach (var crlStore in crlStores)
+			foreach (IStore<X509Crl> crlStore in crlStores)
 			{
 				try
 				{
@@ -98,7 +98,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			}
 
 			if (!foundValidStore && lastException != null)
+			{
 				throw lastException;
+			}
 
 			return crls;
 		}

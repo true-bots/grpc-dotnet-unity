@@ -21,23 +21,23 @@ namespace BestHTTP.Connections
 
 		public KeepAliveHeader KeepAlive
 		{
-			get { return this._keepAlive; }
+			get { return _keepAlive; }
 		}
 
-		private KeepAliveHeader _keepAlive;
+		KeepAliveHeader _keepAlive;
 
 		public bool CanProcessMultiple
 		{
 			get { return false; }
 		}
 
-		private readonly HTTPConnection conn;
+		readonly HTTPConnection conn;
 
 		public LoggingContext Context { get; private set; }
 
 		public HTTP1Handler(HTTPConnection conn)
 		{
-			this.Context = new LoggingContext(this);
+			Context = new LoggingContext(this);
 			this.conn = conn;
 		}
 
@@ -47,8 +47,8 @@ namespace BestHTTP.Connections
 
 		public void RunHandler()
 		{
-			HTTPManager.Logger.Information("HTTP1Handler", string.Format("[{0}] started processing request '{1}'", this, this.conn.CurrentRequest.CurrentUri.ToString()),
-				this.Context, this.conn.CurrentRequest.Context);
+			HTTPManager.Logger.Information("HTTP1Handler", string.Format("[{0}] started processing request '{1}'", this, conn.CurrentRequest.CurrentUri.ToString()),
+				Context, conn.CurrentRequest.Context);
 
 			ThreadedRunner.SetThreadName("BestHTTP.HTTP1 R&W");
 
@@ -58,62 +58,70 @@ namespace BestHTTP.Connections
 
 			try
 			{
-				if (this.conn.CurrentRequest.IsCancellationRequested)
+				if (conn.CurrentRequest.IsCancellationRequested)
+				{
 					return;
+				}
 
 #if !BESTHTTP_DISABLE_CACHING
 				// Setup cache control headers before we send out the request
-				if (!this.conn.CurrentRequest.DisableCache)
-					HTTPCacheService.SetHeaders(this.conn.CurrentRequest);
+				if (!conn.CurrentRequest.DisableCache)
+				{
+					HTTPCacheService.SetHeaders(conn.CurrentRequest);
+				}
 #endif
 
 				// Write the request to the stream
-				this.conn.CurrentRequest.QueuedAt = DateTime.MinValue;
-				this.conn.CurrentRequest.ProcessingStarted = DateTime.UtcNow;
-				this.conn.CurrentRequest.SendOutTo(this.conn.connector.Stream);
-				this.conn.CurrentRequest.Timing.Add(TimingEventNames.Request_Sent);
+				conn.CurrentRequest.QueuedAt = DateTime.MinValue;
+				conn.CurrentRequest.ProcessingStarted = DateTime.UtcNow;
+				conn.CurrentRequest.SendOutTo(conn.connector.Stream);
+				conn.CurrentRequest.Timing.Add(TimingEventNames.Request_Sent);
 
-				if (this.conn.CurrentRequest.IsCancellationRequested)
+				if (conn.CurrentRequest.IsCancellationRequested)
+				{
 					return;
+				}
 
-				this.conn.CurrentRequest.OnCancellationRequested += OnCancellationRequested;
+				conn.CurrentRequest.OnCancellationRequested += OnCancellationRequested;
 
 				// Receive response from the server
-				bool received = Receive(this.conn.CurrentRequest);
+				bool received = Receive(conn.CurrentRequest);
 
-				this.conn.CurrentRequest.Timing.Add(TimingEventNames.Response_Received);
+				conn.CurrentRequest.Timing.Add(TimingEventNames.Response_Received);
 
-				if (this.conn.CurrentRequest.IsCancellationRequested)
+				if (conn.CurrentRequest.IsCancellationRequested)
+				{
 					return;
+				}
 
-				if (!received && this.conn.CurrentRequest.Retries < this.conn.CurrentRequest.MaxRetries)
+				if (!received && conn.CurrentRequest.Retries < conn.CurrentRequest.MaxRetries)
 				{
 					proposedConnectionState = HTTPConnectionStates.Closed;
-					this.conn.CurrentRequest.Retries++;
+					conn.CurrentRequest.Retries++;
 					resendRequest = true;
 					return;
 				}
 
-				ConnectionHelper.HandleResponse(this.conn.ToString(), this.conn.CurrentRequest, out resendRequest, out proposedConnectionState, ref this._keepAlive,
-					this.conn.Context, this.conn.CurrentRequest.Context);
+				ConnectionHelper.HandleResponse(conn.ToString(), conn.CurrentRequest, out resendRequest, out proposedConnectionState, ref _keepAlive,
+					conn.Context, conn.CurrentRequest.Context);
 			}
 			catch (TimeoutException e)
 			{
-				this.conn.CurrentRequest.Response = null;
+				conn.CurrentRequest.Response = null;
 
 				// Do nothing here if Abort() got called on the request, its State is already set.
-				if (!this.conn.CurrentRequest.IsTimedOut)
+				if (!conn.CurrentRequest.IsTimedOut)
 				{
 					// We will try again only once
-					if (this.conn.CurrentRequest.Retries < this.conn.CurrentRequest.MaxRetries)
+					if (conn.CurrentRequest.Retries < conn.CurrentRequest.MaxRetries)
 					{
-						this.conn.CurrentRequest.Retries++;
+						conn.CurrentRequest.Retries++;
 						resendRequest = true;
 					}
 					else
 					{
-						this.conn.CurrentRequest.Exception = e;
-						this.conn.CurrentRequest.State = HTTPRequestStates.ConnectionTimedOut;
+						conn.CurrentRequest.Exception = e;
+						conn.CurrentRequest.State = HTTPRequestStates.ConnectionTimedOut;
 					}
 				}
 
@@ -121,12 +129,16 @@ namespace BestHTTP.Connections
 			}
 			catch (Exception e)
 			{
-				if (this.ShutdownType == ShutdownTypes.Immediate)
+				if (ShutdownType == ShutdownTypes.Immediate)
+				{
 					return;
+				}
 
 				string exceptionMessage = string.Empty;
 				if (e == null)
+				{
 					exceptionMessage = "null";
+				}
 				else
 				{
 					System.Text.StringBuilder sb = PlatformSupport.Text.StringBuilderPool.Get(1);
@@ -140,44 +152,48 @@ namespace BestHTTP.Connections
 						exception = exception.InnerException;
 
 						if (exception != null)
+						{
 							sb.AppendLine();
+						}
 					}
 
 					exceptionMessage = PlatformSupport.Text.StringBuilderPool.ReleaseAndGrab(sb);
 				}
 
-				HTTPManager.Logger.Verbose("HTTP1Handler", exceptionMessage, this.Context, this.conn.CurrentRequest.Context);
+				HTTPManager.Logger.Verbose("HTTP1Handler", exceptionMessage, Context, conn.CurrentRequest.Context);
 
 #if !BESTHTTP_DISABLE_CACHING
-				if (this.conn.CurrentRequest.UseStreaming)
-					HTTPCacheService.DeleteEntity(this.conn.CurrentRequest.CurrentUri);
+				if (conn.CurrentRequest.UseStreaming)
+				{
+					HTTPCacheService.DeleteEntity(conn.CurrentRequest.CurrentUri);
+				}
 #endif
 
 				// Something gone bad, Response must be null!
-				this.conn.CurrentRequest.Response = null;
+				conn.CurrentRequest.Response = null;
 
 				// Do nothing here if Abort() got called on the request, its State is already set.
-				if (!this.conn.CurrentRequest.IsCancellationRequested)
+				if (!conn.CurrentRequest.IsCancellationRequested)
 				{
-					this.conn.CurrentRequest.Exception = e;
-					this.conn.CurrentRequest.State = HTTPRequestStates.Error;
+					conn.CurrentRequest.Exception = e;
+					conn.CurrentRequest.State = HTTPRequestStates.Error;
 				}
 
 				proposedConnectionState = HTTPConnectionStates.Closed;
 			}
 			finally
 			{
-				this.conn.CurrentRequest.OnCancellationRequested -= OnCancellationRequested;
+				conn.CurrentRequest.OnCancellationRequested -= OnCancellationRequested;
 
 				// Exit ASAP
-				if (this.ShutdownType != ShutdownTypes.Immediate)
+				if (ShutdownType != ShutdownTypes.Immediate)
 				{
-					if (this.conn.CurrentRequest.IsCancellationRequested)
+					if (conn.CurrentRequest.IsCancellationRequested)
 					{
 						// we don't know what stage the request is canceled, we can't safely reuse the tcp channel.
 						proposedConnectionState = HTTPConnectionStates.Closed;
 
-						this.conn.CurrentRequest.Response = null;
+						conn.CurrentRequest.Response = null;
 
 						// The request's State already set, or going to be set soon in RequestEvents.cs.
 						//this.conn.CurrentRequest.State = this.conn.CurrentRequest.IsTimedOut ? HTTPRequestStates.TimedOut : HTTPRequestStates.Aborted;
@@ -191,69 +207,88 @@ namespace BestHTTP.Connections
 						//  see order of ProcessQueues in HTTPManager.OnUpdate!) and it would pick this very same closing/closed connection!
 
 						if (proposedConnectionState == HTTPConnectionStates.Closed || proposedConnectionState == HTTPConnectionStates.ClosedResendRequest)
-							ConnectionEventHelper.EnqueueConnectionEvent(new ConnectionEventInfo(this.conn, this.conn.CurrentRequest));
+						{
+							ConnectionEventHelper.EnqueueConnectionEvent(new ConnectionEventInfo(conn, conn.CurrentRequest));
+						}
 						else
-							RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this.conn.CurrentRequest, RequestEvents.Resend));
+						{
+							RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(conn.CurrentRequest, RequestEvents.Resend));
+						}
 					}
-					else if (this.conn.CurrentRequest.Response != null && this.conn.CurrentRequest.Response.IsUpgraded)
+					else if (conn.CurrentRequest.Response != null && conn.CurrentRequest.Response.IsUpgraded)
 					{
 						proposedConnectionState = HTTPConnectionStates.WaitForProtocolShutdown;
 					}
-					else if (this.conn.CurrentRequest.State == HTTPRequestStates.Processing)
+					else if (conn.CurrentRequest.State == HTTPRequestStates.Processing)
 					{
-						if (this.conn.CurrentRequest.Response != null)
-							this.conn.CurrentRequest.State = HTTPRequestStates.Finished;
+						if (conn.CurrentRequest.Response != null)
+						{
+							conn.CurrentRequest.State = HTTPRequestStates.Finished;
+						}
 						else
 						{
-							this.conn.CurrentRequest.Exception = new Exception(string.Format(
+							conn.CurrentRequest.Exception = new Exception(string.Format(
 								"[{0}] Remote server closed the connection before sending response header! Previous request state: {1}. Connection state: {2}",
-								this.ToString(),
-								this.conn.CurrentRequest.State.ToString(),
-								this.conn.State.ToString()));
-							this.conn.CurrentRequest.State = HTTPRequestStates.Error;
+								ToString(),
+								conn.CurrentRequest.State.ToString(),
+								conn.State.ToString()));
+							conn.CurrentRequest.State = HTTPRequestStates.Error;
 
 							proposedConnectionState = HTTPConnectionStates.Closed;
 						}
 					}
 
-					this.conn.CurrentRequest = null;
+					conn.CurrentRequest = null;
 
 					if (proposedConnectionState == HTTPConnectionStates.Processing)
+					{
 						proposedConnectionState = HTTPConnectionStates.Recycle;
+					}
 
 					if (proposedConnectionState != HTTPConnectionStates.ClosedResendRequest)
-						ConnectionEventHelper.EnqueueConnectionEvent(new ConnectionEventInfo(this.conn, proposedConnectionState));
+					{
+						ConnectionEventHelper.EnqueueConnectionEvent(new ConnectionEventInfo(conn, proposedConnectionState));
+					}
 				}
 			}
 		}
 
-		private void OnCancellationRequested(HTTPRequest obj)
+		void OnCancellationRequested(HTTPRequest obj)
 		{
-			if (this.conn != null && this.conn.connector != null)
-				this.conn.connector.Dispose();
+			if (conn != null && conn.connector != null)
+			{
+				conn.connector.Dispose();
+			}
 		}
 
-		private bool Receive(HTTPRequest request)
+		bool Receive(HTTPRequest request)
 		{
 			SupportedProtocols protocol = HTTPProtocolFactory.GetProtocolFromUri(request.CurrentUri);
 
-			if (HTTPManager.Logger.Level == Logger.Loglevels.All)
-				HTTPManager.Logger.Verbose("HTTPConnection", string.Format("[{0}] - Receive - protocol: {1}", this.ToString(), protocol.ToString()), this.Context,
+			if (HTTPManager.Logger.Level == Loglevels.All)
+			{
+				HTTPManager.Logger.Verbose("HTTPConnection", string.Format("[{0}] - Receive - protocol: {1}", ToString(), protocol.ToString()), Context,
 					request.Context);
+			}
 
-			request.Response = HTTPProtocolFactory.Get(protocol, request, this.conn.connector.Stream, request.UseStreaming, false);
+			request.Response = HTTPProtocolFactory.Get(protocol, request, conn.connector.Stream, request.UseStreaming, false);
 
 			if (!request.Response.Receive())
 			{
-				if (HTTPManager.Logger.Level == Logger.Loglevels.All)
-					HTTPManager.Logger.Verbose("HTTP1Handler", string.Format("[{0}] - Receive - Failed! Response will be null, returning with false.", this.ToString()),
-						this.Context, request.Context);
+				if (HTTPManager.Logger.Level == Loglevels.All)
+				{
+					HTTPManager.Logger.Verbose("HTTP1Handler", string.Format("[{0}] - Receive - Failed! Response will be null, returning with false.", ToString()),
+						Context, request.Context);
+				}
+
 				request.Response = null;
 				return false;
 			}
 
-			if (HTTPManager.Logger.Level == Logger.Loglevels.All)
-				HTTPManager.Logger.Verbose("HTTP1Handler", string.Format("[{0}] - Receive - Finished Successfully!", this.ToString()), this.Context, request.Context);
+			if (HTTPManager.Logger.Level == Loglevels.All)
+			{
+				HTTPManager.Logger.Verbose("HTTP1Handler", string.Format("[{0}] - Receive - Finished Successfully!", ToString()), Context, request.Context);
+			}
 
 			return true;
 		}
@@ -262,7 +297,7 @@ namespace BestHTTP.Connections
 
 		public void Shutdown(ShutdownTypes type)
 		{
-			this.ShutdownType = type;
+			ShutdownType = type;
 		}
 
 		public void Dispose()
@@ -271,7 +306,7 @@ namespace BestHTTP.Connections
 			GC.SuppressFinalize(this);
 		}
 
-		private void Dispose(bool disposing)
+		void Dispose(bool disposing)
 		{
 		}
 

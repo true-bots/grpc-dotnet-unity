@@ -14,18 +14,18 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 	public sealed class FastBcChaCha20Poly1305
 		: TlsAeadCipherImpl
 	{
-		private static readonly byte[] Zeroes = new byte[15];
+		static readonly byte[] Zeroes = new byte[15];
 
-		private readonly FastChaCha7539Engine m_cipher = new FastChaCha7539Engine();
-		private readonly FastPoly1305 m_mac = new FastPoly1305();
+		readonly FastChaCha7539Engine m_cipher = new FastChaCha7539Engine();
+		readonly FastPoly1305 m_mac = new FastPoly1305();
 
-		private readonly bool m_isEncrypting;
+		readonly bool m_isEncrypting;
 
-		private int m_additionalDataLength;
+		int m_additionalDataLength;
 
 		public FastBcChaCha20Poly1305(bool isEncrypting)
 		{
-			this.m_isEncrypting = isEncrypting;
+			m_isEncrypting = isEncrypting;
 		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
@@ -41,7 +41,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 				int outputLength = inputLength;
 
 				if (ciphertextLength != outputLength)
+				{
 					throw new InvalidOperationException();
+				}
 
 				UpdateMac(output, outputOffset, ciphertextLength);
 
@@ -55,7 +57,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
                 m_mac.DoFinal(output.AsSpan(outputOffset + ciphertextLength));
 #else
 				byte[] lengths = BufferPool.Get(16, true);
-				using (var _ = new PooledBuffer(lengths))
+				using (PooledBuffer _ = new PooledBuffer(lengths))
 				{
 					Pack.UInt64_To_LE((ulong)m_additionalDataLength, lengths, 0);
 					Pack.UInt64_To_LE((ulong)ciphertextLength, lengths, 8);
@@ -88,7 +90,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
                     throw new TlsFatalAlert(AlertDescription.bad_record_mac);
 #else
 				byte[] expectedMac = BufferPool.Get(16, true);
-				using (var _ = new PooledBuffer(expectedMac))
+				using (PooledBuffer _ = new PooledBuffer(expectedMac))
 				{
 					Pack.UInt64_To_LE((ulong)m_additionalDataLength, expectedMac, 0);
 					Pack.UInt64_To_LE((ulong)ciphertextLength, expectedMac, 8);
@@ -99,7 +101,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 					bool badMac = !TlsUtilities.ConstantTimeAreEqual(16, expectedMac, 0, input, inputOffset + ciphertextLength);
 
 					if (badMac)
+					{
 						throw new TlsFatalAlert(AlertDescription.bad_record_mac);
+					}
 				}
 #endif
 
@@ -107,7 +111,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 				int outputLength = ciphertextLength;
 
 				if (ciphertextLength != outputLength)
+				{
 					throw new InvalidOperationException();
+				}
 
 				return ciphertextLength;
 			}
@@ -121,17 +127,19 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 		public void Init(byte[] nonce, int macSize, byte[] additionalData)
 		{
 			if (nonce == null || nonce.Length != 12 || macSize != 16)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			m_cipher.Init(m_isEncrypting, new ParametersWithIV(null, nonce));
 			InitMac();
 			if (additionalData == null)
 			{
-				this.m_additionalDataLength = 0;
+				m_additionalDataLength = 0;
 			}
 			else
 			{
-				this.m_additionalDataLength = additionalData.Length;
+				m_additionalDataLength = additionalData.Length;
 				UpdateMac(additionalData, 0, additionalData.Length);
 			}
 		}
@@ -158,14 +166,14 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 
 		byte[] firstBlock = new byte[64];
 
-		private void InitMac()
+		void InitMac()
 		{
 			m_cipher.ProcessBytes(firstBlock, 0, 64, firstBlock, 0);
 			m_mac.Init(new KeyParameter(firstBlock, 0, 32));
 			Array.Clear(firstBlock, 0, firstBlock.Length);
 		}
 
-		private void UpdateMac(byte[] buf, int off, int len)
+		void UpdateMac(byte[] buf, int off, int len)
 		{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             m_mac.BlockUpdate(buf.AsSpan(off, len));

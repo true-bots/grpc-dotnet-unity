@@ -16,15 +16,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	{
 		public override int GetHashCode()
 		{
-			int code = Arrays.GetHashCode(this.SubjectKeyIdentifier);
+			int code = Arrays.GetHashCode(SubjectKeyIdentifier);
 
-			BigInteger serialNumber = this.SerialNumber;
+			BigInteger serialNumber = SerialNumber;
 			if (serialNumber != null)
 			{
 				code ^= serialNumber.GetHashCode();
 			}
 
-			X509Name issuer = this.Issuer;
+			X509Name issuer = Issuer;
 			if (issuer != null)
 			{
 				code ^= issuer.GetHashCode();
@@ -37,12 +37,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			object obj)
 		{
 			if (obj == this)
+			{
 				return false;
+			}
 
 			OriginatorID id = obj as OriginatorID;
 
 			if (id == null)
+			{
 				return false;
+			}
 
 			return Arrays.AreEqual(SubjectKeyIdentifier, id.SubjectKeyIdentifier)
 			       && Org.BouncyCastle.Utilities.Platform.Equals(SerialNumber, id.SerialNumber)

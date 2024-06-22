@@ -8,11 +8,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class CertRequest
 		: Asn1Encodable
 	{
-		private readonly DerInteger certReqId;
-		private readonly CertTemplate certTemplate;
-		private readonly Controls controls;
+		readonly DerInteger certReqId;
+		readonly CertTemplate certTemplate;
+		readonly Controls controls;
 
-		private CertRequest(Asn1Sequence seq)
+		CertRequest(Asn1Sequence seq)
 		{
 			certReqId = DerInteger.GetInstance(seq[0]);
 			certTemplate = CertTemplate.GetInstance(seq[1]);
@@ -25,10 +25,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static CertRequest GetInstance(object obj)
 		{
 			if (obj is CertRequest)
+			{
 				return (CertRequest)obj;
+			}
 
 			if (obj != null)
+			{
 				return new CertRequest(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}

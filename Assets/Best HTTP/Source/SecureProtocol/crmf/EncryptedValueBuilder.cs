@@ -17,9 +17,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 {
 	public class EncryptedValueBuilder
 	{
-		private readonly IKeyWrapper wrapper;
-		private readonly ICipherBuilderWithKey encryptor;
-		private readonly IEncryptedValuePadder padder;
+		readonly IKeyWrapper wrapper;
+		readonly ICipherBuilderWithKey encryptor;
+		readonly IEncryptedValuePadder padder;
 
 		///
 		/// Create a builder that makes EncryptedValue structures.
@@ -110,14 +110,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 			}
 		}
 
-		private EncryptedValue EncryptData(byte[] data)
+		EncryptedValue EncryptData(byte[] data)
 		{
 			MemoryOutputStream bOut = new MemoryOutputStream();
-			var cipher = encryptor.BuildCipher(bOut);
+			ICipher cipher = encryptor.BuildCipher(bOut);
 
 			try
 			{
-				using (var eOut = cipher.Stream)
+				using (Stream eOut = cipher.Stream)
 				{
 					eOut.Write(data, 0, data.Length);
 				}
@@ -147,7 +147,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 			return new EncryptedValue(intendedAlg, symmAlg, encSymmKey, keyAlg, valueHint, encValue);
 		}
 
-		private byte[] PadData(byte[] data)
+		byte[] PadData(byte[] data)
 		{
 			if (padder != null)
 			{

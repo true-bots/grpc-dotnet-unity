@@ -36,7 +36,7 @@ namespace BestHTTP.WebSocket.Frames
 		/// <summary>
 		/// A Pong frame sent in response to a Ping frame must have identical "Application data" as found in the message body of the Ping frame being replied to.
 		/// </summary>
-		Pong = 0xA,
+		Pong = 0xA
 		//Reserved6         = 0xB,
 		//Reserved7         = 0xC,
 		//Reserved8         = 0xD,

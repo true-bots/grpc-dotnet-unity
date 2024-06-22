@@ -11,8 +11,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class ShortenedDigest
 		: IDigest
 	{
-		private IDigest baseDigest;
-		private int length;
+		IDigest baseDigest;
+		int length;
 
 		/**
 		* Base constructor.

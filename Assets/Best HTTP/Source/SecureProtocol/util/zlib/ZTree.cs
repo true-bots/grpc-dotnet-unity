@@ -39,15 +39,15 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 {
-	internal sealed class Tree
+	sealed class Tree
 	{
-		private const int MAX_BITS = 15;
-		private const int BL_CODES = 19;
-		private const int D_CODES = 30;
-		private const int LITERALS = 256;
-		private const int LENGTH_CODES = 29;
-		private const int L_CODES = (LITERALS + 1 + LENGTH_CODES);
-		private const int HEAP_SIZE = (2 * L_CODES + 1);
+		const int MAX_BITS = 15;
+		const int BL_CODES = 19;
+		const int D_CODES = 30;
+		const int LITERALS = 256;
+		const int LENGTH_CODES = 29;
+		const int L_CODES = LITERALS + 1 + LENGTH_CODES;
+		const int HEAP_SIZE = 2 * L_CODES + 1;
 
 		// Bit length codes must not exceed MAX_BL_BITS bits
 		internal const int MAX_BL_BITS = 7;
@@ -162,7 +162,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		// used.
 		internal static int d_code(int dist)
 		{
-			return ((dist) < 256 ? _dist_code[dist] : _dist_code[256 + ((dist) >> 7)]);
+			return dist < 256 ? _dist_code[dist] : _dist_code[256 + (dist >> 7)];
 		}
 
 		internal short[] dyn_tree; // the dynamic tree
@@ -191,7 +191,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			short f; // frequency
 			int overflow = 0; // number of elements with bit length too large
 
-			for (bits = 0; bits <= MAX_BITS; bits++) s.bl_count[bits] = 0;
+			for (bits = 0; bits <= MAX_BITS; bits++)
+			{
+				s.bl_count[bits] = 0;
+			}
 
 			// In a first pass, compute the optimal bit lengths (which may
 			// overflow in the case of the bit length tree).
@@ -210,24 +213,41 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				tree[n * 2 + 1] = (short)bits;
 				// We overwrite tree[n*2+1] which is no longer needed
 
-				if (n > max_code) continue; // not a leaf node
+				if (n > max_code)
+				{
+					continue; // not a leaf node
+				}
 
 				s.bl_count[bits]++;
 				xbits = 0;
-				if (n >= based) xbits = extra[n - based];
+				if (n >= based)
+				{
+					xbits = extra[n - based];
+				}
+
 				f = tree[n * 2];
 				s.opt_len += f * (bits + xbits);
-				if (stree != null) s.static_len += f * (stree[n * 2 + 1] + xbits);
+				if (stree != null)
+				{
+					s.static_len += f * (stree[n * 2 + 1] + xbits);
+				}
 			}
 
-			if (overflow == 0) return;
+			if (overflow == 0)
+			{
+				return;
+			}
 
 			// This happens for example on obj2 and pic of the Calgary corpus
 			// Find the first bit length which could increase:
 			do
 			{
 				bits = max_length - 1;
-				while (s.bl_count[bits] == 0) bits--;
+				while (s.bl_count[bits] == 0)
+				{
+					bits--;
+				}
+
 				s.bl_count[bits]--; // move one leaf down the tree
 				s.bl_count[bits + 1] += 2; // move one overflow item as its brother
 				s.bl_count[max_length]--;
@@ -242,7 +262,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				while (n != 0)
 				{
 					m = s.heap[--h];
-					if (m > max_code) continue;
+					if (m > max_code)
+					{
+						continue;
+					}
+
 					if (tree[m * 2 + 1] != bits)
 					{
 						s.opt_len += (int)(((long)bits - (long)tree[m * 2 + 1]) * (long)tree[m * 2]);
@@ -294,11 +318,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			// two codes of non zero frequency.
 			while (s.heap_len < 2)
 			{
-				node = s.heap[++s.heap_len] = (max_code < 2 ? ++max_code : 0);
+				node = s.heap[++s.heap_len] = max_code < 2 ? ++max_code : 0;
 				tree[node * 2] = 1;
 				s.depth[node] = 0;
 				s.opt_len--;
-				if (stree != null) s.static_len -= stree[node * 2 + 1];
+				if (stree != null)
+				{
+					s.static_len -= stree[node * 2 + 1];
+				}
 				// node is 0 or 1 so it does not have extra bits
 			}
 
@@ -308,7 +335,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			// establish sub-heaps of increasing lengths:
 
 			for (n = s.heap_len / 2; n >= 1; n--)
+			{
 				s.pqdownheap(tree, n);
+			}
 
 			// Construct the Huffman tree by repeatedly combining the least two
 			// frequent nodes.
@@ -378,9 +407,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			for (n = 0; n <= max_code; n++)
 			{
 				int len = tree[n * 2 + 1];
-				if (len == 0) continue;
+				if (len == 0)
+				{
+					continue;
+				}
+
 				// Now reverse the bits
-				tree[n * 2] = (short)(bi_reverse(next_code[len]++, len));
+				tree[n * 2] = (short)bi_reverse(next_code[len]++, len);
 			}
 		}
 

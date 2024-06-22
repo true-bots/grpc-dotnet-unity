@@ -7,8 +7,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class OtherRecipientInfo
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier oriType;
-		private readonly Asn1Encodable oriValue;
+		readonly DerObjectIdentifier oriType;
+		readonly Asn1Encodable oriValue;
 
 		public OtherRecipientInfo(
 			DerObjectIdentifier oriType,
@@ -18,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			this.oriValue = oriValue;
 		}
 
-		private OtherRecipientInfo(Asn1Sequence seq)
+		OtherRecipientInfo(Asn1Sequence seq)
 		{
 			oriType = DerObjectIdentifier.GetInstance(seq[0]);
 			oriValue = seq[1];
@@ -50,10 +50,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
+
 			OtherRecipientInfo existing = obj as OtherRecipientInfo;
 			if (existing != null)
+			{
 				return existing;
+			}
+
 			return new OtherRecipientInfo(Asn1Sequence.GetInstance(obj));
 		}
 

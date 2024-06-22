@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class RecipientID
 		: X509CertStoreSelector
 	{
-		private byte[] keyIdentifier;
+		byte[] keyIdentifier;
 
 		public byte[] KeyIdentifier
 		{
@@ -22,15 +22,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		public override int GetHashCode()
 		{
 			int code = Arrays.GetHashCode(keyIdentifier)
-			           ^ Arrays.GetHashCode(this.SubjectKeyIdentifier);
+			           ^ Arrays.GetHashCode(SubjectKeyIdentifier);
 
-			BigInteger serialNumber = this.SerialNumber;
+			BigInteger serialNumber = SerialNumber;
 			if (serialNumber != null)
 			{
 				code ^= serialNumber.GetHashCode();
 			}
 
-			X509Name issuer = this.Issuer;
+			X509Name issuer = Issuer;
 			if (issuer != null)
 			{
 				code ^= issuer.GetHashCode();
@@ -43,12 +43,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			RecipientID id = obj as RecipientID;
 
 			if (id == null)
+			{
 				return false;
+			}
 
 			return Arrays.AreEqual(keyIdentifier, id.keyIdentifier)
 			       && Arrays.AreEqual(SubjectKeyIdentifier, id.SubjectKeyIdentifier)

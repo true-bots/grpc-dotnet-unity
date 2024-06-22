@@ -4,12 +4,12 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal class DLSet
+	class DLSet
 		: DerSet
 	{
-		internal static new readonly DLSet Empty = new DLSet();
+		internal new static readonly DLSet Empty = new DLSet();
 
-		internal static new DLSet FromVector(Asn1EncodableVector elementVector)
+		internal new static DLSet FromVector(Asn1EncodableVector elementVector)
 		{
 			return elementVector.Count < 1 ? Empty : new DLSet(elementVector);
 		}
@@ -51,7 +51,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncoding(int encoding)
 		{
 			if (Asn1OutputStream.EncodingDer == encoding)
+			{
 				return base.GetEncoding(encoding);
+			}
 
 			return new ConstructedDLEncoding(Asn1Tags.Universal, Asn1Tags.Set,
 				Asn1OutputStream.GetContentsEncodings(encoding, elements));
@@ -60,7 +62,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal override IAsn1Encoding GetEncodingImplicit(int encoding, int tagClass, int tagNo)
 		{
 			if (Asn1OutputStream.EncodingDer == encoding)
+			{
 				return base.GetEncodingImplicit(encoding, tagClass, tagNo);
+			}
 
 			return new ConstructedDLEncoding(tagClass, tagNo,
 				Asn1OutputStream.GetContentsEncodings(encoding, elements));

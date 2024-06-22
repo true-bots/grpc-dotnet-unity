@@ -6,7 +6,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
 	public abstract class Asn1Generator
 	{
-		private Stream _out;
+		Stream _out;
 
 		protected Asn1Generator(
 			Stream outStream)

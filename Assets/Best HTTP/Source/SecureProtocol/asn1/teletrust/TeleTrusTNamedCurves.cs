@@ -15,19 +15,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 	/// http://www.ecc-brainpool.org/download/draft_pkix_additional_ecc_dp.txt .</summary>
 	public static class TeleTrusTNamedCurves
 	{
-		private static X9ECPoint ConfigureBasepoint(ECCurve curve, string encoding)
+		static X9ECPoint ConfigureBasepoint(ECCurve curve, string encoding)
 		{
 			X9ECPoint G = new X9ECPoint(curve, Hex.DecodeStrict(encoding));
 			WNafUtilities.ConfigureBasepoint(G.Point);
 			return G;
 		}
 
-		private static ECCurve ConfigureCurve(ECCurve curve)
+		static ECCurve ConfigureCurve(ECCurve curve)
 		{
 			return curve;
 		}
 
-		private static BigInteger FromHex(string hex)
+		static BigInteger FromHex(string hex)
 		{
 			return new BigInteger(1, Hex.DecodeStrict(hex));
 		}
@@ -35,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP160r1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP160r1Holder()
+			BrainpoolP160r1Holder()
 			{
 			}
 
@@ -67,7 +67,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP160t1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP160t1Holder()
+			BrainpoolP160t1Holder()
 			{
 			}
 
@@ -100,7 +100,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP192r1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP192r1Holder()
+			BrainpoolP192r1Holder()
 			{
 			}
 
@@ -132,7 +132,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP192t1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP192t1Holder()
+			BrainpoolP192t1Holder()
 			{
 			}
 
@@ -165,7 +165,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP224r1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP224r1Holder()
+			BrainpoolP224r1Holder()
 			{
 			}
 
@@ -197,7 +197,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP224t1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP224t1Holder()
+			BrainpoolP224t1Holder()
 			{
 			}
 
@@ -230,7 +230,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP256r1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP256r1Holder()
+			BrainpoolP256r1Holder()
 			{
 			}
 
@@ -262,7 +262,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP256t1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP256t1Holder()
+			BrainpoolP256t1Holder()
 			{
 			}
 
@@ -295,7 +295,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP320r1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP320r1Holder()
+			BrainpoolP320r1Holder()
 			{
 			}
 
@@ -327,7 +327,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP320t1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP320t1Holder()
+			BrainpoolP320t1Holder()
 			{
 			}
 
@@ -360,7 +360,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP384r1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP384r1Holder()
+			BrainpoolP384r1Holder()
 			{
 			}
 
@@ -392,7 +392,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP384t1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP384t1Holder()
+			BrainpoolP384t1Holder()
 			{
 			}
 
@@ -425,7 +425,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP512r1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP512r1Holder()
+			BrainpoolP512r1Holder()
 			{
 			}
 
@@ -458,7 +458,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 		internal class BrainpoolP512t1Holder
 			: X9ECParametersHolder
 		{
-			private BrainpoolP512t1Holder()
+			BrainpoolP512t1Holder()
 			{
 			}
 
@@ -489,16 +489,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.TeleTrust
 			}
 		}
 
-		private static readonly Dictionary<string, DerObjectIdentifier> objIds =
+		static readonly Dictionary<string, DerObjectIdentifier> objIds =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
+		static readonly Dictionary<DerObjectIdentifier, X9ECParametersHolder> curves =
 			new Dictionary<DerObjectIdentifier, X9ECParametersHolder>();
 
-		private static readonly Dictionary<DerObjectIdentifier, string> names =
+		static readonly Dictionary<DerObjectIdentifier, string> names =
 			new Dictionary<DerObjectIdentifier, string>();
 
-		private static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
+		static void DefineCurve(string name, DerObjectIdentifier oid, X9ECParametersHolder holder)
 		{
 			objIds.Add(name, oid);
 			names.Add(oid, name);

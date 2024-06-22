@@ -12,17 +12,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 	public class ECMqvWithKdfBasicAgreement
 		: ECMqvBasicAgreement
 	{
-		private readonly string algorithm;
-		private readonly IDerivationFunction kdf;
+		readonly string algorithm;
+		readonly IDerivationFunction kdf;
 
 		public ECMqvWithKdfBasicAgreement(
 			string algorithm,
 			IDerivationFunction kdf)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException("algorithm");
+			}
+
 			if (kdf == null)
+			{
 				throw new ArgumentNullException("kdf");
+			}
 
 			this.algorithm = algorithm;
 			this.kdf = kdf;
@@ -51,7 +56,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 			return new BigInteger(1, keyBytes);
 		}
 
-		private byte[] BigIntToBytes(BigInteger r)
+		byte[] BigIntToBytes(BigInteger r)
 		{
 			int byteLength = X9IntegerConverter.GetByteLength(privParams.StaticPrivateKey.Parameters.Curve);
 			return X9IntegerConverter.IntegerToBytes(r, byteLength);

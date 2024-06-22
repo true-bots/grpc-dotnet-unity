@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class PbeParameter
 		: Asn1Encodable
 	{
-		private readonly Asn1OctetString salt;
-		private readonly DerInteger iterationCount;
+		readonly Asn1OctetString salt;
+		readonly DerInteger iterationCount;
 
 		public static PbeParameter GetInstance(object obj)
 		{
@@ -24,13 +24,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				return new PbeParameter((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private PbeParameter(Asn1Sequence seq)
+		PbeParameter(Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
 			salt = Asn1OctetString.GetInstance(seq[0]);
 			iterationCount = DerInteger.GetInstance(seq[1]);

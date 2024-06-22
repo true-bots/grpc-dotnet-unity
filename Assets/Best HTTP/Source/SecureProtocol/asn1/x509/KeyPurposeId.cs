@@ -13,9 +13,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public sealed class KeyPurposeID
 		: DerObjectIdentifier
 	{
-		private const string id_kp = "1.3.6.1.5.5.7.3";
+		const string id_kp = "1.3.6.1.5.5.7.3";
 
-		private KeyPurposeID(string id)
+		KeyPurposeID(string id)
 			: base(id)
 		{
 		}
@@ -57,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		/// <remarks>see https://www.alvestrand.no/objectid/1.3.6.1.4.1.311.10.3.3.html</remarks>
 		public static readonly KeyPurposeID id_kp_msSGC = new KeyPurposeID("1.3.6.1.4.1.311.10.3.3");
 
-		private const string id_pkinit = "1.3.6.1.5.2.3";
+		const string id_pkinit = "1.3.6.1.5.2.3";
 
 		public static readonly KeyPurposeID scSysNodeNumber = new KeyPurposeID(id_pkinit + ".0");
 		public static readonly KeyPurposeID id_pkinit_authData = new KeyPurposeID(id_pkinit + ".1");

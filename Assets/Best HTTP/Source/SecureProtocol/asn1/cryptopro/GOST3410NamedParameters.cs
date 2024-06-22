@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 	/// <summary>Registry of available named parameters for GOST 3410-94.</summary>
 	public static class Gost3410NamedParameters
 	{
-		private static readonly Gost3410ParamSetParameters cryptoProA = new Gost3410ParamSetParameters(
+		static readonly Gost3410ParamSetParameters cryptoProA = new Gost3410ParamSetParameters(
 			1024,
 			new BigInteger(
 				"127021248288932417465907042777176443525787653508916535812817507265705031260985098497423188333483401180925999995120988934130659205614996724254121049274349357074920312769561451689224110579311248812610229678534638401693520013288995000362260684222750813532307004517341633685004541062586971416883686778842537820383"),
@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 			//                }
 		);
 
-		private static readonly Gost3410ParamSetParameters cryptoProB = new Gost3410ParamSetParameters(
+		static readonly Gost3410ParamSetParameters cryptoProB = new Gost3410ParamSetParameters(
 			1024,
 			new BigInteger(
 				"139454871199115825601409655107690713107041707059928031797758001454375765357722984094124368522288239833039114681648076688236921220737322672160740747771700911134550432053804647694904686120113087816240740184800477047157336662926249423571248823968542221753660143391485680840520336859458494803187341288580489525163"),
@@ -51,7 +51,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 			//}
 		);
 
-		private static readonly Gost3410ParamSetParameters cryptoProXchA = new Gost3410ParamSetParameters(
+		static readonly Gost3410ParamSetParameters cryptoProXchA = new Gost3410ParamSetParameters(
 			1024,
 			new BigInteger(
 				"142011741597563481196368286022318089743276138395243738762872573441927459393512718973631166078467600360848946623567625795282774719212241929071046134208380636394084512691828894000571524625445295769349356752728956831541775441763139384457191755096847107846595662547942312293338483924514339614727760681880609734239"),
@@ -60,13 +60,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.CryptoPro
 				"133531813272720673433859519948319001217942375967847486899482359599369642528734712461590403327731821410328012529253871914788598993103310567744136196364803064721377826656898686468463277710150809401182608770201615324990468332931294920912776241137878030224355746606283971659376426832674269780880061631528163475887")
 		);
 
-		private static readonly Dictionary<string, DerObjectIdentifier> objIds =
+		static readonly Dictionary<string, DerObjectIdentifier> objIds =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly Dictionary<DerObjectIdentifier, Gost3410ParamSetParameters> parameters =
+		static readonly Dictionary<DerObjectIdentifier, Gost3410ParamSetParameters> parameters =
 			new Dictionary<DerObjectIdentifier, Gost3410ParamSetParameters>();
 
-		private static void DefineParameters(string name, DerObjectIdentifier oid,
+		static void DefineParameters(string name, DerObjectIdentifier oid,
 			Gost3410ParamSetParameters parameterSet)
 		{
 			objIds.Add(name, oid);

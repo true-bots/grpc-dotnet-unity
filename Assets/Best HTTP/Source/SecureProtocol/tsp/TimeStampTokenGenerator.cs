@@ -32,24 +32,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 	public class TimeStampTokenGenerator
 	{
-		private int accuracySeconds = -1;
-		private int accuracyMillis = -1;
-		private int accuracyMicros = -1;
-		private bool ordering = false;
-		private GeneralName tsa = null;
-		private DerObjectIdentifier tsaPolicyOID;
+		int accuracySeconds = -1;
+		int accuracyMillis = -1;
+		int accuracyMicros = -1;
+		bool ordering = false;
+		GeneralName tsa = null;
+		DerObjectIdentifier tsaPolicyOID;
 
-		private IStore<X509Certificate> x509Certs;
-		private IStore<X509Crl> x509Crls;
+		IStore<X509Certificate> x509Certs;
+		IStore<X509Crl> x509Crls;
 
-		private IStore<X509V2AttributeCertificate> x509AttrCerts;
+		IStore<X509V2AttributeCertificate> x509AttrCerts;
 
 		// TODO Port changes from bc-java
 		//private Dictionary<> otherRevoc = new Dictionary<>();
-		private SignerInfoGenerator signerInfoGenerator;
+		SignerInfoGenerator signerInfoGenerator;
 		IDigestFactory digestCalculator;
 
-		private Resolution resolution = Resolution.R_SECONDS;
+		Resolution resolution = Resolution.R_SECONDS;
 
 		public Resolution Resolution
 		{
@@ -75,12 +75,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			DerObjectIdentifier tsaPolicy,
 			bool isIssuerSerialIncluded)
 		{
-			this.signerInfoGenerator = signerInfoGen;
+			signerInfoGenerator = signerInfoGen;
 			this.digestCalculator = digestCalculator;
-			this.tsaPolicyOID = tsaPolicy;
+			tsaPolicyOID = tsaPolicy;
 
 			if (signerInfoGenerator.certificate == null)
+			{
 				throw new ArgumentException("SignerInfoGenerator must have an associated certificate");
+			}
 
 			X509Certificate assocCert = signerInfoGenerator.certificate;
 			TspUtil.ValidateCertificate(assocCert);
@@ -91,7 +93,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 				IStreamCalculator<IBlockResult> calculator = digestCalculator.CreateCalculator();
 
-				using (var stream = calculator.Stream)
+				using (Stream stream = calculator.Stream)
 				{
 					stream.Write(certEnc, 0, certEnc.Length);
 				}
@@ -107,7 +109,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 								new DerInteger(assocCert.SerialNumber))
 							: null);
 
-					this.signerInfoGenerator = signerInfoGen.NewBuilder()
+					signerInfoGenerator = signerInfoGen.NewBuilder()
 						.WithSignedAttributeGenerator(new TableGen(signerInfoGen, essCertID))
 						.Build(signerInfoGen.contentSigner, signerInfoGen.certificate);
 				}
@@ -125,7 +127,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 								new DerInteger(assocCert.SerialNumber))
 							: null);
 
-					this.signerInfoGenerator = signerInfoGen.NewBuilder()
+					signerInfoGenerator = signerInfoGen.NewBuilder()
 						.WithSignedAttributeGenerator(new TableGen2(signerInfoGen, essCertID))
 						.Build(signerInfoGen.contentSigner, signerInfoGen.certificate);
 				}
@@ -210,17 +212,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 		public void SetAttributeCertificates(IStore<X509V2AttributeCertificate> attributeCertificates)
 		{
-			this.x509AttrCerts = attributeCertificates;
+			x509AttrCerts = attributeCertificates;
 		}
 
 		public void SetCertificates(IStore<X509Certificate> certificates)
 		{
-			this.x509Certs = certificates;
+			x509Certs = certificates;
 		}
 
 		public void SetCrls(IStore<X509Crl> crls)
 		{
-			this.x509Crls = crls;
+			x509Crls = crls;
 		}
 
 		public void SetAccuracySeconds(
@@ -344,7 +346,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 				respExtensions = extGen.Generate();
 			}
 
-			var timeStampTime = new Asn1GeneralizedTime(WithResolution(genTime, resolution));
+			Asn1GeneralizedTime timeStampTime = new Asn1GeneralizedTime(WithResolution(genTime, resolution));
 
 			TstInfo tstInfo = new TstInfo(tsaPolicy, messageImprint,
 				new DerInteger(serialNumber), timeStampTime, accuracy,
@@ -387,7 +389,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			//}
 		}
 
-		private static DateTime WithResolution(DateTime dateTime, Resolution resolution)
+		static DateTime WithResolution(DateTime dateTime, Resolution resolution)
 		{
 			switch (resolution)
 			{
@@ -404,11 +406,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			}
 		}
 
-		private class TableGen
+		class TableGen
 			: CmsAttributeTableGenerator
 		{
-			private readonly SignerInfoGenerator infoGen;
-			private readonly EssCertID essCertID;
+			readonly SignerInfoGenerator infoGen;
+			readonly EssCertID essCertID;
 
 
 			public TableGen(SignerInfoGenerator infoGen, EssCertID essCertID)
@@ -429,11 +431,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			}
 		}
 
-		private class TableGen2
+		class TableGen2
 			: CmsAttributeTableGenerator
 		{
-			private readonly SignerInfoGenerator infoGen;
-			private readonly EssCertIDv2 essCertID;
+			readonly SignerInfoGenerator infoGen;
+			readonly EssCertIDv2 essCertID;
 
 
 			public TableGen2(SignerInfoGenerator infoGen, EssCertIDv2 essCertID)

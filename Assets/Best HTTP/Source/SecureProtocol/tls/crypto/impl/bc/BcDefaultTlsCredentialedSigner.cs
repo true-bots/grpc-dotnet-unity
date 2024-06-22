@@ -11,15 +11,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 	public class BcDefaultTlsCredentialedSigner
 		: DefaultTlsCredentialedSigner
 	{
-		private static BcTlsCertificate GetEndEntity(BcTlsCrypto crypto, Certificate certificate)
+		static BcTlsCertificate GetEndEntity(BcTlsCrypto crypto, Certificate certificate)
 		{
 			if (certificate == null || certificate.IsEmpty)
+			{
 				throw new ArgumentException("No certificate");
+			}
 
 			return BcTlsCertificate.Convert(crypto, certificate.GetCertificateAt(0));
 		}
 
-		private static TlsSigner MakeSigner(BcTlsCrypto crypto, AsymmetricKeyParameter privateKey,
+		static TlsSigner MakeSigner(BcTlsCrypto crypto, AsymmetricKeyParameter privateKey,
 			Certificate certificate, SignatureAndHashAlgorithm signatureAndHashAlgorithm)
 		{
 			TlsSigner signer;
@@ -69,7 +71,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 			}
 			else
 			{
-				throw new ArgumentException("'privateKey' type not supported: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(privateKey));
+				throw new ArgumentException("'privateKey' type not supported: " + Platform.GetTypeName(privateKey));
 			}
 
 			return signer;

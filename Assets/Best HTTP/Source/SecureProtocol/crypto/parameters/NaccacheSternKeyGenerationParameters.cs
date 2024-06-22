@@ -16,8 +16,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class NaccacheSternKeyGenerationParameters : KeyGenerationParameters
 	{
 		// private BigInteger publicExponent;
-		private readonly int certainty;
-		private readonly int countSmallPrimes;
+		readonly int certainty;
+		readonly int countSmallPrimes;
 
 		/**
 		 * Parameters for generating a NaccacheStern KeyPair.
@@ -40,9 +40,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(random, strength)
 		{
 			if (countSmallPrimes % 2 == 1)
+			{
 				throw new ArgumentException("countSmallPrimes must be a multiple of 2");
+			}
+
 			if (countSmallPrimes < 30)
+			{
 				throw new ArgumentException("countSmallPrimes must be >= 30 for security reasons");
+			}
 
 			this.certainty = certainty;
 			this.countSmallPrimes = countSmallPrimes;

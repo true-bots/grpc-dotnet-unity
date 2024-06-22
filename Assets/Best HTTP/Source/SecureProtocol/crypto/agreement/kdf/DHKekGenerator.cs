@@ -14,12 +14,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Kdf
 	public sealed class DHKekGenerator
 		: IDerivationFunction
 	{
-		private readonly IDigest m_digest;
+		readonly IDigest m_digest;
 
-		private DerObjectIdentifier algorithm;
-		private int keySize;
-		private byte[] z;
-		private byte[] partyAInfo;
+		DerObjectIdentifier algorithm;
+		int keySize;
+		byte[] z;
+		byte[] partyAInfo;
 
 		public DHKekGenerator(IDigest digest)
 		{
@@ -30,13 +30,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Kdf
 		{
 			DHKdfParameters parameters = (DHKdfParameters)param;
 
-			this.algorithm = parameters.Algorithm;
-			this.keySize = parameters.KeySize;
-			this.z = parameters.GetZ(); // TODO Clone?
-			this.partyAInfo = parameters.GetExtraInfo(); // TODO Clone?
+			algorithm = parameters.Algorithm;
+			keySize = parameters.KeySize;
+			z = parameters.GetZ(); // TODO Clone?
+			partyAInfo = parameters.GetExtraInfo(); // TODO Clone?
 		}
 
-		public IDigest Digest => m_digest;
+		public IDigest Digest
+		{
+			get { return m_digest; }
+		}
 
 		public int GenerateBytes(byte[] outBytes, int outOff, int length)
 		{
@@ -54,8 +57,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Kdf
 			// is the digest output size in bits. We can't have an
 			// array with a long index at the moment...
 			//
-			if (oBytes > ((2L << 32) - 1))
+			if (oBytes > (2L << 32) - 1)
+			{
 				throw new ArgumentException("Output length too large");
+			}
 
 			int cThreshold = (int)((oBytes + digestSize - 1) / digestSize);
 

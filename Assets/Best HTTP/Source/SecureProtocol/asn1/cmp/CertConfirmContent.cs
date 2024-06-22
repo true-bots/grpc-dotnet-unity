@@ -11,17 +11,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static CertConfirmContent GetInstance(object obj)
 		{
 			if (obj is CertConfirmContent content)
+			{
 				return content;
+			}
 
 			if (obj is Asn1Sequence seq)
+			{
 				return new CertConfirmContent(seq);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), nameof(obj));
 		}
 
-		private readonly Asn1Sequence m_content;
+		readonly Asn1Sequence m_content;
 
-		private CertConfirmContent(Asn1Sequence seq)
+		CertConfirmContent(Asn1Sequence seq)
 		{
 			m_content = seq;
 		}

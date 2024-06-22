@@ -15,12 +15,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class DHKeyPairGenerator
 		: IAsymmetricCipherKeyPairGenerator
 	{
-		private DHKeyGenerationParameters param;
+		DHKeyGenerationParameters param;
 
 		public virtual void Init(
 			KeyGenerationParameters parameters)
 		{
-			this.param = (DHKeyGenerationParameters)parameters;
+			param = (DHKeyGenerationParameters)parameters;
 		}
 
 		public virtual AsymmetricCipherKeyPair GenerateKeyPair()

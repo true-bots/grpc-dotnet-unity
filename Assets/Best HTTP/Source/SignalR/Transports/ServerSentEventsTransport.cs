@@ -37,7 +37,7 @@ namespace BestHTTP.SignalR.Transports
 		/// <summary>
 		/// The EventSource object.
 		/// </summary>
-		private EventSource EventSource;
+		EventSource EventSource;
 
 		#endregion
 
@@ -57,10 +57,12 @@ namespace BestHTTP.SignalR.Transports
 			}
 
 			// Skip the Connecting state if we are reconnecting. If the connect succeeds, we will set the Started state directly
-			if (this.State != TransportStates.Reconnecting)
-				this.State = TransportStates.Connecting;
+			if (State != TransportStates.Reconnecting)
+			{
+				State = TransportStates.Connecting;
+			}
 
-			RequestTypes requestType = this.State == TransportStates.Reconnecting ? RequestTypes.Reconnect : RequestTypes.Connect;
+			RequestTypes requestType = State == TransportStates.Reconnecting ? RequestTypes.Reconnect : RequestTypes.Connect;
 
 			Uri uri = Connection.BuildUri(requestType, this);
 
@@ -109,59 +111,69 @@ namespace BestHTTP.SignalR.Transports
 
 		protected override void Aborted()
 		{
-			if (this.State == TransportStates.Closing)
-				this.State = TransportStates.Closed;
+			if (State == TransportStates.Closing)
+			{
+				State = TransportStates.Closed;
+			}
 		}
 
 		#endregion
 
 		#region EventSource Event Handlers
 
-		private void OnEventSourceOpen(EventSource eventSource)
+		void OnEventSourceOpen(EventSource eventSource)
 		{
-			HTTPManager.Logger.Information("Transport - " + this.Name, "OnEventSourceOpen");
+			HTTPManager.Logger.Information("Transport - " + Name, "OnEventSourceOpen");
 		}
 
-		private void OnEventSourceMessage(EventSource eventSource, BestHTTP.ServerSentEvents.Message message)
+		void OnEventSourceMessage(EventSource eventSource, Message message)
 		{
 			if (message.Data.Equals("initialized"))
 			{
-				base.OnConnected();
+				OnConnected();
 
 				return;
 			}
 
-			IServerMessage msg = TransportBase.Parse(Connection.JsonEncoder, message.Data);
+			IServerMessage msg = Parse(Connection.JsonEncoder, message.Data);
 
 			if (msg != null)
+			{
 				Connection.OnMessage(msg);
+			}
 		}
 
-		private void OnEventSourceError(EventSource eventSource, string error)
+		void OnEventSourceError(EventSource eventSource, string error)
 		{
-			HTTPManager.Logger.Information("Transport - " + this.Name, "OnEventSourceError");
+			HTTPManager.Logger.Information("Transport - " + Name, "OnEventSourceError");
 
 			// We are in a reconnecting phase, we have to connect now.
-			if (this.State == TransportStates.Reconnecting)
+			if (State == TransportStates.Reconnecting)
 			{
 				Connect();
 				return;
 			}
 
 			// Already closed?
-			if (this.State == TransportStates.Closed)
+			if (State == TransportStates.Closed)
+			{
 				return;
+			}
 
 			// Closing? Then we are closed now.
-			if (this.State == TransportStates.Closing)
-				this.State = TransportStates.Closed;
+			if (State == TransportStates.Closing)
+			{
+				State = TransportStates.Closed;
+			}
 			else // Errored when we didn't expected it.
+			{
 				Connection.Error(error);
+			}
 		}
 
-		private void OnEventSourceClosed(ServerSentEvents.EventSource eventSource)
+		void OnEventSourceClosed(EventSource eventSource)
 		{
-			HTTPManager.Logger.Information("Transport - " + this.Name, "OnEventSourceClosed");
+			HTTPManager.Logger.Information("Transport - " + Name, "OnEventSourceClosed");
 
 			OnEventSourceError(eventSource, "EventSource Closed!");
 		}

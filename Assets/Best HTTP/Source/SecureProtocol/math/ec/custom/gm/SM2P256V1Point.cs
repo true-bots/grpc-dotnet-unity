@@ -5,7 +5,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.GM
 {
-	internal class SM2P256V1Point
+	class SM2P256V1Point
 		: AbstractFpPoint
 	{
 		internal SM2P256V1Point(ECCurve curve, ECFieldElement x, ECFieldElement y)
@@ -25,19 +25,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.GM
 
 		public override ECPoint Add(ECPoint b)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return b;
+			}
+
 			if (b.IsInfinity)
+			{
 				return this;
+			}
+
 			if (this == b)
+			{
 				return Twice();
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			SM2P256V1FieldElement X1 = (SM2P256V1FieldElement)this.RawXCoord, Y1 = (SM2P256V1FieldElement)this.RawYCoord;
+			SM2P256V1FieldElement X1 = (SM2P256V1FieldElement)RawXCoord, Y1 = (SM2P256V1FieldElement)RawYCoord;
 			SM2P256V1FieldElement X2 = (SM2P256V1FieldElement)b.RawXCoord, Y2 = (SM2P256V1FieldElement)b.RawYCoord;
 
-			SM2P256V1FieldElement Z1 = (SM2P256V1FieldElement)this.RawZCoords[0];
+			SM2P256V1FieldElement Z1 = (SM2P256V1FieldElement)RawZCoords[0];
 			SM2P256V1FieldElement Z2 = (SM2P256V1FieldElement)b.RawZCoords[0];
 
 			uint c;
@@ -96,7 +104,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.GM
 				if (Nat256.IsZero(R))
 				{
 					// this == b, i.e. this must be doubled
-					return this.Twice();
+					return Twice();
 				}
 
 				// this == -b, i.e. the result is the point at infinity
@@ -145,16 +153,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.GM
 
 		public override ECPoint Twice()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			SM2P256V1FieldElement Y1 = (SM2P256V1FieldElement)this.RawYCoord;
+			SM2P256V1FieldElement Y1 = (SM2P256V1FieldElement)RawYCoord;
 			if (Y1.IsZero)
+			{
 				return curve.Infinity;
+			}
 
-			SM2P256V1FieldElement X1 = (SM2P256V1FieldElement)this.RawXCoord, Z1 = (SM2P256V1FieldElement)this.RawZCoords[0];
+			SM2P256V1FieldElement X1 = (SM2P256V1FieldElement)RawXCoord, Z1 = (SM2P256V1FieldElement)RawZCoords[0];
 
 			uint c;
 			uint[] t1 = Nat256.Create();
@@ -214,23 +226,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.GM
 		public override ECPoint TwicePlus(ECPoint b)
 		{
 			if (this == b)
+			{
 				return ThreeTimes();
-			if (this.IsInfinity)
-				return b;
-			if (b.IsInfinity)
-				return Twice();
+			}
 
-			ECFieldElement Y1 = this.RawYCoord;
-			if (Y1.IsZero)
+			if (IsInfinity)
+			{
 				return b;
+			}
+
+			if (b.IsInfinity)
+			{
+				return Twice();
+			}
+
+			ECFieldElement Y1 = RawYCoord;
+			if (Y1.IsZero)
+			{
+				return b;
+			}
 
 			return Twice().Add(b);
 		}
 
 		public override ECPoint ThreeTimes()
 		{
-			if (this.IsInfinity || this.RawYCoord.IsZero)
+			if (IsInfinity || RawYCoord.IsZero)
+			{
 				return this;
+			}
 
 			// NOTE: Be careful about recursions between TwicePlus and ThreeTimes
 			return Twice().Add(this);
@@ -239,7 +263,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.GM
 		public override ECPoint Negate()
 		{
 			if (IsInfinity)
+			{
 				return this;
+			}
 
 			return new SM2P256V1Point(Curve, RawXCoord, RawYCoord.Negate(), RawZCoords);
 		}

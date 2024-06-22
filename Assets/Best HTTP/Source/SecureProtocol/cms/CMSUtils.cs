@@ -13,7 +13,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal class CmsUtilities
+	class CmsUtilities
 	{
 		// TODO Is there a .NET equivalent to this?
 //		private static readonly Runtime RUNTIME = Runtime.getRuntime();
@@ -48,7 +48,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			return ReadContentInfo(new Asn1InputStream(input, MaximumMemory));
 		}
 
-		private static ContentInfo ReadContentInfo(
+		static ContentInfo ReadContentInfo(
 			Asn1InputStream aIn)
 		{
 			try
@@ -82,10 +82,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal static List<Asn1TaggedObject> GetAttributeCertificatesFromStore(
 			IStore<X509V2AttributeCertificate> attrCertStore)
 		{
-			var result = new List<Asn1TaggedObject>();
+			List<Asn1TaggedObject> result = new List<Asn1TaggedObject>();
 			if (attrCertStore != null)
 			{
-				foreach (var attrCert in attrCertStore.EnumerateMatches(null))
+				foreach (X509V2AttributeCertificate attrCert in attrCertStore.EnumerateMatches(null))
 				{
 					result.Add(new DerTaggedObject(false, 2, attrCert.AttributeCertificate));
 				}
@@ -96,10 +96,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal static List<X509CertificateStructure> GetCertificatesFromStore(IStore<X509Certificate> certStore)
 		{
-			var result = new List<X509CertificateStructure>();
+			List<X509CertificateStructure> result = new List<X509CertificateStructure>();
 			if (certStore != null)
 			{
-				foreach (var cert in certStore.EnumerateMatches(null))
+				foreach (X509Certificate cert in certStore.EnumerateMatches(null))
 				{
 					result.Add(cert.CertificateStructure);
 				}
@@ -110,10 +110,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal static List<CertificateList> GetCrlsFromStore(IStore<X509Crl> crlStore)
 		{
-			var result = new List<CertificateList>();
+			List<CertificateList> result = new List<CertificateList>();
 			if (crlStore != null)
 			{
-				foreach (var crl in crlStore.EnumerateMatches(null))
+				foreach (X509Crl crl in crlStore.EnumerateMatches(null))
 				{
 					result.Add(crl.CertificateList);
 				}
@@ -125,10 +125,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal static List<Asn1TaggedObject> GetOtherRevocationInfosFromStore(
 			IStore<OtherRevocationInfoFormat> otherRevocationInfoStore)
 		{
-			var result = new List<Asn1TaggedObject>();
+			List<Asn1TaggedObject> result = new List<Asn1TaggedObject>();
 			if (otherRevocationInfoStore != null)
 			{
-				foreach (var otherRevocationInfo in otherRevocationInfoStore.EnumerateMatches(null))
+				foreach (OtherRevocationInfoFormat otherRevocationInfo in otherRevocationInfoStore.EnumerateMatches(null))
 				{
 					ValidateOtherRevocationInfo(otherRevocationInfo);
 
@@ -142,12 +142,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal static List<DerTaggedObject> GetOtherRevocationInfosFromStore(IStore<Asn1Encodable> otherRevInfoStore,
 			DerObjectIdentifier otherRevInfoFormat)
 		{
-			var result = new List<DerTaggedObject>();
+			List<DerTaggedObject> result = new List<DerTaggedObject>();
 			if (otherRevInfoStore != null && otherRevInfoFormat != null)
 			{
-				foreach (var otherRevInfo in otherRevInfoStore.EnumerateMatches(null))
+				foreach (Asn1Encodable otherRevInfo in otherRevInfoStore.EnumerateMatches(null))
 				{
-					var otherRevocationInfo = new OtherRevocationInfoFormat(otherRevInfoFormat, otherRevInfo);
+					OtherRevocationInfoFormat otherRevocationInfo = new OtherRevocationInfoFormat(otherRevInfoFormat, otherRevInfo);
 
 					ValidateOtherRevocationInfo(otherRevocationInfo);
 
@@ -206,7 +206,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				OcspResponse ocspResponse = OcspResponse.GetInstance(otherRevocationInfo.Info);
 
 				if (OcspResponseStatus.Successful != ocspResponse.ResponseStatus.IntValueExact)
+				{
 					throw new ArgumentException("cannot add unsuccessful OCSP response to CMS SignedData");
+				}
 			}
 		}
 	}

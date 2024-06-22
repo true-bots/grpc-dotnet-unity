@@ -14,10 +14,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 	public class KeyTransRecipientInfoGenerator
 		: RecipientInfoGenerator
 	{
-		private readonly IKeyWrapper m_keyWrapper;
+		readonly IKeyWrapper m_keyWrapper;
 
-		private IssuerAndSerialNumber m_issuerAndSerialNumber;
-		private Asn1OctetString m_subjectKeyIdentifier;
+		IssuerAndSerialNumber m_issuerAndSerialNumber;
+		Asn1OctetString m_subjectKeyIdentifier;
 
 		public KeyTransRecipientInfoGenerator(X509Certificate recipCert, IKeyWrapper keyWrapper)
 			: this(new IssuerAndSerialNumber(recipCert.IssuerDN, new DerInteger(recipCert.SerialNumber)), keyWrapper)

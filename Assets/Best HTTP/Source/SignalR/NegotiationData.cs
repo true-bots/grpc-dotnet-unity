@@ -85,14 +85,14 @@ namespace BestHTTP.SignalR
 
 		#region Private
 
-		private HTTPRequest NegotiationRequest;
-		private IConnection Connection;
+		HTTPRequest NegotiationRequest;
+		IConnection Connection;
 
 		#endregion
 
 		public NegotiationData(Connection connection)
 		{
-			this.Connection = connection;
+			Connection = connection;
 		}
 
 		/// <summary>
@@ -122,7 +122,7 @@ namespace BestHTTP.SignalR
 
 		#region Request Event Handler
 
-		private void OnNegotiationRequestFinished(HTTPRequest req, HTTPResponse resp)
+		void OnNegotiationRequestFinished(HTTPRequest req, HTTPResponse resp)
 		{
 			NegotiationRequest = null;
 
@@ -140,7 +140,7 @@ namespace BestHTTP.SignalR
 							return;
 						}
 
-						var Negotiation = Parse(resp.DataAsText.Substring(idx));
+						NegotiationData Negotiation = Parse(resp.DataAsText.Substring(idx));
 
 						if (Negotiation == null)
 						{
@@ -155,16 +155,18 @@ namespace BestHTTP.SignalR
 						}
 					}
 					else
+					{
 						RaiseOnError(string.Format("Negotiation request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText,
 							req.CurrentUri));
+					}
 
 					break;
 
 				case HTTPRequestStates.Error:
-					RaiseOnError(req.Exception != null ? (req.Exception.Message + " " + req.Exception.StackTrace) : string.Empty);
+					RaiseOnError(req.Exception != null ? req.Exception.Message + " " + req.Exception.StackTrace : string.Empty);
 					break;
 
 				default:
@@ -177,7 +179,7 @@ namespace BestHTTP.SignalR
 
 		#region Helper Methods
 
-		private void RaiseOnError(string err)
+		void RaiseOnError(string err)
 		{
 			HTTPManager.Logger.Error("NegotiationData", "Negotiation request failed with error: " + err);
 
@@ -188,39 +190,51 @@ namespace BestHTTP.SignalR
 			}
 		}
 
-		private NegotiationData Parse(string str)
+		NegotiationData Parse(string str)
 		{
 			bool success = false;
 			Dictionary<string, object> dict = Json.Decode(str, ref success) as Dictionary<string, object>;
 			if (!success)
+			{
 				return null;
+			}
 
 			try
 			{
-				this.Url = GetString(dict, "Url");
+				Url = GetString(dict, "Url");
 
 				if (dict.ContainsKey("webSocketServerUrl"))
-					this.WebSocketServerUrl = GetString(dict, "webSocketServerUrl");
+				{
+					WebSocketServerUrl = GetString(dict, "webSocketServerUrl");
+				}
 
-				this.ConnectionToken = Uri.EscapeDataString(GetString(dict, "ConnectionToken"));
-				this.ConnectionId = GetString(dict, "ConnectionId");
+				ConnectionToken = Uri.EscapeDataString(GetString(dict, "ConnectionToken"));
+				ConnectionId = GetString(dict, "ConnectionId");
 
 				if (dict.ContainsKey("KeepAliveTimeout"))
-					this.KeepAliveTimeout = TimeSpan.FromSeconds(GetDouble(dict, "KeepAliveTimeout"));
+				{
+					KeepAliveTimeout = TimeSpan.FromSeconds(GetDouble(dict, "KeepAliveTimeout"));
+				}
 
-				this.DisconnectTimeout = TimeSpan.FromSeconds(GetDouble(dict, "DisconnectTimeout"));
+				DisconnectTimeout = TimeSpan.FromSeconds(GetDouble(dict, "DisconnectTimeout"));
 
 				if (dict.ContainsKey("ConnectionTimeout"))
-					this.ConnectionTimeout = TimeSpan.FromSeconds(GetDouble(dict, "ConnectionTimeout"));
+				{
+					ConnectionTimeout = TimeSpan.FromSeconds(GetDouble(dict, "ConnectionTimeout"));
+				}
 				else
-					this.ConnectionTimeout = TimeSpan.FromSeconds(120);
+				{
+					ConnectionTimeout = TimeSpan.FromSeconds(120);
+				}
 
-				this.TryWebSockets = (bool)Get(dict, "TryWebSockets");
-				this.ProtocolVersion = GetString(dict, "ProtocolVersion");
-				this.TransportConnectTimeout = TimeSpan.FromSeconds(GetDouble(dict, "TransportConnectTimeout"));
+				TryWebSockets = (bool)Get(dict, "TryWebSockets");
+				ProtocolVersion = GetString(dict, "ProtocolVersion");
+				TransportConnectTimeout = TimeSpan.FromSeconds(GetDouble(dict, "TransportConnectTimeout"));
 
 				if (dict.ContainsKey("LongPollDelay"))
-					this.LongPollDelay = TimeSpan.FromSeconds(GetDouble(dict, "LongPollDelay"));
+				{
+					LongPollDelay = TimeSpan.FromSeconds(GetDouble(dict, "LongPollDelay"));
+				}
 			}
 			catch (Exception ex)
 			{
@@ -231,20 +245,23 @@ namespace BestHTTP.SignalR
 			return this;
 		}
 
-		private static object Get(Dictionary<string, object> from, string key)
+		static object Get(Dictionary<string, object> from, string key)
 		{
 			object value;
 			if (!from.TryGetValue(key, out value))
-				throw new System.Exception(string.Format("Can't get {0} from Negotiation data!", key));
+			{
+				throw new Exception(string.Format("Can't get {0} from Negotiation data!", key));
+			}
+
 			return value;
 		}
 
-		private static string GetString(Dictionary<string, object> from, string key)
+		static string GetString(Dictionary<string, object> from, string key)
 		{
 			return Get(from, key) as string;
 		}
 
-		private static List<string> GetStringList(Dictionary<string, object> from, string key)
+		static List<string> GetStringList(Dictionary<string, object> from, string key)
 		{
 			List<object> value = Get(from, key) as List<object>;
 
@@ -253,18 +270,20 @@ namespace BestHTTP.SignalR
 			{
 				string str = value[i] as string;
 				if (str != null)
+				{
 					result.Add(str);
+				}
 			}
 
 			return result;
 		}
 
-		private static int GetInt(Dictionary<string, object> from, string key)
+		static int GetInt(Dictionary<string, object> from, string key)
 		{
 			return (int)(double)Get(from, key);
 		}
 
-		private static double GetDouble(Dictionary<string, object> from, string key)
+		static double GetDouble(Dictionary<string, object> from, string key)
 		{
 			return (double)Get(from, key);
 		}

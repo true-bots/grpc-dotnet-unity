@@ -2,6 +2,7 @@
 #pragma warning disable
 using System;
 using System.Collections.Generic;
+using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Security.Certificates;
@@ -11,7 +12,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Store;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 {
-	internal static class Rfc3281CertPathUtilities
+	static class Rfc3281CertPathUtilities
 	{
 		internal static void ProcessAttrCert7(
 			X509V2AttributeCertificate attrCert,
@@ -23,7 +24,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			// AA Controls
 			// Attribute encryption
 			// Proxy
-			var critExtOids = attrCert.GetCriticalExtensionOids();
+			ISet<string> critExtOids = attrCert.GetCriticalExtensionOids();
 
 			// 7.1
 			// process extensions
@@ -79,7 +80,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			IList<X509Certificate> certPathCerts)
 		{
 			if (!paramsPKIX.IsRevocationEnabled)
+			{
 				return;
+			}
 
 			// check if revocation is available
 			if (attrCert.GetExtensionValue(X509Extensions.NoRevAvail) != null)
@@ -191,7 +194,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			}
 
 			if (!validCrlFound)
+			{
 				throw new PkixCertPathValidatorException("No valid CRL found.", lastException);
+			}
 
 			if (certStatus.Status != CertStatus.Unrevoked)
 			{
@@ -265,11 +270,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			X509Certificate acIssuerCert,
 			PkixParameters pkixParams)
 		{
-			var set = pkixParams.GetTrustedACIssuers();
+			ISet<TrustAnchor> set = pkixParams.GetTrustedACIssuers();
 			bool trusted = false;
 			foreach (TrustAnchor anchor in set)
 			{
-				var symbols = X509Name.RFC2253Symbols;
+				IDictionary<DerObjectIdentifier, string> symbols = X509Name.RFC2253Symbols;
 				if (acIssuerCert.SubjectDN.ToString(false, symbols).Equals(anchor.CAName)
 				    || acIssuerCert.Equals(anchor.TrustedCert))
 				{
@@ -289,7 +294,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			PkixParameters pkixParams)
 		{
 			if (acIssuerCert.GetKeyUsage() != null
-			    && (!acIssuerCert.GetKeyUsage()[0] && !acIssuerCert.GetKeyUsage()[1]))
+			    && !acIssuerCert.GetKeyUsage()[0] && !acIssuerCert.GetKeyUsage()[1])
 			{
 				throw new PkixCertPathValidatorException(
 					"Attribute certificate issuer public key cannot be used to validate digital signatures.");
@@ -343,7 +348,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		{
 			PkixCertPathBuilderResult result = null;
 			// find holder PKCs
-			var holderPKCs = new HashSet<X509Certificate>();
+			HashSet<X509Certificate> holderPKCs = new HashSet<X509Certificate>();
 			if (attrCert.Holder.GetIssuer() != null)
 			{
 				X509CertStoreSelector selector = new X509CertStoreSelector();
@@ -451,7 +456,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		* @throws Exception if the certificate is revoked or the status
 		*             cannot be checked or some error occurs.
 		*/
-		private static void CheckCrl(
+		static void CheckCrl(
 			DistributionPoint dp,
 			X509V2AttributeCertificate attrCert,
 			PkixParameters paramsPKIX,
@@ -469,11 +474,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			 * available for this AC.
 			 */
 			if (attrCert.GetExtensionValue(X509Extensions.NoRevAvail) != null)
+			{
 				return;
+			}
 
 			DateTime currentDate = DateTime.UtcNow;
 			if (validDate.CompareTo(currentDate) > 0)
+			{
 				throw new Exception("Validation time is in future.");
+			}
 
 			// (a)
 			/*
@@ -482,11 +491,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			 * CRLs must be enabled in the ExtendedPkixParameters and are in
 			 * getAdditionalStore()
 			 */
-			var crls = PkixCertPathValidatorUtilities.GetCompleteCrls(dp, attrCert, currentDate, paramsPKIX);
+			ISet<X509Crl> crls = PkixCertPathValidatorUtilities.GetCompleteCrls(dp, attrCert, currentDate, paramsPKIX);
 			bool validCrlFound = false;
 			Exception lastException = null;
 
-			var crl_iter = crls.GetEnumerator();
+			IEnumerator<X509Crl> crl_iter = crls.GetEnumerator();
 
 			while (crl_iter.MoveNext()
 			       && certStatus.Status == CertStatus.Unrevoked
@@ -506,10 +515,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					 * must be ignored.
 					 */
 					if (!interimReasonsMask.HasNewReasons(reasonMask))
+					{
 						continue;
+					}
 
 					// (f)
-					var keys = Rfc3280CertPathUtilities.ProcessCrlF(crl, attrCert, null, null, paramsPKIX,
+					ISet<AsymmetricKeyParameter> keys = Rfc3280CertPathUtilities.ProcessCrlF(crl, attrCert, null, null, paramsPKIX,
 						certPathCerts);
 
 					// (g)
@@ -520,7 +531,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 					if (paramsPKIX.IsUseDeltasEnabled)
 					{
 						// get delta CRLs
-						var deltaCRLs = PkixCertPathValidatorUtilities.GetDeltaCrls(currentDate, paramsPKIX, crl);
+						ISet<X509Crl> deltaCRLs = PkixCertPathValidatorUtilities.GetDeltaCrls(currentDate, paramsPKIX, crl);
 
 						// we only want one valid delta CRL
 						// (h)
@@ -547,7 +558,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						 * first check is not done
 						 */
 						if (attrCert.NotAfter.CompareTo(crl.ThisUpdate) < 0)
+						{
 							throw new Exception("No valid CRL for current time found.");
+						}
 					}
 
 					Rfc3280CertPathUtilities.ProcessCrlB1(dp, attrCert, crl);
@@ -583,7 +596,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			}
 
 			if (!validCrlFound)
+			{
 				throw lastException;
+			}
 		}
 	}
 }

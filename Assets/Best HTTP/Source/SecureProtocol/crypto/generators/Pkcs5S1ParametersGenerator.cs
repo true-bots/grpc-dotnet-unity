@@ -22,7 +22,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class Pkcs5S1ParametersGenerator
 		: PbeParametersGenerator
 	{
-		private readonly IDigest digest;
+		readonly IDigest digest;
 
 		/**
 		* Construct a Pkcs 5 Scheme 1 Parameters generator.
@@ -38,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		/**
 		* the derived key function, the ith hash of the mPassword and the mSalt.
 		*/
-		private byte[] GenerateDerivedKey()
+		byte[] GenerateDerivedKey()
 		{
 			byte[] digestBytes = new byte[digest.GetDigestSize()];
 
@@ -80,7 +80,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			keySize /= 8;
 			ivSize /= 8;
 
-			if ((keySize + ivSize) > digest.GetDigestSize())
+			if (keySize + ivSize > digest.GetDigestSize())
 			{
 				throw new ArgumentException(
 					"Can't Generate a derived key " + (keySize + ivSize) + " bytes long.");

@@ -17,8 +17,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 	public class DHBasicAgreement
 		: IBasicAgreement
 	{
-		private DHPrivateKeyParameters key;
-		private DHParameters dhParams;
+		DHPrivateKeyParameters key;
+		DHParameters dhParams;
 
 		public virtual void Init(
 			ICipherParameters parameters)
@@ -33,8 +33,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 				throw new ArgumentException("DHEngine expects DHPrivateKeyParameters");
 			}
 
-			this.key = (DHPrivateKeyParameters)parameters;
-			this.dhParams = key.Parameters;
+			key = (DHPrivateKeyParameters)parameters;
+			dhParams = key.Parameters;
 		}
 
 		public virtual int GetFieldSize()
@@ -49,23 +49,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 		public virtual BigInteger CalculateAgreement(
 			ICipherParameters pubKey)
 		{
-			if (this.key == null)
+			if (key == null)
+			{
 				throw new InvalidOperationException("Agreement algorithm not initialised");
+			}
 
 			DHPublicKeyParameters pub = (DHPublicKeyParameters)pubKey;
 
 			if (!pub.Parameters.Equals(dhParams))
+			{
 				throw new ArgumentException("Diffie-Hellman public key has wrong parameters.");
+			}
 
 			BigInteger p = dhParams.P;
 
 			BigInteger peerY = pub.Y;
 			if (peerY == null || peerY.CompareTo(BigInteger.One) <= 0 || peerY.CompareTo(p.Subtract(BigInteger.One)) >= 0)
+			{
 				throw new ArgumentException("Diffie-Hellman public key is weak");
+			}
 
 			BigInteger result = peerY.ModPow(key.X, p);
 			if (result.Equals(BigInteger.One))
+			{
 				throw new InvalidOperationException("Shared key can't be 1");
+			}
 
 			return result;
 		}

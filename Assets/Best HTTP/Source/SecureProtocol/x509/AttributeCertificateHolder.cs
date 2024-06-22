@@ -183,14 +183,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			}
 		}
 
-		private GeneralNames GenerateGeneralNames(
+		GeneralNames GenerateGeneralNames(
 			X509Name principal)
 		{
 //			return GeneralNames.GetInstance(new DerSequence(new GeneralName(principal)));
 			return new GeneralNames(new GeneralName(principal));
 		}
 
-		private bool MatchesDN(
+		bool MatchesDN(
 			X509Name subject,
 			GeneralNames targets)
 		{
@@ -218,7 +218,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			return false;
 		}
 
-		private object[] GetNames(
+		object[] GetNames(
 			GeneralName[] names)
 		{
 			int count = 0;
@@ -244,10 +244,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			return result;
 		}
 
-		private X509Name[] GetPrincipals(
+		X509Name[] GetPrincipals(
 			GeneralNames names)
 		{
-			object[] p = this.GetNames(names.GetNames());
+			object[] p = GetNames(names.GetNames());
 
 			int count = 0;
 
@@ -329,7 +329,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		public bool Match(X509Certificate x509Cert)
 		{
 			if (x509Cert == null)
+			{
 				return false;
+			}
 
 			try
 			{
@@ -413,12 +415,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 			AttributeCertificateHolder other = (AttributeCertificateHolder)obj;
 
-			return this.holder.Equals(other.holder);
+			return holder.Equals(other.holder);
 		}
 
 		public override int GetHashCode()
 		{
-			return this.holder.GetHashCode();
+			return holder.GetHashCode();
 		}
 	}
 }

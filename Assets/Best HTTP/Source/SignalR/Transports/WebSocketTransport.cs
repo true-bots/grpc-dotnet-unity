@@ -27,7 +27,7 @@ namespace BestHTTP.SignalR.Transports
 
 		#endregion
 
-		private WebSocket.WebSocket wSocket;
+		WebSocket.WebSocket wSocket;
 
 		public WebSocketTransport(Connection connection)
 			: base("webSockets", connection)
@@ -48,10 +48,12 @@ namespace BestHTTP.SignalR.Transports
 			}
 
 			// Skip the Connecting state if we are reconnecting. If the connect succeeds, we will set the Started state directly
-			if (this.State != TransportStates.Reconnecting)
-				this.State = TransportStates.Connecting;
+			if (State != TransportStates.Reconnecting)
+			{
+				State = TransportStates.Connecting;
+			}
 
-			RequestTypes requestType = this.State == TransportStates.Reconnecting ? RequestTypes.Reconnect : RequestTypes.Connect;
+			RequestTypes requestType = State == TransportStates.Reconnecting ? RequestTypes.Reconnect : RequestTypes.Connect;
 
 			Uri uri = Connection.BuildUri(requestType, this);
 
@@ -76,7 +78,9 @@ namespace BestHTTP.SignalR.Transports
 		protected override void SendImpl(string json)
 		{
 			if (wSocket != null && wSocket.IsOpen)
+			{
 				wSocket.Send(json);
+			}
 		}
 
 		public override void Stop()
@@ -117,7 +121,9 @@ namespace BestHTTP.SignalR.Transports
 		void WSocket_OnOpen(WebSocket.WebSocket webSocket)
 		{
 			if (webSocket != wSocket)
+			{
 				return;
+			}
 
 			HTTPManager.Logger.Information("WebSocketTransport", "WSocket_OnOpen");
 
@@ -127,47 +133,61 @@ namespace BestHTTP.SignalR.Transports
 		void WSocket_OnMessage(WebSocket.WebSocket webSocket, string message)
 		{
 			if (webSocket != wSocket)
+			{
 				return;
+			}
 
-			IServerMessage msg = TransportBase.Parse(Connection.JsonEncoder, message);
+			IServerMessage msg = Parse(Connection.JsonEncoder, message);
 
 			if (msg != null)
+			{
 				Connection.OnMessage(msg);
+			}
 		}
 
 		void WSocket_OnClosed(WebSocket.WebSocket webSocket, ushort code, string message)
 		{
 			if (webSocket != wSocket)
+			{
 				return;
+			}
 
 			string reason = code.ToString() + " : " + message;
 
 			HTTPManager.Logger.Information("WebSocketTransport", "WSocket_OnClosed " + reason);
 
-			if (this.State == TransportStates.Closing)
-				this.State = TransportStates.Closed;
+			if (State == TransportStates.Closing)
+			{
+				State = TransportStates.Closed;
+			}
 			else
+			{
 				Connection.Error(reason);
+			}
 		}
 
 		void WSocket_OnError(WebSocket.WebSocket webSocket, string reason)
 		{
 			if (webSocket != wSocket)
+			{
 				return;
+			}
 
 			// On WP8.1, somehow we receive an exception that the remote server forcibly closed the connection instead of the
 			// WebSocket closed packet... Also, even the /abort request didn't finished.
-			if (this.State == TransportStates.Closing ||
-			    this.State == TransportStates.Closed)
+			if (State == TransportStates.Closing ||
+			    State == TransportStates.Closed)
 			{
-				base.AbortFinished();
+				AbortFinished();
 			}
 			else
 			{
 				if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+				{
 					HTTPManager.Logger.Error("WebSocketTransport", "WSocket_OnError " + reason);
+				}
 
-				this.State = TransportStates.Closed;
+				State = TransportStates.Closed;
 				Connection.Error(reason);
 			}
 		}

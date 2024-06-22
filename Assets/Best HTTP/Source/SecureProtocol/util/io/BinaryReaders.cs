@@ -11,7 +11,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 		{
 			byte[] bytes = binaryReader.ReadBytes(count);
 			if (bytes == null || bytes.Length != count)
+			{
 				throw new EndOfStreamException();
+			}
+
 			return bytes;
 		}
 

@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509.Extension
 		{
 		}
 
-		private static Asn1OctetString FromPublicKey(
+		static Asn1OctetString FromPublicKey(
 			AsymmetricKeyParameter pubKey)
 		{
 			try

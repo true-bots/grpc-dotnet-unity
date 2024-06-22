@@ -10,10 +10,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class BasicOcspResponse
 		: Asn1Encodable
 	{
-		private readonly ResponseData tbsResponseData;
-		private readonly AlgorithmIdentifier signatureAlgorithm;
-		private readonly DerBitString signature;
-		private readonly Asn1Sequence certs;
+		readonly ResponseData tbsResponseData;
+		readonly AlgorithmIdentifier signatureAlgorithm;
+		readonly DerBitString signature;
+		readonly Asn1Sequence certs;
 
 		public static BasicOcspResponse GetInstance(
 			Asn1TaggedObject obj,
@@ -35,7 +35,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new BasicOcspResponse((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public BasicOcspResponse(
@@ -50,16 +50,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			this.certs = certs;
 		}
 
-		private BasicOcspResponse(
+		BasicOcspResponse(
 			Asn1Sequence seq)
 		{
-			this.tbsResponseData = ResponseData.GetInstance(seq[0]);
-			this.signatureAlgorithm = AlgorithmIdentifier.GetInstance(seq[1]);
-			this.signature = (DerBitString)seq[2];
+			tbsResponseData = ResponseData.GetInstance(seq[0]);
+			signatureAlgorithm = AlgorithmIdentifier.GetInstance(seq[1]);
+			signature = (DerBitString)seq[2];
 
 			if (seq.Count > 3)
 			{
-				this.certs = Asn1Sequence.GetInstance((Asn1TaggedObject)seq[3], true);
+				certs = Asn1Sequence.GetInstance((Asn1TaggedObject)seq[3], true);
 			}
 		}
 

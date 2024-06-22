@@ -8,10 +8,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 {
 	public class Pkcs12StoreBuilder
 	{
-		private DerObjectIdentifier keyAlgorithm = PkcsObjectIdentifiers.PbeWithShaAnd3KeyTripleDesCbc;
-		private DerObjectIdentifier certAlgorithm = PkcsObjectIdentifiers.PbewithShaAnd40BitRC2Cbc;
-		private DerObjectIdentifier keyPrfAlgorithm = null;
-		private bool useDerEncoding = false;
+		DerObjectIdentifier keyAlgorithm = PkcsObjectIdentifiers.PbeWithShaAnd3KeyTripleDesCbc;
+		DerObjectIdentifier certAlgorithm = PkcsObjectIdentifiers.PbewithShaAnd40BitRC2Cbc;
+		DerObjectIdentifier keyPrfAlgorithm = null;
+		bool useDerEncoding = false;
 
 		public Pkcs12StoreBuilder()
 		{

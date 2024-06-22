@@ -15,42 +15,50 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class CompleteRevocationRefs
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence crlOcspRefs;
+		readonly Asn1Sequence crlOcspRefs;
 
 		public static CompleteRevocationRefs GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is CompleteRevocationRefs)
+			{
 				return (CompleteRevocationRefs)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CompleteRevocationRefs((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'CompleteRevocationRefs' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
-		private CompleteRevocationRefs(
+		CompleteRevocationRefs(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
+			}
 
 			foreach (Asn1Encodable ae in seq)
 			{
 				CrlOcspRef.GetInstance(ae.ToAsn1Object());
 			}
 
-			this.crlOcspRefs = seq;
+			crlOcspRefs = seq;
 		}
 
 		public CompleteRevocationRefs(
 			params CrlOcspRef[] crlOcspRefs)
 		{
 			if (crlOcspRefs == null)
+			{
 				throw new ArgumentNullException("crlOcspRefs");
+			}
 
 			this.crlOcspRefs = new DerSequence(crlOcspRefs);
 		}
@@ -59,7 +67,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			IEnumerable<CrlOcspRef> crlOcspRefs)
 		{
 			if (crlOcspRefs == null)
+			{
 				throw new ArgumentNullException("crlOcspRefs");
+			}
 
 			this.crlOcspRefs = new DerSequence(
 				Asn1EncodableVector.FromEnumerable(crlOcspRefs));

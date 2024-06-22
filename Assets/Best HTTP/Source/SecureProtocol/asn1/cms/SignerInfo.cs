@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -9,23 +10,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class SignerInfo
 		: Asn1Encodable
 	{
-		private DerInteger version;
-		private SignerIdentifier sid;
-		private AlgorithmIdentifier digAlgorithm;
-		private Asn1Set authenticatedAttributes;
-		private AlgorithmIdentifier digEncryptionAlgorithm;
-		private Asn1OctetString encryptedDigest;
-		private Asn1Set unauthenticatedAttributes;
+		DerInteger version;
+		SignerIdentifier sid;
+		AlgorithmIdentifier digAlgorithm;
+		Asn1Set authenticatedAttributes;
+		AlgorithmIdentifier digEncryptionAlgorithm;
+		Asn1OctetString encryptedDigest;
+		Asn1Set unauthenticatedAttributes;
 
 		public static SignerInfo GetInstance(object obj)
 		{
 			if (obj == null || obj is SignerInfo)
+			{
 				return (SignerInfo)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new SignerInfo((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public SignerInfo(
@@ -36,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			Asn1OctetString encryptedDigest,
 			Asn1Set unauthenticatedAttributes)
 		{
-			this.version = new DerInteger(sid.IsTagged ? 3 : 1);
+			version = new DerInteger(sid.IsTagged ? 3 : 1);
 			this.sid = sid;
 			this.digAlgorithm = digAlgorithm;
 			this.authenticatedAttributes = authenticatedAttributes;
@@ -53,7 +58,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			Asn1OctetString encryptedDigest,
 			Attributes unauthenticatedAttributes)
 		{
-			this.version = new DerInteger(sid.IsTagged ? 3 : 1);
+			version = new DerInteger(sid.IsTagged ? 3 : 1);
 			this.sid = sid;
 			this.digAlgorithm = digAlgorithm;
 			this.authenticatedAttributes = Asn1Set.GetInstance(authenticatedAttributes);
@@ -62,9 +67,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			this.unauthenticatedAttributes = Asn1Set.GetInstance(unauthenticatedAttributes);
 		}
 
-		private SignerInfo(Asn1Sequence seq)
+		SignerInfo(Asn1Sequence seq)
 		{
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
 			e.MoveNext();
 			version = (DerInteger)e.Current;
@@ -76,7 +81,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			digAlgorithm = AlgorithmIdentifier.GetInstance(e.Current.ToAsn1Object());
 
 			e.MoveNext();
-			var obj = e.Current.ToAsn1Object();
+			Asn1Object obj = e.Current.ToAsn1Object();
 
 			if (obj is Asn1TaggedObject tagged)
 			{

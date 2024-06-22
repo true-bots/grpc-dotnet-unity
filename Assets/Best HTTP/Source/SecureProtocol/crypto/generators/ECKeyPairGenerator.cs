@@ -16,11 +16,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class ECKeyPairGenerator
 		: IAsymmetricCipherKeyPairGenerator
 	{
-		private readonly string algorithm;
+		readonly string algorithm;
 
-		private ECDomainParameters parameters;
-		private DerObjectIdentifier publicKeyParamSet;
-		private SecureRandom random;
+		ECDomainParameters parameters;
+		DerObjectIdentifier publicKeyParamSet;
+		SecureRandom random;
 
 		public ECKeyPairGenerator()
 			: this("EC")
@@ -31,7 +31,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			string algorithm)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException("algorithm");
+			}
 
 			this.algorithm = ECKeyParameters.VerifyAlgorithmName(algorithm);
 		}
@@ -43,7 +45,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			{
 				ECKeyGenerationParameters ecP = (ECKeyGenerationParameters)parameters;
 
-				this.publicKeyParamSet = ecP.PublicKeyParamSet;
+				publicKeyParamSet = ecP.PublicKeyParamSet;
 				this.parameters = ecP.DomainParameters;
 			}
 			else
@@ -75,16 +77,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 				X9ECParameters ecps = FindECCurveByOid(oid);
 
-				this.publicKeyParamSet = oid;
+				publicKeyParamSet = oid;
 				this.parameters = new ECDomainParameters(
 					ecps.Curve, ecps.G, ecps.N, ecps.H, ecps.GetSeed());
 			}
 
-			this.random = parameters.Random;
+			random = parameters.Random;
 
-			if (this.random == null)
+			if (random == null)
 			{
-				this.random = CryptoServicesRegistrar.GetSecureRandom();
+				random = CryptoServicesRegistrar.GetSecureRandom();
 			}
 		}
 
@@ -103,10 +105,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				d = new BigInteger(n.BitLength, random);
 
 				if (d.CompareTo(BigInteger.One) < 0 || d.CompareTo(n) >= 0)
+				{
 					continue;
+				}
 
 				if (WNafUtilities.GetNafWeight(d) < minWeight)
+				{
 					continue;
+				}
 
 				break;
 			}

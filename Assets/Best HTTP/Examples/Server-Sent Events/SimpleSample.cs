@@ -8,28 +8,28 @@ using UnityEngine.UI;
 
 namespace BestHTTP.Examples.ServerSentEvents
 {
-	public class SimpleSample : BestHTTP.Examples.Helpers.SampleBase
+	public class SimpleSample : SampleBase
 	{
 #pragma warning disable 0649
 
 		[Tooltip("The url of the resource to use.")] [SerializeField]
-		private string _path = "/sse";
+		string _path = "/sse";
 
-		[SerializeField] private ScrollRect _scrollRect;
+		[SerializeField] ScrollRect _scrollRect;
 
-		[SerializeField] private RectTransform _contentRoot;
+		[SerializeField] RectTransform _contentRoot;
 
-		[SerializeField] private TextListItem _listItemPrefab;
+		[SerializeField] TextListItem _listItemPrefab;
 
-		[SerializeField] private int _maxListItemEntries = 100;
+		[SerializeField] int _maxListItemEntries = 100;
 
-		[SerializeField] private Button _startButton;
+		[SerializeField] Button _startButton;
 
-		[SerializeField] private Button _closeButton;
+		[SerializeField] Button _closeButton;
 
 #pragma warning restore
 
-		private EventSource eventSource;
+		EventSource eventSource;
 
 		protected override void Start()
 		{
@@ -40,32 +40,32 @@ namespace BestHTTP.Examples.ServerSentEvents
 
 		void OnDestroy()
 		{
-			if (this.eventSource != null)
+			if (eventSource != null)
 			{
-				this.eventSource.Close();
-				this.eventSource = null;
+				eventSource.Close();
+				eventSource = null;
 			}
 		}
 
 		public void OnStartButton()
 		{
-			GUIHelper.RemoveChildren(this._contentRoot, 0);
+			GUIHelper.RemoveChildren(_contentRoot, 0);
 
 			// Create the EventSource instance
-			this.eventSource = new EventSource(new Uri(base.sampleSelector.BaseURL + this._path));
+			eventSource = new EventSource(new Uri(sampleSelector.BaseURL + _path));
 
 			// Subscribe to generic events
-			this.eventSource.OnOpen += OnOpen;
-			this.eventSource.OnClosed += OnClosed;
-			this.eventSource.OnError += OnError;
-			this.eventSource.OnStateChanged += this.OnStateChanged;
-			this.eventSource.OnMessage += OnMessage;
+			eventSource.OnOpen += OnOpen;
+			eventSource.OnClosed += OnClosed;
+			eventSource.OnError += OnError;
+			eventSource.OnStateChanged += OnStateChanged;
+			eventSource.OnMessage += OnMessage;
 
 			// Subscribe to an application specific event
-			this.eventSource.On("datetime", OnDateTime);
+			eventSource.On("datetime", OnDateTime);
 
 			// Start to connect to the server
-			this.eventSource.Open();
+			eventSource.Open();
 
 			AddText("Opening Server-Sent Events...");
 
@@ -75,15 +75,15 @@ namespace BestHTTP.Examples.ServerSentEvents
 		public void OnCloseButton()
 		{
 			SetButtons(false, false);
-			this.eventSource.Close();
+			eventSource.Close();
 		}
 
-		private void OnOpen(EventSource eventSource)
+		void OnOpen(EventSource eventSource)
 		{
 			AddText("Open");
 		}
 
-		private void OnClosed(EventSource eventSource)
+		void OnClosed(EventSource eventSource)
 		{
 			AddText("Closed");
 
@@ -92,40 +92,44 @@ namespace BestHTTP.Examples.ServerSentEvents
 			SetButtons(true, false);
 		}
 
-		private void OnError(EventSource eventSource, string error)
+		void OnError(EventSource eventSource, string error)
 		{
 			AddText(string.Format("Error: <color=red>{0}</color>", error));
 		}
 
-		private void OnStateChanged(EventSource eventSource, States oldState, States newState)
+		void OnStateChanged(EventSource eventSource, States oldState, States newState)
 		{
 			AddText(string.Format("State Changed {0} => {1}", oldState, newState));
 		}
 
-		private void OnMessage(EventSource eventSource, Message message)
+		void OnMessage(EventSource eventSource, Message message)
 		{
 			AddText(string.Format("Message: <color=yellow>{0}</color>", message));
 		}
 
-		private void OnDateTime(EventSource eventSource, Message message)
+		void OnDateTime(EventSource eventSource, Message message)
 		{
-			DateTimeData dtData = BestHTTP.JSON.LitJson.JsonMapper.ToObject<DateTimeData>(message.Data);
+			DateTimeData dtData = JSON.LitJson.JsonMapper.ToObject<DateTimeData>(message.Data);
 
 			AddText(string.Format("OnDateTime: <color=yellow>{0}</color>", dtData.ToString()));
 		}
 
-		private void SetButtons(bool start, bool close)
+		void SetButtons(bool start, bool close)
 		{
-			if (this._startButton != null)
-				this._startButton.interactable = start;
+			if (_startButton != null)
+			{
+				_startButton.interactable = start;
+			}
 
-			if (this._closeButton != null)
-				this._closeButton.interactable = close;
+			if (_closeButton != null)
+			{
+				_closeButton.interactable = close;
+			}
 		}
 
-		private void AddText(string text)
+		void AddText(string text)
 		{
-			GUIHelper.AddText(this._listItemPrefab, this._contentRoot, text, this._maxListItemEntries, this._scrollRect);
+			GUIHelper.AddText(_listItemPrefab, _contentRoot, text, _maxListItemEntries, _scrollRect);
 		}
 	}
 
@@ -140,7 +144,7 @@ namespace BestHTTP.Examples.ServerSentEvents
 
 		public override string ToString()
 		{
-			return string.Format("[DateTimeData EventId: {0}, DateTime: {1}]", this.eventid, this.datetime);
+			return string.Format("[DateTimeData EventId: {0}, DateTime: {1}]", eventid, datetime);
 		}
 	}
 }

@@ -10,9 +10,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	 */
 	public class IesParameters : ICipherParameters
 	{
-		private byte[] derivation;
-		private byte[] encoding;
-		private int macKeySize;
+		byte[] derivation;
+		byte[] encoding;
+		int macKeySize;
 
 		/**
 		 * @param derivation the derivation parameter for the KDF function.

@@ -4,13 +4,13 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal class PrimitiveEncodingSuffixed
+	class PrimitiveEncodingSuffixed
 		: IAsn1Encoding
 	{
-		private readonly int m_tagClass;
-		private readonly int m_tagNo;
-		private readonly byte[] m_contentsOctets;
-		private readonly byte m_contentsSuffix;
+		readonly int m_tagClass;
+		readonly int m_tagNo;
+		readonly byte[] m_contentsOctets;
+		readonly byte m_contentsSuffix;
 
 		internal PrimitiveEncodingSuffixed(int tagClass, int tagNo, byte[] contentsOctets, byte contentsSuffix)
 		{

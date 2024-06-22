@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class KeccakDigest
 		: IDigest, IMemoable
 	{
-		private static readonly ulong[] KeccakRoundConstants = new ulong[]
+		static readonly ulong[] KeccakRoundConstants = new ulong[]
 		{
 			0x0000000000000001UL, 0x0000000000008082UL, 0x800000000000808aUL, 0x8000000080008000UL,
 			0x000000000000808bUL, 0x0000000080000001UL, 0x8000000080008081UL, 0x8000000000008009UL,
@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			0x8000000080008081UL, 0x8000000000008080UL, 0x0000000080000001UL, 0x8000000080008008UL
 		};
 
-		private ulong[] state = new ulong[25];
+		ulong[] state = new ulong[25];
 		protected byte[] dataQueue = new byte[192];
 		protected int rate;
 		protected int bitsInQueue;
@@ -48,14 +48,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			CopyIn(source);
 		}
 
-		private void CopyIn(KeccakDigest source)
+		void CopyIn(KeccakDigest source)
 		{
-			Array.Copy(source.state, 0, this.state, 0, source.state.Length);
-			Array.Copy(source.dataQueue, 0, this.dataQueue, 0, source.dataQueue.Length);
-			this.rate = source.rate;
-			this.bitsInQueue = source.bitsInQueue;
-			this.fixedOutputLength = source.fixedOutputLength;
-			this.squeezing = source.squeezing;
+			Array.Copy(source.state, 0, state, 0, source.state.Length);
+			Array.Copy(source.dataQueue, 0, dataQueue, 0, source.dataQueue.Length);
+			rate = source.rate;
+			bitsInQueue = source.bitsInQueue;
+			fixedOutputLength = source.fixedOutputLength;
+			squeezing = source.squeezing;
 		}
 
 		public virtual string AlgorithmName
@@ -138,7 +138,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return rate >> 3;
 		}
 
-		private void Init(int bitLength)
+		void Init(int bitLength)
 		{
 			switch (bitLength)
 			{
@@ -155,25 +155,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private void InitSponge(int rate)
+		void InitSponge(int rate)
 		{
 			if (rate <= 0 || rate >= 1600 || (rate & 63) != 0)
+			{
 				throw new InvalidOperationException("invalid rate value");
+			}
 
 			this.rate = rate;
 			Array.Clear(state, 0, state.Length);
-			Arrays.Fill(this.dataQueue, (byte)0);
-			this.bitsInQueue = 0;
-			this.squeezing = false;
-			this.fixedOutputLength = (1600 - rate) >> 1;
+			Arrays.Fill(dataQueue, (byte)0);
+			bitsInQueue = 0;
+			squeezing = false;
+			fixedOutputLength = (1600 - rate) >> 1;
 		}
 
 		protected void Absorb(byte data)
 		{
 			if ((bitsInQueue & 7) != 0)
+			{
 				throw new InvalidOperationException("attempt to absorb with odd length queue");
+			}
+
 			if (squeezing)
+			{
 				throw new InvalidOperationException("attempt to absorb while squeezing");
+			}
 
 			dataQueue[bitsInQueue >> 3] = data;
 			if ((bitsInQueue += 8) == rate)
@@ -186,9 +193,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		protected void Absorb(byte[] data, int off, int len)
 		{
 			if ((bitsInQueue & 7) != 0)
+			{
 				throw new InvalidOperationException("attempt to absorb with odd length queue");
+			}
+
 			if (squeezing)
+			{
 				throw new InvalidOperationException("attempt to absorb while squeezing");
+			}
 
 			int bytesInQueue = bitsInQueue >> 3;
 			int rateBytes = rate >> 3;
@@ -197,7 +209,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			if (len < available)
 			{
 				Array.Copy(data, off, dataQueue, bytesInQueue, len);
-				this.bitsInQueue += len << 3;
+				bitsInQueue += len << 3;
 				return;
 			}
 
@@ -210,14 +222,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 
 			int remaining;
-			while ((remaining = (len - count)) >= rateBytes)
+			while ((remaining = len - count) >= rateBytes)
 			{
 				KeccakAbsorb(data, off + count);
 				count += rateBytes;
 			}
 
 			Array.Copy(data, off + count, dataQueue, 0, remaining);
-			this.bitsInQueue = remaining << 3;
+			bitsInQueue = remaining << 3;
 		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
@@ -263,11 +275,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		protected void AbsorbBits(int data, int bits)
 		{
 			if (bits < 1 || bits > 7)
+			{
 				throw new ArgumentException("must be in the range 1 to 7", "bits");
+			}
+
 			if ((bitsInQueue & 7) != 0)
+			{
 				throw new InvalidOperationException("attempt to absorb with odd length queue");
+			}
+
 			if (squeezing)
+			{
 				throw new InvalidOperationException("attempt to absorb while squeezing");
+			}
 
 			int mask = (1 << bits) - 1;
 			dataQueue[bitsInQueue >> 3] = (byte)(data & mask);
@@ -276,7 +296,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			bitsInQueue += bits;
 		}
 
-		private void PadAndSwitchToSqueezingPhase()
+		void PadAndSwitchToSqueezingPhase()
 		{
 			Debug.Assert(bitsInQueue < rate);
 
@@ -303,7 +323,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 				}
 			}
 
-			state[(rate - 1) >> 6] ^= (1UL << 63);
+			state[(rate - 1) >> 6] ^= 1UL << 63;
 
 			bitsInQueue = 0;
 			squeezing = true;
@@ -317,7 +337,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 
 			if ((outputLength & 7L) != 0L)
+			{
 				throw new InvalidOperationException("outputLength not a multiple of 8");
+			}
 
 			long i = 0;
 			while (i < outputLength)
@@ -358,7 +380,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-		private void KeccakAbsorb(byte[] data, int off)
+		void KeccakAbsorb(byte[] data, int off)
 		{
 			int count = rate >> 6;
 			for (int i = 0; i < count; ++i)
@@ -384,16 +406,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-		private void KeccakExtract()
+		void KeccakExtract()
 		{
 			KeccakPermutation();
 
 			Pack.UInt64_To_LE(state, 0, rate >> 6, dataQueue, 0);
 
-			this.bitsInQueue = rate;
+			bitsInQueue = rate;
 		}
 
-		private void KeccakPermutation()
+		void KeccakPermutation()
 		{
 			ulong[] A = state;
 

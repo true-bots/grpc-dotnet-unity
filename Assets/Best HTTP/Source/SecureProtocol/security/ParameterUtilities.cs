@@ -19,10 +19,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 {
 	public static class ParameterUtilities
 	{
-		private static readonly IDictionary<string, string> Algorithms =
+		static readonly IDictionary<string, string> Algorithms =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly IDictionary<string, int> BasicIVSizes =
+		static readonly IDictionary<string, int> BasicIVSizes =
 			new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
 		static ParameterUtilities()
@@ -164,7 +164,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			// "RIJNDAEL", "SKIPJACK", "TWOFISH"
 		}
 
-		private static void AddAlgorithm(string canonicalName, params object[] aliases)
+		static void AddAlgorithm(string canonicalName, params object[] aliases)
 		{
 			Algorithms[canonicalName] = canonicalName;
 
@@ -174,7 +174,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 		}
 
-		private static void AddBasicIVSizeEntries(int size, params string[] algorithms)
+		static void AddBasicIVSizeEntries(int size, params string[] algorithms)
 		{
 			foreach (string algorithm in algorithms)
 			{
@@ -213,21 +213,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			int length)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException(nameof(algorithm));
+			}
 
 			string canonical = GetCanonicalAlgorithmName(algorithm);
 
 			if (canonical == null)
+			{
 				throw new SecurityUtilityException("Algorithm " + algorithm + " not recognised.");
+			}
 
 			if (canonical == "DES")
+			{
 				return new DesParameters(keyBytes, offset, length);
+			}
 
 			if (canonical == "DESEDE" || canonical == "DESEDE3")
+			{
 				return new DesEdeParameters(keyBytes, offset, length);
+			}
 
 			if (canonical == "RC2")
+			{
 				return new RC2Parameters(keyBytes, offset, length);
+			}
 
 			return new KeyParameter(keyBytes, offset, length);
 		}
@@ -246,12 +256,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			Asn1Object asn1Params)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException("algorithm");
+			}
 
 			string canonical = GetCanonicalAlgorithmName(algorithm);
 
 			if (canonical == null)
+			{
 				throw new SecurityUtilityException("Algorithm " + algorithm + " not recognised.");
+			}
 
 			byte[] iv = null;
 
@@ -305,12 +319,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			SecureRandom random)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException("algorithm");
+			}
 
 			string canonical = GetCanonicalAlgorithmName(algorithm);
 
 			if (canonical == null)
+			{
 				throw new SecurityUtilityException("Algorithm " + algorithm + " not recognised.");
+			}
 
 			// TODO These algorithms support an IV
 			// but JCE doesn't seem to provide an AlgorithmParametersGenerator for them
@@ -318,16 +336,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 			int basicIVKeySize = FindBasicIVSize(canonical);
 			if (basicIVKeySize != -1)
+			{
 				return CreateIVOctetString(random, basicIVKeySize);
+			}
 
 			if (canonical == "CAST5")
+			{
 				return new Cast5CbcParameters(CreateIV(random, 8), 128);
+			}
 
 			if (canonical == "IDEA")
+			{
 				return new IdeaCbcPar(CreateIV(random, 8));
+			}
 
 			if (canonical == "RC2")
+			{
 				return new RC2CbcParameter(CreateIV(random, 8));
+			}
 
 			throw new SecurityUtilityException("Algorithm " + algorithm + " not recognised.");
 		}
@@ -342,17 +368,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return cp;
 		}
 
-		private static Asn1OctetString CreateIVOctetString(SecureRandom random, int ivLength)
+		static Asn1OctetString CreateIVOctetString(SecureRandom random, int ivLength)
 		{
 			return new DerOctetString(CreateIV(random, ivLength));
 		}
 
-		private static byte[] CreateIV(SecureRandom random, int ivLength)
+		static byte[] CreateIV(SecureRandom random, int ivLength)
 		{
 			return SecureRandom.GetNextBytes(random, ivLength);
 		}
 
-		private static int FindBasicIVSize(string canonicalName)
+		static int FindBasicIVSize(string canonicalName)
 		{
 			return BasicIVSizes.TryGetValue(canonicalName, out int keySize) ? keySize : -1;
 		}

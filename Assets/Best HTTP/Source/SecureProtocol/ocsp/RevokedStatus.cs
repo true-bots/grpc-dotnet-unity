@@ -11,7 +11,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 	public class RevokedStatus
 		: CertificateStatus
 	{
-		private readonly RevokedInfo m_revokedInfo;
+		readonly RevokedInfo m_revokedInfo;
 
 		public RevokedStatus(RevokedInfo revokedInfo)
 		{
@@ -47,7 +47,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			get
 			{
 				if (m_revokedInfo.RevocationReason == null)
+				{
 					throw new InvalidOperationException("attempt to get a reason where none is available");
+				}
 
 				return m_revokedInfo.RevocationReason.IntValueExact;
 			}

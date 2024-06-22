@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class PskTlsServer
 		: AbstractTlsServer
 	{
-		private static readonly int[] DefaultCipherSuites = new int[]
+		static readonly int[] DefaultCipherSuites = new int[]
 		{
 			CipherSuite.TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256,
 			CipherSuite.TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA384,
@@ -30,7 +30,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public PskTlsServer(TlsCrypto crypto, TlsPskIdentityManager pskIdentityManager)
 			: base(crypto)
 		{
-			this.m_pskIdentityManager = pskIdentityManager;
+			m_pskIdentityManager = pskIdentityManager;
 		}
 
 		/// <exception cref="IOException"/>

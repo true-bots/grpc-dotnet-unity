@@ -2,7 +2,7 @@
 
 namespace BestHTTP.SocketIO
 {
-	using BestHTTP.SocketIO.Transports;
+	using Transports;
 
 	/// <summary>
 	/// Interface to hide internal functions from the user by implementing it as an explicit interface.

@@ -29,7 +29,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Date
 		{
 			DateTime utc = dateTime.ToUniversalTime();
 			if (utc.CompareTo(UnixEpoch) < 0)
+			{
 				throw new ArgumentOutOfRangeException(nameof(dateTime), "DateTime value may not be before the epoch");
+			}
 
 			return (utc.Ticks - UnixEpoch.Ticks) / TimeSpan.TicksPerMillisecond;
 		}
@@ -44,7 +46,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Date
 		public static DateTime UnixMsToDateTime(long unixMs)
 		{
 			if (unixMs < MinUnixMs || unixMs > MaxUnixMs)
+			{
 				throw new ArgumentOutOfRangeException(nameof(unixMs));
+			}
 
 			return new DateTime(unixMs * TimeSpan.TicksPerMillisecond + UnixEpoch.Ticks, DateTimeKind.Utc);
 		}
@@ -59,14 +63,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Date
 
 		public static DateTime WithPrecisionCentisecond(DateTime dateTime)
 		{
-			int millisecond = dateTime.Millisecond - (dateTime.Millisecond % 10);
+			int millisecond = dateTime.Millisecond - dateTime.Millisecond % 10;
 			return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day,
 				dateTime.Hour, dateTime.Minute, dateTime.Second, millisecond, dateTime.Kind);
 		}
 
 		public static DateTime WithPrecisionDecisecond(DateTime dateTime)
 		{
-			int millisecond = dateTime.Millisecond - (dateTime.Millisecond % 100);
+			int millisecond = dateTime.Millisecond - dateTime.Millisecond % 100;
 			return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day,
 				dateTime.Hour, dateTime.Minute, dateTime.Second, millisecond, dateTime.Kind);
 		}

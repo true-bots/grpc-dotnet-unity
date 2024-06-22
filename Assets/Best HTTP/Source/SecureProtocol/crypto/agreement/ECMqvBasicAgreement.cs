@@ -21,7 +21,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 				parameters = ((ParametersWithRandom)parameters).Parameters;
 			}
 
-			this.privParams = (MqvPrivateParameters)parameters;
+			privParams = (MqvPrivateParameters)parameters;
 		}
 
 		public virtual int GetFieldSize()
@@ -38,20 +38,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement
 			ECDomainParameters parameters = staticPrivateKey.Parameters;
 
 			if (!parameters.Equals(pubParams.StaticPublicKey.Parameters))
+			{
 				throw new InvalidOperationException("ECMQV public key components have wrong domain parameters");
+			}
 
 			ECPoint agreement = CalculateMqvAgreement(parameters, staticPrivateKey,
 				privParams.EphemeralPrivateKey, privParams.EphemeralPublicKey,
 				pubParams.StaticPublicKey, pubParams.EphemeralPublicKey).Normalize();
 
 			if (agreement.IsInfinity)
+			{
 				throw new InvalidOperationException("Infinity is not a valid agreement value for MQV");
+			}
 
 			return agreement.AffineXCoord.ToBigInteger();
 		}
 
 		// The ECMQV Primitive as described in SEC-1, 3.4
-		private static ECPoint CalculateMqvAgreement(
+		static ECPoint CalculateMqvAgreement(
 			ECDomainParameters parameters,
 			ECPrivateKeyParameters d1U,
 			ECPrivateKeyParameters d2U,

@@ -25,7 +25,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			catch (PemGenerationException e)
 			{
 				if (e.InnerException is IOException inner)
+				{
 					throw inner;
+				}
 
 				throw e;
 			}

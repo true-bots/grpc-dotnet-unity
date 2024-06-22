@@ -9,62 +9,62 @@ using BestHTTP.Examples.Helpers;
 
 namespace BestHTTP.Examples
 {
-	public sealed class SocketIOChatSample : BestHTTP.Examples.Helpers.SampleBase
+	public sealed class SocketIOChatSample : SampleBase
 	{
-		private readonly TimeSpan TYPING_TIMER_LENGTH = TimeSpan.FromMilliseconds(700);
+		readonly TimeSpan TYPING_TIMER_LENGTH = TimeSpan.FromMilliseconds(700);
 
 #pragma warning disable 0649, 0414
 
 		[SerializeField] [Tooltip("The WebSocket address to connect")]
-		private string address = "https://socketio-chat-h9jt.herokuapp.com/socket.io/";
+		string address = "https://socketio-chat-h9jt.herokuapp.com/socket.io/";
 
 		[Header("Login Details")] [SerializeField]
-		private RectTransform _loginRoot;
+		RectTransform _loginRoot;
 
-		[SerializeField] private InputField _userNameInput;
+		[SerializeField] InputField _userNameInput;
 
 		[Header("Chat Setup")] [SerializeField]
-		private RectTransform _chatRoot;
+		RectTransform _chatRoot;
 
-		[SerializeField] private Text _participantsText;
+		[SerializeField] Text _participantsText;
 
-		[SerializeField] private ScrollRect _scrollRect;
+		[SerializeField] ScrollRect _scrollRect;
 
-		[SerializeField] private RectTransform _contentRoot;
+		[SerializeField] RectTransform _contentRoot;
 
-		[SerializeField] private TextListItem _listItemPrefab;
+		[SerializeField] TextListItem _listItemPrefab;
 
-		[SerializeField] private int _maxListItemEntries = 100;
+		[SerializeField] int _maxListItemEntries = 100;
 
-		[SerializeField] private Text _typingUsersText;
+		[SerializeField] Text _typingUsersText;
 
-		[SerializeField] private InputField _input;
+		[SerializeField] InputField _input;
 
-		[Header("Buttons")] [SerializeField] private Button _connectButton;
+		[Header("Buttons")] [SerializeField] Button _connectButton;
 
-		[SerializeField] private Button _closeButton;
+		[SerializeField] Button _closeButton;
 
 #pragma warning restore
 
 		/// <summary>
 		/// The Socket.IO manager instance.
 		/// </summary>
-		private SocketManager Manager;
+		SocketManager Manager;
 
 		/// <summary>
 		/// True if the user is currently typing
 		/// </summary>
-		private bool typing;
+		bool typing;
 
 		/// <summary>
 		/// When the message changed.
 		/// </summary>
-		private DateTime lastTypingTime = DateTime.MinValue;
+		DateTime lastTypingTime = DateTime.MinValue;
 
 		/// <summary>
 		/// Users that typing.
 		/// </summary>
-		private List<string> typingUsers = new List<string>();
+		List<string> typingUsers = new List<string>();
 
 		#region Unity Events
 
@@ -72,18 +72,18 @@ namespace BestHTTP.Examples
 		{
 			base.Start();
 
-			this._userNameInput.text = PlayerPrefs.GetString("SocketIOChatSample_UserName");
-			SetButtons(!string.IsNullOrEmpty(this._userNameInput.text), false);
+			_userNameInput.text = PlayerPrefs.GetString("SocketIOChatSample_UserName");
+			SetButtons(!string.IsNullOrEmpty(_userNameInput.text), false);
 			SetPanels(true);
 		}
 
 		void OnDestroy()
 		{
-			if (this.Manager != null)
+			if (Manager != null)
 			{
 				// Leaving this sample, close the socket
-				this.Manager.Close();
-				this.Manager = null;
+				Manager.Close();
+				Manager = null;
 			}
 		}
 
@@ -95,14 +95,16 @@ namespace BestHTTP.Examples
 		public void OnUserNameInputSubmit(string userName)
 		{
 			if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
+			{
 				OnConnectButton();
+			}
 		}
 
 		public void OnConnectButton()
 		{
 			SetPanels(false);
 
-			PlayerPrefs.SetString("SocketIOChatSample_UserName", this._userNameInput.text);
+			PlayerPrefs.SetString("SocketIOChatSample_UserName", _userNameInput.text);
 
 			AddText("Connecting...");
 
@@ -113,8 +115,8 @@ namespace BestHTTP.Examples
 			{
 				AddText("Connected!");
 
-				Manager.Socket.Emit("add user", this._userNameInput.text);
-				this._input.interactable = true;
+				Manager.Socket.Emit("add user", _userNameInput.text);
+				_input.interactable = true;
 			});
 
 			Manager.Socket.On(SocketIOEventTypes.Disconnect, (s, p, a) =>
@@ -142,15 +144,15 @@ namespace BestHTTP.Examples
 		public void OnCloseButton()
 		{
 			SetButtons(false, false);
-			this.Manager.Close();
+			Manager.Close();
 		}
 
 		void Update()
 		{
 			if (typing)
 			{
-				var typingTimer = DateTime.UtcNow;
-				var timeDiff = typingTimer - lastTypingTime;
+				DateTime typingTimer = DateTime.UtcNow;
+				TimeSpan timeDiff = typingTimer - lastTypingTime;
 				if (timeDiff >= TYPING_TIMER_LENGTH)
 				{
 					Manager.Socket.Emit("stop typing");
@@ -166,11 +168,13 @@ namespace BestHTTP.Examples
 		public void OnMessageInput(string textToSend)
 		{
 			if ((!Input.GetKeyDown(KeyCode.KeypadEnter) && !Input.GetKeyDown(KeyCode.Return)) || string.IsNullOrEmpty(textToSend))
+			{
 				return;
+			}
 
 			Manager.Socket.Emit("new message", textToSend);
 
-			AddText(string.Format("{0}: {1}", this._userNameInput.text, textToSend));
+			AddText(string.Format("{0}: {1}", _userNameInput.text, textToSend));
 		}
 
 		public void UpdateTyping(string textToSend)
@@ -189,37 +193,45 @@ namespace BestHTTP.Examples
 			int numUsers = Convert.ToInt32(data["numUsers"]);
 
 			if (numUsers == 1)
-				this._participantsText.text = "there's 1 participant";
+			{
+				_participantsText.text = "there's 1 participant";
+			}
 			else
-				this._participantsText.text = "there are " + numUsers + " participants";
+			{
+				_participantsText.text = "there are " + numUsers + " participants";
+			}
 		}
 
 		void addChatMessage(Dictionary<string, object> data)
 		{
-			var username = data["username"] as string;
-			var msg = data["message"] as string;
+			string username = data["username"] as string;
+			string msg = data["message"] as string;
 
 			AddText(string.Format("{0}: {1}", username, msg));
 		}
 
 		void AddChatTyping(Dictionary<string, object> data)
 		{
-			var username = data["username"] as string;
+			string username = data["username"] as string;
 
 			int idx = typingUsers.FindIndex((name) => name.Equals(username));
 			if (idx == -1)
+			{
 				typingUsers.Add(username);
+			}
 
 			SetTypingUsers();
 		}
 
 		void RemoveChatTyping(Dictionary<string, object> data)
 		{
-			var username = data["username"] as string;
+			string username = data["username"] as string;
 
 			int idx = typingUsers.FindIndex((name) => name.Equals(username));
 			if (idx != -1)
+			{
 				typingUsers.RemoveAt(idx);
+			}
 
 			SetTypingUsers();
 		}
@@ -242,9 +254,9 @@ namespace BestHTTP.Examples
 
 		void OnUserJoined(Socket socket, Packet packet, params object[] args)
 		{
-			var data = args[0] as Dictionary<string, object>;
+			Dictionary<string, object> data = args[0] as Dictionary<string, object>;
 
-			var username = data["username"] as string;
+			string username = data["username"] as string;
 
 			AddText(string.Format("{0} joined", username));
 
@@ -253,9 +265,9 @@ namespace BestHTTP.Examples
 
 		void OnUserLeft(Socket socket, Packet packet, params object[] args)
 		{
-			var data = args[0] as Dictionary<string, object>;
+			Dictionary<string, object> data = args[0] as Dictionary<string, object>;
 
-			var username = data["username"] as string;
+			string username = data["username"] as string;
 
 			AddText(string.Format("{0} left", username));
 
@@ -274,54 +286,66 @@ namespace BestHTTP.Examples
 
 		#endregion
 
-		private void AddText(string text)
+		void AddText(string text)
 		{
-			GUIHelper.AddText(this._listItemPrefab, this._contentRoot, text, this._maxListItemEntries, this._scrollRect);
+			GUIHelper.AddText(_listItemPrefab, _contentRoot, text, _maxListItemEntries, _scrollRect);
 		}
 
-		private void SetTypingUsers()
+		void SetTypingUsers()
 		{
-			if (this.typingUsers.Count > 0)
+			if (typingUsers.Count > 0)
 			{
-				System.Text.StringBuilder sb = new System.Text.StringBuilder(this.typingUsers[0], this.typingUsers.Count + 1);
+				System.Text.StringBuilder sb = new System.Text.StringBuilder(typingUsers[0], typingUsers.Count + 1);
 
-				for (int i = 1; i < this.typingUsers.Count; ++i)
-					sb.AppendFormat(", {0}", this.typingUsers[i]);
+				for (int i = 1; i < typingUsers.Count; ++i)
+				{
+					sb.AppendFormat(", {0}", typingUsers[i]);
+				}
 
-				if (this.typingUsers.Count == 1)
+				if (typingUsers.Count == 1)
+				{
 					sb.Append(" is typing!");
+				}
 				else
+				{
 					sb.Append(" are typing!");
+				}
 
-				this._typingUsersText.text = sb.ToString();
+				_typingUsersText.text = sb.ToString();
 			}
 			else
-				this._typingUsersText.text = string.Empty;
+			{
+				_typingUsersText.text = string.Empty;
+			}
 		}
 
-		private void SetPanels(bool login)
+		void SetPanels(bool login)
 		{
 			if (login)
 			{
-				this._loginRoot.gameObject.SetActive(true);
-				this._chatRoot.gameObject.SetActive(false);
-				this._input.interactable = false;
+				_loginRoot.gameObject.SetActive(true);
+				_chatRoot.gameObject.SetActive(false);
+				_input.interactable = false;
 			}
 			else
 			{
-				this._loginRoot.gameObject.SetActive(false);
-				this._chatRoot.gameObject.SetActive(true);
-				this._input.interactable = true;
+				_loginRoot.gameObject.SetActive(false);
+				_chatRoot.gameObject.SetActive(true);
+				_input.interactable = true;
 			}
 		}
 
-		private void SetButtons(bool connect, bool close)
+		void SetButtons(bool connect, bool close)
 		{
-			if (this._connectButton != null)
-				this._connectButton.interactable = connect;
+			if (_connectButton != null)
+			{
+				_connectButton.interactable = connect;
+			}
 
-			if (this._closeButton != null)
-				this._closeButton.interactable = close;
+			if (_closeButton != null)
+			{
+				_closeButton.interactable = close;
+			}
 		}
 	}
 }

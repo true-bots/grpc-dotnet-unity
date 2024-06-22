@@ -65,7 +65,7 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 		LingerOption linger_state;
 		bool no_delay;
 
-		private void Init(AddressFamily family)
+		void Init(AddressFamily family)
 		{
 			active = false;
 
@@ -159,7 +159,7 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 
 		public bool ExclusiveAddressUse
 		{
-			get { return (client.ExclusiveAddressUse); }
+			get { return client.ExclusiveAddressUse; }
 			set { client.ExclusiveAddressUse = value; }
 		}
 
@@ -173,7 +173,9 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 			get
 			{
 				if ((values & Properties.LingerState) != 0)
+				{
 					return linger_state;
+				}
 
 				return (LingerOption)client.GetSocketOption(SocketOptionLevel.Socket,
 					SocketOptionName.Linger);
@@ -198,7 +200,9 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 			get
 			{
 				if ((values & Properties.NoDelay) != 0)
+				{
 					return no_delay;
+				}
 
 				return (bool)client.GetSocketOption(
 					SocketOptionLevel.Tcp,
@@ -224,7 +228,9 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 			get
 			{
 				if ((values & Properties.ReceiveBufferSize) != 0)
+				{
 					return recv_buffer_size;
+				}
 
 				return (int)client.GetSocketOption(
 					SocketOptionLevel.Socket,
@@ -250,7 +256,9 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 			get
 			{
 				if ((values & Properties.ReceiveTimeout) != 0)
+				{
 					return recv_timeout;
+				}
 
 				return (int)client.GetSocketOption(
 					SocketOptionLevel.Socket,
@@ -276,7 +284,9 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 			get
 			{
 				if ((values & Properties.SendBufferSize) != 0)
+				{
 					return send_buffer_size;
+				}
 
 				return (int)client.GetSocketOption(
 					SocketOptionLevel.Socket,
@@ -302,7 +312,9 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 			get
 			{
 				if ((values & Properties.SendTimeout) != 0)
+				{
 					return send_timeout;
+				}
 
 				return (int)client.GetSocketOption(
 					SocketOptionLevel.Socket,
@@ -343,7 +355,9 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 					IAsyncResult result = client.BeginConnect(remoteEP, (res) => mre.Set(), null);
 					active = mre.WaitOne(ConnectTimeout);
 					if (active)
+					{
 						client.EndConnect(result);
+					}
 					else
 					{
 						try
@@ -396,17 +410,34 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 			values = 0;
 
 			if ((props & Properties.LingerState) != 0)
+			{
 				LingerState = linger_state;
+			}
+
 			if ((props & Properties.NoDelay) != 0)
+			{
 				NoDelay = no_delay;
+			}
+
 			if ((props & Properties.ReceiveBufferSize) != 0)
+			{
 				ReceiveBufferSize = recv_buffer_size;
+			}
+
 			if ((props & Properties.ReceiveTimeout) != 0)
+			{
 				ReceiveTimeout = recv_timeout;
+			}
+
 			if ((props & Properties.SendBufferSize) != 0)
+			{
 				SendBufferSize = send_buffer_size;
+			}
+
 			if ((props & Properties.SendTimeout) != 0)
+			{
 				SendTimeout = send_timeout;
+			}
 		}
 
 		public void Connect(string hostname, int port)
@@ -474,7 +505,9 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 					}
 
 					if (request != null && request.IsCancellationRequested)
+					{
 						throw new Exception("IsCancellationRequested");
+					}
 
 					HTTPManager.Logger.Verbose("TcpClient", string.Format("Trying to connect to {0}:{1}", address.ToString(), port.ToString()), request.Context);
 
@@ -571,7 +604,10 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposed)
+			{
 				return;
+			}
+
 			disposed = true;
 
 			if (disposing)
@@ -605,7 +641,10 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 			try
 			{
 				if (stream == null)
+				{
 					stream = new NetworkStream(client, true);
+				}
+
 				return stream;
 			}
 			finally
@@ -614,10 +653,12 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 			}
 		}
 
-		private void CheckDisposed()
+		void CheckDisposed()
 		{
 			if (disposed)
+			{
 				throw new ObjectDisposedException(GetType().FullName);
+			}
 		}
 
 #if UNITY_WINDOWS || UNITY_EDITOR
@@ -625,7 +666,7 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 		{
 			int size = System.Runtime.InteropServices.Marshal.SizeOf(new uint());
 
-			var inOptionValues = new byte[size * 3];
+			byte[] inOptionValues = new byte[size * 3];
 
 			BitConverter.GetBytes((uint)(on ? 1 : 0)).CopyTo(inOptionValues, 0);
 			BitConverter.GetBytes((uint)keepAliveTime).CopyTo(inOptionValues, size);
@@ -633,13 +674,13 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 
 			//client.IOControl(IOControlCode.KeepAliveValues, inOptionValues, null);
 			int dwBytesRet = 0;
-			WSAIoctl(client.Handle, /*SIO_KEEPALIVE_VALS*/ System.Net.Sockets.IOControlCode.KeepAliveValues, inOptionValues, inOptionValues.Length, /*NULL*/IntPtr.Zero,
+			WSAIoctl(client.Handle, /*SIO_KEEPALIVE_VALS*/ IOControlCode.KeepAliveValues, inOptionValues, inOptionValues.Length, /*NULL*/IntPtr.Zero,
 				0, ref dwBytesRet, /*NULL*/IntPtr.Zero, /*NULL*/IntPtr.Zero);
 		}
 
 		[System.Runtime.InteropServices.DllImport("Ws2_32.dll")]
 		public static extern int WSAIoctl(
-			/* Socket, Mode */ IntPtr s, System.Net.Sockets.IOControlCode dwIoControlCode,
+			/* Socket, Mode */ IntPtr s, IOControlCode dwIoControlCode,
 			/* Optional Or IntPtr.Zero, 0 */ byte[] lpvInBuffer, int cbInBuffer,
 			/* Optional Or IntPtr.Zero, 0 */ IntPtr lpvOutBuffer, int cbOutBuffer,
 			/* reference to receive Size */ ref int lpcbBytesReturned,

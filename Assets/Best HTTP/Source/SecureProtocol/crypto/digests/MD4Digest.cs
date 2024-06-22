@@ -16,12 +16,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class MD4Digest
 		: GeneralDigest
 	{
-		private const int DigestLength = 16;
+		const int DigestLength = 16;
 
-		private int H1, H2, H3, H4; // IV's
+		int H1, H2, H3, H4; // IV's
 
-		private int[] X = new int[16];
-		private int xOff;
+		int[] X = new int[16];
+		int xOff;
 
 		/**
 		* Standard constructor
@@ -40,7 +40,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			CopyIn(t);
 		}
 
-		private void CopyIn(MD4Digest t)
+		void CopyIn(MD4Digest t)
 		{
 			base.CopyIn(t);
 			H1 = t.H1;
@@ -149,31 +149,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		//
 		// round 1 left rotates
 		//
-		private const int S11 = 3;
-		private const int S12 = 7;
-		private const int S13 = 11;
-		private const int S14 = 19;
+		const int S11 = 3;
+		const int S12 = 7;
+		const int S13 = 11;
+		const int S14 = 19;
 
 		//
 		// round 2 left rotates
 		//
-		private const int S21 = 3;
-		private const int S22 = 5;
-		private const int S23 = 9;
-		private const int S24 = 13;
+		const int S21 = 3;
+		const int S22 = 5;
+		const int S23 = 9;
+		const int S24 = 13;
 
 		//
 		// round 3 left rotates
 		//
-		private const int S31 = 3;
-		private const int S32 = 9;
-		private const int S33 = 11;
-		private const int S34 = 15;
+		const int S31 = 3;
+		const int S32 = 9;
+		const int S33 = 11;
+		const int S34 = 15;
 
 		/*
 		 * F, G, H and I are the basic MD4 functions.
 		 */
-		private int F(
+		int F(
 			int u,
 			int v,
 			int w)
@@ -181,7 +181,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return (u & v) | (~u & w);
 		}
 
-		private int G(
+		int G(
 			int u,
 			int v,
 			int w)
@@ -189,7 +189,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return (u & v) | (u & w) | (v & w);
 		}
 
-		private int H(
+		int H(
 			int u,
 			int v,
 			int w)
@@ -207,62 +207,62 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			//
 			// Round 1 - F cycle, 16 times.
 			//
-			a = Integers.RotateLeft((a + F(b, c, d) + X[0]), S11);
-			d = Integers.RotateLeft((d + F(a, b, c) + X[1]), S12);
-			c = Integers.RotateLeft((c + F(d, a, b) + X[2]), S13);
-			b = Integers.RotateLeft((b + F(c, d, a) + X[3]), S14);
-			a = Integers.RotateLeft((a + F(b, c, d) + X[4]), S11);
-			d = Integers.RotateLeft((d + F(a, b, c) + X[5]), S12);
-			c = Integers.RotateLeft((c + F(d, a, b) + X[6]), S13);
-			b = Integers.RotateLeft((b + F(c, d, a) + X[7]), S14);
-			a = Integers.RotateLeft((a + F(b, c, d) + X[8]), S11);
-			d = Integers.RotateLeft((d + F(a, b, c) + X[9]), S12);
-			c = Integers.RotateLeft((c + F(d, a, b) + X[10]), S13);
-			b = Integers.RotateLeft((b + F(c, d, a) + X[11]), S14);
-			a = Integers.RotateLeft((a + F(b, c, d) + X[12]), S11);
-			d = Integers.RotateLeft((d + F(a, b, c) + X[13]), S12);
-			c = Integers.RotateLeft((c + F(d, a, b) + X[14]), S13);
-			b = Integers.RotateLeft((b + F(c, d, a) + X[15]), S14);
+			a = Integers.RotateLeft(a + F(b, c, d) + X[0], S11);
+			d = Integers.RotateLeft(d + F(a, b, c) + X[1], S12);
+			c = Integers.RotateLeft(c + F(d, a, b) + X[2], S13);
+			b = Integers.RotateLeft(b + F(c, d, a) + X[3], S14);
+			a = Integers.RotateLeft(a + F(b, c, d) + X[4], S11);
+			d = Integers.RotateLeft(d + F(a, b, c) + X[5], S12);
+			c = Integers.RotateLeft(c + F(d, a, b) + X[6], S13);
+			b = Integers.RotateLeft(b + F(c, d, a) + X[7], S14);
+			a = Integers.RotateLeft(a + F(b, c, d) + X[8], S11);
+			d = Integers.RotateLeft(d + F(a, b, c) + X[9], S12);
+			c = Integers.RotateLeft(c + F(d, a, b) + X[10], S13);
+			b = Integers.RotateLeft(b + F(c, d, a) + X[11], S14);
+			a = Integers.RotateLeft(a + F(b, c, d) + X[12], S11);
+			d = Integers.RotateLeft(d + F(a, b, c) + X[13], S12);
+			c = Integers.RotateLeft(c + F(d, a, b) + X[14], S13);
+			b = Integers.RotateLeft(b + F(c, d, a) + X[15], S14);
 
 			//
 			// Round 2 - G cycle, 16 times.
 			//
-			a = Integers.RotateLeft((a + G(b, c, d) + X[0] + 0x5a827999), S21);
-			d = Integers.RotateLeft((d + G(a, b, c) + X[4] + 0x5a827999), S22);
-			c = Integers.RotateLeft((c + G(d, a, b) + X[8] + 0x5a827999), S23);
-			b = Integers.RotateLeft((b + G(c, d, a) + X[12] + 0x5a827999), S24);
-			a = Integers.RotateLeft((a + G(b, c, d) + X[1] + 0x5a827999), S21);
-			d = Integers.RotateLeft((d + G(a, b, c) + X[5] + 0x5a827999), S22);
-			c = Integers.RotateLeft((c + G(d, a, b) + X[9] + 0x5a827999), S23);
-			b = Integers.RotateLeft((b + G(c, d, a) + X[13] + 0x5a827999), S24);
-			a = Integers.RotateLeft((a + G(b, c, d) + X[2] + 0x5a827999), S21);
-			d = Integers.RotateLeft((d + G(a, b, c) + X[6] + 0x5a827999), S22);
-			c = Integers.RotateLeft((c + G(d, a, b) + X[10] + 0x5a827999), S23);
-			b = Integers.RotateLeft((b + G(c, d, a) + X[14] + 0x5a827999), S24);
-			a = Integers.RotateLeft((a + G(b, c, d) + X[3] + 0x5a827999), S21);
-			d = Integers.RotateLeft((d + G(a, b, c) + X[7] + 0x5a827999), S22);
-			c = Integers.RotateLeft((c + G(d, a, b) + X[11] + 0x5a827999), S23);
-			b = Integers.RotateLeft((b + G(c, d, a) + X[15] + 0x5a827999), S24);
+			a = Integers.RotateLeft(a + G(b, c, d) + X[0] + 0x5a827999, S21);
+			d = Integers.RotateLeft(d + G(a, b, c) + X[4] + 0x5a827999, S22);
+			c = Integers.RotateLeft(c + G(d, a, b) + X[8] + 0x5a827999, S23);
+			b = Integers.RotateLeft(b + G(c, d, a) + X[12] + 0x5a827999, S24);
+			a = Integers.RotateLeft(a + G(b, c, d) + X[1] + 0x5a827999, S21);
+			d = Integers.RotateLeft(d + G(a, b, c) + X[5] + 0x5a827999, S22);
+			c = Integers.RotateLeft(c + G(d, a, b) + X[9] + 0x5a827999, S23);
+			b = Integers.RotateLeft(b + G(c, d, a) + X[13] + 0x5a827999, S24);
+			a = Integers.RotateLeft(a + G(b, c, d) + X[2] + 0x5a827999, S21);
+			d = Integers.RotateLeft(d + G(a, b, c) + X[6] + 0x5a827999, S22);
+			c = Integers.RotateLeft(c + G(d, a, b) + X[10] + 0x5a827999, S23);
+			b = Integers.RotateLeft(b + G(c, d, a) + X[14] + 0x5a827999, S24);
+			a = Integers.RotateLeft(a + G(b, c, d) + X[3] + 0x5a827999, S21);
+			d = Integers.RotateLeft(d + G(a, b, c) + X[7] + 0x5a827999, S22);
+			c = Integers.RotateLeft(c + G(d, a, b) + X[11] + 0x5a827999, S23);
+			b = Integers.RotateLeft(b + G(c, d, a) + X[15] + 0x5a827999, S24);
 
 			//
 			// Round 3 - H cycle, 16 times.
 			//
-			a = Integers.RotateLeft((a + H(b, c, d) + X[0] + 0x6ed9eba1), S31);
-			d = Integers.RotateLeft((d + H(a, b, c) + X[8] + 0x6ed9eba1), S32);
-			c = Integers.RotateLeft((c + H(d, a, b) + X[4] + 0x6ed9eba1), S33);
-			b = Integers.RotateLeft((b + H(c, d, a) + X[12] + 0x6ed9eba1), S34);
-			a = Integers.RotateLeft((a + H(b, c, d) + X[2] + 0x6ed9eba1), S31);
-			d = Integers.RotateLeft((d + H(a, b, c) + X[10] + 0x6ed9eba1), S32);
-			c = Integers.RotateLeft((c + H(d, a, b) + X[6] + 0x6ed9eba1), S33);
-			b = Integers.RotateLeft((b + H(c, d, a) + X[14] + 0x6ed9eba1), S34);
-			a = Integers.RotateLeft((a + H(b, c, d) + X[1] + 0x6ed9eba1), S31);
-			d = Integers.RotateLeft((d + H(a, b, c) + X[9] + 0x6ed9eba1), S32);
-			c = Integers.RotateLeft((c + H(d, a, b) + X[5] + 0x6ed9eba1), S33);
-			b = Integers.RotateLeft((b + H(c, d, a) + X[13] + 0x6ed9eba1), S34);
-			a = Integers.RotateLeft((a + H(b, c, d) + X[3] + 0x6ed9eba1), S31);
-			d = Integers.RotateLeft((d + H(a, b, c) + X[11] + 0x6ed9eba1), S32);
-			c = Integers.RotateLeft((c + H(d, a, b) + X[7] + 0x6ed9eba1), S33);
-			b = Integers.RotateLeft((b + H(c, d, a) + X[15] + 0x6ed9eba1), S34);
+			a = Integers.RotateLeft(a + H(b, c, d) + X[0] + 0x6ed9eba1, S31);
+			d = Integers.RotateLeft(d + H(a, b, c) + X[8] + 0x6ed9eba1, S32);
+			c = Integers.RotateLeft(c + H(d, a, b) + X[4] + 0x6ed9eba1, S33);
+			b = Integers.RotateLeft(b + H(c, d, a) + X[12] + 0x6ed9eba1, S34);
+			a = Integers.RotateLeft(a + H(b, c, d) + X[2] + 0x6ed9eba1, S31);
+			d = Integers.RotateLeft(d + H(a, b, c) + X[10] + 0x6ed9eba1, S32);
+			c = Integers.RotateLeft(c + H(d, a, b) + X[6] + 0x6ed9eba1, S33);
+			b = Integers.RotateLeft(b + H(c, d, a) + X[14] + 0x6ed9eba1, S34);
+			a = Integers.RotateLeft(a + H(b, c, d) + X[1] + 0x6ed9eba1, S31);
+			d = Integers.RotateLeft(d + H(a, b, c) + X[9] + 0x6ed9eba1, S32);
+			c = Integers.RotateLeft(c + H(d, a, b) + X[5] + 0x6ed9eba1, S33);
+			b = Integers.RotateLeft(b + H(c, d, a) + X[13] + 0x6ed9eba1, S34);
+			a = Integers.RotateLeft(a + H(b, c, d) + X[3] + 0x6ed9eba1, S31);
+			d = Integers.RotateLeft(d + H(a, b, c) + X[11] + 0x6ed9eba1, S32);
+			c = Integers.RotateLeft(c + H(d, a, b) + X[7] + 0x6ed9eba1, S33);
+			b = Integers.RotateLeft(b + H(c, d, a) + X[15] + 0x6ed9eba1, S34);
 
 			H1 += a;
 			H2 += b;

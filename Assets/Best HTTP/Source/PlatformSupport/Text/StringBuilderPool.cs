@@ -6,7 +6,7 @@ using BestHTTP.PlatformSupport.Threading;
 
 namespace BestHTTP.PlatformSupport.Text
 {
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	public static class StringBuilderPool
 	{
 		/// <summary>
@@ -21,11 +21,13 @@ namespace BestHTTP.PlatformSupport.Text
 
 				// When set to non-enabled remove all stored entries
 				if (!_isEnabled)
+				{
 					Clear();
+				}
 			}
 		}
 
-		private static volatile bool _isEnabled = true;
+		static volatile bool _isEnabled = true;
 
 		/// <summary>
 		/// Buffer entries that released back to the pool and older than this value are moved when next maintenance is triggered.
@@ -37,9 +39,9 @@ namespace BestHTTP.PlatformSupport.Text
 		/// </summary>
 		public static TimeSpan RunMaintenanceEvery = TimeSpan.FromSeconds(5);
 
-		private static DateTime lastMaintenance = DateTime.MinValue;
+		static DateTime lastMaintenance = DateTime.MinValue;
 
-		private readonly static ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+		static readonly ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
 		struct BuilderShelf
 		{
@@ -48,17 +50,19 @@ namespace BestHTTP.PlatformSupport.Text
 
 			public BuilderShelf(StringBuilder sb)
 			{
-				this.builder = sb;
-				this.released = DateTime.UtcNow;
+				builder = sb;
+				released = DateTime.UtcNow;
 			}
 		}
 
-		private static List<BuilderShelf> pooledBuilders = new List<BuilderShelf>();
+		static List<BuilderShelf> pooledBuilders = new List<BuilderShelf>();
 
 		public static StringBuilder Get(int lengthHint)
 		{
 			if (!_isEnabled)
+			{
 				return new StringBuilder(lengthHint);
+			}
 
 			using (new WriteLock(rwLock))
 			{
@@ -87,30 +91,42 @@ namespace BestHTTP.PlatformSupport.Text
 		public static void Release(StringBuilder builder)
 		{
 			if (builder == null)
+			{
 				return;
+			}
 
 			if (!_isEnabled)
+			{
 				return;
+			}
 
 			builder.Clear();
 
 			using (new WriteLock(rwLock))
+			{
 				pooledBuilders.Add(new BuilderShelf(builder));
+			}
 		}
 
 		public static string ReleaseAndGrab(StringBuilder builder)
 		{
 			if (builder == null)
+			{
 				return null;
+			}
 
-			var result = builder.ToString();
+			string result = builder.ToString();
 			if (!_isEnabled)
+			{
 				return result;
+			}
 
 			builder.Clear();
 
 			using (new WriteLock(rwLock))
+			{
 				pooledBuilders.Add(new BuilderShelf(builder));
+			}
 
 			return result;
 		}
@@ -119,7 +135,10 @@ namespace BestHTTP.PlatformSupport.Text
 		{
 			DateTime now = DateTime.UtcNow;
 			if (!_isEnabled || lastMaintenance + RunMaintenanceEvery > now)
+			{
 				return;
+			}
+
 			lastMaintenance = now;
 
 			DateTime olderThan = now - RemoveOlderThan;
@@ -130,7 +149,9 @@ namespace BestHTTP.PlatformSupport.Text
 					BuilderShelf shelf = pooledBuilders[i];
 
 					if (shelf.released < olderThan)
+					{
 						pooledBuilders.RemoveAt(i--);
+					}
 				}
 			}
 		}
@@ -138,7 +159,9 @@ namespace BestHTTP.PlatformSupport.Text
 		public static void Clear()
 		{
 			using (new WriteLock(rwLock))
+			{
 				pooledBuilders.Clear();
+			}
 		}
 	}
 }

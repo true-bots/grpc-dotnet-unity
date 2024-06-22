@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class ECPrivateKeyParameters
 		: ECKeyParameters
 	{
-		private readonly BigInteger d;
+		readonly BigInteger d;
 
 		public ECPrivateKeyParameters(
 			BigInteger d,
@@ -46,12 +46,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			ECPrivateKeyParameters other = obj as ECPrivateKeyParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

@@ -11,39 +11,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class KCcmBlockCipher
 		: IAeadBlockCipher
 	{
-		private static readonly int BYTES_IN_INT = 4;
-		private static readonly int BITS_IN_BYTE = 8;
+		static readonly int BYTES_IN_INT = 4;
+		static readonly int BITS_IN_BYTE = 8;
 
-		private static readonly int MAX_MAC_BIT_LENGTH = 512;
-		private static readonly int MIN_MAC_BIT_LENGTH = 64;
+		static readonly int MAX_MAC_BIT_LENGTH = 512;
+		static readonly int MIN_MAC_BIT_LENGTH = 64;
 
-		private IBlockCipher engine;
+		IBlockCipher engine;
 
-		private int macSize;
-		private bool forEncryption;
+		int macSize;
+		bool forEncryption;
 
-		private byte[] initialAssociatedText;
-		private byte[] mac;
-		private byte[] macBlock;
+		byte[] initialAssociatedText;
+		byte[] mac;
+		byte[] macBlock;
 
-		private byte[] nonce;
+		byte[] nonce;
 
-		private byte[] G1;
-		private byte[] buffer;
+		byte[] G1;
+		byte[] buffer;
 
-		private byte[] s;
-		private byte[] counter;
+		byte[] s;
+		byte[] counter;
 
-		private readonly MemoryStream associatedText = new MemoryStream();
-		private readonly MemoryStream data = new MemoryStream();
+		readonly MemoryStream associatedText = new MemoryStream();
+		readonly MemoryStream data = new MemoryStream();
 
 		/*
 		 *
 		 *
 		 */
-		private int Nb_ = 4;
+		int Nb_ = 4;
 
-		private void setNb(int Nb)
+		void setNb(int Nb)
 		{
 			if (Nb == 4 || Nb == 6 || Nb == 8)
 			{
@@ -77,15 +77,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		public KCcmBlockCipher(IBlockCipher engine, int Nb)
 		{
 			this.engine = engine;
-			this.macSize = engine.GetBlockSize();
-			this.nonce = new byte[engine.GetBlockSize()];
-			this.initialAssociatedText = new byte[engine.GetBlockSize()];
-			this.mac = new byte[engine.GetBlockSize()];
-			this.macBlock = new byte[engine.GetBlockSize()];
-			this.G1 = new byte[engine.GetBlockSize()];
-			this.buffer = new byte[engine.GetBlockSize()];
-			this.s = new byte[engine.GetBlockSize()];
-			this.counter = new byte[engine.GetBlockSize()];
+			macSize = engine.GetBlockSize();
+			nonce = new byte[engine.GetBlockSize()];
+			initialAssociatedText = new byte[engine.GetBlockSize()];
+			mac = new byte[engine.GetBlockSize()];
+			macBlock = new byte[engine.GetBlockSize()];
+			G1 = new byte[engine.GetBlockSize()];
+			buffer = new byte[engine.GetBlockSize()];
+			s = new byte[engine.GetBlockSize()];
+			counter = new byte[engine.GetBlockSize()];
 			setNb(Nb);
 		}
 
@@ -118,7 +118,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				throw new ArgumentException("Invalid parameters specified");
 			}
 
-			this.mac = new byte[macSize];
+			mac = new byte[macSize];
 			this.forEncryption = forEncryption;
 			engine.Init(true, cipherParameters);
 
@@ -130,14 +130,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			}
 		}
 
-		public virtual string AlgorithmName => engine.AlgorithmName + "/KCCM";
+		public virtual string AlgorithmName
+		{
+			get { return engine.AlgorithmName + "/KCCM"; }
+		}
 
 		public virtual int GetBlockSize()
 		{
 			return engine.GetBlockSize();
 		}
 
-		public virtual IBlockCipher UnderlyingCipher => engine;
+		public virtual IBlockCipher UnderlyingCipher
+		{
+			get { return engine; }
+		}
 
 		public virtual void ProcessAadByte(byte input)
 		{
@@ -156,7 +162,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
         }
 #endif
 
-		private void ProcessAAD(byte[] assocText, int assocOff, int assocLen, int dataLen)
+		void ProcessAAD(byte[] assocText, int assocOff, int assocLen, int dataLen)
 		{
 			if (assocLen - assocOff < engine.GetBlockSize())
 			{
@@ -510,7 +516,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
             }
         }
 #else
-		private void CalculateMac(byte[] authText, int authOff, int len)
+		void CalculateMac(byte[] authText, int authOff, int len)
 		{
 			int blockSize = engine.GetBlockSize();
 			int totalLen = len;
@@ -528,7 +534,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			}
 		}
 
-		private void ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
+		void ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			for (int byteIndex = 0; byteIndex < counter.Length; byteIndex++)
 			{
@@ -606,7 +612,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			}
 		}
 
-		private void intToBytes(
+		void intToBytes(
 			int num,
 			byte[] outBytes,
 			int outOff)
@@ -617,7 +623,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			outBytes[outOff] = (byte)num;
 		}
 
-		private byte getFlag(bool authTextPresents, int macSize)
+		byte getFlag(bool authTextPresents, int macSize)
 		{
 			StringBuilder flagByte = new StringBuilder();
 

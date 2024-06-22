@@ -8,10 +8,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class AttributeTypeAndValue
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier type;
-		private readonly Asn1Encodable value;
+		readonly DerObjectIdentifier type;
+		readonly Asn1Encodable value;
 
-		private AttributeTypeAndValue(Asn1Sequence seq)
+		AttributeTypeAndValue(Asn1Sequence seq)
 		{
 			type = (DerObjectIdentifier)seq[0];
 			value = (Asn1Encodable)seq[1];
@@ -20,12 +20,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static AttributeTypeAndValue GetInstance(object obj)
 		{
 			if (obj is AttributeTypeAndValue)
+			{
 				return (AttributeTypeAndValue)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new AttributeTypeAndValue((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public AttributeTypeAndValue(

@@ -7,7 +7,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP128R1FieldElement
+	class SecP128R1FieldElement
 		: AbstractFpFieldElement
 	{
 		public static readonly BigInteger Q = new BigInteger(1,
@@ -18,14 +18,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public SecP128R1FieldElement(BigInteger x)
 		{
 			if (x == null || x.SignValue < 0 || x.CompareTo(Q) >= 0)
+			{
 				throw new ArgumentException("value invalid for SecP128R1FieldElement", "x");
+			}
 
 			this.x = SecP128R1Field.FromBigInteger(x);
 		}
 
 		public SecP128R1FieldElement()
 		{
-			this.x = Nat128.Create();
+			x = Nat128.Create();
 		}
 
 		protected internal SecP128R1FieldElement(uint[] x)
@@ -138,9 +140,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			 *     1, 2, 4, 8, 10, 20, 30, [31]
 			 */
 
-			uint[] x1 = this.x;
+			uint[] x1 = x;
 			if (Nat128.IsZero(x1) || Nat128.IsOne(x1))
+			{
 				return this;
+			}
 
 			uint[] x2 = Nat128.Create();
 			SecP128R1Field.Square(x1, x2);
@@ -186,9 +190,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public virtual bool Equals(SecP128R1FieldElement other)
 		{
 			if (this == other)
+			{
 				return true;
+			}
+
 			if (null == other)
+			{
 				return false;
+			}
+
 			return Nat128.Eq(x, other.x);
 		}
 

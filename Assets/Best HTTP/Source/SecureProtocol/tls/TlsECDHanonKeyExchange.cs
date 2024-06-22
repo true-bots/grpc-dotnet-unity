@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public class TlsECDHanonKeyExchange
 		: AbstractTlsKeyExchange
 	{
-		private static int CheckKeyExchange(int keyExchange)
+		static int CheckKeyExchange(int keyExchange)
 		{
 			switch (keyExchange)
 			{
@@ -33,7 +33,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public TlsECDHanonKeyExchange(int keyExchange, TlsECConfig ecConfig)
 			: base(CheckKeyExchange(keyExchange))
 		{
-			this.m_ecConfig = ecConfig;
+			m_ecConfig = ecConfig;
 		}
 
 		public override void SkipServerCredentials()
@@ -61,7 +61,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			TlsEccUtilities.WriteECConfig(m_ecConfig, buf);
 
-			this.m_agreement = m_context.Crypto.CreateECDomain(m_ecConfig).CreateECDH();
+			m_agreement = m_context.Crypto.CreateECDomain(m_ecConfig).CreateECDH();
 
 			GenerateEphemeral(buf);
 
@@ -70,11 +70,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public override void ProcessServerKeyExchange(Stream input)
 		{
-			this.m_ecConfig = TlsEccUtilities.ReceiveECDHConfig(m_context, input);
+			m_ecConfig = TlsEccUtilities.ReceiveECDHConfig(m_context, input);
 
 			byte[] point = TlsUtilities.ReadOpaque8(input, 1);
 
-			this.m_agreement = m_context.Crypto.CreateECDomain(m_ecConfig).CreateECDH();
+			m_agreement = m_context.Crypto.CreateECDomain(m_ecConfig).CreateECDH();
 
 			ProcessEphemeral(point);
 		}
@@ -122,7 +122,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			TlsEccUtilities.CheckPointEncoding(m_ecConfig.NamedGroup, point);
 
-			this.m_agreement.ReceivePeerValue(point);
+			m_agreement.ReceivePeerValue(point);
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 	/// </remarks>
 	public static class WrapperUtilities
 	{
-		private enum WrapAlgorithm
+		enum WrapAlgorithm
 		{
 			AESWRAP,
 			CAMELLIAWRAP,
@@ -31,7 +31,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			CAMELLIARFC3211WRAP
 		};
 
-		private static readonly IDictionary<string, string> Algorithms =
+		static readonly IDictionary<string, string> Algorithms =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 		static WrapperUtilities()
@@ -88,7 +88,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			IBufferedCipher blockCipher = CipherUtilities.GetCipher(algorithm);
 
 			if (blockCipher != null)
+			{
 				return new BufferedCipherWrapper(blockCipher);
+			}
 
 			throw new SecurityUtilityException("Wrapper " + algorithm + " not recognised.");
 		}
@@ -98,11 +100,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return CollectionUtilities.GetValueOrNull(Algorithms, oid.Id);
 		}
 
-		private class BufferedCipherWrapper
+		class BufferedCipherWrapper
 			: IWrapper
 		{
-			private readonly IBufferedCipher cipher;
-			private bool forWrapping;
+			readonly IBufferedCipher cipher;
+			bool forWrapping;
 
 			public BufferedCipherWrapper(
 				IBufferedCipher cipher)
@@ -130,7 +132,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				int length)
 			{
 				if (!forWrapping)
+				{
 					throw new InvalidOperationException("Not initialised for wrapping");
+				}
 
 				return cipher.DoFinal(input, inOff, length);
 			}
@@ -141,7 +145,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 				int length)
 			{
 				if (forWrapping)
+				{
 					throw new InvalidOperationException("Not initialised for unwrapping");
+				}
 
 				return cipher.DoFinal(input, inOff, length);
 			}

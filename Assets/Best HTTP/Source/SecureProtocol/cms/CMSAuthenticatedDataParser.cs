@@ -53,13 +53,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		internal RecipientInformationStore _recipientInfoStore;
 		internal AuthenticatedDataParser authData;
 
-		private AlgorithmIdentifier macAlg;
-		private byte[] mac;
-		private Asn1.Cms.AttributeTable authAttrs;
-		private Asn1.Cms.AttributeTable unauthAttrs;
+		AlgorithmIdentifier macAlg;
+		byte[] mac;
+		Asn1.Cms.AttributeTable authAttrs;
+		Asn1.Cms.AttributeTable unauthAttrs;
 
-		private bool authAttrNotRead;
-		private bool unauthAttrNotRead;
+		bool authAttrNotRead;
+		bool unauthAttrNotRead;
 
 		public CmsAuthenticatedDataParser(
 			byte[] envelopedData)
@@ -71,8 +71,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			Stream envelopedData)
 			: base(envelopedData)
 		{
-			this.authAttrNotRead = true;
-			this.authData = new AuthenticatedDataParser(
+			authAttrNotRead = true;
+			authData = new AuthenticatedDataParser(
 				(Asn1SequenceParser)contentInfo.GetContent(Asn1Tags.Sequence));
 
 			// TODO Validate version?
@@ -83,7 +83,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			//
 			Asn1Set recipientInfos = Asn1Set.GetInstance(authData.GetRecipientInfos().ToAsn1Object());
 
-			this.macAlg = authData.GetMacAlgorithm();
+			macAlg = authData.GetMacAlgorithm();
 
 			//
 			// read the authenticated content info
@@ -92,12 +92,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			CmsReadable readable = new CmsProcessableInputStream(
 				((Asn1OctetStringParser)data.GetContent(Asn1Tags.OctetString)).GetOctetStream());
 			CmsSecureReadable secureReadable = new CmsEnvelopedHelper.CmsAuthenticatedSecureReadable(
-				this.macAlg, readable);
+				macAlg, readable);
 
 			//
 			// build the RecipientInformationStore
 			//
-			this._recipientInfoStore = CmsEnvelopedHelper.BuildRecipientInformationStore(
+			_recipientInfoStore = CmsEnvelopedHelper.BuildRecipientInformationStore(
 				recipientInfos, secureReadable);
 		}
 

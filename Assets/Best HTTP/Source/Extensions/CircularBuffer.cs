@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace BestHTTP.Extensions
 {
@@ -9,72 +10,78 @@ namespace BestHTTP.Extensions
 
 		public int StartIdx
 		{
-			get { return this.startIdx; }
+			get { return startIdx; }
 		}
 
 		public int EndIdx
 		{
-			get { return this.endIdx; }
+			get { return endIdx; }
 		}
 
 		public T this[int idx]
 		{
 			get
 			{
-				int realIdx = (this.startIdx + idx) % this.Capacity;
+				int realIdx = (startIdx + idx) % Capacity;
 
-				return this.buffer[realIdx];
+				return buffer[realIdx];
 			}
 
 			set
 			{
-				int realIdx = (this.startIdx + idx) % this.Capacity;
+				int realIdx = (startIdx + idx) % Capacity;
 
-				this.buffer[realIdx] = value;
+				buffer[realIdx] = value;
 			}
 		}
 
-		private T[] buffer;
-		private int startIdx;
-		private int endIdx;
+		T[] buffer;
+		int startIdx;
+		int endIdx;
 
 		public CircularBuffer(int capacity)
 		{
-			this.Capacity = capacity;
+			Capacity = capacity;
 		}
 
 		public void Add(T element)
 		{
-			if (this.buffer == null)
-				this.buffer = new T[this.Capacity];
+			if (buffer == null)
+			{
+				buffer = new T[Capacity];
+			}
 
-			this.buffer[this.endIdx] = element;
+			buffer[endIdx] = element;
 
-			this.endIdx = (this.endIdx + 1) % this.Capacity;
-			if (this.endIdx == this.startIdx)
-				this.startIdx = (this.startIdx + 1) % this.Capacity;
+			endIdx = (endIdx + 1) % Capacity;
+			if (endIdx == startIdx)
+			{
+				startIdx = (startIdx + 1) % Capacity;
+			}
 
-			this.Count = Math.Min(this.Count + 1, this.Capacity);
+			Count = Math.Min(Count + 1, Capacity);
 		}
 
 		public void Clear()
 		{
-			this.Count = this.startIdx = this.endIdx = 0;
+			Count = startIdx = endIdx = 0;
 		}
 
 		public override string ToString()
 		{
-			var sb = PlatformSupport.Text.StringBuilderPool.Get(2);
+			StringBuilder sb = PlatformSupport.Text.StringBuilderPool.Get(2);
 			sb.Append("[");
 
-			int idx = this.startIdx;
-			while (idx != this.endIdx)
+			int idx = startIdx;
+			while (idx != endIdx)
 			{
-				sb.Append(this.buffer[idx].ToString());
+				sb.Append(buffer[idx].ToString());
 
-				idx = (idx + 1) % this.Capacity;
-				if (idx != this.endIdx)
+				idx = (idx + 1) % Capacity;
+				if (idx != endIdx)
+				{
 					sb.Append("; ");
+				}
 			}
 
 			sb.Append("]");

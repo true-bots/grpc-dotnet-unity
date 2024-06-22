@@ -34,7 +34,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public static ECPoint SumOfMultiplies(ECPoint[] ps, BigInteger[] ks)
 		{
 			if (ps == null || ks == null || ps.Length != ks.Length || ps.Length < 1)
+			{
 				throw new ArgumentException("point and scalar arrays should be non-null, and of equal, non-zero, length");
+			}
 
 			int count = ps.Length;
 			switch (count)
@@ -120,7 +122,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			ECCurve cp = p.Curve;
 			if (!c.Equals(cp))
+			{
 				throw new ArgumentException("Point must be on the same curve");
+			}
 
 			return c.ImportPoint(p);
 		}
@@ -207,7 +211,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public static ECPoint ValidatePoint(ECPoint p)
 		{
 			if (!p.IsValid())
+			{
 				throw new InvalidOperationException("Invalid point");
+			}
 
 			return p;
 		}
@@ -216,7 +222,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			ECCurve cp = p.Curve;
 			if (!c.Equals(cp))
+			{
 				throw new ArgumentException("Point must be on the same curve", nameof(p));
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             int encodedLength = p.GetEncodedLength(false);
@@ -233,7 +241,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		internal static ECPoint ImplCheckResult(ECPoint p)
 		{
 			if (!p.IsValidPartial())
+			{
 				throw new InvalidOperationException("Invalid result");
+			}
 
 			return p;
 		}
@@ -267,9 +277,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				int jsfi = jsf[i];
 
 				// NOTE: The shifting ensures the sign is extended correctly
-				int kDigit = ((jsfi << 24) >> 28), lDigit = ((jsfi << 28) >> 28);
+				int kDigit = (jsfi << 24) >> 28, lDigit = (jsfi << 28) >> 28;
 
-				int index = 4 + (kDigit * 3) + lDigit;
+				int index = 4 + kDigit * 3 + lDigit;
 				R = R.TwicePlus(table[index]);
 			}
 
@@ -342,7 +352,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return ImplShamirsTrickWNaf(preCompP, preCompNegP, wnafP, preCompQ, preCompNegQ, wnafQ);
 		}
 
-		private static ECPoint ImplShamirsTrickWNaf(ECPoint[] preCompP, ECPoint[] preCompNegP, byte[] wnafP,
+		static ECPoint ImplShamirsTrickWNaf(ECPoint[] preCompP, ECPoint[] preCompNegP, byte[] wnafP,
 			ECPoint[] preCompQ, ECPoint[] preCompNegQ, byte[] wnafQ)
 		{
 			int len = System.Math.Max(wnafP.Length, wnafQ.Length);
@@ -492,7 +502,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return ImplSumOfMultiplies(negs, infos, wnafs);
 		}
 
-		private static ECPoint ImplSumOfMultiplies(bool[] negs, WNafPreCompInfo[] infos, byte[][] wnafs)
+		static ECPoint ImplSumOfMultiplies(bool[] negs, WNafPreCompInfo[] infos, byte[][] wnafs)
 		{
 			int len = 0, count = wnafs.Length;
 			for (int i = 0; i < count; ++i)
@@ -518,7 +528,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 					{
 						int n = System.Math.Abs(wi);
 						WNafPreCompInfo info = infos[j];
-						ECPoint[] table = (wi < 0 == negs[j]) ? info.PreComp : info.PreCompNeg;
+						ECPoint[] table = wi < 0 == negs[j] ? info.PreComp : info.PreCompNeg;
 						r = r.Add(table[n >> 1]);
 					}
 				}
@@ -546,7 +556,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return R;
 		}
 
-		private static ECPoint ImplShamirsTrickFixedPoint(ECPoint p, BigInteger k, ECPoint q, BigInteger l)
+		static ECPoint ImplShamirsTrickFixedPoint(ECPoint p, BigInteger k, ECPoint q, BigInteger l)
 		{
 			ECCurve c = p.Curve;
 			int combSize = FixedPointUtilities.GetCombSize(c);

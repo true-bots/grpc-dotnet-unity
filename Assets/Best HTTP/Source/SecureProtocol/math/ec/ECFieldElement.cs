@@ -80,9 +80,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public virtual bool Equals(ECFieldElement other)
 		{
 			if (this == other)
+			{
 				return true;
+			}
+
 			if (null == other)
+			{
 				return false;
+			}
+
 			return ToBigInteger().Equals(other.ToBigInteger());
 		}
 
@@ -93,7 +99,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override string ToString()
 		{
-			return this.ToBigInteger().ToString(16);
+			return ToBigInteger().ToString(16);
 		}
 
 		public virtual byte[] GetEncoded()
@@ -127,7 +133,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 	public class FpFieldElement
 		: AbstractFpFieldElement
 	{
-		private readonly BigInteger q, r, x;
+		readonly BigInteger q, r, x;
 
 		internal static BigInteger CalculateResidue(BigInteger p)
 		{
@@ -224,7 +230,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			BigInteger ab = ax.Multiply(bx);
 			BigInteger xy = xx.Multiply(yx);
 			BigInteger sum = ab.Add(xy);
-			if (r != null && r.SignValue < 0 && sum.BitLength > (q.BitLength << 1))
+			if (r != null && r.SignValue < 0 && sum.BitLength > q.BitLength << 1)
 			{
 				sum = sum.Subtract(q.ShiftLeft(q.BitLength));
 			}
@@ -262,7 +268,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			BigInteger aa = ax.Multiply(ax);
 			BigInteger xy = xx.Multiply(yx);
 			BigInteger sum = aa.Add(xy);
-			if (r != null && r.SignValue < 0 && sum.BitLength > (q.BitLength << 1))
+			if (r != null && r.SignValue < 0 && sum.BitLength > q.BitLength << 1)
 			{
 				sum = sum.Subtract(q.ShiftLeft(q.BitLength));
 			}
@@ -283,10 +289,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public override ECFieldElement Sqrt()
 		{
 			if (IsZero || IsOne)
+			{
 				return this;
+			}
 
 			if (!q.TestBit(0))
+			{
 				throw new NotImplementedException("even value of q");
+			}
 
 			if (q.TestBit(1)) // q == 4m + 3
 			{
@@ -316,10 +326,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			// q == 8m + 1
 
 			BigInteger legendreExponent = q.ShiftRight(1);
-			if (!(x.ModPow(legendreExponent, q).Equals(BigInteger.One)))
+			if (!x.ModPow(legendreExponent, q).Equals(BigInteger.One))
+			{
 				return null;
+			}
 
-			BigInteger X = this.x;
+			BigInteger X = x;
 			BigInteger fourX = ModDouble(ModDouble(X));
 			;
 
@@ -348,12 +360,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return null;
 		}
 
-		private ECFieldElement CheckSqrt(ECFieldElement z)
+		ECFieldElement CheckSqrt(ECFieldElement z)
 		{
 			return z.Square().Equals(this) ? z : null;
 		}
 
-		private BigInteger[] LucasSequence(
+		BigInteger[] LucasSequence(
 			BigInteger P,
 			BigInteger Q,
 			BigInteger k)
@@ -478,7 +490,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				{
 					BigInteger qMod = BigInteger.One.ShiftLeft(qLen);
 					bool rIsOne = r.Equals(BigInteger.One);
-					while (x.BitLength > (qLen + 1))
+					while (x.BitLength > qLen + 1)
 					{
 						BigInteger u = x.ShiftRight(qLen);
 						BigInteger v = x.Remainder(qMod);
@@ -536,12 +548,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			FpFieldElement other = obj as FpFieldElement;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}
@@ -565,7 +581,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			int m = FieldSize;
 			if ((m & 1) == 0)
+			{
 				throw new InvalidOperationException("Half-trace only defined for odd m");
+			}
 
 			//ECFieldElement ht = this;
 			//for (int i = 1; i < m; i += 2)
@@ -621,9 +639,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			}
 
 			if (tr.IsZero)
+			{
 				return 0;
+			}
+
 			if (tr.IsOne)
+			{
 				return 1;
+			}
+
 			throw new InvalidOperationException("Internal error in trace calculation");
 		}
 	}
@@ -659,14 +683,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		/**
 		 * Tpb or Ppb.
 		 */
-		private int representation;
+		int representation;
 
 		/**
 		 * The exponent <code>m</code> of <code>F<sub>2<sup>m</sup></sub></code>.
 		 */
-		private int m;
+		int m;
 
-		private int[] ks;
+		int[] ks;
 
 		/**
 		 * The <code>LongArray</code> holding the bits.
@@ -676,7 +700,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		internal F2mFieldElement(int m, int[] ks, LongArray x)
 		{
 			this.m = m;
-			this.representation = (ks.Length == 1) ? Tpb : Ppb;
+			representation = ks.Length == 1 ? Tpb : Ppb;
 			this.ks = ks;
 			this.x = x;
 		}
@@ -746,7 +770,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				throw new ArgumentException("One of the F2m field elements has incorrect representation");
 			}
 
-			if ((aF2m.m != bF2m.m) || !Arrays.AreEqual(aF2m.ks, bF2m.ks))
+			if (aF2m.m != bF2m.m || !Arrays.AreEqual(aF2m.ks, bF2m.ks))
 			{
 				throw new ArgumentException("Field elements are not elements of the same field F2m");
 			}
@@ -758,7 +782,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			// No check performed here for performance reasons. Instead the
 			// elements involved are checked in ECPoint.F2m
 			// checkFieldElements(this, b);
-			LongArray iarrClone = this.x.Copy();
+			LongArray iarrClone = x.Copy();
 			F2mFieldElement bF2m = (F2mFieldElement)b;
 			iarrClone.AddShiftedByWords(bF2m.x, 0);
 			return new F2mFieldElement(m, ks, iarrClone);
@@ -861,12 +885,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override ECFieldElement Invert()
 		{
-			return new F2mFieldElement(this.m, this.ks, this.x.ModInverse(m, ks));
+			return new F2mFieldElement(m, ks, x.ModInverse(m, ks));
 		}
 
 		public override ECFieldElement Sqrt()
 		{
-			return (x.IsZero() || x.IsOne()) ? this : SquarePow(m - 1);
+			return x.IsZero() || x.IsOne() ? this : SquarePow(m - 1);
 		}
 
 		/**
@@ -879,7 +903,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		    */
 		public int Representation
 		{
-			get { return this.representation; }
+			get { return representation; }
 		}
 
 		/**
@@ -888,7 +912,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		    */
 		public int M
 		{
-			get { return this.m; }
+			get { return m; }
 		}
 
 		/**
@@ -901,7 +925,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		    */
 		public int K1
 		{
-			get { return this.ks[0]; }
+			get { return ks[0]; }
 		}
 
 		/**
@@ -912,7 +936,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		    */
 		public int K2
 		{
-			get { return this.ks.Length >= 2 ? this.ks[1] : 0; }
+			get { return ks.Length >= 2 ? ks[1] : 0; }
 		}
 
 		/**
@@ -923,19 +947,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		    */
 		public int K3
 		{
-			get { return this.ks.Length >= 3 ? this.ks[2] : 0; }
+			get { return ks.Length >= 3 ? ks[2] : 0; }
 		}
 
 		public override bool Equals(
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			F2mFieldElement other = obj as F2mFieldElement;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}
@@ -943,10 +971,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public virtual bool Equals(
 			F2mFieldElement other)
 		{
-			return ((this.m == other.m)
-			        && (this.representation == other.representation)
-			        && Arrays.AreEqual(this.ks, other.ks)
-			        && (this.x.Equals(other.x)));
+			return m == other.m
+			       && representation == other.representation
+			       && Arrays.AreEqual(ks, other.ks)
+			       && x.Equals(other.x);
 		}
 
 		public override int GetHashCode()

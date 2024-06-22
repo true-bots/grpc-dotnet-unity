@@ -10,15 +10,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class RsassaPssParameters
 		: Asn1Encodable
 	{
-		private AlgorithmIdentifier hashAlgorithm;
-		private AlgorithmIdentifier maskGenAlgorithm;
-		private DerInteger saltLength;
-		private DerInteger trailerField;
+		AlgorithmIdentifier hashAlgorithm;
+		AlgorithmIdentifier maskGenAlgorithm;
+		DerInteger saltLength;
+		DerInteger trailerField;
 
-		public readonly static AlgorithmIdentifier DefaultHashAlgorithm = new AlgorithmIdentifier(OiwObjectIdentifiers.IdSha1, DerNull.Instance);
-		public readonly static AlgorithmIdentifier DefaultMaskGenFunction = new AlgorithmIdentifier(PkcsObjectIdentifiers.IdMgf1, DefaultHashAlgorithm);
-		public readonly static DerInteger DefaultSaltLength = new DerInteger(20);
-		public readonly static DerInteger DefaultTrailerField = new DerInteger(1);
+		public static readonly AlgorithmIdentifier DefaultHashAlgorithm = new AlgorithmIdentifier(OiwObjectIdentifiers.IdSha1, DerNull.Instance);
+		public static readonly AlgorithmIdentifier DefaultMaskGenFunction = new AlgorithmIdentifier(PkcsObjectIdentifiers.IdMgf1, DefaultHashAlgorithm);
+		public static readonly DerInteger DefaultSaltLength = new DerInteger(20);
+		public static readonly DerInteger DefaultTrailerField = new DerInteger(1);
 
 		public static RsassaPssParameters GetInstance(
 			object obj)
@@ -33,7 +33,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				return new RsassaPssParameters((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**

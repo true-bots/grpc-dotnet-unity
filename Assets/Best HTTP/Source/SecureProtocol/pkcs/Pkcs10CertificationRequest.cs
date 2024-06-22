@@ -198,7 +198,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			m_exParams.Add("SHA512WITHRSAANDMGF1", CreatePssParams(sha512AlgId, 64));
 		}
 
-		private static RsassaPssParameters CreatePssParams(
+		static RsassaPssParameters CreatePssParams(
 			AlgorithmIdentifier hashAlgId,
 			int saltSize)
 		{
@@ -263,28 +263,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			Asn1Set attributes)
 		{
 			if (signatureFactory == null)
+			{
 				throw new ArgumentNullException("signatureFactory");
+			}
+
 			if (subject == null)
+			{
 				throw new ArgumentNullException("subject");
+			}
+
 			if (publicKey == null)
+			{
 				throw new ArgumentNullException("publicKey");
+			}
+
 			if (publicKey.IsPrivate)
+			{
 				throw new ArgumentException("expected public key", "publicKey");
+			}
 
 			Init(signatureFactory, subject, publicKey, attributes);
 		}
 
-		private void Init(
+		void Init(
 			ISignatureFactory signatureFactory,
 			X509Name subject,
 			AsymmetricKeyParameter publicKey,
 			Asn1Set attributes)
 		{
-			this.sigAlgId = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
+			sigAlgId = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
 
 			SubjectPublicKeyInfo pubInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(publicKey);
 
-			this.reqInfo = new CertificationRequestInfo(subject, pubInfo, attributes);
+			reqInfo = new CertificationRequestInfo(subject, pubInfo, attributes);
 
 			IStreamCalculator<IBlockResult> streamCalculator = signatureFactory.CreateCalculator();
 			using (Stream sigStream = streamCalculator.Stream)
@@ -327,7 +338,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		/// <returns>true = valid.</returns>
 		public bool Verify()
 		{
-			return Verify(this.GetPublicKey());
+			return Verify(GetPublicKey());
 		}
 
 		public bool Verify(
@@ -350,7 +361,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				byte[] b = reqInfo.GetDerEncoded();
 
 				IStreamCalculator<IVerifier> streamCalculator = verifier.CreateCalculator();
-				using (var stream = streamCalculator.Stream)
+				using (Stream stream = streamCalculator.Stream)
 				{
 					stream.Write(b, 0, b.Length);
 				}
@@ -373,7 +384,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		//        }
 
 		// TODO Figure out how to set parameters on an ISigner
-		private void SetSignatureParameters(
+		void SetSignatureParameters(
 			ISigner signature,
 			Asn1Encodable asn1Params)
 		{
@@ -390,7 +401,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				//					throw new SignatureException("IOException decoding parameters: " + e.Message);
 				//				}
 
-				if (Org.BouncyCastle.Utilities.Platform.EndsWith(signature.AlgorithmName, "MGF1"))
+				if (Platform.EndsWith(signature.AlgorithmName, "MGF1"))
 				{
 					throw new NotImplementedException("signature algorithm with MGF1");
 
@@ -423,7 +434,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			return sigAlgId.Algorithm.Id;
 		}
 
-		private static string GetDigestAlgName(
+		static string GetDigestAlgName(
 			DerObjectIdentifier digestAlgOID)
 		{
 			if (PkcsObjectIdentifiers.MD5.Equals(digestAlgOID))

@@ -9,14 +9,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class TbsRequest
 		: Asn1Encodable
 	{
-		private static readonly DerInteger V1 = new DerInteger(0);
+		static readonly DerInteger V1 = new DerInteger(0);
 
-		private readonly DerInteger version;
-		private readonly GeneralName requestorName;
-		private readonly Asn1Sequence requestList;
-		private readonly X509Extensions requestExtensions;
+		readonly DerInteger version;
+		readonly GeneralName requestorName;
+		readonly Asn1Sequence requestList;
+		readonly X509Extensions requestExtensions;
 
-		private bool versionSet;
+		bool versionSet;
 
 		public static TbsRequest GetInstance(
 			Asn1TaggedObject obj,
@@ -38,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new TbsRequest((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public TbsRequest(
@@ -46,13 +46,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			Asn1Sequence requestList,
 			X509Extensions requestExtensions)
 		{
-			this.version = V1;
+			version = V1;
 			this.requestorName = requestorName;
 			this.requestList = requestList;
 			this.requestExtensions = requestExtensions;
 		}
 
-		private TbsRequest(
+		TbsRequest(
 			Asn1Sequence seq)
 		{
 			int index = 0;
@@ -85,7 +85,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 
 			requestList = (Asn1Sequence)seq[index++];
 
-			if (seq.Count == (index + 1))
+			if (seq.Count == index + 1)
 			{
 				requestExtensions = X509Extensions.GetInstance((Asn1TaggedObject)seq[index], true);
 			}

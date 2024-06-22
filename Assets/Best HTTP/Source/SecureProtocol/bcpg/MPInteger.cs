@@ -10,12 +10,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public sealed class MPInteger
 		: BcpgObject
 	{
-		private readonly BigInteger m_val;
+		readonly BigInteger m_val;
 
 		public MPInteger(BcpgInputStream bcpgIn)
 		{
 			if (bcpgIn == null)
+			{
 				throw new ArgumentNullException(nameof(bcpgIn));
+			}
 
 			int lengthInBits = (bcpgIn.ReadByte() << 8) | bcpgIn.ReadByte();
 			int lengthInBytes = (lengthInBits + 7) / 8;
@@ -35,14 +37,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public MPInteger(BigInteger val)
 		{
 			if (val == null)
+			{
 				throw new ArgumentNullException(nameof(val));
+			}
+
 			if (val.SignValue < 0)
+			{
 				throw new ArgumentException("Values must be positive", nameof(val));
+			}
 
 			m_val = val;
 		}
 
-		public BigInteger Value => m_val;
+		public BigInteger Value
+		{
+			get { return m_val; }
+		}
 
 		public override void Encode(BcpgOutputStream bcpgOut)
 		{

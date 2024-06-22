@@ -27,7 +27,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateSrpExtension(byte[] identity)
 		{
 			if (identity == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			return TlsUtilities.EncodeOpaque8(identity);
 		}
@@ -36,7 +38,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] ReadSrpExtension(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			return TlsUtilities.DecodeOpaque8(extensionData, 1);
 		}

@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 {
-	internal static class Bits
+	static class Bits
 	{
 #if NETSTANDARD1_0_OR_GREATER || NETCOREAPP1_0_OR_GREATER || UNITY_2021_2_OR_NEWER
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

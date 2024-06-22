@@ -30,7 +30,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 		{
 		}
 
-		public long KeyId => (long)Pack.BE_To_UInt64(data);
+		public long KeyId
+		{
+			get { return (long)Pack.BE_To_UInt64(data); }
+		}
 	}
 }
 #pragma warning restore

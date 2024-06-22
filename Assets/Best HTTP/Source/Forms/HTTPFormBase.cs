@@ -59,20 +59,30 @@ namespace BestHTTP.Forms
 		public void AddBinaryData(string fieldName, byte[] content, string fileName, string mimeType)
 		{
 			if (Fields == null)
+			{
 				Fields = new List<HTTPFieldData>();
+			}
 
 			HTTPFieldData field = new HTTPFieldData();
 			field.Name = fieldName;
 
 			if (fileName == null)
+			{
 				field.FileName = fieldName + ".dat";
+			}
 			else
+			{
 				field.FileName = fileName;
+			}
 
 			if (mimeType == null)
+			{
 				field.MimeType = "application/octet-stream";
+			}
 			else
+			{
 				field.MimeType = mimeType;
+			}
 
 			field.Binary = content;
 
@@ -83,19 +93,24 @@ namespace BestHTTP.Forms
 
 		public void AddField(string fieldName, string value)
 		{
-			AddField(fieldName, value, System.Text.Encoding.UTF8);
+			AddField(fieldName, value, Encoding.UTF8);
 		}
 
-		public void AddField(string fieldName, string value, System.Text.Encoding e)
+		public void AddField(string fieldName, string value, Encoding e)
 		{
 			if (Fields == null)
+			{
 				Fields = new List<HTTPFieldData>();
+			}
 
 			HTTPFieldData field = new HTTPFieldData();
 			field.Name = fieldName;
 			field.FileName = null;
 			if (e != null)
+			{
 				field.MimeType = "text/plain; charset=" + e.WebName;
+			}
+
 			field.Text = value;
 			field.Encoding = e;
 
@@ -116,11 +131,11 @@ namespace BestHTTP.Forms
 		/// </summary>
 		public virtual void CopyFrom(HTTPFormBase fields)
 		{
-			this.Fields = new List<HTTPFieldData>(fields.Fields);
-			this.IsChanged = true;
+			Fields = new List<HTTPFieldData>(fields.Fields);
+			IsChanged = true;
 
-			this.HasBinary = fields.HasBinary;
-			this.HasLongValue = fields.HasLongValue;
+			HasBinary = fields.HasBinary;
+			HasLongValue = fields.HasLongValue;
 		}
 
 		/// <summary>

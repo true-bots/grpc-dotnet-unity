@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class DsaPrivateKeyParameters
 		: DsaKeyParameters
 	{
-		private readonly BigInteger x;
+		readonly BigInteger x;
 
 		public DsaPrivateKeyParameters(
 			BigInteger x,
@@ -16,7 +16,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(true, parameters)
 		{
 			if (x == null)
+			{
 				throw new ArgumentNullException("x");
+			}
 
 			this.x = x;
 		}
@@ -30,12 +32,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			DsaPrivateKeyParameters other = obj as DsaPrivateKeyParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

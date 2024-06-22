@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 
 namespace BestHTTP.PlatformSupport.Memory
 {
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	public struct PooledBuffer : IDisposable
 	{
 		public byte[] Data;
@@ -19,34 +19,37 @@ namespace BestHTTP.PlatformSupport.Memory
 
 		public PooledBuffer(byte[] data)
 		{
-			this.Data = data;
-			this.Length = data != null ? data.Length : 0;
+			Data = data;
+			Length = data != null ? data.Length : 0;
 		}
 
 		public PooledBuffer(BufferSegment segment)
 		{
-			this.Data = segment.Data;
-			this.Length = segment.Count;
+			Data = segment.Data;
+			Length = segment.Count;
 		}
 
 		public PooledBuffer(byte[] data, int length)
 		{
-			this.Data = data;
-			this.Length = length;
+			Data = data;
+			Length = length;
 		}
 
 		public void Dispose()
 		{
-			if (this.Data != null)
-				BufferPool.Release(this.Data);
-			this.Data = null;
+			if (Data != null)
+			{
+				BufferPool.Release(Data);
+			}
+
+			Data = null;
 		}
 	}
 
 	/// <summary>
 	/// Private data struct that contains the size <-> byte arrays mapping. 
 	/// </summary>
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	struct BufferStore
 	{
 		/// <summary>
@@ -61,8 +64,8 @@ namespace BestHTTP.PlatformSupport.Memory
 
 		public BufferStore(long size)
 		{
-			this.Size = size;
-			this.buffers = new List<BufferDesc>();
+			Size = size;
+			buffers = new List<BufferDesc>();
 		}
 
 		/// <summary>
@@ -71,16 +74,16 @@ namespace BestHTTP.PlatformSupport.Memory
 		public BufferStore(long size, byte[] buffer)
 			: this(size)
 		{
-			this.buffers.Add(new BufferDesc(buffer));
+			buffers.Add(new BufferDesc(buffer));
 		}
 
 		public override string ToString()
 		{
-			return string.Format("[BufferStore Size: {0:N0}, Buffers: {1}]", this.Size, this.buffers.Count);
+			return string.Format("[BufferStore Size: {0:N0}, Buffers: {1}]", Size, buffers.Count);
 		}
 	}
 
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	struct BufferDesc
 	{
 		public static readonly BufferDesc Empty = new BufferDesc(null);
@@ -97,13 +100,13 @@ namespace BestHTTP.PlatformSupport.Memory
 
 		public BufferDesc(byte[] buff)
 		{
-			this.buffer = buff;
-			this.released = DateTime.UtcNow;
+			buffer = buff;
+			released = DateTime.UtcNow;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("[BufferDesc Size: {0}, Released: {1}]", this.buffer.Length, DateTime.UtcNow - this.released);
+			return string.Format("[BufferDesc Size: {0}, Released: {1}]", buffer.Length, DateTime.UtcNow - released);
 		}
 	}
 }

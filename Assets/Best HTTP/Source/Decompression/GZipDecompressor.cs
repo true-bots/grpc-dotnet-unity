@@ -6,42 +6,57 @@ namespace BestHTTP.Decompression
 {
 	public sealed class GZipDecompressor : IDecompressor
 	{
-		private BufferPoolMemoryStream decompressorInputStream;
-		private BufferPoolMemoryStream decompressorOutputStream;
-		private Zlib.GZipStream decompressorStream;
+		BufferPoolMemoryStream decompressorInputStream;
+		BufferPoolMemoryStream decompressorOutputStream;
+		Zlib.GZipStream decompressorStream;
 
-		private int MinLengthToDecompress = 256;
+		int MinLengthToDecompress = 256;
 
 		public GZipDecompressor(int minLengthToDecompress)
 		{
-			this.MinLengthToDecompress = minLengthToDecompress;
+			MinLengthToDecompress = minLengthToDecompress;
 		}
 
-		private void CloseDecompressors()
+		void CloseDecompressors()
 		{
 			if (decompressorStream != null)
+			{
 				decompressorStream.Dispose();
+			}
+
 			decompressorStream = null;
 
 			if (decompressorInputStream != null)
+			{
 				decompressorInputStream.Dispose();
+			}
+
 			decompressorInputStream = null;
 
 			if (decompressorOutputStream != null)
+			{
 				decompressorOutputStream.Dispose();
+			}
+
 			decompressorOutputStream = null;
 		}
 
 		public DecompressedData Decompress(byte[] data, int offset, int count, bool forceDecompress = false, bool dataCanBeLarger = false)
 		{
 			if (decompressorInputStream == null)
+			{
 				decompressorInputStream = new BufferPoolMemoryStream(count);
+			}
 
 			if (data != null)
+			{
 				decompressorInputStream.Write(data, offset, count);
+			}
 
 			if (!forceDecompress && decompressorInputStream.Length < MinLengthToDecompress)
+			{
 				return new DecompressedData(null, 0);
+			}
 
 			decompressorInputStream.Position = 0;
 
@@ -55,7 +70,10 @@ namespace BestHTTP.Decompression
 			}
 
 			if (decompressorOutputStream == null)
+			{
 				decompressorOutputStream = new BufferPoolMemoryStream();
+			}
+
 			decompressorOutputStream.SetLength(0);
 
 			byte[] copyBuffer = BufferPool.Get(1024, true);
@@ -72,7 +90,9 @@ namespace BestHTTP.Decompression
 
 			// If no read is done (returned with any data) don't zero out the input stream, as it would delete any not yet used data.
 			if (sumReadCount > 0)
+			{
 				decompressorStream.SetLength(0);
+			}
 
 			byte[] result = decompressorOutputStream.ToArray(dataCanBeLarger);
 

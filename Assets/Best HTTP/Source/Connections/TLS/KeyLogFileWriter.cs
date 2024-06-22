@@ -16,7 +16,7 @@ namespace BestHTTP.Connections.TLS
 	/// <summary>
 	/// https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/Key_Log_Format
 	/// </summary>
-	internal enum Labels
+	enum Labels
 	{
 		CLIENT_RANDOM,
 		CLIENT_EARLY_TRAFFIC_SECRET,
@@ -28,9 +28,12 @@ namespace BestHTTP.Connections.TLS
 		EXPORTER_SECRET
 	}
 
-	internal static class KeyLogFileWriter
+	static class KeyLogFileWriter
 	{
-		private static string GetKeylogFileName() => Environment.GetEnvironmentVariable("SSLKEYLOGFILE", EnvironmentVariableTarget.User);
+		static string GetKeylogFileName()
+		{
+			return Environment.GetEnvironmentVariable("SSLKEYLOGFILE", EnvironmentVariableTarget.User);
+		}
 
 		[Conditional("UNITY_EDITOR")]
 		public static void WriteLabel(Labels label, byte[] clientRandom, TlsSecret secret)
@@ -39,8 +42,12 @@ namespace BestHTTP.Connections.TLS
 			{
 				string SSLKEYLOGFILE = GetKeylogFileName();
 				if (!string.IsNullOrEmpty(SSLKEYLOGFILE))
-					using (var writer = new StreamWriter(System.IO.File.Open(SSLKEYLOGFILE, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)))
+				{
+					using (StreamWriter writer = new StreamWriter(File.Open(SSLKEYLOGFILE, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)))
+					{
 						writer.WriteLine($"{label} {Hex.ToHexString(clientRandom)} {Hex.ToHexString((secret as AbstractTlsSecret).CopyData())}");
+					}
+				}
 			}
 		}
 
@@ -76,7 +83,9 @@ namespace BestHTTP.Connections.TLS
 				}
 
 				if (secret != null)
+				{
 					WriteLabel(label, securityParameters.ClientRandom, secret);
+				}
 			}
 			catch
 			{

@@ -16,10 +16,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public TlsSrpLoginParameters(byte[] identity, TlsSrpConfig srpConfig, BigInteger verifier, byte[] salt)
 		{
-			this.m_identity = Arrays.Clone(identity);
-			this.m_srpConfig = srpConfig;
-			this.m_verifier = verifier;
-			this.m_salt = Arrays.Clone(salt);
+			m_identity = Arrays.Clone(identity);
+			m_srpConfig = srpConfig;
+			m_verifier = verifier;
+			m_salt = Arrays.Clone(salt);
 		}
 
 		public virtual TlsSrpConfig Config

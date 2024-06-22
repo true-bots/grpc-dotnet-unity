@@ -11,18 +11,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static CertRepMessage GetInstance(object obj)
 		{
 			if (obj is CertRepMessage certRepMessage)
+			{
 				return certRepMessage;
+			}
 
 			if (obj != null)
+			{
 				return new CertRepMessage(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly Asn1Sequence m_caPubs;
-		private readonly Asn1Sequence m_response;
+		readonly Asn1Sequence m_caPubs;
+		readonly Asn1Sequence m_response;
 
-		private CertRepMessage(Asn1Sequence seq)
+		CertRepMessage(Asn1Sequence seq)
 		{
 			int index = 0;
 
@@ -37,7 +41,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public CertRepMessage(CmpCertificate[] caPubs, CertResponse[] response)
 		{
 			if (response == null)
+			{
 				throw new ArgumentNullException(nameof(response));
+			}
 
 			if (caPubs != null)
 			{

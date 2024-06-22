@@ -6,9 +6,9 @@ using System.Collections.Generic;
 
 namespace BestHTTP.SocketIO3.Transports
 {
-	using BestHTTP.Connections;
-	using BestHTTP.PlatformSupport.Memory;
-	using BestHTTP.WebSocket;
+	using Connections;
+	using PlatformSupport.Memory;
+	using WebSocket;
 	using Extensions;
 
 	/// <summary>
@@ -47,7 +47,9 @@ namespace BestHTTP.SocketIO3.Transports
 		public void Open()
 		{
 			if (State != TransportStates.Closed)
+			{
 				return;
+			}
 
 			Uri uri = null;
 			string baseUrl = new UriBuilder(HTTPProtocolFactory.IsSecureProtocol(Manager.Uri) ? "wss" : "ws",
@@ -56,7 +58,9 @@ namespace BestHTTP.SocketIO3.Transports
 				Manager.Uri.GetRequestPathAndQueryURL()).Uri.ToString();
 			string format = "{0}?EIO={1}&transport=websocket{3}";
 			if (Manager.Handshake != null)
+			{
 				format += "&sid={2}";
+			}
 
 			bool sendAdditionalQueryParams = !Manager.Options.QueryParamsOnlyForHandshake || (Manager.Options.QueryParamsOnlyForHandshake && Manager.Handshake == null);
 
@@ -73,7 +77,7 @@ namespace BestHTTP.SocketIO3.Transports
 			);
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-			if (this.Manager.Options.WebsocketOptions?.PingIntervalOverride is TimeSpan ping)
+			if (Manager.Options.WebsocketOptions?.PingIntervalOverride is TimeSpan ping)
 			{
 				if (ping > TimeSpan.Zero)
 				{
@@ -81,13 +85,19 @@ namespace BestHTTP.SocketIO3.Transports
 					Implementation.PingFrequency = (int)ping.TotalMilliseconds;
 				}
 				else
+				{
 					Implementation.StartPingThread = false;
+				}
 			}
 			else
+			{
 				Implementation.StartPingThread = true;
+			}
 
-			if (this.Manager.Options.HTTPRequestCustomizationCallback != null)
-				Implementation.OnInternalRequestCreated = (ws, internalRequest) => this.Manager.Options.HTTPRequestCustomizationCallback(this.Manager, internalRequest);
+			if (Manager.Options.HTTPRequestCustomizationCallback != null)
+			{
+				Implementation.OnInternalRequestCreated = (ws, internalRequest) => Manager.Options.HTTPRequestCustomizationCallback(Manager, internalRequest);
+			}
 #endif
 
 			Implementation.OnOpen = OnOpen;
@@ -107,14 +117,21 @@ namespace BestHTTP.SocketIO3.Transports
 		public void Close()
 		{
 			if (State == TransportStates.Closed)
+			{
 				return;
+			}
 
 			State = TransportStates.Closed;
 
 			if (Implementation != null)
+			{
 				Implementation.Close();
+			}
 			else
-				HTTPManager.Logger.Warning("WebSocketTransport", "Close - WebSocket Implementation already null!", this.Manager.Context);
+			{
+				HTTPManager.Logger.Warning("WebSocketTransport", "Close - WebSocket Implementation already null!", Manager.Context);
+			}
+
 			Implementation = null;
 		}
 
@@ -132,44 +149,52 @@ namespace BestHTTP.SocketIO3.Transports
 		/// <summary>
 		/// WebSocket implementation OnOpen event handler.
 		/// </summary>
-		private void OnOpen(WebSocket ws)
+		void OnOpen(WebSocket ws)
 		{
 			if (ws != Implementation)
+			{
 				return;
+			}
 
-			HTTPManager.Logger.Information("WebSocketTransport", "OnOpen", this.Manager.Context);
+			HTTPManager.Logger.Information("WebSocketTransport", "OnOpen", Manager.Context);
 
 			State = TransportStates.Opening;
 
 			// Send a Probe packet to test the transport. If we receive back a pong with the same payload we can upgrade
 			if (Manager.UpgradingTransport == this)
-				Send(this.Manager.Parser.CreateOutgoing(TransportEventTypes.Ping, "probe"));
+			{
+				Send(Manager.Parser.CreateOutgoing(TransportEventTypes.Ping, "probe"));
+			}
 		}
 
 		/// <summary>
 		/// WebSocket implementation OnMessage event handler.
 		/// </summary>
-		private void OnMessage(WebSocket ws, string message)
+		void OnMessage(WebSocket ws, string message)
 		{
 			if (ws != Implementation)
+			{
 				return;
+			}
 
-			if (HTTPManager.Logger.Level <= BestHTTP.Logger.Loglevels.All)
-				HTTPManager.Logger.Verbose("WebSocketTransport", "OnMessage: " + message, this.Manager.Context);
+			if (HTTPManager.Logger.Level <= Logger.Loglevels.All)
+			{
+				HTTPManager.Logger.Verbose("WebSocketTransport", "OnMessage: " + message, Manager.Context);
+			}
 
 			IncomingPacket packet = IncomingPacket.Empty;
 			try
 			{
-				packet = this.Manager.Parser.Parse(this.Manager, message);
+				packet = Manager.Parser.Parse(Manager, message);
 
 				if (packet.TransportEvent == TransportEventTypes.Open)
 				{
-					packet.DecodedArg = BestHTTP.JSON.LitJson.JsonMapper.ToObject<HandshakeData>(packet.DecodedArg as string);
+					packet.DecodedArg = JSON.LitJson.JsonMapper.ToObject<HandshakeData>(packet.DecodedArg as string);
 				}
 			}
 			catch (Exception ex)
 			{
-				HTTPManager.Logger.Exception("WebSocketTransport", "OnMessage Packet parsing", ex, this.Manager.Context);
+				HTTPManager.Logger.Exception("WebSocketTransport", "OnMessage Packet parsing", ex, Manager.Context);
 			}
 
 			if (!packet.Equals(IncomingPacket.Empty))
@@ -180,32 +205,38 @@ namespace BestHTTP.SocketIO3.Transports
 				}
 				catch (Exception ex)
 				{
-					HTTPManager.Logger.Exception("WebSocketTransport", "OnMessage OnPacket", ex, this.Manager.Context);
+					HTTPManager.Logger.Exception("WebSocketTransport", "OnMessage OnPacket", ex, Manager.Context);
 				}
 			}
 			else if (HTTPManager.Logger.Level == Logger.Loglevels.All)
-				HTTPManager.Logger.Verbose("WebSocketTransport", "OnMessage: skipping message " + message, this.Manager.Context);
+			{
+				HTTPManager.Logger.Verbose("WebSocketTransport", "OnMessage: skipping message " + message, Manager.Context);
+			}
 		}
 
 		/// <summary>
 		/// WebSocket implementation OnBinary event handler.
 		/// </summary>
-		private void OnBinaryNoAlloc(WebSocket ws, BufferSegment data)
+		void OnBinaryNoAlloc(WebSocket ws, BufferSegment data)
 		{
 			if (ws != Implementation)
+			{
 				return;
+			}
 
-			if (HTTPManager.Logger.Level <= BestHTTP.Logger.Loglevels.All)
-				HTTPManager.Logger.Verbose("WebSocketTransport", $"OnBinaryNoAlloc({data})", this.Manager.Context);
+			if (HTTPManager.Logger.Level <= Logger.Loglevels.All)
+			{
+				HTTPManager.Logger.Verbose("WebSocketTransport", $"OnBinaryNoAlloc({data})", Manager.Context);
+			}
 
 			IncomingPacket packet = IncomingPacket.Empty;
 			try
 			{
-				packet = this.Manager.Parser.Parse(this.Manager, data);
+				packet = Manager.Parser.Parse(Manager, data);
 			}
 			catch (Exception ex)
 			{
-				HTTPManager.Logger.Exception("WebSocketTransport", $"OnBinaryNoAlloc({data}) Packet parsing", ex, this.Manager.Context);
+				HTTPManager.Logger.Exception("WebSocketTransport", $"OnBinaryNoAlloc({data}) Packet parsing", ex, Manager.Context);
 			}
 
 			if (!packet.Equals(IncomingPacket.Empty))
@@ -216,20 +247,24 @@ namespace BestHTTP.SocketIO3.Transports
 				}
 				catch (Exception ex)
 				{
-					HTTPManager.Logger.Exception("WebSocketTransport", $"OnBinaryNoAlloc({data}) OnPacket", ex, this.Manager.Context);
+					HTTPManager.Logger.Exception("WebSocketTransport", $"OnBinaryNoAlloc({data}) OnPacket", ex, Manager.Context);
 				}
 			}
 			else if (HTTPManager.Logger.Level == Logger.Loglevels.All)
-				HTTPManager.Logger.Verbose("WebSocketTransport", "OnBinaryNoAlloc skipping message", this.Manager.Context);
+			{
+				HTTPManager.Logger.Verbose("WebSocketTransport", "OnBinaryNoAlloc skipping message", Manager.Context);
+			}
 		}
 
 		/// <summary>
 		/// WebSocket implementation OnError event handler.
 		/// </summary>
-		private void OnError(WebSocket ws, string error)
+		void OnError(WebSocket ws, string error)
 		{
 			if (ws != Implementation)
+			{
 				return;
+			}
 
 #if !UNITY_WEBGL || UNITY_EDITOR
 			if (string.IsNullOrEmpty(error))
@@ -239,19 +274,24 @@ namespace BestHTTP.SocketIO3.Transports
 					// The request finished without any problem.
 					case HTTPRequestStates.Finished:
 						if (ws.InternalRequest.Response.IsSuccess || ws.InternalRequest.Response.StatusCode == 101)
+						{
 							error = string.Format("Request finished. Status Code: {0} Message: {1}", ws.InternalRequest.Response.StatusCode.ToString(),
 								ws.InternalRequest.Response.Message);
+						}
 						else
+						{
 							error = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}",
 								ws.InternalRequest.Response.StatusCode,
 								ws.InternalRequest.Response.Message,
 								ws.InternalRequest.Response.DataAsText);
+						}
+
 						break;
 
 					// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 					case HTTPRequestStates.Error:
 						error = "Request Finished with Error! : " + ws.InternalRequest.Exception != null
-							? (ws.InternalRequest.Exception.Message + " " + ws.InternalRequest.Exception.StackTrace)
+							? ws.InternalRequest.Exception.Message + " " + ws.InternalRequest.Exception.StackTrace
 							: string.Empty;
 						break;
 
@@ -274,27 +314,37 @@ namespace BestHTTP.SocketIO3.Transports
 #endif
 
 			if (Manager.UpgradingTransport != this)
+			{
 				(Manager as IManager).OnTransportError(this, error);
+			}
 			else
+			{
 				Manager.UpgradingTransport = null;
+			}
 		}
 
 		/// <summary>
 		/// WebSocket implementation OnClosed event handler.
 		/// </summary>
-		private void OnClosed(WebSocket ws, ushort code, string message)
+		void OnClosed(WebSocket ws, ushort code, string message)
 		{
 			if (ws != Implementation)
+			{
 				return;
+			}
 
-			HTTPManager.Logger.Information("WebSocketTransport", "OnClosed", this.Manager.Context);
+			HTTPManager.Logger.Information("WebSocketTransport", "OnClosed", Manager.Context);
 
 			Close();
 
 			if (Manager.UpgradingTransport != this)
+			{
 				(Manager as IManager).TryToReconnect();
+			}
 			else
+			{
 				Manager.UpgradingTransport = null;
+			}
 		}
 
 		#endregion
@@ -309,20 +359,26 @@ namespace BestHTTP.SocketIO3.Transports
 			if (State == TransportStates.Closed ||
 			    State == TransportStates.Paused)
 			{
-				HTTPManager.Logger.Information("WebSocketTransport", string.Format("Send - State == {0}, skipping packet sending!", State), this.Manager.Context);
+				HTTPManager.Logger.Information("WebSocketTransport", string.Format("Send - State == {0}, skipping packet sending!", State), Manager.Context);
 				return;
 			}
 
 			if (packet.IsBinary)
+			{
 				Implementation.SendAsBinary(packet.PayloadData);
+			}
 			else
 			{
 				Implementation.Send(packet.Payload);
 			}
 
 			if (packet.Attachements != null)
+			{
 				for (int i = 0; i < packet.Attachements.Count; ++i)
+				{
 					Implementation.Send(packet.Attachements[i]);
+				}
+			}
 		}
 
 		/// <summary>
@@ -331,7 +387,9 @@ namespace BestHTTP.SocketIO3.Transports
 		public void Send(List<OutgoingPacket> packets)
 		{
 			for (int i = 0; i < packets.Count; ++i)
+			{
 				Send(packets[i]);
+			}
 
 			packets.Clear();
 		}
@@ -343,15 +401,20 @@ namespace BestHTTP.SocketIO3.Transports
 		/// <summary>
 		/// Will only process packets that need to upgrade. All other packets are passed to the Manager.
 		/// </summary>
-		private void OnPacket(IncomingPacket packet)
+		void OnPacket(IncomingPacket packet)
 		{
 			switch (packet.TransportEvent)
 			{
 				case TransportEventTypes.Open:
-					if (this.State != TransportStates.Opening)
-						HTTPManager.Logger.Warning("WebSocketTransport", "Received 'Open' packet while state is '" + State.ToString() + "'", this.Manager.Context);
+					if (State != TransportStates.Opening)
+					{
+						HTTPManager.Logger.Warning("WebSocketTransport", "Received 'Open' packet while state is '" + State.ToString() + "'", Manager.Context);
+					}
 					else
+					{
 						State = TransportStates.Open;
+					}
+
 					goto default;
 
 				case TransportEventTypes.Pong:
@@ -366,7 +429,10 @@ namespace BestHTTP.SocketIO3.Transports
 
 				default:
 					if (Manager.UpgradingTransport != this)
+					{
 						(Manager as IManager).OnPacket(packet);
+					}
+
 					break;
 			}
 		}

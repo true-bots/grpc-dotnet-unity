@@ -10,11 +10,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		public const int DigitalSignatureUsage = 1;
 		public const int KeyEstablishmentUsage = 2;
 
-		private readonly int l;
-		private readonly int n;
-		private readonly int certainty;
-		private readonly SecureRandom random;
-		private readonly int usageIndex;
+		readonly int l;
+		readonly int n;
+		readonly int certainty;
+		readonly SecureRandom random;
+		readonly int usageIndex;
 
 		/**
 		 * Construct without a usage index, this will do a random construction of G.
@@ -40,8 +40,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		 */
 		public DsaParameterGenerationParameters(int L, int N, int certainty, SecureRandom random, int usageIndex)
 		{
-			this.l = L;
-			this.n = N;
+			l = L;
+			n = N;
 			this.certainty = certainty;
 			this.random = random;
 			this.usageIndex = usageIndex;

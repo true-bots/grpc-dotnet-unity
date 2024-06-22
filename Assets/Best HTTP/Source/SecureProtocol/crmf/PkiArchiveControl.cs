@@ -15,9 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crmf
 		public static readonly int keyGenParameters = PkiArchiveOptions.keyGenParameters;
 		public static readonly int archiveRemGenPrivKey = PkiArchiveOptions.archiveRemGenPrivKey;
 
-		private static readonly DerObjectIdentifier type = CrmfObjectIdentifiers.id_regCtrl_pkiArchiveOptions;
+		static readonly DerObjectIdentifier type = CrmfObjectIdentifiers.id_regCtrl_pkiArchiveOptions;
 
-		private readonly PkiArchiveOptions pkiArchiveOptions;
+		readonly PkiArchiveOptions pkiArchiveOptions;
 
 		/// <summary>
 		/// Basic constructor - build from an PKIArchiveOptions structure.

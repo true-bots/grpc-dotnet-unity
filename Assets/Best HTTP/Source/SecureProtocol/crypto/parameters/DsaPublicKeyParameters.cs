@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class DsaPublicKeyParameters
 		: DsaKeyParameters
 	{
-		private static BigInteger Validate(BigInteger y, DsaParameters parameters)
+		static BigInteger Validate(BigInteger y, DsaParameters parameters)
 		{
 			// we can't validate without params, fortunately we can't use the key either...
 			if (parameters != null)
@@ -24,7 +24,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			return y;
 		}
 
-		private readonly BigInteger y;
+		readonly BigInteger y;
 
 		public DsaPublicKeyParameters(
 			BigInteger y,
@@ -32,7 +32,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(false, parameters)
 		{
 			if (y == null)
+			{
 				throw new ArgumentNullException("y");
+			}
 
 			this.y = Validate(y, parameters);
 		}
@@ -45,12 +47,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		public override bool Equals(object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			DsaPublicKeyParameters other = obj as DsaPublicKeyParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

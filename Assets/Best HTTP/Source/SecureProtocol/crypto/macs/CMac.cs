@@ -29,20 +29,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class CMac
 		: IMac
 	{
-		private const byte CONSTANT_128 = (byte)0x87;
-		private const byte CONSTANT_64 = (byte)0x1b;
+		const byte CONSTANT_128 = (byte)0x87;
+		const byte CONSTANT_64 = (byte)0x1b;
 
-		private byte[] ZEROES;
+		byte[] ZEROES;
 
-		private byte[] mac;
+		byte[] mac;
 
-		private byte[] buf;
-		private int bufOff;
-		private IBlockCipherMode m_cipherMode;
+		byte[] buf;
+		int bufOff;
+		IBlockCipherMode m_cipherMode;
 
-		private int macSize;
+		int macSize;
 
-		private byte[] L, Lu, Lu2;
+		byte[] L, Lu, Lu2;
 
 		/**
 		* create a standard MAC based on a CBC block cipher (64 or 128 bit block).
@@ -73,14 +73,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			IBlockCipher cipher,
 			int macSizeInBits)
 		{
-			if ((macSizeInBits % 8) != 0)
+			if (macSizeInBits % 8 != 0)
+			{
 				throw new ArgumentException("MAC size must be multiple of 8");
+			}
 
-			if (macSizeInBits > (cipher.GetBlockSize() * 8))
+			if (macSizeInBits > cipher.GetBlockSize() * 8)
 			{
 				throw new ArgumentException(
 					"MAC size must be less or equal to "
-					+ (cipher.GetBlockSize() * 8));
+					+ cipher.GetBlockSize() * 8);
 			}
 
 			if (cipher.GetBlockSize() != 8 && cipher.GetBlockSize() != 16)
@@ -90,7 +92,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			}
 
 			m_cipherMode = new CbcBlockCipher(cipher);
-			this.macSize = macSizeInBits / 8;
+			macSize = macSizeInBits / 8;
 
 			mac = new byte[cipher.GetBlockSize()];
 
@@ -106,7 +108,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			get { return m_cipherMode.AlgorithmName; }
 		}
 
-		private static int ShiftLeft(byte[] block, byte[] output)
+		static int ShiftLeft(byte[] block, byte[] output)
 		{
 			int i = block.Length;
 			uint bit = 0;
@@ -120,7 +122,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			return (int)bit;
 		}
 
-		private static byte[] DoubleLu(byte[] input)
+		static byte[] DoubleLu(byte[] input)
 		{
 			byte[] ret = new byte[input.Length];
 			int carry = ShiftLeft(input, ret);
@@ -174,7 +176,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public void BlockUpdate(byte[] inBytes, int inOff, int len)
 		{
 			if (len < 0)
+			{
 				throw new ArgumentException("Can't have a negative input length!");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             BlockUpdate(inBytes.AsSpan(inOff, len));

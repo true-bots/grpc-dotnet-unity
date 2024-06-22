@@ -10,8 +10,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	 */
 	public class OidTokenizer
 	{
-		private string oid;
-		private int index;
+		string oid;
+		int index;
 
 		public OidTokenizer(
 			string oid)

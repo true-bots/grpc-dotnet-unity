@@ -11,12 +11,12 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecT283Field
+	class SecT283Field
 	{
-		private const ulong M27 = ulong.MaxValue >> 37;
-		private const ulong M57 = ulong.MaxValue >> 7;
+		const ulong M27 = ulong.MaxValue >> 37;
+		const ulong M57 = ulong.MaxValue >> 7;
 
-		private static readonly ulong[] ROOT_Z = new ulong[]
+		static readonly ulong[] ROOT_Z = new ulong[]
 		{
 			0x0C30C30C30C30808UL, 0x30C30C30C30C30C3UL,
 			0x820820820820830CUL, 0x0820820820820820UL, 0x2082082UL
@@ -53,7 +53,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			z[4] = x[4];
 		}
 
-		private static void AddTo(ulong[] x, ulong[] z)
+		static void AddTo(ulong[] x, ulong[] z)
 		{
 			z[0] ^= x[0];
 			z[1] ^= x[1];
@@ -85,7 +85,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public static void Invert(ulong[] x, ulong[] z)
 		{
 			if (Nat320.IsZero64(x))
+			{
 				throw new InvalidOperationException();
+			}
 
 			// Itoh-Tsujii inversion
 
@@ -226,7 +228,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			zz[6] = (z6 >> 42) ^ (z7 << 15);
 			zz[7] = (z7 >> 49) ^ (z8 << 8);
 			zz[8] = (z8 >> 56) ^ (z9 << 1);
-			zz[9] = (z9 >> 63); // Zero!
+			zz[9] = z9 >> 63; // Zero!
 		}
 
 		protected static void ImplExpand(ulong[] x, ulong[] z)
@@ -236,7 +238,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			z[1] = ((x0 >> 57) ^ (x1 << 7)) & M57;
 			z[2] = ((x1 >> 50) ^ (x2 << 14)) & M57;
 			z[3] = ((x2 >> 43) ^ (x3 << 21)) & M57;
-			z[4] = ((x3 >> 36) ^ (x4 << 28));
+			z[4] = (x3 >> 36) ^ (x4 << 28);
 		}
 
 		//protected static void AddMs(ulong[] zz, int zOff, ulong[] p, params int[] ms)
@@ -448,13 +450,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			{
 				j = (uint)(x >> k);
 				g = u[j & 7]
-				    ^ u[(j >> 3) & 7] << 3
-				    ^ u[(j >> 6) & 7] << 6;
-				l ^= (g << k);
-				h ^= (g >> -k);
+				    ^ (u[(j >> 3) & 7] << 3)
+				    ^ (u[(j >> 6) & 7] << 6);
+				l ^= g << k;
+				h ^= g >> -k;
 			} while ((k -= 9) > 0);
 
-			h ^= ((x & 0x0100804020100800L) & (ulong)(((long)y << 7) >> 63)) >> 8;
+			h ^= (x & 0x0100804020100800L & (ulong)(((long)y << 7) >> 63)) >> 8;
 
 			Debug.Assert(h >> 49 == 0);
 

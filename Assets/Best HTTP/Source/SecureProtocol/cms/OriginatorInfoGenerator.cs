@@ -10,13 +10,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
 	public class OriginatorInfoGenerator
 	{
-		private readonly List<Asn1Encodable> origCerts;
-		private readonly List<Asn1Encodable> origCrls;
+		readonly List<Asn1Encodable> origCerts;
+		readonly List<Asn1Encodable> origCrls;
 
 		public OriginatorInfoGenerator(X509Certificate origCert)
 		{
-			this.origCerts = new List<Asn1Encodable> { origCert.CertificateStructure };
-			this.origCrls = null;
+			origCerts = new List<Asn1Encodable> { origCert.CertificateStructure };
+			origCrls = null;
 		}
 
 		public OriginatorInfoGenerator(IStore<X509Certificate> x509Certs)
@@ -62,8 +62,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				}
 			}
 
-			this.origCerts = certificates;
-			this.origCrls = revocations;
+			origCerts = certificates;
+			origCrls = revocations;
 		}
 
 		public virtual OriginatorInfo Generate()

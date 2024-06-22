@@ -21,7 +21,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class Sha384Digest
 		: LongDigest
 	{
-		private const int DigestLength = 48;
+		const int DigestLength = 48;
 
 		public Sha384Digest()
 		{

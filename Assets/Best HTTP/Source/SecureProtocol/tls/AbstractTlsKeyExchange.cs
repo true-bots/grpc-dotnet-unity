@@ -16,12 +16,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		protected AbstractTlsKeyExchange(int keyExchange)
 		{
-			this.m_keyExchange = keyExchange;
+			m_keyExchange = keyExchange;
 		}
 
 		public virtual void Init(TlsContext context)
 		{
-			this.m_context = context;
+			m_context = context;
 		}
 
 		public abstract void SkipServerCredentials();
@@ -41,7 +41,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual byte[] GenerateServerKeyExchange()
 		{
 			if (RequiresServerKeyExchange)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			return null;
 		}
@@ -49,13 +51,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public virtual void SkipServerKeyExchange()
 		{
 			if (RequiresServerKeyExchange)
+			{
 				throw new TlsFatalAlert(AlertDescription.unexpected_message);
+			}
 		}
 
 		public virtual void ProcessServerKeyExchange(Stream input)
 		{
 			if (!RequiresServerKeyExchange)
+			{
 				throw new TlsFatalAlert(AlertDescription.unexpected_message);
+			}
 		}
 
 		public virtual short[] GetClientCertificateTypes()

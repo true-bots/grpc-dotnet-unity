@@ -23,18 +23,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static RevDetails GetInstance(object obj)
 		{
 			if (obj is RevDetails revDetails)
+			{
 				return revDetails;
+			}
 
 			if (obj != null)
+			{
 				return new RevDetails(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly CertTemplate m_certDetails;
-		private readonly X509Extensions m_crlEntryDetails;
+		readonly CertTemplate m_certDetails;
+		readonly X509Extensions m_crlEntryDetails;
 
-		private RevDetails(Asn1Sequence seq)
+		RevDetails(Asn1Sequence seq)
 		{
 			m_certDetails = CertTemplate.GetInstance(seq[0]);
 
@@ -55,9 +59,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_crlEntryDetails = crlEntryDetails;
 		}
 
-		public virtual CertTemplate CertDetails => m_certDetails;
+		public virtual CertTemplate CertDetails
+		{
+			get { return m_certDetails; }
+		}
 
-		public virtual X509Extensions CrlEntryDetails => m_crlEntryDetails;
+		public virtual X509Extensions CrlEntryDetails
+		{
+			get { return m_crlEntryDetails; }
+		}
 
 		/**
 		* <pre>

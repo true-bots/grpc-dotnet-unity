@@ -9,20 +9,26 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 	public sealed class SignerStream
 		: Stream
 	{
-		private readonly Stream stream;
-		private readonly ISigner inSigner;
-		private readonly ISigner outSigner;
+		readonly Stream stream;
+		readonly ISigner inSigner;
+		readonly ISigner outSigner;
 
 		public SignerStream(Stream stream, ISigner readSigner, ISigner writeSigner)
 		{
 			this.stream = stream;
-			this.inSigner = readSigner;
-			this.outSigner = writeSigner;
+			inSigner = readSigner;
+			outSigner = writeSigner;
 		}
 
-		public ISigner ReadSigner => inSigner;
+		public ISigner ReadSigner
+		{
+			get { return inSigner; }
+		}
 
-		public ISigner WriteSigner => outSigner;
+		public ISigner WriteSigner
+		{
+			get { return outSigner; }
+		}
 
 		public override bool CanRead
 		{

@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class OcspRequest
 		: Asn1Encodable
 	{
-		private readonly TbsRequest tbsRequest;
-		private readonly Signature optionalSignature;
+		readonly TbsRequest tbsRequest;
+		readonly Signature optionalSignature;
 
 		public static OcspRequest GetInstance(
 			Asn1TaggedObject obj,
@@ -31,7 +31,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new OcspRequest((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public OcspRequest(
@@ -39,13 +39,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			Signature optionalSignature)
 		{
 			if (tbsRequest == null)
+			{
 				throw new ArgumentNullException("tbsRequest");
+			}
 
 			this.tbsRequest = tbsRequest;
 			this.optionalSignature = optionalSignature;
 		}
 
-		private OcspRequest(
+		OcspRequest(
 			Asn1Sequence seq)
 		{
 			tbsRequest = TbsRequest.GetInstance(seq[0]);

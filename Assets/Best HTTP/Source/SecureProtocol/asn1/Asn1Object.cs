@@ -42,7 +42,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				Asn1InputStream asn1 = new Asn1InputStream(input, data.Length);
 				Asn1Object result = asn1.ReadObject();
 				if (input.Position != input.Length)
+				{
 					throw new IOException("extra data found after object");
+				}
+
 				return result;
 			}
 			catch (InvalidCastException)

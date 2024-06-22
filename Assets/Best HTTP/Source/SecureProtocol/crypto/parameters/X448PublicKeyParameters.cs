@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	{
 		public static readonly int KeySize = X448.PointSize;
 
-		private readonly byte[] data = new byte[KeySize];
+		readonly byte[] data = new byte[KeySize];
 
 		public X448PublicKeyParameters(byte[] buf)
 			: this(Validate(buf), 0)
@@ -41,7 +41,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(false)
 		{
 			if (KeySize != Streams.ReadFully(input, data))
+			{
 				throw new EndOfStreamException("EOF encountered in middle of X448 public key");
+			}
 		}
 
 		public void Encode(byte[] buf, int off)
@@ -61,10 +63,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			return Arrays.Clone(data);
 		}
 
-		private static byte[] Validate(byte[] buf)
+		static byte[] Validate(byte[] buf)
 		{
 			if (buf.Length != KeySize)
+			{
 				throw new ArgumentException("must have length " + KeySize, nameof(buf));
+			}
 
 			return buf;
 		}

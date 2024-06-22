@@ -10,15 +10,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class ServerNameList
 	{
-		private readonly IList<ServerName> m_serverNameList;
+		readonly IList<ServerName> m_serverNameList;
 
 		/// <param name="serverNameList">an <see cref="IList{T}"/> of <see cref="ServerName"/>.</param>
 		public ServerNameList(IList<ServerName> serverNameList)
 		{
 			if (null == serverNameList)
+			{
 				throw new ArgumentNullException("serverNameList");
+			}
 
-			this.m_serverNameList = serverNameList;
+			m_serverNameList = serverNameList;
 		}
 
 		/// <returns>an <see cref="IList{T}"/> of <see cref="ServerName"/>.</returns>
@@ -39,7 +41,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				nameTypesSeen = CheckNameType(nameTypesSeen, entry.NameType);
 				if (null == nameTypesSeen)
+				{
 					throw new TlsFatalAlert(AlertDescription.internal_error);
+				}
 
 				entry.Encode(buf);
 			}
@@ -61,14 +65,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			MemoryStream buf = new MemoryStream(data, false);
 
 			short[] nameTypesSeen = TlsUtilities.EmptyShorts;
-			var server_name_list = new List<ServerName>();
+			List<ServerName> server_name_list = new List<ServerName>();
 			while (buf.Position < buf.Length)
 			{
 				ServerName entry = ServerName.Parse(buf);
 
 				nameTypesSeen = CheckNameType(nameTypesSeen, entry.NameType);
 				if (null == nameTypesSeen)
+				{
 					throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+				}
 
 				server_name_list.Add(entry);
 			}
@@ -76,11 +82,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return new ServerNameList(server_name_list);
 		}
 
-		private static short[] CheckNameType(short[] nameTypesSeen, short nameType)
+		static short[] CheckNameType(short[] nameTypesSeen, short nameType)
 		{
 			// RFC 6066 3. The ServerNameList MUST NOT contain more than one name of the same NameType.
 			if (Arrays.Contains(nameTypesSeen, nameType))
+			{
 				return null;
+			}
 
 			return Arrays.Append(nameTypesSeen, nameType);
 		}

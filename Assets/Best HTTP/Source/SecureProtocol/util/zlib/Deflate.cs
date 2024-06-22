@@ -41,12 +41,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 {
 	public sealed class Deflate
 	{
-		private const int MAX_MEM_LEVEL = 9;
+		const int MAX_MEM_LEVEL = 9;
 
-		private const int Z_DEFAULT_COMPRESSION = -1;
+		const int Z_DEFAULT_COMPRESSION = -1;
 
-		private const int MAX_WBITS = 15; // 32K LZ77 window
-		private const int DEF_MEM_LEVEL = 8;
+		const int MAX_WBITS = 15; // 32K LZ77 window
+		const int DEF_MEM_LEVEL = 8;
 
 		internal class Config
 		{
@@ -67,10 +67,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			}
 		}
 
-		private const int STORED = 0;
-		private const int FAST = 1;
-		private const int SLOW = 2;
-		private static readonly Config[] config_table;
+		const int STORED = 0;
+		const int FAST = 1;
+		const int SLOW = 2;
+		static readonly Config[] config_table;
 
 		static Deflate()
 		{
@@ -89,7 +89,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			config_table[9] = new Config(32, 258, 258, 4096, SLOW);
 		}
 
-		private static readonly string[] z_errmsg =
+		static readonly string[] z_errmsg =
 		{
 			"need dictionary", // Z_NEED_DICT       2
 			"stream end", // Z_STREAM_END      1
@@ -104,80 +104,80 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		};
 
 		// block not completed, need more input or more output
-		private const int NeedMore = 0;
+		const int NeedMore = 0;
 
 		// block flush performed
-		private const int BlockDone = 1;
+		const int BlockDone = 1;
 
 		// finish started, need only more output at next deflate
-		private const int FinishStarted = 2;
+		const int FinishStarted = 2;
 
 		// finish done, accept no more input or output
-		private const int FinishDone = 3;
+		const int FinishDone = 3;
 
 		// preset dictionary flag in zlib header
-		private const int PRESET_DICT = 0x20;
+		const int PRESET_DICT = 0x20;
 
-		private const int Z_FILTERED = 1;
-		private const int Z_HUFFMAN_ONLY = 2;
-		private const int Z_DEFAULT_STRATEGY = 0;
+		const int Z_FILTERED = 1;
+		const int Z_HUFFMAN_ONLY = 2;
+		const int Z_DEFAULT_STRATEGY = 0;
 
-		private const int Z_NO_FLUSH = 0;
-		private const int Z_PARTIAL_FLUSH = 1;
-		private const int Z_SYNC_FLUSH = 2;
-		private const int Z_FULL_FLUSH = 3;
-		private const int Z_FINISH = 4;
+		const int Z_NO_FLUSH = 0;
+		const int Z_PARTIAL_FLUSH = 1;
+		const int Z_SYNC_FLUSH = 2;
+		const int Z_FULL_FLUSH = 3;
+		const int Z_FINISH = 4;
 
-		private const int Z_OK = 0;
-		private const int Z_STREAM_END = 1;
-		private const int Z_NEED_DICT = 2;
-		private const int Z_ERRNO = -1;
-		private const int Z_STREAM_ERROR = -2;
-		private const int Z_DATA_ERROR = -3;
-		private const int Z_MEM_ERROR = -4;
-		private const int Z_BUF_ERROR = -5;
-		private const int Z_VERSION_ERROR = -6;
+		const int Z_OK = 0;
+		const int Z_STREAM_END = 1;
+		const int Z_NEED_DICT = 2;
+		const int Z_ERRNO = -1;
+		const int Z_STREAM_ERROR = -2;
+		const int Z_DATA_ERROR = -3;
+		const int Z_MEM_ERROR = -4;
+		const int Z_BUF_ERROR = -5;
+		const int Z_VERSION_ERROR = -6;
 
-		private const int INIT_STATE = 42;
-		private const int BUSY_STATE = 113;
-		private const int FINISH_STATE = 666;
+		const int INIT_STATE = 42;
+		const int BUSY_STATE = 113;
+		const int FINISH_STATE = 666;
 
 		// The deflate compression method
-		private const int Z_DEFLATED = 8;
+		const int Z_DEFLATED = 8;
 
-		private const int STORED_BLOCK = 0;
-		private const int STATIC_TREES = 1;
-		private const int DYN_TREES = 2;
+		const int STORED_BLOCK = 0;
+		const int STATIC_TREES = 1;
+		const int DYN_TREES = 2;
 
 		// The three kinds of block type
-		private const int Z_BINARY = 0;
-		private const int Z_ASCII = 1;
-		private const int Z_UNKNOWN = 2;
+		const int Z_BINARY = 0;
+		const int Z_ASCII = 1;
+		const int Z_UNKNOWN = 2;
 
-		private const int Buf_size = 8 * 2;
+		const int Buf_size = 8 * 2;
 
 		// repeat previous bit length 3-6 times (2 bits of repeat count)
-		private const int REP_3_6 = 16;
+		const int REP_3_6 = 16;
 
 		// repeat a zero length 3-10 times  (3 bits of repeat count)
-		private const int REPZ_3_10 = 17;
+		const int REPZ_3_10 = 17;
 
 		// repeat a zero length 11-138 times  (7 bits of repeat count)
-		private const int REPZ_11_138 = 18;
+		const int REPZ_11_138 = 18;
 
-		private const int MIN_MATCH = 3;
-		private const int MAX_MATCH = 258;
-		private const int MIN_LOOKAHEAD = (MAX_MATCH + MIN_MATCH + 1);
+		const int MIN_MATCH = 3;
+		const int MAX_MATCH = 258;
+		const int MIN_LOOKAHEAD = MAX_MATCH + MIN_MATCH + 1;
 
-		private const int MAX_BITS = 15;
-		private const int D_CODES = 30;
-		private const int BL_CODES = 19;
-		private const int LENGTH_CODES = 29;
-		private const int LITERALS = 256;
-		private const int L_CODES = (LITERALS + 1 + LENGTH_CODES);
-		private const int HEAP_SIZE = (2 * L_CODES + 1);
+		const int MAX_BITS = 15;
+		const int D_CODES = 30;
+		const int BL_CODES = 19;
+		const int LENGTH_CODES = 29;
+		const int LITERALS = 256;
+		const int L_CODES = LITERALS + 1 + LENGTH_CODES;
+		const int HEAP_SIZE = 2 * L_CODES + 1;
 
-		private const int END_BLOCK = 256;
+		const int END_BLOCK = 256;
 
 		internal ZStream strm; // pointer back to this zlib stream
 		internal int status; // as the name implies
@@ -345,10 +345,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			}
 
 			// Set the default configuration parameters:
-			max_lazy_match = Deflate.config_table[level].max_lazy;
-			good_match = Deflate.config_table[level].good_length;
-			nice_match = Deflate.config_table[level].nice_length;
-			max_chain_length = Deflate.config_table[level].max_chain;
+			max_lazy_match = config_table[level].max_lazy;
+			good_match = config_table[level].good_length;
+			nice_match = config_table[level].nice_length;
+			max_chain_length = config_table[level].max_chain;
 
 			strstart = 0;
 			block_start = 0;
@@ -381,9 +381,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		internal void init_block()
 		{
 			// Initialize the trees.
-			for (int i = 0; i < L_CODES; i++) dyn_ltree[i * 2] = 0;
-			for (int i = 0; i < D_CODES; i++) dyn_dtree[i * 2] = 0;
-			for (int i = 0; i < BL_CODES; i++) bl_tree[i * 2] = 0;
+			for (int i = 0; i < L_CODES; i++)
+			{
+				dyn_ltree[i * 2] = 0;
+			}
+
+			for (int i = 0; i < D_CODES; i++)
+			{
+				dyn_dtree[i * 2] = 0;
+			}
+
+			for (int i = 0; i < BL_CODES; i++)
+			{
+				bl_tree[i * 2] = 0;
+			}
 
 			dyn_ltree[END_BLOCK * 2] = 1;
 			opt_len = static_len = 0;
@@ -410,7 +421,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				}
 
 				// Exit if v is smaller than both sons
-				if (smaller(tree, v, heap[j], depth)) break;
+				if (smaller(tree, v, heap[j], depth))
+				{
+					break;
+				}
 
 				// Exchange v with the smallest son
 				heap[k] = heap[j];
@@ -426,8 +440,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		{
 			short tn2 = tree[n * 2];
 			short tm2 = tree[m * 2];
-			return (tn2 < tm2 ||
-			        (tn2 == tm2 && depth[n] <= depth[m]));
+			return tn2 < tm2 ||
+			       (tn2 == tm2 && depth[n] <= depth[m]);
 		}
 
 		// Scan a literal or distance tree to determine the frequencies of the codes
@@ -466,7 +480,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				}
 				else if (curlen != 0)
 				{
-					if (curlen != prevlen) bl_tree[curlen * 2]++;
+					if (curlen != prevlen)
+					{
+						bl_tree[curlen * 2]++;
+					}
+
 					bl_tree[REP_3_6 * 2]++;
 				}
 				else if (count <= 10)
@@ -518,7 +536,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			// 3 but the actual value used is 4.)
 			for (max_blindex = BL_CODES - 1; max_blindex >= 3; max_blindex--)
 			{
-				if (bl_tree[Tree.bl_order[max_blindex] * 2 + 1] != 0) break;
+				if (bl_tree[Tree.bl_order[max_blindex] * 2 + 1] != 0)
+				{
+					break;
+				}
 			}
 
 			// Update opt_len to include the bit length tree and counts
@@ -628,7 +649,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		// IN assertion: there is enough room in pending_buf.
 		internal void put_byte(byte[] p, int start, int len)
 		{
-			System.Array.Copy(p, start, pending_buf, pending, len);
+			Array.Copy(p, start, pending_buf, pending, len);
 			pending += len;
 		}
 
@@ -639,20 +660,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 		internal void put_short(int w)
 		{
-			pending_buf[pending++] = (byte)(w /*&0xff*/);
+			pending_buf[pending++] = (byte)w /*&0xff*/;
 			pending_buf[pending++] = (byte)(w >> 8);
 		}
 
 		internal void putShortMSB(int b)
 		{
 			pending_buf[pending++] = (byte)(b >> 8);
-			pending_buf[pending++] = (byte)(b /*&0xff*/);
+			pending_buf[pending++] = (byte)b /*&0xff*/;
 		}
 
 		internal void send_code(int c, short[] tree)
 		{
 			int c2 = c * 2;
-			send_bits((tree[c2] & 0xffff), (tree[c2 + 1] & 0xffff));
+			send_bits(tree[c2] & 0xffff, tree[c2 + 1] & 0xffff);
 		}
 
 		internal void send_bits(int val, int length)
@@ -660,9 +681,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			if (bi_valid > Buf_size - length)
 			{
 				bi_buf |= (uint)(val << bi_valid);
-				pending_buf[pending++] = (byte)(bi_buf /*&0xff*/);
+				pending_buf[pending++] = (byte)bi_buf /*&0xff*/;
 				pending_buf[pending++] = (byte)(bi_buf >> 8);
-				bi_buf = ((uint)val) >> (Buf_size - bi_valid);
+				bi_buf = (uint)val >> (Buf_size - bi_valid);
 				bi_valid += length - Buf_size;
 			}
 			else
@@ -755,10 +776,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				}
 
 				out_length >>= 3;
-				if ((matches < (last_lit / 2)) && out_length < in_length / 2) return true;
+				if (matches < last_lit / 2 && out_length < in_length / 2)
+				{
+					return true;
+				}
 			}
 
-			return (last_lit == lit_bufsize - 1);
+			return last_lit == lit_bufsize - 1;
 			// We avoid equality with lit_bufsize because of wraparound at 64K
 			// on 16 bit machines and because stored blocks are restricted to
 			// 64K-1 bytes.
@@ -779,7 +803,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				{
 					dist = ((pending_buf[d_buf + lx * 2] << 8) & 0xff00) |
 					       (pending_buf[d_buf + lx * 2 + 1] & 0xff);
-					lc = (pending_buf[l_buf + lx]) & 0xff;
+					lc = pending_buf[l_buf + lx] & 0xff;
 					lx++;
 
 					if (dist == 0)
@@ -846,7 +870,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				n++;
 			}
 
-			data_type = (byte)(bin_freq > (ascii_freq >> 2) ? Z_BINARY : Z_ASCII);
+			data_type = (byte)(bin_freq > ascii_freq >> 2 ? Z_BINARY : Z_ASCII);
 		}
 
 		// Flush the bit buffer, keeping at most 7 bits in it.
@@ -854,14 +878,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		{
 			if (bi_valid == 16)
 			{
-				pending_buf[pending++] = (byte)(bi_buf /*&0xff*/);
+				pending_buf[pending++] = (byte)bi_buf /*&0xff*/;
 				pending_buf[pending++] = (byte)(bi_buf >> 8);
 				bi_buf = 0;
 				bi_valid = 0;
 			}
 			else if (bi_valid >= 8)
 			{
-				pending_buf[pending++] = (byte)(bi_buf);
+				pending_buf[pending++] = (byte)bi_buf;
 				bi_buf >>= 8;
 				bi_buf &= 0x00ff;
 				bi_valid -= 8;
@@ -873,12 +897,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		{
 			if (bi_valid > 8)
 			{
-				pending_buf[pending++] = (byte)(bi_buf);
+				pending_buf[pending++] = (byte)bi_buf;
 				pending_buf[pending++] = (byte)(bi_buf >> 8);
 			}
 			else if (bi_valid > 0)
 			{
-				pending_buf[pending++] = (byte)(bi_buf);
+				pending_buf[pending++] = (byte)bi_buf;
 			}
 
 			bi_buf = 0;
@@ -940,8 +964,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				if (lookahead <= 1)
 				{
 					fill_window();
-					if (lookahead == 0 && flush == Z_NO_FLUSH) return NeedMore;
-					if (lookahead == 0) break; // flush the current block
+					if (lookahead == 0 && flush == Z_NO_FLUSH)
+					{
+						return NeedMore;
+					}
+
+					if (lookahead == 0)
+					{
+						break; // flush the current block
+					}
 				}
 
 				strstart += lookahead;
@@ -956,7 +987,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					strstart = (int)max_start;
 
 					flush_block_only(false);
-					if (strm.avail_out == 0) return NeedMore;
+					if (strm.avail_out == 0)
+					{
+						return NeedMore;
+					}
 				}
 
 				// Flush if we may have to slide, otherwise block_start may become
@@ -964,13 +998,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				if (strstart - block_start >= w_size - MIN_LOOKAHEAD)
 				{
 					flush_block_only(false);
-					if (strm.avail_out == 0) return NeedMore;
+					if (strm.avail_out == 0)
+					{
+						return NeedMore;
+					}
 				}
 			}
 
 			flush_block_only(flush == Z_FINISH);
 			if (strm.avail_out == 0)
-				return (flush == Z_FINISH) ? FinishStarted : NeedMore;
+			{
+				return flush == Z_FINISH ? FinishStarted : NeedMore;
+			}
 
 			return flush == Z_FINISH ? FinishDone : BlockDone;
 		}
@@ -999,7 +1038,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			if (level > 0)
 			{
 				// Check if the file is ascii or binary
-				if (data_type == Z_UNKNOWN) set_data_type();
+				if (data_type == Z_UNKNOWN)
+				{
+					set_data_type();
+				}
 
 				// Construct the literal and distance trees
 				l_desc.build_tree(this);
@@ -1017,7 +1059,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				opt_lenb = (opt_len + 3 + 7) >> 3;
 				static_lenb = (static_len + 3 + 7) >> 3;
 
-				if (static_lenb <= opt_lenb) opt_lenb = static_lenb;
+				if (static_lenb <= opt_lenb)
+				{
+					opt_lenb = static_lenb;
+				}
 			}
 			else
 			{
@@ -1073,7 +1118,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 			do
 			{
-				more = (window_size - lookahead - strstart);
+				more = window_size - lookahead - strstart;
 
 				// Deal with !@#$% 64K limit:
 				if (more == 0 && strstart == 0 && lookahead == 0)
@@ -1091,7 +1136,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				}
 				else if (strstart >= w_size + w_size - MIN_LOOKAHEAD)
 				{
-					System.Array.Copy(window, w_size, window, 0, w_size);
+					Array.Copy(window, w_size, window, 0, w_size);
 					match_start -= w_size;
 					strstart -= w_size; // we now have strstart >= MAX_DIST
 					block_start -= w_size;
@@ -1106,16 +1151,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					p = n;
 					do
 					{
-						m = (head[--p] & 0xffff);
-						head[p] = (short)(m >= w_size ? (m - w_size) : 0);
+						m = head[--p] & 0xffff;
+						head[p] = (short)(m >= w_size ? m - w_size : 0);
 					} while (--n != 0);
 
 					n = w_size;
 					p = n;
 					do
 					{
-						m = (prev[--p] & 0xffff);
-						prev[p] = (short)(m >= w_size ? (m - w_size) : 0);
+						m = prev[--p] & 0xffff;
+						prev[p] = (short)(m >= w_size ? m - w_size : 0);
 						// If n is not on any hash chain, prev[n] is garbage but
 						// its value will never be used.
 					} while (--n != 0);
@@ -1123,7 +1168,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					more += w_size;
 				}
 
-				if (strm.avail_in == 0) return;
+				if (strm.avail_in == 0)
+				{
+					return;
+				}
 
 				// If there was no sliding:
 				//    strstart <= WSIZE+MAX_DIST-1 && lookahead <= MIN_LOOKAHEAD - 1 &&
@@ -1143,7 +1191,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				if (lookahead >= MIN_MATCH)
 				{
 					ins_h = window[strstart] & 0xff;
-					ins_h = (((ins_h) << hash_shift) ^ (window[strstart + 1] & 0xff)) & hash_mask;
+					ins_h = ((ins_h << hash_shift) ^ (window[strstart + 1] & 0xff)) & hash_mask;
 				}
 				// If the whole input has less than MIN_MATCH bytes, ins_h is garbage,
 				// but this is not important since only literal bytes will be emitted.
@@ -1175,17 +1223,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						return NeedMore;
 					}
 
-					if (lookahead == 0) break; // flush the current block
+					if (lookahead == 0)
+					{
+						break; // flush the current block
+					}
 				}
 
 				// Insert the string window[strstart .. strstart+2] in the
 				// dictionary, and set hash_head to the head of the hash chain:
 				if (lookahead >= MIN_MATCH)
 				{
-					ins_h = (((ins_h) << hash_shift) ^ (window[(strstart) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
+					ins_h = ((ins_h << hash_shift) ^ (window[strstart + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
 
 					//  prev[strstart&w_mask]=hash_head=head[ins_h];
-					hash_head = (head[ins_h] & 0xffff);
+					hash_head = head[ins_h] & 0xffff;
 					prev[strstart & w_mask] = head[ins_h];
 					head[ins_h] = (short)strstart;
 				}
@@ -1225,9 +1276,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						{
 							strstart++;
 
-							ins_h = ((ins_h << hash_shift) ^ (window[(strstart) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
+							ins_h = ((ins_h << hash_shift) ^ (window[strstart + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
 							//      prev[strstart&w_mask]=hash_head=head[ins_h];
-							hash_head = (head[ins_h] & 0xffff);
+							hash_head = head[ins_h] & 0xffff;
 							prev[strstart & w_mask] = head[ins_h];
 							head[ins_h] = (short)strstart;
 
@@ -1243,7 +1294,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						match_length = 0;
 						ins_h = window[strstart] & 0xff;
 
-						ins_h = (((ins_h) << hash_shift) ^ (window[strstart + 1] & 0xff)) & hash_mask;
+						ins_h = ((ins_h << hash_shift) ^ (window[strstart + 1] & 0xff)) & hash_mask;
 						// If lookahead < MIN_MATCH, ins_h is garbage, but it does not
 						// matter since it will be recomputed at next deflate call.
 					}
@@ -1260,15 +1311,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				if (bflush)
 				{
 					flush_block_only(false);
-					if (strm.avail_out == 0) return NeedMore;
+					if (strm.avail_out == 0)
+					{
+						return NeedMore;
+					}
 				}
 			}
 
 			flush_block_only(flush == Z_FINISH);
 			if (strm.avail_out == 0)
 			{
-				if (flush == Z_FINISH) return FinishStarted;
-				else return NeedMore;
+				if (flush == Z_FINISH)
+				{
+					return FinishStarted;
+				}
+				else
+				{
+					return NeedMore;
+				}
 			}
 
 			return flush == Z_FINISH ? FinishDone : BlockDone;
@@ -1299,7 +1359,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						return NeedMore;
 					}
 
-					if (lookahead == 0) break; // flush the current block
+					if (lookahead == 0)
+					{
+						break; // flush the current block
+					}
 				}
 
 				// Insert the string window[strstart .. strstart+2] in the
@@ -1307,9 +1370,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 				if (lookahead >= MIN_MATCH)
 				{
-					ins_h = (((ins_h) << hash_shift) ^ (window[(strstart) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
+					ins_h = ((ins_h << hash_shift) ^ (window[strstart + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
 					//  prev[strstart&w_mask]=hash_head=head[ins_h];
-					hash_head = (head[ins_h] & 0xffff);
+					hash_head = head[ins_h] & 0xffff;
 					prev[strstart & w_mask] = head[ins_h];
 					head[ins_h] = (short)strstart;
 				}
@@ -1364,9 +1427,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					{
 						if (++strstart <= max_insert)
 						{
-							ins_h = (((ins_h) << hash_shift) ^ (window[(strstart) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
+							ins_h = ((ins_h << hash_shift) ^ (window[strstart + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
 							//prev[strstart&w_mask]=hash_head=head[ins_h];
-							hash_head = (head[ins_h] & 0xffff);
+							hash_head = head[ins_h] & 0xffff;
 							prev[strstart & w_mask] = head[ins_h];
 							head[ins_h] = (short)strstart;
 						}
@@ -1379,7 +1442,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					if (bflush)
 					{
 						flush_block_only(false);
-						if (strm.avail_out == 0) return NeedMore;
+						if (strm.avail_out == 0)
+						{
+							return NeedMore;
+						}
 					}
 				}
 				else if (match_available != 0)
@@ -1397,7 +1463,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 					strstart++;
 					lookahead--;
-					if (strm.avail_out == 0) return NeedMore;
+					if (strm.avail_out == 0)
+					{
+						return NeedMore;
+					}
 				}
 				else
 				{
@@ -1420,8 +1489,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 			if (strm.avail_out == 0)
 			{
-				if (flush == Z_FINISH) return FinishStarted;
-				else return NeedMore;
+				if (flush == Z_FINISH)
+				{
+					return FinishStarted;
+				}
+				else
+				{
+					return NeedMore;
+				}
 			}
 
 			return flush == Z_FINISH ? FinishDone : BlockDone;
@@ -1434,7 +1509,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			int match; // matched string
 			int len; // length of current match
 			int best_len = prev_length; // best match length so far
-			int limit = strstart > (w_size - MIN_LOOKAHEAD) ? strstart - (w_size - MIN_LOOKAHEAD) : 0;
+			int limit = strstart > w_size - MIN_LOOKAHEAD ? strstart - (w_size - MIN_LOOKAHEAD) : 0;
 			int nice_match = this.nice_match;
 
 			// Stop when cur_match becomes <= limit. To simplify the code,
@@ -1457,7 +1532,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 			// Do not look for matches beyond the end of the input. This is necessary
 			// to make deflate deterministic.
-			if (nice_match > lookahead) nice_match = lookahead;
+			if (nice_match > lookahead)
+			{
+				nice_match = lookahead;
+			}
 
 			do
 			{
@@ -1468,7 +1546,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				if (window[match + best_len] != scan_end ||
 				    window[match + best_len - 1] != scan_end1 ||
 				    window[match] != window[scan] ||
-				    window[++match] != window[scan + 1]) continue;
+				    window[++match] != window[scan + 1])
+				{
+					continue;
+				}
 
 				// The check at best_len-1 can be removed because it will be made
 				// again later. (This heuristic is not always a win.)
@@ -1499,14 +1580,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				{
 					match_start = cur_match;
 					best_len = len;
-					if (len >= nice_match) break;
+					if (len >= nice_match)
+					{
+						break;
+					}
+
 					scan_end1 = window[scan + best_len - 1];
 					scan_end = window[scan + best_len];
 				}
-			} while ((cur_match = (prev[cur_match & wmask] & 0xffff)) > limit
+			} while ((cur_match = prev[cur_match & wmask] & 0xffff) > limit
 			         && --chain_length != 0);
 
-			if (best_len <= lookahead) return best_len;
+			if (best_len <= lookahead)
+			{
+				return best_len;
+			}
+
 			return lookahead;
 		}
 
@@ -1535,7 +1624,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 
 			strm.msg = null;
 
-			if (level == Z_DEFAULT_COMPRESSION) level = 6;
+			if (level == Z_DEFAULT_COMPRESSION)
+			{
+				level = 6;
+			}
 
 			if (windowBits < 0)
 			{
@@ -1562,7 +1654,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			hash_bits = memLevel + 7;
 			hash_size = 1 << hash_bits;
 			hash_mask = hash_size - 1;
-			hash_shift = ((hash_bits + MIN_MATCH - 1) / MIN_MATCH);
+			hash_shift = (hash_bits + MIN_MATCH - 1) / MIN_MATCH;
 
 			window = new byte[w_size * 2];
 			prev = new short[w_size];
@@ -1601,7 +1693,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				noheader = 0; // was set to -1 by deflate(..., Z_FINISH);
 			}
 
-			status = (noheader != 0) ? BUSY_STATE : INIT_STATE;
+			status = noheader != 0 ? BUSY_STATE : INIT_STATE;
 			strm.adler = strm._adler.adler32(0, null, 0, 0);
 
 			last_flush = Z_NO_FLUSH;
@@ -1669,18 +1761,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			int index = 0;
 
 			if (dictionary == null || status != INIT_STATE)
+			{
 				return Z_STREAM_ERROR;
+			}
 
 			strm.adler = strm._adler.adler32(strm.adler, dictionary, 0, dictLength);
 
-			if (length < MIN_MATCH) return Z_OK;
+			if (length < MIN_MATCH)
+			{
+				return Z_OK;
+			}
+
 			if (length > w_size - MIN_LOOKAHEAD)
 			{
 				length = w_size - MIN_LOOKAHEAD;
 				index = dictLength - length; // use the tail of the dictionary
 			}
 
-			System.Array.Copy(dictionary, index, window, 0, length);
+			Array.Copy(dictionary, index, window, 0, length);
 			strstart = length;
 			block_start = length;
 
@@ -1689,11 +1787,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			// call of fill_window.
 
 			ins_h = window[0] & 0xff;
-			ins_h = (((ins_h) << hash_shift) ^ (window[1] & 0xff)) & hash_mask;
+			ins_h = ((ins_h << hash_shift) ^ (window[1] & 0xff)) & hash_mask;
 
 			for (int n = 0; n <= length - MIN_MATCH; n++)
 			{
-				ins_h = (((ins_h) << hash_shift) ^ (window[(n) + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
+				ins_h = ((ins_h << hash_shift) ^ (window[n + (MIN_MATCH - 1)] & 0xff)) & hash_mask;
 				prev[n & w_mask] = head[ins_h];
 				head[ins_h] = (short)n;
 			}
@@ -1714,13 +1812,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			    (strm.next_in == null && strm.avail_in != 0) ||
 			    (status == FINISH_STATE && flush != Z_FINISH))
 			{
-				strm.msg = z_errmsg[Z_NEED_DICT - (Z_STREAM_ERROR)];
+				strm.msg = z_errmsg[Z_NEED_DICT - Z_STREAM_ERROR];
 				return Z_STREAM_ERROR;
 			}
 
 			if (strm.avail_out == 0)
 			{
-				strm.msg = z_errmsg[Z_NEED_DICT - (Z_BUF_ERROR)];
+				strm.msg = z_errmsg[Z_NEED_DICT - Z_BUF_ERROR];
 				return Z_BUF_ERROR;
 			}
 
@@ -1734,10 +1832,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				int header = (Z_DEFLATED + ((w_bits - 8) << 4)) << 8;
 				int level_flags = ((level - 1) & 0xff) >> 1;
 
-				if (level_flags > 3) level_flags = 3;
-				header |= (level_flags << 6);
-				if (strstart != 0) header |= PRESET_DICT;
-				header += 31 - (header % 31);
+				if (level_flags > 3)
+				{
+					level_flags = 3;
+				}
+
+				header |= level_flags << 6;
+				if (strstart != 0)
+				{
+					header |= PRESET_DICT;
+				}
+
+				header += 31 - header % 31;
 
 				status = BUSY_STATE;
 				putShortMSB(header);
@@ -1776,14 +1882,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			else if (strm.avail_in == 0 && flush <= old_flush &&
 			         flush != Z_FINISH)
 			{
-				strm.msg = z_errmsg[Z_NEED_DICT - (Z_BUF_ERROR)];
+				strm.msg = z_errmsg[Z_NEED_DICT - Z_BUF_ERROR];
 				return Z_BUF_ERROR;
 			}
 
 			// User must not provide more input after the first FINISH:
 			if (status == FINISH_STATE && strm.avail_in != 0)
 			{
-				strm.msg = z_errmsg[Z_NEED_DICT - (Z_BUF_ERROR)];
+				strm.msg = z_errmsg[Z_NEED_DICT - Z_BUF_ERROR];
 				return Z_BUF_ERROR;
 			}
 
@@ -1844,7 +1950,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 						{
 							//state.head[s.hash_size-1]=0;
 							for (int i = 0; i < hash_size /*-1*/; i++) // forget history
+							{
 								head[i] = 0;
+							}
 						}
 					}
 
@@ -1857,8 +1965,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				}
 			}
 
-			if (flush != Z_FINISH) return Z_OK;
-			if (noheader != 0) return Z_STREAM_END;
+			if (flush != Z_FINISH)
+			{
+				return Z_OK;
+			}
+
+			if (noheader != 0)
+			{
+				return Z_STREAM_END;
+			}
 
 			// Write the zlib trailer (adler32)
 			putShortMSB((int)(strm.adler >> 16));

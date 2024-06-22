@@ -66,8 +66,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Srp
 		public virtual BigInteger GenerateServerCredentials()
 		{
 			BigInteger k = Srp6Utilities.CalculateK(digest, N, g);
-			this.privB = SelectPrivateValue();
-			this.pubB = k.Multiply(v).Mod(N).Add(g.ModPow(privB, N)).Mod(N);
+			privB = SelectPrivateValue();
+			pubB = k.Multiply(v).Mod(N).Add(g.ModPow(privB, N)).Mod(N);
 
 			return pubB;
 		}
@@ -80,9 +80,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Srp
 		 */
 		public virtual BigInteger CalculateSecret(BigInteger clientA)
 		{
-			this.A = Srp6Utilities.ValidatePublicValue(N, clientA);
-			this.u = Srp6Utilities.CalculateU(digest, N, A, pubB);
-			this.S = CalculateS();
+			A = Srp6Utilities.ValidatePublicValue(N, clientA);
+			u = Srp6Utilities.CalculateU(digest, N, A, pubB);
+			S = CalculateS();
 
 			return S;
 		}
@@ -92,7 +92,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Srp
 			return Srp6Utilities.GeneratePrivateValue(digest, N, g, random);
 		}
 
-		private BigInteger CalculateS()
+		BigInteger CalculateS()
 		{
 			return v.ModPow(u, N).Multiply(A).Mod(N).ModPow(privB, N);
 		}
@@ -107,7 +107,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Srp
 		public virtual bool VerifyClientEvidenceMessage(BigInteger clientM1)
 		{
 			// Verify pre-requirements
-			if (this.A == null || this.pubB == null || this.S == null)
+			if (A == null || pubB == null || S == null)
 			{
 				throw new CryptoException("Impossible to compute and verify M1: " +
 				                          "some data are missing from the previous operations (A,B,S)");
@@ -117,7 +117,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Srp
 			BigInteger computedM1 = Srp6Utilities.CalculateM1(digest, N, A, pubB, S);
 			if (computedM1.Equals(clientM1))
 			{
-				this.M1 = clientM1;
+				M1 = clientM1;
 				return true;
 			}
 
@@ -133,14 +133,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Srp
 		public virtual BigInteger CalculateServerEvidenceMessage()
 		{
 			// Verify pre-requirements
-			if (this.A == null || this.M1 == null || this.S == null)
+			if (A == null || M1 == null || S == null)
 			{
 				throw new CryptoException("Impossible to compute M2: " +
 				                          "some data are missing from the previous operations (A,M1,S)");
 			}
 
 			// Compute the server evidence message 'M2'
-			this.M2 = Srp6Utilities.CalculateM2(digest, N, A, M1, S);
+			M2 = Srp6Utilities.CalculateM2(digest, N, A, M1, S);
 			return M2;
 		}
 
@@ -153,13 +153,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Srp
 		public virtual BigInteger CalculateSessionKey()
 		{
 			// Verify pre-requirements
-			if (this.S == null || this.M1 == null || this.M2 == null)
+			if (S == null || M1 == null || M2 == null)
 			{
 				throw new CryptoException("Impossible to compute Key: " +
 				                          "some data are missing from the previous operations (S,M1,M2)");
 			}
 
-			this.Key = Srp6Utilities.CalculateKey(digest, N, S);
+			Key = Srp6Utilities.CalculateKey(digest, N, S);
 			return Key;
 		}
 	}

@@ -11,21 +11,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 	public class SecureRandom
 		: Random
 	{
-		private static long counter = DateTime.UtcNow.Ticks;
+		static long counter = DateTime.UtcNow.Ticks;
 
-		private static long NextCounterValue()
+		static long NextCounterValue()
 		{
 			return Interlocked.Increment(ref counter);
 		}
 
-		private static readonly SecureRandom MasterRandom = new SecureRandom(new CryptoApiRandomGenerator());
+		static readonly SecureRandom MasterRandom = new SecureRandom(new CryptoApiRandomGenerator());
 		internal static readonly SecureRandom ArbitraryRandom = new SecureRandom(new VmpcRandomGenerator(), 16);
 
-		private static DigestRandomGenerator CreatePrng(string digestName, bool autoSeed)
+		static DigestRandomGenerator CreatePrng(string digestName, bool autoSeed)
 		{
 			IDigest digest = DigestUtilities.GetDigest(digestName);
 			if (digest == null)
+			{
 				return null;
+			}
+
 			DigestRandomGenerator prng = new DigestRandomGenerator(digest);
 			if (autoSeed)
 			{
@@ -60,7 +63,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public static SecureRandom GetInstance(string algorithm, bool autoSeed)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException(nameof(algorithm));
+			}
 
 			if (algorithm.EndsWith("PRNG", StringComparison.OrdinalIgnoreCase))
 			{
@@ -68,7 +73,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 
 				DigestRandomGenerator prng = CreatePrng(digestName, autoSeed);
 				if (prng != null)
+				{
 					return new SecureRandom(prng);
+				}
 			}
 
 			throw new ArgumentException("Unrecognised PRNG algorithm: " + algorithm, "algorithm");
@@ -142,7 +149,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			if (maxValue < 2)
 			{
 				if (maxValue < 0)
+				{
 					throw new ArgumentOutOfRangeException("maxValue", "cannot be negative");
+				}
 
 				return 0;
 			}
@@ -171,21 +180,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			if (maxValue <= minValue)
 			{
 				if (maxValue == minValue)
+				{
 					return minValue;
+				}
 
 				throw new ArgumentException("maxValue cannot be less than minValue");
 			}
 
 			int diff = maxValue - minValue;
 			if (diff > 0)
+			{
 				return minValue + Next(diff);
+			}
 
 			for (;;)
 			{
 				int i = NextInt();
 
 				if (i >= minValue && i < maxValue)
+				{
 					return i;
+				}
 			}
 		}
 
@@ -215,7 +230,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
         }
 #endif
 
-		private static readonly double DoubleScale = 1.0 / Convert.ToDouble(1L << 53);
+		static readonly double DoubleScale = 1.0 / Convert.ToDouble(1L << 53);
 
 		public override double NextDouble()
 		{
@@ -246,7 +261,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return (long)Pack.BE_To_UInt64(bytes);
 		}
 
-		private static void AutoSeed(IRandomGenerator generator, int seedLength)
+		static void AutoSeed(IRandomGenerator generator, int seedLength)
 		{
 			generator.AddSeedMaterial(NextCounterValue());
 

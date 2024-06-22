@@ -558,7 +558,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateAlpnExtensionClient(IList<ProtocolName> protocolNameList)
 		{
 			if (protocolNameList == null || protocolNameList.Count < 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			MemoryStream buf = new MemoryStream();
 
@@ -576,7 +578,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <exception cref="IOException"/>
 		public static byte[] CreateAlpnExtensionServer(ProtocolName protocolName)
 		{
-			var protocol_name_list = new List<ProtocolName>();
+			List<ProtocolName> protocol_name_list = new List<ProtocolName>();
 			protocol_name_list.Add(protocolName);
 
 			return CreateAlpnExtensionClient(protocol_name_list);
@@ -586,7 +588,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateCertificateAuthoritiesExtension(IList<X509Name> authorities)
 		{
 			if (null == authorities || authorities.Count < 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			MemoryStream buf = new MemoryStream();
 
@@ -606,7 +610,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateCertificateTypeExtensionClient(short[] certificateTypes)
 		{
 			if (TlsUtilities.IsNullOrEmpty(certificateTypes) || certificateTypes.Length > 255)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			return TlsUtilities.EncodeUint8ArrayWithUint8Length(certificateTypes);
 		}
@@ -626,7 +632,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateCompressCertificateExtension(int[] algorithms)
 		{
 			if (TlsUtilities.IsNullOrEmpty(algorithms) || algorithms.Length > 127)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			return TlsUtilities.EncodeUint16ArrayWithUint8Length(algorithms);
 		}
@@ -634,8 +642,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <exception cref="IOException"/>
 		public static byte[] CreateCookieExtension(byte[] cookie)
 		{
-			if (TlsUtilities.IsNullOrEmpty(cookie) || cookie.Length >= (1 << 16))
+			if (TlsUtilities.IsNullOrEmpty(cookie) || cookie.Length >= 1 << 16)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			return TlsUtilities.EncodeOpaque16(cookie);
 		}
@@ -685,7 +695,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateKeyShareClientHello(IList<KeyShareEntry> clientShares)
 		{
 			if (clientShares == null || clientShares.Count < 1)
+			{
 				return TlsUtilities.EncodeUint16(0);
+			}
 
 			MemoryStream buf = new MemoryStream();
 
@@ -738,13 +750,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			if (null != filters)
 			{
 				//foreach (DerObjectIdentifier certificateExtensionOid in filters.Keys)
-				foreach (var filter in filters)
+				foreach (KeyValuePair<DerObjectIdentifier, byte[]> filter in filters)
 				{
-					var certificateExtensionOid = filter.Key;
-					var certificateExtensionValues = filter.Value;
+					DerObjectIdentifier certificateExtensionOid = filter.Key;
+					byte[] certificateExtensionValues = filter.Value;
 
 					if (null == certificateExtensionOid || null == certificateExtensionValues)
+					{
 						throw new TlsFatalAlert(AlertDescription.internal_error);
+					}
 
 					byte[] derEncoding = certificateExtensionOid.GetEncoded(Asn1Encodable.Der);
 					TlsUtilities.WriteOpaque8(derEncoding, buf);
@@ -772,7 +786,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreatePreSharedKeyClientHello(OfferedPsks offeredPsks)
 		{
 			if (offeredPsks == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			MemoryStream buf = new MemoryStream();
 
@@ -791,7 +807,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreatePskKeyExchangeModesExtension(short[] modes)
 		{
 			if (TlsUtilities.IsNullOrEmpty(modes) || modes.Length > 255)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			return TlsUtilities.EncodeUint8ArrayWithUint8Length(modes);
 		}
@@ -800,7 +818,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateRecordSizeLimitExtension(int recordSizeLimit)
 		{
 			if (recordSizeLimit < 64)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			return TlsUtilities.EncodeUint16(recordSizeLimit);
 		}
@@ -809,7 +829,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateServerNameExtensionClient(IList<ServerName> serverNameList)
 		{
 			if (serverNameList == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			MemoryStream buf = new MemoryStream();
 
@@ -845,7 +867,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateStatusRequestExtension(CertificateStatusRequest statusRequest)
 		{
 			if (statusRequest == null)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			MemoryStream buf = new MemoryStream();
 
@@ -858,7 +882,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateStatusRequestV2Extension(IList<CertificateStatusRequestItemV2> statusRequestV2)
 		{
 			if (statusRequestV2 == null || statusRequestV2.Count < 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			MemoryStream buf = new MemoryStream();
 
@@ -877,7 +903,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateSupportedGroupsExtension(IList<int> namedGroups)
 		{
 			if (namedGroups == null || namedGroups.Count < 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			int count = namedGroups.Count;
 			int[] values = new int[count];
@@ -910,7 +938,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static byte[] CreateSupportedVersionsExtensionClient(ProtocolVersion[] versions)
 		{
 			if (TlsUtilities.IsNullOrEmpty(versions) || versions.Length > 127)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			int count = versions.Length;
 			byte[] data = new byte[1 + count * 2];
@@ -959,13 +989,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private static bool ReadEmptyExtensionData(byte[] extensionData)
+		static bool ReadEmptyExtensionData(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			if (extensionData.Length != 0)
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			return true;
 		}
@@ -975,15 +1009,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static IList<ProtocolName> ReadAlpnExtensionClient(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData);
 
 			int length = TlsUtilities.ReadUint16(buf);
-			if (length != (extensionData.Length - 2))
+			if (length != extensionData.Length - 2)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
-			var protocol_name_list = new List<ProtocolName>();
+			List<ProtocolName> protocol_name_list = new List<ProtocolName>();
 			while (buf.Position < buf.Length)
 			{
 				ProtocolName protocolName = ProtocolName.Parse(buf);
@@ -997,9 +1035,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <exception cref="IOException"/>
 		public static ProtocolName ReadAlpnExtensionServer(byte[] extensionData)
 		{
-			var protocol_name_list = ReadAlpnExtensionClient(extensionData);
+			IList<ProtocolName> protocol_name_list = ReadAlpnExtensionClient(extensionData);
 			if (protocol_name_list.Count != 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			return protocol_name_list[0];
 		}
@@ -1008,17 +1048,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static IList<X509Name> ReadCertificateAuthoritiesExtension(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
+
 			if (extensionData.Length < 5)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData);
 
 			int length = TlsUtilities.ReadUint16(buf);
-			if (length != (extensionData.Length - 2))
+			if (length != extensionData.Length - 2)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
-			var authorities = new List<X509Name>();
+			List<X509Name> authorities = new List<X509Name>();
 			while (buf.Position < buf.Length)
 			{
 				byte[] derEncoding = TlsUtilities.ReadOpaque16(buf, 1);
@@ -1036,7 +1083,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			short[] certificateTypes = TlsUtilities.DecodeUint8ArrayWithUint8Length(extensionData);
 			if (certificateTypes.Length < 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			return certificateTypes;
 		}
@@ -1058,7 +1107,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			int[] algorithms = TlsUtilities.DecodeUint16ArrayWithUint8Length(extensionData);
 			if (algorithms.Length < 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			return algorithms;
 		}
@@ -1097,7 +1148,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static HeartbeatExtension ReadHeartbeatExtension(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
@@ -1112,7 +1165,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static IList<KeyShareEntry> ReadKeyShareClientHello(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			/*
 			 * TODO[tls13] Clients MUST NOT offer multiple KeyShareEntry values for the same group.
@@ -1124,10 +1179,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
 			int length = TlsUtilities.ReadUint16(buf);
-			if (length != (extensionData.Length - 2))
+			if (length != extensionData.Length - 2)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
-			var clientShares = new List<KeyShareEntry>();
+			List<KeyShareEntry> clientShares = new List<KeyShareEntry>();
 			while (buf.Position < buf.Length)
 			{
 				KeyShareEntry clientShare = KeyShareEntry.Parse(buf);
@@ -1148,7 +1205,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static KeyShareEntry ReadKeyShareServerHello(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
@@ -1169,17 +1228,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static IDictionary<DerObjectIdentifier, byte[]> ReadOidFiltersExtension(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
+
 			if (extensionData.Length < 2)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
 			int length = TlsUtilities.ReadUint16(buf);
-			if (length != (extensionData.Length - 2))
+			if (length != extensionData.Length - 2)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
-			var filters = new Dictionary<DerObjectIdentifier, byte[]>();
+			Dictionary<DerObjectIdentifier, byte[]> filters = new Dictionary<DerObjectIdentifier, byte[]>();
 			while (buf.Position < buf.Length)
 			{
 				byte[] derEncoding = TlsUtilities.ReadOpaque8(buf, 1);
@@ -1188,7 +1254,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				TlsUtilities.RequireDerEncoding(certificateExtensionOid, derEncoding);
 
 				if (filters.ContainsKey(certificateExtensionOid))
+				{
 					throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+				}
 
 				byte[] certificateExtensionValues = TlsUtilities.ReadOpaque16(buf);
 
@@ -1202,10 +1270,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static int ReadPaddingExtension(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			if (!Arrays.AreAllZeroes(extensionData, 0, extensionData.Length))
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			return extensionData.Length;
 		}
@@ -1220,7 +1292,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static OfferedPsks ReadPreSharedKeyClientHello(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
@@ -1242,7 +1316,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			short[] modes = TlsUtilities.DecodeUint8ArrayWithUint8Length(extensionData);
 			if (modes.Length < 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			return modes;
 		}
@@ -1252,7 +1328,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			int recordSizeLimit = TlsUtilities.DecodeUint16(extensionData);
 			if (recordSizeLimit < 64)
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			return recordSizeLimit;
 		}
@@ -1261,7 +1339,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static IList<ServerName> ReadServerNameExtensionClient(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
@@ -1282,11 +1362,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static IList<SignatureAndHashAlgorithm> ReadSignatureAlgorithmsExtension(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
-			var supported_signature_algorithms = TlsUtilities.ParseSupportedSignatureAlgorithms(buf);
+			IList<SignatureAndHashAlgorithm> supported_signature_algorithms = TlsUtilities.ParseSupportedSignatureAlgorithms(buf);
 
 			TlsProtocol.AssertEmpty(buf);
 
@@ -1303,7 +1385,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static CertificateStatusRequest ReadStatusRequestExtension(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
@@ -1318,17 +1402,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static IList<CertificateStatusRequestItemV2> ReadStatusRequestV2Extension(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
+
 			if (extensionData.Length < 3)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
 			int length = TlsUtilities.ReadUint16(buf);
-			if (length != (extensionData.Length - 2))
+			if (length != extensionData.Length - 2)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
-			var statusRequestV2 = new List<CertificateStatusRequestItemV2>();
+			List<CertificateStatusRequestItemV2> statusRequestV2 = new List<CertificateStatusRequestItemV2>();
 			while (buf.Position < buf.Length)
 			{
 				CertificateStatusRequestItemV2 entry = CertificateStatusRequestItemV2.Parse(buf);
@@ -1342,13 +1433,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static int[] ReadSupportedGroupsExtension(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
 			int length = TlsUtilities.ReadUint16(buf);
 			if (length < 2 || (length & 1) != 0)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			int[] namedGroups = TlsUtilities.ReadUint16Array(length / 2, buf);
 
@@ -1377,13 +1472,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static ProtocolVersion[] ReadSupportedVersionsExtensionClient(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
+
 			if (extensionData.Length < 3 || extensionData.Length > 255 || (extensionData.Length & 1) == 0)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			int length = TlsUtilities.ReadUint8(extensionData, 0);
-			if (length != (extensionData.Length - 1))
+			if (length != extensionData.Length - 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			int count = length / 2;
 			ProtocolVersion[] versions = new ProtocolVersion[count];
@@ -1399,9 +1501,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static ProtocolVersion ReadSupportedVersionsExtensionServer(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
+
 			if (extensionData.Length != 2)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			return TlsUtilities.ReadVersion(extensionData, 0);
 		}
@@ -1416,17 +1523,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static IList<TrustedAuthority> ReadTrustedCAKeysExtensionClient(byte[] extensionData)
 		{
 			if (extensionData == null)
+			{
 				throw new ArgumentNullException("extensionData");
+			}
+
 			if (extensionData.Length < 2)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			MemoryStream buf = new MemoryStream(extensionData, false);
 
 			int length = TlsUtilities.ReadUint16(buf);
-			if (length != (extensionData.Length - 2))
+			if (length != extensionData.Length - 2)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
-			var trusted_authorities_list = new List<TrustedAuthority>();
+			List<TrustedAuthority> trusted_authorities_list = new List<TrustedAuthority>();
 			while (buf.Position < buf.Length)
 			{
 				TrustedAuthority entry = TrustedAuthority.Parse(buf);
@@ -1443,7 +1557,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private static byte[] PatchOpaque16(MemoryStream buf)
+		static byte[] PatchOpaque16(MemoryStream buf)
 		{
 			int length = Convert.ToInt32(buf.Length) - 2;
 			TlsUtilities.CheckUint16(length);

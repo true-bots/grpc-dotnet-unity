@@ -9,13 +9,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class EncryptedPrivateKeyInfo
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier algId;
-		private readonly Asn1OctetString data;
+		readonly AlgorithmIdentifier algId;
+		readonly Asn1OctetString data;
 
-		private EncryptedPrivateKeyInfo(Asn1Sequence seq)
+		EncryptedPrivateKeyInfo(Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
 			algId = AlgorithmIdentifier.GetInstance(seq[0]);
 			data = Asn1OctetString.GetInstance(seq[1]);
@@ -26,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			byte[] encoding)
 		{
 			this.algId = algId;
-			this.data = new DerOctetString(encoding);
+			data = new DerOctetString(encoding);
 		}
 
 		public static EncryptedPrivateKeyInfo GetInstance(
@@ -38,9 +40,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			}
 
 			if (obj is Asn1Sequence seq)
+			{
 				return new EncryptedPrivateKeyInfo(seq);
+			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public AlgorithmIdentifier EncryptionAlgorithm

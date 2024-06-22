@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess;
@@ -20,13 +21,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 {
 	public class TimeStampToken
 	{
-		private readonly CmsSignedData tsToken;
+		readonly CmsSignedData tsToken;
 
-		private readonly SignerInformation tsaSignerInfo;
+		readonly SignerInformation tsaSignerInfo;
 
 //		private readonly DateTime			genTime;
-		private readonly TimeStampTokenInfo tstInfo;
-		private readonly CertID certID;
+		readonly TimeStampTokenInfo tstInfo;
+		readonly CertID certID;
 
 		public TimeStampToken(
 			Asn1.Cms.ContentInfo contentInfo)
@@ -37,14 +38,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		public TimeStampToken(
 			CmsSignedData signedData)
 		{
-			this.tsToken = signedData;
+			tsToken = signedData;
 
-			if (!this.tsToken.SignedContentType.Equals(PkcsObjectIdentifiers.IdCTTstInfo))
+			if (!tsToken.SignedContentType.Equals(PkcsObjectIdentifiers.IdCTTstInfo))
 			{
 				throw new TspValidationException("ContentInfo object not for a time stamp.");
 			}
 
-			var signers = tsToken.GetSignerInfos().GetSigners();
+			IList<SignerInformation> signers = tsToken.GetSignerInfos().GetSigners();
 
 			if (signers.Count != 1)
 			{
@@ -54,7 +55,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			}
 
 
-			var signerEnum = signers.GetEnumerator();
+			IEnumerator<SignerInformation> signerEnum = signers.GetEnumerator();
 
 			signerEnum.MoveNext();
 			tsaSignerInfo = signerEnum.Current;
@@ -66,7 +67,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 
 				content.Write(bOut);
 
-				this.tstInfo = new TimeStampTokenInfo(
+				tstInfo = new TimeStampTokenInfo(
 					TstInfo.GetInstance(
 						Asn1Object.FromByteArray(bOut.ToArray())));
 
@@ -89,12 +90,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 					if (attr.AttrValues[0] is SigningCertificateV2)
 					{
 						SigningCertificateV2 signCert = SigningCertificateV2.GetInstance(attr.AttrValues[0]);
-						this.certID = new CertID(EssCertIDv2.GetInstance(signCert.GetCerts()[0]));
+						certID = new CertID(EssCertIDv2.GetInstance(signCert.GetCerts()[0]));
 					}
 					else
 					{
 						SigningCertificate signCert = SigningCertificate.GetInstance(attr.AttrValues[0]);
-						this.certID = new CertID(EssCertID.GetInstance(signCert.GetCerts()[0]));
+						certID = new CertID(EssCertID.GetInstance(signCert.GetCerts()[0]));
 					}
 				}
 				else
@@ -102,11 +103,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 					attr = tsaSignerInfo.SignedAttributes[PkcsObjectIdentifiers.IdAASigningCertificateV2];
 
 					if (attr == null)
+					{
 						throw new TspValidationException("no signing certificate attribute found, time stamp invalid.");
+					}
 
 					SigningCertificateV2 signCertV2 = SigningCertificateV2.GetInstance(attr.AttrValues[0]);
 
-					this.certID = new CertID(EssCertIDv2.GetInstance(signCertV2.GetCerts()[0]));
+					certID = new CertID(EssCertIDv2.GetInstance(signCertV2.GetCerts()[0]));
 				}
 			}
 			catch (CmsException e)
@@ -135,11 +138,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 			get { return tsaSignerInfo.UnsignedAttributes; }
 		}
 
-		public IStore<X509V2AttributeCertificate> GetAttributeCertificates() => tsToken.GetAttributeCertificates();
+		public IStore<X509V2AttributeCertificate> GetAttributeCertificates()
+		{
+			return tsToken.GetAttributeCertificates();
+		}
 
-		public IStore<X509Certificate> GetCertificates() => tsToken.GetCertificates();
+		public IStore<X509Certificate> GetCertificates()
+		{
+			return tsToken.GetCertificates();
+		}
 
-		public IStore<X509Crl> GetCrls() => tsToken.GetCrls();
+		public IStore<X509Crl> GetCrls()
+		{
+			return tsToken.GetCrls();
+		}
 
 		/**
 		 * Validate the time stamp token.
@@ -164,12 +176,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 					certID.GetHashAlgorithmName(), cert.GetEncoded());
 
 				if (!Arrays.ConstantTimeAreEqual(certID.GetCertHash(), hash))
+				{
 					throw new TspValidationException("certificate hash does not match certID hash.");
+				}
 
 				if (certID.IssuerSerial != null)
 				{
 					if (!certID.IssuerSerial.Serial.HasValue(cert.SerialNumber))
+					{
 						throw new TspValidationException("certificate serial number does not match certID for signature.");
+					}
 
 					GeneralName[] names = certID.IssuerSerial.Issuer.GetNames();
 					X509Name principal = PrincipalUtilities.GetIssuerX509Principal(cert);
@@ -250,37 +266,41 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		}
 
 		// perhaps this should be done using an interface on the ASN.1 classes...
-		private class CertID
+		class CertID
 		{
-			private EssCertID certID;
-			private EssCertIDv2 certIDv2;
+			EssCertID certID;
+			EssCertIDv2 certIDv2;
 
 			internal CertID(EssCertID certID)
 			{
 				this.certID = certID;
-				this.certIDv2 = null;
+				certIDv2 = null;
 			}
 
 			internal CertID(EssCertIDv2 certID)
 			{
-				this.certIDv2 = certID;
+				certIDv2 = certID;
 				this.certID = null;
 			}
 
 			public string GetHashAlgorithmName()
 			{
 				if (certID != null)
+				{
 					return "SHA-1";
+				}
 
 				if (NistObjectIdentifiers.IdSha256.Equals(certIDv2.HashAlgorithm.Algorithm))
+				{
 					return "SHA-256";
+				}
 
 				return certIDv2.HashAlgorithm.Algorithm.Id;
 			}
 
 			public AlgorithmIdentifier GetHashAlgorithm()
 			{
-				return (certID != null)
+				return certID != null
 					? new AlgorithmIdentifier(OiwObjectIdentifiers.IdSha1)
 					: certIDv2.HashAlgorithm;
 			}

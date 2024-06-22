@@ -43,18 +43,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public virtual void WriteObject(Asn1Encodable asn1Encodable)
 		{
 			if (null == asn1Encodable)
+			{
 				throw new ArgumentNullException("asn1Encodable");
+			}
 
-			asn1Encodable.ToAsn1Object().GetEncoding(this.Encoding).Encode(this);
+			asn1Encodable.ToAsn1Object().GetEncoding(Encoding).Encode(this);
 			FlushInternal();
 		}
 
 		public virtual void WriteObject(Asn1Object asn1Object)
 		{
 			if (null == asn1Object)
+			{
 				throw new ArgumentNullException("asn1Object");
+			}
 
-			asn1Object.GetEncoding(this.Encoding).Encode(this);
+			asn1Object.GetEncoding(Encoding).Encode(this);
 			FlushInternal();
 		}
 
@@ -127,7 +131,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			while (tagNo > 127)
 			{
 				tagNo >>= 7;
-				stack[--pos] = (byte)(tagNo & 0x7F | 0x80);
+				stack[--pos] = (byte)((tagNo & 0x7F) | 0x80);
 			}
 
 			stack[--pos] = (byte)(tagClass | 0x1F);
@@ -165,7 +169,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal static int GetLengthOfDL(int dl)
 		{
 			if (dl < 128)
+			{
 				return 1;
+			}
 
 			int length = 2;
 			while ((dl >>= 8) > 0)
@@ -179,7 +185,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal static int GetLengthOfIdentifier(int tagNo)
 		{
 			if (tagNo < 31)
+			{
 				return 1;
+			}
 
 			int length = 2;
 			while ((tagNo >>= 7) > 0)

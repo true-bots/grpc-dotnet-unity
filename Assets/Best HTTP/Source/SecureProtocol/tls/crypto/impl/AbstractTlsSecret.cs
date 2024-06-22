@@ -27,7 +27,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 		protected virtual void CheckAlive()
 		{
 			if (m_data == null)
+			{
 				throw new InvalidOperationException("Secret has already been extracted or destroyed");
+			}
 		}
 
 		protected abstract AbstractTlsCrypto Crypto { get; }

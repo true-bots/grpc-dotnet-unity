@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	public class DerExternalParser
 		: Asn1Encodable
 	{
-		private readonly Asn1StreamParser m_parser;
+		readonly Asn1StreamParser m_parser;
 
 		internal DerExternalParser(Asn1StreamParser parser)
 		{

@@ -11,13 +11,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 	public class CfbBlockCipher
 		: IBlockCipherMode
 	{
-		private byte[] IV;
-		private byte[] cfbV;
-		private byte[] cfbOutV;
-		private bool encrypting;
+		byte[] IV;
+		byte[] cfbV;
+		byte[] cfbOutV;
+		bool encrypting;
 
-		private readonly int blockSize;
-		private readonly IBlockCipher cipher;
+		readonly int blockSize;
+		readonly IBlockCipher cipher;
 
 		/**
         * Basic constructor.
@@ -31,13 +31,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			int bitBlockSize)
 		{
 			if (bitBlockSize < 8 || (bitBlockSize & 7) != 0)
+			{
 				throw new ArgumentException("CFB" + bitBlockSize + " not supported", "bitBlockSize");
+			}
 
 			this.cipher = cipher;
-			this.blockSize = bitBlockSize / 8;
-			this.IV = new byte[cipher.GetBlockSize()];
-			this.cfbV = new byte[cipher.GetBlockSize()];
-			this.cfbOutV = new byte[cipher.GetBlockSize()];
+			blockSize = bitBlockSize / 8;
+			IV = new byte[cipher.GetBlockSize()];
+			cfbV = new byte[cipher.GetBlockSize()];
+			cfbOutV = new byte[cipher.GetBlockSize()];
 		}
 
 		/**
@@ -45,7 +47,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		*
 		* @return the underlying block cipher that we are wrapping.
 		*/
-		public IBlockCipher UnderlyingCipher => cipher;
+		public IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		/**
 		* Initialise the cipher and, possibly, the initialisation vector (IV).
@@ -62,7 +67,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			bool forEncryption,
 			ICipherParameters parameters)
 		{
-			this.encrypting = forEncryption;
+			encrypting = forEncryption;
 			if (parameters is ParametersWithIV)
 			{
 				ParametersWithIV ivParam = (ParametersWithIV)parameters;
@@ -91,7 +96,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		*/
 		public string AlgorithmName
 		{
-			get { return cipher.AlgorithmName + "/CFB" + (blockSize * 8); }
+			get { return cipher.AlgorithmName + "/CFB" + blockSize * 8; }
 		}
 
 		public bool IsPartialBlockOkay
@@ -174,7 +179,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
             return blockSize;
         }
 #else
-		private int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			Check.DataLength(input, inOff, blockSize, "input buffer too short");
 			Check.OutputLength(outBytes, outOff, blockSize, "output buffer too short");
@@ -196,7 +201,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			return blockSize;
 		}
 
-		private int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			Check.DataLength(input, inOff, blockSize, "input buffer too short");
 			Check.OutputLength(outBytes, outOff, blockSize, "output buffer too short");

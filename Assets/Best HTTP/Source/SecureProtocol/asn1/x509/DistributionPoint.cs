@@ -43,10 +43,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new DistributionPoint((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Invalid DistributionPoint: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid DistributionPoint: " + Platform.GetTypeName(obj));
 		}
 
-		private DistributionPoint(
+		DistributionPoint(
 			Asn1Sequence seq)
 		{
 			for (int i = 0; i != seq.Count; i++)
@@ -73,9 +73,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			ReasonFlags reasons,
 			GeneralNames crlIssuer)
 		{
-			this.distributionPoint = distributionPointName;
+			distributionPoint = distributionPointName;
 			this.reasons = reasons;
-			this.cRLIssuer = crlIssuer;
+			cRLIssuer = crlIssuer;
 		}
 
 		public DistributionPointName DistributionPointName
@@ -128,7 +128,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return buf.ToString();
 		}
 
-		private void AppendObject(StringBuilder buf, string name, string val)
+		void AppendObject(StringBuilder buf, string name, string val)
 		{
 			string indent = "    ";
 			buf.Append(indent);

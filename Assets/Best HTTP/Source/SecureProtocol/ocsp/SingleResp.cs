@@ -56,7 +56,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		*
 		* @return nextUpdate, or null if not present.
 		*/
-		public DateTime? NextUpdate => resp.NextUpdate?.ToDateTime();
+		public DateTime? NextUpdate
+		{
+			get { return resp.NextUpdate?.ToDateTime(); }
+		}
 
 		public X509Extensions SingleExtensions
 		{

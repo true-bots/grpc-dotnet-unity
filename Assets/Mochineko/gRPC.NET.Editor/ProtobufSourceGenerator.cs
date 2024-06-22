@@ -1,6 +1,8 @@
 #nullable enable
+using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Mochineko.gRPC.NET.Editor
 {
@@ -12,12 +14,12 @@ namespace Mochineko.gRPC.NET.Editor
 			GetWindow<ProtobufSourceGenerator>("Protobuf Source Generator");
 		}
 
-		private string protocPath = string.Empty;
-		private string pluginPath = string.Empty;
-		private string outputRelativePath = "Assets/Generated";
-		private string protoFileRelativePath = "Assets/Proto";
+		string protocPath = string.Empty;
+		string pluginPath = string.Empty;
+		string outputRelativePath = "Assets/Generated";
+		string protoFileRelativePath = "Assets/Proto";
 
-		private void OnGUI()
+		void OnGUI()
 		{
 			EditorGUILayout.LabelField("Generates C# source code from protocol buffer (.proto) file.");
 
@@ -25,7 +27,7 @@ namespace Mochineko.gRPC.NET.Editor
 
 			if (GUILayout.Button("Select Output Relative Path ..."))
 			{
-				var fullPath =
+				string? fullPath =
 					EditorUtility.OpenFolderPanel("Select Output Directory", "Assets", string.Empty);
 				outputRelativePath = fullPath.Replace(Application.dataPath, "Assets");
 			}
@@ -36,7 +38,7 @@ namespace Mochineko.gRPC.NET.Editor
 
 			if (GUILayout.Button("Select .proto File ..."))
 			{
-				var fullPath = EditorUtility.OpenFilePanel("Select .proto File", "Assets/", "proto");
+				string? fullPath = EditorUtility.OpenFilePanel("Select .proto File", "Assets/", "proto");
 				protoFileRelativePath = fullPath.Replace(Application.dataPath, "Assets");
 			}
 
@@ -61,10 +63,10 @@ namespace Mochineko.gRPC.NET.Editor
 			}
 		}
 
-		private void Generate()
+		void Generate()
 		{
-			using var process = new System.Diagnostics.Process();
-			var startInfo = new System.Diagnostics.ProcessStartInfo
+			using Process? process = new System.Diagnostics.Process();
+			ProcessStartInfo? startInfo = new System.Diagnostics.ProcessStartInfo
 			{
 				FileName = GRPCSettings.ProtocPath,
 				Arguments = $"--csharp_out {outputRelativePath} " +
@@ -73,7 +75,7 @@ namespace Mochineko.gRPC.NET.Editor
 				            $"{protoFileRelativePath}",
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
-				RedirectStandardError = true,
+				RedirectStandardError = true
 			};
 
 			process.StartInfo = startInfo;

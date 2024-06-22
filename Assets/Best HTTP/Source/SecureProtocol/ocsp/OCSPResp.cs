@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 {
 	public class OcspResp
 	{
-		private OcspResponse resp;
+		OcspResponse resp;
 
 		public OcspResp(
 			OcspResponse resp)
@@ -29,12 +29,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 		{
 		}
 
-		private OcspResp(
+		OcspResp(
 			Asn1InputStream aIn)
 		{
 			try
 			{
-				this.resp = OcspResponse.GetInstance(aIn.ReadObject());
+				resp = OcspResponse.GetInstance(aIn.ReadObject());
 			}
 			catch (Exception e)
 			{
@@ -44,15 +44,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 
 		public int Status
 		{
-			get { return this.resp.ResponseStatus.IntValueExact; }
+			get { return resp.ResponseStatus.IntValueExact; }
 		}
 
 		public object GetResponseObject()
 		{
-			ResponseBytes rb = this.resp.ResponseBytes;
+			ResponseBytes rb = resp.ResponseBytes;
 
 			if (rb == null)
+			{
 				return null;
+			}
 
 			if (rb.ResponseType.Equals(OcspObjectIdentifiers.PkixOcspBasic))
 			{
@@ -83,12 +85,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			OcspResp other = obj as OcspResp;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return resp.Equals(other.resp);
 		}

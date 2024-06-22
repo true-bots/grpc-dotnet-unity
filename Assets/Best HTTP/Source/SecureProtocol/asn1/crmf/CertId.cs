@@ -9,10 +9,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class CertId
 		: Asn1Encodable
 	{
-		private readonly GeneralName issuer;
-		private readonly DerInteger serialNumber;
+		readonly GeneralName issuer;
+		readonly DerInteger serialNumber;
 
-		private CertId(Asn1Sequence seq)
+		CertId(Asn1Sequence seq)
 		{
 			issuer = GeneralName.GetInstance(seq[0]);
 			serialNumber = DerInteger.GetInstance(seq[1]);
@@ -21,12 +21,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static CertId GetInstance(object obj)
 		{
 			if (obj is CertId)
+			{
 				return (CertId)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CertId((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static CertId GetInstance(Asn1TaggedObject obj, bool isExplicit)

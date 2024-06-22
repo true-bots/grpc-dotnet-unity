@@ -7,11 +7,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class RC2Parameters
 		: KeyParameter
 	{
-		private readonly int bits;
+		readonly int bits;
 
 		public RC2Parameters(
 			byte[] key)
-			: this(key, (key.Length > 128) ? 1024 : (key.Length * 8))
+			: this(key, key.Length > 128 ? 1024 : key.Length * 8)
 		{
 		}
 
@@ -19,7 +19,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			byte[] key,
 			int keyOff,
 			int keyLen)
-			: this(key, keyOff, keyLen, (keyLen > 128) ? 1024 : (keyLen * 8))
+			: this(key, keyOff, keyLen, keyLen > 128 ? 1024 : keyLen * 8)
 		{
 		}
 

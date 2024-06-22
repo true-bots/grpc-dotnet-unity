@@ -8,14 +8,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 	public sealed class MacSink
 		: BaseOutputStream
 	{
-		private readonly IMac m_mac;
+		readonly IMac m_mac;
 
 		public MacSink(IMac mac)
 		{
 			m_mac = mac;
 		}
 
-		public IMac Mac => m_mac;
+		public IMac Mac
+		{
+			get { return m_mac; }
+		}
 
 		public override void Write(byte[] buffer, int offset, int count)
 		{

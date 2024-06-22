@@ -15,12 +15,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		{
 			int valueLength = BigIntegers.GetUnsignedByteLength(n);
 			if (encoding.Length != valueLength * 2)
+			{
 				throw new ArgumentException("Encoding has incorrect length", "encoding");
+			}
 
 			return new BigInteger[]
 			{
 				DecodeValue(n, encoding, 0, valueLength),
-				DecodeValue(n, encoding, valueLength, valueLength),
+				DecodeValue(n, encoding, valueLength, valueLength)
 			};
 		}
 
@@ -36,7 +38,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		protected virtual BigInteger CheckValue(BigInteger n, BigInteger x)
 		{
 			if (x.SignValue < 0 || x.CompareTo(n) >= 0)
+			{
 				throw new ArgumentException("Value out of range", "x");
+			}
 
 			return x;
 		}

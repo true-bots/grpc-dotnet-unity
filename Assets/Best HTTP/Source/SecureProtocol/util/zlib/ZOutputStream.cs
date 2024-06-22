@@ -45,14 +45,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 	public class ZOutputStream
 		: BaseOutputStream
 	{
-		private static ZStream GetDefaultZStream(bool nowrap)
+		static ZStream GetDefaultZStream(bool nowrap)
 		{
 			ZStream z = new ZStream();
 			z.inflateInit(nowrap);
 			return z;
 		}
 
-		private const int BufferSize = 4096;
+		const int BufferSize = 4096;
 
 		protected ZStream z;
 
@@ -92,7 +92,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			}
 
 			this.output = output;
-			this.compress = (z.istate == null);
+			compress = z.istate == null;
 			this.z = z;
 		}
 
@@ -107,9 +107,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			Debug.Assert(output.CanWrite);
 
 			this.output = output;
-			this.compress = true;
-			this.z = new ZStream();
-			this.z.deflateInit(level, nowrap);
+			compress = true;
+			z = new ZStream();
+			z.deflateInit(level, nowrap);
 		}
 
 		protected void Detach(bool disposing)
@@ -131,7 +131,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					}
 					finally
 					{
-						this.closed = true;
+						closed = true;
 						End();
 						output = null;
 					}
@@ -160,7 +160,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 					}
 					finally
 					{
-						this.closed = true;
+						closed = true;
 						End();
 						output.Dispose();
 						output = null;
@@ -174,11 +174,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		public virtual void End()
 		{
 			if (z == null)
+			{
 				return;
+			}
+
 			if (compress)
+			{
 				z.deflateEnd();
+			}
 			else
+			{
 				z.inflateEnd();
+			}
+
 			z.free();
 			z = null;
 		}
@@ -198,7 +206,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				if (err != JZlib.Z_STREAM_END && err != JZlib.Z_OK)
 					// TODO
 					//throw new ZStreamException((compress?"de":"in")+"flating: "+z.msg);
+				{
 					throw new IOException((compress ? "de" : "in") + "flating: " + z.msg);
+				}
 
 				int count = buf.Length - z.avail_out;
 				if (count > 0)
@@ -218,7 +228,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 		public virtual int FlushMode
 		{
 			get { return flushLevel; }
-			set { this.flushLevel = value; }
+			set { flushLevel = value; }
 		}
 
 		public virtual long TotalIn
@@ -236,7 +246,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 			Streams.ValidateBufferArguments(buffer, offset, count);
 
 			if (count == 0)
+			{
 				return;
+			}
 
 			z.next_in = buffer;
 			z.next_in_index = offset;
@@ -255,7 +267,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Zlib
 				if (err != JZlib.Z_OK)
 					// TODO
 					//throw new ZStreamException((compress ? "de" : "in") + "flating: " + z.msg);
+				{
 					throw new IOException((compress ? "de" : "in") + "flating: " + z.msg);
+				}
 
 				output.Write(buf, 0, buf.Length - z.avail_out);
 			} while (z.avail_in > 0 || z.avail_out == 0);

@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerExternal), Asn1Tags.External)
+			Meta() : base(typeof(DerExternal), Asn1Tags.External)
 			{
 			}
 
@@ -29,16 +29,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerExternal GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerExternal derExternal)
+			{
 				return derExternal;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerExternal converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -52,7 +58,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static DerExternal GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
@@ -60,11 +66,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (DerExternal)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly DerObjectIdentifier directReference;
-		private readonly DerInteger indirectReference;
-		private readonly Asn1ObjectDescriptor dataValueDescriptor;
-		private readonly int encoding;
-		private readonly Asn1Object externalContent;
+		readonly DerObjectIdentifier directReference;
+		readonly DerInteger indirectReference;
+		readonly Asn1ObjectDescriptor dataValueDescriptor;
+		readonly int encoding;
+		readonly Asn1Object externalContent;
 
 		public DerExternal(Asn1EncodableVector vector)
 			: this(new DerSequence(vector))
@@ -95,15 +101,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 
 			if (sequence.Count != offset + 1)
+			{
 				throw new ArgumentException("input sequence too large", "sequence");
+			}
 
 			if (!(asn1 is Asn1TaggedObject))
+			{
 				throw new ArgumentException(
 					"No tagged object found in sequence. Structure doesn't seem to be of type External", "sequence");
+			}
 
 			Asn1TaggedObject obj = (Asn1TaggedObject)asn1;
-			this.encoding = CheckEncoding(obj.TagNo);
-			this.externalContent = GetExternalContent(obj);
+			encoding = CheckEncoding(obj.TagNo);
+			externalContent = GetExternalContent(obj);
 		}
 
 		/**
@@ -120,8 +130,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			this.directReference = directReference;
 			this.indirectReference = indirectReference;
 			this.dataValueDescriptor = dataValueDescriptor;
-			this.encoding = CheckEncoding(externalData.TagNo);
-			this.externalContent = GetExternalContent(externalData);
+			encoding = CheckEncoding(externalData.TagNo);
+			externalContent = GetExternalContent(externalData);
 		}
 
 		/**
@@ -140,7 +150,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			this.indirectReference = indirectReference;
 			this.dataValueDescriptor = dataValueDescriptor;
 			this.encoding = CheckEncoding(encoding);
-			this.externalContent = CheckExternalContent(encoding, externalData);
+			externalContent = CheckExternalContent(encoding, externalData);
 		}
 
 		internal Asn1Sequence BuildSequence()
@@ -163,22 +173,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		protected override int Asn1GetHashCode()
 		{
-			return Objects.GetHashCode(this.directReference)
-			       ^ Objects.GetHashCode(this.indirectReference)
-			       ^ Objects.GetHashCode(this.dataValueDescriptor)
-			       ^ this.encoding
-			       ^ this.externalContent.GetHashCode();
+			return Objects.GetHashCode(directReference)
+			       ^ Objects.GetHashCode(indirectReference)
+			       ^ Objects.GetHashCode(dataValueDescriptor)
+			       ^ encoding
+			       ^ externalContent.GetHashCode();
 		}
 
 		protected override bool Asn1Equals(Asn1Object asn1Object)
 		{
 			DerExternal that = asn1Object as DerExternal;
 			return null != that
-			       && Equals(this.directReference, that.directReference)
-			       && Equals(this.indirectReference, that.indirectReference)
-			       && Equals(this.dataValueDescriptor, that.dataValueDescriptor)
-			       && this.encoding == that.encoding
-			       && this.externalContent.Equals(that.externalContent);
+			       && Equals(directReference, that.directReference)
+			       && Equals(indirectReference, that.indirectReference)
+			       && Equals(dataValueDescriptor, that.dataValueDescriptor)
+			       && encoding == that.encoding
+			       && externalContent.Equals(that.externalContent);
 		}
 
 		public Asn1ObjectDescriptor DataValueDescriptor
@@ -214,25 +224,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			get { return indirectReference; }
 		}
 
-		private static Asn1ObjectDescriptor CheckDataValueDescriptor(Asn1Object dataValueDescriptor)
+		static Asn1ObjectDescriptor CheckDataValueDescriptor(Asn1Object dataValueDescriptor)
 		{
 			if (dataValueDescriptor is Asn1ObjectDescriptor)
+			{
 				return (Asn1ObjectDescriptor)dataValueDescriptor;
+			}
+
 			if (dataValueDescriptor is DerGraphicString)
+			{
 				return new Asn1ObjectDescriptor((DerGraphicString)dataValueDescriptor);
+			}
 
 			throw new ArgumentException("incompatible type for data-value-descriptor", "dataValueDescriptor");
 		}
 
-		private static int CheckEncoding(int encoding)
+		static int CheckEncoding(int encoding)
 		{
 			if (encoding < 0 || encoding > 2)
+			{
 				throw new InvalidOperationException("invalid encoding value: " + encoding);
+			}
 
 			return encoding;
 		}
 
-		private static Asn1Object CheckExternalContent(int tagNo, Asn1Object externalContent)
+		static Asn1Object CheckExternalContent(int tagNo, Asn1Object externalContent)
 		{
 			switch (tagNo)
 			{
@@ -245,11 +262,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private static Asn1Object GetExternalContent(Asn1TaggedObject encoding)
+		static Asn1Object GetExternalContent(Asn1TaggedObject encoding)
 		{
 			int tagClass = encoding.TagClass, tagNo = encoding.TagNo;
 			if (Asn1Tags.ContextSpecific != tagClass)
+			{
 				throw new ArgumentException("invalid tag: " + Asn1Utilities.GetTagText(tagClass, tagNo), "encoding");
+			}
 
 			switch (tagNo)
 			{
@@ -264,10 +283,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private static Asn1Object GetObjFromSequence(Asn1Sequence sequence, int index)
+		static Asn1Object GetObjFromSequence(Asn1Sequence sequence, int index)
 		{
 			if (sequence.Count <= index)
+			{
 				throw new ArgumentException("too few objects in input sequence", "sequence");
+			}
 
 			return sequence[index].ToAsn1Object();
 		}

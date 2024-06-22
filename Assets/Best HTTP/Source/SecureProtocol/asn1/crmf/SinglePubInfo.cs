@@ -9,10 +9,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class SinglePubInfo
 		: Asn1Encodable
 	{
-		private readonly DerInteger pubMethod;
-		private readonly GeneralName pubLocation;
+		readonly DerInteger pubMethod;
+		readonly GeneralName pubLocation;
 
-		private SinglePubInfo(Asn1Sequence seq)
+		SinglePubInfo(Asn1Sequence seq)
 		{
 			pubMethod = DerInteger.GetInstance(seq[0]);
 
@@ -25,12 +25,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static SinglePubInfo GetInstance(object obj)
 		{
 			if (obj is SinglePubInfo)
+			{
 				return (SinglePubInfo)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new SinglePubInfo((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public virtual GeneralName PubLocation

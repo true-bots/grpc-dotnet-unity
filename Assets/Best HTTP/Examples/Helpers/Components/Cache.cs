@@ -9,35 +9,37 @@ namespace BestHTTP.Examples.Helpers.Components
 	public class Cache : MonoBehaviour
 	{
 #pragma warning disable 0649, 0169
-		[SerializeField] private Text _count;
+		[SerializeField] Text _count;
 
-		[SerializeField] private Text _size;
+		[SerializeField] Text _size;
 
-		[SerializeField] private Button _clear;
+		[SerializeField] Button _clear;
 #pragma warning restore
 
-		private void Start()
+		void Start()
 		{
 			PluginEventHelper.OnEvent += OnPluginEvent;
 			UpdateLabels();
 		}
 
-		private void OnDestroy()
+		void OnDestroy()
 		{
 			PluginEventHelper.OnEvent -= OnPluginEvent;
 		}
 
-		private void OnPluginEvent(PluginEventInfo @event)
+		void OnPluginEvent(PluginEventInfo @event)
 		{
 			if (@event.Event == PluginEvents.SaveCacheLibrary)
+			{
 				UpdateLabels();
+			}
 		}
 
-		private void UpdateLabels()
+		void UpdateLabels()
 		{
 #if !BESTHTTP_DISABLE_CACHING
-			this._count.text = BestHTTP.Caching.HTTPCacheService.GetCacheEntityCount().ToString("N0");
-			this._size.text = BestHTTP.Caching.HTTPCacheService.GetCacheSize().ToString("N0");
+			_count.text = Caching.HTTPCacheService.GetCacheEntityCount().ToString("N0");
+			_size.text = Caching.HTTPCacheService.GetCacheSize().ToString("N0");
 #else
             this._count.text = "0";
             this._size.text = "0";
@@ -47,7 +49,7 @@ namespace BestHTTP.Examples.Helpers.Components
 		public void OnClearButtonClicked()
 		{
 #if !BESTHTTP_DISABLE_CACHING
-			BestHTTP.Caching.HTTPCacheService.BeginClear();
+			Caching.HTTPCacheService.BeginClear();
 #endif
 		}
 	}

@@ -17,7 +17,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class TargetInformation
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence targets;
+		readonly Asn1Sequence targets;
 
 		/**
 		 * Creates an instance of a TargetInformation from the given object.
@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new TargetInformation((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -51,7 +51,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		 * @throws ArgumentException if the sequence does not contain
 		 *             correctly encoded Targets elements.
 		 */
-		private TargetInformation(
+		TargetInformation(
 			Asn1Sequence targets)
 		{
 			this.targets = targets;

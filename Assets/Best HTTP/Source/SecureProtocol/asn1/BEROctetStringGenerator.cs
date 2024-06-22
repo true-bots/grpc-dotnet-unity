@@ -43,13 +43,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return new BufferedBerOctetStream(this, buf);
 		}
 
-		private class BufferedBerOctetStream
+		class BufferedBerOctetStream
 			: BaseOutputStream
 		{
-			private byte[] _buf;
-			private int _off;
-			private readonly BerOctetStringGenerator _gen;
-			private readonly Asn1OutputStream _derOut;
+			byte[] _buf;
+			int _off;
+			readonly BerOctetStringGenerator _gen;
+			readonly Asn1OutputStream _derOut;
 
 			internal BufferedBerOctetStream(
 				BerOctetStringGenerator gen,
@@ -94,7 +94,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 
 				Array.Copy(buffer, offset + pos, _buf, 0, remaining);
-				this._off = remaining;
+				_off = remaining;
 #endif
 			}
 

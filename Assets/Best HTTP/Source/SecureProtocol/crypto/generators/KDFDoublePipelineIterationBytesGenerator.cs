@@ -11,68 +11,70 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		: IMacDerivationFunction
 	{
 		// fields set by the constructor       
-		private readonly IMac prf;
-		private readonly int h;
+		readonly IMac prf;
+		readonly int h;
 
 		// fields set by init
-		private byte[] fixedInputData;
+		byte[] fixedInputData;
 
-		private int maxSizeExcl;
+		int maxSizeExcl;
 
 		// ios is i defined as an octet string (the binary representation)
-		private byte[] ios;
-		private bool useCounter;
+		byte[] ios;
+		bool useCounter;
 
 		// operational
-		private int generatedBytes;
+		int generatedBytes;
 
 		// k is used as buffer for all K(i) values
-		private byte[] a;
-		private byte[] k;
+		byte[] a;
+		byte[] k;
 
 		public KdfDoublePipelineIterationBytesGenerator(IMac prf)
 		{
 			this.prf = prf;
-			this.h = prf.GetMacSize();
-			this.a = new byte[h];
-			this.k = new byte[h];
+			h = prf.GetMacSize();
+			a = new byte[h];
+			k = new byte[h];
 		}
 
 		public void Init(IDerivationParameters parameters)
 		{
 			if (!(parameters is KdfDoublePipelineIterationParameters dpiParams))
+			{
 				throw new ArgumentException("Wrong type of arguments given");
+			}
 
 			// --- init mac based PRF ---
 
-			this.prf.Init(new KeyParameter(dpiParams.Ki));
+			prf.Init(new KeyParameter(dpiParams.Ki));
 
 			// --- set arguments ---
 
-			this.fixedInputData = dpiParams.FixedInputData;
+			fixedInputData = dpiParams.FixedInputData;
 
 			int r = dpiParams.R;
-			this.ios = new byte[r / 8];
+			ios = new byte[r / 8];
 
 			if (dpiParams.UseCounter)
 			{
 				// this is more conservative than the spec
 				BigInteger maxSize = BigInteger.One.ShiftLeft(r).Multiply(BigInteger.ValueOf(h));
-				this.maxSizeExcl = maxSize.BitLength > 31 ? int.MaxValue : maxSize.IntValueExact;
+				maxSizeExcl = maxSize.BitLength > 31 ? int.MaxValue : maxSize.IntValueExact;
 			}
 			else
 			{
-				this.maxSizeExcl = int.MaxValue;
+				maxSizeExcl = int.MaxValue;
 			}
 
-			this.useCounter = dpiParams.UseCounter;
+			useCounter = dpiParams.UseCounter;
 
 			// --- set operational state ---
 
 			generatedBytes = 0;
 		}
 
-		private void GenerateNext()
+		void GenerateNext()
 		{
 			if (generatedBytes == 0)
 			{
@@ -134,7 +136,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
             return GenerateBytes(output.AsSpan(outOff, length));
 #else
 			if (generatedBytes >= maxSizeExcl - length)
+			{
 				throw new DataLengthException("Current KDFCTR may only be used for " + maxSizeExcl + " bytes");
+			}
 
 			int toGenerate = length;
 			int posInK = generatedBytes % h;
@@ -193,7 +197,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
         }
 #endif
 
-		public IMac Mac => prf;
+		public IMac Mac
+		{
+			get { return prf; }
+		}
 	}
 }
 #pragma warning restore

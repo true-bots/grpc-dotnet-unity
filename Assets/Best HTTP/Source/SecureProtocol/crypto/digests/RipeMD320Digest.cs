@@ -23,12 +23,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			return DigestLength;
 		}
 
-		private const int DigestLength = 40;
+		const int DigestLength = 40;
 
-		private int H0, H1, H2, H3, H4, H5, H6, H7, H8, H9; // IV's
+		int H0, H1, H2, H3, H4, H5, H6, H7, H8, H9; // IV's
 
-		private int[] X = new int[16];
-		private int xOff;
+		int[] X = new int[16];
+		int xOff;
 
 		/// <summary> Standard constructor</summary>
 		public RipeMD320Digest()
@@ -45,7 +45,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			CopyIn(t);
 		}
 
-		private void CopyIn(RipeMD320Digest t)
+		void CopyIn(RipeMD320Digest t)
 		{
 			base.CopyIn(t);
 
@@ -167,11 +167,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rotate int x left n bits.
 		 */
-		private int RL(
+		int RL(
 			int x,
 			int n)
 		{
-			return (x << n) | (int)(((uint)x) >> (32 - n));
+			return (x << n) | (int)((uint)x >> (32 - n));
 		}
 
 		/*
@@ -181,7 +181,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rounds 0-15
 		 */
-		private int F1(int x, int y, int z)
+		int F1(int x, int y, int z)
 		{
 			return x ^ y ^ z;
 		}
@@ -189,7 +189,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rounds 16-31
 		 */
-		private int F2(int x, int y, int z)
+		int F2(int x, int y, int z)
 		{
 			return (x & y) | (~ x & z);
 		}
@@ -197,7 +197,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rounds 32-47
 		 */
-		private int F3(int x, int y, int z)
+		int F3(int x, int y, int z)
 		{
 			return (x | ~ y) ^ z;
 		}
@@ -205,7 +205,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rounds 48-63
 		 */
-		private int F4(int x, int y, int z)
+		int F4(int x, int y, int z)
 		{
 			return (x & z) | (y & ~ z);
 		}
@@ -213,7 +213,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		/*
 		 * rounds 64-79
 		 */
-		private int F5(int x, int y, int z)
+		int F5(int x, int y, int z)
 		{
 			return x ^ (y | ~z);
 		}

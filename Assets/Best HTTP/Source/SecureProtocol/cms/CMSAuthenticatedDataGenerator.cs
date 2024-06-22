@@ -45,7 +45,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 * generate an enveloped object that contains an CMS Enveloped Data
 		 * object using the given provider and the passed in key generator.
 		 */
-		private CmsAuthenticatedData Generate(
+		CmsAuthenticatedData Generate(
 			CmsProcessable content,
 			string macOid,
 			CipherKeyGenerator keyGen)
@@ -63,7 +63,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 				Asn1Encodable asn1Params = GenerateAsn1Parameters(macOid, encKeyBytes);
 
-				macAlgId = GetAlgorithmIdentifier(macOid, encKey, asn1Params, out var cipherParameters);
+				macAlgId = GetAlgorithmIdentifier(macOid, encKey, asn1Params, out ICipherParameters cipherParameters);
 
 				IMac mac = MacUtilities.GetMac(macOid);
 				// TODO Confirm no ParametersWithRandom needed
@@ -71,8 +71,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 //	            mac.Init(cipherParameters);
 				mac.Init(encKey);
 
-				var bOut = new MemoryStream();
-				using (var mOut = new TeeOutputStream(bOut, new MacSink(mac)))
+				MemoryStream bOut = new MemoryStream();
+				using (TeeOutputStream mOut = new TeeOutputStream(bOut, new MacSink(mac)))
 				{
 					content.Write(mOut);
 				}
@@ -95,7 +95,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				throw new CmsException("exception decoding algorithm parameters.", e);
 			}
 
-			var recipientInfos = new Asn1EncodableVector();
+			Asn1EncodableVector recipientInfos = new Asn1EncodableVector();
 
 			foreach (RecipientInfoGenerator rig in recipientInfoGenerators)
 			{
@@ -113,9 +113,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				}
 			}
 
-			var eci = new ContentInfo(CmsObjectIdentifiers.Data, encContent);
+			ContentInfo eci = new ContentInfo(CmsObjectIdentifiers.Data, encContent);
 
-			var contentInfo = new ContentInfo(
+			ContentInfo contentInfo = new ContentInfo(
 				CmsObjectIdentifiers.AuthenticatedData,
 				new AuthenticatedData(null, new DerSet(recipientInfos), macAlgId, null, eci, null, macResult, null));
 

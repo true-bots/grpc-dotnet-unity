@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class ECPublicKeyParameters
 		: ECKeyParameters
 	{
-		private readonly ECPoint q;
+		readonly ECPoint q;
 
 		public ECPublicKeyParameters(
 			ECPoint q,
@@ -45,12 +45,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		public override bool Equals(object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			ECPublicKeyParameters other = obj as ECPublicKeyParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}

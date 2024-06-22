@@ -12,22 +12,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class MD2Digest
 		: IDigest, IMemoable
 	{
-		private const int DigestLength = 16;
-		private const int BYTE_LENGTH = 16;
+		const int DigestLength = 16;
+		const int BYTE_LENGTH = 16;
 
 		/* X buffer */
-		private byte[] X = new byte[48];
-		private int xOff;
+		byte[] X = new byte[48];
+		int xOff;
 
 		/* M buffer */
 
-		private byte[] M = new byte[16];
-		private int mOff;
+		byte[] M = new byte[16];
+		int mOff;
 
 		/* check sum */
 
-		private byte[] C = new byte[16];
-		private int COff;
+		byte[] C = new byte[16];
+		int COff;
 
 		public MD2Digest()
 		{
@@ -39,7 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			CopyIn(t);
 		}
 
-		private void CopyIn(MD2Digest t)
+		void CopyIn(MD2Digest t)
 		{
 			Array.Copy(t.X, 0, X, 0, t.X.Length);
 			xOff = t.xOff;
@@ -176,7 +176,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			//
 			// fill the current word
 			//
-			while ((mOff != 0) && (length > 0))
+			while (mOff != 0 && length > 0)
 			{
 				Update(input[inOff]);
 				inOff++;
@@ -275,7 +275,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 
 
 		// 256-byte random permutation constructed from the digits of PI
-		private static readonly byte[] S =
+		static readonly byte[] S =
 		{
 			(byte)41, (byte)46, (byte)67, (byte)201, (byte)162, (byte)216, (byte)124,
 			(byte)1, (byte)61, (byte)54, (byte)84, (byte)161, (byte)236, (byte)240,

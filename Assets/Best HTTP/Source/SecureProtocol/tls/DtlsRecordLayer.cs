@@ -9,13 +9,13 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Date;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-	internal class DtlsRecordLayer
+	class DtlsRecordLayer
 		: DatagramTransport
 	{
-		private const int RECORD_HEADER_LENGTH = 13;
-		private const int MAX_FRAGMENT_LENGTH = 1 << 14;
-		private const long TCP_MSL = 1000L * 60 * 2;
-		private const long RETRANSMIT_TIMEOUT = TCP_MSL * 2;
+		const int RECORD_HEADER_LENGTH = 13;
+		const int MAX_FRAGMENT_LENGTH = 1 << 14;
+		const long TCP_MSL = 1000L * 60 * 2;
+		const long RETRANSMIT_TIMEOUT = TCP_MSL * 2;
 
 		/// <exception cref="IOException"/>
 		internal static byte[] ReceiveClientHelloRecord(byte[] data, int dataOff, int dataLen)
@@ -27,24 +27,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			short contentType = TlsUtilities.ReadUint8(data, dataOff + 0);
 			if (ContentType.handshake != contentType)
+			{
 				return null;
+			}
 
 			ProtocolVersion version = TlsUtilities.ReadVersion(data, dataOff + 1);
 			if (!ProtocolVersion.DTLSv10.IsEqualOrEarlierVersionOf(version))
+			{
 				return null;
+			}
 
 			int epoch = TlsUtilities.ReadUint16(data, dataOff + 3);
 			if (0 != epoch)
+			{
 				return null;
+			}
 
 			//long sequenceNumber = TlsUtilities.ReadUint48(data, dataOff + 5);
 
 			int length = TlsUtilities.ReadUint16(data, dataOff + 11);
 			if (dataLen < RECORD_HEADER_LENGTH + length)
+			{
 				return null;
+			}
 
 			if (length > MAX_FRAGMENT_LENGTH)
+			{
 				return null;
+			}
 
 			// NOTE: We ignore/drop any data after the first record 
 			return TlsUtilities.CopyOfRangeExact(data, dataOff + RECORD_HEADER_LENGTH,
@@ -69,7 +79,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private static void SendDatagram(DatagramSender sender, byte[] buf, int off, int len)
+		static void SendDatagram(DatagramSender sender, byte[] buf, int off, int len)
 		{
 			// TODO[tls-port] Can we support interrupted IO on .NET?
 			//try
@@ -85,50 +95,50 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			sender.Send(buf, off, len);
 		}
 
-		private readonly TlsContext m_context;
-		private readonly TlsPeer m_peer;
-		private readonly DatagramTransport m_transport;
+		readonly TlsContext m_context;
+		readonly TlsPeer m_peer;
+		readonly DatagramTransport m_transport;
 
-		private readonly ByteQueue m_recordQueue = new ByteQueue();
-		private readonly object m_writeLock = new object();
+		readonly ByteQueue m_recordQueue = new ByteQueue();
+		readonly object m_writeLock = new object();
 
-		private volatile bool m_closed = false;
+		volatile bool m_closed = false;
 
-		private volatile bool m_failed = false;
+		volatile bool m_failed = false;
 
 		// TODO[dtls13] Review the draft/RFC (legacy_record_version) to see if readVersion can be removed
-		private volatile ProtocolVersion m_readVersion = null, m_writeVersion = null;
-		private volatile bool m_inConnection;
-		private volatile bool m_inHandshake;
-		private volatile int m_plaintextLimit;
-		private DtlsEpoch m_currentEpoch, m_pendingEpoch;
-		private DtlsEpoch m_readEpoch, m_writeEpoch;
+		volatile ProtocolVersion m_readVersion = null, m_writeVersion = null;
+		volatile bool m_inConnection;
+		volatile bool m_inHandshake;
+		volatile int m_plaintextLimit;
+		DtlsEpoch m_currentEpoch, m_pendingEpoch;
+		DtlsEpoch m_readEpoch, m_writeEpoch;
 
-		private DtlsHandshakeRetransmit m_retransmit = null;
-		private DtlsEpoch m_retransmitEpoch = null;
-		private Timeout m_retransmitTimeout = null;
+		DtlsHandshakeRetransmit m_retransmit = null;
+		DtlsEpoch m_retransmitEpoch = null;
+		Timeout m_retransmitTimeout = null;
 
-		private TlsHeartbeat m_heartbeat = null; // If non-null, controls the sending of heartbeat requests
-		private bool m_heartBeatResponder = false; // Whether we should send heartbeat responses
+		TlsHeartbeat m_heartbeat = null; // If non-null, controls the sending of heartbeat requests
+		bool m_heartBeatResponder = false; // Whether we should send heartbeat responses
 
-		private HeartbeatMessage m_heartbeatInFlight = null; // The current in-flight heartbeat request, if any
-		private Timeout m_heartbeatTimeout = null; // Idle timeout (if none in-flight), else expiry timeout for response
+		HeartbeatMessage m_heartbeatInFlight = null; // The current in-flight heartbeat request, if any
+		Timeout m_heartbeatTimeout = null; // Idle timeout (if none in-flight), else expiry timeout for response
 
-		private int m_heartbeatResendMillis = -1; // Delay before retransmit of current in-flight heartbeat request
-		private Timeout m_heartbeatResendTimeout = null; // Timeout for next retransmit of the in-flight heartbeat request
+		int m_heartbeatResendMillis = -1; // Delay before retransmit of current in-flight heartbeat request
+		Timeout m_heartbeatResendTimeout = null; // Timeout for next retransmit of the in-flight heartbeat request
 
 		internal DtlsRecordLayer(TlsContext context, TlsPeer peer, DatagramTransport transport)
 		{
-			this.m_context = context;
-			this.m_peer = peer;
-			this.m_transport = transport;
+			m_context = context;
+			m_peer = peer;
+			m_transport = transport;
 
-			this.m_inHandshake = true;
+			m_inHandshake = true;
 
-			this.m_currentEpoch = new DtlsEpoch(0, TlsNullNullCipher.Instance);
-			this.m_pendingEpoch = null;
-			this.m_readEpoch = m_currentEpoch;
-			this.m_writeEpoch = m_currentEpoch;
+			m_currentEpoch = new DtlsEpoch(0, TlsNullNullCipher.Instance);
+			m_pendingEpoch = null;
+			m_readEpoch = m_currentEpoch;
+			m_writeEpoch = m_currentEpoch;
 
 			SetPlaintextLimit(MAX_FRAGMENT_LENGTH);
 		}
@@ -140,7 +150,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		internal virtual void ResetAfterHelloVerifyRequestServer(long recordSeq)
 		{
-			this.m_inConnection = true;
+			m_inConnection = true;
 
 			m_currentEpoch.SequenceNumber = recordSeq;
 			m_currentEpoch.ReplayWindow.Reset(recordSeq);
@@ -148,7 +158,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		internal virtual void SetPlaintextLimit(int plaintextLimit)
 		{
-			this.m_plaintextLimit = plaintextLimit;
+			m_plaintextLimit = plaintextLimit;
 		}
 
 		internal virtual int ReadEpoch
@@ -159,18 +169,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal virtual ProtocolVersion ReadVersion
 		{
 			get { return m_readVersion; }
-			set { this.m_readVersion = value; }
+			set { m_readVersion = value; }
 		}
 
 		internal virtual void SetWriteVersion(ProtocolVersion writeVersion)
 		{
-			this.m_writeVersion = writeVersion;
+			m_writeVersion = writeVersion;
 		}
 
 		internal virtual void InitPendingEpoch(TlsCipher pendingCipher)
 		{
 			if (m_pendingEpoch != null)
+			{
 				throw new InvalidOperationException();
+			}
 
 			/*
 			 * TODO "In order to ensure that any given sequence/epoch pair is unique, implementations
@@ -179,7 +191,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			 */
 
 			// TODO Check for overflow
-			this.m_pendingEpoch = new DtlsEpoch(m_writeEpoch.Epoch + 1, pendingCipher);
+			m_pendingEpoch = new DtlsEpoch(m_writeEpoch.Epoch + 1, pendingCipher);
 		}
 
 		internal virtual void HandshakeSuccessful(DtlsHandshakeRetransmit retransmit)
@@ -192,23 +204,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			if (null != retransmit)
 			{
-				this.m_retransmit = retransmit;
-				this.m_retransmitEpoch = m_currentEpoch;
-				this.m_retransmitTimeout = new Timeout(RETRANSMIT_TIMEOUT);
+				m_retransmit = retransmit;
+				m_retransmitEpoch = m_currentEpoch;
+				m_retransmitTimeout = new Timeout(RETRANSMIT_TIMEOUT);
 			}
 
-			this.m_inHandshake = false;
-			this.m_currentEpoch = m_pendingEpoch;
-			this.m_pendingEpoch = null;
+			m_inHandshake = false;
+			m_currentEpoch = m_pendingEpoch;
+			m_pendingEpoch = null;
 		}
 
 		internal virtual void InitHeartbeat(TlsHeartbeat heartbeat, bool heartbeatResponder)
 		{
 			if (m_inHandshake)
+			{
 				throw new InvalidOperationException();
+			}
 
-			this.m_heartbeat = heartbeat;
-			this.m_heartBeatResponder = heartbeatResponder;
+			m_heartbeat = heartbeat;
+			m_heartBeatResponder = heartbeatResponder;
 
 			if (null != heartbeat)
 			{
@@ -220,11 +234,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			if (null != m_retransmitEpoch)
 			{
-				this.m_writeEpoch = m_retransmitEpoch;
+				m_writeEpoch = m_retransmitEpoch;
 			}
 			else
 			{
-				this.m_writeEpoch = m_currentEpoch;
+				m_writeEpoch = m_currentEpoch;
 			}
 		}
 
@@ -265,21 +279,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				if (Timeout.HasExpired(m_heartbeatTimeout, currentTimeMillis))
 				{
 					if (null != m_heartbeatInFlight)
+					{
 						throw new TlsTimeoutException("Heartbeat timed out");
+					}
 
-					this.m_heartbeatInFlight = HeartbeatMessage.Create(m_context,
+					m_heartbeatInFlight = HeartbeatMessage.Create(m_context,
 						HeartbeatMessageType.heartbeat_request, m_heartbeat.GeneratePayload());
-					this.m_heartbeatTimeout = new Timeout(m_heartbeat.TimeoutMillis, currentTimeMillis);
+					m_heartbeatTimeout = new Timeout(m_heartbeat.TimeoutMillis, currentTimeMillis);
 
-					this.m_heartbeatResendMillis = DtlsReliableHandshake.INITIAL_RESEND_MILLIS;
-					this.m_heartbeatResendTimeout = new Timeout(m_heartbeatResendMillis, currentTimeMillis);
+					m_heartbeatResendMillis = DtlsReliableHandshake.INITIAL_RESEND_MILLIS;
+					m_heartbeatResendTimeout = new Timeout(m_heartbeatResendMillis, currentTimeMillis);
 
 					SendHeartbeatMessage(m_heartbeatInFlight);
 				}
 				else if (Timeout.HasExpired(m_heartbeatResendTimeout, currentTimeMillis))
 				{
-					this.m_heartbeatResendMillis = DtlsReliableHandshake.BackOff(m_heartbeatResendMillis);
-					this.m_heartbeatResendTimeout = new Timeout(m_heartbeatResendMillis, currentTimeMillis);
+					m_heartbeatResendMillis = DtlsReliableHandshake.BackOff(m_heartbeatResendMillis);
+					m_heartbeatResendTimeout = new Timeout(m_heartbeatResendMillis, currentTimeMillis);
 
 					SendHeartbeatMessage(m_heartbeatInFlight);
 				}
@@ -421,7 +437,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					byte[] data = new byte[1] { 1 };
 					SendRecord(ContentType.change_cipher_spec, data, 0, data.Length);
 
-					this.m_writeEpoch = nextEpoch;
+					m_writeEpoch = nextEpoch;
 				}
 			}
 
@@ -502,7 +518,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					}
 				}
 
-				this.m_failed = true;
+				m_failed = true;
 
 				CloseTransport();
 			}
@@ -512,7 +528,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			if (!m_closed)
 			{
-				this.m_failed = true;
+				m_failed = true;
 
 				CloseTransport();
 			}
@@ -524,7 +540,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			RaiseAlert(AlertLevel.warning, alertDescription, message, null);
 		}
 
-		private void CloseTransport()
+		void CloseTransport()
 		{
 			if (!m_closed)
 			{
@@ -549,12 +565,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					// Ignore
 				}
 
-				this.m_closed = true;
+				m_closed = true;
 			}
 		}
 
 		/// <exception cref="IOException"/>
-		private void RaiseAlert(short alertLevel, short alertDescription, string message, Exception cause)
+		void RaiseAlert(short alertLevel, short alertDescription, string message, Exception cause)
 		{
 			m_peer.NotifyAlertRaised(alertLevel, alertDescription, message, cause);
 
@@ -568,7 +584,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private int ReceiveDatagram(byte[] buf, int off, int len, int waitMillis)
+		int ReceiveDatagram(byte[] buf, int off, int len, int waitMillis)
 		{
 			try
 			{
@@ -581,7 +597,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			catch (SocketException e)
 			{
 				if (TlsUtilities.IsTimeout(e))
+				{
 					return -1;
+				}
 
 				throw e;
 			}
@@ -598,16 +616,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private int ProcessRecord(int received, byte[] record, Span<byte> buffer)
 #else
-		private int ProcessRecord(int received, byte[] record, byte[] buf, int off)
+		int ProcessRecord(int received, byte[] record, byte[] buf, int off)
 #endif
 		{
 			// NOTE: received < 0 (timeout) is covered by this first case
 			if (received < RECORD_HEADER_LENGTH)
+			{
 				return -1;
+			}
 
 			int length = TlsUtilities.ReadUint16(record, 11);
-			if (received != (length + RECORD_HEADER_LENGTH))
+			if (received != length + RECORD_HEADER_LENGTH)
+			{
 				return -1;
+			}
 
 			// TODO[dtls13] Deal with opaque record type for 1.3 AEAD ciphers
 			short recordType = TlsUtilities.ReadUint8(record, 0);
@@ -638,15 +660,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 
 			if (null == recordEpoch)
+			{
 				return -1;
+			}
 
 			long seq = TlsUtilities.ReadUint48(record, 5);
 			if (recordEpoch.ReplayWindow.ShouldDiscard(seq))
+			{
 				return -1;
+			}
 
 			ProtocolVersion recordVersion = TlsUtilities.ReadVersion(record, 1);
 			if (!recordVersion.IsDtls)
+			{
 				return -1;
+			}
 
 			if (null != m_readVersion && !m_readVersion.Equals(recordVersion))
 			{
@@ -662,7 +690,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					&& HandshakeType.client_hello == TlsUtilities.ReadUint8(record, RECORD_HEADER_LENGTH);
 
 				if (!isClientHelloFragment)
+				{
 					return -1;
+				}
 			}
 
 			long macSeqNo = GetMacSequenceNumber(recordEpoch.Epoch, seq);
@@ -673,10 +703,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			recordEpoch.ReplayWindow.ReportAuthenticated(seq);
 
 			if (decoded.len > m_plaintextLimit)
+			{
 				return -1;
+			}
 
 			if (decoded.len < 1 && decoded.contentType != ContentType.application_data)
+			{
 				return -1;
+			}
 
 			if (null == m_readVersion)
 			{
@@ -695,11 +729,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					 * the same in both DTLS 1.2 and 1.0) and not as part of version negotiation.
 					 */
 					if (!ProtocolVersion.DTLSv12.IsEqualOrLaterVersionOf(recordVersion))
+					{
 						return -1;
+					}
 				}
 				else
 				{
-					this.m_readVersion = recordVersion;
+					m_readVersion = recordVersion;
 				}
 			}
 
@@ -748,7 +784,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 					{
 						short message = TlsUtilities.ReadUint8(decoded.buf, decoded.off + i);
 						if (message != ChangeCipherSpec.change_cipher_spec)
+						{
 							continue;
+						}
 
 						if (m_pendingEpoch != null)
 						{
@@ -831,9 +869,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			 */
 			if (!m_inHandshake && null != m_retransmit)
 			{
-				this.m_retransmit = null;
-				this.m_retransmitEpoch = null;
-				this.m_retransmitTimeout = null;
+				m_retransmit = null;
+				m_retransmitEpoch = null;
+				m_retransmitTimeout = null;
 			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
@@ -845,7 +883,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private int ReceiveRecord(byte[] buf, int off, int len, int waitMillis)
+		int ReceiveRecord(byte[] buf, int off, int len, int waitMillis)
 		{
 			if (m_recordQueue.Available > 0)
 			{
@@ -864,7 +902,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				int received = ReceiveDatagram(buf, off, len, waitMillis);
 				if (received >= RECORD_HEADER_LENGTH)
 				{
-					this.m_inConnection = true;
+					m_inConnection = true;
 
 					int fragmentLength = TlsUtilities.ReadUint16(buf, off + 11);
 					int recordLength = RECORD_HEADER_LENGTH + fragmentLength;
@@ -879,16 +917,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 		}
 
-		private void ResetHeartbeat()
+		void ResetHeartbeat()
 		{
-			this.m_heartbeatInFlight = null;
-			this.m_heartbeatResendMillis = -1;
-			this.m_heartbeatResendTimeout = null;
-			this.m_heartbeatTimeout = new Timeout(m_heartbeat.IdleMillis);
+			m_heartbeatInFlight = null;
+			m_heartbeatResendMillis = -1;
+			m_heartbeatResendTimeout = null;
+			m_heartbeatTimeout = new Timeout(m_heartbeat.IdleMillis);
 		}
 
 		/// <exception cref="IOException"/>
-		private void SendHeartbeatMessage(HeartbeatMessage heartbeatMessage)
+		void SendHeartbeatMessage(HeartbeatMessage heartbeatMessage)
 		{
 			MemoryStream output = new MemoryStream();
 			heartbeatMessage.Encode(output);
@@ -914,26 +952,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
         private void SendRecord(short contentType, ReadOnlySpan<byte> buffer)
 #else
-		private void SendRecord(short contentType, byte[] buf, int off, int len)
+		void SendRecord(short contentType, byte[] buf, int off, int len)
 #endif
 		{
 			// Never send anything until a valid ClientHello has been received
 			if (m_writeVersion == null)
+			{
 				return;
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             int len = buffer.Length;
 #endif
 
 			if (len > m_plaintextLimit)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			/*
 			 * RFC 5246 6.2.1 Implementations MUST NOT send zero-length fragments of Handshake, Alert,
 			 * or ChangeCipherSpec content types.
 			 */
 			if (len < 1 && contentType != ContentType.application_data)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			lock (m_writeLock)
 			{
@@ -963,7 +1007,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			}
 		}
 
-		private static long GetMacSequenceNumber(int epoch, long sequence_number)
+		static long GetMacSequenceNumber(int epoch, long sequence_number)
 		{
 			return ((epoch & 0xFFFFFFFFL) << 48) | sequence_number;
 		}

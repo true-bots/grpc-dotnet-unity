@@ -6,7 +6,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
-	internal sealed class HandshakeMessageOutput
+	sealed class HandshakeMessageOutput
 		: MemoryStream
 	{
 		internal static int GetLength(int bodyLength)

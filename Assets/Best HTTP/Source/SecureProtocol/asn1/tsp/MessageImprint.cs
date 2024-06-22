@@ -9,26 +9,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 	public class MessageImprint
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier hashAlgorithm;
-		private readonly byte[] hashedMessage;
+		readonly AlgorithmIdentifier hashAlgorithm;
+		readonly byte[] hashedMessage;
 
 		public static MessageImprint GetInstance(object obj)
 		{
 			if (obj is MessageImprint)
+			{
 				return (MessageImprint)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new MessageImprint(Asn1Sequence.GetInstance(obj));
 		}
 
-		private MessageImprint(
+		MessageImprint(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
-			this.hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
-			this.hashedMessage = Asn1OctetString.GetInstance(seq[1]).GetOctets();
+			hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
+			hashedMessage = Asn1OctetString.GetInstance(seq[1]).GetOctets();
 		}
 
 		public MessageImprint(

@@ -15,9 +15,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class SM4Engine
 		: IBlockCipher
 	{
-		private const int BlockSize = 16;
+		const int BlockSize = 16;
 
-		private static readonly byte[] Sbox =
+		static readonly byte[] Sbox =
 		{
 			0xd6, 0x90, 0xe9, 0xfe, 0xcc, 0xe1, 0x3d, 0xb7, 0x16, 0xb6, 0x14, 0xc2, 0x28, 0xfb, 0x2c, 0x05,
 			0x2b, 0x67, 0x9a, 0x76, 0x2a, 0xbe, 0x04, 0xc3, 0xaa, 0x44, 0x13, 0x26, 0x49, 0x86, 0x06, 0x99,
@@ -37,7 +37,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x18, 0xf0, 0x7d, 0xec, 0x3a, 0xdc, 0x4d, 0x20, 0x79, 0xee, 0x5f, 0x3e, 0xd7, 0xcb, 0x39, 0x48
 		};
 
-		private static readonly uint[] CK =
+		static readonly uint[] CK =
 		{
 			0x00070e15, 0x1c232a31, 0x383f464d, 0x545b6269,
 			0x70777e85, 0x8c939aa1, 0xa8afb6bd, 0xc4cbd2d9,
@@ -49,15 +49,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x10171e25, 0x2c333a41, 0x484f565d, 0x646b7279
 		};
 
-		private static readonly uint[] FK =
+		static readonly uint[] FK =
 		{
 			0xa3b1bac6, 0x56aa3350, 0x677d9197, 0xb27022dc
 		};
 
-		private uint[] rk;
+		uint[] rk;
 
 		// non-linear substitution tau.
-		private static uint tau(uint A)
+		static uint tau(uint A)
 		{
 			uint b0 = Sbox[A >> 24];
 			uint b1 = Sbox[(A >> 16) & 0xFF];
@@ -67,18 +67,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
 		}
 
-		private static uint L_ap(uint B)
+		static uint L_ap(uint B)
 		{
 			return B ^ Integers.RotateLeft(B, 13) ^ Integers.RotateLeft(B, 23);
 		}
 
-		private uint T_ap(uint Z)
+		uint T_ap(uint Z)
 		{
 			return L_ap(tau(Z));
 		}
 
 		// Key expansion
-		private void ExpandKey(bool forEncryption, byte[] key)
+		void ExpandKey(bool forEncryption, byte[] key)
 		{
 			uint K0 = Pack.BE_To_UInt32(key, 0) ^ FK[0];
 			uint K1 = Pack.BE_To_UInt32(key, 4) ^ FK[1];
@@ -110,13 +110,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 
 		// Linear substitution L
-		private static uint L(uint B)
+		static uint L(uint B)
 		{
 			return B ^ Integers.RotateLeft(B, 2) ^ Integers.RotateLeft(B, 10) ^ Integers.RotateLeft(B, 18) ^ Integers.RotateLeft(B, 24);
 		}
 
 		// Mixer-substitution T
-		private static uint T(uint Z)
+		static uint T(uint Z)
 		{
 			return L(tau(Z));
 		}
@@ -125,11 +125,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		{
 			KeyParameter keyParameter = parameters as KeyParameter;
 			if (null == keyParameter)
-				throw new ArgumentException("invalid parameter passed to SM4 init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters), "parameters");
+			{
+				throw new ArgumentException("invalid parameter passed to SM4 init - " + Platform.GetTypeName(parameters), "parameters");
+			}
 
 			byte[] key = keyParameter.GetKey();
 			if (key.Length != 16)
+			{
 				throw new ArgumentException("SM4 requires a 128 bit key", "parameters");
+			}
 
 			if (null == rk)
 			{
@@ -152,7 +156,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (null == rk)
+			{
 				throw new InvalidOperationException("SM4 not initialised");
+			}
 
 			Check.DataLength(input, inOff, BlockSize, "input buffer too short");
 			Check.OutputLength(output, outOff, BlockSize, "output buffer too short");

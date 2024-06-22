@@ -29,23 +29,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
         */
 		protected override void EngineInit(KeyGenerationParameters parameters)
 		{
-			this.random = parameters.Random;
-			this.strength = (parameters.Strength + 7) / 8;
+			random = parameters.Random;
+			strength = (parameters.Strength + 7) / 8;
 
-			if (strength == 0 || strength == (168 / 8))
+			if (strength == 0 || strength == 168 / 8)
 			{
 				strength = DesEdeParameters.DesEdeKeyLength;
 			}
-			else if (strength == (112 / 8))
+			else if (strength == 112 / 8)
 			{
-				strength = 2 * DesEdeParameters.DesKeyLength;
+				strength = 2 * DesParameters.DesKeyLength;
 			}
 			else if (strength != DesEdeParameters.DesEdeKeyLength
-			         && strength != (2 * DesEdeParameters.DesKeyLength))
+			         && strength != 2 * DesParameters.DesKeyLength)
 			{
 				throw new ArgumentException("DESede key must be "
-				                            + (DesEdeParameters.DesEdeKeyLength * 8) + " or "
-				                            + (2 * 8 * DesEdeParameters.DesKeyLength)
+				                            + DesEdeParameters.DesEdeKeyLength * 8 + " or "
+				                            + 2 * 8 * DesParameters.DesKeyLength
 				                            + " bits long.");
 			}
 		}
@@ -57,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			do
 			{
 				random.NextBytes(newKey);
-				DesEdeParameters.SetOddParity(newKey);
+				DesParameters.SetOddParity(newKey);
 			} while (DesEdeParameters.IsWeakKey(newKey, 0, newKey.Length) || !DesEdeParameters.IsRealEdeKey(newKey, 0));
 
 			return newKey;

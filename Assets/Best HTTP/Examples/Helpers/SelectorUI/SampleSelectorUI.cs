@@ -10,66 +10,75 @@ namespace BestHTTP.Examples.Helpers.SelectorUI
 	{
 #pragma warning disable 0649, 0169
 
-		[SerializeField] private Category _categoryListItemPrefab;
+		[SerializeField] Category _categoryListItemPrefab;
 
-		[SerializeField] private ExampleListItem _exampleListItemPrefab;
+		[SerializeField] ExampleListItem _exampleListItemPrefab;
 
-		[SerializeField] private ExampleInfo _exampleInfoPrefab;
+		[SerializeField] ExampleInfo _exampleInfoPrefab;
 
-		[SerializeField] private RectTransform _listRoot;
+		[SerializeField] RectTransform _listRoot;
 
-		[SerializeField] private RectTransform _dyncamicContentRoot;
+		[SerializeField] RectTransform _dyncamicContentRoot;
 
-		private SampleRoot sampleSelector;
-		private ExampleListItem selectedSample;
-		private GameObject dynamicContent;
+		SampleRoot sampleSelector;
+		ExampleListItem selectedSample;
+		GameObject dynamicContent;
 
 #pragma warning restore
 
-		private void Start()
+		void Start()
 		{
-			this.sampleSelector = FindObjectOfType<SampleRoot>();
+			sampleSelector = FindObjectOfType<SampleRoot>();
 			DisplayExamples();
 		}
 
-		private void DisplayExamples()
+		void DisplayExamples()
 		{
 			// Sort examples by category
-			this.sampleSelector.samples.Sort((a, b) =>
+			sampleSelector.samples.Sort((a, b) =>
 			{
 				if (a == null || b == null)
+				{
 					return 0;
+				}
 
 				int result = a.Category.CompareTo(b.Category);
 				if (result == 0)
+				{
 					result = a.DisplayName.CompareTo(b.DisplayName);
+				}
+
 				return result;
 			});
 
 			string currentCategory = null;
 
-			for (int i = 0; i < this.sampleSelector.samples.Count; ++i)
+			for (int i = 0; i < sampleSelector.samples.Count; ++i)
 			{
-				var examplePrefab = this.sampleSelector.samples[i];
+				SampleBase examplePrefab = sampleSelector.samples[i];
 
 				if (examplePrefab == null)
+				{
 					continue;
+				}
 
-				if (examplePrefab.BannedPlatforms.Contains(UnityEngine.Application.platform))
+				if (examplePrefab.BannedPlatforms.Contains(Application.platform))
+				{
 					continue;
+				}
 
 				if (currentCategory != examplePrefab.Category)
 				{
-					var category = Instantiate<Category>(this._categoryListItemPrefab, this._listRoot, false);
+					Category category = Instantiate<Category>(_categoryListItemPrefab, _listRoot, false);
 					category.SetLabel(examplePrefab.Category);
 
 					currentCategory = examplePrefab.Category;
 				}
 
-				var listItem = Instantiate<ExampleListItem>(this._exampleListItemPrefab, this._listRoot, false);
+				ExampleListItem listItem = Instantiate<ExampleListItem>(_exampleListItemPrefab, _listRoot, false);
 				listItem.Setup(this, examplePrefab);
 
-				if (this.sampleSelector.selectedExamplePrefab == null)
+				if (sampleSelector.selectedExamplePrefab == null)
 				{
 					SelectSample(listItem);
 				}
@@ -78,20 +87,25 @@ namespace BestHTTP.Examples.Helpers.SelectorUI
 
 		public void SelectSample(ExampleListItem item)
 		{
-			this.sampleSelector.selectedExamplePrefab = item.ExamplePrefab;
-			if (this.dynamicContent != null)
-				Destroy(this.dynamicContent);
+			sampleSelector.selectedExamplePrefab = item.ExamplePrefab;
+			if (dynamicContent != null)
+			{
+				Destroy(dynamicContent);
+			}
 
-			var example = Instantiate<ExampleInfo>(this._exampleInfoPrefab, this._dyncamicContentRoot, false);
+			ExampleInfo example = Instantiate<ExampleInfo>(_exampleInfoPrefab, _dyncamicContentRoot, false);
 			example.Setup(this, item.ExamplePrefab);
-			this.dynamicContent = example.gameObject;
+			dynamicContent = example.gameObject;
 		}
 
 		public void ExecuteExample(SampleBase example)
 		{
-			if (this.dynamicContent != null)
-				Destroy(this.dynamicContent);
-			this.dynamicContent = Instantiate(example, this._dyncamicContentRoot, false).gameObject;
+			if (dynamicContent != null)
+			{
+				Destroy(dynamicContent);
+			}
+
+			dynamicContent = Instantiate(example, _dyncamicContentRoot, false).gameObject;
 		}
 	}
 }

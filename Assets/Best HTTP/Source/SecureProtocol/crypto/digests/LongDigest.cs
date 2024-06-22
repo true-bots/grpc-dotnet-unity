@@ -13,18 +13,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public abstract class LongDigest
 		: IDigest, IMemoable
 	{
-		private int MyByteLength = 128;
+		int MyByteLength = 128;
 
-		private byte[] xBuf;
-		private int xBufOff;
+		byte[] xBuf;
+		int xBufOff;
 
-		private long byteCount1;
-		private long byteCount2;
+		long byteCount1;
+		long byteCount2;
 
 		internal ulong H1, H2, H3, H4, H5, H6, H7, H8;
 
-		private ulong[] W = new ulong[80];
-		private int wOff;
+		ulong[] W = new ulong[80];
+		int wOff;
 
 		/**
 		* Constructor for variable length word
@@ -92,7 +92,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			//
 			// fill the current word
 			//
-			while ((xBufOff != 0) && (length > 0))
+			while (xBufOff != 0 && length > 0)
 			{
 				Update(input[inOff]);
 
@@ -231,7 +231,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		* adjust the byte counts so that byteCount2 represents the
 		* upper long (less 3 bits) word of the byte count.
 		*/
-		private void AdjustByteCounts()
+		void AdjustByteCounts()
 		{
 			if (byteCount1 > 0x1fffffffffffffffL)
 			{
@@ -338,32 +338,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		}
 
 		/* SHA-384 and SHA-512 functions (as for SHA-256 but for longs) */
-		private static ulong Ch(ulong x, ulong y, ulong z)
+		static ulong Ch(ulong x, ulong y, ulong z)
 		{
 			return (x & y) ^ (~x & z);
 		}
 
-		private static ulong Maj(ulong x, ulong y, ulong z)
+		static ulong Maj(ulong x, ulong y, ulong z)
 		{
 			return (x & y) ^ (x & z) ^ (y & z);
 		}
 
-		private static ulong Sum0(ulong x)
+		static ulong Sum0(ulong x)
 		{
 			return ((x << 36) | (x >> 28)) ^ ((x << 30) | (x >> 34)) ^ ((x << 25) | (x >> 39));
 		}
 
-		private static ulong Sum1(ulong x)
+		static ulong Sum1(ulong x)
 		{
 			return ((x << 50) | (x >> 14)) ^ ((x << 46) | (x >> 18)) ^ ((x << 23) | (x >> 41));
 		}
 
-		private static ulong Sigma0(ulong x)
+		static ulong Sigma0(ulong x)
 		{
 			return ((x << 63) | (x >> 1)) ^ ((x << 56) | (x >> 8)) ^ (x >> 7);
 		}
 
-		private static ulong Sigma1(ulong x)
+		static ulong Sigma1(ulong x)
 		{
 			return ((x << 45) | (x >> 19)) ^ ((x << 3) | (x >> 61)) ^ (x >> 6);
 		}

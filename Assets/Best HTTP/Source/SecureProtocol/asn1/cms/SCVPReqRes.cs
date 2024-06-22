@@ -7,29 +7,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class ScvpReqRes
 		: Asn1Encodable
 	{
-		private readonly ContentInfo request;
-		private readonly ContentInfo response;
+		readonly ContentInfo request;
+		readonly ContentInfo response;
 
 		public static ScvpReqRes GetInstance(object obj)
 		{
 			if (obj is ScvpReqRes)
+			{
 				return (ScvpReqRes)obj;
+			}
+
 			if (obj != null)
+			{
 				return new ScvpReqRes(Asn1Sequence.GetInstance(obj));
+			}
+
 			return null;
 		}
 
-		private ScvpReqRes(Asn1Sequence seq)
+		ScvpReqRes(Asn1Sequence seq)
 		{
 			if (seq[0] is Asn1TaggedObject)
 			{
-				this.request = ContentInfo.GetInstance(Asn1TaggedObject.GetInstance(seq[0]), true);
-				this.response = ContentInfo.GetInstance(seq[1]);
+				request = ContentInfo.GetInstance(Asn1TaggedObject.GetInstance(seq[0]), true);
+				response = ContentInfo.GetInstance(seq[1]);
 			}
 			else
 			{
-				this.request = null;
-				this.response = ContentInfo.GetInstance(seq[0]);
+				request = null;
+				response = ContentInfo.GetInstance(seq[0]);
 			}
 		}
 

@@ -15,7 +15,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(Asn1RelativeOid), Asn1Tags.RelativeOid)
+			Meta() : base(typeof(Asn1RelativeOid), Asn1Tags.RelativeOid)
 			{
 			}
 
@@ -33,16 +33,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1RelativeOid GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is Asn1RelativeOid asn1RelativeOid)
+			{
 				return asn1RelativeOid;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is Asn1RelativeOid converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -56,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static Asn1RelativeOid GetInstance(Asn1TaggedObject taggedObject, bool declaredExplicit)
@@ -64,32 +70,39 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (Asn1RelativeOid)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private const long LongLimit = (long.MaxValue >> 7) - 0x7F;
+		const long LongLimit = (long.MaxValue >> 7) - 0x7F;
 
-		private readonly string identifier;
-		private byte[] contents;
+		readonly string identifier;
+		byte[] contents;
 
 		public Asn1RelativeOid(string identifier)
 		{
 			if (identifier == null)
+			{
 				throw new ArgumentNullException("identifier");
+			}
+
 			if (!IsValidIdentifier(identifier, 0))
+			{
 				throw new FormatException("string " + identifier + " not a relative OID");
+			}
 
 			this.identifier = identifier;
 		}
 
-		private Asn1RelativeOid(Asn1RelativeOid oid, string branchID)
+		Asn1RelativeOid(Asn1RelativeOid oid, string branchID)
 		{
 			if (!IsValidIdentifier(branchID, 0))
+			{
 				throw new FormatException("string " + branchID + " not a valid relative OID branch");
+			}
 
-			this.identifier = oid.Id + "." + branchID;
+			identifier = oid.Id + "." + branchID;
 		}
 
-		private Asn1RelativeOid(byte[] contents, bool clone)
+		Asn1RelativeOid(byte[] contents, bool clone)
 		{
-			this.identifier = ParseContents(contents);
+			identifier = ParseContents(contents);
 			this.contents = clone ? Arrays.Clone(contents) : contents;
 		}
 
@@ -112,7 +125,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			Asn1RelativeOid that = asn1Object as Asn1RelativeOid;
 			return null != that
-			       && this.identifier == that.identifier;
+			       && identifier == that.identifier;
 		}
 
 		protected override int Asn1GetHashCode()
@@ -130,7 +143,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return new PrimitiveEncoding(tagClass, tagNo, GetContents());
 		}
 
-		private void DoOutput(MemoryStream bOut)
+		void DoOutput(MemoryStream bOut)
 		{
 			OidTokenizer tok = new OidTokenizer(identifier);
 			while (tok.HasMoreTokens)
@@ -147,7 +160,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private byte[] GetContents()
+		byte[] GetContents()
 		{
 			lock (this)
 			{
@@ -179,7 +192,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				if (ch == '.')
 				{
 					if (0 == digitCount || (digitCount > 1 && identifier[pos + 1] == '0'))
+					{
 						return false;
+					}
 
 					digitCount = 0;
 				}
@@ -194,7 +209,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 
 			if (0 == digitCount || (digitCount > 1 && identifier[pos + 1] == '0'))
+			{
 				return false;
+			}
 
 			return true;
 		}
@@ -208,7 +225,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 #endif
 			int pos = 8;
 			result[pos] = (byte)((int)fieldValue & 0x7F);
-			while (fieldValue >= (1L << 7))
+			while (fieldValue >= 1L << 7)
 			{
 				fieldValue >>= 7;
 				result[--pos] = (byte)((int)fieldValue | 0x80);
@@ -252,7 +269,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private static string ParseContents(byte[] contents)
+		static string ParseContents(byte[] contents)
 		{
 			StringBuilder objId = new StringBuilder();
 			long value = 0;

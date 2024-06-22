@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes.Gcm
 	public class Tables4kGcmMultiplier
 		: IGcmMultiplier
 	{
-		private byte[] H;
-		private GcmUtilities.FieldElement[] T;
+		byte[] H;
+		GcmUtilities.FieldElement[] T;
 
 		public void Init(byte[] H)
 		{

@@ -24,21 +24,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static CertReqTemplateContent GetInstance(object obj)
 		{
 			if (obj is CertReqTemplateContent certReqTemplateContent)
+			{
 				return certReqTemplateContent;
+			}
 
 			if (obj != null)
+			{
 				return new CertReqTemplateContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly CertTemplate m_certTemplate;
-		private readonly Asn1Sequence m_keySpec;
+		readonly CertTemplate m_certTemplate;
+		readonly Asn1Sequence m_keySpec;
 
-		private CertReqTemplateContent(Asn1Sequence seq)
+		CertReqTemplateContent(Asn1Sequence seq)
 		{
 			if (seq.Count != 1 && seq.Count != 2)
+			{
 				throw new ArgumentException("expected sequence size of 1 or 2");
+			}
 
 			m_certTemplate = CertTemplate.GetInstance(seq[0]);
 
@@ -54,9 +60,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_keySpec = keySpec;
 		}
 
-		public virtual CertTemplate CertTemplate => m_certTemplate;
+		public virtual CertTemplate CertTemplate
+		{
+			get { return m_certTemplate; }
+		}
 
-		public virtual Asn1Sequence KeySpec => m_keySpec;
+		public virtual Asn1Sequence KeySpec
+		{
+			get { return m_keySpec; }
+		}
 
 		public override Asn1Object ToAsn1Object()
 		{

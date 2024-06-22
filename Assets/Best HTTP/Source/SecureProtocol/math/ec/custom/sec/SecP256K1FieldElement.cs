@@ -7,7 +7,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Encoders;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP256K1FieldElement
+	class SecP256K1FieldElement
 		: AbstractFpFieldElement
 	{
 		public static readonly BigInteger Q = new BigInteger(1,
@@ -18,14 +18,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public SecP256K1FieldElement(BigInteger x)
 		{
 			if (x == null || x.SignValue < 0 || x.CompareTo(Q) >= 0)
+			{
 				throw new ArgumentException("value invalid for SecP256K1FieldElement", "x");
+			}
 
 			this.x = SecP256K1Field.FromBigInteger(x);
 		}
 
 		public SecP256K1FieldElement()
 		{
-			this.x = Nat256.Create();
+			x = Nat256.Create();
 		}
 
 		protected internal SecP256K1FieldElement(uint[] x)
@@ -137,9 +139,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 			 * We use: 1, [2], 3, 6, 9, 11, [22], 44, 88, 176, 220, [223]
 			 */
 
-			uint[] x1 = this.x;
+			uint[] x1 = x;
 			if (Nat256.IsZero(x1) || Nat256.IsOne(x1))
+			{
 				return this;
+			}
 
 			uint[] tt0 = Nat256.CreateExt();
 
@@ -203,9 +207,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public virtual bool Equals(SecP256K1FieldElement other)
 		{
 			if (this == other)
+			{
 				return true;
+			}
+
 			if (null == other)
+			{
 				return false;
+			}
+
 			return Nat256.Eq(x, other.x);
 		}
 

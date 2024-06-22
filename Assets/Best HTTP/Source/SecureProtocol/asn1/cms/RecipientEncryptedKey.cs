@@ -8,10 +8,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class RecipientEncryptedKey
 		: Asn1Encodable
 	{
-		private readonly KeyAgreeRecipientIdentifier identifier;
-		private readonly Asn1OctetString encryptedKey;
+		readonly KeyAgreeRecipientIdentifier identifier;
+		readonly Asn1OctetString encryptedKey;
 
-		private RecipientEncryptedKey(
+		RecipientEncryptedKey(
 			Asn1Sequence seq)
 		{
 			identifier = KeyAgreeRecipientIdentifier.GetInstance(seq[0]);
@@ -53,14 +53,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 				return new RecipientEncryptedKey((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Invalid RecipientEncryptedKey: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid RecipientEncryptedKey: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public RecipientEncryptedKey(
 			KeyAgreeRecipientIdentifier id,
 			Asn1OctetString encryptedKey)
 		{
-			this.identifier = id;
+			identifier = id;
 			this.encryptedKey = encryptedKey;
 		}
 

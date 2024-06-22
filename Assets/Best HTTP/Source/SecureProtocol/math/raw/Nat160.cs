@@ -6,9 +6,9 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 {
-	internal abstract class Nat160
+	abstract class Nat160
 	{
-		private const ulong M = 0xFFFFFFFFUL;
+		const ulong M = 0xFFFFFFFFUL;
 
 		public static uint Add(uint[] x, uint[] y, uint[] z)
 		{
@@ -169,7 +169,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			for (int i = 4; i >= 0; --i)
 			{
 				if (x[i] != y[i])
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -198,9 +200,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			{
 				uint x_i = x[i], y_i = y[i];
 				if (x_i < y_i)
+				{
 					return false;
+				}
+
 				if (x_i > y_i)
+				{
 					return true;
+				}
 			}
 
 			return true;
@@ -212,9 +219,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw
 			{
 				uint x_i = x[xOff + i], y_i = y[yOff + i];
 				if (x_i < y_i)
+				{
 					return false;
+				}
+
 				if (x_i > y_i)
+				{
 					return true;
+				}
 			}
 
 			return true;

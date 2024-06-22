@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 	public class SigningCertificate
 		: Asn1Encodable
 	{
-		private Asn1Sequence certs, policies;
+		Asn1Sequence certs, policies;
 
 		public static SigningCertificate GetInstance(
 			object o)
@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 
 			throw new ArgumentException(
 				"unknown object in 'SigningCertificate' factory : "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(o) + ".");
+				+ Platform.GetTypeName(o) + ".");
 		}
 
 		/**
@@ -40,11 +40,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
 			}
 
-			this.certs = Asn1Sequence.GetInstance(seq[0]);
+			certs = Asn1Sequence.GetInstance(seq[0]);
 
 			if (seq.Count > 1)
 			{
-				this.policies = Asn1Sequence.GetInstance(seq[1]);
+				policies = Asn1Sequence.GetInstance(seq[1]);
 			}
 		}
 

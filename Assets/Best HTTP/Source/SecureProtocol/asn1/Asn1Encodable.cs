@@ -60,12 +60,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			IAsn1Convertible other = obj as IAsn1Convertible;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			Asn1Object o1 = ToAsn1Object();
 			Asn1Object o2 = other.ToAsn1Object();

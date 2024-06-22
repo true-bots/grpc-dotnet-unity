@@ -11,9 +11,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class ECDHPublicBcpgKey
 		: ECPublicBcpgKey
 	{
-		private byte reserved;
-		private HashAlgorithmTag hashFunctionId;
-		private SymmetricKeyAlgorithmTag symAlgorithmId;
+		byte reserved;
+		HashAlgorithmTag hashFunctionId;
+		SymmetricKeyAlgorithmTag symAlgorithmId;
 
 		/// <param name="bcpgIn">The stream to read the packet from.</param>
 		public ECDHPublicBcpgKey(BcpgInputStream bcpgIn)
@@ -21,7 +21,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		{
 			int length = bcpgIn.ReadByte();
 			if (length != 3)
+			{
 				throw new InvalidOperationException("KDF parameters size of 3 expected.");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             Span<byte> kdfParameters = stackalloc byte[3];
@@ -93,7 +95,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			bcpgOut.WriteByte((byte)symAlgorithmId);
 		}
 
-		private void VerifyHashAlgorithm()
+		void VerifyHashAlgorithm()
 		{
 			switch (hashFunctionId)
 			{
@@ -106,7 +108,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			}
 		}
 
-		private void VerifySymmetricKeyAlgorithm()
+		void VerifySymmetricKeyAlgorithm()
 		{
 			switch (symAlgorithmId)
 			{

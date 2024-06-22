@@ -5,9 +5,9 @@ using System.Globalization;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities
 {
-	internal static class Platform
+	static class Platform
 	{
-		private static readonly CompareInfo InvariantCompareInfo = CultureInfo.InvariantCulture.CompareInfo;
+		static readonly CompareInfo InvariantCompareInfo = CultureInfo.InvariantCulture.CompareInfo;
 
 		internal static bool EqualsIgnoreCase(string a, string b)
 		{

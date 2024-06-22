@@ -8,20 +8,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cmp
 {
 	public struct RevocationDetails
 	{
-		private readonly RevDetails m_revDetails;
+		readonly RevDetails m_revDetails;
 
 		public RevocationDetails(RevDetails revDetails)
 		{
 			m_revDetails = revDetails;
 		}
 
-		public X509Name Subject => m_revDetails.CertDetails.Subject;
+		public X509Name Subject
+		{
+			get { return m_revDetails.CertDetails.Subject; }
+		}
 
-		public X509Name Issuer => m_revDetails.CertDetails.Issuer;
+		public X509Name Issuer
+		{
+			get { return m_revDetails.CertDetails.Issuer; }
+		}
 
-		public BigInteger SerialNumber => m_revDetails.CertDetails.SerialNumber.Value;
+		public BigInteger SerialNumber
+		{
+			get { return m_revDetails.CertDetails.SerialNumber.Value; }
+		}
 
-		public RevDetails ToASN1Structure() => m_revDetails;
+		public RevDetails ToASN1Structure()
+		{
+			return m_revDetails;
+		}
 	}
 }
 #pragma warning restore

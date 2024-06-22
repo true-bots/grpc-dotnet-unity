@@ -4,9 +4,9 @@ using System;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal sealed class Asn1UniversalTypes
+	sealed class Asn1UniversalTypes
 	{
-		private Asn1UniversalTypes()
+		Asn1UniversalTypes()
 		{
 		}
 

@@ -44,40 +44,40 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 	     * Size of the tweak in bytes (always 128 bit/16 bytes)
 	     */
-		private const int TWEAK_SIZE_BYTES = 16;
+		const int TWEAK_SIZE_BYTES = 16;
 
-		private const int TWEAK_SIZE_WORDS = TWEAK_SIZE_BYTES / 8;
+		const int TWEAK_SIZE_WORDS = TWEAK_SIZE_BYTES / 8;
 
 		/**
 	     * Rounds in Threefish-256
 	     */
-		private const int ROUNDS_256 = 72;
+		const int ROUNDS_256 = 72;
 
 		/**
 	     * Rounds in Threefish-512
 	     */
-		private const int ROUNDS_512 = 72;
+		const int ROUNDS_512 = 72;
 
 		/**
 	     * Rounds in Threefish-1024
 	     */
-		private const int ROUNDS_1024 = 80;
+		const int ROUNDS_1024 = 80;
 
 		/**
 	     * Max rounds of any of the variants
 	     */
-		private const int MAX_ROUNDS = ROUNDS_1024;
+		const int MAX_ROUNDS = ROUNDS_1024;
 
 		/**
 	     * Key schedule parity constant
 	     */
-		private const ulong C_240 = 0x1BD11BDAA9FC1A22L;
+		const ulong C_240 = 0x1BD11BDAA9FC1A22L;
 
 		/* Pre-calculated modulo arithmetic tables for key schedule lookups */
-		private static readonly int[] MOD9 = new int[MAX_ROUNDS];
-		private static readonly int[] MOD17 = new int[MOD9.Length];
-		private static readonly int[] MOD5 = new int[MOD9.Length];
-		private static readonly int[] MOD3 = new int[MOD9.Length];
+		static readonly int[] MOD9 = new int[MAX_ROUNDS];
+		static readonly int[] MOD17 = new int[MOD9.Length];
+		static readonly int[] MOD5 = new int[MOD9.Length];
+		static readonly int[] MOD3 = new int[MOD9.Length];
 
 		static ThreefishEngine()
 		{
@@ -93,34 +93,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 	     * Block size in bytes
 	     */
-		private readonly int blocksizeBytes;
+		readonly int blocksizeBytes;
 
 		/**
 	     * Block size in 64 bit words
 	     */
-		private readonly int blocksizeWords;
+		readonly int blocksizeWords;
 
 		/**
 	     * Buffer for byte oriented processBytes to call internal word API
 	     */
-		private readonly ulong[] currentBlock;
+		readonly ulong[] currentBlock;
 
 		/**
 	     * Tweak bytes (2 byte t1,t2, calculated t3 and repeat of t1,t2 for modulo free lookup
 	     */
-		private readonly ulong[] t = new ulong[5];
+		readonly ulong[] t = new ulong[5];
 
 		/**
 	     * Key schedule words
 	     */
-		private readonly ulong[] kw;
+		readonly ulong[] kw;
 
 		/**
 	     * The internal cipher implementation (varies by blocksize)
 	     */
-		private readonly ThreefishCipher cipher;
+		readonly ThreefishCipher cipher;
 
-		private bool forEncryption;
+		bool forEncryption;
 
 		/// <summary>
 		/// Constructs a new Threefish cipher, with a specified block size.
@@ -129,15 +129,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		///                      <see cref="BLOCKSIZE_1024"/> .</param>
 		public ThreefishEngine(int blocksizeBits)
 		{
-			this.blocksizeBytes = (blocksizeBits / 8);
-			this.blocksizeWords = (this.blocksizeBytes / 8);
-			this.currentBlock = new ulong[blocksizeWords];
+			blocksizeBytes = blocksizeBits / 8;
+			blocksizeWords = blocksizeBytes / 8;
+			currentBlock = new ulong[blocksizeWords];
 
 			/*
 			 * Provide room for original key words, extended key word and repeat of key words for modulo
 			 * free lookup of key schedule words.
 			 */
-			this.kw = new ulong[2 * blocksizeWords + 1];
+			kw = new ulong[2 * blocksizeWords + 1];
 
 			switch (blocksizeBits)
 			{
@@ -180,7 +180,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			else
 			{
 				throw new ArgumentException("Invalid parameter passed to Threefish init - "
-				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Platform.GetTypeName(parameters));
 			}
 
 			ulong[] keyWords = null;
@@ -188,7 +188,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			if (keyBytes != null)
 			{
-				if (keyBytes.Length != this.blocksizeBytes)
+				if (keyBytes.Length != blocksizeBytes)
 				{
 					throw new ArgumentException("Threefish key must be same size as block (" + blocksizeBytes
 					                                                                         + " bytes)");
@@ -232,9 +232,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void SetKey(ulong[] key)
+		void SetKey(ulong[] key)
 		{
-			if (key.Length != this.blocksizeWords)
+			if (key.Length != blocksizeWords)
 			{
 				throw new ArgumentException("Threefish key must be same size as block (" + blocksizeWords
 				                                                                         + " words)");
@@ -259,7 +259,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			Array.Copy(kw, 0, kw, blocksizeWords + 1, blocksizeWords);
 		}
 
-		private void SetTweak(ulong[] tweak)
+		void SetTweak(ulong[] tweak)
 		{
 			if (tweak.Length != TWEAK_SIZE_WORDS)
 			{
@@ -278,7 +278,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		public virtual string AlgorithmName
 		{
-			get { return "Threefish-" + (blocksizeBytes * 8); }
+			get { return "Threefish-" + blocksizeBytes * 8; }
 		}
 
 		public virtual int GetBlockSize()
@@ -292,7 +292,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			Check.OutputLength(outBytes, outOff, blocksizeBytes, "output buffer too short");
 
 			Pack.LE_To_UInt64(inBytes, inOff, currentBlock);
-			ProcessBlock(this.currentBlock, this.currentBlock);
+			ProcessBlock(currentBlock, currentBlock);
 			Pack.UInt64_To_LE(currentBlock, outBytes, outOff);
 			return blocksizeBytes;
 		}
@@ -326,9 +326,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			if (inWords.Length != blocksizeWords)
+			{
 				throw new DataLengthException("input buffer too short");
+			}
+
 			if (outWords.Length != blocksizeWords)
+			{
 				throw new OutputLengthException("output buffer too short");
+			}
 
 			if (forEncryption)
 			{
@@ -345,7 +350,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 	     * Rotate left + xor part of the mix operation.
 	     */
-		private static ulong RotlXor(ulong x, int n, ulong xor)
+		static ulong RotlXor(ulong x, int n, ulong xor)
 		{
 			return ((x << n) | (x >> (64 - n))) ^ xor;
 		}
@@ -353,13 +358,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 	     * Rotate xor + rotate right part of the unmix operation.
 	     */
-		private static ulong XorRotr(ulong x, int n, ulong xor)
+		static ulong XorRotr(ulong x, int n, ulong xor)
 		{
 			ulong xored = x ^ xor;
 			return (xored >> n) | (xored << (64 - n));
 		}
 
-		private abstract class ThreefishCipher
+		abstract class ThreefishCipher
 		{
 			/**
 	         * The extended + repeated tweak words
@@ -382,22 +387,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			internal abstract void DecryptBlock(ulong[] block, ulong[] outWords);
 		}
 
-		private sealed class Threefish256Cipher
+		sealed class Threefish256Cipher
 			: ThreefishCipher
 		{
 			/**
 	         * Mix rotation constants defined in Skein 1.3 specification
 	         */
-			private const int ROTATION_0_0 = 14, ROTATION_0_1 = 16;
+			const int ROTATION_0_0 = 14, ROTATION_0_1 = 16;
 
-			private const int ROTATION_1_0 = 52, ROTATION_1_1 = 57;
-			private const int ROTATION_2_0 = 23, ROTATION_2_1 = 40;
-			private const int ROTATION_3_0 = 5, ROTATION_3_1 = 37;
+			const int ROTATION_1_0 = 52, ROTATION_1_1 = 57;
+			const int ROTATION_2_0 = 23, ROTATION_2_1 = 40;
+			const int ROTATION_3_0 = 5, ROTATION_3_1 = 37;
 
-			private const int ROTATION_4_0 = 25, ROTATION_4_1 = 33;
-			private const int ROTATION_5_0 = 46, ROTATION_5_1 = 12;
-			private const int ROTATION_6_0 = 58, ROTATION_6_1 = 22;
-			private const int ROTATION_7_0 = 32, ROTATION_7_1 = 32;
+			const int ROTATION_4_0 = 25, ROTATION_4_1 = 33;
+			const int ROTATION_5_0 = 46, ROTATION_5_1 = 12;
+			const int ROTATION_6_0 = 58, ROTATION_6_1 = 22;
+			const int ROTATION_7_0 = 32, ROTATION_7_1 = 32;
 
 			public Threefish256Cipher(ulong[] kw, ulong[] t)
 				: base(kw, t)
@@ -449,7 +454,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				 * inlining constant rotation values (avoiding array index/lookup).
 				 */
 
-				for (int d = 1; d < (ROUNDS_256 / 4); d += 2)
+				for (int d = 1; d < ROUNDS_256 / 4; d += 2)
 				{
 					int dm5 = mod5[d];
 					int dm3 = mod3[d];
@@ -536,7 +541,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				ulong b2 = block[2];
 				ulong b3 = block[3];
 
-				for (int d = (ROUNDS_256 / 4) - 1; d >= 1; d -= 2)
+				for (int d = ROUNDS_256 / 4 - 1; d >= 1; d -= 2)
 				{
 					int dm5 = mod5[d];
 					int dm3 = mod3[d];
@@ -615,22 +620,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private sealed class Threefish512Cipher
+		sealed class Threefish512Cipher
 			: ThreefishCipher
 		{
 			/**
 	         * Mix rotation constants defined in Skein 1.3 specification
 	         */
-			private const int ROTATION_0_0 = 46, ROTATION_0_1 = 36, ROTATION_0_2 = 19, ROTATION_0_3 = 37;
+			const int ROTATION_0_0 = 46, ROTATION_0_1 = 36, ROTATION_0_2 = 19, ROTATION_0_3 = 37;
 
-			private const int ROTATION_1_0 = 33, ROTATION_1_1 = 27, ROTATION_1_2 = 14, ROTATION_1_3 = 42;
-			private const int ROTATION_2_0 = 17, ROTATION_2_1 = 49, ROTATION_2_2 = 36, ROTATION_2_3 = 39;
-			private const int ROTATION_3_0 = 44, ROTATION_3_1 = 9, ROTATION_3_2 = 54, ROTATION_3_3 = 56;
+			const int ROTATION_1_0 = 33, ROTATION_1_1 = 27, ROTATION_1_2 = 14, ROTATION_1_3 = 42;
+			const int ROTATION_2_0 = 17, ROTATION_2_1 = 49, ROTATION_2_2 = 36, ROTATION_2_3 = 39;
+			const int ROTATION_3_0 = 44, ROTATION_3_1 = 9, ROTATION_3_2 = 54, ROTATION_3_3 = 56;
 
-			private const int ROTATION_4_0 = 39, ROTATION_4_1 = 30, ROTATION_4_2 = 34, ROTATION_4_3 = 24;
-			private const int ROTATION_5_0 = 13, ROTATION_5_1 = 50, ROTATION_5_2 = 10, ROTATION_5_3 = 17;
-			private const int ROTATION_6_0 = 25, ROTATION_6_1 = 29, ROTATION_6_2 = 39, ROTATION_6_3 = 43;
-			private const int ROTATION_7_0 = 8, ROTATION_7_1 = 35, ROTATION_7_2 = 56, ROTATION_7_3 = 22;
+			const int ROTATION_4_0 = 39, ROTATION_4_1 = 30, ROTATION_4_2 = 34, ROTATION_4_3 = 24;
+			const int ROTATION_5_0 = 13, ROTATION_5_1 = 50, ROTATION_5_2 = 10, ROTATION_5_3 = 17;
+			const int ROTATION_6_0 = 25, ROTATION_6_1 = 29, ROTATION_6_2 = 39, ROTATION_6_3 = 43;
+			const int ROTATION_7_0 = 8, ROTATION_7_1 = 35, ROTATION_7_2 = 56, ROTATION_7_3 = 22;
 
 			internal Threefish512Cipher(ulong[] kw, ulong[] t)
 				: base(kw, t)
@@ -690,7 +695,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				 * inlining constant rotation values (avoiding array index/lookup).
 				 */
 
-				for (int d = 1; d < (ROUNDS_512 / 4); d += 2)
+				for (int d = 1; d < ROUNDS_512 / 4; d += 2)
 				{
 					int dm9 = mod9[d];
 					int dm3 = mod3[d];
@@ -809,7 +814,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				ulong b6 = block[6];
 				ulong b7 = block[7];
 
-				for (int d = (ROUNDS_512 / 4) - 1; d >= 1; d -= 2)
+				for (int d = ROUNDS_512 / 4 - 1; d >= 1; d -= 2)
 				{
 					int dm9 = mod9[d];
 					int dm3 = mod3[d];
@@ -936,30 +941,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private sealed class Threefish1024Cipher
+		sealed class Threefish1024Cipher
 			: ThreefishCipher
 		{
 			/**
 	         * Mix rotation constants defined in Skein 1.3 specification
 	         */
-			private const int ROTATION_0_0 = 24, ROTATION_0_1 = 13, ROTATION_0_2 = 8, ROTATION_0_3 = 47;
+			const int ROTATION_0_0 = 24, ROTATION_0_1 = 13, ROTATION_0_2 = 8, ROTATION_0_3 = 47;
 
-			private const int ROTATION_0_4 = 8, ROTATION_0_5 = 17, ROTATION_0_6 = 22, ROTATION_0_7 = 37;
-			private const int ROTATION_1_0 = 38, ROTATION_1_1 = 19, ROTATION_1_2 = 10, ROTATION_1_3 = 55;
-			private const int ROTATION_1_4 = 49, ROTATION_1_5 = 18, ROTATION_1_6 = 23, ROTATION_1_7 = 52;
-			private const int ROTATION_2_0 = 33, ROTATION_2_1 = 4, ROTATION_2_2 = 51, ROTATION_2_3 = 13;
-			private const int ROTATION_2_4 = 34, ROTATION_2_5 = 41, ROTATION_2_6 = 59, ROTATION_2_7 = 17;
-			private const int ROTATION_3_0 = 5, ROTATION_3_1 = 20, ROTATION_3_2 = 48, ROTATION_3_3 = 41;
-			private const int ROTATION_3_4 = 47, ROTATION_3_5 = 28, ROTATION_3_6 = 16, ROTATION_3_7 = 25;
+			const int ROTATION_0_4 = 8, ROTATION_0_5 = 17, ROTATION_0_6 = 22, ROTATION_0_7 = 37;
+			const int ROTATION_1_0 = 38, ROTATION_1_1 = 19, ROTATION_1_2 = 10, ROTATION_1_3 = 55;
+			const int ROTATION_1_4 = 49, ROTATION_1_5 = 18, ROTATION_1_6 = 23, ROTATION_1_7 = 52;
+			const int ROTATION_2_0 = 33, ROTATION_2_1 = 4, ROTATION_2_2 = 51, ROTATION_2_3 = 13;
+			const int ROTATION_2_4 = 34, ROTATION_2_5 = 41, ROTATION_2_6 = 59, ROTATION_2_7 = 17;
+			const int ROTATION_3_0 = 5, ROTATION_3_1 = 20, ROTATION_3_2 = 48, ROTATION_3_3 = 41;
+			const int ROTATION_3_4 = 47, ROTATION_3_5 = 28, ROTATION_3_6 = 16, ROTATION_3_7 = 25;
 
-			private const int ROTATION_4_0 = 41, ROTATION_4_1 = 9, ROTATION_4_2 = 37, ROTATION_4_3 = 31;
-			private const int ROTATION_4_4 = 12, ROTATION_4_5 = 47, ROTATION_4_6 = 44, ROTATION_4_7 = 30;
-			private const int ROTATION_5_0 = 16, ROTATION_5_1 = 34, ROTATION_5_2 = 56, ROTATION_5_3 = 51;
-			private const int ROTATION_5_4 = 4, ROTATION_5_5 = 53, ROTATION_5_6 = 42, ROTATION_5_7 = 41;
-			private const int ROTATION_6_0 = 31, ROTATION_6_1 = 44, ROTATION_6_2 = 47, ROTATION_6_3 = 46;
-			private const int ROTATION_6_4 = 19, ROTATION_6_5 = 42, ROTATION_6_6 = 44, ROTATION_6_7 = 25;
-			private const int ROTATION_7_0 = 9, ROTATION_7_1 = 48, ROTATION_7_2 = 35, ROTATION_7_3 = 52;
-			private const int ROTATION_7_4 = 23, ROTATION_7_5 = 31, ROTATION_7_6 = 37, ROTATION_7_7 = 20;
+			const int ROTATION_4_0 = 41, ROTATION_4_1 = 9, ROTATION_4_2 = 37, ROTATION_4_3 = 31;
+			const int ROTATION_4_4 = 12, ROTATION_4_5 = 47, ROTATION_4_6 = 44, ROTATION_4_7 = 30;
+			const int ROTATION_5_0 = 16, ROTATION_5_1 = 34, ROTATION_5_2 = 56, ROTATION_5_3 = 51;
+			const int ROTATION_5_4 = 4, ROTATION_5_5 = 53, ROTATION_5_6 = 42, ROTATION_5_7 = 41;
+			const int ROTATION_6_0 = 31, ROTATION_6_1 = 44, ROTATION_6_2 = 47, ROTATION_6_3 = 46;
+			const int ROTATION_6_4 = 19, ROTATION_6_5 = 42, ROTATION_6_6 = 44, ROTATION_6_7 = 25;
+			const int ROTATION_7_0 = 9, ROTATION_7_1 = 48, ROTATION_7_2 = 35, ROTATION_7_3 = 52;
+			const int ROTATION_7_4 = 23, ROTATION_7_5 = 31, ROTATION_7_6 = 37, ROTATION_7_7 = 20;
 
 			public Threefish1024Cipher(ulong[] kw, ulong[] t)
 				: base(kw, t)
@@ -1035,7 +1040,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				 * inlining constant rotation values (avoiding array index/lookup).
 				 */
 
-				for (int d = 1; d < (ROUNDS_1024 / 4); d += 2)
+				for (int d = 1; d < ROUNDS_1024 / 4; d += 2)
 				{
 					int dm17 = mod17[d];
 					int dm3 = mod3[d];
@@ -1218,7 +1223,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				ulong b14 = block[14];
 				ulong b15 = block[15];
 
-				for (int d = (ROUNDS_1024 / 4) - 1; d >= 1; d -= 2)
+				for (int d = ROUNDS_1024 / 4 - 1; d >= 1; d -= 2)
 				{
 					int dm17 = mod17[d];
 					int dm3 = mod3[d];

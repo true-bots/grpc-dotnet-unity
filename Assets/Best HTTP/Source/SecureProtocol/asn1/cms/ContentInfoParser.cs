@@ -15,8 +15,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	*/
 	public class ContentInfoParser
 	{
-		private readonly DerObjectIdentifier m_contentType;
-		private readonly Asn1TaggedObjectParser m_content;
+		readonly DerObjectIdentifier m_contentType;
+		readonly Asn1TaggedObjectParser m_content;
 
 		public ContentInfoParser(Asn1SequenceParser seq)
 		{
@@ -32,7 +32,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public IAsn1Convertible GetContent(int tag)
 		{
 			if (null == m_content)
+			{
 				return null;
+			}
 
 			// TODO[cms] Ideally we could enforce the claimed tag
 			//return Asn1Utilities.ParseContextBaseUniversal(content, 0, true, tag);

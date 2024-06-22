@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class AttributePkcs
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier attrType;
-		private readonly Asn1Set attrValues;
+		readonly DerObjectIdentifier attrType;
+		readonly Asn1Set attrValues;
 
 		/**
          * return an Attribute object from the given object.
@@ -32,14 +32,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				return new AttributePkcs(seq);
 			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private AttributePkcs(
+		AttributePkcs(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
 			attrType = DerObjectIdentifier.GetInstance(seq[0]);
 			attrValues = Asn1Set.GetInstance(seq[1]);

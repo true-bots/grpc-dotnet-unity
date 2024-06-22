@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 	public class AsymmetricKeyEntry
 		: Pkcs12Entry
 	{
-		private readonly AsymmetricKeyParameter key;
+		readonly AsymmetricKeyParameter key;
 
 		public AsymmetricKeyEntry(AsymmetricKeyParameter key)
 			: base(new Dictionary<DerObjectIdentifier, Asn1Encodable>())
@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 		public AsymmetricKeyParameter Key
 		{
-			get { return this.key; }
+			get { return key; }
 		}
 
 		public override bool Equals(object obj)
@@ -34,7 +34,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			AsymmetricKeyEntry other = obj as AsymmetricKeyEntry;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return key.Equals(other.key);
 		}

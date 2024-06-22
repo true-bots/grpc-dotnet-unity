@@ -18,9 +18,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class X509CertificateStructure
 		: Asn1Encodable
 	{
-		private readonly TbsCertificateStructure tbsCert;
-		private readonly AlgorithmIdentifier sigAlgID;
-		private readonly DerBitString sig;
+		readonly TbsCertificateStructure tbsCert;
+		readonly AlgorithmIdentifier sigAlgID;
+		readonly DerBitString sig;
 
 		public static X509CertificateStructure GetInstance(
 			Asn1TaggedObject obj,
@@ -33,9 +33,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			object obj)
 		{
 			if (obj is X509CertificateStructure)
+			{
 				return (X509CertificateStructure)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new X509CertificateStructure(Asn1Sequence.GetInstance(obj));
 		}
 
@@ -45,22 +51,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			DerBitString sig)
 		{
 			if (tbsCert == null)
+			{
 				throw new ArgumentNullException("tbsCert");
+			}
+
 			if (sigAlgID == null)
+			{
 				throw new ArgumentNullException("sigAlgID");
+			}
+
 			if (sig == null)
+			{
 				throw new ArgumentNullException("sig");
+			}
 
 			this.tbsCert = tbsCert;
 			this.sigAlgID = sigAlgID;
 			this.sig = sig;
 		}
 
-		private X509CertificateStructure(
+		X509CertificateStructure(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 3)
+			{
 				throw new ArgumentException("sequence wrong size for a certificate", "seq");
+			}
 
 			//
 			// correct x509 certficate

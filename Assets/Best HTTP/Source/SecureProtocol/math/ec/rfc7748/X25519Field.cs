@@ -10,17 +10,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 	{
 		public const int Size = 10;
 
-		private const int M24 = 0x00FFFFFF;
-		private const int M25 = 0x01FFFFFF;
-		private const int M26 = 0x03FFFFFF;
+		const int M24 = 0x00FFFFFF;
+		const int M25 = 0x01FFFFFF;
+		const int M26 = 0x03FFFFFF;
 
-		private static readonly uint[] P32 = new uint[]
+		static readonly uint[] P32 = new uint[]
 		{
 			0xFFFFFFEDU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU,
 			0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0x7FFFFFFFU
 		};
 
-		private static readonly int[] RootNegOne =
+		static readonly int[] RootNegOne =
 		{
 			0x020EA0B0, 0x0386C9D2, 0x00478C4E, 0x0035697F, 0x005E8630,
 			0x01FBD7A7, 0x0340264F, 0x01F0B2B4, 0x00027E0E, 0x00570649
@@ -77,37 +77,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			int z0 = z[0], z1 = z[1], z2 = z[2], z3 = z[3], z4 = z[4];
 			int z5 = z[5], z6 = z[6], z7 = z[7], z8 = z[8], z9 = z[9];
 
-			z2 += (z1 >> 26);
+			z2 += z1 >> 26;
 			z1 &= M26;
-			z4 += (z3 >> 26);
+			z4 += z3 >> 26;
 			z3 &= M26;
-			z7 += (z6 >> 26);
+			z7 += z6 >> 26;
 			z6 &= M26;
-			z9 += (z8 >> 26);
+			z9 += z8 >> 26;
 			z8 &= M26;
 
-			z3 += (z2 >> 25);
+			z3 += z2 >> 25;
 			z2 &= M25;
-			z5 += (z4 >> 25);
+			z5 += z4 >> 25;
 			z4 &= M25;
-			z8 += (z7 >> 25);
+			z8 += z7 >> 25;
 			z7 &= M25;
 			//z0 += (z9 >> 24) * 19; z9 &= M24;
 			z0 += (z9 >> 25) * 38;
 			z9 &= M25;
 
-			z1 += (z0 >> 26);
+			z1 += z0 >> 26;
 			z0 &= M26;
-			z6 += (z5 >> 26);
+			z6 += z5 >> 26;
 			z5 &= M26;
 
-			z2 += (z1 >> 26);
+			z2 += z1 >> 26;
 			z1 &= M26;
-			z4 += (z3 >> 26);
+			z4 += z3 >> 26;
 			z3 &= M26;
-			z7 += (z6 >> 26);
+			z7 += z6 >> 26;
 			z6 &= M26;
-			z9 += (z8 >> 26);
+			z9 += z8 >> 26;
 			z8 &= M26;
 
 			z[0] = z0;
@@ -129,7 +129,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			for (int i = 0; i < Size; ++i)
 			{
 				int z_i = z[zOff + i], diff = z_i ^ x[xOff + i];
-				z_i ^= (diff & cond);
+				z_i ^= diff & cond;
 				z[zOff + i] = z_i;
 			}
 		}
@@ -233,7 +233,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Decode128(uint[] x, int xOff, int[] z, int zOff)
+		static void Decode128(uint[] x, int xOff, int[] z, int zOff)
 		{
 			uint t0 = x[xOff + 0], t1 = x[xOff + 1], t2 = x[xOff + 2], t3 = x[xOff + 3];
 
@@ -257,7 +257,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Decode128(byte[] bs, int off, int[] z, int zOff)
+		static void Decode128(byte[] bs, int off, int[] z, int zOff)
 		{
 			uint t0 = Decode32(bs, off + 0);
 			uint t1 = Decode32(bs, off + 4);
@@ -287,7 +287,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static uint Decode32(byte[] bs, int off)
+		static uint Decode32(byte[] bs, int off)
 		{
 			uint n = bs[off];
 			n |= (uint)bs[++off] << 8;
@@ -337,7 +337,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Encode128(int[] x, int xOff, uint[] z, int zOff)
+		static void Encode128(int[] x, int xOff, uint[] z, int zOff)
 		{
 			uint x0 = (uint)x[xOff + 0],
 				x1 = (uint)x[xOff + 1],
@@ -363,7 +363,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Encode128(int[] x, int xOff, byte[] bs, int off)
+		static void Encode128(int[] x, int xOff, byte[] bs, int off)
 		{
 			uint x0 = (uint)x[xOff + 0], x1 = (uint)x[xOff + 1], x2 = (uint)x[xOff + 2];
 			uint x3 = (uint)x[xOff + 3], x4 = (uint)x[xOff + 4];
@@ -391,9 +391,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void Encode32(uint n, byte[] bs, int off)
+		static void Encode32(uint n, byte[] bs, int off)
 		{
-			bs[off] = (byte)(n);
+			bs[off] = (byte)n;
 			bs[++off] = (byte)(n >> 8);
 			bs[++off] = (byte)(n >> 16);
 			bs[++off] = (byte)(n >> 24);
@@ -703,7 +703,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			z8 = (int)t & M26;
 			t >>= 26;
 			//t       += a9 + (c4 - a4);
-			t += (c4 - a4) - b4;
+			t += c4 - a4 - b4;
 			//z9       = (int)t & M24; t >>= 24;
 			//t        = a0 + (t + ((c5 - a5) << 1)) * 19;
 			z9 = (int)t & M25;
@@ -774,7 +774,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			}
 		}
 
-		private static void PowPm5d8(int[] x, int[] rx2, int[] rz)
+		static void PowPm5d8(int[] x, int[] rx2, int[] rz)
 		{
 			// z = x^((p-5)/8) = x^FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD
 			// (250 1s) (1 0s) (1 1s)
@@ -816,7 +816,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			Mul(t, x, rz);
 		}
 
-		private static void Reduce(int[] z, int x)
+		static void Reduce(int[] z, int x)
 		{
 			int t = z[9], z9 = t & M24;
 			t = (t >> 24) + x;
@@ -973,7 +973,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			z8 = (int)t & M26;
 			t >>= 26;
 			//t       += a9 + (c4 - a4);
-			t += (c4 - a4) - b4;
+			t += c4 - a4 - b4;
 			//z9       = (int)t & M24; t >>= 24;
 			//t        = a0 + (t + ((c5 - a5) << 1)) * 19;
 			z9 = (int)t & M25;

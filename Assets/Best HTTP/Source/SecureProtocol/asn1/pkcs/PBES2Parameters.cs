@@ -7,29 +7,37 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class PbeS2Parameters
 		: Asn1Encodable
 	{
-		private readonly KeyDerivationFunc func;
-		private readonly EncryptionScheme scheme;
+		readonly KeyDerivationFunc func;
+		readonly EncryptionScheme scheme;
 
 		public static PbeS2Parameters GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
+
 			PbeS2Parameters existing = obj as PbeS2Parameters;
 			if (existing != null)
+			{
 				return existing;
+			}
+
 			return new PbeS2Parameters(Asn1Sequence.GetInstance(obj));
 		}
 
 		public PbeS2Parameters(KeyDerivationFunc keyDevFunc, EncryptionScheme encScheme)
 		{
-			this.func = keyDevFunc;
-			this.scheme = encScheme;
+			func = keyDevFunc;
+			scheme = encScheme;
 		}
 
-		private PbeS2Parameters(Asn1Sequence seq)
+		PbeS2Parameters(Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
 			Asn1Sequence funcSeq = (Asn1Sequence)seq[0].ToAsn1Object();
 

@@ -9,23 +9,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class ModDetectionCodePacket
 		: ContainedPacket
 	{
-		private readonly byte[] digest;
+		readonly byte[] digest;
 
 		internal ModDetectionCodePacket(
 			BcpgInputStream bcpgIn)
 		{
 			if (bcpgIn == null)
+			{
 				throw new ArgumentNullException("bcpgIn");
+			}
 
-			this.digest = new byte[20];
-			bcpgIn.ReadFully(this.digest);
+			digest = new byte[20];
+			bcpgIn.ReadFully(digest);
 		}
 
 		public ModDetectionCodePacket(
 			byte[] digest)
 		{
 			if (digest == null)
+			{
 				throw new ArgumentNullException("digest");
+			}
 
 			this.digest = (byte[])digest.Clone();
 		}

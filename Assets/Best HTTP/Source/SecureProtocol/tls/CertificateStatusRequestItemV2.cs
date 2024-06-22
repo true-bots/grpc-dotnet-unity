@@ -8,16 +8,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	/// <summary>Implementation of the RFC 6961 2.2. CertificateStatusRequestItemV2.</summary>
 	public sealed class CertificateStatusRequestItemV2
 	{
-		private readonly short m_statusType;
-		private readonly object m_request;
+		readonly short m_statusType;
+		readonly object m_request;
 
 		public CertificateStatusRequestItemV2(short statusType, object request)
 		{
 			if (!IsCorrectType(statusType, request))
+			{
 				throw new ArgumentException("not an instance of the correct type", "request");
+			}
 
-			this.m_statusType = statusType;
-			this.m_request = request;
+			m_statusType = statusType;
+			m_request = request;
 		}
 
 		public short StatusType
@@ -35,7 +37,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			get
 			{
 				if (!(m_request is OcspStatusRequest))
+				{
 					throw new InvalidOperationException("'request' is not an OcspStatusRequest");
+				}
 
 				return (OcspStatusRequest)m_request;
 			}
@@ -89,7 +93,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			return new CertificateStatusRequestItemV2(status_type, request);
 		}
 
-		private static bool IsCorrectType(short statusType, object request)
+		static bool IsCorrectType(short statusType, object request)
 		{
 			switch (statusType)
 			{

@@ -29,15 +29,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 			ProtocolVersion negotiatedVersion = securityParameters.NegotiatedVersion;
 
 			if (TlsImplUtilities.IsTlsV13(negotiatedVersion))
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
-			this.m_cryptoParams = cryptoParams;
-			this.m_randomData = cryptoParams.NonceGenerator.GenerateNonce(256);
+			m_cryptoParams = cryptoParams;
+			m_randomData = cryptoParams.NonceGenerator.GenerateNonce(256);
 
-			this.m_encryptThenMac = securityParameters.IsEncryptThenMac;
-			this.m_useExplicitIV = TlsImplUtilities.IsTlsV11(negotiatedVersion);
+			m_encryptThenMac = securityParameters.IsEncryptThenMac;
+			m_useExplicitIV = TlsImplUtilities.IsTlsV11(negotiatedVersion);
 
-			this.m_acceptExtraPadding = !negotiatedVersion.IsSsl;
+			m_acceptExtraPadding = !negotiatedVersion.IsSsl;
 
 			/*
 			 * Don't use variable-length padding with truncated MACs.
@@ -47,12 +49,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 			 *
 			 * TODO[DTLS] Consider supporting in DTLS (without exceeding send limit though)
 			 */
-			this.m_useExtraPadding = securityParameters.IsExtendedPadding
-			                         && ProtocolVersion.TLSv10.IsEqualOrEarlierVersionOf(negotiatedVersion)
-			                         && (m_encryptThenMac || !securityParameters.IsTruncatedHmac);
+			m_useExtraPadding = securityParameters.IsExtendedPadding
+			                    && ProtocolVersion.TLSv10.IsEqualOrEarlierVersionOf(negotiatedVersion)
+			                    && (m_encryptThenMac || !securityParameters.IsTruncatedHmac);
 
-			this.m_encryptCipher = encryptCipher;
-			this.m_decryptCipher = decryptCipher;
+			m_encryptCipher = encryptCipher;
+			m_decryptCipher = decryptCipher;
 
 			TlsBlockCipherImpl clientCipher, serverCipher;
 			if (cryptoParams.IsServer)
@@ -66,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 				serverCipher = decryptCipher;
 			}
 
-			int keyBlockSize = (2 * cipherKeySize) + clientMac.MacLength + serverMac.MacLength;
+			int keyBlockSize = 2 * cipherKeySize + clientMac.MacLength + serverMac.MacLength;
 
 			// From TLS 1.1 onwards, block ciphers don't need IVs from the key_block
 			if (!m_useExplicitIV)
@@ -133,18 +135,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 			}
 
 			if (pos != keyBlockSize)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 #endif
 
 			if (cryptoParams.IsServer)
 			{
-				this.m_writeMac = new TlsSuiteHmac(cryptoParams, serverMac);
-				this.m_readMac = new TlsSuiteHmac(cryptoParams, clientMac);
+				m_writeMac = new TlsSuiteHmac(cryptoParams, serverMac);
+				m_readMac = new TlsSuiteHmac(cryptoParams, clientMac);
 			}
 			else
 			{
-				this.m_writeMac = new TlsSuiteHmac(cryptoParams, clientMac);
-				this.m_readMac = new TlsSuiteHmac(cryptoParams, serverMac);
+				m_writeMac = new TlsSuiteHmac(cryptoParams, clientMac);
+				m_readMac = new TlsSuiteHmac(cryptoParams, serverMac);
 			}
 		}
 
@@ -212,7 +216,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 				enc_input_length += macSize;
 			}
 
-			int padding_length = blockSize - (enc_input_length % blockSize);
+			int padding_length = blockSize - enc_input_length % blockSize;
 			if (m_useExtraPadding)
 			{
 				// Add a random number of extra blocks worth of padding
@@ -265,7 +269,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 			}
 
 			if (outOff != outBuf.Length)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			return new TlsEncodeResult(outBuf, 0, outBuf.Length, contentType);
 #endif
@@ -365,7 +371,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 			}
 
 			if (len < minLen)
+			{
 				throw new TlsFatalAlert(AlertDescription.decode_error);
+			}
 
 			int blocks_length = len;
 			if (m_encryptThenMac)
@@ -374,7 +382,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 			}
 
 			if (blocks_length % blockSize != 0)
+			{
 				throw new TlsFatalAlert(AlertDescription.decryption_failed);
+			}
 
 			if (m_encryptThenMac)
 			{
@@ -407,7 +417,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 			// If there's anything wrong with the padding, this will return zero
 			int totalPad = CheckPaddingConstantTime(ciphertext, offset, blocks_length, blockSize,
 				m_encryptThenMac ? 0 : macSize);
-			bool badMac = (totalPad == 0);
+			bool badMac = totalPad == 0;
 
 			int dec_output_length = blocks_length - totalPad;
 
@@ -423,7 +433,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 			}
 
 			if (badMac)
+			{
 				throw new TlsFatalAlert(AlertDescription.bad_record_mac);
+			}
 
 			return new TlsDecodeResult(ciphertext, offset, dec_output_length, recordType);
 		}
@@ -514,13 +526,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 
 			if (m_encryptThenMac)
 			{
-				ciphertextLength -= (ciphertextLength % blockSize);
+				ciphertextLength -= ciphertextLength % blockSize;
 				ciphertextLength += macSize;
 			}
 			else
 			{
 				ciphertextLength += macSize;
-				ciphertextLength -= (ciphertextLength % blockSize);
+				ciphertextLength -= ciphertextLength % blockSize;
 			}
 
 			return ciphertextLength;

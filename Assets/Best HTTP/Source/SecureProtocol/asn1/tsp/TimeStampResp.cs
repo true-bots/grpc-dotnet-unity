@@ -10,26 +10,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 	public class TimeStampResp
 		: Asn1Encodable
 	{
-		private readonly PkiStatusInfo pkiStatusInfo;
-		private readonly ContentInfo timeStampToken;
+		readonly PkiStatusInfo pkiStatusInfo;
+		readonly ContentInfo timeStampToken;
 
 		public static TimeStampResp GetInstance(object obj)
 		{
 			if (obj is TimeStampResp)
+			{
 				return (TimeStampResp)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new TimeStampResp(Asn1Sequence.GetInstance(obj));
 		}
 
-		private TimeStampResp(
+		TimeStampResp(
 			Asn1Sequence seq)
 		{
-			this.pkiStatusInfo = PkiStatusInfo.GetInstance(seq[0]);
+			pkiStatusInfo = PkiStatusInfo.GetInstance(seq[0]);
 
 			if (seq.Count > 1)
 			{
-				this.timeStampToken = ContentInfo.GetInstance(seq[1]);
+				timeStampToken = ContentInfo.GetInstance(seq[1]);
 			}
 		}
 

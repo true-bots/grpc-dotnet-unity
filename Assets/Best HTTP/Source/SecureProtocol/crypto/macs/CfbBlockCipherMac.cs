@@ -10,15 +10,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	/**
 	* implements a Cipher-FeedBack (CFB) mode on top of a simple cipher.
 	*/
-	internal class MacCfbBlockCipher
+	class MacCfbBlockCipher
 		: IBlockCipherMode
 	{
-		private byte[] IV;
-		private byte[] cfbV;
-		private byte[] cfbOutV;
+		byte[] IV;
+		byte[] cfbV;
+		byte[] cfbOutV;
 
-		private readonly int blockSize;
-		private readonly IBlockCipher cipher;
+		readonly int blockSize;
+		readonly IBlockCipher cipher;
 
 		/**
         * Basic constructor.
@@ -32,11 +32,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			int bitBlockSize)
 		{
 			this.cipher = cipher;
-			this.blockSize = bitBlockSize / 8;
+			blockSize = bitBlockSize / 8;
 
-			this.IV = new byte[cipher.GetBlockSize()];
-			this.cfbV = new byte[cipher.GetBlockSize()];
-			this.cfbOutV = new byte[cipher.GetBlockSize()];
+			IV = new byte[cipher.GetBlockSize()];
+			cfbV = new byte[cipher.GetBlockSize()];
+			cfbOutV = new byte[cipher.GetBlockSize()];
 		}
 
 		/**
@@ -79,10 +79,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		*/
 		public string AlgorithmName
 		{
-			get { return cipher.AlgorithmName + "/CFB" + (blockSize * 8); }
+			get { return cipher.AlgorithmName + "/CFB" + blockSize * 8; }
 		}
 
-		public IBlockCipher UnderlyingCipher => cipher;
+		public IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		public bool IsPartialBlockOkay
 		{
@@ -168,12 +171,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class CfbBlockCipherMac
 		: IMac
 	{
-		private byte[] mac;
-		private byte[] Buffer;
-		private int bufOff;
-		private MacCfbBlockCipher cipher;
-		private IBlockCipherPadding padding;
-		private int macSize;
+		byte[] mac;
+		byte[] Buffer;
+		int bufOff;
+		MacCfbBlockCipher cipher;
+		IBlockCipherPadding padding;
+		int macSize;
 
 		/**
         * create a standard MAC based on a CFB block cipher. This will produce an
@@ -184,7 +187,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
         */
 		public CfbBlockCipherMac(
 			IBlockCipher cipher)
-			: this(cipher, 8, (cipher.GetBlockSize() * 8) / 2, null)
+			: this(cipher, 8, cipher.GetBlockSize() * 8 / 2, null)
 		{
 		}
 
@@ -199,7 +202,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public CfbBlockCipherMac(
 			IBlockCipher cipher,
 			IBlockCipherPadding padding)
-			: this(cipher, 8, (cipher.GetBlockSize() * 8) / 2, padding)
+			: this(cipher, 8, cipher.GetBlockSize() * 8 / 2, padding)
 		{
 		}
 
@@ -246,14 +249,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			int macSizeInBits,
 			IBlockCipherPadding padding)
 		{
-			if ((macSizeInBits % 8) != 0)
+			if (macSizeInBits % 8 != 0)
+			{
 				throw new ArgumentException("MAC size must be multiple of 8");
+			}
 
 			mac = new byte[cipher.GetBlockSize()];
 
 			this.cipher = new MacCfbBlockCipher(cipher, cfbBitSize);
 			this.padding = padding;
-			this.macSize = macSizeInBits / 8;
+			macSize = macSizeInBits / 8;
 
 			Buffer = new byte[this.cipher.GetBlockSize()];
 			bufOff = 0;
@@ -290,7 +295,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 		public void BlockUpdate(byte[] input, int inOff, int len)
 		{
 			if (len < 0)
+			{
 				throw new ArgumentException("Can't have a negative input length!");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             BlockUpdate(input.AsSpan(inOff, len));
@@ -361,7 +368,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			int blockSize = cipher.GetBlockSize();
 
 			// pad with zeroes
-			if (this.padding == null)
+			if (padding == null)
 			{
 				while (bufOff < blockSize)
 				{

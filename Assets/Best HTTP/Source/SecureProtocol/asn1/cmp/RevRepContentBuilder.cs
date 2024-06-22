@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 {
 	public class RevRepContentBuilder
 	{
-		private readonly Asn1EncodableVector m_status = new Asn1EncodableVector();
-		private readonly Asn1EncodableVector m_revCerts = new Asn1EncodableVector();
-		private readonly Asn1EncodableVector m_crls = new Asn1EncodableVector();
+		readonly Asn1EncodableVector m_status = new Asn1EncodableVector();
+		readonly Asn1EncodableVector m_revCerts = new Asn1EncodableVector();
+		readonly Asn1EncodableVector m_crls = new Asn1EncodableVector();
 
 		public virtual RevRepContentBuilder Add(PkiStatusInfo status)
 		{
@@ -21,7 +21,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public virtual RevRepContentBuilder Add(PkiStatusInfo status, CertId certId)
 		{
 			if (m_status.Count != m_revCerts.Count)
+			{
 				throw new InvalidOperationException("status and revCerts sequence must be in common order");
+			}
 
 			m_status.Add(status);
 			m_revCerts.Add(certId);

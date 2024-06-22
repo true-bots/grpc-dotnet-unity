@@ -31,10 +31,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 		/// <param name="mac">The MAC to use.</param>
 		public TlsSuiteHmac(TlsCryptoParameters cryptoParams, TlsHmac mac)
 		{
-			this.m_cryptoParams = cryptoParams;
-			this.m_mac = mac;
-			this.m_macSize = GetMacSize(cryptoParams, mac);
-			this.m_digestBlockSize = mac.InternalBlockSize;
+			m_cryptoParams = cryptoParams;
+			m_mac = mac;
+			m_macSize = GetMacSize(cryptoParams, mac);
+			m_digestBlockSize = mac.InternalBlockSize;
 
 			// TODO This should check the actual algorithm, not assume based on the digest size
 			if (TlsImplUtilities.IsSsl(cryptoParams) && mac.MacLength == 20)
@@ -42,11 +42,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 				/*
 				 * NOTE: For the SSL 3.0 MAC with SHA-1, the secret + input pad is not block-aligned.
 				 */
-				this.m_digestOverhead = 4;
+				m_digestOverhead = 4;
 			}
 			else
 			{
-				this.m_digestOverhead = m_digestBlockSize / 8;
+				m_digestOverhead = m_digestBlockSize / 8;
 			}
 		}
 
@@ -142,7 +142,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl
 		protected virtual byte[] Truncate(byte[] bs)
 		{
 			if (bs.Length <= m_macSize)
+			{
 				return bs;
+			}
 
 			return Arrays.CopyOf(bs, m_macSize);
 		}

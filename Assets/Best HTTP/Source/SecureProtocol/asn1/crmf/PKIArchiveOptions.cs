@@ -12,20 +12,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public const int keyGenParameters = 1;
 		public const int archiveRemGenPrivKey = 2;
 
-		private readonly Asn1Encodable value;
+		readonly Asn1Encodable value;
 
 		public static PkiArchiveOptions GetInstance(object obj)
 		{
 			if (obj is PkiArchiveOptions)
+			{
 				return (PkiArchiveOptions)obj;
+			}
 
 			if (obj is Asn1TaggedObject)
+			{
 				return new PkiArchiveOptions((Asn1TaggedObject)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private PkiArchiveOptions(Asn1TaggedObject tagged)
+		PkiArchiveOptions(Asn1TaggedObject tagged)
 		{
 			switch (tagged.TagNo)
 			{
@@ -45,17 +49,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 
 		public PkiArchiveOptions(EncryptedKey encKey)
 		{
-			this.value = encKey;
+			value = encKey;
 		}
 
 		public PkiArchiveOptions(Asn1OctetString keyGenParameters)
 		{
-			this.value = keyGenParameters;
+			value = keyGenParameters;
 		}
 
 		public PkiArchiveOptions(bool archiveRemGenPrivKey)
 		{
-			this.value = DerBoolean.GetInstance(archiveRemGenPrivKey);
+			value = DerBoolean.GetInstance(archiveRemGenPrivKey);
 		}
 
 		public virtual int Type
@@ -63,10 +67,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 			get
 			{
 				if (value is EncryptedKey)
+				{
 					return encryptedPrivKey;
+				}
 
 				if (value is Asn1OctetString)
+				{
 					return keyGenParameters;
+				}
 
 				return archiveRemGenPrivKey;
 			}

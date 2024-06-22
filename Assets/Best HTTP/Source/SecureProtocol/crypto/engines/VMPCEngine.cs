@@ -39,23 +39,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			ICipherParameters parameters)
 		{
 			if (!(parameters is ParametersWithIV))
+			{
 				throw new ArgumentException("VMPC Init parameters must include an IV");
+			}
 
 			ParametersWithIV ivParams = (ParametersWithIV)parameters;
 
 			if (!(ivParams.Parameters is KeyParameter))
+			{
 				throw new ArgumentException("VMPC Init parameters must include a key");
+			}
 
 			KeyParameter key = (KeyParameter)ivParams.Parameters;
 
-			this.workingIV = ivParams.GetIV();
+			workingIV = ivParams.GetIV();
 
 			if (workingIV == null || workingIV.Length < 1 || workingIV.Length > 768)
+			{
 				throw new ArgumentException("VMPC requires 1 to 768 bytes of IV");
+			}
 
-			this.workingKey = key.GetKey();
+			workingKey = key.GetKey();
 
-			InitKey(this.workingKey, this.workingIV);
+			InitKey(workingKey, workingIV);
 		}
 
 		protected virtual void InitKey(
@@ -138,14 +144,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		public virtual void Reset()
 		{
-			InitKey(this.workingKey, this.workingIV);
+			InitKey(workingKey, workingIV);
 		}
 
 		public virtual byte ReturnByte(
 			byte input)
 		{
 			s = P[(s + P[n & 0xff]) & 0xff];
-			byte z = P[(P[(P[s & 0xff]) & 0xff] + 1) & 0xff];
+			byte z = P[(P[P[s & 0xff] & 0xff] + 1) & 0xff];
 			// encryption
 			byte temp = P[n & 0xff];
 			P[n & 0xff] = P[s & 0xff];

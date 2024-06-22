@@ -13,20 +13,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 {
 	public class X509CrlParser
 	{
-		private static readonly PemParser PemCrlParser = new PemParser("CRL");
+		static readonly PemParser PemCrlParser = new PemParser("CRL");
 
-		private readonly bool lazyAsn1;
+		readonly bool lazyAsn1;
 
-		private Asn1Set sCrlData;
-		private int sCrlDataObjectCount;
-		private Stream currentCrlStream;
+		Asn1Set sCrlData;
+		int sCrlDataObjectCount;
+		Stream currentCrlStream;
 
 		public X509CrlParser(bool lazyAsn1 = false)
 		{
 			this.lazyAsn1 = lazyAsn1;
 		}
 
-		private X509Crl ReadDerCrl(Asn1InputStream dIn)
+		X509Crl ReadDerCrl(Asn1InputStream dIn)
 		{
 			Asn1Sequence seq = (Asn1Sequence)dIn.ReadObject();
 
@@ -44,17 +44,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			return new X509Crl(CertificateList.GetInstance(seq));
 		}
 
-		private X509Crl ReadPemCrl(Stream inStream)
+		X509Crl ReadPemCrl(Stream inStream)
 		{
 			Asn1Sequence seq = PemCrlParser.ReadPemObject(inStream);
 
 			return seq == null ? null : new X509Crl(CertificateList.GetInstance(seq));
 		}
 
-		private X509Crl GetCrl()
+		X509Crl GetCrl()
 		{
 			if (sCrlData == null || sCrlDataObjectCount >= sCrlData.Count)
+			{
 				return null;
+			}
 
 			return new X509Crl(CertificateList.GetInstance(sCrlData[sCrlDataObjectCount++]));
 		}
@@ -84,9 +86,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		public X509Crl ReadCrl(Stream inStream)
 		{
 			if (inStream == null)
+			{
 				throw new ArgumentNullException("inStream");
+			}
+
 			if (!inStream.CanRead)
+			{
 				throw new ArgumentException("inStream must be read-able", "inStream");
+			}
 
 			if (currentCrlStream == null)
 			{
@@ -106,7 +113,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				if (sCrlData != null)
 				{
 					if (sCrlDataObjectCount != sCrlData.Count)
+					{
 						return GetCrl();
+					}
 
 					sCrlData = null;
 					sCrlDataObjectCount = 0;
@@ -115,7 +124,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 				int tag = inStream.ReadByte();
 				if (tag < 0)
+				{
 					return null;
+				}
 
 				if (inStream.CanSeek)
 				{
@@ -129,7 +140,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				}
 
 				if (tag != 0x30) // assume ascii PEM encoded.
+				{
 					return ReadPemCrl(inStream);
+				}
 
 				Asn1InputStream asn1 = lazyAsn1
 					? new LazyAsn1InputStream(inStream)

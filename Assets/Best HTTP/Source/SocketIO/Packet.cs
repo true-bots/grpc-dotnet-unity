@@ -6,11 +6,11 @@ namespace BestHTTP.SocketIO
 {
 	using System;
 	using System.Collections.Generic;
-	using BestHTTP.JSON;
+	using JSON;
 
 	public sealed class Packet
 	{
-		private enum PayloadTypes : byte
+		enum PayloadTypes : byte
 		{
 			Textual = 0,
 			Binary = 1
@@ -68,7 +68,7 @@ namespace BestHTTP.SocketIO
 			}
 		}
 
-		private List<byte[]> attachments;
+		List<byte[]> attachments;
 
 		/// <summary>
 		/// Property to check whether all attachments are received to this packet.
@@ -97,9 +97,9 @@ namespace BestHTTP.SocketIO
 		/// </summary>
 		internal Packet()
 		{
-			this.TransportEvent = TransportEventTypes.Unknown;
-			this.SocketIOEvent = SocketIOEventTypes.Unknown;
-			this.Payload = string.Empty;
+			TransportEvent = TransportEventTypes.Unknown;
+			SocketIOEvent = SocketIOEventTypes.Unknown;
+			Payload = string.Empty;
 		}
 
 		/// <summary>
@@ -107,7 +107,7 @@ namespace BestHTTP.SocketIO
 		/// </summary>
 		internal Packet(string from)
 		{
-			this.Parse(from);
+			Parse(from);
 		}
 
 		/// <summary>
@@ -115,34 +115,40 @@ namespace BestHTTP.SocketIO
 		/// </summary>
 		public Packet(TransportEventTypes transportEvent, SocketIOEventTypes packetType, string nsp, string payload, int attachment = 0, int id = 0)
 		{
-			this.TransportEvent = transportEvent;
-			this.SocketIOEvent = packetType;
-			this.Namespace = nsp;
-			this.Payload = payload;
-			this.AttachmentCount = attachment;
-			this.Id = id;
+			TransportEvent = transportEvent;
+			SocketIOEvent = packetType;
+			Namespace = nsp;
+			Payload = payload;
+			AttachmentCount = attachment;
+			Id = id;
 		}
 
 		#endregion
 
 		#region Public Functions
 
-		public object[] Decode(BestHTTP.SocketIO.JsonEncoders.IJsonEncoder encoder)
+		public object[] Decode(JsonEncoders.IJsonEncoder encoder)
 		{
 			if (IsDecoded || encoder == null)
+			{
 				return DecodedArgs;
+			}
 
 			IsDecoded = true;
 
 			if (string.IsNullOrEmpty(Payload))
+			{
 				return DecodedArgs;
+			}
 
 			List<object> decoded = encoder.Decode(Payload);
 
 			if (decoded != null && decoded.Count > 0)
 			{
-				if (this.SocketIOEvent == SocketIOEventTypes.Ack || this.SocketIOEvent == SocketIOEventTypes.BinaryAck)
+				if (SocketIOEvent == SocketIOEventTypes.Ack || SocketIOEvent == SocketIOEventTypes.BinaryAck)
+				{
 					DecodedArgs = decoded.ToArray();
+				}
 				else
 				{
 					decoded.RemoveAt(0);
@@ -161,35 +167,49 @@ namespace BestHTTP.SocketIO
 		{
 			// Already decoded
 			if (!string.IsNullOrEmpty(EventName))
+			{
 				return EventName;
+			}
 
 			// No Payload to decode
 			if (string.IsNullOrEmpty(Payload))
+			{
 				return string.Empty;
+			}
 
 			// Not array encoded, we can't decode
 			if (Payload[0] != '[')
+			{
 				return string.Empty;
+			}
 
 			int idx = 1;
 
 			// Search for the string-begin mark( ' or " chars)
 			while (Payload.Length > idx && Payload[idx] != '"' && Payload[idx] != '\'')
+			{
 				idx++;
+			}
 
 			// Reached the end of the string
 			if (Payload.Length <= idx)
+			{
 				return string.Empty;
+			}
 
 			int startIdx = ++idx;
 
 			// Search for the trailing mark of the string
 			while (Payload.Length > idx && Payload[idx] != '"' && Payload[idx] != '\'')
+			{
 				idx++;
+			}
 
 			// Reached the end of the string
 			if (Payload.Length <= idx)
+			{
 				return string.Empty;
+			}
 
 			return EventName = Payload.Substring(startIdx, idx - startIdx);
 		}
@@ -198,36 +218,50 @@ namespace BestHTTP.SocketIO
 		{
 			// No Payload to decode
 			if (string.IsNullOrEmpty(Payload))
+			{
 				return string.Empty;
+			}
 
 			// Not array encoded, we can't decode
 			if (Payload[0] != '[')
+			{
 				return string.Empty;
+			}
 
 			int idx = 1;
 
 			// Search for the string-begin mark( ' or " chars)
 			while (Payload.Length > idx && Payload[idx] != '"' && Payload[idx] != '\'')
+			{
 				idx++;
+			}
 
 			// Reached the end of the string
 			if (Payload.Length <= idx)
+			{
 				return string.Empty;
+			}
 
 			int startIdx = idx;
 
 			// Search for end of first element, or end of the array marks
 			while (Payload.Length > idx && Payload[idx] != ',' && Payload[idx] != ']')
+			{
 				idx++;
+			}
 
 			// Reached the end of the string
 			if (Payload.Length <= ++idx)
+			{
 				return string.Empty;
+			}
 
 			string payload = Payload.Remove(startIdx, idx - startIdx);
 
 			if (removeArrayMarks)
+			{
 				payload = payload.Substring(1, payload.Length - 2);
+			}
 
 			return payload;
 		}
@@ -243,8 +277,8 @@ namespace BestHTTP.SocketIO
 			return PlaceholderReplacer((json, obj) =>
 			{
 				int idx = Convert.ToInt32(obj["num"]);
-				this.Payload = this.Payload.Replace(json, idx.ToString());
-				this.IsDecoded = false;
+				Payload = Payload.Replace(json, idx.ToString());
+				IsDecoded = false;
 			});
 		}
 
@@ -257,13 +291,15 @@ namespace BestHTTP.SocketIO
 			//"452-["multiImage",{"image":true,"buffer1":{"_placeholder":true,"num":0},"buffer2":{"_placeholder":true,"num":1}}]"
 
 			if (!HasAllAttachment)
+			{
 				return false;
+			}
 
 			return PlaceholderReplacer((json, obj) =>
 			{
 				int idx = Convert.ToInt32(obj["num"]);
-				this.Payload = this.Payload.Replace(json, string.Format("\"{0}\"", Convert.ToBase64String(this.Attachments[idx])));
-				this.IsDecoded = false;
+				Payload = Payload.Replace(json, string.Format("\"{0}\"", Convert.ToBase64String(Attachments[idx])));
+				IsDecoded = false;
 			});
 		}
 
@@ -277,23 +313,29 @@ namespace BestHTTP.SocketIO
 		internal void Parse(string from)
 		{
 			int idx = 0;
-			this.TransportEvent = (TransportEventTypes)ToInt(from[idx++]);
+			TransportEvent = (TransportEventTypes)ToInt(from[idx++]);
 
 			if (from.Length > idx && ToInt(from[idx]) >= 0)
-				this.SocketIOEvent = (SocketIOEventTypes)ToInt(from[idx++]);
+			{
+				SocketIOEvent = (SocketIOEventTypes)ToInt(from[idx++]);
+			}
 			else
-				this.SocketIOEvent = SocketIOEventTypes.Unknown;
+			{
+				SocketIOEvent = SocketIOEventTypes.Unknown;
+			}
 
 			// Parse Attachment
-			if (this.SocketIOEvent == SocketIOEventTypes.BinaryEvent || this.SocketIOEvent == SocketIOEventTypes.BinaryAck)
+			if (SocketIOEvent == SocketIOEventTypes.BinaryEvent || SocketIOEvent == SocketIOEventTypes.BinaryAck)
 			{
 				int endIdx = from.IndexOf('-', idx);
 				if (endIdx == -1)
+				{
 					endIdx = from.Length;
+				}
 
 				int attachment = 0;
 				int.TryParse(from.Substring(idx, endIdx - idx), out attachment);
-				this.AttachmentCount = attachment;
+				AttachmentCount = attachment;
 				idx = endIdx + 1;
 			}
 
@@ -302,43 +344,55 @@ namespace BestHTTP.SocketIO
 			{
 				int endIdx = from.IndexOf(',', idx);
 				if (endIdx == -1)
+				{
 					endIdx = from.Length;
+				}
 
-				this.Namespace = from.Substring(idx, endIdx - idx);
+				Namespace = from.Substring(idx, endIdx - idx);
 				idx = endIdx + 1;
 			}
 			else
-				this.Namespace = "/";
+			{
+				Namespace = "/";
+			}
 
 			// Parse Id
 			if (from.Length > idx && ToInt(from[idx]) >= 0)
 			{
 				int startIdx = idx++;
 				while (from.Length > idx && ToInt(from[idx]) >= 0)
+				{
 					idx++;
+				}
 
 				int id = 0;
 				int.TryParse(from.Substring(startIdx, idx - startIdx), out id);
-				this.Id = id;
+				Id = id;
 			}
 
 			// What left is the payload data
 			if (from.Length > idx)
-				this.Payload = from.Substring(idx);
+			{
+				Payload = from.Substring(idx);
+			}
 			else
-				this.Payload = string.Empty;
+			{
+				Payload = string.Empty;
+			}
 		}
 
 		/// <summary>
 		/// Custom function instead of char.GetNumericValue, as it throws an error under WebGL using the new 4.x runtime.
 		/// It will return the value of the char if it's a numeric one, otherwise -1.
 		/// </summary>
-		private int ToInt(char ch)
+		int ToInt(char ch)
 		{
 			int charValue = Convert.ToInt32(ch);
 			int num = charValue - '0';
 			if (num < 0 || num > 9)
+			{
 				return -1;
+			}
 
 			return num;
 		}
@@ -351,36 +405,44 @@ namespace BestHTTP.SocketIO
 			StringBuilder builder = new StringBuilder();
 
 			// Set to Message if not set, and we are sending attachments
-			if (this.TransportEvent == TransportEventTypes.Unknown && this.AttachmentCount > 0)
-				this.TransportEvent = TransportEventTypes.Message;
+			if (TransportEvent == TransportEventTypes.Unknown && AttachmentCount > 0)
+			{
+				TransportEvent = TransportEventTypes.Message;
+			}
 
-			if (this.TransportEvent != TransportEventTypes.Unknown)
-				builder.Append(((int)this.TransportEvent).ToString());
+			if (TransportEvent != TransportEventTypes.Unknown)
+			{
+				builder.Append(((int)TransportEvent).ToString());
+			}
 
 			// Set to BinaryEvent if not set, and we are sending attachments
-			if (this.SocketIOEvent == SocketIOEventTypes.Unknown && this.AttachmentCount > 0)
-				this.SocketIOEvent = SocketIOEventTypes.BinaryEvent;
-
-			if (this.SocketIOEvent != SocketIOEventTypes.Unknown)
-				builder.Append(((int)this.SocketIOEvent).ToString());
-
-			if (this.SocketIOEvent == SocketIOEventTypes.BinaryEvent || this.SocketIOEvent == SocketIOEventTypes.BinaryAck)
+			if (SocketIOEvent == SocketIOEventTypes.Unknown && AttachmentCount > 0)
 			{
-				builder.Append(this.AttachmentCount.ToString());
+				SocketIOEvent = SocketIOEventTypes.BinaryEvent;
+			}
+
+			if (SocketIOEvent != SocketIOEventTypes.Unknown)
+			{
+				builder.Append(((int)SocketIOEvent).ToString());
+			}
+
+			if (SocketIOEvent == SocketIOEventTypes.BinaryEvent || SocketIOEvent == SocketIOEventTypes.BinaryAck)
+			{
+				builder.Append(AttachmentCount.ToString());
 				builder.Append("-");
 			}
 
 			// Add the namespace. If there is any other then the root nsp ("/")
 			// then we have to add a trailing "," if we have more data.
 			bool nspAdded = false;
-			if (this.Namespace != "/")
+			if (Namespace != "/")
 			{
-				builder.Append(this.Namespace);
+				builder.Append(Namespace);
 				nspAdded = true;
 			}
 
 			// ack id, if any
-			if (this.Id != 0)
+			if (Id != 0)
 			{
 				if (nspAdded)
 				{
@@ -388,11 +450,11 @@ namespace BestHTTP.SocketIO
 					nspAdded = false;
 				}
 
-				builder.Append(this.Id.ToString());
+				builder.Append(Id.ToString());
 			}
 
 			// payload
-			if (!string.IsNullOrEmpty(this.Payload))
+			if (!string.IsNullOrEmpty(Payload))
 			{
 				if (nspAdded)
 				{
@@ -400,7 +462,7 @@ namespace BestHTTP.SocketIO
 					nspAdded = false;
 				}
 
-				builder.Append(this.Payload);
+				builder.Append(Payload);
 			}
 
 			return builder.ToString();
@@ -414,10 +476,14 @@ namespace BestHTTP.SocketIO
 			if (AttachmentCount != 0 || (Attachments != null && Attachments.Count != 0))
 			{
 				if (Attachments == null)
+				{
 					throw new ArgumentException("packet.Attachments are null!");
+				}
 
 				if (AttachmentCount != Attachments.Count)
+				{
 					throw new ArgumentException("packet.AttachmentCount != packet.Attachments.Count. Use the packet.AddAttachment function to add data to a packet!");
+				}
 			}
 
 			// Encode it as usual
@@ -472,19 +538,25 @@ namespace BestHTTP.SocketIO
 		internal void AddAttachmentFromServer(byte[] data, bool copyFull)
 		{
 			if (data == null || data.Length == 0)
+			{
 				return;
+			}
 
-			if (this.attachments == null)
-				this.attachments = new List<byte[]>(this.AttachmentCount);
+			if (attachments == null)
+			{
+				attachments = new List<byte[]>(AttachmentCount);
+			}
 
 			if (copyFull)
-				this.Attachments.Add(data);
+			{
+				Attachments.Add(data);
+			}
 			else
 			{
 				byte[] buff = new byte[data.Length - 1];
 				Array.Copy(data, 1, buff, 0, data.Length - 1);
 
-				this.Attachments.Add(buff);
+				Attachments.Add(buff);
 			}
 		}
 
@@ -495,7 +567,7 @@ namespace BestHTTP.SocketIO
 		/// <summary>
 		/// Encodes a byte array to a Socket.IO binary encoded message
 		/// </summary>
-		private byte[] EncodeData(byte[] data, PayloadTypes type, byte[] afterHeaderData)
+		byte[] EncodeData(byte[] data, PayloadTypes type, byte[] afterHeaderData)
 		{
 			// Packet binary encoding:
 			// [          0|1         ][            length of data           ][    FF    ][data]
@@ -504,11 +576,13 @@ namespace BestHTTP.SocketIO
 			// Get the length of the payload. Socket.IO uses a wasteful encoding to send the length of the data.
 			// If the data is 16 bytes we have to send the length as two bytes: byte value of the character '1' and byte value of the character '6'.
 			// Instead of just one byte: 0xF. If the payload is 123 bytes, we can't send as 0x7B...
-			int afterHeaderLength = (afterHeaderData != null ? afterHeaderData.Length : 0);
+			int afterHeaderLength = afterHeaderData != null ? afterHeaderData.Length : 0;
 			string lenStr = (data.Length + afterHeaderLength).ToString();
 			byte[] len = new byte[lenStr.Length];
 			for (int cv = 0; cv < lenStr.Length; ++cv)
+			{
 				len[cv] = (byte)char.GetNumericValue(lenStr[cv]);
+			}
 
 			// We need another buffer to store the final data
 			byte[] buffer = new byte[data.Length + len.Length + 2 + afterHeaderLength];
@@ -518,7 +592,9 @@ namespace BestHTTP.SocketIO
 
 			// Copy the length of the data
 			for (int cv = 0; cv < len.Length; ++cv)
+			{
 				buffer[1 + cv] = len[cv];
+			}
 
 			int idx = 1 + len.Length;
 
@@ -540,52 +616,66 @@ namespace BestHTTP.SocketIO
 		/// <summary>
 		/// Searches for the "{'_placeholder':true,'num':X}" string, and will call the given action to modify the PayLoad
 		/// </summary>
-		private bool PlaceholderReplacer(Action<string, Dictionary<string, object>> onFound)
+		bool PlaceholderReplacer(Action<string, Dictionary<string, object>> onFound)
 		{
-			if (string.IsNullOrEmpty(this.Payload))
+			if (string.IsNullOrEmpty(Payload))
+			{
 				return false;
+			}
 
 			// Find the first index of the "_placeholder" str
-			int placeholderIdx = this.Payload.IndexOf(Placeholder);
+			int placeholderIdx = Payload.IndexOf(Placeholder);
 
 			while (placeholderIdx >= 0)
 			{
 				// Find the object-start token
 				int startIdx = placeholderIdx;
-				while (this.Payload[startIdx] != '{')
+				while (Payload[startIdx] != '{')
+				{
 					startIdx--;
+				}
 
 				// Find the object-end token
 				int endIdx = placeholderIdx;
-				while (this.Payload.Length > endIdx && this.Payload[endIdx] != '}')
+				while (Payload.Length > endIdx && Payload[endIdx] != '}')
+				{
 					endIdx++;
+				}
 
 				// We reached the end
-				if (this.Payload.Length <= endIdx)
+				if (Payload.Length <= endIdx)
+				{
 					return false;
+				}
 
 				// Get the object, and decode it
-				string placeholderJson = this.Payload.Substring(startIdx, endIdx - startIdx + 1);
+				string placeholderJson = Payload.Substring(startIdx, endIdx - startIdx + 1);
 				bool success = false;
 				Dictionary<string, object> obj = Json.Decode(placeholderJson, ref success) as Dictionary<string, object>;
 				if (!success)
+				{
 					return false;
+				}
 
 				// Check for presence and value of _placeholder
 				object value;
 				if (!obj.TryGetValue(Placeholder, out value) ||
 				    !(bool)value)
+				{
 					return false;
+				}
 
 				// Check for presence of num
 				if (!obj.TryGetValue("num", out value))
+				{
 					return false;
+				}
 
 				// Let do, what we have to do
 				onFound(placeholderJson, obj);
 
 				// Find the next attachment if there is any
-				placeholderIdx = this.Payload.IndexOf(Placeholder);
+				placeholderIdx = Payload.IndexOf(Placeholder);
 			}
 
 			return true;
@@ -600,7 +690,7 @@ namespace BestHTTP.SocketIO
 		/// </summary>
 		public override string ToString()
 		{
-			return this.Payload;
+			return Payload;
 		}
 
 		/// <summary>
@@ -608,10 +698,10 @@ namespace BestHTTP.SocketIO
 		/// </summary>
 		internal Packet Clone()
 		{
-			Packet packet = new Packet(this.TransportEvent, this.SocketIOEvent, this.Namespace, this.Payload, 0, this.Id);
-			packet.EventName = this.EventName;
-			packet.AttachmentCount = this.AttachmentCount;
-			packet.attachments = this.attachments;
+			Packet packet = new Packet(TransportEvent, SocketIOEvent, Namespace, Payload, 0, Id);
+			packet.EventName = EventName;
+			packet.AttachmentCount = AttachmentCount;
+			packet.attachments = attachments;
 
 			return packet;
 		}

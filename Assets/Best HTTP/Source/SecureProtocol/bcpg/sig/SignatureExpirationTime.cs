@@ -28,7 +28,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 		/**
 		* return time in seconds before signature expires after creation time.
 		*/
-		public long Time => Pack.BE_To_UInt32(data, 0);
+		public long Time
+		{
+			get { return Pack.BE_To_UInt32(data, 0); }
+		}
 	}
 }
 #pragma warning restore

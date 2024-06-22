@@ -12,21 +12,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 	public class BcTlsRsaPssSigner
 		: BcTlsSigner
 	{
-		private readonly int m_signatureScheme;
+		readonly int m_signatureScheme;
 
 		public BcTlsRsaPssSigner(BcTlsCrypto crypto, RsaKeyParameters privateKey, int signatureScheme)
 			: base(crypto, privateKey)
 		{
 			if (!SignatureScheme.IsRsaPss(signatureScheme))
+			{
 				throw new ArgumentException("signatureScheme");
+			}
 
-			this.m_signatureScheme = signatureScheme;
+			m_signatureScheme = signatureScheme;
 		}
 
 		public override byte[] GenerateRawSignature(SignatureAndHashAlgorithm algorithm, byte[] hash)
 		{
 			if (algorithm == null || SignatureScheme.From(algorithm) != m_signatureScheme)
+			{
 				throw new InvalidOperationException("Invalid algorithm: " + algorithm);
+			}
 
 			int cryptoHashAlgorithm = SignatureScheme.GetCryptoHashAlgorithm(m_signatureScheme);
 			IDigest digest = m_crypto.CreateDigest(cryptoHashAlgorithm);

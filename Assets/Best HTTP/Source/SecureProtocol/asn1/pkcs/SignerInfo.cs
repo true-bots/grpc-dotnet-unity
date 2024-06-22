@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
@@ -12,13 +13,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class SignerInfo
 		: Asn1Encodable
 	{
-		private DerInteger version;
-		private IssuerAndSerialNumber issuerAndSerialNumber;
-		private AlgorithmIdentifier digAlgorithm;
-		private Asn1Set authenticatedAttributes;
-		private AlgorithmIdentifier digEncryptionAlgorithm;
-		private Asn1OctetString encryptedDigest;
-		private Asn1Set unauthenticatedAttributes;
+		DerInteger version;
+		IssuerAndSerialNumber issuerAndSerialNumber;
+		AlgorithmIdentifier digAlgorithm;
+		Asn1Set authenticatedAttributes;
+		AlgorithmIdentifier digEncryptionAlgorithm;
+		Asn1OctetString encryptedDigest;
+		Asn1Set unauthenticatedAttributes;
 
 		public static SignerInfo GetInstance(
 			object obj)
@@ -33,7 +34,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				return new SignerInfo((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public SignerInfo(
@@ -57,7 +58,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		public SignerInfo(
 			Asn1Sequence seq)
 		{
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 
 			e.MoveNext();
 			version = (DerInteger)e.Current;
@@ -69,7 +70,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			digAlgorithm = AlgorithmIdentifier.GetInstance(e.Current);
 
 			e.MoveNext();
-			var obj = e.Current;
+			Asn1Encodable obj = e.Current;
 
 			if (obj is Asn1TaggedObject tagged)
 			{
@@ -85,7 +86,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			}
 
 			e.MoveNext();
-			encryptedDigest = DerOctetString.GetInstance(e.Current);
+			encryptedDigest = Asn1OctetString.GetInstance(e.Current);
 
 			if (e.MoveNext())
 			{

@@ -49,7 +49,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 				{
 					int b = ReadByte();
 					if (b < 0)
+					{
 						break;
+					}
 
 					buffer[offset + pos++] = (byte)b;
 				}
@@ -57,7 +59,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 			catch (IOException)
 			{
 				if (pos == 0)
+				{
 					throw;
+				}
 			}
 
 			return pos;

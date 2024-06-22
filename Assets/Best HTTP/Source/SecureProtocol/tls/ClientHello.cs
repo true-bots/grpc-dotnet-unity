@@ -10,24 +10,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class ClientHello
 	{
-		private readonly ProtocolVersion m_version;
-		private readonly byte[] m_random;
-		private readonly byte[] m_sessionID;
-		private readonly byte[] m_cookie;
-		private readonly int[] m_cipherSuites;
-		private readonly IDictionary<int, byte[]> m_extensions;
-		private readonly int m_bindersSize;
+		readonly ProtocolVersion m_version;
+		readonly byte[] m_random;
+		readonly byte[] m_sessionID;
+		readonly byte[] m_cookie;
+		readonly int[] m_cipherSuites;
+		readonly IDictionary<int, byte[]> m_extensions;
+		readonly int m_bindersSize;
 
 		public ClientHello(ProtocolVersion version, byte[] random, byte[] sessionID, byte[] cookie,
 			int[] cipherSuites, IDictionary<int, byte[]> extensions, int bindersSize)
 		{
-			this.m_version = version;
-			this.m_random = random;
-			this.m_sessionID = sessionID;
-			this.m_cookie = cookie;
-			this.m_cipherSuites = cipherSuites;
-			this.m_extensions = extensions;
-			this.m_bindersSize = bindersSize;
+			m_version = version;
+			m_random = random;
+			m_sessionID = sessionID;
+			m_cookie = cookie;
+			m_cipherSuites = cipherSuites;
+			m_extensions = extensions;
+			m_bindersSize = bindersSize;
 		}
 
 		public int BindersSize
@@ -72,7 +72,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public void Encode(TlsContext context, Stream output)
 		{
 			if (m_bindersSize < 0)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			TlsUtilities.WriteVersion(m_version, output);
 
@@ -115,7 +117,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		}
 
 		/// <exception cref="IOException"/>
-		private static ClientHello ImplParse(MemoryStream messageInput, Stream dtlsOutput)
+		static ClientHello ImplParse(MemoryStream messageInput, Stream dtlsOutput)
 		{
 			Stream input = messageInput;
 			if (null != dtlsOutput)
@@ -156,7 +158,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 			short[] compressionMethods = TlsUtilities.ReadUint8ArrayWithUint8Length(input, 1);
 			if (!Arrays.Contains(compressionMethods, CompressionMethod.cls_null))
+			{
 				throw new TlsFatalAlert(AlertDescription.handshake_failure);
+			}
 
 			/*
 			 * NOTE: Can't use TlsProtocol.ReadExtensions directly because TeeInputStream a) won't have

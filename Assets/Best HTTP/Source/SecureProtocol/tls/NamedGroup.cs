@@ -105,7 +105,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public const int arbitrary_explicit_char2_curves = 0xFF02;
 
 		/* Names of the actual underlying elliptic curves (not necessarily matching the NamedGroup names). */
-		private static readonly string[] CurveNames = new string[]
+		static readonly string[] CurveNames = new string[]
 		{
 			"sect163k1", "sect163r1", "sect163r2", "sect193r1",
 			"sect193r2", "sect233k1", "sect233r1", "sect239k1", "sect283k1", "sect283r1", "sect409k1", "sect409r1",
@@ -117,7 +117,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			"Tc26-Gost-3410-12-512-paramSetC", "sm2p256v1"
 		};
 
-		private static readonly string[] FiniteFieldNames = new string[]
+		static readonly string[] FiniteFieldNames = new string[]
 		{
 			"ffdhe2048", "ffdhe3072", "ffdhe4096",
 			"ffdhe6144", "ffdhe8192"
@@ -138,7 +138,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			else
 			{
 				if ((namedGroup >= brainpoolP256r1tls13 && namedGroup <= brainpoolP512r1tls13)
-				    || (namedGroup == curveSM2))
+				    || namedGroup == curveSM2)
 				{
 					return false;
 				}
@@ -363,18 +363,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static bool IsChar2Curve(int namedGroup)
 		{
 			return (namedGroup >= sect163k1 && namedGroup <= sect571r1)
-			       || (namedGroup == arbitrary_explicit_char2_curves);
+			       || namedGroup == arbitrary_explicit_char2_curves;
 		}
 
 		public static bool IsPrimeCurve(int namedGroup)
 		{
 			return (namedGroup >= secp160k1 && namedGroup <= curveSM2)
-			       || (namedGroup == arbitrary_explicit_prime_curves);
+			       || namedGroup == arbitrary_explicit_prime_curves;
 		}
 
 		public static bool IsPrivate(int namedGroup)
 		{
-			return (namedGroup >> 2) == 0x7F || (namedGroup >> 8) == 0xFE;
+			return namedGroup >> 2 == 0x7F || namedGroup >> 8 == 0xFE;
 		}
 
 		public static bool IsValid(int namedGroup)

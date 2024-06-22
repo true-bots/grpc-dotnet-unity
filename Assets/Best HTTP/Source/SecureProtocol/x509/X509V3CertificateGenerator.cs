@@ -18,9 +18,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	/// </summary>
 	public class X509V3CertificateGenerator
 	{
-		private readonly X509ExtensionsGenerator extGenerator = new X509ExtensionsGenerator();
+		readonly X509ExtensionsGenerator extGenerator = new X509ExtensionsGenerator();
 
-		private V3TbsCertificateGenerator tbsGen;
+		V3TbsCertificateGenerator tbsGen;
 
 		public X509V3CertificateGenerator()
 		{
@@ -124,7 +124,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			tbsGen.SetIssuerUniqueID(booleanToBitString(uniqueID));
 		}
 
-		private DerBitString booleanToBitString(
+		DerBitString booleanToBitString(
 			bool[] id)
 		{
 			byte[] bytes = new byte[(id.Length + 7) / 8];
@@ -133,7 +133,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			{
 				if (id[i])
 				{
-					bytes[i / 8] |= (byte)(1 << ((7 - (i % 8))));
+					bytes[i / 8] |= (byte)(1 << 7 - i % 8);
 				}
 			}
 
@@ -227,13 +227,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		{
 			Asn1OctetString extValue = cert.GetExtensionValue(oid);
 			if (extValue == null)
+			{
 				throw new CertificateParsingException("extension " + oid + " not present");
+			}
 
 			try
 			{
 				Asn1Encodable value = X509ExtensionUtilities.FromExtensionValue(extValue);
 
-				this.AddExtension(oid, critical, value);
+				AddExtension(oid, critical, value);
 			}
 			catch (Exception e)
 			{
@@ -249,7 +251,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		/// <returns>An <see cref="X509Certificate"/>.</returns>
 		public X509Certificate Generate(ISignatureFactory signatureFactory)
 		{
-			var sigAlgID = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
+			AlgorithmIdentifier sigAlgID = (AlgorithmIdentifier)signatureFactory.AlgorithmDetails;
 
 			tbsGen.SetSignature(sigAlgID);
 
@@ -266,7 +268,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 				tbsCert.EncodeTo(sigStream, Asn1Encodable.Der);
 			}
 
-			var signature = streamCalculator.GetResult().Collect();
+			byte[] signature = streamCalculator.GetResult().Collect();
 
 			return new X509Certificate(new X509CertificateStructure(tbsCert, sigAlgID, new DerBitString(signature)));
 		}

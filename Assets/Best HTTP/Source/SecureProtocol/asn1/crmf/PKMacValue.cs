@@ -13,24 +13,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class PKMacValue
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier algID;
-		private readonly DerBitString macValue;
+		readonly AlgorithmIdentifier algID;
+		readonly DerBitString macValue;
 
-		private PKMacValue(Asn1Sequence seq)
+		PKMacValue(Asn1Sequence seq)
 		{
-			this.algID = AlgorithmIdentifier.GetInstance(seq[0]);
-			this.macValue = DerBitString.GetInstance(seq[1]);
+			algID = AlgorithmIdentifier.GetInstance(seq[0]);
+			macValue = DerBitString.GetInstance(seq[1]);
 		}
 
 		public static PKMacValue GetInstance(object obj)
 		{
 			if (obj is PKMacValue)
+			{
 				return (PKMacValue)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new PKMacValue((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static PKMacValue GetInstance(Asn1TaggedObject obj, bool isExplicit)

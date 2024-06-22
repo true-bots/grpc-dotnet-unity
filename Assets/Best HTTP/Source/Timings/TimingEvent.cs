@@ -23,46 +23,50 @@ namespace BestHTTP.Timings
 
 		public TimingEvent(string name, TimeSpan duration)
 		{
-			this.Name = name;
-			this.Duration = duration;
-			this.When = DateTime.Now;
+			Name = name;
+			Duration = duration;
+			When = DateTime.Now;
 		}
 
 		public TimingEvent(string name, DateTime when, TimeSpan duration)
 		{
-			this.Name = name;
-			this.When = when;
-			this.Duration = duration;
+			Name = name;
+			When = when;
+			Duration = duration;
 		}
 
 		public TimeSpan CalculateDuration(TimingEvent @event)
 		{
-			if (this.When < @event.When)
-				return @event.When - this.When;
+			if (When < @event.When)
+			{
+				return @event.When - When;
+			}
 
-			return this.When - @event.When;
+			return When - @event.When;
 		}
 
 		public bool Equals(TimingEvent other)
 		{
-			return this.Name == other.Name &&
-			       this.Duration == other.Duration &&
-			       this.When == other.When;
+			return Name == other.Name &&
+			       Duration == other.Duration &&
+			       When == other.When;
 		}
 
 		public override bool Equals(object obj)
 		{
 			if (obj is TimingEvent)
-				return this.Equals((TimingEvent)obj);
+			{
+				return Equals((TimingEvent)obj);
+			}
 
 			return false;
 		}
 
 		public override int GetHashCode()
 		{
-			return (this.Name != null ? this.Name.GetHashCode() : 0) ^
-			       this.Duration.GetHashCode() ^
-			       this.When.GetHashCode();
+			return (Name != null ? Name.GetHashCode() : 0) ^
+			       Duration.GetHashCode() ^
+			       When.GetHashCode();
 		}
 
 		public static bool operator==(TimingEvent lhs, TimingEvent rhs)
@@ -77,7 +81,7 @@ namespace BestHTTP.Timings
 
 		public override string ToString()
 		{
-			return string.Format("['{0}': {1}]", this.Name, this.Duration);
+			return string.Format("['{0}': {1}]", Name, Duration);
 		}
 	}
 }

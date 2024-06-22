@@ -10,8 +10,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class Request
 		: Asn1Encodable
 	{
-		private readonly CertID reqCert;
-		private readonly X509Extensions singleRequestExtensions;
+		readonly CertID reqCert;
+		readonly X509Extensions singleRequestExtensions;
 
 		public static Request GetInstance(
 			Asn1TaggedObject obj,
@@ -33,7 +33,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new Request((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public Request(
@@ -41,13 +41,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			X509Extensions singleRequestExtensions)
 		{
 			if (reqCert == null)
+			{
 				throw new ArgumentNullException("reqCert");
+			}
 
 			this.reqCert = reqCert;
 			this.singleRequestExtensions = singleRequestExtensions;
 		}
 
-		private Request(
+		Request(
 			Asn1Sequence seq)
 		{
 			reqCert = CertID.GetInstance(seq[0]);

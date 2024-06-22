@@ -12,8 +12,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 	public class BasicAlphabetMapper
 		: IAlphabetMapper
 	{
-		private readonly IDictionary<char, int> m_indexMap = new Dictionary<char, int>();
-		private readonly IList<char> m_charMap = new List<char>();
+		readonly IDictionary<char, int> m_indexMap = new Dictionary<char, int>();
+		readonly IList<char> m_charMap = new List<char>();
 
 		/**
 		 * Base constructor.
@@ -35,7 +35,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 			for (int i = 0; i != alphabet.Length; i++)
 			{
 				if (m_indexMap.ContainsKey(alphabet[i]))
+				{
 					throw new ArgumentException("duplicate key detected in alphabet: " + alphabet[i]);
+				}
 
 				m_indexMap.Add(alphabet[i], i);
 				m_charMap.Add(alphabet[i]);
@@ -56,8 +58,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 				outBuf = new byte[input.Length];
 				for (int i = 0; i != input.Length; i++)
 				{
-					if (!m_indexMap.TryGetValue(input[i], out var idx))
+					if (!m_indexMap.TryGetValue(input[i], out int idx))
+					{
 						throw new InvalidOperationException();
+					}
 
 					outBuf[i] = (byte)idx;
 				}
@@ -67,8 +71,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Utilities
 				outBuf = new byte[input.Length * 2];
 				for (int i = 0; i != input.Length; i++)
 				{
-					if (!m_indexMap.TryGetValue(input[i], out var idx))
+					if (!m_indexMap.TryGetValue(input[i], out int idx))
+					{
 						throw new InvalidOperationException();
+					}
 
 					outBuf[i * 2 + 0] = (byte)(idx >> 8);
 					outBuf[i * 2 + 1] = (byte)idx;

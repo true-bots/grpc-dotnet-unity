@@ -21,8 +21,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class UserNotice
 		: Asn1Encodable
 	{
-		private readonly NoticeReference noticeRef;
-		private readonly DisplayText explicitText;
+		readonly NoticeReference noticeRef;
+		readonly DisplayText explicitText;
 
 		/**
 		 * Creates a new <code>UserNotice</code> instance.
@@ -51,7 +51,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		{
 		}
 
-		private UserNotice(Asn1Sequence seq)
+		UserNotice(Asn1Sequence seq)
 		{
 			if (seq.Count == 2)
 			{
@@ -85,9 +85,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static UserNotice GetInstance(object obj)
 		{
 			if (obj is UserNotice)
+			{
 				return (UserNotice)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new UserNotice(Asn1Sequence.GetInstance(obj));
 		}
 

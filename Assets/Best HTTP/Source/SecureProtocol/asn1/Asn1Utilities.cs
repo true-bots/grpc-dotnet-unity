@@ -81,7 +81,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1Encodable TryGetExplicitBaseObject(Asn1TaggedObject taggedObject, int tagClass, int tagNo)
 		{
 			if (!taggedObject.HasTag(tagClass, tagNo))
+			{
 				return null;
+			}
 
 			return taggedObject.GetExplicitBaseObject();
 		}
@@ -109,7 +111,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static Asn1TaggedObject TryGetExplicitBaseTagged(Asn1TaggedObject taggedObject, int tagClass, int tagNo)
 		{
 			if (!taggedObject.HasTag(tagClass, tagNo))
+			{
 				return null;
+			}
 
 			return taggedObject.GetExplicitBaseTagged();
 		}
@@ -140,7 +144,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			int baseTagClass, int baseTagNo)
 		{
 			if (!taggedObject.HasTag(tagClass, tagNo))
+			{
 				return null;
+			}
 
 			return taggedObject.GetImplicitBaseTagged(baseTagClass, baseTagNo);
 		}
@@ -172,7 +178,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			bool declaredExplicit, int baseTagNo)
 		{
 			if (!taggedObject.HasTag(tagClass, tagNo))
+			{
 				return null;
+			}
 
 			return taggedObject.GetBaseUniversal(declaredExplicit, baseTagNo);
 		}
@@ -207,7 +215,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			int tagClass, int tagNo)
 		{
 			if (!taggedObjectParser.HasTag(tagClass, tagNo))
+			{
 				return null;
+			}
 
 			return taggedObjectParser.ParseExplicitBaseTagged();
 		}
@@ -244,7 +254,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			int tagClass, int tagNo, int baseTagClass, int baseTagNo)
 		{
 			if (!taggedObjectParser.HasTag(tagClass, tagNo))
+			{
 				return null;
+			}
 
 			return taggedObjectParser.ParseImplicitBaseTagged(baseTagClass, baseTagNo);
 		}
@@ -281,7 +293,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			int tagNo, bool declaredExplicit, int baseTagNo)
 		{
 			if (!taggedObjectParser.HasTag(tagClass, tagNo))
+			{
 				return null;
+			}
 
 			return taggedObjectParser.ParseBaseUniversal(declaredExplicit, baseTagNo);
 		}
@@ -318,7 +332,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			int tagClass, int tagNo)
 		{
 			if (!taggedObjectParser.HasTag(tagClass, tagNo))
+			{
 				return null;
+			}
 
 			return taggedObjectParser.ParseExplicitBaseObject();
 		}

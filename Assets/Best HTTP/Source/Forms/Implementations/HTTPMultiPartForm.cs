@@ -12,18 +12,18 @@ namespace BestHTTP.Forms
 		/// <summary>
 		/// A random boundary generated in the constructor.
 		/// </summary>
-		private string Boundary;
+		string Boundary;
 
 		/// <summary>
 		///
 		/// </summary>
-		private byte[] CachedData;
+		byte[] CachedData;
 
 		#endregion
 
 		public HTTPMultiPartForm()
 		{
-			this.Boundary = "BestHTTP_HTTPMultiPartForm_" + this.GetHashCode().ToString("X");
+			Boundary = "BestHTTP_HTTPMultiPartForm_" + GetHashCode().ToString("X");
 		}
 
 		#region IHTTPForm Implementation
@@ -37,9 +37,11 @@ namespace BestHTTP.Forms
 		public override byte[] GetData()
 		{
 			if (CachedData != null)
+			{
 				return CachedData;
+			}
 
-			using (var ms = new BufferPoolMemoryStream())
+			using (BufferPoolMemoryStream ms = new BufferPoolMemoryStream())
 			{
 				for (int i = 0; i < Fields.Count; ++i)
 				{
@@ -54,7 +56,9 @@ namespace BestHTTP.Forms
 
 					// Set up Content-Type head for the form.
 					if (!string.IsNullOrEmpty(field.MimeType))
+					{
 						ms.WriteLine("Content-Type: " + field.MimeType);
+					}
 
 					ms.WriteLine();
 

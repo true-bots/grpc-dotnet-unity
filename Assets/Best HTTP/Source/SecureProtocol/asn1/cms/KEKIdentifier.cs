@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class KekIdentifier
 		: Asn1Encodable
 	{
-		private Asn1OctetString keyIdentifier;
-		private Asn1GeneralizedTime date;
-		private OtherKeyAttribute other;
+		Asn1OctetString keyIdentifier;
+		Asn1GeneralizedTime date;
+		OtherKeyAttribute other;
 
 		public KekIdentifier(
 			byte[] keyIdentifier,
@@ -77,12 +77,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is KekIdentifier)
+			{
 				return (KekIdentifier)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new KekIdentifier((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid KekIdentifier: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid KekIdentifier: " + Platform.GetTypeName(obj));
 		}
 
 		public Asn1OctetString KeyIdentifier

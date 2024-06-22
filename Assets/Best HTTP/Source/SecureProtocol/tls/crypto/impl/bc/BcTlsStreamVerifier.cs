@@ -7,16 +7,16 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 {
-	internal sealed class BcTlsStreamVerifier
+	sealed class BcTlsStreamVerifier
 		: TlsStreamVerifier
 	{
-		private readonly SignerSink m_output;
-		private readonly byte[] m_signature;
+		readonly SignerSink m_output;
+		readonly byte[] m_signature;
 
 		internal BcTlsStreamVerifier(ISigner verifier, byte[] signature)
 		{
-			this.m_output = new SignerSink(verifier);
-			this.m_signature = signature;
+			m_output = new SignerSink(verifier);
+			m_signature = signature;
 		}
 
 		public Stream Stream

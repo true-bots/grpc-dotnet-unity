@@ -6,19 +6,22 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 {
-	internal class LimitedInputStream
+	class LimitedInputStream
 		: BaseInputStream
 	{
-		private readonly Stream m_stream;
-		private long m_limit;
+		readonly Stream m_stream;
+		long m_limit;
 
 		internal LimitedInputStream(Stream stream, long limit)
 		{
-			this.m_stream = stream;
-			this.m_limit = limit;
+			m_stream = stream;
+			m_limit = limit;
 		}
 
-		internal long CurrentLimit => m_limit;
+		internal long CurrentLimit
+		{
+			get { return m_limit; }
+		}
 
 		public override int Read(byte[] buffer, int offset, int count)
 		{
@@ -26,7 +29,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 			if (numRead > 0)
 			{
 				if ((m_limit -= numRead) < 0)
+				{
 					throw new StreamOverflowException("Data Overflow");
+				}
 			}
 
 			return numRead;
@@ -51,7 +56,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO
 			if (b >= 0)
 			{
 				if (--m_limit < 0)
+				{
 					throw new StreamOverflowException("Data Overflow");
+				}
 			}
 
 			return b;

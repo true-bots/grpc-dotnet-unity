@@ -16,9 +16,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class ECGost3410Signer
 		: IDsa
 	{
-		private ECKeyParameters key;
-		private SecureRandom random;
-		private bool forSigning;
+		ECKeyParameters key;
+		SecureRandom random;
+		bool forSigning;
 
 		public virtual string AlgorithmName
 		{
@@ -33,29 +33,36 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			{
 				if (parameters is ParametersWithRandom rParam)
 				{
-					this.random = rParam.Random;
+					random = rParam.Random;
 					parameters = rParam.Parameters;
 				}
 				else
 				{
-					this.random = CryptoServicesRegistrar.GetSecureRandom();
+					random = CryptoServicesRegistrar.GetSecureRandom();
 				}
 
 				if (!(parameters is ECPrivateKeyParameters ecPrivateKeyParameters))
+				{
 					throw new InvalidKeyException("EC private key required for signing");
+				}
 
-				this.key = ecPrivateKeyParameters;
+				key = ecPrivateKeyParameters;
 			}
 			else
 			{
 				if (!(parameters is ECPublicKeyParameters ecPublicKeyParameters))
+				{
 					throw new InvalidKeyException("EC public key required for verification");
+				}
 
-				this.key = ecPublicKeyParameters;
+				key = ecPublicKeyParameters;
 			}
 		}
 
-		public virtual BigInteger Order => key.Parameters.N;
+		public virtual BigInteger Order
+		{
+			get { return key.Parameters.N; }
+		}
 
 		/**
 		 * generate a signature for the given message using the key we were
@@ -67,7 +74,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual BigInteger[] GenerateSignature(byte[] message)
 		{
 			if (!forSigning)
+			{
 				throw new InvalidOperationException("not initialized for signing");
+			}
 
 			byte[] mRev = Arrays.Reverse(message); // conversion is little-endian
 			BigInteger e = new BigInteger(1, mRev);
@@ -109,7 +118,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual bool VerifySignature(byte[] message, BigInteger r, BigInteger s)
 		{
 			if (forSigning)
+			{
 				throw new InvalidOperationException("not initialized for verification");
+			}
 
 			byte[] mRev = Arrays.Reverse(message); // conversion is little-endian
 			BigInteger e = new BigInteger(1, mRev);
@@ -117,11 +128,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 			// r in the range [1,n-1]
 			if (r.CompareTo(BigInteger.One) < 0 || r.CompareTo(n) >= 0)
+			{
 				return false;
+			}
 
 			// s in the range [1,n-1]
 			if (s.CompareTo(BigInteger.One) < 0 || s.CompareTo(n) >= 0)
+			{
 				return false;
+			}
 
 			BigInteger v = BigIntegers.ModOddInverseVar(n, e);
 
@@ -134,7 +149,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			ECPoint point = ECAlgorithms.SumOfTwoMultiplies(G, z1, Q, z2).Normalize();
 
 			if (point.IsInfinity)
+			{
 				return false;
+			}
 
 			BigInteger R = point.AffineXCoord.ToBigInteger().Mod(n);
 

@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using System.Text;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Utilities;
@@ -21,19 +22,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 	public class X509CrlEntry
 		: X509ExtensionBase
 	{
-		private CrlEntry c;
-		private bool isIndirect;
-		private X509Name previousCertificateIssuer;
-		private X509Name certificateIssuer;
+		CrlEntry c;
+		bool isIndirect;
+		X509Name previousCertificateIssuer;
+		X509Name certificateIssuer;
 
-		private volatile bool hashValueSet;
-		private volatile int hashValue;
+		volatile bool hashValueSet;
+		volatile int hashValue;
 
 		public X509CrlEntry(
 			CrlEntry c)
 		{
 			this.c = c;
-			this.certificateIssuer = loadCertificateIssuer();
+			certificateIssuer = loadCertificateIssuer();
 		}
 
 		/**
@@ -61,10 +62,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			this.c = c;
 			this.isIndirect = isIndirect;
 			this.previousCertificateIssuer = previousCertificateIssuer;
-			this.certificateIssuer = loadCertificateIssuer();
+			certificateIssuer = loadCertificateIssuer();
 		}
 
-		private X509Name loadCertificateIssuer()
+		X509Name loadCertificateIssuer()
 		{
 			if (!isIndirect)
 			{
@@ -137,26 +138,32 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		public override bool Equals(object other)
 		{
 			if (this == other)
+			{
 				return true;
+			}
 
 			X509CrlEntry that = other as X509CrlEntry;
 			if (null == that)
-				return false;
-
-			if (this.hashValueSet && that.hashValueSet)
 			{
-				if (this.hashValue != that.hashValue)
-					return false;
+				return false;
 			}
 
-			return this.c.Equals(that.c);
+			if (hashValueSet && that.hashValueSet)
+			{
+				if (hashValue != that.hashValue)
+				{
+					return false;
+				}
+			}
+
+			return c.Equals(that.c);
 		}
 
 		public override int GetHashCode()
 		{
 			if (!hashValueSet)
 			{
-				hashValue = this.c.GetHashCode();
+				hashValue = c.GetHashCode();
 				hashValueSet = true;
 			}
 
@@ -167,15 +174,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		{
 			StringBuilder buf = new StringBuilder();
 
-			buf.Append("        userCertificate: ").Append(this.SerialNumber).AppendLine();
-			buf.Append("         revocationDate: ").Append(this.RevocationDate).AppendLine();
-			buf.Append("      certificateIssuer: ").Append(this.GetCertificateIssuer()).AppendLine();
+			buf.Append("        userCertificate: ").Append(SerialNumber).AppendLine();
+			buf.Append("         revocationDate: ").Append(RevocationDate).AppendLine();
+			buf.Append("      certificateIssuer: ").Append(GetCertificateIssuer()).AppendLine();
 
 			X509Extensions extensions = c.Extensions;
 
 			if (extensions != null)
 			{
-				var e = extensions.ExtensionOids.GetEnumerator();
+				IEnumerator<DerObjectIdentifier> e = extensions.ExtensionOids.GetEnumerator();
 				if (e.MoveNext())
 				{
 					buf.Append("   crlEntryExtensions:").AppendLine();

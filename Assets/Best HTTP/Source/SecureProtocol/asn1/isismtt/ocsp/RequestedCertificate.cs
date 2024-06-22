@@ -50,9 +50,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 			AttributeCertificate = 1
 		}
 
-		private readonly X509CertificateStructure cert;
-		private readonly byte[] publicKeyCert;
-		private readonly byte[] attributeCert;
+		readonly X509CertificateStructure cert;
+		readonly byte[] publicKeyCert;
+		readonly byte[] attributeCert;
 
 		public static RequestedCertificate GetInstance(
 			object obj)
@@ -72,7 +72,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 				return new RequestedCertificate((Asn1TaggedObject)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static RequestedCertificate GetInstance(
@@ -80,21 +80,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 			bool isExplicit)
 		{
 			if (!isExplicit)
+			{
 				throw new ArgumentException("choice item must be explicitly tagged");
+			}
 
 			return GetInstance(obj.GetObject());
 		}
 
-		private RequestedCertificate(
+		RequestedCertificate(
 			Asn1TaggedObject tagged)
 		{
 			switch ((Choice)tagged.TagNo)
 			{
 				case Choice.AttributeCertificate:
-					this.attributeCert = Asn1OctetString.GetInstance(tagged, true).GetOctets();
+					attributeCert = Asn1OctetString.GetInstance(tagged, true).GetOctets();
 					break;
 				case Choice.PublicKeyCertificate:
-					this.publicKeyCert = Asn1OctetString.GetInstance(tagged, true).GetOctets();
+					publicKeyCert = Asn1OctetString.GetInstance(tagged, true).GetOctets();
 					break;
 				default:
 					throw new ArgumentException("unknown tag number: " + tagged.TagNo);
@@ -111,7 +113,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 		public RequestedCertificate(
 			X509CertificateStructure certificate)
 		{
-			this.cert = certificate;
+			cert = certificate;
 		}
 
 		public RequestedCertificate(
@@ -126,10 +128,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 			get
 			{
 				if (cert != null)
+				{
 					return Choice.Certificate;
+				}
 
 				if (publicKeyCert != null)
+				{
 					return Choice.PublicKeyCertificate;
+				}
 
 				return Choice.AttributeCertificate;
 			}
@@ -150,7 +156,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.Ocsp
 			}
 
 			if (publicKeyCert != null)
+			{
 				return publicKeyCert;
+			}
 
 			return attributeCert;
 		}

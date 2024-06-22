@@ -21,31 +21,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 	{
 		public const string IgnoreUselessPasswordProperty = "BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs12.IgnoreUselessPassword";
 
-		private readonly Dictionary<string, AsymmetricKeyEntry> m_keys =
+		readonly Dictionary<string, AsymmetricKeyEntry> m_keys =
 			new Dictionary<string, AsymmetricKeyEntry>(StringComparer.OrdinalIgnoreCase);
 
-		private readonly Dictionary<string, string> m_localIds = new Dictionary<string, string>();
+		readonly Dictionary<string, string> m_localIds = new Dictionary<string, string>();
 
-		private readonly Dictionary<string, X509CertificateEntry> m_certs =
+		readonly Dictionary<string, X509CertificateEntry> m_certs =
 			new Dictionary<string, X509CertificateEntry>(StringComparer.OrdinalIgnoreCase);
 
-		private readonly Dictionary<CertId, X509CertificateEntry> m_chainCerts =
+		readonly Dictionary<CertId, X509CertificateEntry> m_chainCerts =
 			new Dictionary<CertId, X509CertificateEntry>();
 
-		private readonly Dictionary<string, X509CertificateEntry> m_keyCerts =
+		readonly Dictionary<string, X509CertificateEntry> m_keyCerts =
 			new Dictionary<string, X509CertificateEntry>();
 
-		private readonly DerObjectIdentifier keyAlgorithm;
-		private readonly DerObjectIdentifier keyPrfAlgorithm;
-		private readonly DerObjectIdentifier certAlgorithm;
-		private readonly bool useDerEncoding;
+		readonly DerObjectIdentifier keyAlgorithm;
+		readonly DerObjectIdentifier keyPrfAlgorithm;
+		readonly DerObjectIdentifier certAlgorithm;
+		readonly bool useDerEncoding;
 
-		private AsymmetricKeyEntry unmarkedKeyEntry = null;
+		AsymmetricKeyEntry unmarkedKeyEntry = null;
 
-		private const int MinIterations = 1024;
-		private const int SaltSize = 20;
+		const int MinIterations = 1024;
+		const int SaltSize = 20;
 
-		private static SubjectKeyIdentifier CreateSubjectKeyID(AsymmetricKeyParameter pubKey)
+		static SubjectKeyIdentifier CreateSubjectKeyID(AsymmetricKeyParameter pubKey)
 		{
 			return new SubjectKeyIdentifier(
 				SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(pubKey));
@@ -53,12 +53,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 		internal class CertId
 		{
-			private readonly byte[] id;
+			readonly byte[] id;
 
 			internal CertId(
 				AsymmetricKeyParameter pubKey)
 			{
-				this.id = CreateSubjectKeyID(pubKey).GetKeyIdentifier();
+				id = CreateSubjectKeyID(pubKey).GetKeyIdentifier();
 			}
 
 			internal CertId(
@@ -81,12 +81,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				object obj)
 			{
 				if (obj == this)
+				{
 					return true;
+				}
 
 				CertId other = obj as CertId;
 
 				if (other == null)
+				{
 					return false;
+				}
 
 				return Arrays.AreEqual(id, other.id);
 			}
@@ -105,7 +109,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		{
 			AsymmetricKeyParameter privKey = PrivateKeyFactory.CreateKey(privKeyInfo);
 
-			var attributes = new Dictionary<DerObjectIdentifier, Asn1Encodable>();
+			Dictionary<DerObjectIdentifier, Asn1Encodable> attributes = new Dictionary<DerObjectIdentifier, Asn1Encodable>();
 			AsymmetricKeyEntry keyEntry = new AsymmetricKeyEntry(privKey, attributes);
 
 			string alias = null;
@@ -126,11 +130,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 						// TODO We might want to "merge" attribute sets with
 						// the same OID - currently, differing values give an error
-						if (attributes.TryGetValue(aOid, out var attributeValue))
+						if (attributes.TryGetValue(aOid, out Asn1Encodable attributeValue))
 						{
 							// OK, but the value has to be the same
 							if (!attributeValue.Equals(attr))
+							{
 								throw new IOException("attempt to add existing attribute with different value");
+							}
 						}
 						else
 						{
@@ -186,7 +192,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public void Load(Stream input, char[] password)
 		{
 			if (input == null)
+			{
 				throw new ArgumentNullException("input");
+			}
 
 			Pfx bag = Pfx.GetInstance(Asn1Object.FromStream(input));
 			ContentInfo info = bag.AuthSafe;
@@ -195,7 +203,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			if (bag.MacData != null) // check the mac code
 			{
 				if (password == null)
+				{
 					throw new ArgumentNullException("password", "no password supplied when one expected");
+				}
 
 				MacData mData = bag.MacData;
 				DigestInfo dInfo = mData.Mac;
@@ -211,21 +221,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				if (!Arrays.ConstantTimeAreEqual(mac, dig))
 				{
 					if (password.Length > 0)
+					{
 						throw new IOException("PKCS12 key store MAC invalid - wrong password or corrupted file.");
+					}
 
 					// Try with incorrect zero length password
 					mac = CalculatePbeMac(algId.Algorithm, salt, itCount, password, true, data);
 
 					if (!Arrays.ConstantTimeAreEqual(mac, dig))
+					{
 						throw new IOException("PKCS12 key store MAC invalid - wrong password or corrupted file.");
+					}
 
 					wrongPkcs12Zero = true;
 				}
 			}
 			else if (password != null)
 			{
-				string ignoreProperty = Org.BouncyCastle.Utilities.Platform.GetEnvironmentVariable(IgnoreUselessPasswordProperty);
-				bool ignore = ignoreProperty != null && Org.BouncyCastle.Utilities.Platform.EqualsIgnoreCase("true", ignoreProperty);
+				string ignoreProperty = Platform.GetEnvironmentVariable(IgnoreUselessPasswordProperty);
+				bool ignore = ignoreProperty != null && Platform.EqualsIgnoreCase("true", ignoreProperty);
 
 				if (!ignore)
 				{
@@ -237,7 +251,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			m_localIds.Clear();
 			unmarkedKeyEntry = null;
 
-			var certBags = new List<SafeBag>();
+			List<SafeBag> certBags = new List<SafeBag>();
 
 			if (info.ContentType.Equals(PkcsObjectIdentifiers.Data))
 			{
@@ -311,7 +325,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				//
 				// set the attributes
 				//
-				var attributes = new Dictionary<DerObjectIdentifier, Asn1Encodable>();
+				Dictionary<DerObjectIdentifier, Asn1Encodable> attributes = new Dictionary<DerObjectIdentifier, Asn1Encodable>();
 				Asn1OctetString localId = null;
 				string alias = null;
 
@@ -329,14 +343,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 							// TODO We might want to "merge" attribute sets with
 							// the same OID - currently, differing values give an error
-							if (attributes.TryGetValue(aOid, out var attributeValue))
+							if (attributes.TryGetValue(aOid, out Asn1Encodable attributeValue))
 							{
 								// we've found more than one - one might be incorrect
 								if (PkcsObjectIdentifiers.Pkcs9AtLocalKeyID.Equals(aOid))
 								{
 									string id = Hex.ToHexString(Asn1OctetString.GetInstance(attr).GetOctets());
 									if (!m_keys.ContainsKey(id) && !m_localIds.ContainsKey(id))
+									{
 										continue; // ignore this one - it's not valid
+									}
 								}
 
 								// OK, but the value has to be the same
@@ -402,7 +418,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public AsymmetricKeyEntry GetKey(string alias)
 		{
 			if (alias == null)
+			{
 				throw new ArgumentNullException(nameof(alias));
+			}
 
 			return CollectionUtilities.GetValueOrNull(m_keys, alias);
 		}
@@ -410,7 +428,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public bool IsCertificateEntry(string alias)
 		{
 			if (alias == null)
+			{
 				throw new ArgumentNullException(nameof(alias));
+			}
 
 			return m_certs.ContainsKey(alias) && !m_keys.ContainsKey(alias);
 		}
@@ -418,7 +438,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public bool IsKeyEntry(string alias)
 		{
 			if (alias == null)
+			{
 				throw new ArgumentNullException(nameof(alias));
+			}
 
 			return m_keys.ContainsKey(alias);
 		}
@@ -427,7 +449,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		{
 			get
 			{
-				var aliases = new HashSet<string>(m_certs.Keys);
+				HashSet<string> aliases = new HashSet<string>(m_certs.Keys);
 				aliases.UnionWith(m_keys.Keys);
 				return CollectionUtilities.Proxy(aliases);
 			}
@@ -436,7 +458,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public bool ContainsAlias(string alias)
 		{
 			if (alias == null)
+			{
 				throw new ArgumentNullException(nameof(alias));
+			}
 
 			return m_certs.ContainsKey(alias) || m_keys.ContainsKey(alias);
 		}
@@ -447,13 +471,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public X509CertificateEntry GetCertificate(string alias)
 		{
 			if (alias == null)
+			{
 				throw new ArgumentNullException(nameof(alias));
+			}
 
-			if (m_certs.TryGetValue(alias, out var cert))
+			if (m_certs.TryGetValue(alias, out X509CertificateEntry cert))
+			{
 				return cert;
+			}
 
-			var keyCertKey = alias;
-			if (m_localIds.TryGetValue(alias, out var localId))
+			string keyCertKey = alias;
+			if (m_localIds.TryGetValue(alias, out string localId))
 			{
 				keyCertKey = localId;
 			}
@@ -464,18 +492,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public string GetCertificateAlias(X509Certificate cert)
 		{
 			if (cert == null)
-				throw new ArgumentNullException(nameof(cert));
-
-			foreach (var entry in m_certs)
 			{
-				if (entry.Value.Certificate.Equals(cert))
-					return entry.Key;
+				throw new ArgumentNullException(nameof(cert));
 			}
 
-			foreach (var entry in m_keyCerts)
+			foreach (KeyValuePair<string, X509CertificateEntry> entry in m_certs)
 			{
 				if (entry.Value.Certificate.Equals(cert))
+				{
 					return entry.Key;
+				}
+			}
+
+			foreach (KeyValuePair<string, X509CertificateEntry> entry in m_keyCerts)
+			{
+				if (entry.Value.Certificate.Equals(cert))
+				{
+					return entry.Key;
+				}
 			}
 
 			return null;
@@ -484,16 +518,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public X509CertificateEntry[] GetCertificateChain(string alias)
 		{
 			if (alias == null)
+			{
 				throw new ArgumentNullException(nameof(alias));
+			}
 
 			if (!IsKeyEntry(alias))
+			{
 				return null;
+			}
 
 			X509CertificateEntry c = GetCertificate(alias);
 			if (c == null)
+			{
 				return null;
+			}
 
-			var cs = new List<X509CertificateEntry>();
+			List<X509CertificateEntry> cs = new List<X509CertificateEntry>();
 
 			while (c != null)
 			{
@@ -522,7 +562,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 					if (!i.Equivalent(s))
 					{
-						foreach (var entry in m_chainCerts)
+						foreach (KeyValuePair<CertId, X509CertificateEntry> entry in m_chainCerts)
 						{
 							X509Certificate cert = entry.Value.Certificate;
 
@@ -561,11 +601,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public void SetCertificateEntry(string alias, X509CertificateEntry certEntry)
 		{
 			if (alias == null)
+			{
 				throw new ArgumentNullException(nameof(alias));
+			}
+
 			if (certEntry == null)
+			{
 				throw new ArgumentNullException(nameof(certEntry));
+			}
+
 			if (m_keys.ContainsKey(alias))
+			{
 				throw new ArgumentException("There is a key entry with the name " + alias + ".");
+			}
 
 			m_certs[alias] = certEntry;
 			m_chainCerts[new CertId(certEntry.Certificate.GetPublicKey())] = certEntry;
@@ -574,11 +622,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public void SetKeyEntry(string alias, AsymmetricKeyEntry keyEntry, X509CertificateEntry[] chain)
 		{
 			if (alias == null)
+			{
 				throw new ArgumentNullException(nameof(alias));
+			}
+
 			if (keyEntry == null)
+			{
 				throw new ArgumentNullException(nameof(keyEntry));
+			}
+
 			if (keyEntry.Key.IsPrivate && chain == null)
+			{
 				throw new ArgumentException("No certificate chain for private key");
+			}
 
 			if (m_keys.ContainsKey(alias))
 			{
@@ -597,18 +653,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public void DeleteEntry(string alias)
 		{
 			if (alias == null)
+			{
 				throw new ArgumentNullException(nameof(alias));
+			}
 
-			if (CollectionUtilities.Remove(m_certs, alias, out var cert))
+			if (CollectionUtilities.Remove(m_certs, alias, out X509CertificateEntry cert))
 			{
 				m_chainCerts.Remove(new CertId(cert.Certificate.GetPublicKey()));
 			}
 
 			if (m_keys.Remove(alias))
 			{
-				if (CollectionUtilities.Remove(m_localIds, alias, out var id))
+				if (CollectionUtilities.Remove(m_localIds, alias, out string id))
 				{
-					if (CollectionUtilities.Remove(m_keyCerts, id, out var keyCert))
+					if (CollectionUtilities.Remove(m_keyCerts, id, out X509CertificateEntry keyCert))
 					{
 						m_chainCerts.Remove(new CertId(keyCert.Certificate.GetPublicKey()));
 					}
@@ -619,10 +677,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public bool IsEntryOfType(string alias, Type entryType)
 		{
 			if (entryType == typeof(X509CertificateEntry))
+			{
 				return IsCertificateEntry(alias);
+			}
 
 			if (entryType == typeof(AsymmetricKeyEntry))
+			{
 				return IsKeyEntry(alias) && GetCertificate(alias) != null;
+			}
 
 			return false;
 		}
@@ -633,7 +695,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			{
 				int count = m_certs.Count;
 
-				foreach (var key in m_keys.Keys)
+				foreach (string key in m_keys.Keys)
 				{
 					if (!m_certs.ContainsKey(key))
 					{
@@ -648,18 +710,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 		public void Save(Stream stream, char[] password, SecureRandom random)
 		{
 			if (stream == null)
+			{
 				throw new ArgumentNullException(nameof(stream));
+			}
+
 			if (random == null)
+			{
 				throw new ArgumentNullException(nameof(random));
+			}
 
 			//
 			// handle the keys
 			//
 			Asn1EncodableVector keyBags = new Asn1EncodableVector();
-			foreach (var keyEntry in m_keys)
+			foreach (KeyValuePair<string, AsymmetricKeyEntry> keyEntry in m_keys)
 			{
-				var name = keyEntry.Key;
-				var privKey = keyEntry.Value;
+				string name = keyEntry.Key;
+				AsymmetricKeyEntry privKey = keyEntry.Value;
 
 				byte[] kSalt = new byte[SaltSize];
 				random.NextBytes(kSalt);
@@ -689,7 +756,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 				Asn1EncodableVector kName = new Asn1EncodableVector();
 
-				foreach (var oid in privKey.BagAttributeKeys)
+				foreach (DerObjectIdentifier oid in privKey.BagAttributeKeys)
 				{
 					// NB: Ignore any existing FriendlyName
 					if (!PkcsObjectIdentifiers.Pkcs9AtFriendlyName.Equals(oid))
@@ -741,7 +808,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			Asn1EncodableVector certBags = new Asn1EncodableVector();
 			Pkcs12PbeParams cParams = new Pkcs12PbeParams(cSalt, MinIterations);
 			AlgorithmIdentifier cAlgId = new AlgorithmIdentifier(certAlgorithm, cParams.ToAsn1Object());
-			var doneCerts = new HashSet<X509Certificate>();
+			HashSet<X509Certificate> doneCerts = new HashSet<X509Certificate>();
 
 			foreach (string name in m_keys.Keys)
 			{
@@ -752,7 +819,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 				Asn1EncodableVector fName = new Asn1EncodableVector();
 
-				foreach (var oid in certEntry.BagAttributeKeys)
+				foreach (DerObjectIdentifier oid in certEntry.BagAttributeKeys)
 				{
 					// NB: Ignore any existing FriendlyName
 					if (!PkcsObjectIdentifiers.Pkcs9AtFriendlyName.Equals(oid))
@@ -792,13 +859,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				doneCerts.Add(certEntry.Certificate);
 			}
 
-			foreach (var certEntry in m_certs)
+			foreach (KeyValuePair<string, X509CertificateEntry> certEntry in m_certs)
 			{
-				var certId = certEntry.Key;
-				var cert = certEntry.Value;
+				string certId = certEntry.Key;
+				X509CertificateEntry cert = certEntry.Value;
 
 				if (m_keys.ContainsKey(certId))
+				{
 					continue;
+				}
 
 				CertBag cBag = new CertBag(
 					PkcsObjectIdentifiers.X509Certificate,
@@ -806,14 +875,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 				Asn1EncodableVector fName = new Asn1EncodableVector();
 
-				foreach (var oid in cert.BagAttributeKeys)
+				foreach (DerObjectIdentifier oid in cert.BagAttributeKeys)
 				{
 					// a certificate not immediately linked to a key doesn't require
 					// a localKeyID and will confuse some PKCS12 implementations.
 					//
 					// If we find one, we'll prune it out.
 					if (PkcsObjectIdentifiers.Pkcs9AtLocalKeyID.Equals(oid))
+					{
 						continue;
+					}
 
 					// NB: Ignore any existing FriendlyName
 					if (!PkcsObjectIdentifiers.Pkcs9AtFriendlyName.Equals(oid))
@@ -868,13 +939,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 				doneCerts.Add(cert.Certificate);
 			}
 
-			foreach (var chainCertEntry in m_chainCerts)
+			foreach (KeyValuePair<CertId, X509CertificateEntry> chainCertEntry in m_chainCerts)
 			{
-				var certId = chainCertEntry.Key;
-				var cert = chainCertEntry.Value;
+				CertId certId = chainCertEntry.Key;
+				X509CertificateEntry cert = chainCertEntry.Value;
 
 				if (doneCerts.Contains(cert.Certificate))
+				{
 					continue;
+				}
 
 				CertBag cBag = new CertBag(
 					PkcsObjectIdentifiers.X509Certificate,
@@ -882,14 +955,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 
 				Asn1EncodableVector fName = new Asn1EncodableVector();
 
-				foreach (var oid in cert.BagAttributeKeys)
+				foreach (DerObjectIdentifier oid in cert.BagAttributeKeys)
 				{
 					// a certificate not immediately linked to a key doesn't require
 					// a localKeyID and will confuse some PKCS12 implementations.
 					//
 					// If we find one, we'll prune it out.
 					if (PkcsObjectIdentifiers.Pkcs9AtLocalKeyID.Equals(oid))
+					{
 						continue;
+					}
 
 					fName.Add(new DerSequence(oid, new DerSet(cert[oid])));
 				}
@@ -963,7 +1038,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			return MacUtilities.DoFinal(mac, data);
 		}
 
-		private static byte[] CryptPbeData(
+		static byte[] CryptPbeData(
 			bool forEncryption,
 			AlgorithmIdentifier algId,
 			char[] password,
@@ -973,7 +1048,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkcs
 			IBufferedCipher cipher = PbeUtilities.CreateEngine(algId) as IBufferedCipher;
 
 			if (cipher == null)
+			{
 				throw new Exception("Unknown encryption algorithm: " + algId.Algorithm);
+			}
 
 			if (algId.Algorithm.Equals(PkcsObjectIdentifiers.IdPbeS2))
 			{

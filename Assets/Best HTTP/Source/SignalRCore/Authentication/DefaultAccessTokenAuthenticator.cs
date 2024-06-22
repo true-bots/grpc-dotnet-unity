@@ -26,11 +26,11 @@ namespace BestHTTP.SignalRCore.Authentication
 
 #pragma warning restore 0067
 
-		private HubConnection _connection;
+		HubConnection _connection;
 
 		public DefaultAccessTokenAuthenticator(HubConnection connection)
 		{
-			this._connection = connection;
+			_connection = connection;
 		}
 
 		/// <summary>
@@ -43,18 +43,24 @@ namespace BestHTTP.SignalRCore.Authentication
 		/// <summary>
 		/// Prepares the request by adding two headers to it
 		/// </summary>
-		public void PrepareRequest(BestHTTP.HTTPRequest request)
+		public void PrepareRequest(HTTPRequest request)
 		{
-			if (this._connection.NegotiationResult == null)
+			if (_connection.NegotiationResult == null)
+			{
 				return;
+			}
 
 			// Add Authorization header to http requests, add access_token param to the uri otherwise
-			if (BestHTTP.Connections.HTTPProtocolFactory.GetProtocolFromUri(request.CurrentUri) == BestHTTP.Connections.SupportedProtocols.HTTP)
-				request.SetHeader("Authorization", "Bearer " + this._connection.NegotiationResult.AccessToken);
+			if (Connections.HTTPProtocolFactory.GetProtocolFromUri(request.CurrentUri) == Connections.SupportedProtocols.HTTP)
+			{
+				request.SetHeader("Authorization", "Bearer " + _connection.NegotiationResult.AccessToken);
+			}
 			else
 #if !BESTHTTP_DISABLE_WEBSOCKET
-			if (BestHTTP.Connections.HTTPProtocolFactory.GetProtocolFromUri(request.Uri) != BestHTTP.Connections.SupportedProtocols.WebSocket)
+			if (Connections.HTTPProtocolFactory.GetProtocolFromUri(request.Uri) != Connections.SupportedProtocols.WebSocket)
+			{
 				request.Uri = PrepareUriImpl(request.Uri);
+			}
 #else
                 ;
 #endif
@@ -62,8 +68,10 @@ namespace BestHTTP.SignalRCore.Authentication
 
 		public Uri PrepareUri(Uri uri)
 		{
-			if (this._connection.NegotiationResult == null)
+			if (_connection.NegotiationResult == null)
+			{
 				return uri;
+			}
 
 			if (uri.Query.StartsWith("??"))
 			{
@@ -74,20 +82,22 @@ namespace BestHTTP.SignalRCore.Authentication
 			}
 
 #if !BESTHTTP_DISABLE_WEBSOCKET
-			if (BestHTTP.Connections.HTTPProtocolFactory.GetProtocolFromUri(uri) == BestHTTP.Connections.SupportedProtocols.WebSocket)
+			if (Connections.HTTPProtocolFactory.GetProtocolFromUri(uri) == Connections.SupportedProtocols.WebSocket)
+			{
 				uri = PrepareUriImpl(uri);
+			}
 #endif
 
 			return uri;
 		}
 
-		private Uri PrepareUriImpl(Uri uri)
+		Uri PrepareUriImpl(Uri uri)
 		{
-			if (this._connection.NegotiationResult != null && !string.IsNullOrEmpty(this._connection.NegotiationResult.AccessToken))
+			if (_connection.NegotiationResult != null && !string.IsNullOrEmpty(_connection.NegotiationResult.AccessToken))
 			{
 				string query = string.IsNullOrEmpty(uri.Query) ? "" : uri.Query + "&";
 				UriBuilder uriBuilder = new UriBuilder(uri.Scheme, uri.Host, uri.Port, uri.AbsolutePath,
-					query + "access_token=" + this._connection.NegotiationResult.AccessToken);
+					query + "access_token=" + _connection.NegotiationResult.AccessToken);
 				return uriBuilder.Uri;
 			}
 

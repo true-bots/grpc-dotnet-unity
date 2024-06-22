@@ -27,7 +27,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class EncryptedData
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence data;
+		readonly Asn1Sequence data;
 //        private readonly DerObjectIdentifier bagId;
 //        private readonly Asn1Object bagValue;
 
@@ -44,20 +44,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				return new EncryptedData((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private EncryptedData(
+		EncryptedData(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 2)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
 			DerInteger version = (DerInteger)seq[0];
 			if (!version.HasValue(0))
+			{
 				throw new ArgumentException("sequence not version 0");
+			}
 
-			this.data = (Asn1Sequence)seq[1];
+			data = (Asn1Sequence)seq[1];
 		}
 
 		public EncryptedData(

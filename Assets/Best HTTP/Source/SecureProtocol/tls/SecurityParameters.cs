@@ -60,25 +60,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		internal void Clear()
 		{
-			this.m_sessionHash = null;
-			this.m_sessionID = null;
-			this.m_clientCertTypes = null;
-			this.m_clientServerNames = null;
-			this.m_clientSigAlgs = null;
-			this.m_clientSigAlgsCert = null;
-			this.m_clientSupportedGroups = null;
-			this.m_serverSigAlgs = null;
-			this.m_serverSigAlgsCert = null;
-			this.m_serverSupportedGroups = null;
-			this.m_statusRequestVersion = 0;
+			m_sessionHash = null;
+			m_sessionID = null;
+			m_clientCertTypes = null;
+			m_clientServerNames = null;
+			m_clientSigAlgs = null;
+			m_clientSigAlgsCert = null;
+			m_clientSupportedGroups = null;
+			m_serverSigAlgs = null;
+			m_serverSigAlgsCert = null;
+			m_serverSupportedGroups = null;
+			m_statusRequestVersion = 0;
 
-			this.m_baseKeyClient = ClearSecret(m_baseKeyClient);
-			this.m_baseKeyServer = ClearSecret(m_baseKeyServer);
-			this.m_earlyExporterMasterSecret = ClearSecret(m_earlyExporterMasterSecret);
-			this.m_earlySecret = ClearSecret(m_earlySecret);
-			this.m_exporterMasterSecret = ClearSecret(m_exporterMasterSecret);
-			this.m_handshakeSecret = ClearSecret(m_handshakeSecret);
-			this.m_masterSecret = ClearSecret(m_masterSecret);
+			m_baseKeyClient = ClearSecret(m_baseKeyClient);
+			m_baseKeyServer = ClearSecret(m_baseKeyServer);
+			m_earlyExporterMasterSecret = ClearSecret(m_earlyExporterMasterSecret);
+			m_earlySecret = ClearSecret(m_earlySecret);
+			m_exporterMasterSecret = ClearSecret(m_exporterMasterSecret);
+			m_handshakeSecret = ClearSecret(m_handshakeSecret);
+			m_masterSecret = ClearSecret(m_masterSecret);
 		}
 
 		public ProtocolName ApplicationProtocol
@@ -324,7 +324,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public bool IsRenegotiating { get; set; }
 		public Certificate PreRenegotiatingServerCert { get; set; }
 
-		private static TlsSecret ClearSecret(TlsSecret secret)
+		static TlsSecret ClearSecret(TlsSecret secret)
 		{
 			if (null != secret)
 			{

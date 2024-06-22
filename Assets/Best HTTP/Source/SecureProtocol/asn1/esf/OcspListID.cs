@@ -17,34 +17,43 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class OcspListID
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence ocspResponses;
+		readonly Asn1Sequence ocspResponses;
 
 		public static OcspListID GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is OcspListID)
+			{
 				return (OcspListID)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new OcspListID((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'OcspListID' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
-		private OcspListID(
+		OcspListID(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
+			}
+
 			if (seq.Count != 1)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
-			this.ocspResponses = (Asn1Sequence)seq[0].ToAsn1Object();
+			ocspResponses = (Asn1Sequence)seq[0].ToAsn1Object();
 
-			foreach (Asn1Encodable ae in this.ocspResponses)
+			foreach (Asn1Encodable ae in ocspResponses)
 			{
 				OcspResponsesID.GetInstance(ae.ToAsn1Object());
 			}
@@ -54,7 +63,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			params OcspResponsesID[] ocspResponses)
 		{
 			if (ocspResponses == null)
+			{
 				throw new ArgumentNullException("ocspResponses");
+			}
 
 			this.ocspResponses = new DerSequence(ocspResponses);
 		}
@@ -63,7 +74,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			IEnumerable<OcspResponsesID> ocspResponses)
 		{
 			if (ocspResponses == null)
+			{
 				throw new ArgumentNullException("ocspResponses");
+			}
 
 			this.ocspResponses = new DerSequence(
 				Asn1EncodableVector.FromEnumerable(ocspResponses));

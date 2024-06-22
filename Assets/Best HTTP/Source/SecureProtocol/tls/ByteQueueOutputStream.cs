@@ -9,11 +9,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public sealed class ByteQueueOutputStream
 		: BaseOutputStream
 	{
-		private readonly ByteQueue m_buffer;
+		readonly ByteQueue m_buffer;
 
 		public ByteQueueOutputStream()
 		{
-			this.m_buffer = new ByteQueue();
+			m_buffer = new ByteQueue();
 		}
 
 		public ByteQueue Buffer

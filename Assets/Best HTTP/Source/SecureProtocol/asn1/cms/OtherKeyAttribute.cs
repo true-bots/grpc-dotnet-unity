@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class OtherKeyAttribute
 		: Asn1Encodable
 	{
-		private DerObjectIdentifier keyAttrId;
-		private Asn1Encodable keyAttr;
+		DerObjectIdentifier keyAttrId;
+		Asn1Encodable keyAttr;
 
 		/**
          * return an OtherKeyAttribute object from the given object.
@@ -21,12 +21,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			object obj)
 		{
 			if (obj == null || obj is OtherKeyAttribute)
+			{
 				return (OtherKeyAttribute)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new OtherKeyAttribute((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public OtherKeyAttribute(

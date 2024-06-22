@@ -16,17 +16,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 	public class Restriction
 		: Asn1Encodable
 	{
-		private readonly DirectoryString restriction;
+		readonly DirectoryString restriction;
 
 		public static Restriction GetInstance(object obj)
 		{
 			if (obj is Restriction)
+			{
 				return (Restriction)obj;
+			}
 
 			if (obj is IAsn1String)
+			{
 				return new Restriction(DirectoryString.GetInstance(obj));
+			}
 
-			throw new ArgumentException("Unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -40,7 +44,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 		*
 		* @param restriction A IAsn1String.
 		*/
-		private Restriction(DirectoryString restriction)
+		Restriction(DirectoryString restriction)
 		{
 			this.restriction = restriction;
 		}

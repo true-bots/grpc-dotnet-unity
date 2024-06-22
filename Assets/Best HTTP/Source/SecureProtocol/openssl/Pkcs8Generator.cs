@@ -26,11 +26,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 		public static readonly string PbeSha1_RC2_128 = PkcsObjectIdentifiers.PbeWithShaAnd128BitRC2Cbc.Id;
 		public static readonly string PbeSha1_RC2_40 = PkcsObjectIdentifiers.PbewithShaAnd40BitRC2Cbc.Id;
 
-		private char[] password;
-		private string algorithm;
-		private int iterationCount;
-		private AsymmetricKeyParameter privKey;
-		private SecureRandom random;
+		char[] password;
+		string algorithm;
+		int iterationCount;
+		AsymmetricKeyParameter privKey;
+		SecureRandom random;
 
 		/**
 		* Constructor for an unencrypted private key PEM object.
@@ -55,22 +55,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.OpenSsl
 			// TODO Check privKey.IsPrivate
 			this.privKey = privKey;
 			this.algorithm = algorithm;
-			this.iterationCount = 2048;
+			iterationCount = 2048;
 		}
 
 		public SecureRandom SecureRandom
 		{
-			set { this.random = value; }
+			set { random = value; }
 		}
 
 		public char[] Password
 		{
-			set { this.password = value; }
+			set { password = value; }
 		}
 
 		public int IterationCount
 		{
-			set { this.iterationCount = value; }
+			set { iterationCount = value; }
 		}
 
 		public PemObject Generate()

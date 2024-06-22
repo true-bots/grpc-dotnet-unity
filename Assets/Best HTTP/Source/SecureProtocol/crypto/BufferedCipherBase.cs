@@ -27,9 +27,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		{
 			byte[] outBytes = ProcessByte(input);
 			if (outBytes == null)
+			{
 				return 0;
+			}
+
 			if (outOff + outBytes.Length > output.Length)
+			{
 				throw new DataLengthException("output buffer too short");
+			}
+
 			outBytes.CopyTo(output, outOff);
 			return outBytes.Length;
 		}
@@ -63,9 +69,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		{
 			byte[] outBytes = ProcessBytes(input, inOff, length);
 			if (outBytes == null)
+			{
 				return 0;
+			}
+
 			if (outOff + outBytes.Length > output.Length)
+			{
 				throw new DataLengthException("output buffer too short");
+			}
+
 			outBytes.CopyTo(output, outOff);
 			return outBytes.Length;
 		}
@@ -93,7 +105,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		{
 			byte[] outBytes = DoFinal();
 			if (outOff + outBytes.Length > output.Length)
+			{
 				throw new DataLengthException("output buffer too short");
+			}
+
 			outBytes.CopyTo(output, outOff);
 			return outBytes.Length;
 		}

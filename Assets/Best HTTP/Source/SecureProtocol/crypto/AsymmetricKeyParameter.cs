@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	public abstract class AsymmetricKeyParameter
 		: ICipherParameters
 	{
-		private readonly bool privateKey;
+		readonly bool privateKey;
 
 		protected AsymmetricKeyParameter(
 			bool privateKey)

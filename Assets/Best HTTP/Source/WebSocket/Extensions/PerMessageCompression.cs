@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_WEBSOCKET && (!UNITY_WEBGL || UNITY_EDITOR)
 
 using System;
+using System.Collections.Generic;
 using BestHTTP.Extensions;
 using BestHTTP.WebSocket.Frames;
 using BestHTTP.Decompression.Zlib;
@@ -16,7 +17,7 @@ namespace BestHTTP.WebSocket.Extensions
 	{
 		public const int MinDataLengthToCompressDefault = 256;
 
-		private static readonly byte[] Trailer = new byte[] { 0x00, 0x00, 0xFF, 0xFF };
+		static readonly byte[] Trailer = new byte[] { 0x00, 0x00, 0xFF, 0xFF };
 
 		#region Public Properties
 
@@ -59,17 +60,17 @@ namespace BestHTTP.WebSocket.Extensions
 		/// <summary>
 		/// Cached object to support context takeover.
 		/// </summary>
-		private BufferPoolMemoryStream compressorOutputStream;
+		BufferPoolMemoryStream compressorOutputStream;
 
-		private DeflateStream compressorDeflateStream;
+		DeflateStream compressorDeflateStream;
 
 		/// <summary>
 		/// Cached object to support context takeover.
 		/// </summary>
-		private BufferPoolMemoryStream decompressorInputStream;
+		BufferPoolMemoryStream decompressorInputStream;
 
-		private BufferPoolMemoryStream decompressorOutputStream;
-		private DeflateStream decompressorDeflateStream;
+		BufferPoolMemoryStream decompressorOutputStream;
+		DeflateStream decompressorDeflateStream;
 
 		#endregion
 
@@ -85,12 +86,12 @@ namespace BestHTTP.WebSocket.Extensions
 			int desiredServerMaxWindowBits,
 			int minDatalengthToCompress)
 		{
-			this.Level = level;
-			this.ClientNoContextTakeover = clientNoContextTakeover;
-			this.ServerNoContextTakeover = serverNoContextTakeover;
-			this.ClientMaxWindowBits = desiredClientMaxWindowBits;
-			this.ServerMaxWindowBits = desiredServerMaxWindowBits;
-			this.MinimumDataLegthToCompress = minDatalengthToCompress;
+			Level = level;
+			ClientNoContextTakeover = clientNoContextTakeover;
+			ServerNoContextTakeover = serverNoContextTakeover;
+			ClientMaxWindowBits = desiredClientMaxWindowBits;
+			ServerMaxWindowBits = desiredServerMaxWindowBits;
+			MinimumDataLegthToCompress = minDatalengthToCompress;
 		}
 
 		#region IExtension Implementation
@@ -109,8 +110,10 @@ namespace BestHTTP.WebSocket.Extensions
 			// A client MAY include the "server_no_context_takeover" extension parameter in an extension negotiation offer.  This extension parameter has no value.
 			// By including this extension parameter in an extension negotiation offer, a client prevents the peer server from using context takeover.
 			// If the peer server doesn't use context takeover, the client doesn't need to reserve memory to retain the LZ77 sliding window between messages.
-			if (this.ServerNoContextTakeover)
+			if (ServerNoContextTakeover)
+			{
 				headerValue += "; server_no_context_takeover";
+			}
 
 
 			// http://tools.ietf.org/html/rfc7692#section-7.1.1.2
@@ -118,23 +121,31 @@ namespace BestHTTP.WebSocket.Extensions
 			// This extension parameter has no value.  By including this extension parameter in an extension negotiation offer,
 			// a client informs the peer server of a hint that even if the server doesn't include the "client_no_context_takeover"
 			// extension parameter in the corresponding extension negotiation response to the offer, the client is not going to use context takeover.
-			if (this.ClientNoContextTakeover)
+			if (ClientNoContextTakeover)
+			{
 				headerValue += "; client_no_context_takeover";
+			}
 
 			// http://tools.ietf.org/html/rfc7692#section-7.1.2.1
 			// By including this parameter in an extension negotiation offer, a client limits the LZ77 sliding window size that the server
 			// will use to compress messages.If the peer server uses a small LZ77 sliding window to compress messages, the client can reduce the memory needed for the LZ77 sliding window.
-			if (this.ServerMaxWindowBits != ZlibConstants.WindowBitsMax)
-				headerValue += "; server_max_window_bits=" + this.ServerMaxWindowBits.ToString();
+			if (ServerMaxWindowBits != ZlibConstants.WindowBitsMax)
+			{
+				headerValue += "; server_max_window_bits=" + ServerMaxWindowBits.ToString();
+			}
 			else
 				// Absence of this parameter in an extension negotiation offer indicates that the client can receive messages compressed using an LZ77 sliding window of up to 32,768 bytes.
-				this.ServerMaxWindowBits = ZlibConstants.WindowBitsMax;
+			{
+				ServerMaxWindowBits = ZlibConstants.WindowBitsMax;
+			}
 
 			// http://tools.ietf.org/html/rfc7692#section-7.1.2.2
 			// By including this parameter in an offer, a client informs the peer server that the client supports the "client_max_window_bits"
 			// extension parameter in an extension negotiation response and, optionally, a hint by attaching a value to the parameter.
-			if (this.ClientMaxWindowBits != ZlibConstants.WindowBitsMax)
-				headerValue += "; client_max_window_bits=" + this.ClientMaxWindowBits.ToString();
+			if (ClientMaxWindowBits != ZlibConstants.WindowBitsMax)
+			{
+				headerValue += "; client_max_window_bits=" + ClientMaxWindowBits.ToString();
+			}
 			else
 			{
 				headerValue += "; client_max_window_bits";
@@ -144,7 +155,7 @@ namespace BestHTTP.WebSocket.Extensions
 				// extension negotiation response with a value greater than the one in the extension negotiation offer or if the server doesn't include
 				// the extension parameter at all, the client is not going to use an LZ77 sliding window size greater than the size specified
 				// by the value in the extension negotiation offer to compress messages.
-				this.ClientMaxWindowBits = ZlibConstants.WindowBitsMax;
+				ClientMaxWindowBits = ZlibConstants.WindowBitsMax;
 			}
 
 			// Add the new header to the request.
@@ -154,9 +165,11 @@ namespace BestHTTP.WebSocket.Extensions
 		public bool ParseNegotiation(HTTPResponse resp)
 		{
 			// Search for any returned neogitation offer
-			var headerValues = resp.GetHeaderValues("Sec-WebSocket-Extensions");
+			List<string> headerValues = resp.GetHeaderValues("Sec-WebSocket-Extensions");
 			if (headerValues == null)
+			{
 				return false;
+			}
 
 			for (int i = 0; i < headerValues.Count; ++i)
 			{
@@ -173,26 +186,38 @@ namespace BestHTTP.WebSocket.Extensions
 
 						HeaderValue option;
 						if (value.TryGetOption("client_no_context_takeover", out option))
-							this.ClientNoContextTakeover = true;
+						{
+							ClientNoContextTakeover = true;
+						}
 
 						if (value.TryGetOption("server_no_context_takeover", out option))
-							this.ServerNoContextTakeover = true;
+						{
+							ServerNoContextTakeover = true;
+						}
 
 						if (value.TryGetOption("client_max_window_bits", out option))
+						{
 							if (option.HasValue)
 							{
 								int windowBits;
 								if (int.TryParse(option.Value, out windowBits))
-									this.ClientMaxWindowBits = windowBits;
+								{
+									ClientMaxWindowBits = windowBits;
+								}
 							}
+						}
 
 						if (value.TryGetOption("server_max_window_bits", out option))
+						{
 							if (option.HasValue)
 							{
 								int windowBits;
 								if (int.TryParse(option.Value, out windowBits))
-									this.ServerMaxWindowBits = windowBits;
+								{
+									ServerMaxWindowBits = windowBits;
+								}
 							}
+						}
 
 						return true;
 					}
@@ -211,10 +236,14 @@ namespace BestHTTP.WebSocket.Extensions
 			// http://tools.ietf.org/html/rfc7692#section-7.2.3.1
 			//  the RSV1 bit is set only on the first frame.
 			if ((writer.Type == WebSocketFrameTypes.Binary || writer.Type == WebSocketFrameTypes.Text) &&
-			    writer.Data != null && writer.Data.Count >= this.MinimumDataLegthToCompress)
+			    writer.Data != null && writer.Data.Count >= MinimumDataLegthToCompress)
+			{
 				return (byte)(inFlag | 0x40);
+			}
 			else
+			{
 				return inFlag;
+			}
 		}
 
 		/// <summary>
@@ -223,13 +252,19 @@ namespace BestHTTP.WebSocket.Extensions
 		public BufferSegment Encode(WebSocketFrame writer)
 		{
 			if (writer.Data == null)
+			{
 				return BufferSegment.Empty;
+			}
 
 			// Is compressing enabled for this frame? If so, compress it.
 			if ((writer.Header & 0x40) != 0)
+			{
 				return Compress(writer.Data);
+			}
 			else
+			{
 				return writer.Data;
+			}
 		}
 
 		/// <summary>
@@ -239,9 +274,13 @@ namespace BestHTTP.WebSocket.Extensions
 		{
 			// Is the server compressed the data? If so, decompress it.
 			if ((header & 0x40) != 0)
+			{
 				return Decompress(data);
+			}
 			else
+			{
 				return data;
+			}
 		}
 
 		#endregion
@@ -251,15 +290,18 @@ namespace BestHTTP.WebSocket.Extensions
 		/// <summary>
 		/// A function to compress and return the data parameter with possible context takeover support (reusing the DeflateStream).
 		/// </summary>
-		private BufferSegment Compress(BufferSegment data)
+		BufferSegment Compress(BufferSegment data)
 		{
 			if (compressorOutputStream == null)
+			{
 				compressorOutputStream = new BufferPoolMemoryStream();
+			}
+
 			compressorOutputStream.SetLength(0);
 
 			if (compressorDeflateStream == null)
 			{
-				compressorDeflateStream = new DeflateStream(compressorOutputStream, CompressionMode.Compress, this.Level, true, this.ClientMaxWindowBits);
+				compressorDeflateStream = new DeflateStream(compressorOutputStream, CompressionMode.Compress, Level, true, ClientMaxWindowBits);
 				compressorDeflateStream.FlushMode = FlushType.Sync;
 			}
 
@@ -279,7 +321,7 @@ namespace BestHTTP.WebSocket.Extensions
 			}
 			finally
 			{
-				if (this.ClientNoContextTakeover)
+				if (ClientNoContextTakeover)
 				{
 					compressorDeflateStream.Dispose();
 					compressorDeflateStream = null;
@@ -292,42 +334,49 @@ namespace BestHTTP.WebSocket.Extensions
 		/// <summary>
 		/// A function to decompress and return the data parameter with possible context takeover support (reusing the DeflateStream).
 		/// </summary>
-		private BufferSegment Decompress(BufferSegment data)
+		BufferSegment Decompress(BufferSegment data)
 		{
 			if (decompressorInputStream == null)
+			{
 				decompressorInputStream = new BufferPoolMemoryStream(data.Count + 4);
+			}
 
 			decompressorInputStream.Write(data.Data, data.Offset, data.Count);
 
 			// http://tools.ietf.org/html/rfc7692#section-7.2.2
 			// Append 4 octets of 0x00 0x00 0xff 0xff to the tail end of the payload of the message.
-			decompressorInputStream.Write(PerMessageCompression.Trailer, 0, PerMessageCompression.Trailer.Length);
+			decompressorInputStream.Write(Trailer, 0, Trailer.Length);
 
 			decompressorInputStream.Position = 0;
 
 			if (decompressorDeflateStream == null)
 			{
 				decompressorDeflateStream =
-					new DeflateStream(decompressorInputStream, CompressionMode.Decompress, CompressionLevel.Default, true, this.ServerMaxWindowBits);
+					new DeflateStream(decompressorInputStream, CompressionMode.Decompress, CompressionLevel.Default, true, ServerMaxWindowBits);
 				decompressorDeflateStream.FlushMode = FlushType.Sync;
 			}
 
 			if (decompressorOutputStream == null)
+			{
 				decompressorOutputStream = new BufferPoolMemoryStream();
+			}
+
 			decompressorOutputStream.SetLength(0);
 
 			byte[] copyBuffer = BufferPool.Get(1024, true);
 			int readCount;
 			while ((readCount = decompressorDeflateStream.Read(copyBuffer, 0, copyBuffer.Length)) != 0)
+			{
 				decompressorOutputStream.Write(copyBuffer, 0, readCount);
+			}
 
 			BufferPool.Release(copyBuffer);
 
 			decompressorDeflateStream.SetLength(0);
 
-			var result = decompressorOutputStream.ToBufferSegment();
+			BufferSegment result = decompressorOutputStream.ToBufferSegment();
 
-			if (this.ServerNoContextTakeover)
+			if (ServerNoContextTakeover)
 			{
 				decompressorDeflateStream.Dispose();
 				decompressorDeflateStream = null;

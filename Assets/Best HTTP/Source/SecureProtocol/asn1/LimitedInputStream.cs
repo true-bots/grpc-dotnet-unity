@@ -5,16 +5,16 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal abstract class LimitedInputStream
+	abstract class LimitedInputStream
 		: BaseInputStream
 	{
 		protected readonly Stream _in;
-		private int _limit;
+		int _limit;
 
 		internal LimitedInputStream(Stream inStream, int limit)
 		{
-			this._in = inStream;
-			this._limit = limit;
+			_in = inStream;
+			_limit = limit;
 		}
 
 		internal virtual int Limit

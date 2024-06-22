@@ -8,14 +8,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.IO
 	public sealed class SignerSink
 		: BaseOutputStream
 	{
-		private readonly ISigner m_signer;
+		readonly ISigner m_signer;
 
 		public SignerSink(ISigner signer)
 		{
 			m_signer = signer;
 		}
 
-		public ISigner Signer => m_signer;
+		public ISigner Signer
+		{
+			get { return m_signer; }
+		}
 
 		public override void Write(byte[] buffer, int offset, int count)
 		{

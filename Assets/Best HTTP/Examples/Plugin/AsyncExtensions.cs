@@ -16,15 +16,20 @@ namespace BestHTTP
 					// The request finished without any problem.
 					case HTTPRequestStates.Finished:
 						if (resp.IsSuccess)
-							tcs.TrySetResult(BestHTTP.JSON.LitJson.JsonMapper.ToObject<T>(resp.DataAsText));
+						{
+							tcs.TrySetResult(JSON.LitJson.JsonMapper.ToObject<T>(resp.DataAsText));
+						}
 						else
+						{
 							tcs.TrySetException(HTTPRequestAsyncExtensions.CreateException("Request finished Successfully, but the server sent an error.", resp));
+						}
+
 						break;
 
 					// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 					case HTTPRequestStates.Error:
 						HTTPRequestAsyncExtensions.VerboseLogging(request,
-							"Request Finished with Error! " + (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception"));
+							"Request Finished with Error! " + (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception"));
 
 						tcs.TrySetException(HTTPRequestAsyncExtensions.CreateException("No Exception", null, req.Exception));
 						break;

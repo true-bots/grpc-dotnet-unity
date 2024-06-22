@@ -8,18 +8,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public abstract class Gost3411_2012Digest
 		: IDigest, IMemoable
 	{
-		private readonly byte[] IV = new byte[64];
-		private readonly byte[] N = new byte[64];
-		private readonly byte[] Sigma = new byte[64];
-		private readonly byte[] Ki = new byte[64];
-		private readonly byte[] m = new byte[64];
-		private readonly byte[] h = new byte[64];
+		readonly byte[] IV = new byte[64];
+		readonly byte[] N = new byte[64];
+		readonly byte[] Sigma = new byte[64];
+		readonly byte[] Ki = new byte[64];
+		readonly byte[] m = new byte[64];
+		readonly byte[] h = new byte[64];
 
 		// Temporary buffers
-		private readonly byte[] tmp = new byte[64];
-		private readonly byte[] block = new byte[64];
+		readonly byte[] tmp = new byte[64];
+		readonly byte[] block = new byte[64];
 
-		private int bOff = 64;
+		int bOff = 64;
 
 		protected Gost3411_2012Digest(byte[] IV)
 		{
@@ -116,15 +116,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		{
 			Gost3411_2012Digest o = (Gost3411_2012Digest)other;
 
-			Array.Copy(o.IV, 0, this.IV, 0, 64);
-			Array.Copy(o.N, 0, this.N, 0, 64);
-			Array.Copy(o.Sigma, 0, this.Sigma, 0, 64);
-			Array.Copy(o.Ki, 0, this.Ki, 0, 64);
-			Array.Copy(o.m, 0, this.m, 0, 64);
-			Array.Copy(o.h, 0, this.h, 0, 64);
+			Array.Copy(o.IV, 0, IV, 0, 64);
+			Array.Copy(o.N, 0, N, 0, 64);
+			Array.Copy(o.Sigma, 0, Sigma, 0, 64);
+			Array.Copy(o.Ki, 0, Ki, 0, 64);
+			Array.Copy(o.m, 0, m, 0, 64);
+			Array.Copy(o.h, 0, h, 0, 64);
 
-			Array.Copy(o.block, 0, this.block, 0, 64);
-			this.bOff = o.bOff;
+			Array.Copy(o.block, 0, block, 0, 64);
+			bOff = o.bOff;
 		}
 
 		public void Update(byte input)
@@ -192,97 +192,97 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
         }
 #endif
 
-		private void F(byte[] V)
+		void F(byte[] V)
 		{
 			ulong[] res = new ulong[8];
 			ulong r;
 
 			r = 0;
-			r ^= T[0][(V[56] & 0xFF)];
-			r ^= T[1][(V[48] & 0xFF)];
-			r ^= T[2][(V[40] & 0xFF)];
-			r ^= T[3][(V[32] & 0xFF)];
-			r ^= T[4][(V[24] & 0xFF)];
-			r ^= T[5][(V[16] & 0xFF)];
-			r ^= T[6][(V[8] & 0xFF)];
-			r ^= T[7][(V[0] & 0xFF)];
+			r ^= T[0][V[56] & 0xFF];
+			r ^= T[1][V[48] & 0xFF];
+			r ^= T[2][V[40] & 0xFF];
+			r ^= T[3][V[32] & 0xFF];
+			r ^= T[4][V[24] & 0xFF];
+			r ^= T[5][V[16] & 0xFF];
+			r ^= T[6][V[8] & 0xFF];
+			r ^= T[7][V[0] & 0xFF];
 			res[0] = r;
 
 			r = 0;
-			r ^= T[0][(V[57] & 0xFF)];
-			r ^= T[1][(V[49] & 0xFF)];
-			r ^= T[2][(V[41] & 0xFF)];
-			r ^= T[3][(V[33] & 0xFF)];
-			r ^= T[4][(V[25] & 0xFF)];
-			r ^= T[5][(V[17] & 0xFF)];
-			r ^= T[6][(V[9] & 0xFF)];
-			r ^= T[7][(V[1] & 0xFF)];
+			r ^= T[0][V[57] & 0xFF];
+			r ^= T[1][V[49] & 0xFF];
+			r ^= T[2][V[41] & 0xFF];
+			r ^= T[3][V[33] & 0xFF];
+			r ^= T[4][V[25] & 0xFF];
+			r ^= T[5][V[17] & 0xFF];
+			r ^= T[6][V[9] & 0xFF];
+			r ^= T[7][V[1] & 0xFF];
 			res[1] = r;
 
 			r = 0;
-			r ^= T[0][(V[58] & 0xFF)];
-			r ^= T[1][(V[50] & 0xFF)];
-			r ^= T[2][(V[42] & 0xFF)];
-			r ^= T[3][(V[34] & 0xFF)];
-			r ^= T[4][(V[26] & 0xFF)];
-			r ^= T[5][(V[18] & 0xFF)];
-			r ^= T[6][(V[10] & 0xFF)];
-			r ^= T[7][(V[2] & 0xFF)];
+			r ^= T[0][V[58] & 0xFF];
+			r ^= T[1][V[50] & 0xFF];
+			r ^= T[2][V[42] & 0xFF];
+			r ^= T[3][V[34] & 0xFF];
+			r ^= T[4][V[26] & 0xFF];
+			r ^= T[5][V[18] & 0xFF];
+			r ^= T[6][V[10] & 0xFF];
+			r ^= T[7][V[2] & 0xFF];
 			res[2] = r;
 
 			r = 0;
-			r ^= T[0][(V[59] & 0xFF)];
-			r ^= T[1][(V[51] & 0xFF)];
-			r ^= T[2][(V[43] & 0xFF)];
-			r ^= T[3][(V[35] & 0xFF)];
-			r ^= T[4][(V[27] & 0xFF)];
-			r ^= T[5][(V[19] & 0xFF)];
-			r ^= T[6][(V[11] & 0xFF)];
-			r ^= T[7][(V[3] & 0xFF)];
+			r ^= T[0][V[59] & 0xFF];
+			r ^= T[1][V[51] & 0xFF];
+			r ^= T[2][V[43] & 0xFF];
+			r ^= T[3][V[35] & 0xFF];
+			r ^= T[4][V[27] & 0xFF];
+			r ^= T[5][V[19] & 0xFF];
+			r ^= T[6][V[11] & 0xFF];
+			r ^= T[7][V[3] & 0xFF];
 			res[3] = r;
 
 			r = 0;
-			r ^= T[0][(V[60] & 0xFF)];
-			r ^= T[1][(V[52] & 0xFF)];
-			r ^= T[2][(V[44] & 0xFF)];
-			r ^= T[3][(V[36] & 0xFF)];
-			r ^= T[4][(V[28] & 0xFF)];
-			r ^= T[5][(V[20] & 0xFF)];
-			r ^= T[6][(V[12] & 0xFF)];
-			r ^= T[7][(V[4] & 0xFF)];
+			r ^= T[0][V[60] & 0xFF];
+			r ^= T[1][V[52] & 0xFF];
+			r ^= T[2][V[44] & 0xFF];
+			r ^= T[3][V[36] & 0xFF];
+			r ^= T[4][V[28] & 0xFF];
+			r ^= T[5][V[20] & 0xFF];
+			r ^= T[6][V[12] & 0xFF];
+			r ^= T[7][V[4] & 0xFF];
 			res[4] = r;
 
 			r = 0;
-			r ^= T[0][(V[61] & 0xFF)];
-			r ^= T[1][(V[53] & 0xFF)];
-			r ^= T[2][(V[45] & 0xFF)];
-			r ^= T[3][(V[37] & 0xFF)];
-			r ^= T[4][(V[29] & 0xFF)];
-			r ^= T[5][(V[21] & 0xFF)];
-			r ^= T[6][(V[13] & 0xFF)];
-			r ^= T[7][(V[5] & 0xFF)];
+			r ^= T[0][V[61] & 0xFF];
+			r ^= T[1][V[53] & 0xFF];
+			r ^= T[2][V[45] & 0xFF];
+			r ^= T[3][V[37] & 0xFF];
+			r ^= T[4][V[29] & 0xFF];
+			r ^= T[5][V[21] & 0xFF];
+			r ^= T[6][V[13] & 0xFF];
+			r ^= T[7][V[5] & 0xFF];
 			res[5] = r;
 
 			r = 0;
-			r ^= T[0][(V[62] & 0xFF)];
-			r ^= T[1][(V[54] & 0xFF)];
-			r ^= T[2][(V[46] & 0xFF)];
-			r ^= T[3][(V[38] & 0xFF)];
-			r ^= T[4][(V[30] & 0xFF)];
-			r ^= T[5][(V[22] & 0xFF)];
-			r ^= T[6][(V[14] & 0xFF)];
-			r ^= T[7][(V[6] & 0xFF)];
+			r ^= T[0][V[62] & 0xFF];
+			r ^= T[1][V[54] & 0xFF];
+			r ^= T[2][V[46] & 0xFF];
+			r ^= T[3][V[38] & 0xFF];
+			r ^= T[4][V[30] & 0xFF];
+			r ^= T[5][V[22] & 0xFF];
+			r ^= T[6][V[14] & 0xFF];
+			r ^= T[7][V[6] & 0xFF];
 			res[6] = r;
 
 			r = 0;
-			r ^= T[0][(V[63] & 0xFF)];
-			r ^= T[1][(V[55] & 0xFF)];
-			r ^= T[2][(V[47] & 0xFF)];
-			r ^= T[3][(V[39] & 0xFF)];
-			r ^= T[4][(V[31] & 0xFF)];
-			r ^= T[5][(V[23] & 0xFF)];
-			r ^= T[6][(V[15] & 0xFF)];
-			r ^= T[7][(V[7] & 0xFF)];
+			r ^= T[0][V[63] & 0xFF];
+			r ^= T[1][V[55] & 0xFF];
+			r ^= T[2][V[47] & 0xFF];
+			r ^= T[3][V[39] & 0xFF];
+			r ^= T[4][V[31] & 0xFF];
+			r ^= T[5][V[23] & 0xFF];
+			r ^= T[6][V[15] & 0xFF];
+			r ^= T[7][V[7] & 0xFF];
 			res[7] = r;
 
 			r = res[0];
@@ -293,7 +293,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			V[3] = (byte)(r >> 24);
 			V[2] = (byte)(r >> 16);
 			V[1] = (byte)(r >> 8);
-			V[0] = (byte)(r);
+			V[0] = (byte)r;
 
 			r = res[1];
 			V[15] = (byte)(r >> 56);
@@ -303,7 +303,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			V[11] = (byte)(r >> 24);
 			V[10] = (byte)(r >> 16);
 			V[9] = (byte)(r >> 8);
-			V[8] = (byte)(r);
+			V[8] = (byte)r;
 
 			r = res[2];
 			V[23] = (byte)(r >> 56);
@@ -313,7 +313,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			V[19] = (byte)(r >> 24);
 			V[18] = (byte)(r >> 16);
 			V[17] = (byte)(r >> 8);
-			V[16] = (byte)(r);
+			V[16] = (byte)r;
 
 			r = res[3];
 			V[31] = (byte)(r >> 56);
@@ -323,7 +323,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			V[27] = (byte)(r >> 24);
 			V[26] = (byte)(r >> 16);
 			V[25] = (byte)(r >> 8);
-			V[24] = (byte)(r);
+			V[24] = (byte)r;
 
 			r = res[4];
 			V[39] = (byte)(r >> 56);
@@ -333,7 +333,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			V[35] = (byte)(r >> 24);
 			V[34] = (byte)(r >> 16);
 			V[33] = (byte)(r >> 8);
-			V[32] = (byte)(r);
+			V[32] = (byte)r;
 
 			r = res[5];
 			V[47] = (byte)(r >> 56);
@@ -343,7 +343,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			V[43] = (byte)(r >> 24);
 			V[42] = (byte)(r >> 16);
 			V[41] = (byte)(r >> 8);
-			V[40] = (byte)(r);
+			V[40] = (byte)r;
 
 			r = res[6];
 			V[55] = (byte)(r >> 56);
@@ -353,7 +353,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			V[51] = (byte)(r >> 24);
 			V[50] = (byte)(r >> 16);
 			V[49] = (byte)(r >> 8);
-			V[48] = (byte)(r);
+			V[48] = (byte)r;
 
 			r = res[7];
 			V[63] = (byte)(r >> 56);
@@ -363,10 +363,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			V[59] = (byte)(r >> 24);
 			V[58] = (byte)(r >> 16);
 			V[57] = (byte)(r >> 8);
-			V[56] = (byte)(r);
+			V[56] = (byte)r;
 		}
 
-		private void xor512(byte[] A, byte[] B)
+		void xor512(byte[] A, byte[] B)
 		{
 			for (int i = 0; i < 64; ++i)
 			{
@@ -374,7 +374,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private void E(byte[] K, byte[] m)
+		void E(byte[] K, byte[] m)
 		{
 			Array.Copy(K, 0, Ki, 0, 64);
 			xor512(K, m);
@@ -392,7 +392,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			xor512(K, Ki);
 		}
 
-		private void g_N(byte[] h, byte[] N, byte[] m)
+		void g_N(byte[] h, byte[] N, byte[] m)
 		{
 			Array.Copy(h, 0, tmp, 0, 64);
 
@@ -404,7 +404,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			xor512(h, m);
 		}
 
-		private void addMod512(byte[] A, int num)
+		void addMod512(byte[] A, int num)
 		{
 			int c;
 			c = (A[63] & 0xFF) + (num & 0xFF);
@@ -413,14 +413,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			c = (A[62] & 0xFF) + ((num >> 8) & 0xFF) + (c >> 8);
 			A[62] = (byte)c;
 
-			for (int i = 61; (i >= 0) && (c > 0); --i)
+			for (int i = 61; i >= 0 && c > 0; --i)
 			{
 				c = (A[i] & 0xFF) + (c >> 8);
 				A[i] = (byte)c;
 			}
 		}
 
-		private void addMod512(byte[] A, byte[] B)
+		void addMod512(byte[] A, byte[] B)
 		{
 			for (int c = 0, i = 63; i >= 0; --i)
 			{
@@ -429,7 +429,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private void reverse(byte[] src, byte[] dst)
+		void reverse(byte[] src, byte[] dst)
 		{
 			int len = src.Length;
 			for (int i = 0; i < len; i++)
@@ -438,7 +438,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		}
 
-		private static readonly byte[][] C = new byte[][]
+		static readonly byte[][] C = new byte[][]
 		{
 			new byte[]
 			{
@@ -575,7 +575,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 		};
 
-		private static readonly byte[] Zero =
+		static readonly byte[] Zero =
 		{
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -587,7 +587,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		};
 
-		private readonly static ulong[][] T =
+		static readonly ulong[][] T =
 		{
 			new ulong[]
 			{

@@ -12,9 +12,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	 */
 	public class Gost3410ParametersGenerator
 	{
-		private int size;
-		private int typeproc;
-		private SecureRandom init_random;
+		int size;
+		int typeproc;
+		SecureRandom init_random;
 
 		/**
 		 * initialise the key generator.
@@ -29,12 +29,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			SecureRandom random)
 		{
 			this.size = size;
-			this.typeproc = typeProcedure;
-			this.init_random = random;
+			typeproc = typeProcedure;
+			init_random = random;
 		}
 
 		//Procedure A
-		private int procedure_A(int x0, int c, BigInteger[] pq, int size)
+		int procedure_A(int x0, int c, BigInteger[] pq, int size)
 		{
 			//Verify and perform condition: 0<x<2^16; 0<c<2^16; c - odd.
 			while (x0 < 0 || x0 > 65536)
@@ -42,7 +42,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				x0 = init_random.NextInt() / 32768;
 			}
 
-			while ((c < 0 || c > 65536) || (c / 2 == 0))
+			while (c < 0 || c > 65536 || c / 2 == 0)
 			{
 				c = init_random.NextInt() / 32768 + 1;
 			}
@@ -91,7 +91,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 					for (int j = 0; j < rm; j++)
 					{
-						y[j + 1] = (y[j].Multiply(constA16).Add(C)).Mod(BigInteger.Two.Pow(16));
+						y[j + 1] = y[j].Multiply(constA16).Add(C).Mod(BigInteger.Two.Pow(16));
 					}
 
 					//step 7
@@ -151,7 +151,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		}
 
 		//Procedure A'
-		private long procedure_Aa(long x0, long c, BigInteger[] pq, int size)
+		long procedure_Aa(long x0, long c, BigInteger[] pq, int size)
 		{
 			//Verify and perform condition: 0<x<2^32; 0<c<2^32; c - odd.
 			while (x0 < 0 || x0 > 4294967296L)
@@ -159,7 +159,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				x0 = init_random.NextInt() * 2;
 			}
 
-			while ((c < 0 || c > 4294967296L) || (c / 2 == 0))
+			while (c < 0 || c > 4294967296L || c / 2 == 0)
 			{
 				c = init_random.NextInt() * 2 + 1;
 			}
@@ -208,7 +208,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 					for (int j = 0; j < rm; j++)
 					{
-						y[j + 1] = (y[j].Multiply(constA32).Add(C)).Mod(BigInteger.Two.Pow(32));
+						y[j + 1] = y[j].Multiply(constA32).Add(C).Mod(BigInteger.Two.Pow(32));
 					}
 
 					//step 7
@@ -268,7 +268,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		}
 
 		//Procedure B
-		private void procedure_B(int x0, int c, BigInteger[] pq)
+		void procedure_B(int x0, int c, BigInteger[] pq)
 		{
 			//Verify and perform condition: 0<x<2^16; 0<c<2^16; c - odd.
 			while (x0 < 0 || x0 > 65536)
@@ -276,7 +276,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				x0 = init_random.NextInt() / 32768;
 			}
 
-			while ((c < 0 || c > 65536) || (c / 2 == 0))
+			while (c < 0 || c > 65536 || c / 2 == 0)
 			{
 				c = init_random.NextInt() / 32768 + 1;
 			}
@@ -307,7 +307,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				//step 3
 				for (int j = 0; j < 64; j++)
 				{
-					y[j + 1] = (y[j].Multiply(constA16).Add(C)).Mod(BigInteger.Two.Pow(16));
+					y[j + 1] = y[j].Multiply(constA16).Add(C).Mod(BigInteger.Two.Pow(16));
 				}
 
 				//step 4
@@ -358,7 +358,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		}
 
 		//Procedure B'
-		private void procedure_Bb(long x0, long c, BigInteger[] pq)
+		void procedure_Bb(long x0, long c, BigInteger[] pq)
 		{
 			//Verify and perform condition: 0<x<2^32; 0<c<2^32; c - odd.
 			while (x0 < 0 || x0 > 4294967296L)
@@ -366,7 +366,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				x0 = init_random.NextInt() * 2;
 			}
 
-			while ((c < 0 || c > 4294967296L) || (c / 2 == 0))
+			while (c < 0 || c > 4294967296L || c / 2 == 0)
 			{
 				c = init_random.NextInt() * 2 + 1;
 			}
@@ -397,7 +397,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 				//step 3
 				for (int j = 0; j < 32; j++)
 				{
-					y[j + 1] = (y[j].Multiply(constA32).Add(C)).Mod(BigInteger.Two.Pow(32));
+					y[j + 1] = y[j].Multiply(constA32).Add(C).Mod(BigInteger.Two.Pow(32));
 				}
 
 				//step 4
@@ -452,7 +452,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * procedure generates the a value from the given p,q,
 		 * returning the a value.
 		 */
-		private BigInteger procedure_C(BigInteger p, BigInteger q)
+		BigInteger procedure_C(BigInteger p, BigInteger q)
 		{
 			BigInteger pSub1 = p.Subtract(BigInteger.One);
 			BigInteger pSub1Divq = pSub1.Divide(q);

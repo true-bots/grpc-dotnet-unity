@@ -9,15 +9,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 {
 	public sealed class ServerSrpParams
 	{
-		private BigInteger m_N, m_g, m_B;
-		private byte[] m_s;
+		BigInteger m_N, m_g, m_B;
+		byte[] m_s;
 
 		public ServerSrpParams(BigInteger N, BigInteger g, byte[] s, BigInteger B)
 		{
-			this.m_N = N;
-			this.m_g = g;
-			this.m_s = Arrays.Clone(s);
-			this.m_B = B;
+			m_N = N;
+			m_g = g;
+			m_s = Arrays.Clone(s);
+			m_B = B;
 		}
 
 		public BigInteger B

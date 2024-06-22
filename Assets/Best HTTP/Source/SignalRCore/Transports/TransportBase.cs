@@ -8,7 +8,7 @@ using BestHTTP.PlatformSupport.Text;
 
 namespace BestHTTP.SignalRCore.Transports
 {
-	internal abstract class TransportBase : ITransport
+	abstract class TransportBase : ITransport
 	{
 		public abstract TransportTypes TransportType { get; }
 
@@ -22,16 +22,18 @@ namespace BestHTTP.SignalRCore.Transports
 		/// </summary>
 		public TransportStates State
 		{
-			get { return this._state; }
+			get { return _state; }
 			protected set
 			{
-				if (this._state != value)
+				if (_state != value)
 				{
-					TransportStates oldState = this._state;
-					this._state = value;
+					TransportStates oldState = _state;
+					_state = value;
 
-					if (this.OnStateChanged != null)
-						this.OnStateChanged(oldState, this._state);
+					if (OnStateChanged != null)
+					{
+						OnStateChanged(oldState, _state);
+					}
 				}
 			}
 		}
@@ -62,10 +64,10 @@ namespace BestHTTP.SignalRCore.Transports
 
 		internal TransportBase(HubConnection con)
 		{
-			this.connection = con;
-			this.Context = new LoggingContext(this);
-			this.Context.Add("Hub", this.connection.Context);
-			this.State = TransportStates.Initial;
+			connection = con;
+			Context = new LoggingContext(this);
+			Context.Add("Hub", connection.Context);
+			State = TransportStates.Initial;
 		}
 
 		/// <summary>
@@ -90,45 +92,57 @@ namespace BestHTTP.SignalRCore.Transports
 			//  -an empty json object ('{}') if the handshake process is succesfull
 			//  -otherwise it has one 'error' field
 
-			Dictionary<string, object> response = BestHTTP.JSON.Json.Decode(data) as Dictionary<string, object>;
+			Dictionary<string, object> response = JSON.Json.Decode(data) as Dictionary<string, object>;
 
 			if (response == null)
+			{
 				return "Couldn't parse json data: " + data;
+			}
 
 			object error;
 			if (response.TryGetValue("error", out error))
+			{
 				return error.ToString();
+			}
 
 			return null;
 		}
 
 		protected void HandleHandshakeResponse(string data)
 		{
-			this.ErrorReason = ParseHandshakeResponse(data);
+			ErrorReason = ParseHandshakeResponse(data);
 
-			this.State = string.IsNullOrEmpty(this.ErrorReason) ? TransportStates.Connected : TransportStates.Failed;
+			State = string.IsNullOrEmpty(ErrorReason) ? TransportStates.Connected : TransportStates.Failed;
 		}
 
 		//StringBuilder queryBuilder = new StringBuilder(3);
 		protected Uri BuildUri(Uri baseUri)
 		{
-			if (this.connection.NegotiationResult == null)
+			if (connection.NegotiationResult == null)
+			{
 				return baseUri;
+			}
 
 			UriBuilder builder = new UriBuilder(baseUri);
 
-			var queryBuilder = StringBuilderPool.Get(3);
+			StringBuilder queryBuilder = StringBuilderPool.Get(3);
 
 			queryBuilder.Append(baseUri.Query);
-			if (!string.IsNullOrEmpty(this.connection.NegotiationResult.ConnectionToken))
-				queryBuilder.Append("&id=").Append(this.connection.NegotiationResult.ConnectionToken);
-			else if (!string.IsNullOrEmpty(this.connection.NegotiationResult.ConnectionId))
-				queryBuilder.Append("&id=").Append(this.connection.NegotiationResult.ConnectionId);
+			if (!string.IsNullOrEmpty(connection.NegotiationResult.ConnectionToken))
+			{
+				queryBuilder.Append("&id=").Append(connection.NegotiationResult.ConnectionToken);
+			}
+			else if (!string.IsNullOrEmpty(connection.NegotiationResult.ConnectionId))
+			{
+				queryBuilder.Append("&id=").Append(connection.NegotiationResult.ConnectionId);
+			}
 
 			builder.Query = StringBuilderPool.ReleaseAndGrab(queryBuilder);
 
 			if (builder.Query.StartsWith("??"))
+			{
 				builder.Query = builder.Query.Substring(2);
+			}
 
 			return builder.Uri;
 		}

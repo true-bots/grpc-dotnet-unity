@@ -21,11 +21,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public class Sha256Digest
 		: GeneralDigest
 	{
-		private const int DigestLength = 32;
+		const int DigestLength = 32;
 
-		private uint H1, H2, H3, H4, H5, H6, H7, H8;
-		private uint[] X = new uint[64];
-		private int xOff;
+		uint H1, H2, H3, H4, H5, H6, H7, H8;
+		uint[] X = new uint[64];
+		int xOff;
 
 		public Sha256Digest()
 		{
@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			CopyIn(t);
 		}
 
-		private void CopyIn(Sha256Digest t)
+		void CopyIn(Sha256Digest t)
 		{
 			base.CopyIn(t);
 
@@ -99,7 +99,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			}
 
 			X[14] = (uint)((ulong)bitLength >> 32);
-			X[15] = (uint)((ulong)bitLength);
+			X[15] = (uint)(ulong)bitLength;
 		}
 
 		public override int DoFinal(byte[] output, int outOff)
@@ -153,7 +153,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			Array.Clear(X, 0, X.Length);
 		}
 
-		private void initHs()
+		void initHs()
 		{
 			/* SHA-256 initial hash value
 			 * The first 32 bits of the fractional parts of the square roots
@@ -259,7 +259,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			Array.Clear(X, 0, 16);
 		}
 
-		private static uint Sum1Ch(uint x, uint y, uint z)
+		static uint Sum1Ch(uint x, uint y, uint z)
 		{
 //			return Sum1(x) + Ch(x, y, z);
 			return (((x >> 6) | (x << 26)) ^ ((x >> 11) | (x << 21)) ^ ((x >> 25) | (x << 7)))
@@ -267,7 +267,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			       + (z ^ (x & (y ^ z)));
 		}
 
-		private static uint Sum0Maj(uint x, uint y, uint z)
+		static uint Sum0Maj(uint x, uint y, uint z)
 		{
 //			return Sum0(x) + Maj(x, y, z);
 			return (((x >> 2) | (x << 30)) ^ ((x >> 13) | (x << 19)) ^ ((x >> 22) | (x << 10)))
@@ -298,12 +298,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 //	        return ((x >> 6) | (x << 26)) ^ ((x >> 11) | (x << 21)) ^ ((x >> 25) | (x << 7));
 //        }
 
-		private static uint Theta0(uint x)
+		static uint Theta0(uint x)
 		{
 			return ((x >> 7) | (x << 25)) ^ ((x >> 18) | (x << 14)) ^ (x >> 3);
 		}
 
-		private static uint Theta1(uint x)
+		static uint Theta1(uint x)
 		{
 			return ((x >> 17) | (x << 15)) ^ ((x >> 19) | (x << 13)) ^ (x >> 10);
 		}
@@ -312,7 +312,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		 * (represent the first 32 bits of the fractional parts of the
 		 * cube roots of the first sixty-four prime numbers)
 		 */
-		private static readonly uint[] K =
+		static readonly uint[] K =
 		{
 			0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 			0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,

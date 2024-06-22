@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using BestHTTP.PlatformSupport.Threading;
+using Unity.Profiling;
 using UnityEngine;
 
 #if NETFX_CORE
@@ -34,7 +35,7 @@ namespace BestHTTP
 	/// Will route some U3D calls to the HTTPManager.
 	/// </summary>
 	[ExecuteInEditMode]
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	public sealed class HTTPUpdateDelegator : MonoBehaviour
 	{
 		#region Public Properties
@@ -47,7 +48,7 @@ namespace BestHTTP
 			get { return CheckInstance(); }
 		}
 
-		private volatile static HTTPUpdateDelegator instance;
+		static volatile HTTPUpdateDelegator instance;
 
 		/// <summary>
 		/// True, if the Instance property should hold a valid value.
@@ -68,7 +69,7 @@ namespace BestHTTP
 			set { SetThreadingMode(value); }
 		}
 
-		private ThreadingMode _currentThreadingMode = ThreadingMode.UnityUpdate;
+		ThreadingMode _currentThreadingMode = ThreadingMode.UnityUpdate;
 
 		/// <summary>
 		/// How much time the plugin should wait between two update call. Its default value 100 ms.
@@ -79,19 +80,19 @@ namespace BestHTTP
 		/// Called in the OnApplicationQuit function. If this function returns False, the plugin will not start to
 		/// shut down itself.
 		/// </summary>
-		public static System.Func<bool> OnBeforeApplicationQuit;
+		public static Func<bool> OnBeforeApplicationQuit;
 
 		/// <summary>
 		/// Called when the Unity application's foreground state changed.
 		/// </summary>
-		public static System.Action<bool> OnApplicationForegroundStateChanged;
+		public static Action<bool> OnApplicationForegroundStateChanged;
 
 		#endregion
 
-		private static bool isSetupCalled;
-		private int isHTTPManagerOnUpdateRunning;
-		private AutoResetEvent pingEvent = new AutoResetEvent(false);
-		private int updateThreadCount = 0;
+		static bool isSetupCalled;
+		int isHTTPManagerOnUpdateRunning;
+		AutoResetEvent pingEvent = new AutoResetEvent(false);
+		int updateThreadCount = 0;
 
 #if UNITY_EDITOR
 		/// <summary>
@@ -126,7 +127,9 @@ namespace BestHTTP
 					GameObject go = GameObject.Find("HTTP Update Delegator");
 
 					if (go != null)
+					{
 						instance = go.GetComponent<HTTPUpdateDelegator>();
+					}
 
 					if (instance == null)
 					{
@@ -170,25 +173,29 @@ namespace BestHTTP
 			return instance;
 		}
 
-		private void Setup()
+		void Setup()
 		{
 			if (isSetupCalled)
+			{
 				return;
+			}
 
-			using (var _ = new Unity.Profiling.ProfilerMarker(nameof(HTTPUpdateDelegator.Setup)).Auto())
+			using (ProfilerMarker.AutoScope _ = new Unity.Profiling.ProfilerMarker(nameof(Setup)).Auto())
 			{
 				isSetupCalled = true;
 
-				HTTPManager.Logger.Information("HTTPUpdateDelegator", $"Setup called Threading Mode: {this._currentThreadingMode}");
+				HTTPManager.Logger.Information("HTTPUpdateDelegator", $"Setup called Threading Mode: {_currentThreadingMode}");
 
 				HTTPManager.Setup();
 
-				SetThreadingMode(this._currentThreadingMode);
+				SetThreadingMode(_currentThreadingMode);
 
 				// Unity doesn't tolerate well if the DontDestroyOnLoad called when purely in editor mode. So, we will set the flag
 				//  only when we are playing, or not in the editor.
 				if (!Application.isEditor || Application.isPlaying)
-					GameObject.DontDestroyOnLoad(this.gameObject);
+				{
+					DontDestroyOnLoad(gameObject);
+				}
 
 				HTTPManager.Logger.Information("HTTPUpdateDelegator", "Setup done!");
 			}
@@ -200,14 +207,18 @@ namespace BestHTTP
 		public void SetThreadingMode(ThreadingMode mode)
 		{
 			if (_currentThreadingMode == mode)
+			{
 				return;
+			}
 
 			HTTPManager.Logger.Information("HTTPUpdateDelegator", $"SetThreadingMode({mode}, {isSetupCalled})");
 
 			_currentThreadingMode = mode;
 
 			if (!isSetupCalled)
+			{
 				Setup();
+			}
 
 			switch (_currentThreadingMode)
 			{
@@ -230,13 +241,19 @@ namespace BestHTTP
 		/// <summary>
 		/// Swaps threading mode between Unity's Update function or a distinct thread.
 		/// </summary>
-		public void SwapThreadingMode() => SetThreadingMode(_currentThreadingMode == ThreadingMode.Threaded ? ThreadingMode.UnityUpdate : ThreadingMode.Threaded);
+		public void SwapThreadingMode()
+		{
+			SetThreadingMode(_currentThreadingMode == ThreadingMode.Threaded ? ThreadingMode.UnityUpdate : ThreadingMode.Threaded);
+		}
 
 		/// <summary>
 		/// Pings the update thread to call HTTPManager.OnUpdate immediately.
 		/// </summary>
 		/// <remarks>Works only when the current threading mode is Threaded!</remarks>
-		public void PingUpdateThread() => pingEvent.Set();
+		public void PingUpdateThread()
+		{
+			pingEvent.Set();
+		}
 
 		void ThreadFunc()
 		{
@@ -271,13 +288,17 @@ namespace BestHTTP
 		void Update()
 		{
 			if (!isSetupCalled)
+			{
 				Setup();
+			}
 
 			if (CurrentThreadingMode == ThreadingMode.UnityUpdate)
+			{
 				CallOnUpdate();
+			}
 		}
 
-		private void CallOnUpdate()
+		void CallOnUpdate()
 		{
 			// Prevent overlapping call of OnUpdate from unity's main thread and a separate thread
 			if (Interlocked.CompareExchange(ref isHTTPManagerOnUpdateRunning, 1, 0) == 0)
@@ -306,7 +327,7 @@ namespace BestHTTP
 				UnityEditor.EditorApplication.update -= Update;
 				UnityEditor.EditorApplication.update += Update;
 
-				HTTPUpdateDelegator.ResetSetup();
+				ResetSetup();
 				HTTPManager.ResetSetup();
 			}
 		}
@@ -329,18 +350,22 @@ namespace BestHTTP
 #if UNITY_EDITOR
 			if (UnityEditor.EditorApplication.isPlaying)
 #endif
+			{
 				UnityApplication_WantsToQuit();
+			}
 		}
 
 		void OnApplicationPause(bool isPaused)
 		{
 			HTTPManager.Logger.Information("HTTPUpdateDelegator", "OnApplicationPause isPaused: " + isPaused);
 
-			if (HTTPUpdateDelegator.OnApplicationForegroundStateChanged != null)
-				HTTPUpdateDelegator.OnApplicationForegroundStateChanged(isPaused);
+			if (OnApplicationForegroundStateChanged != null)
+			{
+				OnApplicationForegroundStateChanged(isPaused);
+			}
 		}
 
-		private static bool UnityApplication_WantsToQuit()
+		static bool UnityApplication_WantsToQuit()
 		{
 			HTTPManager.Logger.Information("HTTPUpdateDelegator", "UnityApplication_WantsToQuit Called!");
 
@@ -354,7 +379,7 @@ namespace BestHTTP
 						return false;
 					}
 				}
-				catch (System.Exception ex)
+				catch (Exception ex)
 				{
 					HTTPManager.Logger.Exception("HTTPUpdateDelegator", string.Empty, ex);
 				}
@@ -364,7 +389,9 @@ namespace BestHTTP
 			Instance.PingUpdateThread();
 
 			if (!IsCreated)
+			{
 				return true;
+			}
 
 			IsCreated = false;
 

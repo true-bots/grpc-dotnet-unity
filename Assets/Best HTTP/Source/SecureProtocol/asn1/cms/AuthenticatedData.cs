@@ -9,15 +9,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	public class AuthenticatedData
 		: Asn1Encodable
 	{
-		private DerInteger version;
-		private OriginatorInfo originatorInfo;
-		private Asn1Set recipientInfos;
-		private AlgorithmIdentifier macAlgorithm;
-		private AlgorithmIdentifier digestAlgorithm;
-		private ContentInfo encapsulatedContentInfo;
-		private Asn1Set authAttrs;
-		private Asn1OctetString mac;
-		private Asn1Set unauthAttrs;
+		DerInteger version;
+		OriginatorInfo originatorInfo;
+		Asn1Set recipientInfos;
+		AlgorithmIdentifier macAlgorithm;
+		AlgorithmIdentifier digestAlgorithm;
+		ContentInfo encapsulatedContentInfo;
+		Asn1Set authAttrs;
+		Asn1OctetString mac;
+		Asn1Set unauthAttrs;
 
 		public AuthenticatedData(
 			OriginatorInfo originatorInfo,
@@ -43,13 +43,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 			this.macAlgorithm = macAlgorithm;
 			this.digestAlgorithm = digestAlgorithm;
 			this.recipientInfos = recipientInfos;
-			this.encapsulatedContentInfo = encapsulatedContent;
+			encapsulatedContentInfo = encapsulatedContent;
 			this.authAttrs = authAttrs;
 			this.mac = mac;
 			this.unauthAttrs = unauthAttrs;
 		}
 
-		private AuthenticatedData(
+		AuthenticatedData(
 			Asn1Sequence seq)
 		{
 			int index = 0;
@@ -125,7 +125,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 				return new AuthenticatedData((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Invalid AuthenticatedData: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid AuthenticatedData: " + Platform.GetTypeName(obj));
 		}
 
 		public DerInteger Version
@@ -210,7 +210,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 		public static int CalculateVersion(OriginatorInfo origInfo)
 		{
 			if (origInfo == null)
+			{
 				return 0;
+			}
 
 			int ver = 0;
 

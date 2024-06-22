@@ -12,11 +12,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 	public class PemWriter
 		: IDisposable
 	{
-		private const int LineLength = 64;
+		const int LineLength = 64;
 
-		private readonly TextWriter writer;
-		private readonly int nlLength;
-		private char[] buf = new char[LineLength];
+		readonly TextWriter writer;
+		readonly int nlLength;
+		char[] buf = new char[LineLength];
 
 		/**
 		 * Base constructor.
@@ -26,7 +26,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		public PemWriter(TextWriter writer)
 		{
 			this.writer = writer ?? throw new ArgumentNullException(nameof(writer));
-			this.nlLength = Environment.NewLine.Length;
+			nlLength = Environment.NewLine.Length;
 		}
 
 		#region IDisposable
@@ -62,7 +62,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 		public int GetOutputSize(PemObject obj)
 		{
 			// BEGIN and END boundaries.
-			int size = (2 * (obj.Type.Length + 10 + nlLength)) + 6 + 4;
+			int size = 2 * (obj.Type.Length + 10 + nlLength) + 6 + 4;
 
 			if (obj.Headers.Count > 0)
 			{
@@ -75,9 +75,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			}
 
 			// base64 encoding
-			int dataLen = ((obj.Content.Length + 2) / 3) * 4;
+			int dataLen = (obj.Content.Length + 2) / 3 * 4;
 
-			size += dataLen + (((dataLen + LineLength - 1) / LineLength) * nlLength);
+			size += dataLen + (dataLen + LineLength - 1) / LineLength * nlLength;
 
 			return size;
 		}
@@ -104,7 +104,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			WritePostEncapsulationBoundary(obj.Type);
 		}
 
-		private void WriteEncoded(byte[] bytes)
+		void WriteEncoded(byte[] bytes)
 		{
 			bytes = Base64.Encode(bytes);
 
@@ -113,8 +113,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 				int index = 0;
 				while (index != buf.Length)
 				{
-					if ((i + index) >= bytes.Length)
+					if (i + index >= bytes.Length)
+					{
 						break;
+					}
 
 					buf[index] = (char)bytes[i + index];
 					index++;
@@ -124,12 +126,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 			}
 		}
 
-		private void WritePreEncapsulationBoundary(string type)
+		void WritePreEncapsulationBoundary(string type)
 		{
 			writer.WriteLine("-----BEGIN " + type + "-----");
 		}
 
-		private void WritePostEncapsulationBoundary(string type)
+		void WritePostEncapsulationBoundary(string type)
 		{
 			writer.WriteLine("-----END " + type + "-----");
 		}

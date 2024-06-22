@@ -31,7 +31,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public sealed class BCrypt
 	{
 		// magic String "OrpheanBeholderScryDoubt" is used as clear text for encryption
-		private static readonly uint[] MAGIC_STRING =
+		static readonly uint[] MAGIC_STRING =
 		{
 			0x4F727068, 0x65616E42, 0x65686F6C,
 			0x64657253, 0x63727944, 0x6F756274
@@ -39,7 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 		internal const int MAGIC_STRING_LENGTH = 6;
 
-		private static readonly uint[]
+		static readonly uint[]
 			KP =
 			{
 				0x243F6A88, 0x85A308D3, 0x13198A2E, 0x03707344,
@@ -321,16 +321,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		// Useful constants
 		//====================================
 
-		private const int ROUNDS = 16;
-		private const int SBOX_SK = 256;
-		private const int SBOX_SK2 = SBOX_SK * 2;
-		private const int SBOX_SK3 = SBOX_SK * 3;
-		private const int P_SZ = ROUNDS + 2;
+		const int ROUNDS = 16;
+		const int SBOX_SK = 256;
+		const int SBOX_SK2 = SBOX_SK * 2;
+		const int SBOX_SK3 = SBOX_SK * 3;
+		const int P_SZ = ROUNDS + 2;
 
-		private readonly uint[] S; // the s-boxes
-		private readonly uint[] P; // the p-array
+		readonly uint[] S; // the s-boxes
+		readonly uint[] P; // the p-array
 
-		private BCrypt()
+		BCrypt()
 		{
 			S = new uint[SBOX_SK * 4];
 			P = new uint[P_SZ];
@@ -340,16 +340,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		// Private Implementation
 		//==================================
 
-		private uint F(uint x)
+		uint F(uint x)
 		{
-			return (((S[(x >> 24)] + S[SBOX_SK + ((x >> 16) & 0xff)])
-			         ^ S[SBOX_SK2 + ((x >> 8) & 0xff)]) + S[SBOX_SK3 + (x & 0xff)]);
+			return ((S[x >> 24] + S[SBOX_SK + ((x >> 16) & 0xff)])
+			        ^ S[SBOX_SK2 + ((x >> 8) & 0xff)]) + S[SBOX_SK3 + (x & 0xff)];
 		}
 
 		/*
 		 * apply the encryption cycle to each value pair in the table.
 		 */
-		private void ProcessTable(uint xl, uint xr, uint[] table)
+		void ProcessTable(uint xl, uint xr, uint[] table)
 		{
 			int size = table.Length;
 
@@ -377,7 +377,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * Initialize the S-boxes and the P-array, with a fixed string
 		 * This string contains the hexadecimal digits of pi (3.141...)
 		 */
-		private void InitState()
+		void InitState()
 		{
 			Array.Copy(KS0, 0, S, 0, SBOX_SK);
 			Array.Copy(KS1, 0, S, SBOX_SK, SBOX_SK);
@@ -391,7 +391,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * XOR P with key cyclic.
 		 * This is the first part of ExpandKey function
 		 */
-		private void CyclicXorKey(byte[] key)
+		void CyclicXorKey(byte[] key)
 		{
 			int keyLength = key.Length;
 			int keyIndex = 0;
@@ -421,7 +421,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		/*
 		 *  encrypt magic String 64 times in ECB
 		 */
-		private byte[] EncryptMagicString()
+		byte[] EncryptMagicString()
 		{
 			uint[] text =
 			{
@@ -467,7 +467,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * @param 	iv1: value from last proceeded table
 		 * @param 	iv2: value from last proceeded table
 		 */
-		private void ProcessTableWithSalt(uint[] table, uint[] salt32Bit, uint iv1, uint iv2)
+		void ProcessTableWithSalt(uint[] table, uint[] salt32Bit, uint iv1, uint iv2)
 		{
 			uint xl = iv1 ^ salt32Bit[0];
 			uint xr = iv2 ^ salt32Bit[1];
@@ -523,12 +523,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * @param psw  the password
 		 * @return a 192 bit key
 		 */
-		private byte[] DeriveRawKey(int cost, byte[] salt, byte[] psw)
+		byte[] DeriveRawKey(int cost, byte[] salt, byte[] psw)
 		{
 			if (salt.Length != 16)
+			{
 				throw new DataLengthException("Invalid salt size: 16 bytes expected.");
+			}
+
 			if (cost < 4 || cost > 31)
+			{
 				throw new ArgumentException("Illegal cost factor: 4 - 31 expected.", "cost");
+			}
 
 			if (psw.Length == 0)
 			{
@@ -620,15 +625,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		public static byte[] Generate(byte[] password, byte[] salt, int cost)
 		{
 			if (password == null)
+			{
 				throw new ArgumentNullException("password");
+			}
+
 			if (password.Length > MAX_PASSWORD_BYTES)
+			{
 				throw new ArgumentException("BCrypt password must be <= 72 bytes", "password");
+			}
+
 			if (salt == null)
+			{
 				throw new ArgumentNullException("salt");
+			}
+
 			if (salt.Length != SALT_SIZE_BYTES)
+			{
 				throw new ArgumentException("BCrypt salt must be 128 bits", "salt");
+			}
+
 			if (cost < MIN_COST || cost > MAX_COST)
+			{
 				throw new ArgumentException("BCrypt cost must be from 4..31", "cost");
+			}
 
 			return new BCrypt().DeriveRawKey(cost, salt, password);
 		}

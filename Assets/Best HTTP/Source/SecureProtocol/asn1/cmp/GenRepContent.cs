@@ -8,17 +8,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static GenRepContent GetInstance(object obj)
 		{
 			if (obj is GenRepContent genRepContent)
+			{
 				return genRepContent;
+			}
 
 			if (obj != null)
+			{
 				return new GenRepContent(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly Asn1Sequence m_content;
+		readonly Asn1Sequence m_content;
 
-		private GenRepContent(Asn1Sequence seq)
+		GenRepContent(Asn1Sequence seq)
 		{
 			m_content = seq;
 		}

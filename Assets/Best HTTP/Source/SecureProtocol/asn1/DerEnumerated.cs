@@ -14,7 +14,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerEnumerated), Asn1Tags.Enumerated)
+			Meta() : base(typeof(DerEnumerated), Asn1Tags.Enumerated)
 			{
 			}
 
@@ -32,16 +32,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerEnumerated GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerEnumerated derEnumerated)
+			{
 				return derEnumerated;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerEnumerated converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -55,7 +61,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj));
 		}
 
 		/**
@@ -70,34 +76,40 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (DerEnumerated)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly byte[] contents;
-		private readonly int start;
+		readonly byte[] contents;
+		readonly int start;
 
 		public DerEnumerated(int val)
 		{
 			if (val < 0)
+			{
 				throw new ArgumentException("enumerated must be non-negative", "val");
+			}
 
-			this.contents = BigInteger.ValueOf(val).ToByteArray();
-			this.start = 0;
+			contents = BigInteger.ValueOf(val).ToByteArray();
+			start = 0;
 		}
 
 		public DerEnumerated(long val)
 		{
 			if (val < 0L)
+			{
 				throw new ArgumentException("enumerated must be non-negative", "val");
+			}
 
-			this.contents = BigInteger.ValueOf(val).ToByteArray();
-			this.start = 0;
+			contents = BigInteger.ValueOf(val).ToByteArray();
+			start = 0;
 		}
 
 		public DerEnumerated(BigInteger val)
 		{
 			if (val.SignValue < 0)
+			{
 				throw new ArgumentException("enumerated must be non-negative", "val");
+			}
 
-			this.contents = val.ToByteArray();
-			this.start = 0;
+			contents = val.ToByteArray();
+			start = 0;
 		}
 
 		public DerEnumerated(byte[] contents)
@@ -108,12 +120,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal DerEnumerated(byte[] contents, bool clone)
 		{
 			if (DerInteger.IsMalformed(contents))
+			{
 				throw new ArgumentException("malformed enumerated", "contents");
+			}
+
 			if (0 != (contents[0] & 0x80))
+			{
 				throw new ArgumentException("enumerated must be non-negative", "contents");
+			}
 
 			this.contents = clone ? Arrays.Clone(contents) : contents;
-			this.start = DerInteger.SignBytesToSkip(this.contents);
+			start = DerInteger.SignBytesToSkip(this.contents);
 		}
 
 		public BigInteger Value
@@ -123,7 +140,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 
 		public bool HasValue(int x)
 		{
-			return (contents.Length - start) <= 4
+			return contents.Length - start <= 4
 			       && DerInteger.IntValue(contents, start, DerInteger.SignExtSigned) == x;
 		}
 
@@ -141,7 +158,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			{
 				int count = contents.Length - start;
 				if (count > 4)
+				{
 					throw new ArithmeticException("ASN.1 Enumerated out of int range");
+				}
 
 				return DerInteger.IntValue(contents, start, DerInteger.SignExtSigned);
 			}
@@ -161,9 +180,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			DerEnumerated other = asn1Object as DerEnumerated;
 			if (other == null)
+			{
 				return false;
+			}
 
-			return Arrays.AreEqual(this.contents, other.contents);
+			return Arrays.AreEqual(contents, other.contents);
 		}
 
 		protected override int Asn1GetHashCode()
@@ -171,18 +192,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return Arrays.GetHashCode(contents);
 		}
 
-		private static readonly DerEnumerated[] cache = new DerEnumerated[12];
+		static readonly DerEnumerated[] cache = new DerEnumerated[12];
 
 		internal static DerEnumerated CreatePrimitive(byte[] contents, bool clone)
 		{
 			if (contents.Length > 1)
+			{
 				return new DerEnumerated(contents, clone);
+			}
+
 			if (contents.Length == 0)
+			{
 				throw new ArgumentException("ENUMERATED has zero length", "contents");
+			}
 
 			int value = contents[0];
 			if (value >= cache.Length)
+			{
 				return new DerEnumerated(contents, clone);
+			}
 
 			DerEnumerated possibleMatch = cache[value];
 			if (possibleMatch == null)

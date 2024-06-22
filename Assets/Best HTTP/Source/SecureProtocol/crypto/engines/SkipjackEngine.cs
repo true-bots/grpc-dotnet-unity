@@ -12,9 +12,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public sealed class SkipjackEngine
 		: IBlockCipher
 	{
-		private const int BLOCK_SIZE = 8;
+		const int BLOCK_SIZE = 8;
 
-		private static readonly short[] ftable =
+		static readonly short[] ftable =
 		{
 			0xa3, 0xd7, 0x09, 0x83, 0xf8, 0x48, 0xf6, 0xf4, 0xb3, 0x21, 0x15, 0x78, 0x99, 0xb1, 0xaf, 0xf9,
 			0xe7, 0x2d, 0x4d, 0x8a, 0xce, 0x4c, 0xca, 0x2e, 0x52, 0x95, 0xd9, 0x1e, 0x4e, 0x38, 0x44, 0x28,
@@ -34,8 +34,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x5e, 0x6c, 0xa9, 0x13, 0x57, 0x25, 0xb5, 0xe3, 0xbd, 0xa8, 0x3a, 0x01, 0x05, 0x59, 0x2a, 0x46
 		};
 
-		private int[] key0, key1, key2, key3;
-		private bool encrypting;
+		int[] key0, key1, key2, key3;
+		bool encrypting;
 
 		/**
 		* initialise a SKIPJACK cipher.
@@ -48,15 +48,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter keyParameter))
-				throw new ArgumentException("invalid parameter passed to SKIPJACK init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			{
+				throw new ArgumentException("invalid parameter passed to SKIPJACK init - " + Platform.GetTypeName(parameters));
+			}
 
 			byte[] keyBytes = keyParameter.GetKey();
 
-			this.encrypting = forEncryption;
-			this.key0 = new int[32];
-			this.key1 = new int[32];
-			this.key2 = new int[32];
-			this.key3 = new int[32];
+			encrypting = forEncryption;
+			key0 = new int[32];
+			key1 = new int[32];
+			key2 = new int[32];
+			key3 = new int[32];
 
 			//
 			// expand the key to 128 bytes in 4 parts (saving us a modulo, multiply
@@ -84,7 +86,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (key1 == null)
+			{
 				throw new InvalidOperationException("SKIPJACK engine not initialised");
+			}
 
 			Check.DataLength(input, inOff, BLOCK_SIZE, "input buffer too short");
 			Check.OutputLength(output, outOff, BLOCK_SIZE, "output buffer too short");
@@ -137,7 +141,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 		* The G permutation
 		*/
-		private int G(
+		int G(
 			int k,
 			int w)
 		{
@@ -151,7 +155,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			g5 = ftable[g4 ^ key2[k]] ^ g3;
 			g6 = ftable[g5 ^ key3[k]] ^ g4;
 
-			return ((g5 << 8) + g6);
+			return (g5 << 8) + g6;
 		}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
@@ -244,7 +248,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         }
 
 #else
-		private int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int EncryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			int w1 = (input[inOff + 0] << 8) + (input[inOff + 1] & 0xff);
 			int w2 = (input[inOff + 2] << 8) + (input[inOff + 3] & 0xff);
@@ -276,19 +280,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				}
 			}
 
-			outBytes[outOff + 0] = (byte)((w1 >> 8));
-			outBytes[outOff + 1] = (byte)(w1);
-			outBytes[outOff + 2] = (byte)((w2 >> 8));
-			outBytes[outOff + 3] = (byte)(w2);
-			outBytes[outOff + 4] = (byte)((w3 >> 8));
-			outBytes[outOff + 5] = (byte)(w3);
-			outBytes[outOff + 6] = (byte)((w4 >> 8));
-			outBytes[outOff + 7] = (byte)(w4);
+			outBytes[outOff + 0] = (byte)(w1 >> 8);
+			outBytes[outOff + 1] = (byte)w1;
+			outBytes[outOff + 2] = (byte)(w2 >> 8);
+			outBytes[outOff + 3] = (byte)w2;
+			outBytes[outOff + 4] = (byte)(w3 >> 8);
+			outBytes[outOff + 5] = (byte)w3;
+			outBytes[outOff + 6] = (byte)(w4 >> 8);
+			outBytes[outOff + 7] = (byte)w4;
 
 			return BLOCK_SIZE;
 		}
 
-		private int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
+		int DecryptBlock(byte[] input, int inOff, byte[] outBytes, int outOff)
 		{
 			int w2 = (input[inOff + 0] << 8) + (input[inOff + 1] & 0xff);
 			int w1 = (input[inOff + 2] << 8) + (input[inOff + 3] & 0xff);
@@ -320,14 +324,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				}
 			}
 
-			outBytes[outOff + 0] = (byte)((w2 >> 8));
-			outBytes[outOff + 1] = (byte)(w2);
-			outBytes[outOff + 2] = (byte)((w1 >> 8));
-			outBytes[outOff + 3] = (byte)(w1);
-			outBytes[outOff + 4] = (byte)((w4 >> 8));
-			outBytes[outOff + 5] = (byte)(w4);
-			outBytes[outOff + 6] = (byte)((w3 >> 8));
-			outBytes[outOff + 7] = (byte)(w3);
+			outBytes[outOff + 0] = (byte)(w2 >> 8);
+			outBytes[outOff + 1] = (byte)w2;
+			outBytes[outOff + 2] = (byte)(w1 >> 8);
+			outBytes[outOff + 3] = (byte)w1;
+			outBytes[outOff + 4] = (byte)(w4 >> 8);
+			outBytes[outOff + 5] = (byte)w4;
+			outBytes[outOff + 6] = (byte)(w3 >> 8);
+			outBytes[outOff + 7] = (byte)w3;
 
 			return BLOCK_SIZE;
 		}
@@ -336,7 +340,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 		* the inverse of the G permutation.
 		*/
-		private int H(int k, int w)
+		int H(int k, int w)
 		{
 			int h1 = w & 0xff;
 			int h2 = (w >> 8) & 0xff;

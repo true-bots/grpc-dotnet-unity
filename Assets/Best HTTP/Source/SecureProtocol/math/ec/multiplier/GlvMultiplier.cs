@@ -14,7 +14,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 		public GlvMultiplier(ECCurve curve, GlvEndomorphism glvEndomorphism)
 		{
 			if (curve == null || curve.Order == null)
+			{
 				throw new ArgumentException("Need curve with known group order", "curve");
+			}
 
 			this.curve = curve;
 			this.glvEndomorphism = glvEndomorphism;
@@ -23,7 +25,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 		protected override ECPoint MultiplyPositive(ECPoint p, BigInteger k)
 		{
 			if (!curve.Equals(p.Curve))
+			{
 				throw new InvalidOperationException();
+			}
 
 			BigInteger n = p.Curve.Order;
 			BigInteger[] ab = glvEndomorphism.DecomposeScalar(k.Mod(n));

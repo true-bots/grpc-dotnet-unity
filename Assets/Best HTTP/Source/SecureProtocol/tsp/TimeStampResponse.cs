@@ -16,8 +16,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 	 */
 	public class TimeStampResponse
 	{
-		private TimeStampResp resp;
-		private TimeStampToken timeStampToken;
+		TimeStampResp resp;
+		TimeStampToken timeStampToken;
 
 		public TimeStampResponse(
 			TimeStampResp resp)
@@ -56,7 +56,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		{
 		}
 
-		private static TimeStampResp readTimeStampResp(
+		static TimeStampResp readTimeStampResp(
 			Asn1InputStream input)
 		{
 			try
@@ -121,7 +121,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		public void Validate(
 			TimeStampRequest request)
 		{
-			TimeStampToken tok = this.TimeStampToken;
+			TimeStampToken tok = TimeStampToken;
 
 			if (tok != null)
 			{
@@ -132,7 +132,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 					throw new TspValidationException("response contains wrong nonce value.");
 				}
 
-				if (this.Status != (int)PkiStatus.Granted && this.Status != (int)PkiStatus.GrantedWithMods)
+				if (Status != (int)PkiStatus.Granted && Status != (int)PkiStatus.GrantedWithMods)
 				{
 					throw new TspValidationException("time stamp token found in failed request.");
 				}
@@ -168,7 +168,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 					throw new TspValidationException("TSA policy wrong for request.");
 				}
 			}
-			else if (this.Status == (int)PkiStatus.Granted || this.Status == (int)PkiStatus.GrantedWithMods)
+			else if (Status == (int)PkiStatus.Granted || Status == (int)PkiStatus.GrantedWithMods)
 			{
 				throw new TspValidationException("no time stamp token found and one expected.");
 			}

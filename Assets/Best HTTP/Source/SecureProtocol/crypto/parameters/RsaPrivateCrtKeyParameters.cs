@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class RsaPrivateCrtKeyParameters
 		: RsaKeyParameters
 	{
-		private readonly BigInteger e, p, q, dP, dQ, qInv;
+		readonly BigInteger e, p, q, dP, dQ, qInv;
 
 		public RsaPrivateCrtKeyParameters(
 			BigInteger modulus,
@@ -30,7 +30,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			ValidateValue(dQ, "dQ", "DQ value");
 			ValidateValue(qInv, "qInv", "InverseQ value");
 
-			this.e = publicExponent;
+			e = publicExponent;
 			this.p = p;
 			this.q = q;
 			this.dP = dP;
@@ -85,17 +85,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			RsaPrivateCrtKeyParameters kp = obj as RsaPrivateCrtKeyParameters;
 
 			if (kp == null)
+			{
 				return false;
+			}
 
 			return kp.DP.Equals(dP)
 			       && kp.DQ.Equals(dQ)
-			       && kp.Exponent.Equals(this.Exponent)
-			       && kp.Modulus.Equals(this.Modulus)
+			       && kp.Exponent.Equals(Exponent)
+			       && kp.Modulus.Equals(Modulus)
 			       && kp.P.Equals(p)
 			       && kp.Q.Equals(q)
 			       && kp.PublicExponent.Equals(e)
@@ -108,12 +112,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			       ^ P.GetHashCode() ^ Q.GetHashCode() ^ PublicExponent.GetHashCode() ^ QInv.GetHashCode();
 		}
 
-		private static void ValidateValue(BigInteger x, string name, string desc)
+		static void ValidateValue(BigInteger x, string name, string desc)
 		{
 			if (x == null)
+			{
 				throw new ArgumentNullException(name);
+			}
+
 			if (x.SignValue <= 0)
+			{
 				throw new ArgumentException("Not a valid RSA " + desc, name);
+			}
 		}
 	}
 }

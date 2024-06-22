@@ -18,14 +18,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 	public class TimeStampRequest
 		: X509ExtensionBase
 	{
-		private TimeStampReq req;
-		private X509Extensions extensions;
+		TimeStampReq req;
+		X509Extensions extensions;
 
 		public TimeStampRequest(
 			TimeStampReq req)
 		{
 			this.req = req;
-			this.extensions = req.Extensions;
+			extensions = req.Extensions;
 		}
 
 		/**
@@ -52,12 +52,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		{
 		}
 
-		private TimeStampRequest(
+		TimeStampRequest(
 			Asn1InputStream str)
 		{
 			try
 			{
-				this.req = TimeStampReq.GetInstance(str.ReadObject());
+				req = TimeStampReq.GetInstance(str.ReadObject());
 			}
 			catch (InvalidCastException e)
 			{
@@ -125,25 +125,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tsp
 		*/
 		public void Validate(IList<string> algorithms, IList<string> policies, IList<string> extensions)
 		{
-			if (!algorithms.Contains(this.MessageImprintAlgOid))
-				throw new TspValidationException("request contains unknown algorithm", PkiFailureInfo.BadAlg);
-
-			if (policies != null && this.ReqPolicy != null && !policies.Contains(this.ReqPolicy))
-				throw new TspValidationException("request contains unknown policy", PkiFailureInfo.UnacceptedPolicy);
-
-			if (this.Extensions != null && extensions != null)
+			if (!algorithms.Contains(MessageImprintAlgOid))
 			{
-				foreach (DerObjectIdentifier oid in this.Extensions.ExtensionOids)
+				throw new TspValidationException("request contains unknown algorithm", PkiFailureInfo.BadAlg);
+			}
+
+			if (policies != null && ReqPolicy != null && !policies.Contains(ReqPolicy))
+			{
+				throw new TspValidationException("request contains unknown policy", PkiFailureInfo.UnacceptedPolicy);
+			}
+
+			if (Extensions != null && extensions != null)
+			{
+				foreach (DerObjectIdentifier oid in Extensions.ExtensionOids)
 				{
 					if (!extensions.Contains(oid.Id))
+					{
 						throw new TspValidationException("request contains unknown extension", PkiFailureInfo.UnacceptedExtension);
+					}
 				}
 			}
 
-			int digestLength = TspUtil.GetDigestLength(this.MessageImprintAlgOid);
+			int digestLength = TspUtil.GetDigestLength(MessageImprintAlgOid);
 
-			if (digestLength != this.GetMessageImprintDigest().Length)
+			if (digestLength != GetMessageImprintDigest().Length)
+			{
 				throw new TspValidationException("imprint digest the wrong length", PkiFailureInfo.BadDataFormat);
+			}
 		}
 
 		/**

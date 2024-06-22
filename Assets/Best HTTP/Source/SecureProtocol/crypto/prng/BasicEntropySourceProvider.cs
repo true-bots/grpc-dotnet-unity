@@ -11,8 +11,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 	public class BasicEntropySourceProvider
 		: IEntropySourceProvider
 	{
-		private readonly SecureRandom mSecureRandom;
-		private readonly bool mPredictionResistant;
+		readonly SecureRandom mSecureRandom;
+		readonly bool mPredictionResistant;
 
 		/**
 		 * Create a entropy source provider based on the passed in SecureRandom.
@@ -23,7 +23,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 		public BasicEntropySourceProvider(SecureRandom secureRandom, bool isPredictionResistant)
 		{
 			if (secureRandom == null)
+			{
 				throw new ArgumentNullException(nameof(secureRandom));
+			}
 
 			mSecureRandom = secureRandom;
 			mPredictionResistant = isPredictionResistant;
@@ -41,21 +43,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Prng
 			return new BasicEntropySource(mSecureRandom, mPredictionResistant, bitsRequired);
 		}
 
-		private class BasicEntropySource
+		class BasicEntropySource
 			: IEntropySource
 		{
-			private readonly SecureRandom mSecureRandom;
-			private readonly bool mPredictionResistant;
-			private readonly int mEntropySize;
+			readonly SecureRandom mSecureRandom;
+			readonly bool mPredictionResistant;
+			readonly int mEntropySize;
 
 			internal BasicEntropySource(SecureRandom secureRandom, bool predictionResistant, int entropySize)
 			{
 				if (secureRandom == null)
+				{
 					throw new ArgumentNullException(nameof(secureRandom));
+				}
 
-				this.mSecureRandom = secureRandom;
-				this.mPredictionResistant = predictionResistant;
-				this.mEntropySize = entropySize;
+				mSecureRandom = secureRandom;
+				mPredictionResistant = predictionResistant;
+				mEntropySize = entropySize;
 			}
 
 			bool IEntropySource.IsPredictionResistant

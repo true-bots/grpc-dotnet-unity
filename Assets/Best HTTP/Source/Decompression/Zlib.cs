@@ -131,7 +131,7 @@ namespace BestHTTP.Decompression.Zlib
 		Full,
 
 		/// <summary>Signals the end of the compression/decompression stream.</summary>
-		Finish,
+		Finish
 	}
 
 
@@ -211,7 +211,7 @@ namespace BestHTTP.Decompression.Zlib
 		/// <summary>
 		/// A synonym for BestCompression.
 		/// </summary>
-		Level9 = 9,
+		Level9 = 9
 	}
 
 	/// <summary>
@@ -239,7 +239,7 @@ namespace BestHTTP.Decompression.Zlib
 		/// Using <c>HuffmanOnly</c> will force the compressor to do Huffman encoding only, with no
 		/// string matching.
 		/// </summary>
-		HuffmanOnly = 2,
+		HuffmanOnly = 2
 	}
 
 
@@ -256,7 +256,7 @@ namespace BestHTTP.Decompression.Zlib
 		/// <summary>
 		/// Used to specify that the stream should decompress the data.
 		/// </summary>
-		Decompress = 1,
+		Decompress = 1
 	}
 
 
@@ -264,7 +264,7 @@ namespace BestHTTP.Decompression.Zlib
 	/// A general purpose exception class for exceptions in the Zlib library.
 	/// </summary>
 	[Interop.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d0000E")]
-	internal class ZlibException : System.Exception
+	class ZlibException : Exception
 	{
 		/// <summary>
 		/// The ZlibException class captures exception information generated
@@ -279,14 +279,14 @@ namespace BestHTTP.Decompression.Zlib
 		/// This ctor collects a message attached to the exception.
 		/// </summary>
 		/// <param name="s">the message for the exception.</param>
-		public ZlibException(System.String s)
+		public ZlibException(string s)
 			: base(s)
 		{
 		}
 	}
 
 
-	internal class SharedUtils
+	class SharedUtils
 	{
 		/// <summary>
 		/// Performs an unsigned bitwise right shift with the specified number
@@ -327,44 +327,52 @@ namespace BestHTTP.Decompression.Zlib
 		///   count depending on the data available in the source TextReader. Returns -1
 		///   if the end of the stream is reached.
 		/// </returns>
-		public static System.Int32 ReadInput(System.IO.TextReader sourceTextReader, byte[] target, int start, int count)
+		public static int ReadInput(System.IO.TextReader sourceTextReader, byte[] target, int start, int count)
 		{
 			// Returns 0 bytes if not enough space in target
-			if (target.Length == 0) return 0;
+			if (target.Length == 0)
+			{
+				return 0;
+			}
 
 			char[] charArray = new char[target.Length];
 			int bytesRead = sourceTextReader.Read(charArray, start, count);
 
 			// Returns -1 if EOF
-			if (bytesRead == 0) return -1;
+			if (bytesRead == 0)
+			{
+				return -1;
+			}
 
 			for (int index = start; index < start + bytesRead; index++)
+			{
 				target[index] = (byte)charArray[index];
+			}
 
 			return bytesRead;
 		}
 
 
-		internal static byte[] ToByteArray(System.String sourceString)
+		internal static byte[] ToByteArray(string sourceString)
 		{
-			return System.Text.UTF8Encoding.UTF8.GetBytes(sourceString);
+			return System.Text.Encoding.UTF8.GetBytes(sourceString);
 		}
 
 
 		internal static char[] ToCharArray(byte[] byteArray)
 		{
-			return System.Text.UTF8Encoding.UTF8.GetChars(byteArray);
+			return System.Text.Encoding.UTF8.GetChars(byteArray);
 		}
 	}
 
-	internal static class InternalConstants
+	static class InternalConstants
 	{
 		internal static readonly int MAX_BITS = 15;
 		internal static readonly int BL_CODES = 19;
 		internal static readonly int D_CODES = 30;
 		internal static readonly int LITERALS = 256;
 		internal static readonly int LENGTH_CODES = 29;
-		internal static readonly int L_CODES = (LITERALS + 1 + LENGTH_CODES);
+		internal static readonly int L_CODES = LITERALS + 1 + LENGTH_CODES;
 
 		// Bit length codes must not exceed MAX_BL_BITS bits
 		internal static readonly int MAX_BL_BITS = 7;
@@ -379,7 +387,7 @@ namespace BestHTTP.Decompression.Zlib
 		internal static readonly int REPZ_11_138 = 18;
 	}
 
-	internal sealed class StaticTree
+	sealed class StaticTree
 	{
 		internal static readonly short[] lengthAndLiteralsTreeCodes = new short[]
 		{
@@ -439,7 +447,7 @@ namespace BestHTTP.Decompression.Zlib
 		internal int elems; // max number of elements in the tree
 		internal int maxLength; // max bit length for the codes
 
-		private StaticTree(short[] treeCodes, int[] extraBits, int extraBase, int elems, int maxLength)
+		StaticTree(short[] treeCodes, int[] extraBits, int extraBase, int elems, int maxLength)
 		{
 			this.treeCodes = treeCodes;
 			this.extraBits = extraBits;
@@ -472,10 +480,10 @@ namespace BestHTTP.Decompression.Zlib
 	public sealed class Adler
 	{
 		// largest prime smaller than 65536
-		private static readonly uint BASE = 65521;
+		static readonly uint BASE = 65521;
 
 		// NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1
-		private static readonly int NMAX = 5552;
+		static readonly int NMAX = 5552;
 
 
 #pragma warning disable 3001
@@ -499,7 +507,9 @@ namespace BestHTTP.Decompression.Zlib
 		public static uint Adler32(uint adler, byte[] buf, int index, int len)
 		{
 			if (buf == null)
+			{
 				return 1;
+			}
 
 			uint s1 = (uint)(adler & 0xffff);
 			uint s2 = (uint)((adler >> 16) & 0xffff);

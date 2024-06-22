@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class ECDsaSigner
 		: IDsa
 	{
-		private static readonly BigInteger Eight = BigInteger.ValueOf(8);
+		static readonly BigInteger Eight = BigInteger.ValueOf(8);
 
 		protected readonly IDsaKCalculator kCalculator;
 
@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		 */
 		public ECDsaSigner()
 		{
-			this.kCalculator = new RandomDsaKCalculator();
+			kCalculator = new RandomDsaKCalculator();
 		}
 
 		/**
@@ -61,19 +61,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				}
 
 				if (!(parameters is ECPrivateKeyParameters))
+				{
 					throw new InvalidKeyException("EC private key required for signing");
+				}
 
-				this.key = (ECPrivateKeyParameters)parameters;
+				key = (ECPrivateKeyParameters)parameters;
 			}
 			else
 			{
 				if (!(parameters is ECPublicKeyParameters))
+				{
 					throw new InvalidKeyException("EC public key required for verification");
+				}
 
-				this.key = (ECPublicKeyParameters)parameters;
+				key = (ECPublicKeyParameters)parameters;
 			}
 
-			this.random = InitSecureRandom(forSigning && !kCalculator.IsDeterministic, providedRandom);
+			random = InitSecureRandom(forSigning && !kCalculator.IsDeterministic, providedRandom);
 		}
 
 		public virtual BigInteger Order
@@ -158,7 +162,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			ECPoint point = ECAlgorithms.SumOfTwoMultiplies(G, u1, Q, u2);
 
 			if (point.IsInfinity)
+			{
 				return false;
+			}
 
 			/*
 			 * If possible, avoid normalizing the point (to save a modular inversion in the curve field).

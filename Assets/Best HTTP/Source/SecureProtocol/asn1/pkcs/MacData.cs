@@ -27,22 +27,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				return new MacData((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private MacData(
+		MacData(
 			Asn1Sequence seq)
 		{
-			this.digInfo = DigestInfo.GetInstance(seq[0]);
-			this.salt = ((Asn1OctetString)seq[1]).GetOctets();
+			digInfo = DigestInfo.GetInstance(seq[0]);
+			salt = ((Asn1OctetString)seq[1]).GetOctets();
 
 			if (seq.Count == 3)
 			{
-				this.iterationCount = ((DerInteger)seq[2]).Value;
+				iterationCount = ((DerInteger)seq[2]).Value;
 			}
 			else
 			{
-				this.iterationCount = BigInteger.One;
+				iterationCount = BigInteger.One;
 			}
 		}
 

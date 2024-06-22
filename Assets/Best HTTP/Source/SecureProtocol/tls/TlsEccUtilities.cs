@@ -13,7 +13,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static TlsECConfig CreateNamedECConfig(TlsContext context, int namedGroup)
 		{
 			if (NamedGroup.GetCurveBits(namedGroup) < 1)
+			{
 				throw new TlsFatalAlert(AlertDescription.internal_error);
+			}
 
 			return new TlsECConfig(namedGroup);
 		}
@@ -49,7 +51,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static void CheckPointEncoding(int namedGroup, byte[] encoding)
 		{
 			if (TlsUtilities.IsNullOrEmpty(encoding))
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			switch (namedGroup)
 			{
@@ -78,14 +82,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			short curveType = TlsUtilities.ReadUint8(input);
 			if (curveType != ECCurveType.named_curve)
+			{
 				throw new TlsFatalAlert(AlertDescription.handshake_failure);
+			}
 
 			int namedGroup = TlsUtilities.ReadUint16(input);
 			if (NamedGroup.RefersToAnECDHCurve(namedGroup))
 			{
 				int[] clientSupportedGroups = context.SecurityParameters.ClientSupportedGroups;
 				if (null == clientSupportedGroups || Arrays.Contains(clientSupportedGroups, namedGroup))
+				{
 					return new TlsECConfig(namedGroup);
+				}
 			}
 
 			throw new TlsFatalAlert(AlertDescription.illegal_parameter);

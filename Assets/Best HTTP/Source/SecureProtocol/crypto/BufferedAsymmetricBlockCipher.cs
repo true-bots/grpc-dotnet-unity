@@ -11,10 +11,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	public class BufferedAsymmetricBlockCipher
 		: BufferedCipherBase
 	{
-		private readonly IAsymmetricBlockCipher cipher;
+		readonly IAsymmetricBlockCipher cipher;
 
-		private byte[] buffer;
-		private int bufOff;
+		byte[] buffer;
+		int bufOff;
 
 		/**
         * base constructor.
@@ -78,15 +78,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			// we allow for an extra byte where people are using their own padding
 			// mechanisms on a raw cipher.
 			//
-			this.buffer = new byte[cipher.GetInputBlockSize() + (forEncryption ? 1 : 0)];
-			this.bufOff = 0;
+			buffer = new byte[cipher.GetInputBlockSize() + (forEncryption ? 1 : 0)];
+			bufOff = 0;
 		}
 
 		public override byte[] ProcessByte(
 			byte input)
 		{
 			if (bufOff >= buffer.Length)
+			{
 				throw new DataLengthException("attempt to process message too long for cipher");
+			}
 
 			buffer[bufOff++] = input;
 			return null;
@@ -95,7 +97,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 		public override int ProcessByte(byte input, byte[] output, int outOff)
 		{
 			if (bufOff >= buffer.Length)
+			{
 				throw new DataLengthException("attempt to process message too long for cipher");
+			}
 
 			buffer[bufOff++] = input;
 			return 0;
@@ -118,12 +122,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			int length)
 		{
 			if (length < 1)
+			{
 				return null;
+			}
 
 			if (input == null)
+			{
 				throw new ArgumentNullException("input");
+			}
+
 			if (bufOff + length > buffer.Length)
+			{
 				throw new DataLengthException("attempt to process message too long for cipher");
+			}
 
 			Array.Copy(input, inOff, buffer, bufOff, length);
 			bufOff += length;

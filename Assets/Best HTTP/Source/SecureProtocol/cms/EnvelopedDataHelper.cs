@@ -10,7 +10,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Security;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal class EnvelopedDataHelper
+	class EnvelopedDataHelper
 	{
 		//private static readonly IDictionary<DerObjectIdentifier, string> BaseCipherNames =
 		//    new Dictionary<DerObjectIdentifier, string>();

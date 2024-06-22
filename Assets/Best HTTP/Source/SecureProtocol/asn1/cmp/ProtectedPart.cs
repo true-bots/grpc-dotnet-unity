@@ -8,18 +8,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static ProtectedPart GetInstance(object obj)
 		{
 			if (obj is ProtectedPart protectedPart)
+			{
 				return protectedPart;
+			}
 
 			if (obj != null)
+			{
 				return new ProtectedPart(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly PkiHeader m_header;
-		private readonly PkiBody m_body;
+		readonly PkiHeader m_header;
+		readonly PkiBody m_body;
 
-		private ProtectedPart(Asn1Sequence seq)
+		ProtectedPart(Asn1Sequence seq)
 		{
 			m_header = PkiHeader.GetInstance(seq[0]);
 			m_body = PkiBody.GetInstance(seq[1]);
@@ -31,9 +35,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			m_body = body;
 		}
 
-		public virtual PkiHeader Header => m_header;
+		public virtual PkiHeader Header
+		{
+			get { return m_header; }
+		}
 
-		public virtual PkiBody Body => m_body;
+		public virtual PkiBody Body
+		{
+			get { return m_body; }
+		}
 
 		/**
 		 * <pre>

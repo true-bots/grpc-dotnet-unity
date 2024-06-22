@@ -5,7 +5,7 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal class BerTaggedObjectParser
+	class BerTaggedObjectParser
 		: Asn1TaggedObjectParser
 	{
 		internal readonly int m_tagClass;
@@ -47,7 +47,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public virtual IAsn1Convertible ParseBaseUniversal(bool declaredExplicit, int baseTagNo)
 		{
 			if (declaredExplicit)
+			{
 				return m_parser.ParseObject(baseTagNo);
+			}
 
 			return m_parser.ParseImplicitConstructedIL(baseTagNo);
 		}

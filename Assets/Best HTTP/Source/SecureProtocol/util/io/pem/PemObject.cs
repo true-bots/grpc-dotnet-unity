@@ -8,9 +8,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO.Pem
 	public class PemObject
 		: PemObjectGenerator
 	{
-		private string type;
-		private IList<PemHeader> headers;
-		private byte[] content;
+		string type;
+		IList<PemHeader> headers;
+		byte[] content;
 
 		public PemObject(string type, byte[] content)
 			: this(type, new List<PemHeader>(), content)

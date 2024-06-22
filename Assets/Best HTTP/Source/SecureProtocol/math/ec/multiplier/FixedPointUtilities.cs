@@ -24,14 +24,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 			return (FixedPointPreCompInfo)p.Curve.Precompute(p, PRECOMP_NAME, new FixedPointCallback(p));
 		}
 
-		private class FixedPointCallback
+		class FixedPointCallback
 			: IPreCompCallback
 		{
-			private readonly ECPoint m_p;
+			readonly ECPoint m_p;
 
 			internal FixedPointCallback(ECPoint p)
 			{
-				this.m_p = p;
+				m_p = p;
 			}
 
 			public PreCompInfo Precompute(PreCompInfo existing)
@@ -39,12 +39,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 				FixedPointPreCompInfo existingFP = existing as FixedPointPreCompInfo;
 
 				ECCurve c = m_p.Curve;
-				int bits = FixedPointUtilities.GetCombSize(c);
+				int bits = GetCombSize(c);
 				int minWidth = bits > 250 ? 6 : 5;
 				int n = 1 << minWidth;
 
 				if (CheckExisting(existingFP, n))
+				{
 					return existingFP;
+				}
 
 				int d = (bits + minWidth - 1) / minWidth;
 
@@ -68,7 +70,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 					ECPoint pow2 = pow2Table[bit];
 
 					int step = 1 << bit;
-					for (int i = step; i < n; i += (step << 1))
+					for (int i = step; i < n; i += step << 1)
 					{
 						lookupTable[i] = lookupTable[i - step].Add(pow2);
 					}
@@ -83,12 +85,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Multiplier
 				return result;
 			}
 
-			private bool CheckExisting(FixedPointPreCompInfo existingFP, int n)
+			bool CheckExisting(FixedPointPreCompInfo existingFP, int n)
 			{
 				return existingFP != null && CheckTable(existingFP.LookupTable, n);
 			}
 
-			private bool CheckTable(ECLookupTable table, int n)
+			bool CheckTable(ECLookupTable table, int n)
 			{
 				return table != null && table.Size >= n;
 			}

@@ -11,30 +11,43 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static CAKeyUpdAnnContent GetInstance(object obj)
 		{
 			if (obj is CAKeyUpdAnnContent content)
+			{
 				return content;
+			}
 
 			if (obj is Asn1Sequence seq)
+			{
 				return new CAKeyUpdAnnContent(seq);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), nameof(obj));
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), nameof(obj));
 		}
 
-		private readonly CmpCertificate m_oldWithNew;
-		private readonly CmpCertificate m_newWithOld;
-		private readonly CmpCertificate m_newWithNew;
+		readonly CmpCertificate m_oldWithNew;
+		readonly CmpCertificate m_newWithOld;
+		readonly CmpCertificate m_newWithNew;
 
-		private CAKeyUpdAnnContent(Asn1Sequence seq)
+		CAKeyUpdAnnContent(Asn1Sequence seq)
 		{
 			m_oldWithNew = CmpCertificate.GetInstance(seq[0]);
 			m_newWithOld = CmpCertificate.GetInstance(seq[1]);
 			m_newWithNew = CmpCertificate.GetInstance(seq[2]);
 		}
 
-		public virtual CmpCertificate OldWithNew => m_oldWithNew;
+		public virtual CmpCertificate OldWithNew
+		{
+			get { return m_oldWithNew; }
+		}
 
-		public virtual CmpCertificate NewWithOld => m_newWithOld;
+		public virtual CmpCertificate NewWithOld
+		{
+			get { return m_newWithOld; }
+		}
 
-		public virtual CmpCertificate NewWithNew => m_newWithNew;
+		public virtual CmpCertificate NewWithNew
+		{
+			get { return m_newWithNew; }
+		}
 
 		/**
 		 * <pre>

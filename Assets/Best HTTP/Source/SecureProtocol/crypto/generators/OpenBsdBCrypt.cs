@@ -16,7 +16,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	 */
 	public class OpenBsdBCrypt
 	{
-		private static readonly byte[] EncodingTable = // the Bcrypts encoding table for OpenBSD
+		static readonly byte[] EncodingTable = // the Bcrypts encoding table for OpenBSD
 		{
 			(byte)'.', (byte)'/', (byte)'A', (byte)'B', (byte)'C', (byte)'D',
 			(byte)'E', (byte)'F', (byte)'G', (byte)'H', (byte)'I', (byte)'J',
@@ -34,9 +34,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		/*
 		 * set up the decoding table.
 		 */
-		private static readonly byte[] DecodingTable = new byte[128];
-		private static readonly string DefaultVersion = "2y";
-		private static readonly HashSet<string> AllowedVersions = new HashSet<string>();
+		static readonly byte[] DecodingTable = new byte[128];
+		static readonly string DefaultVersion = "2y";
+		static readonly HashSet<string> AllowedVersions = new HashSet<string>();
 
 		static OpenBsdBCrypt()
 		{
@@ -70,16 +70,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * @param password the password
 		 * @return a 60 character Bcrypt String
 		 */
-		private static string CreateBcryptString(string version, byte[] password, byte[] salt, int cost)
+		static string CreateBcryptString(string version, byte[] password, byte[] salt, int cost)
 		{
 			if (!AllowedVersions.Contains(version))
+			{
 				throw new ArgumentException("Version " + version + " is not accepted by this implementation.", "version");
+			}
 
 			StringBuilder sb = new StringBuilder(60);
 			sb.Append('$');
 			sb.Append(version);
 			sb.Append('$');
-			sb.Append(cost < 10 ? ("0" + cost) : cost.ToString());
+			sb.Append(cost < 10 ? "0" + cost : cost.ToString());
 			sb.Append('$');
 			sb.Append(EncodeData(salt));
 
@@ -118,16 +120,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		public static string Generate(string version, char[] password, byte[] salt, int cost)
 		{
 			if (!AllowedVersions.Contains(version))
+			{
 				throw new ArgumentException("Version " + version + " is not accepted by this implementation.", "version");
+			}
+
 			if (password == null)
+			{
 				throw new ArgumentNullException("password");
+			}
+
 			if (salt == null)
+			{
 				throw new ArgumentNullException("salt");
+			}
+
 			if (salt.Length != 16)
+			{
 				throw new DataLengthException("16 byte salt required: " + salt.Length);
+			}
 
 			if (cost < 4 || cost > 31) // Minimum rounds: 16, maximum 2^31
+			{
 				throw new ArgumentException("Invalid cost factor.", "cost");
+			}
 
 			byte[] psw = Strings.ToUtf8ByteArray(password);
 
@@ -160,13 +175,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		{
 			// validate bcryptString:
 			if (bcryptString.Length != 60)
+			{
 				throw new DataLengthException("Bcrypt String length: " + bcryptString.Length + ", 60 required.");
+			}
+
 			if (bcryptString[0] != '$' || bcryptString[3] != '$' || bcryptString[6] != '$')
+			{
 				throw new ArgumentException("Invalid Bcrypt String format.", "bcryptString");
+			}
 
 			string version = bcryptString.Substring(1, 2);
 			if (!AllowedVersions.Contains(version))
+			{
 				throw new ArgumentException("Bcrypt version '" + version + "' is not supported by this implementation", "bcryptString");
+			}
 
 			int cost;
 			try
@@ -179,11 +201,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			}
 
 			if (cost < 4 || cost > 31)
+			{
 				throw new ArgumentException("Invalid cost factor: " + cost + ", 4 < cost < 31 expected.");
+			}
 
 			// check password:
 			if (password == null)
+			{
 				throw new ArgumentNullException("Missing password.");
+			}
 
 			int start = bcryptString.LastIndexOf('$') + 1, end = bcryptString.Length - 31;
 			byte[] salt = DecodeSaltString(bcryptString.Substring(start, end - start));
@@ -199,10 +225,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * @param 	a byte representation of the salt or the password
 		 * @return 	the Bcrypt base64 string
 		 */
-		private static string EncodeData(byte[] data)
+		static string EncodeData(byte[] data)
 		{
 			if (data.Length != 24 && data.Length != 16) // 192 bit key or 128 bit salt expected
+			{
 				throw new DataLengthException("Invalid length: " + data.Length + ", 24 for key or 16 for salt expected");
+			}
 
 			bool salt = false;
 			if (data.Length == 16) //salt
@@ -253,7 +281,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		 * @exception 	InvalidArgumentException if the parameter
 		 * 				contains a value other than from Bcrypts base 64 encoding table
 		 */
-		private static byte[] DecodeSaltString(string saltString)
+		static byte[] DecodeSaltString(string saltString)
 		{
 			char[] saltChars = saltString.ToCharArray();
 
@@ -261,14 +289,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			byte b1, b2, b3, b4;
 
 			if (saltChars.Length != 22) // bcrypt salt must be 22 (16 bytes)
+			{
 				throw new DataLengthException("Invalid base64 salt length: " + saltChars.Length + " , 22 required.");
+			}
 
 			// check string for invalid characters:
 			for (int i = 0; i < saltChars.Length; i++)
 			{
 				int value = saltChars[i];
 				if (value > 122 || value < 46 || (value > 57 && value < 65))
+				{
 					throw new ArgumentException("Salt string contains invalid character: " + value, "saltString");
+				}
 			}
 
 			// Padding: add two '\u0000'

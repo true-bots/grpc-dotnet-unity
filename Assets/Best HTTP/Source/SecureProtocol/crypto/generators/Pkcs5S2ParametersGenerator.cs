@@ -22,8 +22,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 	public class Pkcs5S2ParametersGenerator
 		: PbeParametersGenerator
 	{
-		private readonly IMac hMac;
-		private readonly byte[] state;
+		readonly IMac hMac;
+		readonly byte[] state;
 
 		/**
 		* construct a Pkcs5 Scheme 2 Parameters generator.
@@ -35,11 +35,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 
 		public Pkcs5S2ParametersGenerator(IDigest digest)
 		{
-			this.hMac = new HMac(digest);
-			this.state = new byte[hMac.GetMacSize()];
+			hMac = new HMac(digest);
+			state = new byte[hMac.GetMacSize()];
 		}
 
-		private void F(
+		void F(
 			byte[] S,
 			int c,
 			byte[] iBuf,
@@ -47,7 +47,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			int outOff)
 		{
 			if (c == 0)
+			{
 				throw new ArgumentException("iteration count must be at least 1.");
+			}
 
 			if (S != null)
 			{
@@ -71,7 +73,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 			}
 		}
 
-		private byte[] GenerateDerivedKey(
+		byte[] GenerateDerivedKey(
 			int dkLen)
 		{
 			int hLen = hMac.GetMacSize();

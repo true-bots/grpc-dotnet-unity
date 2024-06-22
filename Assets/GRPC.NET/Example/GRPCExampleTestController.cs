@@ -15,14 +15,14 @@ namespace GRPC.NET.Example
 {
 	public class GRPCExampleTestController : MonoBehaviour
 	{
-		private GRPCExampleLogger m_Logger;
+		GRPCExampleLogger m_Logger;
 
-		private GrpcTestCallIdFactory m_CallIdFactory;
+		GrpcTestCallIdFactory m_CallIdFactory;
 
-		private GrpcTestCallFactory m_CallFactoryA;
-		private GrpcTestCallFactory m_CallFactoryB;
+		GrpcTestCallFactory m_CallFactoryA;
+		GrpcTestCallFactory m_CallFactoryB;
 
-		private void Awake()
+		void Awake()
 		{
 			m_Logger = gameObject.GetComponent<GRPCExampleLogger>();
 
@@ -37,50 +37,53 @@ namespace GRPC.NET.Example
 			m_CallFactoryB = new GrpcTestCallFactory(m_CallIdFactory, 'B', m_Logger);
 		}
 
-		void Update() => m_CallIdFactory.Update();
+		void Update()
+		{
+			m_CallIdFactory.Update();
+		}
 
-		private static string MetadataToString(Metadata metadata)
+		static string MetadataToString(Metadata metadata)
 		{
 			return string.Join(",", metadata);
 		}
 
-		private static readonly Metadata AuthMetadata = new Metadata { { "Authorization", "Bearer f623f5c2-46a8-4bdc-9ac5-45358a615a54" } };
+		static readonly Metadata AuthMetadata = new Metadata { { "Authorization", "Bearer f623f5c2-46a8-4bdc-9ac5-45358a615a54" } };
 
-		private void RunTestCallUnary(GrpcTestCallFactory callFactory, Metadata metadata = null, string detail = null)
+		void RunTestCallUnary(GrpcTestCallFactory callFactory, Metadata metadata = null, string detail = null)
 		{
 			Debug.Log("RunTestCallUnary");
 
-			var call = callFactory.CreateUnary(metadata, detail);
+			GrpcTestCall call = callFactory.CreateUnary(metadata, detail);
 			call.Call();
 		}
 
-		private void RunTestCallServerStreaming(GrpcTestCallFactory callFactory)
+		void RunTestCallServerStreaming(GrpcTestCallFactory callFactory)
 		{
 			Debug.Log("RunTestCallServerStreaming");
 
-			var call = callFactory.CreateServerStreaming(AuthMetadata);
+			GrpcTestCall call = callFactory.CreateServerStreaming(AuthMetadata);
 			call.Call();
 		}
 
-		private void RunTestCallClientStreaming(GrpcTestCallFactory callFactory)
+		void RunTestCallClientStreaming(GrpcTestCallFactory callFactory)
 		{
 			Debug.Log("RunTestCallClientStreaming");
 
-			var call = callFactory.CreateClientStreaming(AuthMetadata);
+			GrpcTestCall call = callFactory.CreateClientStreaming(AuthMetadata);
 			call.Call();
 		}
 
-		private void RunTestCallBiStreaming(GrpcTestCallFactory callFactory)
+		void RunTestCallBiStreaming(GrpcTestCallFactory callFactory)
 		{
 			Debug.Log("RunTestCallBiStreaming");
 
-			var call = callFactory.CreateBiStreaming(AuthMetadata);
+			GrpcTestCall call = callFactory.CreateBiStreaming(AuthMetadata);
 			call.Call();
 		}
 
-		private class UnaryGrpcTestCall : GrpcTestCall
+		class UnaryGrpcTestCall : GrpcTestCall
 		{
-			private readonly string m_Detail;
+			readonly string m_Detail;
 
 			public UnaryGrpcTestCall(GRPCExampleLogger log, GrpcTestCallIdFactory callIdFactory, char factoryId,
 				HelloWorldService.HelloWorldServiceClient client, Metadata metadata, string detail) : base(log, callIdFactory, factoryId,
@@ -93,14 +96,14 @@ namespace GRPC.NET.Example
 			{
 				FireCallStarted("Unary");
 
-				var asyncCall = Client.helloAsync(new HelloRequest()
+				AsyncUnaryCall<HelloResponse> asyncCall = Client.helloAsync(new HelloRequest()
 				{
 					Text = "World" + (m_Detail != null ? $" [{m_Detail}]" : "")
 				}, Metadata, cancellationToken: cancelToken);
 
 				void PrintStatus()
 				{
-					var metadata = asyncCall.GetTrailers();
+					Metadata metadata = asyncCall.GetTrailers();
 					WriteLog($"Trailers[{metadata.Count}]: {MetadataToString(metadata)}");
 					WriteLog($"Status: {asyncCall.GetStatus()}");
 				}
@@ -113,7 +116,7 @@ namespace GRPC.NET.Example
 			}
 		}
 
-		private class ServerStreamingGrpcTestCall : GrpcTestCall
+		class ServerStreamingGrpcTestCall : GrpcTestCall
 		{
 			public ServerStreamingGrpcTestCall(GRPCExampleLogger log, GrpcTestCallIdFactory callIdFactory, char factoryId,
 				HelloWorldService.HelloWorldServiceClient client, Metadata metadata) : base(log, callIdFactory, factoryId, true, client, metadata)
@@ -124,14 +127,14 @@ namespace GRPC.NET.Example
 			{
 				FireCallStarted("ServerStreaming");
 
-				var asyncCall = Client.helloServer(new HelloRequest()
+				AsyncServerStreamingCall<HelloResponse> asyncCall = Client.helloServer(new HelloRequest()
 				{
 					Text = "World"
 				}, Metadata, cancellationToken: cancelToken);
 
 				void PrintStatus()
 				{
-					var metadata = asyncCall.GetTrailers();
+					Metadata metadata = asyncCall.GetTrailers();
 					WriteLog($"Trailers[{metadata.Count}]: {MetadataToString(metadata)}");
 					WriteLog($"Status: {asyncCall.GetStatus()}");
 				}
@@ -142,7 +145,7 @@ namespace GRPC.NET.Example
 			}
 		}
 
-		private class ClientStreamingGrpcTestCall : GrpcTestCall
+		class ClientStreamingGrpcTestCall : GrpcTestCall
 		{
 			public ClientStreamingGrpcTestCall(GRPCExampleLogger log, GrpcTestCallIdFactory callIdFactory, char factoryId,
 				HelloWorldService.HelloWorldServiceClient client, Metadata metadata) : base(log, callIdFactory, factoryId, false, client, metadata)
@@ -153,11 +156,11 @@ namespace GRPC.NET.Example
 			{
 				FireCallStarted("ClientStreaming");
 
-				var asyncCall = Client.helloClient(Metadata, cancellationToken: cancelToken);
+				AsyncClientStreamingCall<HelloRequest, HelloResponse> asyncCall = Client.helloClient(Metadata, cancellationToken: cancelToken);
 
 				void PrintStatus()
 				{
-					var metadata = asyncCall.GetTrailers();
+					Metadata metadata = asyncCall.GetTrailers();
 					WriteLog($"Trailers[{metadata.Count}]: {MetadataToString(metadata)}");
 					WriteLog($"Status: {asyncCall.GetStatus()}");
 				}
@@ -172,7 +175,7 @@ namespace GRPC.NET.Example
 			}
 		}
 
-		private class BiStreamingGrpcTestCall : GrpcTestCall
+		class BiStreamingGrpcTestCall : GrpcTestCall
 		{
 			public BiStreamingGrpcTestCall(GRPCExampleLogger log, GrpcTestCallIdFactory callIdFactory, char factoryId,
 				HelloWorldService.HelloWorldServiceClient client, Metadata metadata) : base(log, callIdFactory, factoryId, true, client, metadata)
@@ -183,11 +186,11 @@ namespace GRPC.NET.Example
 			{
 				FireCallStarted("ClientStreaming");
 
-				var asyncCall = Client.helloBoth(Metadata, cancellationToken: cancelToken);
+				AsyncDuplexStreamingCall<HelloRequest, HelloResponse> asyncCall = Client.helloBoth(Metadata, cancellationToken: cancelToken);
 
 				void PrintStatus()
 				{
-					var metadata = asyncCall.GetTrailers();
+					Metadata metadata = asyncCall.GetTrailers();
 					WriteLog($"Trailers[{metadata.Count}]: {MetadataToString(metadata)}");
 					WriteLog($"Status: {asyncCall.GetStatus()}");
 				}
@@ -200,30 +203,35 @@ namespace GRPC.NET.Example
 			}
 		}
 
-		private class GrpcTestCallIdFactory
+		class GrpcTestCallIdFactory
 		{
-			private static Color Hex2Color(string hex) => ColorUtility.TryParseHtmlString(hex, out var color) ? color : Color.red;
+			static Color Hex2Color(string hex)
+			{
+				return ColorUtility.TryParseHtmlString(hex, out Color color) ? color : Color.red;
+			}
 
-			private static readonly Color[] ColorList =
+			static readonly Color[] ColorList =
 			{
 				Hex2Color("#db5f57"), Hex2Color("#dbc257"), Hex2Color("#91db57"), Hex2Color("#57db80"),
-				Hex2Color("#57d3db"), Hex2Color("#5770db"), Hex2Color("#a157db"), Hex2Color("#db57b2"),
+				Hex2Color("#57d3db"), Hex2Color("#5770db"), Hex2Color("#a157db"), Hex2Color("#db57b2")
 			};
 
-			private int m_Inc = 0;
-			private int m_ColorPointer = 0;
+			int m_Inc = 0;
+			int m_ColorPointer = 0;
 
-			private List<GrpcTestCall> m_ActiveCalls = new List<GrpcTestCall>();
+			List<GrpcTestCall> m_ActiveCalls = new List<GrpcTestCall>();
 
 			public (int, Color) CreateNext(GrpcTestCall call)
 			{
 				Interlocked.Increment(ref m_Inc);
 
 				// Find unique color for this call
-				var c = ColorList[m_ColorPointer];
+				Color c = ColorList[m_ColorPointer];
 				m_ColorPointer++;
 				if (m_ColorPointer >= ColorList.Length)
+				{
 					m_ColorPointer = 0;
+				}
 
 				// Add call to active list
 				m_ActiveCalls.Add(call);
@@ -232,13 +240,20 @@ namespace GRPC.NET.Example
 			}
 
 			// Keep track of active calls
-			public IEnumerable<GrpcTestCall> GetActiveCalls() => m_ActiveCalls;
-			public void Completed(GrpcTestCall call) => m_ActiveCalls.Remove(call);
+			public IEnumerable<GrpcTestCall> GetActiveCalls()
+			{
+				return m_ActiveCalls;
+			}
+
+			public void Completed(GrpcTestCall call)
+			{
+				m_ActiveCalls.Remove(call);
+			}
 
 			// Timer utility callback to make delayed calls possible
 			public event Action OnTimer;
 
-			private float m_Time = 0;
+			float m_Time = 0;
 
 			public void Update()
 			{
@@ -250,16 +265,16 @@ namespace GRPC.NET.Example
 			}
 		}
 
-		private class GrpcTestCallFactory
+		class GrpcTestCallFactory
 		{
 			public string ServerAddressInput = "https://127.0.0.1:50051";
 
-			private readonly GrpcTestCallIdFactory m_IdFactory;
-			private readonly char m_FactoryId;
-			private readonly GRPCExampleLogger m_Logger;
+			readonly GrpcTestCallIdFactory m_IdFactory;
+			readonly char m_FactoryId;
+			readonly GRPCExampleLogger m_Logger;
 
-			private GrpcChannel m_Channel;
-			private HelloWorldService.HelloWorldServiceClient m_Client;
+			GrpcChannel m_Channel;
+			HelloWorldService.HelloWorldServiceClient m_Client;
 
 			public GrpcTestCallFactory(GrpcTestCallIdFactory idFactory, char factoryId, GRPCExampleLogger logger)
 			{
@@ -292,7 +307,7 @@ namespace GRPC.NET.Example
 				return new BiStreamingGrpcTestCall(m_Logger, m_IdFactory, m_FactoryId, m_Client, metadata);
 			}
 
-			private void EnsureClientConnection()
+			void EnsureClientConnection()
 			{
 				// Setup GRPC channel
 				GRPCBestHttpHandler httpHandler = new GRPCBestHttpHandler();
@@ -305,7 +320,7 @@ namespace GRPC.NET.Example
 			}
 		}
 
-		private abstract class GrpcTestCall
+		abstract class GrpcTestCall
 		{
 			protected readonly GRPCExampleLogger Log;
 			protected readonly GrpcTestCallIdFactory CallIdFactory;
@@ -314,8 +329,8 @@ namespace GRPC.NET.Example
 			public readonly Color Color;
 
 			protected readonly bool UsesReceive;
-			private CancellationTokenSource m_CancelToken;
-			private CancellationTokenSource m_ReceiveCancelToken;
+			CancellationTokenSource m_CancelToken;
+			CancellationTokenSource m_ReceiveCancelToken;
 
 			protected readonly HelloWorldService.HelloWorldServiceClient Client;
 			protected readonly Metadata Metadata;
@@ -341,15 +356,24 @@ namespace GRPC.NET.Example
 				CallImpl(m_CancelToken.Token, m_ReceiveCancelToken.Token);
 			}
 
-			public void Cancel() => m_CancelToken.Cancel();
+			public void Cancel()
+			{
+				m_CancelToken.Cancel();
+			}
 
-			public void CancelReceive() => m_ReceiveCancelToken.Cancel();
+			public void CancelReceive()
+			{
+				m_ReceiveCancelToken.Cancel();
+			}
 
-			public bool SupportsReceiveCancellation() => UsesReceive;
+			public bool SupportsReceiveCancellation()
+			{
+				return UsesReceive;
+			}
 
 			protected void WriteLog(string msg)
 			{
-				var colorHex = ColorUtility.ToHtmlStringRGBA(Color);
+				string colorHex = ColorUtility.ToHtmlStringRGBA(Color);
 				Log.WriteLogOutput($"<color=#{colorHex}>[{FactoryId}|{Inc}] {msg}</color>");
 			}
 
@@ -382,7 +406,7 @@ namespace GRPC.NET.Example
 
 			protected void ContinuationWithHeaders(Task<Metadata> task)
 			{
-				var metadata = task.Result;
+				Metadata metadata = task.Result;
 				WriteLog($"Metadata[{metadata.Count}]: {string.Join(",", metadata)}");
 			}
 
@@ -394,7 +418,7 @@ namespace GRPC.NET.Example
 				}
 				else
 				{
-					var result = task.Result;
+					HelloResponse result = task.Result;
 					WriteLog($"Received: {result.Text}");
 				}
 			}
@@ -404,10 +428,10 @@ namespace GRPC.NET.Example
 			{
 				try
 				{
-					var idx = 0;
+					int idx = 0;
 					while (await responseStream.MoveNext(receiveCancelToken))
 					{
-						var response = responseStream.Current;
+						HelloResponse response = responseStream.Current;
 						WriteLog($"Received({idx++}): {response.Text}");
 					}
 				}
@@ -423,7 +447,7 @@ namespace GRPC.NET.Example
 
 			protected void SendClientRequests(IClientStreamWriter<HelloRequest> requestStream)
 			{
-				var idx = 0;
+				int idx = 0;
 
 				async void OnTimerFunc()
 				{
@@ -431,7 +455,7 @@ namespace GRPC.NET.Example
 					{
 						if (idx < 5)
 						{
-							var msg = new HelloRequest() { Text = $"World {idx}" };
+							HelloRequest msg = new HelloRequest() { Text = $"World {idx}" };
 							WriteLog($"Send({idx}): {msg.Text}");
 							await requestStream.WriteAsync(msg);
 							idx += 1;
@@ -512,12 +536,14 @@ namespace GRPC.NET.Example
 		void GUICancelButtonArea(GrpcTestCallIdFactory callFactory)
 		{
 			GUILayout.BeginVertical();
-			foreach (var call in callFactory.GetActiveCalls()) // FIXME: modified while reading...
+			foreach (GrpcTestCall call in callFactory.GetActiveCalls()) // FIXME: modified while reading...
 			{
-				var colorHex = ColorUtility.ToHtmlStringRGBA(call.Color);
+				string colorHex = ColorUtility.ToHtmlStringRGBA(call.Color);
 
 				if (call.SupportsReceiveCancellation())
+				{
 					GUILayout.BeginHorizontal();
+				}
 
 				if (GUILayout.Button($"<color=#{colorHex}>[{call.FactoryId}|{call.Inc}] Cancel</color>"))
 				{
@@ -546,17 +572,17 @@ namespace GRPC.NET.Example
 			m_CallFactoryA.ServerAddressInput = GUI.TextField(new Rect(pad, pad, screenWidth * 0.25f, 20), m_CallFactoryA.ServerAddressInput, 400);
 			m_CallFactoryB.ServerAddressInput = GUI.TextField(new Rect(pad + screenWidth * 0.25f, pad, screenWidth * 0.25f, 20), m_CallFactoryB.ServerAddressInput, 400);
 
-			var buttonAreaA = new Rect(pad, pad + 24, screenWidth * 0.25f, Screen.height);
+			Rect buttonAreaA = new Rect(pad, pad + 24, screenWidth * 0.25f, Screen.height);
 			GUILayout.BeginArea(buttonAreaA);
 			GUITestButtonArea(m_CallFactoryA);
 			GUILayout.EndArea();
 
-			var buttonAreaB = new Rect(pad + screenWidth * 0.25f, pad + 24, screenWidth * 0.25f, Screen.height);
+			Rect buttonAreaB = new Rect(pad + screenWidth * 0.25f, pad + 24, screenWidth * 0.25f, Screen.height);
 			GUILayout.BeginArea(buttonAreaB);
 			GUITestButtonArea(m_CallFactoryB);
 			GUILayout.EndArea();
 
-			var cancelArea = new Rect(pad + screenWidth * 0.25f * 3, pad, screenWidth * 0.25f, Screen.height);
+			Rect cancelArea = new Rect(pad + screenWidth * 0.25f * 3, pad, screenWidth * 0.25f, Screen.height);
 			GUILayout.BeginArea(cancelArea);
 			GUICancelButtonArea(m_CallIdFactory);
 			GUILayout.EndArea();

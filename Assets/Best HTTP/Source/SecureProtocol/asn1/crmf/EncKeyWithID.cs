@@ -9,57 +9,61 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class EncKeyWithID
 		: Asn1Encodable
 	{
-		private readonly PrivateKeyInfo privKeyInfo;
-		private readonly Asn1Encodable identifier;
+		readonly PrivateKeyInfo privKeyInfo;
+		readonly Asn1Encodable identifier;
 
 		public static EncKeyWithID GetInstance(object obj)
 		{
 			if (obj is EncKeyWithID)
+			{
 				return (EncKeyWithID)obj;
+			}
 
 			if (obj != null)
+			{
 				return new EncKeyWithID(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private EncKeyWithID(Asn1Sequence seq)
+		EncKeyWithID(Asn1Sequence seq)
 		{
-			this.privKeyInfo = PrivateKeyInfo.GetInstance(seq[0]);
+			privKeyInfo = PrivateKeyInfo.GetInstance(seq[0]);
 
 			if (seq.Count > 1)
 			{
 				if (!(seq[1] is DerUtf8String))
 				{
-					this.identifier = GeneralName.GetInstance(seq[1]);
+					identifier = GeneralName.GetInstance(seq[1]);
 				}
 				else
 				{
-					this.identifier = (Asn1Encodable)seq[1];
+					identifier = (Asn1Encodable)seq[1];
 				}
 			}
 			else
 			{
-				this.identifier = null;
+				identifier = null;
 			}
 		}
 
 		public EncKeyWithID(PrivateKeyInfo privKeyInfo)
 		{
 			this.privKeyInfo = privKeyInfo;
-			this.identifier = null;
+			identifier = null;
 		}
 
 		public EncKeyWithID(PrivateKeyInfo privKeyInfo, DerUtf8String str)
 		{
 			this.privKeyInfo = privKeyInfo;
-			this.identifier = str;
+			identifier = str;
 		}
 
 		public EncKeyWithID(PrivateKeyInfo privKeyInfo, GeneralName generalName)
 		{
 			this.privKeyInfo = privKeyInfo;
-			this.identifier = generalName;
+			identifier = generalName;
 		}
 
 		public virtual PrivateKeyInfo PrivateKey

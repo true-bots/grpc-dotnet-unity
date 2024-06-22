@@ -9,11 +9,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class PopoSigningKey
 		: Asn1Encodable
 	{
-		private readonly PopoSigningKeyInput poposkInput;
-		private readonly AlgorithmIdentifier algorithmIdentifier;
-		private readonly DerBitString signature;
+		readonly PopoSigningKeyInput poposkInput;
+		readonly AlgorithmIdentifier algorithmIdentifier;
+		readonly DerBitString signature;
 
-		private PopoSigningKey(Asn1Sequence seq)
+		PopoSigningKey(Asn1Sequence seq)
 		{
 			int index = 0;
 
@@ -36,12 +36,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static PopoSigningKey GetInstance(object obj)
 		{
 			if (obj is PopoSigningKey)
+			{
 				return (PopoSigningKey)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new PopoSigningKey((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Invalid object: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Invalid object: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public static PopoSigningKey GetInstance(Asn1TaggedObject obj, bool isExplicit)
@@ -62,8 +66,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 			AlgorithmIdentifier aid,
 			DerBitString signature)
 		{
-			this.poposkInput = poposkIn;
-			this.algorithmIdentifier = aid;
+			poposkInput = poposkIn;
+			algorithmIdentifier = aid;
 			this.signature = signature;
 		}
 

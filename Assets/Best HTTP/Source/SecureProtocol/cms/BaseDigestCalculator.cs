@@ -5,10 +5,10 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal class BaseDigestCalculator
+	class BaseDigestCalculator
 		: IDigestCalculator
 	{
-		private readonly byte[] digest;
+		readonly byte[] digest;
 
 		internal BaseDigestCalculator(
 			byte[] digest)

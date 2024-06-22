@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerBoolean), Asn1Tags.Boolean)
+			Meta() : base(typeof(DerBoolean), Asn1Tags.Boolean)
 			{
 			}
 
@@ -34,16 +34,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerBoolean GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerBoolean derBoolean)
+			{
 				return derBoolean;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerBoolean converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -57,7 +63,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj));
 		}
 
 		public static DerBoolean GetInstance(bool value)
@@ -82,19 +88,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (DerBoolean)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly byte value;
+		readonly byte value;
 
 		public DerBoolean(
 			byte[] val)
 		{
 			if (val.Length != 1)
+			{
 				throw new ArgumentException("byte value should have 1 byte in it", "val");
+			}
 
 			// TODO Are there any constraints on the possible byte values?
-			this.value = val[0];
+			value = val[0];
 		}
 
-		private DerBoolean(
+		DerBoolean(
 			bool value)
 		{
 			this.value = value ? (byte)0xff : (byte)0;
@@ -121,7 +129,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			DerBoolean other = asn1Object as DerBoolean;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return IsTrue == other.IsTrue;
 		}
@@ -139,14 +149,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal static DerBoolean CreatePrimitive(byte[] contents)
 		{
 			if (contents.Length != 1)
+			{
 				throw new ArgumentException("BOOLEAN value should have 1 byte in it", "contents");
+			}
 
 			byte b = contents[0];
 
 			return b == 0 ? False : b == 0xFF ? True : new DerBoolean(contents);
 		}
 
-		private byte[] GetContents(int encoding)
+		byte[] GetContents(int encoding)
 		{
 			byte contents = value;
 			if (Asn1OutputStream.EncodingDer == encoding && IsTrue)

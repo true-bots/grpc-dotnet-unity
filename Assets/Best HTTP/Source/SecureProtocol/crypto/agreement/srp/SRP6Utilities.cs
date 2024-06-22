@@ -76,7 +76,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Srp
 
 			// Check that val % N != 0
 			if (val.Equals(BigInteger.Zero))
+			{
 				throw new CryptoException("Invalid public value: 0");
+			}
 
 			return val;
 		}
@@ -148,7 +150,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Srp
 			return new BigInteger(1, output);
 		}
 
-		private static BigInteger HashPaddedTriplet(IDigest digest, BigInteger N, BigInteger n1, BigInteger n2, BigInteger n3)
+		static BigInteger HashPaddedTriplet(IDigest digest, BigInteger N, BigInteger n1, BigInteger n2, BigInteger n3)
 		{
 			int paddedLength = (N.BitLength + 7) / 8;
 			int digestSize = digest.GetDigestSize();
@@ -184,7 +186,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.Srp
 			return new BigInteger(1, output);
 		}
 
-		private static BigInteger HashPaddedPair(IDigest digest, BigInteger N, BigInteger n1, BigInteger n2)
+		static BigInteger HashPaddedPair(IDigest digest, BigInteger N, BigInteger n1, BigInteger n2)
 		{
 			int paddedLength = (N.BitLength + 7) / 8;
 			int digestSize = digest.GetDigestSize();

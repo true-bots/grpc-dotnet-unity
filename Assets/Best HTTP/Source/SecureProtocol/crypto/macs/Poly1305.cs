@@ -27,38 +27,38 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 	public class Poly1305
 		: IMac
 	{
-		private const int BlockSize = 16;
+		const int BlockSize = 16;
 
-		private readonly IBlockCipher cipher;
+		readonly IBlockCipher cipher;
 
 		// Initialised state
 
 		/** Polynomial key */
-		private uint r0, r1, r2, r3, r4;
+		uint r0, r1, r2, r3, r4;
 
 		/** Precomputed 5 * r[1..4] */
-		private uint s1, s2, s3, s4;
+		uint s1, s2, s3, s4;
 
 		/** Encrypted nonce */
-		private uint k0, k1, k2, k3;
+		uint k0, k1, k2, k3;
 
 		// Accumulating state
 
 		/** Current block of buffered input */
-		private byte[] currentBlock = new byte[BlockSize];
+		byte[] currentBlock = new byte[BlockSize];
 
 		/** Current offset in input buffer */
-		private int currentBlockOffset = 0;
+		int currentBlockOffset = 0;
 
 		/** Polynomial accumulator */
-		private uint h0, h1, h2, h3, h4;
+		uint h0, h1, h2, h3, h4;
 
 		/**
 		 * Constructs a Poly1305 MAC, where the key passed to init() will be used directly.
 		 */
 		public Poly1305()
 		{
-			this.cipher = null;
+			cipher = null;
 		}
 
 		/**
@@ -86,7 +86,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			if (cipher != null)
 			{
 				if (!(parameters is ParametersWithIV))
+				{
 					throw new ArgumentException("Poly1305 requires an IV when used with a block cipher.", "parameters");
+				}
 
 				ParametersWithIV ivParams = (ParametersWithIV)parameters;
 				nonce = ivParams.GetIV();
@@ -94,7 +96,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			}
 
 			if (!(parameters is KeyParameter))
+			{
 				throw new ArgumentException("Poly1305 requires a key.");
+			}
 
 			KeyParameter keyParams = (KeyParameter)parameters;
 
@@ -103,13 +107,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			Reset();
 		}
 
-		private void SetKey(byte[] key, byte[] nonce)
+		void SetKey(byte[] key, byte[] nonce)
 		{
 			if (key.Length != 32)
+			{
 				throw new ArgumentException("Poly1305 key must be 256 bits.");
+			}
 
 			if (cipher != null && (nonce == null || nonce.Length != BlockSize))
+			{
 				throw new ArgumentException("Poly1305 requires a 128 bit IV.");
+			}
 
 			// Extract r portion of key (and "clamp" the values)
 			uint t0 = Pack.LE_To_UInt32(key, 0);
@@ -252,7 +260,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
             uint t2 = Pack.LE_To_UInt32(block[8..]);
             uint t3 = Pack.LE_To_UInt32(block[12..]);
 #else
-		private void ProcessBlock(byte[] buf, int off)
+		void ProcessBlock(byte[] buf, int off)
 		{
 			uint t0 = Pack.LE_To_UInt32(buf, off + 0);
 			uint t1 = Pack.LE_To_UInt32(buf, off + 4);
@@ -273,13 +281,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			ulong tp4 = (ulong)h0 * r4 + (ulong)h1 * r3 + (ulong)h2 * r2 + (ulong)h3 * r1 + (ulong)h4 * r0;
 
 			h0 = (uint)tp0 & 0x3ffffff;
-			tp1 += (tp0 >> 26);
+			tp1 += tp0 >> 26;
 			h1 = (uint)tp1 & 0x3ffffff;
-			tp2 += (tp1 >> 26);
+			tp2 += tp1 >> 26;
 			h2 = (uint)tp2 & 0x3ffffff;
-			tp3 += (tp2 >> 26);
+			tp3 += tp2 >> 26;
 			h3 = (uint)tp3 & 0x3ffffff;
-			tp4 += (tp3 >> 26);
+			tp4 += tp3 >> 26;
 			h4 = (uint)tp4 & 0x3ffffff;
 			h0 += (uint)(tp4 >> 26) * 5;
 			h1 += h0 >> 26;
@@ -304,7 +312,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 						currentBlock[currentBlockOffset++] = 0;
 					}
 
-					h4 -= (1 << 24);
+					h4 -= 1 << 24;
 				}
 
 				ProcessBlock(currentBlock, 0);
@@ -324,7 +332,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Macs
 			h3 &= 0x3ffffff;
 
 			long c = ((int)(h4 >> 26) - 1) * 5;
-			c += (long)k0 + ((h0) | (h1 << 26));
+			c += (long)k0 + (h0 | (h1 << 26));
 			Pack.UInt32_To_LE((uint)c, output, outOff);
 			c >>= 32;
 			c += (long)k1 + ((h1 >> 6) | (h2 << 20));

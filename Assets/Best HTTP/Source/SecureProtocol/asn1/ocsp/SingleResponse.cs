@@ -9,11 +9,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class SingleResponse
 		: Asn1Encodable
 	{
-		private readonly CertID certID;
-		private readonly CertStatus certStatus;
-		private readonly Asn1GeneralizedTime thisUpdate;
-		private readonly Asn1GeneralizedTime nextUpdate;
-		private readonly X509Extensions singleExtensions;
+		readonly CertID certID;
+		readonly CertStatus certStatus;
+		readonly Asn1GeneralizedTime thisUpdate;
+		readonly Asn1GeneralizedTime nextUpdate;
+		readonly X509Extensions singleExtensions;
 
 		public SingleResponse(
 			CertID certID,
@@ -32,15 +32,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 		public SingleResponse(
 			Asn1Sequence seq)
 		{
-			this.certID = CertID.GetInstance(seq[0]);
-			this.certStatus = CertStatus.GetInstance(seq[1]);
-			this.thisUpdate = (Asn1GeneralizedTime)seq[2];
+			certID = CertID.GetInstance(seq[0]);
+			certStatus = CertStatus.GetInstance(seq[1]);
+			thisUpdate = (Asn1GeneralizedTime)seq[2];
 
 			if (seq.Count > 4)
 			{
-				this.nextUpdate = Asn1GeneralizedTime.GetInstance(
+				nextUpdate = Asn1GeneralizedTime.GetInstance(
 					(Asn1TaggedObject)seq[3], true);
-				this.singleExtensions = X509Extensions.GetInstance(
+				singleExtensions = X509Extensions.GetInstance(
 					(Asn1TaggedObject)seq[4], true);
 			}
 			else if (seq.Count > 3)
@@ -49,11 +49,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 
 				if (o.TagNo == 0)
 				{
-					this.nextUpdate = Asn1GeneralizedTime.GetInstance(o, true);
+					nextUpdate = Asn1GeneralizedTime.GetInstance(o, true);
 				}
 				else
 				{
-					this.singleExtensions = X509Extensions.GetInstance(o, true);
+					singleExtensions = X509Extensions.GetInstance(o, true);
 				}
 			}
 		}
@@ -78,7 +78,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new SingleResponse((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public CertID CertId

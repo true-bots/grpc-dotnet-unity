@@ -5,7 +5,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Math.Raw;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 {
-	internal class SecP521R1Point
+	class SecP521R1Point
 		: AbstractFpPoint
 	{
 		internal SecP521R1Point(ECCurve curve, ECFieldElement x, ECFieldElement y)
@@ -25,19 +25,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 
 		public override ECPoint Add(ECPoint b)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return b;
+			}
+
 			if (b.IsInfinity)
+			{
 				return this;
+			}
+
 			if (this == b)
+			{
 				return Twice();
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			SecP521R1FieldElement X1 = (SecP521R1FieldElement)this.RawXCoord, Y1 = (SecP521R1FieldElement)this.RawYCoord;
+			SecP521R1FieldElement X1 = (SecP521R1FieldElement)RawXCoord, Y1 = (SecP521R1FieldElement)RawYCoord;
 			SecP521R1FieldElement X2 = (SecP521R1FieldElement)b.RawXCoord, Y2 = (SecP521R1FieldElement)b.RawYCoord;
 
-			SecP521R1FieldElement Z1 = (SecP521R1FieldElement)this.RawZCoords[0];
+			SecP521R1FieldElement Z1 = (SecP521R1FieldElement)RawZCoords[0];
 			SecP521R1FieldElement Z2 = (SecP521R1FieldElement)b.RawZCoords[0];
 
 			uint[] tt0 = Nat.Create(33);
@@ -96,7 +104,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 				if (Nat.IsZero(17, R))
 				{
 					// this == b, i.e. this must be doubled
-					return this.Twice();
+					return Twice();
 				}
 
 				// this == -b, i.e. the result is the point at infinity
@@ -143,16 +151,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 
 		public override ECPoint Twice()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			SecP521R1FieldElement Y1 = (SecP521R1FieldElement)this.RawYCoord;
+			SecP521R1FieldElement Y1 = (SecP521R1FieldElement)RawYCoord;
 			if (Y1.IsZero)
+			{
 				return curve.Infinity;
+			}
 
-			SecP521R1FieldElement X1 = (SecP521R1FieldElement)this.RawXCoord, Z1 = (SecP521R1FieldElement)this.RawZCoords[0];
+			SecP521R1FieldElement X1 = (SecP521R1FieldElement)RawXCoord, Z1 = (SecP521R1FieldElement)RawZCoords[0];
 
 			uint[] tt0 = Nat.Create(33);
 			uint[] t1 = Nat.Create(17);
@@ -212,23 +224,35 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public override ECPoint TwicePlus(ECPoint b)
 		{
 			if (this == b)
+			{
 				return ThreeTimes();
-			if (this.IsInfinity)
-				return b;
-			if (b.IsInfinity)
-				return Twice();
+			}
 
-			ECFieldElement Y1 = this.RawYCoord;
-			if (Y1.IsZero)
+			if (IsInfinity)
+			{
 				return b;
+			}
+
+			if (b.IsInfinity)
+			{
+				return Twice();
+			}
+
+			ECFieldElement Y1 = RawYCoord;
+			if (Y1.IsZero)
+			{
+				return b;
+			}
 
 			return Twice().Add(b);
 		}
 
 		public override ECPoint ThreeTimes()
 		{
-			if (this.IsInfinity || this.RawYCoord.IsZero)
+			if (IsInfinity || RawYCoord.IsZero)
+			{
 				return this;
+			}
 
 			// NOTE: Be careful about recursions between TwicePlus and ThreeTimes
 			return Twice().Add(this);
@@ -237,7 +261,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Custom.Sec
 		public override ECPoint Negate()
 		{
 			if (IsInfinity)
+			{
 				return this;
+			}
 
 			return new SecP521R1Point(Curve, RawXCoord, RawYCoord.Negate(), RawZCoords);
 		}

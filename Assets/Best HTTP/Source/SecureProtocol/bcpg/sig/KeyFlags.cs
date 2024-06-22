@@ -19,7 +19,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg.Sig
 		public const int Authentication = 0x20;
 		public const int Shared = 0x80;
 
-		private static byte[] IntToByteArray(
+		static byte[] IntToByteArray(
 			int v)
 		{
 			byte[] tmp = new byte[4];

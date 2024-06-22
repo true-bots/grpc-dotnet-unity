@@ -15,8 +15,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 		public const int PointSize = 32;
 		public const int ScalarSize = 32;
 
-		private const int C_A = 486662;
-		private const int C_A24 = (C_A + 2) / 4;
+		const int C_A = 486662;
+		const int C_A24 = (C_A + 2) / 4;
 
 		//private static readonly int[] SqrtNeg486664 = { 0x03457E06, 0x03812ABF, 0x01A82CC6, 0x028A5BE8, 0x018B43A7,
 		//    0x03FC4F7E, 0x02C23700, 0x006BBD27, 0x03A30500, 0x001E4DDB };
@@ -57,7 +57,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
             n[7] |= 0x40000000U;
         }
 #else
-		private static uint Decode32(byte[] bs, int off)
+		static uint Decode32(byte[] bs, int off)
 		{
 			uint n = bs[off];
 			n |= (uint)bs[++off] << 8;
@@ -66,7 +66,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 			return n;
 		}
 
-		private static void DecodeScalar(byte[] k, int kOff, uint[] n)
+		static void DecodeScalar(byte[] k, int kOff, uint[] n)
 		{
 			for (int i = 0; i < 8; ++i)
 			{
@@ -82,7 +82,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
 		public static void GeneratePrivateKey(SecureRandom random, byte[] k)
 		{
 			if (k.Length != ScalarSize)
+			{
 				throw new ArgumentException(nameof(k));
+			}
 
 			random.NextBytes(k);
 
@@ -117,7 +119,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Rfc7748
         }
 #endif
 
-		private static void PointDouble(int[] x, int[] z)
+		static void PointDouble(int[] x, int[] z)
 		{
 			int[] a = F.Create();
 			int[] b = F.Create();

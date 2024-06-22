@@ -16,14 +16,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 	public class BcTlsDHDomain
 		: TlsDHDomain
 	{
-		private static byte[] EncodeValue(DHParameters dh, bool padded, BigInteger x)
+		static byte[] EncodeValue(DHParameters dh, bool padded, BigInteger x)
 		{
 			return padded
 				? BigIntegers.AsUnsignedByteArray(GetValueLength(dh), x)
 				: BigIntegers.AsUnsignedByteArray(x);
 		}
 
-		private static int GetValueLength(DHParameters dh)
+		static int GetValueLength(DHParameters dh)
 		{
 			return BigIntegers.GetUnsignedByteLength(dh.P);
 		}
@@ -42,7 +42,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		{
 			DHGroup dhGroup = TlsDHUtilities.GetDHGroup(dhConfig);
 			if (dhGroup == null)
+			{
 				throw new ArgumentException("No DH configuration provided");
+			}
 
 			return new DHParameters(dhGroup.P, dhGroup.G, dhGroup.Q, dhGroup.L);
 		}
@@ -53,9 +55,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 
 		public BcTlsDHDomain(BcTlsCrypto crypto, TlsDHConfig dhConfig)
 		{
-			this.m_crypto = crypto;
-			this.m_config = dhConfig;
-			this.m_domainParameters = GetDomainParameters(dhConfig);
+			m_crypto = crypto;
+			m_config = dhConfig;
+			m_domainParameters = GetDomainParameters(dhConfig);
 		}
 
 		public virtual BcTlsSecret CalculateDHAgreement(DHPrivateKeyParameters privateKey,
@@ -73,7 +75,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls.Crypto.Impl.BC
 		public virtual BigInteger DecodeParameter(byte[] encoding)
 		{
 			if (m_config.IsPadded && GetValueLength(m_domainParameters) != encoding.Length)
+			{
 				throw new TlsFatalAlert(AlertDescription.illegal_parameter);
+			}
 
 			return new BigInteger(1, encoding);
 		}

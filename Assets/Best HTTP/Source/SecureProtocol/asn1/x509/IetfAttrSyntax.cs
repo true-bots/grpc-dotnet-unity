@@ -29,7 +29,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 			if (seq[0] is Asn1TaggedObject)
 			{
-				policyAuthority = GeneralNames.GetInstance(((Asn1TaggedObject)seq[0]), false);
+				policyAuthority = GeneralNames.GetInstance((Asn1TaggedObject)seq[0], false);
 				i++;
 			}
 			else if (seq.Count == 2)
@@ -93,7 +93,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 
 		public object[] GetValues()
 		{
-			if (this.ValueType == ValueOctets)
+			if (ValueType == ValueOctets)
 			{
 				Asn1OctetString[] tmp = new Asn1OctetString[values.Count];
 
@@ -105,7 +105,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return tmp;
 			}
 
-			if (this.ValueType == ValueOid)
+			if (ValueType == ValueOid)
 			{
 				DerObjectIdentifier[] tmp = new DerObjectIdentifier[values.Count];
 

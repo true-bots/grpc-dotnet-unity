@@ -19,17 +19,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class OtherHash
 		: Asn1Encodable, IAsn1Choice
 	{
-		private readonly Asn1OctetString sha1Hash;
-		private readonly OtherHashAlgAndValue otherHash;
+		readonly Asn1OctetString sha1Hash;
+		readonly OtherHashAlgAndValue otherHash;
 
 		public static OtherHash GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is OtherHash)
+			{
 				return (OtherHash)obj;
+			}
 
 			if (obj is Asn1OctetString)
+			{
 				return new OtherHash((Asn1OctetString)obj);
+			}
 
 			return new OtherHash(
 				OtherHashAlgAndValue.GetInstance(obj));
@@ -39,7 +43,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			byte[] sha1Hash)
 		{
 			if (sha1Hash == null)
+			{
 				throw new ArgumentNullException("sha1Hash");
+			}
 
 			this.sha1Hash = new DerOctetString(sha1Hash);
 		}
@@ -48,7 +54,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			Asn1OctetString sha1Hash)
 		{
 			if (sha1Hash == null)
+			{
 				throw new ArgumentNullException("sha1Hash");
+			}
 
 			this.sha1Hash = sha1Hash;
 		}
@@ -57,7 +65,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			OtherHashAlgAndValue otherHash)
 		{
 			if (otherHash == null)
+			{
 				throw new ArgumentNullException("otherHash");
+			}
 
 			this.otherHash = otherHash;
 		}

@@ -10,21 +10,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 	public sealed class ByteQueue
 	{
 		/// <returns>The smallest number which can be written as 2^x which is bigger than i.</returns>
-		private static int GetAllocationSize(int i)
+		static int GetAllocationSize(int i)
 		{
 			return Integers.HighestOneBit((256 | i) << 1);
 		}
 
 		/// <summary>The buffer where we store our data.</summary>
-		private byte[] m_databuf;
+		byte[] m_databuf;
 
 		/// <summary>How many bytes at the beginning of the buffer are skipped.</summary>
-		private int m_skipped = 0;
+		int m_skipped = 0;
 
 		/// <summary>How many bytes in the buffer are valid data.</summary>
-		private int m_available = 0;
+		int m_available = 0;
 
-		private bool m_readOnlyBuf = false;
+		bool m_readOnlyBuf = false;
 
 		public ByteQueue()
 			: this(0)
@@ -33,15 +33,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 		public ByteQueue(int capacity)
 		{
-			this.m_databuf = capacity == 0 ? TlsUtilities.EmptyBytes : new byte[capacity];
+			m_databuf = capacity == 0 ? TlsUtilities.EmptyBytes : new byte[capacity];
 		}
 
 		public ByteQueue(byte[] buf, int off, int len)
 		{
-			this.m_databuf = buf;
-			this.m_skipped = off;
-			this.m_available = len;
-			this.m_readOnlyBuf = true;
+			m_databuf = buf;
+			m_skipped = off;
+			m_available = len;
+			m_readOnlyBuf = true;
 		}
 
 		/// <summary>Add some data to our buffer.</summary>
@@ -54,7 +54,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
             AddData(buf.AsSpan(off, len));
 #else
 			if (m_readOnlyBuf)
+			{
 				throw new InvalidOperationException("Cannot add data to read-only buffer");
+			}
 
 			if (m_available == 0)
 			{
@@ -66,7 +68,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 
 				m_skipped = 0;
 			}
-			else if ((m_skipped + m_available + len) > m_databuf.Length)
+			else if (m_skipped + m_available + len > m_databuf.Length)
 			{
 				int desiredSize = GetAllocationSize(m_available + len);
 				if (desiredSize > m_databuf.Length)
@@ -137,7 +139,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public void CopyTo(Stream output, int length)
 		{
 			if (length > m_available)
+			{
 				throw new InvalidOperationException("Cannot copy " + length + " bytes, only got " + m_available);
+			}
 
 			output.Write(m_databuf, m_skipped, length);
 		}
@@ -149,13 +153,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		/// <param name="skip">How many bytes from our data to skip.</param>
 		public void Read(byte[] buf, int offset, int len, int skip)
 		{
-			if ((buf.Length - offset) < len)
+			if (buf.Length - offset < len)
 			{
 				throw new ArgumentException("Buffer size of " + buf.Length
 				                                              + " is too small for a read of " + len + " bytes");
 			}
 
-			if ((m_available - skip) < len)
+			if (m_available - skip < len)
 			{
 				throw new InvalidOperationException("Not enough data to read");
 			}
@@ -180,7 +184,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		internal HandshakeMessageInput ReadHandshakeMessage(int length)
 		{
 			if (length > m_available)
+			{
 				throw new InvalidOperationException("Cannot read " + length + " bytes, only got " + m_available);
+			}
 
 			int position = m_skipped;
 
@@ -193,7 +199,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public int ReadInt32()
 		{
 			if (m_available < 4)
+			{
 				throw new InvalidOperationException("Not enough data to read");
+			}
 
 			return TlsUtilities.ReadInt32(m_databuf, m_skipped);
 		}
@@ -201,7 +209,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public int ReadUint16(int skip)
 		{
 			if (m_available < skip + 2)
+			{
 				throw new InvalidOperationException("Not enough data to read");
+			}
 
 			return TlsUtilities.ReadUint16(m_databuf, m_skipped + skip);
 		}
@@ -211,7 +221,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public void RemoveData(int i)
 		{
 			if (i > m_available)
+			{
 				throw new InvalidOperationException("Cannot remove " + i + " bytes, only got " + m_available);
+			}
 
 			/*
 			 * Skip the data.

@@ -9,15 +9,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 	public class BufferedIesCipher
 		: BufferedCipherBase
 	{
-		private readonly IesEngine engine;
-		private bool forEncryption;
-		private MemoryStream buffer = new MemoryStream();
+		readonly IesEngine engine;
+		bool forEncryption;
+		MemoryStream buffer = new MemoryStream();
 
 		public BufferedIesCipher(
 			IesEngine engine)
 		{
 			if (engine == null)
+			{
 				throw new ArgumentNullException("engine");
+			}
 
 			this.engine = engine;
 		}
@@ -47,7 +49,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			int inputLen)
 		{
 			if (engine == null)
+			{
 				throw new InvalidOperationException("cipher not initialised");
+			}
 
 			int baseLen = inputLen + Convert.ToInt32(buffer.Length);
 			return forEncryption
@@ -87,13 +91,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto
 			int length)
 		{
 			if (input == null)
+			{
 				throw new ArgumentNullException("input");
+			}
+
 			if (inOff < 0)
+			{
 				throw new ArgumentException("inOff");
+			}
+
 			if (length < 0)
+			{
 				throw new ArgumentException("length");
+			}
+
 			if (inOff + length > input.Length)
+			{
 				throw new ArgumentException("invalid offset/length specified for input array");
+			}
 
 			buffer.Write(input, inOff, length);
 			return null;

@@ -27,14 +27,14 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 	/// <summary>
 	/// Implements the Galois/Counter mode (GCM) detailed in NIST Special Publication 800-38D.
 	/// </summary>
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 #if BESTHTTP_WITH_BURST
     [Unity.Burst.BurstCompile]
 #endif
 	public sealed class FastGcmBlockCipher
 		: IAeadBlockCipher
 	{
-		private static IGcmMultiplier CreateGcmMultiplier()
+		static IGcmMultiplier CreateGcmMultiplier()
 		{
 #if NETCOREAPP3_0_OR_GREATER
             // TODO Prefer more tightly coupled test
@@ -50,33 +50,33 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 		public const int BlockSize = 16;
 		byte[] ctrBlock = new byte[BlockSize];
 
-		private readonly IBlockCipher cipher;
-		private readonly BurstTables8kGcmMultiplier multiplier;
-		private IGcmExponentiator exp;
+		readonly IBlockCipher cipher;
+		readonly BurstTables8kGcmMultiplier multiplier;
+		IGcmExponentiator exp;
 
 		// These fields are set by Init and not modified by processing
-		private bool forEncryption;
-		private bool initialised;
-		private int macSize;
-		private byte[] lastKey;
-		private byte[] nonce;
-		private byte[] initialAssociatedText;
-		private byte[] H;
-		private byte[] J0;
+		bool forEncryption;
+		bool initialised;
+		int macSize;
+		byte[] lastKey;
+		byte[] nonce;
+		byte[] initialAssociatedText;
+		byte[] H;
+		byte[] J0;
 
 		// These fields are modified during processing
-		private byte[] bufBlock;
-		private byte[] macBlock;
-		private byte[] S, S_at, S_atPre;
-		private byte[] counter;
-		private uint counter32;
-		private uint blocksRemaining;
-		private int bufOff;
-		private ulong totalLength;
-		private byte[] atBlock;
-		private int atBlockPos;
-		private ulong atLength;
-		private ulong atLengthPre;
+		byte[] bufBlock;
+		byte[] macBlock;
+		byte[] S, S_at, S_atPre;
+		byte[] counter;
+		uint counter32;
+		uint blocksRemaining;
+		int bufOff;
+		ulong totalLength;
+		byte[] atBlock;
+		int atBlockPos;
+		ulong atLength;
+		ulong atLengthPre;
 
 		public FastGcmBlockCipher(
 			IBlockCipher c)
@@ -89,20 +89,28 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			IGcmMultiplier m)
 		{
 			if (c.GetBlockSize() != BlockSize)
+			{
 				throw new ArgumentException("cipher required with a block size of " + BlockSize + ".");
+			}
 
 			//if (m == null)
 			//{
 			//    m = CreateGcmMultiplier();
 			//}
 
-			this.cipher = c;
-			this.multiplier = new BurstTables8kGcmMultiplier();
+			cipher = c;
+			multiplier = new BurstTables8kGcmMultiplier();
 		}
 
-		public string AlgorithmName => cipher.AlgorithmName + "/GCM";
+		public string AlgorithmName
+		{
+			get { return cipher.AlgorithmName + "/GCM"; }
+		}
 
-		public IBlockCipher UnderlyingCipher => cipher;
+		public IBlockCipher UnderlyingCipher
+		{
+			get { return cipher; }
+		}
 
 		public int GetBlockSize()
 		{
@@ -117,9 +125,12 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 		{
 			this.forEncryption = forEncryption;
 			//this.macBlock = null;
-			if (this.macBlock != null)
-				Array.Clear(this.macBlock, 0, this.macBlock.Length);
-			this.initialised = true;
+			if (macBlock != null)
+			{
+				Array.Clear(macBlock, 0, macBlock.Length);
+			}
+
+			initialised = true;
 
 			KeyParameter keyParam;
 			byte[] newNonce = null;
@@ -154,8 +165,8 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 				throw new ArgumentException("invalid parameters passed to GCM");
 			}
 
-			int bufLength = forEncryption ? BlockSize : (BlockSize + macSize);
-			this.bufBlock = new byte[bufLength];
+			int bufLength = forEncryption ? BlockSize : BlockSize + macSize;
+			bufBlock = new byte[bufLength];
 
 			if (newNonce == null || newNonce.Length < 1)
 			{
@@ -192,24 +203,24 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			{
 				cipher.Init(true, keyParam);
 
-				this.H = new byte[BlockSize];
+				H = new byte[BlockSize];
 				cipher.ProcessBlock(H, 0, H, 0);
 
 				// if keyParam is null we're reusing the last key and the multiplier doesn't need re-init
 				multiplier.Init(H);
 				exp = null;
 			}
-			else if (this.H == null)
+			else if (H == null)
 			{
 				throw new ArgumentException("Key must be specified in initial init");
 			}
 
-			this.J0 = new byte[BlockSize];
+			J0 = new byte[BlockSize];
 
 			if (nonce.Length == 12)
 			{
 				Array.Copy(nonce, 0, J0, 0, nonce.Length);
-				this.J0[BlockSize - 1] = 0x01;
+				J0[BlockSize - 1] = 0x01;
 			}
 			else
 			{
@@ -219,18 +230,18 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 				gHASHBlock(J0, X);
 			}
 
-			this.S = new byte[BlockSize];
-			this.S_at = new byte[BlockSize];
-			this.S_atPre = new byte[BlockSize];
-			this.atBlock = new byte[BlockSize];
-			this.atBlockPos = 0;
-			this.atLength = 0;
-			this.atLengthPre = 0;
-			this.counter = Arrays.Clone(J0);
-			this.counter32 = Pack.BE_To_UInt32(counter, 12);
-			this.blocksRemaining = uint.MaxValue - 1; // page 8, len(P) <= 2^39 - 256, 1 block used by tag
-			this.bufOff = 0;
-			this.totalLength = 0;
+			S = new byte[BlockSize];
+			S_at = new byte[BlockSize];
+			S_atPre = new byte[BlockSize];
+			atBlock = new byte[BlockSize];
+			atBlockPos = 0;
+			atLength = 0;
+			atLengthPre = 0;
+			counter = Arrays.Clone(J0);
+			counter32 = Pack.BE_To_UInt32(counter, 12);
+			blocksRemaining = uint.MaxValue - 1; // page 8, len(P) <= 2^39 - 256, 1 block used by tag
+			bufOff = 0;
+			totalLength = 0;
 
 			if (initialAssociatedText != null)
 			{
@@ -360,7 +371,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
         }
 #endif
 
-		private void InitCipher()
+		void InitCipher()
 		{
 			if (atLength > 0)
 			{
@@ -750,7 +761,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			else
 			{
 				if (extra < macSize)
+				{
 					throw new InvalidCipherTextException("data too short");
+				}
 
 				extra -= macSize;
 
@@ -786,7 +799,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 				}
 
 				// Number of cipher-text blocks produced
-				long c = (long)(((totalLength * 8) + 127) >> 7);
+				long c = (long)((totalLength * 8 + 127) >> 7);
 
 				// Calculate the adjustment factor
 				byte[] H_c = new byte[16];
@@ -820,7 +833,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			int resultLen = extra;
 
 			// We place into macBlock our calculated value for T
-			this.macBlock = new byte[macSize];
+			macBlock = new byte[macSize];
 			Array.Copy(tag, 0, macBlock, 0, macSize);
 
 			if (forEncryption)
@@ -834,8 +847,10 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 				// Retrieve the T value from the message and compare to calculated one
 				byte[] msgMac = new byte[macSize];
 				Array.Copy(bufBlock, extra, msgMac, 0, macSize);
-				if (!Arrays.ConstantTimeAreEqual(this.macBlock, msgMac))
+				if (!Arrays.ConstantTimeAreEqual(macBlock, msgMac))
+				{
 					throw new InvalidCipherTextException("mac check in GCM failed");
+				}
 			}
 
 			Reset(false);
@@ -961,7 +976,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			Reset(true);
 		}
 
-		private void Reset(bool clearMac)
+		void Reset(bool clearMac)
 		{
 			// note: we do not reset the nonce.
 
@@ -1292,7 +1307,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
             totalLength += (uint)partialBlock.Length;
         }
 #else
-		private void DecryptBlock(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
+		void DecryptBlock(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
 		{
 			Check.OutputLength(outBuf, outOff, BlockSize, "Output buffer too short");
 
@@ -1328,7 +1343,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			totalLength += BlockSize;
 		}
 
-		private void DecryptBlocks2(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
+		void DecryptBlocks2(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
 		{
 			Check.OutputLength(outBuf, outOff, BlockSize * 2, "Output buffer too short");
 
@@ -1389,7 +1404,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			totalLength += BlockSize * 2;
 		}
 
-		private void EncryptBlock(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
+		void EncryptBlock(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
 		{
 			Check.OutputLength(outBuf, outOff, BlockSize, "Output buffer too short");
 
@@ -1425,7 +1440,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			totalLength += BlockSize;
 		}
 
-		private void EncryptBlocks2(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
+		void EncryptBlocks2(byte[] inBuf, int inOff, byte[] outBuf, int outOff)
 		{
 			Check.OutputLength(outBuf, outOff, BlockSize * 2, "Output buffer too short");
 
@@ -1486,10 +1501,12 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			totalLength += BlockSize * 2;
 		}
 
-		private void GetNextCtrBlock(byte[] block)
+		void GetNextCtrBlock(byte[] block)
 		{
 			if (blocksRemaining == 0)
+			{
 				throw new InvalidOperationException("Attempt to process too many blocks");
+			}
 
 			blocksRemaining--;
 
@@ -1498,7 +1515,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			cipher.ProcessBlock(counter, 0, block, 0);
 		}
 
-		private void ProcessPartial(byte[] buf, int off, int len, byte[] output, int outOff)
+		void ProcessPartial(byte[] buf, int off, int len, byte[] output, int outOff)
 		{
 			//byte[] ctrBlock = new byte[BlockSize];
 			GetNextCtrBlock(ctrBlock);
@@ -1519,11 +1536,11 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 		}
 #endif
 
-		private void gHASH(byte[] Y, byte[] b, int len)
+		void gHASH(byte[] Y, byte[] b, int len)
 		{
 			for (int pos = 0; pos < len; pos += BlockSize)
 			{
-				int num = System.Math.Min(len - pos, BlockSize);
+				int num = Math.Min(len - pos, BlockSize);
 				gHASHPartial(Y, b, pos, num);
 			}
 		}
@@ -1543,13 +1560,13 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
             multiplier.MultiplyH(Y);
         }
 #else
-		private void gHASHBlock(byte[] Y, byte[] b)
+		void gHASHBlock(byte[] Y, byte[] b)
 		{
 			GcmUtilities.Xor(Y, b);
 			multiplier.MultiplyH(Y);
 		}
 
-		private void gHASHBlock(byte[] Y, byte[] b, int off)
+		void gHASHBlock(byte[] Y, byte[] b, int off)
 		{
 			GcmUtilities.Xor(Y, b, off);
 			multiplier.MultiplyH(Y);
@@ -1557,13 +1574,13 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 #endif
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void gHASHPartial(byte[] Y, byte[] b, int off, int len)
+		void gHASHPartial(byte[] Y, byte[] b, int off, int len)
 		{
 			GcmUtilities.Xor(Y, b, off, len);
 			multiplier.MultiplyH(Y);
 		}
 
-		private void CheckStatus()
+		void CheckStatus()
 		{
 			if (!initialised)
 			{

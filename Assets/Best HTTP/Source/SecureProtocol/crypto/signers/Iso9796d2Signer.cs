@@ -19,19 +19,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			return recoveredMessage;
 		}
 
-		private IDigest digest;
-		private IAsymmetricBlockCipher cipher;
+		IDigest digest;
+		IAsymmetricBlockCipher cipher;
 
-		private int trailer;
-		private int keyBits;
-		private byte[] block;
-		private byte[] mBuf;
-		private int messageLength;
-		private bool fullMessage;
-		private byte[] recoveredMessage;
+		int trailer;
+		int keyBits;
+		byte[] block;
+		byte[] mBuf;
+		int messageLength;
+		bool fullMessage;
+		byte[] recoveredMessage;
 
-		private byte[] preSig;
-		private byte[] preBlock;
+		byte[] preSig;
+		byte[] preBlock;
 
 		/// <summary>
 		/// Generate a signer with either implicit or explicit trailers for ISO9796-2.
@@ -100,7 +100,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		}
 
 		/// <summary> compare two byte arrays - constant time.</summary>
-		private bool IsSameAs(byte[] a, byte[] b)
+		bool IsSameAs(byte[] a, byte[] b)
 		{
 			int checkLen;
 			if (messageLength > mBuf.Length)
@@ -136,7 +136,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		}
 
 		/// <summary> clear possible sensitive data</summary>
-		private void ClearBlock(
+		void ClearBlock(
 			byte[] block)
 		{
 			Array.Clear(block, 0, block.Length);
@@ -148,10 +148,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			byte[] block = cipher.ProcessBlock(signature, 0, signature.Length);
 
 			if (((block[0] & 0xC0) ^ 0x40) != 0)
+			{
 				throw new InvalidCipherTextException("malformed signature");
+			}
 
 			if (((block[block.Length - 1] & 0xF) ^ 0xC) != 0)
+			{
 				throw new InvalidCipherTextException("malformed signature");
+			}
 
 			int delta = 0;
 
@@ -164,10 +168,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				int sigTrail = ((block[block.Length - 2] & 0xFF) << 8) | (block[block.Length - 1] & 0xFF);
 
 				if (IsoTrailers.NoTrailerAvailable(digest))
+				{
 					throw new ArgumentException("unrecognised hash in signature");
+				}
 
 				if (sigTrail != IsoTrailers.GetTrailer(digest))
+				{
 					throw new InvalidOperationException("signer initialised with wrong digest for trailer " + sigTrail);
+				}
 
 				delta = 2;
 			}
@@ -180,7 +188,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			for (mStart = 0; mStart != block.Length; mStart++)
 			{
 				if (((block[mStart] & 0x0f) ^ 0x0a) == 0)
+				{
 					break;
+				}
 			}
 
 			mStart++;
@@ -190,8 +200,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			//
 			// there must be at least one byte of message string
 			//
-			if ((off - mStart) <= 0)
+			if (off - mStart <= 0)
+			{
 				throw new InvalidCipherTextException("malformed block");
+			}
 
 			//
 			// if we contain the whole message as well, check the hash of that.
@@ -238,7 +250,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 #else
 			while (inLen > 0 && messageLength < mBuf.Length)
 			{
-				this.Update(input[inOff]);
+				Update(input[inOff]);
 				inOff++;
 				inLen--;
 			}
@@ -322,8 +334,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 			if (x > 0)
 			{
-				int mR = messageLength - ((x + 7) / 8);
-				header = (byte)(0x60);
+				int mR = messageLength - (x + 7) / 8;
+				header = (byte)0x60;
 
 				delta -= mR;
 
@@ -331,13 +343,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			}
 			else
 			{
-				header = (byte)(0x40);
+				header = (byte)0x40;
 				delta -= messageLength;
 
 				Array.Copy(mBuf, 0, block, delta, messageLength);
 			}
 
-			if ((delta - 1) > 0)
+			if (delta - 1 > 0)
 			{
 				for (int i = delta - 1; i != 0; i--)
 				{
@@ -385,7 +397,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			else
 			{
 				if (!Arrays.AreEqual(preSig, signature))
+				{
 					throw new InvalidOperationException("updateWithRecoveredMessage called on different signature");
+				}
 
 				block = preBlock;
 
@@ -394,10 +408,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			}
 
 			if (((block[0] & 0xC0) ^ 0x40) != 0)
+			{
 				return ReturnFalse(block);
+			}
 
 			if (((block[block.Length - 1] & 0xF) ^ 0xC) != 0)
+			{
 				return ReturnFalse(block);
+			}
 
 			int delta = 0;
 
@@ -410,10 +428,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 				int sigTrail = ((block[block.Length - 2] & 0xFF) << 8) | (block[block.Length - 1] & 0xFF);
 
 				if (IsoTrailers.NoTrailerAvailable(digest))
+				{
 					throw new ArgumentException("unrecognised hash in signature");
+				}
 
 				if (sigTrail != IsoTrailers.GetTrailer(digest))
+				{
 					throw new InvalidOperationException("signer initialised with wrong digest for trailer " + sigTrail);
+				}
 
 				delta = 2;
 			}
@@ -442,7 +464,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			//
 			// there must be at least one byte of message string
 			//
-			if ((off - mStart) <= 0)
+			if (off - mStart <= 0)
 			{
 				return ReturnFalse(block);
 			}
@@ -529,7 +551,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			return true;
 		}
 
-		private bool ReturnFalse(byte[] block)
+		bool ReturnFalse(byte[] block)
 		{
 			messageLength = 0;
 

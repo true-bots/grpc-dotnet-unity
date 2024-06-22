@@ -7,10 +7,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 {
 	public class KdfCounterParameters : IDerivationParameters
 	{
-		private byte[] ki;
-		private byte[] fixedInputDataCounterPrefix;
-		private byte[] fixedInputDataCounterSuffix;
-		private int r;
+		byte[] ki;
+		byte[] fixedInputDataCounterPrefix;
+		byte[] fixedInputDataCounterSuffix;
+		int r;
 
 		/// <summary>
 		/// Base constructor - suffix fixed input data only.

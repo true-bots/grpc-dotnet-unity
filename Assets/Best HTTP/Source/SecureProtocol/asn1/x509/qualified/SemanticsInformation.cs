@@ -1,6 +1,7 @@
 #if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
 #pragma warning disable
 using System;
+using System.Collections.Generic;
 using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
@@ -22,8 +23,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
 	public class SemanticsInformation
 		: Asn1Encodable
 	{
-		private readonly DerObjectIdentifier semanticsIdentifier;
-		private readonly GeneralName[] nameRegistrationAuthorities;
+		readonly DerObjectIdentifier semanticsIdentifier;
+		readonly GeneralName[] nameRegistrationAuthorities;
 
 		public static SemanticsInformation GetInstance(
 			object obj)
@@ -38,17 +39,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
 				return new SemanticsInformation(Asn1Sequence.GetInstance(obj));
 			}
 
-			throw new ArgumentException("unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public SemanticsInformation(Asn1Sequence seq)
 		{
 			if (seq.Count < 1)
+			{
 				throw new ArgumentException("no objects in SemanticsInformation");
+			}
 
-			var e = seq.GetEnumerator();
+			IEnumerator<Asn1Encodable> e = seq.GetEnumerator();
 			e.MoveNext();
-			var obj = e.Current;
+			Asn1Encodable obj = e.Current;
 			if (obj is DerObjectIdentifier oid)
 			{
 				semanticsIdentifier = oid;
@@ -78,7 +81,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
 			GeneralName[] generalNames)
 		{
 			this.semanticsIdentifier = semanticsIdentifier;
-			this.nameRegistrationAuthorities = generalNames;
+			nameRegistrationAuthorities = generalNames;
 		}
 
 		public SemanticsInformation(
@@ -90,7 +93,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509.Qualified
 		public SemanticsInformation(
 			GeneralName[] generalNames)
 		{
-			this.nameRegistrationAuthorities = generalNames;
+			nameRegistrationAuthorities = generalNames;
 		}
 
 		public DerObjectIdentifier SemanticsIdentifier

@@ -14,14 +14,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class RsaCoreEngine
 		: IRsa
 	{
-		private RsaKeyParameters key;
-		private bool forEncryption;
-		private int bitSize;
+		RsaKeyParameters key;
+		bool forEncryption;
+		int bitSize;
 
-		private void CheckInitialised()
+		void CheckInitialised()
 		{
 			if (key == null)
+			{
 				throw new InvalidOperationException("RSA engine not initialised");
+			}
 		}
 
 		/**
@@ -40,11 +42,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 
 			if (!(parameters is RsaKeyParameters))
+			{
 				throw new InvalidKeyException("Not an RSA key");
+			}
 
-			this.key = (RsaKeyParameters)parameters;
+			key = (RsaKeyParameters)parameters;
 			this.forEncryption = forEncryption;
-			this.bitSize = key.Modulus.BitLength;
+			bitSize = key.Modulus.BitLength;
 		}
 
 		/**
@@ -95,12 +99,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int maxLength = (bitSize + 7) / 8;
 
 			if (inLen > maxLength)
+			{
 				throw new DataLengthException("input too large for RSA cipher.");
+			}
 
 			BigInteger input = new BigInteger(1, inBuf, inOff, inLen);
 
 			if (input.CompareTo(key.Modulus) >= 0)
+			{
 				throw new DataLengthException("input too large for RSA cipher.");
+			}
 
 			return input;
 		}
@@ -137,10 +145,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				BigInteger mP, mQ, h, m;
 
 				// mP = ((input Mod p) ^ dP)) Mod p
-				mP = (input.Remainder(p)).ModPow(dP, p);
+				mP = input.Remainder(p).ModPow(dP, p);
 
 				// mQ = ((input Mod q) ^ dQ)) Mod q
-				mQ = (input.Remainder(q)).ModPow(dQ, q);
+				mQ = input.Remainder(q).ModPow(dQ, q);
 
 				// h = qInv * (mP - mQ) Mod p
 				h = mP.Subtract(mQ);

@@ -48,16 +48,21 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static readonly ProtocolName Nntp_Transit = AsUtf8Encoding("nnsp");
 		public static readonly ProtocolName Dns_Over_Quic = AsUtf8Encoding("doq");
 
-		private readonly byte[] m_bytes;
+		readonly byte[] m_bytes;
 
-		private ProtocolName(byte[] bytes)
+		ProtocolName(byte[] bytes)
 		{
 			if (bytes == null)
+			{
 				throw new ArgumentNullException("bytes");
-			if (bytes.Length < 1 || bytes.Length > 255)
-				throw new ArgumentException("must have length from 1 to 255", "bytes");
+			}
 
-			this.m_bytes = bytes;
+			if (bytes.Length < 1 || bytes.Length > 255)
+			{
+				throw new ArgumentException("must have length from 1 to 255", "bytes");
+			}
+
+			m_bytes = bytes;
 		}
 
 		public byte[] GetBytes()

@@ -7,9 +7,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
 	public class SignerInformationStore
 	{
-		private readonly IList<SignerInformation> all;
+		readonly IList<SignerInformation> all;
 
-		private readonly IDictionary<SignerID, IList<SignerInformation>> m_table =
+		readonly IDictionary<SignerID, IList<SignerInformation>> m_table =
 			new Dictionary<SignerID, IList<SignerInformation>>();
 
 		/**
@@ -19,8 +19,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		 */
 		public SignerInformationStore(SignerInformation signerInfo)
 		{
-			this.all = new List<SignerInformation>(1);
-			this.all.Add(signerInfo);
+			all = new List<SignerInformation>(1);
+			all.Add(signerInfo);
 
 			SignerID sid = signerInfo.SignerID;
 
@@ -38,7 +38,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			{
 				SignerID sid = signer.SignerID;
 
-				if (!m_table.TryGetValue(sid, out var list))
+				if (!m_table.TryGetValue(sid, out IList<SignerInformation> list))
 				{
 					m_table[sid] = list = new List<SignerInformation>(1);
 				}
@@ -46,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				list.Add(signer);
 			}
 
-			this.all = new List<SignerInformation>(signerInfos);
+			all = new List<SignerInformation>(signerInfos);
 		}
 
 		/**
@@ -58,8 +58,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		*/
 		public SignerInformation GetFirstSigner(SignerID selector)
 		{
-			if (m_table.TryGetValue(selector, out var list))
+			if (m_table.TryGetValue(selector, out IList<SignerInformation> list))
+			{
 				return list[0];
+			}
 
 			return null;
 		}
@@ -84,8 +86,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 		*/
 		public IList<SignerInformation> GetSigners(SignerID selector)
 		{
-			if (m_table.TryGetValue(selector, out var list))
+			if (m_table.TryGetValue(selector, out IList<SignerInformation> list))
+			{
 				return new List<SignerInformation>(list);
+			}
 
 			return new List<SignerInformation>(0);
 		}

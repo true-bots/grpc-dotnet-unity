@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 	*/
 	public class ISO10126d2Padding : IBlockCipherPadding
 	{
-		private SecureRandom random;
+		SecureRandom random;
 
 		/**
 		* Initialise the padder.
@@ -68,7 +68,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Paddings
 
 			int failed = (position | (count - 1)) >> 31;
 			if (failed != 0)
+			{
 				throw new InvalidCipherTextException("pad block corrupted");
+			}
 
 			return count;
 		}

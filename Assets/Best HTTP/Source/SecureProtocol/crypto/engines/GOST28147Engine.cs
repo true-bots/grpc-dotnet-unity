@@ -14,15 +14,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class Gost28147Engine
 		: IBlockCipher
 	{
-		private const int BlockSize = 8;
-		private int[] workingKey = null;
-		private bool forEncryption;
+		const int BlockSize = 8;
+		int[] workingKey = null;
+		bool forEncryption;
 
-		private byte[] S = Sbox_Default;
+		byte[] S = Sbox_Default;
 
 		// these are the S-boxes given in Applied Cryptography 2nd Ed., p. 333
 		// This is default S-box!
-		private static readonly byte[] Sbox_Default =
+		static readonly byte[] Sbox_Default =
 		{
 			0x4, 0xA, 0x9, 0x2, 0xD, 0x8, 0x0, 0xE, 0x6, 0xB, 0x1, 0xC, 0x7, 0xF, 0x5, 0x3,
 			0xE, 0xB, 0x4, 0xC, 0x6, 0xD, 0xF, 0xA, 0x2, 0x3, 0x8, 0x1, 0x0, 0x7, 0x5, 0x9,
@@ -39,7 +39,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		 * getting from, see: http://tools.ietf.org/id/draft-popov-cryptopro-cpalgs-01.txt
 		 *                    http://tools.ietf.org/id/draft-popov-cryptopro-cpalgs-02.txt
 		 */
-		private static readonly byte[] ESbox_Test =
+		static readonly byte[] ESbox_Test =
 		{
 			0x4, 0x2, 0xF, 0x5, 0x9, 0x1, 0x0, 0x8, 0xE, 0x3, 0xB, 0xC, 0xD, 0x7, 0xA, 0x6,
 			0xC, 0x9, 0xF, 0xE, 0x8, 0x1, 0x3, 0xA, 0x2, 0x7, 0x4, 0xD, 0x6, 0x0, 0xB, 0x5,
@@ -51,7 +51,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0xC, 0x6, 0x5, 0x2, 0xB, 0x0, 0x9, 0xD, 0x3, 0xE, 0x7, 0xA, 0xF, 0x4, 0x1, 0x8
 		};
 
-		private static readonly byte[] ESbox_A =
+		static readonly byte[] ESbox_A =
 		{
 			0x9, 0x6, 0x3, 0x2, 0x8, 0xB, 0x1, 0x7, 0xA, 0x4, 0xE, 0xF, 0xC, 0x0, 0xD, 0x5,
 			0x3, 0x7, 0xE, 0x9, 0x8, 0xA, 0xF, 0x0, 0x5, 0x2, 0x6, 0xC, 0xB, 0x4, 0xD, 0x1,
@@ -63,7 +63,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0xB, 0xA, 0xF, 0x5, 0x0, 0xC, 0xE, 0x8, 0x6, 0x2, 0x3, 0x9, 0x1, 0x7, 0xD, 0x4
 		};
 
-		private static readonly byte[] ESbox_B =
+		static readonly byte[] ESbox_B =
 		{
 			0x8, 0x4, 0xB, 0x1, 0x3, 0x5, 0x0, 0x9, 0x2, 0xE, 0xA, 0xC, 0xD, 0x6, 0x7, 0xF,
 			0x0, 0x1, 0x2, 0xA, 0x4, 0xD, 0x5, 0xC, 0x9, 0x7, 0x3, 0xF, 0xB, 0x8, 0x6, 0xE,
@@ -75,7 +75,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x0, 0x4, 0xB, 0xE, 0x8, 0x3, 0x7, 0x1, 0xA, 0x2, 0x9, 0x6, 0xF, 0xD, 0x5, 0xC
 		};
 
-		private static readonly byte[] ESbox_C =
+		static readonly byte[] ESbox_C =
 		{
 			0x1, 0xB, 0xC, 0x2, 0x9, 0xD, 0x0, 0xF, 0x4, 0x5, 0x8, 0xE, 0xA, 0x7, 0x6, 0x3,
 			0x0, 0x1, 0x7, 0xD, 0xB, 0x4, 0x5, 0x2, 0x8, 0xE, 0xF, 0xC, 0x9, 0xA, 0x6, 0x3,
@@ -87,7 +87,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x7, 0x4, 0x0, 0x5, 0xA, 0x2, 0xF, 0xE, 0xC, 0x6, 0x1, 0xB, 0xD, 0x9, 0x3, 0x8
 		};
 
-		private static readonly byte[] ESbox_D =
+		static readonly byte[] ESbox_D =
 		{
 			0xF, 0xC, 0x2, 0xA, 0x6, 0x4, 0x5, 0x0, 0x7, 0x9, 0xE, 0xD, 0x1, 0xB, 0x8, 0x3,
 			0xB, 0x6, 0x3, 0x4, 0xC, 0xF, 0xE, 0x2, 0x7, 0xD, 0x8, 0x0, 0x5, 0xA, 0x9, 0x1,
@@ -100,7 +100,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		};
 
 		//S-box for digest
-		private static readonly byte[] DSbox_Test =
+		static readonly byte[] DSbox_Test =
 		{
 			0x4, 0xA, 0x9, 0x2, 0xD, 0x8, 0x0, 0xE, 0x6, 0xB, 0x1, 0xC, 0x7, 0xF, 0x5, 0x3,
 			0xE, 0xB, 0x4, 0xC, 0x6, 0xD, 0xF, 0xA, 0x2, 0x3, 0x8, 0x1, 0x0, 0x7, 0x5, 0x9,
@@ -112,7 +112,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			0x1, 0xF, 0xD, 0x0, 0x5, 0x7, 0xA, 0x4, 0x9, 0x2, 0x3, 0xE, 0x6, 0xB, 0x8, 0xC
 		};
 
-		private static readonly byte[] DSbox_A =
+		static readonly byte[] DSbox_A =
 		{
 			0xA, 0x4, 0x5, 0x6, 0x8, 0x1, 0x3, 0x7, 0xD, 0xC, 0xE, 0x0, 0x9, 0x2, 0xB, 0xF,
 			0x5, 0xF, 0x4, 0x0, 0x2, 0xD, 0xB, 0x9, 0x1, 0x7, 0x6, 0x3, 0xC, 0xE, 0xA, 0x8,
@@ -127,7 +127,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		//
 		// pre-defined sbox table
 		//
-		private static readonly Dictionary<string, byte[]> m_sBoxes =
+		static readonly Dictionary<string, byte[]> m_sBoxes =
 			new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
 
 		static Gost28147Engine()
@@ -142,7 +142,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			AddSBox("D-A", DSbox_A);
 		}
 
-		private static void AddSBox(string sBoxName, byte[] sBox)
+		static void AddSBox(string sBoxName, byte[] sBox)
 		{
 			m_sBoxes.Add(sBoxName, sBox);
 		}
@@ -170,9 +170,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				//
 				byte[] sBox = param.GetSBox();
 				if (sBox.Length != Sbox_Default.Length)
+				{
 					throw new ArgumentException("invalid S-box passed to GOST28147 init");
+				}
 
-				this.S = Arrays.Clone(sBox);
+				S = Arrays.Clone(sBox);
 
 				//
 				// set key if there is one
@@ -189,7 +191,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			else if (parameters != null)
 			{
 				throw new ArgumentException("invalid parameter passed to Gost28147 init - "
-				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Platform.GetTypeName(parameters));
 			}
 		}
 
@@ -206,7 +208,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (workingKey == null)
+			{
 				throw new InvalidOperationException("Gost28147 engine not initialised");
+			}
 
 			Check.DataLength(input, inOff, BlockSize, "input buffer too short");
 			Check.OutputLength(output, outOff, BlockSize, "output buffer too short");
@@ -235,12 +239,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 #endif
 
-		private int[] GenerateWorkingKey(bool forEncryption, byte[] userKey)
+		int[] GenerateWorkingKey(bool forEncryption, byte[] userKey)
 		{
 			this.forEncryption = forEncryption;
 
 			if (userKey.Length != 32)
+			{
 				throw new ArgumentException("Key length invalid. Key needs to be 32 byte - 256 bit!!!");
+			}
 
 			int[] key = new int[8];
 			for (int i = 0; i != 8; i++)
@@ -251,9 +257,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return key;
 		}
 
-		private int Gost28147_mainStep(int n1, int key)
+		int Gost28147_mainStep(int n1, int key)
 		{
-			int cm = (key + n1); // CM1
+			int cm = key + n1; // CM1
 
 			// S-box replacing
 
@@ -268,7 +274,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 //			return om << 11 | om >>> (32-11); // 11-leftshift
 			int omLeft = om << 11;
-			int omRight = (int)(((uint)om) >> (32 - 11)); // Note: Casts required to get unsigned bit rotation
+			int omRight = (int)((uint)om >> (32 - 11)); // Note: Casts required to get unsigned bit rotation
 
 			return omLeft | omRight;
 		}
@@ -328,13 +334,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			Pack.UInt32_To_LE((uint)N2, output[4..]);
 		}
 #else
-		private void Gost28147Func(int[] workingKey, byte[] inBytes, int inOff, byte[] outBytes, int outOff)
+		void Gost28147Func(int[] workingKey, byte[] inBytes, int inOff, byte[] outBytes, int outOff)
 		{
 			int N1 = (int)Pack.LE_To_UInt32(inBytes, inOff);
 			int N2 = (int)Pack.LE_To_UInt32(inBytes, inOff + 4);
 			int tmp; //tmp -> for saving N1
 
-			if (this.forEncryption)
+			if (forEncryption)
 			{
 				for (int k = 0; k < 3; k++) // 1-24 steps
 				{
@@ -367,7 +373,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					for (int j = 7; j >= 0; j--)
 					{
-						if ((k == 2) && (j == 0))
+						if (k == 2 && j == 0)
 						{
 							break; // break 32 step
 						}
@@ -393,7 +399,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		*/
 		public static byte[] GetSBox(string sBoxName)
 		{
-			if (!m_sBoxes.TryGetValue(sBoxName, out var sBox))
+			if (!m_sBoxes.TryGetValue(sBoxName, out byte[] sBox))
 			{
 				throw new ArgumentException("Unknown S-Box - possible types: "
 				                            + "\"Default\", \"E-Test\", \"E-A\", \"E-B\", \"E-C\", \"E-D\", \"D-Test\", \"D-A\".");
@@ -404,10 +410,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		public static string GetSBoxName(byte[] sBox)
 		{
-			foreach (var entry in m_sBoxes)
+			foreach (KeyValuePair<string, byte[]> entry in m_sBoxes)
 			{
 				if (Arrays.AreEqual(entry.Value, sBox))
+				{
 					return entry.Key;
+				}
 			}
 
 			throw new ArgumentException("SBOX provided did not map to a known one");

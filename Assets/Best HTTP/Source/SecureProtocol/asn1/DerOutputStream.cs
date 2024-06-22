@@ -5,7 +5,7 @@ using System.IO;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
-	internal class DerOutputStream
+	class DerOutputStream
 		: Asn1OutputStream
 	{
 		internal DerOutputStream(Stream os)

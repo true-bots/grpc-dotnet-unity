@@ -10,32 +10,38 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 	public class Pbkdf2Params
 		: Asn1Encodable
 	{
-		private static AlgorithmIdentifier algid_hmacWithSHA1 = new AlgorithmIdentifier(PkcsObjectIdentifiers.IdHmacWithSha1, DerNull.Instance);
+		static AlgorithmIdentifier algid_hmacWithSHA1 = new AlgorithmIdentifier(PkcsObjectIdentifiers.IdHmacWithSha1, DerNull.Instance);
 
-		private readonly Asn1OctetString octStr;
-		private readonly DerInteger iterationCount, keyLength;
-		private readonly AlgorithmIdentifier prf;
+		readonly Asn1OctetString octStr;
+		readonly DerInteger iterationCount, keyLength;
+		readonly AlgorithmIdentifier prf;
 
 		public static Pbkdf2Params GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is Pbkdf2Params)
+			{
 				return (Pbkdf2Params)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new Pbkdf2Params((Asn1Sequence)obj);
+			}
 
-			throw new ArgumentException("Unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("Unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public Pbkdf2Params(
 			Asn1Sequence seq)
 		{
 			if (seq.Count < 2 || seq.Count > 4)
+			{
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
+			}
 
-			this.octStr = (Asn1OctetString)seq[0];
-			this.iterationCount = (DerInteger)seq[1];
+			octStr = (Asn1OctetString)seq[0];
+			iterationCount = (DerInteger)seq[1];
 
 			Asn1Encodable kl = null, d = null;
 			if (seq.Count > 3)
@@ -70,7 +76,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			byte[] salt,
 			int iterationCount)
 		{
-			this.octStr = new DerOctetString(salt);
+			octStr = new DerOctetString(salt);
 			this.iterationCount = new DerInteger(iterationCount);
 		}
 

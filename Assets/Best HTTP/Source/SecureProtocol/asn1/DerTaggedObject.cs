@@ -54,7 +54,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			Asn1Object baseObject = GetBaseObject().ToAsn1Object();
 
 			if (!IsExplicit())
+			{
 				return baseObject.GetEncodingImplicit(encoding, TagClass, TagNo);
+			}
 
 			return new ConstructedDLEncoding(TagClass, TagNo, new IAsn1Encoding[] { baseObject.GetEncoding(encoding) });
 		}
@@ -66,7 +68,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			Asn1Object baseObject = GetBaseObject().ToAsn1Object();
 
 			if (!IsExplicit())
+			{
 				return baseObject.GetEncodingImplicit(encoding, tagClass, tagNo);
+			}
 
 			return new ConstructedDLEncoding(tagClass, tagNo, new IAsn1Encoding[] { baseObject.GetEncoding(encoding) });
 		}

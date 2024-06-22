@@ -21,31 +21,31 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		/// <summary>
 		/// The id of the JPAKEParticipant who created/sent this payload.
 		/// </summary>
-		private readonly string participantId;
+		readonly string participantId;
 
 		/// <summary>
 		/// The value of g^x1
 		/// </summary>
-		private readonly BigInteger gx1;
+		readonly BigInteger gx1;
 
 		/// <summary>
 		/// The value of g^x2
 		/// </summary>
-		private readonly BigInteger gx2;
+		readonly BigInteger gx2;
 
 		/// <summary>
 		/// The zero knowledge proof for x1.
 		/// 
 		/// This is a two element array, containing {g^v, r} for x1.
 		/// </summary>
-		private readonly BigInteger[] knowledgeProofForX1;
+		readonly BigInteger[] knowledgeProofForX1;
 
 		/// <summary>
 		/// The zero knowledge proof for x2.
 		/// 
 		/// This is a two element array, containing {g^v, r} for x2.
 		/// </summary>
-		private readonly BigInteger[] knowledgeProofForX2;
+		readonly BigInteger[] knowledgeProofForX2;
 
 		public JPakeRound1Payload(string participantId, BigInteger gx1, BigInteger gx2, BigInteger[] knowledgeProofForX1, BigInteger[] knowledgeProofForX2)
 		{

@@ -25,18 +25,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static PkiPublicationInfo GetInstance(object obj)
 		{
 			if (obj is PkiPublicationInfo pkiPublicationInfo)
+			{
 				return pkiPublicationInfo;
+			}
 
 			if (obj != null)
+			{
 				return new PkiPublicationInfo(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly DerInteger m_action;
-		private readonly Asn1Sequence m_pubInfos;
+		readonly DerInteger m_action;
+		readonly Asn1Sequence m_pubInfos;
 
-		private PkiPublicationInfo(Asn1Sequence seq)
+		PkiPublicationInfo(Asn1Sequence seq)
 		{
 			m_action = DerInteger.GetInstance(seq[0]);
 			if (seq.Count > 1)
@@ -80,12 +84,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 			}
 		}
 
-		public virtual DerInteger Action => m_action;
+		public virtual DerInteger Action
+		{
+			get { return m_action; }
+		}
 
 		public virtual SinglePubInfo[] GetPubInfos()
 		{
 			if (m_pubInfos == null)
+			{
 				return null;
+			}
 
 			return m_pubInfos.MapElements(SinglePubInfo.GetInstance);
 		}
@@ -106,7 +115,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public override Asn1Object ToAsn1Object()
 		{
 			if (m_pubInfos == null)
+			{
 				return new DerSequence(m_action);
+			}
 
 			return new DerSequence(m_action, m_pubInfos);
 		}

@@ -9,8 +9,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 	public class ServiceLocator
 		: Asn1Encodable
 	{
-		private readonly X509Name issuer;
-		private readonly Asn1Object locator;
+		readonly X509Name issuer;
+		readonly Asn1Object locator;
 
 		public static ServiceLocator GetInstance(
 			Asn1TaggedObject obj,
@@ -32,7 +32,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 				return new ServiceLocator((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		public ServiceLocator(
@@ -46,20 +46,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ocsp
 			Asn1Object locator)
 		{
 			if (issuer == null)
+			{
 				throw new ArgumentNullException("issuer");
+			}
 
 			this.issuer = issuer;
 			this.locator = locator;
 		}
 
-		private ServiceLocator(
+		ServiceLocator(
 			Asn1Sequence seq)
 		{
-			this.issuer = X509Name.GetInstance(seq[0]);
+			issuer = X509Name.GetInstance(seq[0]);
 
 			if (seq.Count > 1)
 			{
-				this.locator = seq[1].ToAsn1Object();
+				locator = seq[1].ToAsn1Object();
 			}
 		}
 

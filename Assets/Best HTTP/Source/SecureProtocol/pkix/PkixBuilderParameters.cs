@@ -16,9 +16,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 	public class PkixBuilderParameters
 		: PkixParameters
 	{
-		private int maxPathLength = 5;
+		int maxPathLength = 5;
 
-		private ISet<X509Certificate> excludedCerts = new HashSet<X509Certificate>();
+		ISet<X509Certificate> excludedCerts = new HashSet<X509Certificate>();
 
 		/**
 		* Returns an instance of <code>PkixBuilderParameters</code>.
@@ -66,7 +66,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 						"The maximum path length parameter can not be less than -1.");
 				}
 
-				this.maxPathLength = value;
+				maxPathLength = value;
 			}
 		}
 

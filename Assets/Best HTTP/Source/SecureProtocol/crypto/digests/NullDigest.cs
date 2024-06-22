@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 {
 	public class NullDigest : IDigest
 	{
-		private readonly MemoryStream bOut = new MemoryStream();
+		readonly MemoryStream bOut = new MemoryStream();
 
 		public string AlgorithmName
 		{

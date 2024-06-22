@@ -69,23 +69,35 @@ namespace BestHTTP.SignalR.Messages
 			IDictionary<string, object> dic = data as IDictionary<string, object>;
 			object value;
 
-			this.MessageId = dic["C"].ToString();
+			MessageId = dic["C"].ToString();
 
 			if (dic.TryGetValue("S", out value))
+			{
 				IsInitialization = int.Parse(value.ToString()) == 1 ? true : false;
+			}
 			else
+			{
 				IsInitialization = false;
+			}
 
 			if (dic.TryGetValue("G", out value))
+			{
 				GroupsToken = value.ToString();
+			}
 
 			if (dic.TryGetValue("T", out value))
+			{
 				ShouldReconnect = int.Parse(value.ToString()) == 1 ? true : false;
+			}
 			else
+			{
 				ShouldReconnect = false;
+			}
 
 			if (dic.TryGetValue("L", out value))
+			{
 				PollDelay = TimeSpan.FromMilliseconds(double.Parse(value.ToString()));
+			}
 
 			IEnumerable enumerable = dic["M"] as IEnumerable;
 
@@ -106,14 +118,22 @@ namespace BestHTTP.SignalR.Messages
 					if (subObj != null)
 					{
 						if (subObj.ContainsKey("H"))
+						{
 							subMsg = new MethodCallMessage();
+						}
 						else if (subObj.ContainsKey("I"))
+						{
 							subMsg = new ProgressMessage();
+						}
 						else
+						{
 							subMsg = new DataMessage();
+						}
 					}
 					else
+					{
 						subMsg = new DataMessage();
+					}
 
 					subMsg.Parse(subData);
 
@@ -137,7 +157,7 @@ namespace BestHTTP.SignalR.Messages
 
 		void IServerMessage.Parse(object data)
 		{
-			this.Data = data;
+			Data = data;
 		}
 	}
 
@@ -188,7 +208,10 @@ namespace BestHTTP.SignalR.Messages
 
 			List<object> args = new List<object>();
 			foreach (object arg in dic["A"] as IEnumerable)
+			{
 				args.Add(arg);
+			}
+
 			Arguments = args.ToArray();
 
 #if BESTHTTP_SIGNALR_WITH_JSONDOTNET
@@ -198,7 +221,9 @@ namespace BestHTTP.SignalR.Messages
 #else
 			object value;
 			if (dic.TryGetValue("S", out value))
+			{
 				State = value as IDictionary<string, object>;
+			}
 #endif
 		}
 	}
@@ -216,7 +241,7 @@ namespace BestHTTP.SignalR.Messages
 		/// <summary>
 		/// The unique id that the client set when called the server side method. Used by the plugin to deliver this message to the good Hub.
 		/// </summary>
-		public UInt64 InvocationId { get; private set; }
+		public ulong InvocationId { get; private set; }
 
 		/// <summary>
 		/// The return value of the server side method call, or null if the method's return type is void.
@@ -236,11 +261,13 @@ namespace BestHTTP.SignalR.Messages
 		{
 			IDictionary<string, object> dic = data as IDictionary<string, object>;
 
-			InvocationId = UInt64.Parse(dic["I"].ToString());
+			InvocationId = ulong.Parse(dic["I"].ToString());
 
 			object value;
 			if (dic.TryGetValue("R", out value))
+			{
 				ReturnValue = value;
+			}
 
 			if (dic.TryGetValue("S", out value))
 			{
@@ -263,7 +290,7 @@ namespace BestHTTP.SignalR.Messages
 		/// <summary>
 		/// The unique id that the client set when called the server side method. Used by the plugin to deliver this message to the good Hub.
 		/// </summary>
-		public UInt64 InvocationId { get; private set; }
+		public ulong InvocationId { get; private set; }
 
 		/// <summary>
 		/// True if it's a hub error.
@@ -302,15 +329,19 @@ namespace BestHTTP.SignalR.Messages
 		{
 			IDictionary<string, object> dic = data as IDictionary<string, object>;
 
-			InvocationId = UInt64.Parse(dic["I"].ToString());
+			InvocationId = ulong.Parse(dic["I"].ToString());
 
 			object value;
 
 			if (dic.TryGetValue("E", out value))
+			{
 				ErrorMessage = value.ToString();
+			}
 
 			if (dic.TryGetValue("H", out value))
+			{
 				IsHubError = int.Parse(value.ToString()) == 1 ? true : false;
+			}
 
 			if (dic.TryGetValue("D", out value))
 			{
@@ -322,7 +353,9 @@ namespace BestHTTP.SignalR.Messages
 			}
 
 			if (dic.TryGetValue("T", out value))
+			{
 				StackTrace = value.ToString();
+			}
 
 			if (dic.TryGetValue("S", out value))
 			{
@@ -348,7 +381,7 @@ namespace BestHTTP.SignalR.Messages
 		/// <summary>
 		/// The unique id that the client set when called the server side method. Used by the plugin to deliver this message to the good Hub.
 		/// </summary>
-		public UInt64 InvocationId { get; private set; }
+		public ulong InvocationId { get; private set; }
 
 		/// <summary>
 		/// Current progress of the long running method.
@@ -369,7 +402,7 @@ namespace BestHTTP.SignalR.Messages
 			IDictionary<string, object> P = dic["P"] as IDictionary<string, object>;
 #endif
 
-			InvocationId = UInt64.Parse(P["I"].ToString());
+			InvocationId = ulong.Parse(P["I"].ToString());
 			Progress = double.Parse(P["D"].ToString());
 		}
 	}

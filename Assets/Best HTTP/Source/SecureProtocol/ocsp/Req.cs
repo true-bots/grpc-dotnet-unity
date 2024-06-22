@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 	public class Req
 		: X509ExtensionBase
 	{
-		private Request req;
+		Request req;
 
 		public Req(
 			Request req)

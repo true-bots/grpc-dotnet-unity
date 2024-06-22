@@ -17,7 +17,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 		public DsaSecretBcpgKey(
 			BcpgInputStream bcpgIn)
 		{
-			this.x = new MPInteger(bcpgIn);
+			x = new MPInteger(bcpgIn);
 		}
 
 		public DsaSecretBcpgKey(

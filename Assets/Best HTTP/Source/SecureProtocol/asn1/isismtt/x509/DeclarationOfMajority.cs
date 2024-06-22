@@ -34,7 +34,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 			DateOfBirth = 2
 		};
 
-		private readonly Asn1TaggedObject declaration;
+		readonly Asn1TaggedObject declaration;
 
 		public DeclarationOfMajority(
 			int notYoungerThan)
@@ -47,7 +47,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 			string country)
 		{
 			if (country.Length > 2)
+			{
 				throw new ArgumentException("country can only be 2 characters");
+			}
 
 			DerPrintableString countryString = new DerPrintableString(country, true);
 
@@ -61,13 +63,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				seq = new DerSequence(DerBoolean.False, countryString);
 			}
 
-			this.declaration = new DerTaggedObject(false, 1, seq);
+			declaration = new DerTaggedObject(false, 1, seq);
 		}
 
 		public DeclarationOfMajority(
 			Asn1GeneralizedTime dateOfBirth)
 		{
-			this.declaration = new DerTaggedObject(false, 2, dateOfBirth);
+			declaration = new DerTaggedObject(false, 2, dateOfBirth);
 		}
 
 		public static DeclarationOfMajority GetInstance(
@@ -83,16 +85,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.IsisMtt.X509
 				return new DeclarationOfMajority((Asn1TaggedObject)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private DeclarationOfMajority(
+		DeclarationOfMajority(
 			Asn1TaggedObject o)
 		{
 			if (o.TagNo > 2)
+			{
 				throw new ArgumentException("Bad tag number: " + o.TagNo);
+			}
 
-			this.declaration = o;
+			declaration = o;
 		}
 
 		/**

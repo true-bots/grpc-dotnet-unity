@@ -8,7 +8,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class ElGamalKeyGenerationParameters
 		: KeyGenerationParameters
 	{
-		private readonly ElGamalParameters parameters;
+		readonly ElGamalParameters parameters;
 
 		public ElGamalKeyGenerationParameters(
 			SecureRandom random,

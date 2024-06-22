@@ -34,12 +34,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return GetInstance(X509Extension.ConvertValueToObject((X509Extension)obj));
 			}
 
-			throw new ArgumentException("unknown object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in GetInstance: " + Platform.GetTypeName(obj), "obj");
 		}
 
-		private Asn1GeneralizedTime _notBefore, _notAfter;
+		Asn1GeneralizedTime _notBefore, _notAfter;
 
-		private PrivateKeyUsagePeriod(
+		PrivateKeyUsagePeriod(
 			Asn1Sequence seq)
 		{
 			foreach (Asn1TaggedObject tObj in seq)

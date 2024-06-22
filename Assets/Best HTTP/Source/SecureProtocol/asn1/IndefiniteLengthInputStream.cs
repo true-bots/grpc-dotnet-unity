@@ -8,8 +8,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 	class IndefiniteLengthInputStream
 		: LimitedInputStream
 	{
-		private int _lookAhead;
-		private bool _eofOn00 = true;
+		int _lookAhead;
+		bool _eofOn00 = true;
 
 		internal IndefiniteLengthInputStream(Stream inStream, int limit)
 			: base(inStream, limit)
@@ -31,10 +31,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private void CheckEndOfContents()
+		void CheckEndOfContents()
 		{
 			if (0 != RequireByte())
+			{
 				throw new IOException("malformed end-of-contents marker");
+			}
 
 			_lookAhead = -1;
 			SetParentEofDetect();
@@ -44,14 +46,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			// Only use this optimisation if we aren't checking for 00
 			if (_eofOn00 || count <= 1)
+			{
 				return base.Read(buffer, offset, count);
+			}
 
 			if (_lookAhead < 0)
+			{
 				return 0;
+			}
 
 			int numRead = _in.Read(buffer, offset + 1, count - 1);
 			if (numRead <= 0)
+			{
 				throw new EndOfStreamException();
+			}
 
 			buffer[offset] = (byte)_lookAhead;
 			_lookAhead = RequireByte();
@@ -97,11 +105,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return result;
 		}
 
-		private int RequireByte()
+		int RequireByte()
 		{
 			int b = _in.ReadByte();
 			if (b < 0)
+			{
 				throw new EndOfStreamException();
+			}
 
 			return b;
 		}

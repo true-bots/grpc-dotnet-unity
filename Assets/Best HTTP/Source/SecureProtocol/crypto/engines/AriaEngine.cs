@@ -15,13 +15,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class AriaEngine
 		: IBlockCipher
 	{
-		private static readonly byte[][] C =
+		static readonly byte[][] C =
 		{
 			Hex.DecodeStrict("517cc1b727220a94fe13abe8fa9a6ee0"),
 			Hex.DecodeStrict("6db14acc9e21c820ff28b1d5ef5de2b0"), Hex.DecodeStrict("db92371d2126e9700324977504e8c90e")
 		};
 
-		private static readonly byte[] SB1_sbox =
+		static readonly byte[] SB1_sbox =
 		{
 			(byte)0x63, (byte)0x7c, (byte)0x77, (byte)0x7b, (byte)0xf2, (byte)0x6b,
 			(byte)0x6f, (byte)0xc5, (byte)0x30, (byte)0x01, (byte)0x67, (byte)0x2b, (byte)0xfe, (byte)0xd7, (byte)0xab,
@@ -54,7 +54,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			(byte)0x99, (byte)0x2d, (byte)0x0f, (byte)0xb0, (byte)0x54, (byte)0xbb, (byte)0x16
 		};
 
-		private static readonly byte[] SB2_sbox =
+		static readonly byte[] SB2_sbox =
 		{
 			(byte)0xe2, (byte)0x4e, (byte)0x54, (byte)0xfc, (byte)0x94, (byte)0xc2,
 			(byte)0x4a, (byte)0xcc, (byte)0x62, (byte)0x0d, (byte)0x6a, (byte)0x46, (byte)0x3c, (byte)0x4d, (byte)0x8b,
@@ -87,7 +87,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			(byte)0xde, (byte)0x71, (byte)0x1a, (byte)0xaf, (byte)0xba, (byte)0xb5, (byte)0x81
 		};
 
-		private static readonly byte[] SB3_sbox =
+		static readonly byte[] SB3_sbox =
 		{
 			(byte)0x52, (byte)0x09, (byte)0x6a, (byte)0xd5, (byte)0x30, (byte)0x36,
 			(byte)0xa5, (byte)0x38, (byte)0xbf, (byte)0x40, (byte)0xa3, (byte)0x9e, (byte)0x81, (byte)0xf3, (byte)0xd7,
@@ -120,7 +120,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			(byte)0x69, (byte)0x14, (byte)0x63, (byte)0x55, (byte)0x21, (byte)0x0c, (byte)0x7d
 		};
 
-		private static readonly byte[] SB4_sbox =
+		static readonly byte[] SB4_sbox =
 		{
 			(byte)0x30, (byte)0x68, (byte)0x99, (byte)0x1b, (byte)0x87, (byte)0xb9,
 			(byte)0x21, (byte)0x78, (byte)0x50, (byte)0x39, (byte)0xdb, (byte)0xe1, (byte)0x72, (byte)0x9, (byte)0x62,
@@ -155,17 +155,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		protected const int BlockSize = 16;
 
-		private byte[][] m_roundKeys;
+		byte[][] m_roundKeys;
 
 		public virtual void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			KeyParameter keyParameter = parameters as KeyParameter;
 
 			if (keyParameter == null)
+			{
 				throw new ArgumentException("invalid parameter passed to ARIA init - "
-				                            + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Platform.GetTypeName(parameters));
+			}
 
-			this.m_roundKeys = KeySchedule(forEncryption, keyParameter.GetKey());
+			m_roundKeys = KeySchedule(forEncryption, keyParameter.GetKey());
 		}
 
 		public virtual string AlgorithmName
@@ -181,7 +183,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (m_roundKeys == null)
+			{
 				throw new InvalidOperationException("ARIA engine not initialised");
+			}
 
 			Check.DataLength(input, inOff, BlockSize, "input buffer too short");
 			Check.OutputLength(output, outOff, BlockSize, "output buffer too short");
@@ -291,7 +295,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		{
 			int keyLen = K.Length;
 			if (keyLen < 16 || keyLen > 32 || (keyLen & 7) != 0)
+			{
 				throw new ArgumentException("Key length not 128/192/256 bits.");
+			}
 
 			int keyLenIdx = (keyLen >> 3) - 2;
 
@@ -322,7 +328,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			FO(W3, CK3);
 			Xor(W3, W1);
 
-			int numRounds = 12 + (keyLenIdx * 2);
+			int numRounds = 12 + keyLenIdx * 2;
 			byte[][] rks = new byte[numRounds + 1][];
 
 			rks[0] = KeyScheduleRound(W0, W1, 19);
@@ -379,7 +385,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				int lo = wr[(to - off) & 0xF] & 0xFF;
 
 				int b = (hi << left) | (lo >> right);
-				b ^= (w[to] & 0xFF);
+				b ^= w[to] & 0xFF;
 
 				rk[to] = (byte)b;
 

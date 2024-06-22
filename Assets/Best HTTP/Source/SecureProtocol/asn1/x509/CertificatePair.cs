@@ -41,7 +41,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class CertificatePair
 		: Asn1Encodable
 	{
-		private X509CertificateStructure forward, reverse;
+		X509CertificateStructure forward, reverse;
 
 		public static CertificatePair GetInstance(
 			object obj)
@@ -56,7 +56,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new CertificatePair((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -73,7 +73,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		*
 		* @param seq The ASN.1 sequence.
 		*/
-		private CertificatePair(
+		CertificatePair(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 1 && seq.Count != 2)

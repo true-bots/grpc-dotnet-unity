@@ -22,24 +22,24 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.X509;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal class CmsSignedHelper
+	class CmsSignedHelper
 	{
 		internal static readonly CmsSignedHelper Instance = new CmsSignedHelper();
 
-		private static readonly string EncryptionECDsaWithSha1 = X9ObjectIdentifiers.ECDsaWithSha1.Id;
-		private static readonly string EncryptionECDsaWithSha224 = X9ObjectIdentifiers.ECDsaWithSha224.Id;
-		private static readonly string EncryptionECDsaWithSha256 = X9ObjectIdentifiers.ECDsaWithSha256.Id;
-		private static readonly string EncryptionECDsaWithSha384 = X9ObjectIdentifiers.ECDsaWithSha384.Id;
-		private static readonly string EncryptionECDsaWithSha512 = X9ObjectIdentifiers.ECDsaWithSha512.Id;
+		static readonly string EncryptionECDsaWithSha1 = X9ObjectIdentifiers.ECDsaWithSha1.Id;
+		static readonly string EncryptionECDsaWithSha224 = X9ObjectIdentifiers.ECDsaWithSha224.Id;
+		static readonly string EncryptionECDsaWithSha256 = X9ObjectIdentifiers.ECDsaWithSha256.Id;
+		static readonly string EncryptionECDsaWithSha384 = X9ObjectIdentifiers.ECDsaWithSha384.Id;
+		static readonly string EncryptionECDsaWithSha512 = X9ObjectIdentifiers.ECDsaWithSha512.Id;
 
-		private static readonly IDictionary<string, string> m_encryptionAlgs = new Dictionary<string, string>();
-		private static readonly IDictionary<string, string> m_digestAlgs = new Dictionary<string, string>();
-		private static readonly IDictionary<string, string[]> m_digestAliases = new Dictionary<string, string[]>();
+		static readonly IDictionary<string, string> m_encryptionAlgs = new Dictionary<string, string>();
+		static readonly IDictionary<string, string> m_digestAlgs = new Dictionary<string, string>();
+		static readonly IDictionary<string, string[]> m_digestAliases = new Dictionary<string, string[]>();
 
-		private static readonly HashSet<string> noParams = new HashSet<string>();
-		private static readonly IDictionary<string, string> m_ecAlgorithms = new Dictionary<string, string>();
+		static readonly HashSet<string> noParams = new HashSet<string>();
+		static readonly IDictionary<string, string> m_ecAlgorithms = new Dictionary<string, string>();
 
-		private static void AddEntries(DerObjectIdentifier oid, string digest, string encryption)
+		static void AddEntries(DerObjectIdentifier oid, string digest, string encryption)
 		{
 			string alias = oid.Id;
 			m_digestAlgs.Add(alias, digest);
@@ -152,7 +152,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
         */
 		internal string GetDigestAlgName(string digestAlgOid)
 		{
-			return m_digestAlgs.TryGetValue(digestAlgOid, out var algName) ? algName : digestAlgOid;
+			return m_digestAlgs.TryGetValue(digestAlgOid, out string algName) ? algName : digestAlgOid;
 		}
 
 		internal AlgorithmIdentifier GetEncAlgorithmIdentifier(DerObjectIdentifier encOid,
@@ -168,7 +168,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal string[] GetDigestAliases(string algName)
 		{
-			return m_digestAliases.TryGetValue(algName, out var aliases) ? (string[])aliases.Clone() : new string[0];
+			return m_digestAliases.TryGetValue(algName, out string[] aliases) ? (string[])aliases.Clone() : new string[0];
 		}
 
 		/**
@@ -178,7 +178,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
         */
 		internal string GetEncryptionAlgName(string encryptionAlgOid)
 		{
-			return m_encryptionAlgs.TryGetValue(encryptionAlgOid, out var algName) ? algName : encryptionAlgOid;
+			return m_encryptionAlgs.TryGetValue(encryptionAlgOid, out string algName) ? algName : encryptionAlgOid;
 		}
 
 		internal IDigest GetDigestInstance(
@@ -217,7 +217,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			AlgorithmIdentifier algId)
 		{
 			if (algId.Parameters == null)
+			{
 				return new AlgorithmIdentifier(algId.Algorithm, DerNull.Instance);
+			}
 
 			return algId;
 		}
@@ -231,7 +233,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 			if (key is RsaKeyParameters rsaKeyParameters)
 			{
 				if (!rsaKeyParameters.IsPrivate)
+				{
 					throw new ArgumentException("Expected RSA private key");
+				}
 
 				encOID = CmsSignedGenerator.EncryptionRsa;
 			}
@@ -272,7 +276,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				}
 				else if (ecPrivKey.Parameters is ECGost3410Parameters ecGost3410Parameters)
 				{
-					var digestParamSet = ecGost3410Parameters.DigestParamSet;
+					DerObjectIdentifier digestParamSet = ecGost3410Parameters.DigestParamSet;
 					if (digestParamSet.Equals(RosstandartObjectIdentifiers.id_tc26_gost_3411_12_256))
 					{
 						encOID = CmsSignedGenerator.EncryptionECGost3410_2012_256;
@@ -290,7 +294,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 				{
 					// TODO Should we insist on algName being one of "EC" or "ECDSA", as Java does?
 					if (!m_ecAlgorithms.TryGetValue(digestOID, out encOID))
+					{
 						throw new ArgumentException("can't mix ECDSA with anything but SHA family digests");
+					}
 				}
 			}
 			else if (key is Gost3410PrivateKeyParameters)
@@ -307,7 +313,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal IStore<X509V2AttributeCertificate> GetAttributeCertificates(Asn1Set attrCertSet)
 		{
-			var contents = new List<X509V2AttributeCertificate>();
+			List<X509V2AttributeCertificate> contents = new List<X509V2AttributeCertificate>();
 			if (attrCertSet != null)
 			{
 				foreach (Asn1Encodable ae in attrCertSet)
@@ -329,7 +335,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal IStore<X509Certificate> GetCertificates(Asn1Set certSet)
 		{
-			var contents = new List<X509Certificate>();
+			List<X509Certificate> contents = new List<X509Certificate>();
 			if (certSet != null)
 			{
 				foreach (Asn1Encodable ae in certSet)
@@ -346,7 +352,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal IStore<X509Crl> GetCrls(Asn1Set crlSet)
 		{
-			var contents = new List<X509Crl>();
+			List<X509Crl> contents = new List<X509Crl>();
 			if (crlSet != null)
 			{
 				foreach (Asn1Encodable ae in crlSet)
@@ -363,7 +369,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 
 		internal IStore<Asn1Encodable> GetOtherRevInfos(Asn1Set crlSet, DerObjectIdentifier otherRevInfoFormat)
 		{
-			var contents = new List<Asn1Encodable>();
+			List<Asn1Encodable> contents = new List<Asn1Encodable>();
 			if (crlSet != null && otherRevInfoFormat != null)
 			{
 				foreach (Asn1Encodable ae in crlSet)
@@ -372,7 +378,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 					{
 						if (taggedObject.HasContextTag(1))
 						{
-							var otherRevocationInfo = OtherRevocationInfoFormat.GetInstance(taggedObject, false);
+							OtherRevocationInfoFormat otherRevocationInfo = OtherRevocationInfoFormat.GetInstance(taggedObject, false);
 
 							if (otherRevInfoFormat.Equals(otherRevocationInfo.InfoFormat))
 							{

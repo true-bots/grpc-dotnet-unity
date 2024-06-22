@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace BestHTTP.SocketIO
 {
 	using BestHTTP;
-	using BestHTTP.SocketIO.Events;
+	using Events;
 
 	/// <summary>
 	/// This class represents a Socket.IO namespace.
@@ -47,17 +47,17 @@ namespace BestHTTP.SocketIO
 		/// <summary>
 		/// A table to store acknowledgment callbacks associated to the given ids.
 		/// </summary>
-		private Dictionary<int, SocketIOAckCallback> AckCallbacks;
+		Dictionary<int, SocketIOAckCallback> AckCallbacks;
 
 		/// <summary>
 		/// Tha callback table that helps this class to manage event subscription and dispatching events.
 		/// </summary>
-		private EventTable EventCallbacks;
+		EventTable EventCallbacks;
 
 		/// <summary>
 		/// Cached list to spare some GC alloc.
 		/// </summary>
-		private List<object> arguments = new List<object>();
+		List<object> arguments = new List<object>();
 
 		#endregion
 
@@ -66,11 +66,11 @@ namespace BestHTTP.SocketIO
 		/// </summary>
 		internal Socket(string nsp, SocketManager manager)
 		{
-			this.Namespace = nsp;
-			this.Manager = manager;
-			this.IsOpen = false;
-			this.AutoDecodePayload = true;
-			this.EventCallbacks = new EventTable(this);
+			Namespace = nsp;
+			Manager = manager;
+			IsOpen = false;
+			AutoDecodePayload = true;
+			EventCallbacks = new EventTable(this);
 		}
 
 		#region Socket Handling
@@ -84,9 +84,13 @@ namespace BestHTTP.SocketIO
 
 			// The transport already established the connection
 			if (Manager.State == SocketManager.States.Open)
+			{
 				OnTransportOpen();
+			}
 			else if (Manager.Options.AutoConnect && Manager.State == SocketManager.States.Initial)
+			{
 				Manager.Open();
+			}
 		}
 
 		/// <summary>
@@ -105,7 +109,7 @@ namespace BestHTTP.SocketIO
 			// Send a disconnect packet to the server
 			if (IsOpen)
 			{
-				Packet packet = new Packet(TransportEventTypes.Message, SocketIOEventTypes.Disconnect, this.Namespace, string.Empty);
+				Packet packet = new Packet(TransportEventTypes.Message, SocketIOEventTypes.Disconnect, Namespace, string.Empty);
 				(Manager as IManager).SendPacket(packet);
 
 				// IsOpen must be false, because in the OnPacket preprocessing the packet would call this function again
@@ -114,7 +118,9 @@ namespace BestHTTP.SocketIO
 			}
 
 			if (AckCallbacks != null)
+			{
 				AckCallbacks.Clear();
+			}
 
 			if (remove)
 			{
@@ -137,7 +143,9 @@ namespace BestHTTP.SocketIO
 		{
 			bool blackListed = EventNames.IsBlacklisted(eventName);
 			if (blackListed)
+			{
 				throw new ArgumentException("Blacklisted event: " + eventName);
+			}
 
 			arguments.Clear();
 			arguments.Add(eventName);
@@ -154,7 +162,9 @@ namespace BestHTTP.SocketIO
 					if (binData != null)
 					{
 						if (attachments == null)
+						{
 							attachments = new List<byte[]>();
+						}
 
 						Dictionary<string, object> placeholderObj = new Dictionary<string, object>(2);
 						placeholderObj.Add(Packet.Placeholder, true);
@@ -165,7 +175,9 @@ namespace BestHTTP.SocketIO
 						attachments.Add(binData);
 					}
 					else
+					{
 						arguments.Add(args[i]);
+					}
 				}
 			}
 
@@ -186,7 +198,9 @@ namespace BestHTTP.SocketIO
 			arguments.Clear();
 
 			if (payload == null)
+			{
 				throw new ArgumentException("Encoding the arguments to JSON failed!");
+			}
 
 			int id = 0;
 
@@ -195,20 +209,24 @@ namespace BestHTTP.SocketIO
 				id = Manager.NextAckId;
 
 				if (AckCallbacks == null)
+				{
 					AckCallbacks = new Dictionary<int, SocketIOAckCallback>();
+				}
 
 				AckCallbacks[id] = callback;
 			}
 
 			Packet packet = new Packet(TransportEventTypes.Message,
 				attachments == null ? SocketIOEventTypes.Event : SocketIOEventTypes.BinaryEvent,
-				this.Namespace,
+				Namespace,
 				payload,
 				0,
 				id);
 
 			if (attachments != null)
+			{
 				packet.Attachments = attachments; // This will set the AttachmentCount property too.
+			}
 
 			(Manager as IManager).SendPacket(packet);
 
@@ -218,15 +236,21 @@ namespace BestHTTP.SocketIO
 		public Socket EmitAck(Packet originalPacket, params object[] args)
 		{
 			if (originalPacket == null)
+			{
 				throw new ArgumentNullException("originalPacket == null!");
+			}
 
 			if ( /*originalPacket.Id == 0 ||*/
-			    (originalPacket.SocketIOEvent != SocketIOEventTypes.Event && originalPacket.SocketIOEvent != SocketIOEventTypes.BinaryEvent))
+			    originalPacket.SocketIOEvent != SocketIOEventTypes.Event && originalPacket.SocketIOEvent != SocketIOEventTypes.BinaryEvent)
+			{
 				throw new ArgumentException("Wrong packet - you can't send an Ack for a packet with id == 0 and SocketIOEvent != Event or SocketIOEvent != BinaryEvent!");
+			}
 
 			arguments.Clear();
 			if (args != null && args.Length > 0)
+			{
 				arguments.AddRange(args);
+			}
 
 			string payload = null;
 			try
@@ -241,11 +265,13 @@ namespace BestHTTP.SocketIO
 			}
 
 			if (payload == null)
+			{
 				throw new ArgumentException("Encoding the arguments to JSON failed!");
+			}
 
 			Packet packet = new Packet(TransportEventTypes.Message,
 				originalPacket.SocketIOEvent == SocketIOEventTypes.Event ? SocketIOEventTypes.Ack : SocketIOEventTypes.BinaryAck,
-				this.Namespace,
+				Namespace,
 				payload,
 				0,
 				originalPacket.Id);
@@ -264,14 +290,14 @@ namespace BestHTTP.SocketIO
 		/// </summary>
 		public void On(string eventName, SocketIOCallback callback)
 		{
-			EventCallbacks.Register(eventName, callback, false, this.AutoDecodePayload);
+			EventCallbacks.Register(eventName, callback, false, AutoDecodePayload);
 		}
 
 		public void On(SocketIOEventTypes type, SocketIOCallback callback)
 		{
 			string eventName = EventNames.GetNameFor(type);
 
-			EventCallbacks.Register(eventName, callback, false, this.AutoDecodePayload);
+			EventCallbacks.Register(eventName, callback, false, AutoDecodePayload);
 		}
 
 		public void On(string eventName, SocketIOCallback callback, bool autoDecodePayload)
@@ -292,12 +318,12 @@ namespace BestHTTP.SocketIO
 
 		public void Once(string eventName, SocketIOCallback callback)
 		{
-			EventCallbacks.Register(eventName, callback, true, this.AutoDecodePayload);
+			EventCallbacks.Register(eventName, callback, true, AutoDecodePayload);
 		}
 
 		public void Once(SocketIOEventTypes type, SocketIOCallback callback)
 		{
-			EventCallbacks.Register(EventNames.GetNameFor(type), callback, true, this.AutoDecodePayload);
+			EventCallbacks.Register(EventNames.GetNameFor(type), callback, true, AutoDecodePayload);
 		}
 
 		public void Once(string eventName, SocketIOCallback callback, bool autoDecodePayload)
@@ -367,17 +393,17 @@ namespace BestHTTP.SocketIO
 			switch (packet.SocketIOEvent)
 			{
 				case SocketIOEventTypes.Connect:
-					if (this.Manager.Options.ServerVersion != SupportedSocketIOVersions.v3)
+					if (Manager.Options.ServerVersion != SupportedSocketIOVersions.v3)
 					{
-						this.Id = this.Namespace != "/" ? this.Namespace + "#" + this.Manager.Handshake.Sid : this.Manager.Handshake.Sid;
+						Id = Namespace != "/" ? Namespace + "#" + Manager.Handshake.Sid : Manager.Handshake.Sid;
 					}
 					else
 					{
-						var data = JSON.Json.Decode(packet.Payload) as Dictionary<string, object>;
-						this.Id = data["sid"].ToString();
+						Dictionary<string, object> data = JSON.Json.Decode(packet.Payload) as Dictionary<string, object>;
+						Id = data["sid"].ToString();
 					}
 
-					this.IsOpen = true;
+					IsOpen = true;
 					break;
 
 				case SocketIOEventTypes.Disconnect:
@@ -396,7 +422,7 @@ namespace BestHTTP.SocketIO
 					object result = JSON.Json.Decode(packet.Payload, ref success);
 					if (success)
 					{
-						var errDict = result as Dictionary<string, object>;
+						Dictionary<string, object> errDict = result as Dictionary<string, object>;
 						Error err = null;
 
 						if (errDict != null)
@@ -404,7 +430,9 @@ namespace BestHTTP.SocketIO
 							object tmpObject = null;
 							string code = null;
 							if (errDict.TryGetValue("code", out tmpObject))
+							{
 								code = tmpObject.ToString();
+							}
 
 							int errorCode;
 							if (code != null && int.TryParse(code, out errorCode) && errorCode >= 0 && errorCode <= 7)
@@ -415,7 +443,9 @@ namespace BestHTTP.SocketIO
 						}
 
 						if (err == null)
+						{
 							err = new Error(SocketIOErrors.Custom, packet.Payload);
+						}
 
 						EventCallbacks.Call(EventNames.GetNameFor(SocketIOEventTypes.Error), packet, err);
 
@@ -437,7 +467,7 @@ namespace BestHTTP.SocketIO
 				{
 					try
 					{
-						ackCallback(this, packet, this.AutoDecodePayload ? packet.Decode(Manager.Encoder) : null);
+						ackCallback(this, packet, AutoDecodePayload ? packet.Decode(Manager.Encoder) : null);
 					}
 					catch (Exception ex)
 					{
@@ -465,7 +495,9 @@ namespace BestHTTP.SocketIO
 		void ISocket.EmitEvent(string eventName, params object[] args)
 		{
 			if (!string.IsNullOrEmpty(eventName))
+			{
 				EventCallbacks.Call(eventName, null, args);
+			}
 		}
 
 		void ISocket.EmitError(SocketIOErrors errCode, string msg)
@@ -480,20 +512,24 @@ namespace BestHTTP.SocketIO
 		/// </summary>
 		internal void OnTransportOpen()
 		{
-			HTTPManager.Logger.Information("Socket", "OnTransportOpen - IsOpen: " + this.IsOpen);
+			HTTPManager.Logger.Information("Socket", "OnTransportOpen - IsOpen: " + IsOpen);
 
-			if (this.IsOpen)
+			if (IsOpen)
+			{
 				return;
+			}
 
-			if (this.Namespace != "/" || this.Manager.Options.ServerVersion == SupportedSocketIOVersions.v3)
+			if (Namespace != "/" || Manager.Options.ServerVersion == SupportedSocketIOVersions.v3)
 			{
 				try
 				{
 					string authData = null;
-					if (this.Manager.Options.ServerVersion == SupportedSocketIOVersions.v3)
-						authData = this.Manager.Options.Auth != null ? this.Manager.Options.Auth(this.Manager, this) : "{}";
+					if (Manager.Options.ServerVersion == SupportedSocketIOVersions.v3)
+					{
+						authData = Manager.Options.Auth != null ? Manager.Options.Auth(Manager, this) : "{}";
+					}
 
-					(Manager as IManager).SendPacket(new Packet(TransportEventTypes.Message, SocketIOEventTypes.Connect, this.Namespace, authData));
+					(Manager as IManager).SendPacket(new Packet(TransportEventTypes.Message, SocketIOEventTypes.Connect, Namespace, authData));
 				}
 				catch (Exception ex)
 				{
@@ -501,7 +537,9 @@ namespace BestHTTP.SocketIO
 				}
 			}
 			else
-				this.IsOpen = true;
+			{
+				IsOpen = true;
+			}
 		}
 
 		#endregion

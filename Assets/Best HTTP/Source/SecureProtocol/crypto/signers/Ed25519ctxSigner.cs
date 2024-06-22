@@ -11,12 +11,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 	public class Ed25519ctxSigner
 		: ISigner
 	{
-		private readonly Buffer buffer = new Buffer();
-		private readonly byte[] context;
+		readonly Buffer buffer = new Buffer();
+		readonly byte[] context;
 
-		private bool forSigning;
-		private Ed25519PrivateKeyParameters privateKey;
-		private Ed25519PublicKeyParameters publicKey;
+		bool forSigning;
+		Ed25519PrivateKeyParameters privateKey;
+		Ed25519PublicKeyParameters publicKey;
 
 		public Ed25519ctxSigner(byte[] context)
 		{
@@ -34,13 +34,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 
 			if (forSigning)
 			{
-				this.privateKey = (Ed25519PrivateKeyParameters)parameters;
-				this.publicKey = null;
+				privateKey = (Ed25519PrivateKeyParameters)parameters;
+				publicKey = null;
 			}
 			else
 			{
-				this.privateKey = null;
-				this.publicKey = (Ed25519PublicKeyParameters)parameters;
+				privateKey = null;
+				publicKey = (Ed25519PublicKeyParameters)parameters;
 			}
 
 			Reset();
@@ -66,7 +66,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual byte[] GenerateSignature()
 		{
 			if (!forSigning || null == privateKey)
+			{
 				throw new InvalidOperationException("Ed25519ctxSigner not initialised for signature generation.");
+			}
 
 			return buffer.GenerateSignature(privateKey, context);
 		}
@@ -74,7 +76,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 		public virtual bool VerifySignature(byte[] signature)
 		{
 			if (forSigning || null == publicKey)
+			{
 				throw new InvalidOperationException("Ed25519ctxSigner not initialised for verification");
+			}
 
 			return buffer.VerifySignature(publicKey, context, signature);
 		}
@@ -84,7 +88,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Signers
 			buffer.Reset();
 		}
 
-		private class Buffer : MemoryStream
+		class Buffer : MemoryStream
 		{
 			internal byte[] GenerateSignature(Ed25519PrivateKeyParameters privateKey, byte[] ctx)
 			{

@@ -23,12 +23,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 	/// </summary>
 	public class TrustAnchor
 	{
-		private readonly AsymmetricKeyParameter pubKey;
-		private readonly string caName;
-		private readonly X509Name caPrincipal;
-		private readonly X509Certificate trustedCert;
-		private byte[] ncBytes;
-		private NameConstraints nc;
+		readonly AsymmetricKeyParameter pubKey;
+		readonly string caName;
+		readonly X509Name caPrincipal;
+		readonly X509Certificate trustedCert;
+		byte[] ncBytes;
+		NameConstraints nc;
 
 		/// <summary>
 		/// Creates an instance of TrustAnchor with the specified X509Certificate and
@@ -80,12 +80,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			byte[] nameConstraints)
 		{
 			if (trustedCert == null)
+			{
 				throw new ArgumentNullException("trustedCert");
+			}
 
 			this.trustedCert = trustedCert;
-			this.pubKey = null;
-			this.caName = null;
-			this.caPrincipal = null;
+			pubKey = null;
+			caName = null;
+			caPrincipal = null;
 			setNameConstraints(nameConstraints);
 		}
 
@@ -124,13 +126,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			byte[] nameConstraints)
 		{
 			if (caPrincipal == null)
+			{
 				throw new ArgumentNullException("caPrincipal");
-			if (pubKey == null)
-				throw new ArgumentNullException("pubKey");
+			}
 
-			this.trustedCert = null;
+			if (pubKey == null)
+			{
+				throw new ArgumentNullException("pubKey");
+			}
+
+			trustedCert = null;
 			this.caPrincipal = caPrincipal;
-			this.caName = caPrincipal.ToString();
+			caName = caPrincipal.ToString();
 			this.pubKey = pubKey;
 			setNameConstraints(nameConstraints);
 		}
@@ -160,16 +167,24 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			byte[] nameConstraints)
 		{
 			if (caName == null)
+			{
 				throw new ArgumentNullException("caName");
-			if (pubKey == null)
-				throw new ArgumentNullException("pubKey");
-			if (caName.Length == 0)
-				throw new ArgumentException("caName can not be an empty string");
+			}
 
-			this.caPrincipal = new X509Name(caName);
+			if (pubKey == null)
+			{
+				throw new ArgumentNullException("pubKey");
+			}
+
+			if (caName.Length == 0)
+			{
+				throw new ArgumentException("caName can not be an empty string");
+			}
+
+			caPrincipal = new X509Name(caName);
 			this.pubKey = pubKey;
 			this.caName = caName;
-			this.trustedCert = null;
+			trustedCert = null;
 			setNameConstraints(nameConstraints);
 		}
 
@@ -178,7 +193,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// </summary>
 		public X509Certificate TrustedCert
 		{
-			get { return this.trustedCert; }
+			get { return trustedCert; }
 		}
 
 		/// <summary>
@@ -186,7 +201,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// </summary>
 		public X509Name CA
 		{
-			get { return this.caPrincipal; }
+			get { return caPrincipal; }
 		}
 
 		/// <summary>
@@ -194,7 +209,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// </summary>
 		public string CAName
 		{
-			get { return this.caName; }
+			get { return caName; }
 		}
 
 		/// <summary>
@@ -202,13 +217,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 		/// </summary>
 		public AsymmetricKeyParameter CAPublicKey
 		{
-			get { return this.pubKey; }
+			get { return pubKey; }
 		}
 
 		/// <summary>
 		/// Decode the name constraints and clone them if not null.
 		/// </summary>
-		private void setNameConstraints(
+		void setNameConstraints(
 			byte[] bytes)
 		{
 			if (bytes == null)
@@ -239,14 +254,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			// TODO Some of the sub-objects might not implement ToString() properly
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine("[");
-			if (this.pubKey != null)
+			if (pubKey != null)
 			{
-				sb.Append("  Trusted CA Public Key: ").Append(this.pubKey).AppendLine();
-				sb.Append("  Trusted CA Issuer Name: ").Append(this.caName).AppendLine();
+				sb.Append("  Trusted CA Public Key: ").Append(pubKey).AppendLine();
+				sb.Append("  Trusted CA Issuer Name: ").Append(caName).AppendLine();
 			}
 			else
 			{
-				sb.Append("  Trusted CA cert: ").Append(this.TrustedCert).AppendLine();
+				sb.Append("  Trusted CA cert: ").Append(TrustedCert).AppendLine();
 			}
 
 			if (nc != null)

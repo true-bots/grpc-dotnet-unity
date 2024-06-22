@@ -36,7 +36,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			int off = 0;
 			int length = 0;
 
-			for (off = 0; (off + 4) < key.Length; off += 4)
+			for (off = 0; off + 4 < key.Length; off += 4)
 			{
 				kPad[length++] = (int)Pack.LE_To_UInt32(key, off);
 			}

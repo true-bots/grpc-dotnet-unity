@@ -20,14 +20,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 	public class IssuingDistributionPoint
 		: Asn1Encodable
 	{
-		private readonly DistributionPointName _distributionPoint;
-		private readonly bool _onlyContainsUserCerts;
-		private readonly bool _onlyContainsCACerts;
-		private readonly ReasonFlags _onlySomeReasons;
-		private readonly bool _indirectCRL;
-		private readonly bool _onlyContainsAttributeCerts;
+		readonly DistributionPointName _distributionPoint;
+		readonly bool _onlyContainsUserCerts;
+		readonly bool _onlyContainsCACerts;
+		readonly ReasonFlags _onlySomeReasons;
+		readonly bool _indirectCRL;
+		readonly bool _onlyContainsAttributeCerts;
 
-		private readonly Asn1Sequence seq;
+		readonly Asn1Sequence seq;
 
 		public static IssuingDistributionPoint GetInstance(
 			Asn1TaggedObject obj,
@@ -49,7 +49,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new IssuingDistributionPoint((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("unknown object in factory: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj), "obj");
+			throw new ArgumentException("unknown object in factory: " + Platform.GetTypeName(obj), "obj");
 		}
 
 		/**
@@ -75,12 +75,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			bool indirectCRL,
 			bool onlyContainsAttributeCerts)
 		{
-			this._distributionPoint = distributionPoint;
-			this._indirectCRL = indirectCRL;
-			this._onlyContainsAttributeCerts = onlyContainsAttributeCerts;
-			this._onlyContainsCACerts = onlyContainsCACerts;
-			this._onlyContainsUserCerts = onlyContainsUserCerts;
-			this._onlySomeReasons = onlySomeReasons;
+			_distributionPoint = distributionPoint;
+			_indirectCRL = indirectCRL;
+			_onlyContainsAttributeCerts = onlyContainsAttributeCerts;
+			_onlyContainsCACerts = onlyContainsCACerts;
+			_onlyContainsUserCerts = onlyContainsUserCerts;
+			_onlySomeReasons = onlySomeReasons;
 
 			Asn1EncodableVector vec = new Asn1EncodableVector();
 			if (distributionPoint != null)
@@ -120,7 +120,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		/**
          * Constructor from Asn1Sequence
          */
-		private IssuingDistributionPoint(
+		IssuingDistributionPoint(
 			Asn1Sequence seq)
 		{
 			this.seq = seq;
@@ -142,7 +142,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 						_onlyContainsCACerts = DerBoolean.GetInstance(o, false).IsTrue;
 						break;
 					case 3:
-						_onlySomeReasons = new ReasonFlags(ReasonFlags.GetInstance(o, false));
+						_onlySomeReasons = new ReasonFlags(DerBitString.GetInstance(o, false));
 						break;
 					case 4:
 						_indirectCRL = DerBoolean.GetInstance(o, false).IsTrue;
@@ -235,7 +235,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return buf.ToString();
 		}
 
-		private void AppendObject(StringBuilder buf, string name, string val)
+		void AppendObject(StringBuilder buf, string name, string val)
 		{
 			string indent = "    ";
 			buf.Append(indent);

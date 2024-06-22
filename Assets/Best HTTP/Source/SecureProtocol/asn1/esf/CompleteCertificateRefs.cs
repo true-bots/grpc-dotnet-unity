@@ -15,42 +15,50 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 	public class CompleteCertificateRefs
 		: Asn1Encodable
 	{
-		private readonly Asn1Sequence otherCertIDs;
+		readonly Asn1Sequence otherCertIDs;
 
 		public static CompleteCertificateRefs GetInstance(
 			object obj)
 		{
 			if (obj == null || obj is CompleteCertificateRefs)
+			{
 				return (CompleteCertificateRefs)obj;
+			}
 
 			if (obj is Asn1Sequence)
+			{
 				return new CompleteCertificateRefs((Asn1Sequence)obj);
+			}
 
 			throw new ArgumentException(
 				"Unknown object in 'CompleteCertificateRefs' factory: "
-				+ Org.BouncyCastle.Utilities.Platform.GetTypeName(obj),
+				+ Platform.GetTypeName(obj),
 				"obj");
 		}
 
-		private CompleteCertificateRefs(
+		CompleteCertificateRefs(
 			Asn1Sequence seq)
 		{
 			if (seq == null)
+			{
 				throw new ArgumentNullException("seq");
+			}
 
 			foreach (Asn1Encodable ae in seq)
 			{
 				OtherCertID.GetInstance(ae.ToAsn1Object());
 			}
 
-			this.otherCertIDs = seq;
+			otherCertIDs = seq;
 		}
 
 		public CompleteCertificateRefs(
 			params OtherCertID[] otherCertIDs)
 		{
 			if (otherCertIDs == null)
+			{
 				throw new ArgumentNullException("otherCertIDs");
+			}
 
 			this.otherCertIDs = new DerSequence(otherCertIDs);
 		}
@@ -59,7 +67,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Esf
 			IEnumerable<OtherCertID> otherCertIDs)
 		{
 			if (otherCertIDs == null)
+			{
 				throw new ArgumentNullException("otherCertIDs");
+			}
 
 			this.otherCertIDs = new DerSequence(
 				Asn1EncodableVector.FromEnumerable(otherCertIDs));

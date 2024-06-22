@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace PlatformSupport.Collections.Specialized
 {
-	public delegate void NotifyCollectionChangedEventHandler(object sender, PlatformSupport.Collections.Specialized.NotifyCollectionChangedEventArgs e);
+	public delegate void NotifyCollectionChangedEventHandler(object sender, NotifyCollectionChangedEventArgs e);
 
 	public interface INotifyCollectionChanged
 	{
@@ -33,7 +33,7 @@ namespace PlatformSupport.Collections.Specialized
 		Move,
 
 		/// <summary> The contents of the collection changed dramatically. </summary>
-		Reset,
+		Reset
 	}
 
 	/// <summary>
@@ -54,10 +54,12 @@ namespace PlatformSupport.Collections.Specialized
 		/// Construct a NotifyCollectionChangedEventArgs that describes a reset change.
 		/// </summary>
 		/// <param name="action">The action that caused the event (must be Reset).</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action)
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action)
 		{
-			if (action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+			if (action != NotifyCollectionChangedAction.Reset)
+			{
 				throw new ArgumentException("action");
+			}
 
 			InitializeAdd(action, null, -1);
 		}
@@ -67,18 +69,20 @@ namespace PlatformSupport.Collections.Specialized
 		/// </summary>
 		/// <param name="action">The action that caused the event; can only be Reset, Add or Remove action.</param>
 		/// <param name="changedItem">The item affected by the change.</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, object changedItem)
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object changedItem)
 		{
-			if ((action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Add) && (action != PlatformSupport.Collections.Specialized
-				                                                                                          .NotifyCollectionChangedAction.Remove)
-			                                                                                          && (action != PlatformSupport.Collections.Specialized
-				                                                                                          .NotifyCollectionChangedAction.Reset))
+			if (action != NotifyCollectionChangedAction.Add && action != NotifyCollectionChangedAction.Remove
+			                                                && action != NotifyCollectionChangedAction.Reset)
+			{
 				throw new ArgumentException("action");
+			}
 
-			if (action == PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+			if (action == NotifyCollectionChangedAction.Reset)
 			{
 				if (changedItem != null)
+				{
 					throw new ArgumentException("action");
+				}
 
 				InitializeAdd(action, null, -1);
 			}
@@ -94,20 +98,25 @@ namespace PlatformSupport.Collections.Specialized
 		/// <param name="action">The action that caused the event.</param>
 		/// <param name="changedItem">The item affected by the change.</param>
 		/// <param name="index">The index where the change occurred.</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, object changedItem, int index)
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object changedItem, int index)
 		{
-			if ((action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Add) && (action != PlatformSupport.Collections.Specialized
-				                                                                                          .NotifyCollectionChangedAction.Remove)
-			                                                                                          && (action != PlatformSupport.Collections.Specialized
-				                                                                                          .NotifyCollectionChangedAction.Reset))
+			if (action != NotifyCollectionChangedAction.Add && action != NotifyCollectionChangedAction.Remove
+			                                                && action != NotifyCollectionChangedAction.Reset)
+			{
 				throw new ArgumentException("action");
+			}
 
-			if (action == PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+			if (action == NotifyCollectionChangedAction.Reset)
 			{
 				if (changedItem != null)
+				{
 					throw new ArgumentException("action");
+				}
+
 				if (index != -1)
+				{
 					throw new ArgumentException("action");
+				}
 
 				InitializeAdd(action, null, -1);
 			}
@@ -122,25 +131,29 @@ namespace PlatformSupport.Collections.Specialized
 		/// </summary>
 		/// <param name="action">The action that caused the event.</param>
 		/// <param name="changedItems">The items affected by the change.</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, IList changedItems)
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList changedItems)
 		{
-			if ((action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Add) && (action != PlatformSupport.Collections.Specialized
-				                                                                                          .NotifyCollectionChangedAction.Remove)
-			                                                                                          && (action != PlatformSupport.Collections.Specialized
-				                                                                                          .NotifyCollectionChangedAction.Reset))
+			if (action != NotifyCollectionChangedAction.Add && action != NotifyCollectionChangedAction.Remove
+			                                                && action != NotifyCollectionChangedAction.Reset)
+			{
 				throw new ArgumentException("action");
+			}
 
-			if (action == PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+			if (action == NotifyCollectionChangedAction.Reset)
 			{
 				if (changedItems != null)
+				{
 					throw new ArgumentException("action");
+				}
 
 				InitializeAdd(action, null, -1);
 			}
 			else
 			{
 				if (changedItems == null)
+				{
 					throw new ArgumentNullException("changedItems");
+				}
 
 				InitializeAddOrRemove(action, changedItems, -1);
 			}
@@ -152,29 +165,39 @@ namespace PlatformSupport.Collections.Specialized
 		/// <param name="action">The action that caused the event.</param>
 		/// <param name="changedItems">The items affected by the change.</param>
 		/// <param name="startingIndex">The index where the change occurred.</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, IList changedItems, int startingIndex)
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList changedItems, int startingIndex)
 		{
-			if ((action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Add) && (action != PlatformSupport.Collections.Specialized
-				                                                                                          .NotifyCollectionChangedAction.Remove)
-			                                                                                          && (action != PlatformSupport.Collections.Specialized
-				                                                                                          .NotifyCollectionChangedAction.Reset))
+			if (action != NotifyCollectionChangedAction.Add && action != NotifyCollectionChangedAction.Remove
+			                                                && action != NotifyCollectionChangedAction.Reset)
+			{
 				throw new ArgumentException("action");
+			}
 
-			if (action == PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+			if (action == NotifyCollectionChangedAction.Reset)
 			{
 				if (changedItems != null)
+				{
 					throw new ArgumentException("action");
+				}
+
 				if (startingIndex != -1)
+				{
 					throw new ArgumentException("action");
+				}
 
 				InitializeAdd(action, null, -1);
 			}
 			else
 			{
 				if (changedItems == null)
+				{
 					throw new ArgumentNullException("changedItems");
+				}
+
 				if (startingIndex < -1)
+				{
 					throw new ArgumentException("startingIndex");
+				}
 
 				InitializeAddOrRemove(action, changedItems, startingIndex);
 			}
@@ -186,10 +209,12 @@ namespace PlatformSupport.Collections.Specialized
 		/// <param name="action">Can only be a Replace action.</param>
 		/// <param name="newItem">The new item replacing the original item.</param>
 		/// <param name="oldItem">The original item that is replaced.</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, object newItem, object oldItem)
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object newItem, object oldItem)
 		{
-			if (action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			if (action != NotifyCollectionChangedAction.Replace)
+			{
 				throw new ArgumentException("action");
+			}
 
 			InitializeMoveOrReplace(action, new object[] { newItem }, new object[] { oldItem }, -1, -1);
 		}
@@ -201,10 +226,12 @@ namespace PlatformSupport.Collections.Specialized
 		/// <param name="newItem">The new item replacing the original item.</param>
 		/// <param name="oldItem">The original item that is replaced.</param>
 		/// <param name="index">The index of the item being replaced.</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, object newItem, object oldItem, int index)
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object newItem, object oldItem, int index)
 		{
-			if (action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			if (action != NotifyCollectionChangedAction.Replace)
+			{
 				throw new ArgumentException("action");
+			}
 
 			InitializeMoveOrReplace(action, new object[] { newItem }, new object[] { oldItem }, index, index);
 		}
@@ -215,14 +242,22 @@ namespace PlatformSupport.Collections.Specialized
 		/// <param name="action">Can only be a Replace action.</param>
 		/// <param name="newItems">The new items replacing the original items.</param>
 		/// <param name="oldItems">The original items that are replaced.</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, IList newItems, IList oldItems)
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList newItems, IList oldItems)
 		{
-			if (action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			if (action != NotifyCollectionChangedAction.Replace)
+			{
 				throw new ArgumentException("action");
+			}
+
 			if (newItems == null)
+			{
 				throw new ArgumentNullException("newItems");
+			}
+
 			if (oldItems == null)
+			{
 				throw new ArgumentNullException("oldItems");
+			}
 
 			InitializeMoveOrReplace(action, newItems, oldItems, -1, -1);
 		}
@@ -234,15 +269,23 @@ namespace PlatformSupport.Collections.Specialized
 		/// <param name="newItems">The new items replacing the original items.</param>
 		/// <param name="oldItems">The original items that are replaced.</param>
 		/// <param name="startingIndex">The starting index of the items being replaced.</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, IList newItems, IList oldItems,
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList newItems, IList oldItems,
 			int startingIndex)
 		{
-			if (action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			if (action != NotifyCollectionChangedAction.Replace)
+			{
 				throw new ArgumentException("action");
+			}
+
 			if (newItems == null)
+			{
 				throw new ArgumentNullException("newItems");
+			}
+
 			if (oldItems == null)
+			{
 				throw new ArgumentNullException("oldItems");
+			}
 
 			InitializeMoveOrReplace(action, newItems, oldItems, startingIndex, startingIndex);
 		}
@@ -254,12 +297,17 @@ namespace PlatformSupport.Collections.Specialized
 		/// <param name="changedItem">The item affected by the change.</param>
 		/// <param name="index">The new index for the changed item.</param>
 		/// <param name="oldIndex">The old index for the changed item.</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, object changedItem, int index, int oldIndex)
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, object changedItem, int index, int oldIndex)
 		{
-			if (action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Move)
+			if (action != NotifyCollectionChangedAction.Move)
+			{
 				throw new ArgumentException("action");
+			}
+
 			if (index < 0)
+			{
 				throw new ArgumentException("index");
+			}
 
 			object[] changedItems = new object[] { changedItem };
 			InitializeMoveOrReplace(action, changedItems, changedItems, index, oldIndex);
@@ -272,12 +320,17 @@ namespace PlatformSupport.Collections.Specialized
 		/// <param name="changedItems">The items affected by the change.</param>
 		/// <param name="index">The new index for the changed items.</param>
 		/// <param name="oldIndex">The old index for the changed items.</param>
-		public NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, IList changedItems, int index, int oldIndex)
+		public NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList changedItems, int index, int oldIndex)
 		{
-			if (action != PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Move)
+			if (action != NotifyCollectionChangedAction.Move)
+			{
 				throw new ArgumentException("action");
+			}
+
 			if (index < 0)
+			{
 				throw new ArgumentException("index");
+			}
 
 			InitializeMoveOrReplace(action, changedItems, changedItems, index, oldIndex);
 		}
@@ -285,41 +338,47 @@ namespace PlatformSupport.Collections.Specialized
 		/// <summary>
 		/// Construct a NotifyCollectionChangedEventArgs with given fields (no validation). Used by WinRT marshaling.
 		/// </summary>
-		internal NotifyCollectionChangedEventArgs(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, IList newItems, IList oldItems,
+		internal NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction action, IList newItems, IList oldItems,
 			int newIndex, int oldIndex)
 		{
 			_action = action;
-			_newItems = (newItems == null) ? null : new ReadOnlyList(newItems);
-			_oldItems = (oldItems == null) ? null : new ReadOnlyList(oldItems);
+			_newItems = newItems == null ? null : new ReadOnlyList(newItems);
+			_oldItems = oldItems == null ? null : new ReadOnlyList(oldItems);
 			_newStartingIndex = newIndex;
 			_oldStartingIndex = oldIndex;
 		}
 
-		private void InitializeAddOrRemove(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, IList changedItems, int startingIndex)
+		void InitializeAddOrRemove(NotifyCollectionChangedAction action, IList changedItems, int startingIndex)
 		{
-			if (action == PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Add)
+			if (action == NotifyCollectionChangedAction.Add)
+			{
 				InitializeAdd(action, changedItems, startingIndex);
-			else if (action == PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+			}
+			else if (action == NotifyCollectionChangedAction.Remove)
+			{
 				InitializeRemove(action, changedItems, startingIndex);
+			}
 			else
-				Debug.Assert(false, String.Format("Unsupported action: {0}", action.ToString()));
+			{
+				Debug.Assert(false, string.Format("Unsupported action: {0}", action.ToString()));
+			}
 		}
 
-		private void InitializeAdd(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, IList newItems, int newStartingIndex)
+		void InitializeAdd(NotifyCollectionChangedAction action, IList newItems, int newStartingIndex)
 		{
 			_action = action;
-			_newItems = (newItems == null) ? null : new ReadOnlyList(newItems);
+			_newItems = newItems == null ? null : new ReadOnlyList(newItems);
 			_newStartingIndex = newStartingIndex;
 		}
 
-		private void InitializeRemove(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, IList oldItems, int oldStartingIndex)
+		void InitializeRemove(NotifyCollectionChangedAction action, IList oldItems, int oldStartingIndex)
 		{
 			_action = action;
-			_oldItems = (oldItems == null) ? null : new ReadOnlyList(oldItems);
+			_oldItems = oldItems == null ? null : new ReadOnlyList(oldItems);
 			_oldStartingIndex = oldStartingIndex;
 		}
 
-		private void InitializeMoveOrReplace(PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction action, IList newItems, IList oldItems,
+		void InitializeMoveOrReplace(NotifyCollectionChangedAction action, IList newItems, IList oldItems,
 			int startingIndex, int oldStartingIndex)
 		{
 			InitializeAdd(action, newItems, startingIndex);
@@ -335,7 +394,7 @@ namespace PlatformSupport.Collections.Specialized
 		/// <summary>
 		/// The action that caused the event.
 		/// </summary>
-		public PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction Action
+		public NotifyCollectionChangedAction Action
 		{
 			get { return _action; }
 		}
@@ -378,15 +437,15 @@ namespace PlatformSupport.Collections.Specialized
 		//
 		//------------------------------------------------------
 
-		private PlatformSupport.Collections.Specialized.NotifyCollectionChangedAction _action;
-		private IList _newItems, _oldItems;
-		private int _newStartingIndex = -1;
-		private int _oldStartingIndex = -1;
+		NotifyCollectionChangedAction _action;
+		IList _newItems, _oldItems;
+		int _newStartingIndex = -1;
+		int _oldStartingIndex = -1;
 	}
 
-	internal sealed class ReadOnlyList : IList
+	sealed class ReadOnlyList : IList
 	{
-		private readonly IList _list;
+		readonly IList _list;
 
 		internal ReadOnlyList(IList list)
 		{

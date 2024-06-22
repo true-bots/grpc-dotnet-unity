@@ -10,20 +10,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 	public class RsaSecretBcpgKey
 		: BcpgObject, IBcpgKey
 	{
-		private readonly MPInteger d, p, q, u;
-		private readonly BigInteger expP, expQ, crt;
+		readonly MPInteger d, p, q, u;
+		readonly BigInteger expP, expQ, crt;
 
 		public RsaSecretBcpgKey(
 			BcpgInputStream bcpgIn)
 		{
-			this.d = new MPInteger(bcpgIn);
-			this.p = new MPInteger(bcpgIn);
-			this.q = new MPInteger(bcpgIn);
-			this.u = new MPInteger(bcpgIn);
+			d = new MPInteger(bcpgIn);
+			p = new MPInteger(bcpgIn);
+			q = new MPInteger(bcpgIn);
+			u = new MPInteger(bcpgIn);
 
-			this.expP = d.Value.Remainder(p.Value.Subtract(BigInteger.One));
-			this.expQ = d.Value.Remainder(q.Value.Subtract(BigInteger.One));
-			this.crt = BigIntegers.ModOddInverse(p.Value, q.Value);
+			expP = d.Value.Remainder(p.Value.Subtract(BigInteger.One));
+			expQ = d.Value.Remainder(q.Value.Subtract(BigInteger.One));
+			crt = BigIntegers.ModOddInverse(p.Value, q.Value);
 		}
 
 		public RsaSecretBcpgKey(
@@ -36,7 +36,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			if (cmp >= 0)
 			{
 				if (cmp == 0)
+				{
 					throw new ArgumentException("p and q cannot be equal");
+				}
 
 				BigInteger tmp = p;
 				p = q;
@@ -46,11 +48,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Bcpg
 			this.d = new MPInteger(d);
 			this.p = new MPInteger(p);
 			this.q = new MPInteger(q);
-			this.u = new MPInteger(BigIntegers.ModOddInverse(q, p));
+			u = new MPInteger(BigIntegers.ModOddInverse(q, p));
 
-			this.expP = d.Remainder(p.Subtract(BigInteger.One));
-			this.expQ = d.Remainder(q.Subtract(BigInteger.One));
-			this.crt = BigIntegers.ModOddInverse(p, q);
+			expP = d.Remainder(p.Subtract(BigInteger.One));
+			expQ = d.Remainder(q.Subtract(BigInteger.One));
+			crt = BigIntegers.ModOddInverse(p, q);
 		}
 
 		public BigInteger Modulus

@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 	public class PkixCertPathBuilderResult
 		: PkixCertPathValidatorResult //, ICertPathBuilderResult
 	{
-		private PkixCertPath certPath;
+		PkixCertPath certPath;
 
 		public PkixCertPathBuilderResult(
 			PkixCertPath certPath,
@@ -23,7 +23,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			: base(trustAnchor, policyTree, subjectPublicKey)
 		{
 			if (certPath == null)
+			{
 				throw new ArgumentNullException("certPath");
+			}
 
 			this.certPath = certPath;
 		}

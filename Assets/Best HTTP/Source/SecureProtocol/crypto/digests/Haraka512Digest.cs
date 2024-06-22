@@ -7,8 +7,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 	public sealed class Haraka512Digest
 		: HarakaBase
 	{
-		private readonly byte[] m_buf;
-		private int m_bufPos;
+		readonly byte[] m_buf;
+		int m_bufPos;
 
 		public Haraka512Digest()
 		{
@@ -16,14 +16,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 			m_bufPos = 0;
 		}
 
-		public override string AlgorithmName => "Haraka-512";
+		public override string AlgorithmName
+		{
+			get { return "Haraka-512"; }
+		}
 
-		public override int GetByteLength() => 64;
+		public override int GetByteLength()
+		{
+			return 64;
+		}
 
 		public override void Update(byte input)
 		{
 			if (m_bufPos > 64 - 1)
+			{
 				throw new ArgumentException("total input cannot be more than 64 bytes");
+			}
 
 			m_buf[m_bufPos++] = input;
 		}
@@ -31,7 +39,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		public override void BlockUpdate(byte[] input, int inOff, int len)
 		{
 			if (m_bufPos > 64 - len)
+			{
 				throw new ArgumentException("total input cannot be more than 64 bytes");
+			}
 
 			Array.Copy(input, inOff, m_buf, m_bufPos, len);
 			m_bufPos += len;
@@ -54,10 +64,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
             return DoFinal(output.AsSpan(outOff));
 #else
 			if (m_bufPos != 64)
+			{
 				throw new ArgumentException("input must be exactly 64 bytes");
+			}
 
 			if (output.Length - outOff < 32)
+			{
 				throw new ArgumentException("output too short to receive digest");
+			}
 
 			int rv = Haraka512256(m_buf, output, outOff);
 
@@ -181,7 +195,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
             return DIGEST_SIZE;
         }
 #else
-		private static int Haraka512256(byte[] msg, byte[] output, int outOff)
+		static int Haraka512256(byte[] msg, byte[] output, int outOff)
 		{
 			byte[][] s1 = new byte[4][];
 			s1[0] = new byte[16];
@@ -263,7 +277,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Digests
 		}
 #endif
 
-		private static void Mix512(byte[][] s1, byte[][] s2)
+		static void Mix512(byte[][] s1, byte[][] s2)
 		{
 			Array.Copy(s1[0], 12, s2[0], 0, 4);
 			Array.Copy(s1[2], 12, s2[0], 4, 4);

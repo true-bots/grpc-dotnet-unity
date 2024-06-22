@@ -8,7 +8,7 @@ namespace BestHTTP.Examples.Helpers.SelectorUI
 	public sealed class ExampleListItem : MonoBehaviour
 	{
 #pragma warning disable 0649
-		[SerializeField] private Text _text;
+		[SerializeField] Text _text;
 #pragma warning restore
 
 		public SampleSelectorUI ParentUI { get; private set; }
@@ -17,15 +17,15 @@ namespace BestHTTP.Examples.Helpers.SelectorUI
 
 		public void Setup(SampleSelectorUI parentUI, SampleBase prefab)
 		{
-			this.ParentUI = parentUI;
-			this.ExamplePrefab = prefab;
+			ParentUI = parentUI;
+			ExamplePrefab = prefab;
 
-			this._text.text = prefab.DisplayName;
+			_text.text = prefab.DisplayName;
 		}
 
 		public void OnButton()
 		{
-			this.ParentUI.SelectSample(this);
+			ParentUI.SelectSample(this);
 		}
 	}
 }

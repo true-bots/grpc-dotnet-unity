@@ -29,7 +29,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 	/// </remarks>
 	public static class CipherUtilities
 	{
-		private enum CipherAlgorithm
+		enum CipherAlgorithm
 		{
 			AES,
 			ARC4,
@@ -70,10 +70,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			TWOFISH,
 			VMPC,
 			VMPC_KSA3,
-			XTEA,
+			XTEA
 		};
 
-		private enum CipherMode
+		enum CipherMode
 		{
 			ECB,
 			NONE,
@@ -91,7 +91,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			SIC
 		};
 
-		private enum CipherPadding
+		enum CipherPadding
 		{
 			NOPADDING,
 			RAW,
@@ -128,10 +128,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			TBCPADDING,
 			WITHCTS,
 			X923PADDING,
-			ZEROBYTEPADDING,
+			ZEROBYTEPADDING
 		};
 
-		private static readonly Dictionary<string, string> Algorithms =
+		static readonly Dictionary<string, string> Algorithms =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 		static CipherUtilities()
@@ -289,7 +289,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 		public static IBufferedCipher GetCipher(string algorithm)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException(nameof(algorithm));
+			}
 
 			algorithm = CollectionUtilities.GetValueOrKey(Algorithms, algorithm).ToUpperInvariant();
 
@@ -315,9 +317,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			}
 
 
-			if (Org.BouncyCastle.Utilities.Platform.StartsWith(algorithm, "PBE"))
+			if (Platform.StartsWith(algorithm, "PBE"))
 			{
-				if (Org.BouncyCastle.Utilities.Platform.EndsWith(algorithm, "-CBC"))
+				if (Platform.EndsWith(algorithm, "-CBC"))
 				{
 					if (algorithm == "PBEWITHSHA1ANDDES-CBC")
 					{
@@ -342,7 +344,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 							new CbcBlockCipher(new RC2Engine()));
 					}
 				}
-				else if (Org.BouncyCastle.Utilities.Platform.EndsWith(algorithm, "-BC") || Org.BouncyCastle.Utilities.Platform.EndsWith(algorithm, "-OPENSSL"))
+				else if (Platform.EndsWith(algorithm, "-BC") || Platform.EndsWith(algorithm, "-OPENSSL"))
 				{
 					if (Strings.IsOneOf(algorithm,
 						    "PBEWITHSHAAND128BITAES-CBC-BC",
@@ -508,7 +510,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			if (aeadCipher != null)
 			{
 				if (parts.Length > 1)
+				{
 					throw new ArgumentException("Modes and paddings cannot be applied to AEAD ciphers");
+				}
 
 				return new BufferedAeadCipher(aeadCipher);
 			}
@@ -516,7 +520,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			if (streamCipher != null)
 			{
 				if (parts.Length > 1)
+				{
 					throw new ArgumentException("Modes and paddings not used for stream ciphers");
+				}
 
 				return new BufferedStreamCipher(streamCipher);
 			}
@@ -530,7 +536,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			if (parts.Length > 2)
 			{
 				if (streamCipher != null)
+				{
 					throw new ArgumentException("Paddings not used for stream ciphers");
+				}
 
 				string paddingName = parts[2];
 
@@ -663,7 +671,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 							break;
 						case CipherMode.CFB:
 						{
-							int bits = (di < 0)
+							int bits = di < 0
 								? 8 * blockCipher.GetBlockSize()
 								: int.Parse(mode.Substring(di));
 
@@ -691,7 +699,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 							break;
 						case CipherMode.OFB:
 						{
-							int bits = (di < 0)
+							int bits = di < 0
 								? 8 * blockCipher.GetBlockSize()
 								: int.Parse(mode.Substring(di));
 
@@ -723,9 +731,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			if (aeadBlockCipher != null)
 			{
 				if (cts)
+				{
 					throw new SecurityUtilityException("CTS mode not valid for AEAD ciphers.");
+				}
+
 				if (padded && parts.Length > 2 && parts[2] != "")
+				{
 					throw new SecurityUtilityException("Bad padding specified for AEAD cipher.");
+				}
 
 				return new BufferedAeadBlockCipher(aeadBlockCipher);
 			}
@@ -768,18 +781,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Security
 			return CollectionUtilities.GetValueOrNull(Algorithms, oid.Id);
 		}
 
-		private static int GetDigitIndex(string s)
+		static int GetDigitIndex(string s)
 		{
 			for (int i = 0; i < s.Length; ++i)
 			{
 				if (char.IsDigit(s[i]))
+				{
 					return i;
+				}
 			}
 
 			return -1;
 		}
 
-		private static IBlockCipher CreateBlockCipher(CipherAlgorithm cipherAlgorithm)
+		static IBlockCipher CreateBlockCipher(CipherAlgorithm cipherAlgorithm)
 		{
 			switch (cipherAlgorithm)
 			{

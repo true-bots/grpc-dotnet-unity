@@ -12,7 +12,7 @@ namespace BestHTTP.Cookies
 	/// </summary>
 	public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 	{
-		private const int Version = 1;
+		const int Version = 1;
 
 		#region Public Properties
 
@@ -108,27 +108,27 @@ namespace BestHTTP.Cookies
 		public Cookie(string name, string value, string path, string domain)
 			: this() // call the parameter-less constructor to set default values
 		{
-			this.Name = name;
-			this.Value = value;
-			this.Path = path;
-			this.Domain = domain;
+			Name = name;
+			Value = value;
+			Path = path;
+			Domain = domain;
 		}
 
 		public Cookie(Uri uri, string name, string value, DateTime expires, bool isSession = true)
 			: this(name, value, uri.AbsolutePath, uri.Host)
 		{
-			this.Expires = expires;
-			this.IsSession = isSession;
-			this.Date = DateTime.UtcNow;
+			Expires = expires;
+			IsSession = isSession;
+			Date = DateTime.UtcNow;
 		}
 
 		public Cookie(Uri uri, string name, string value, long maxAge = -1, bool isSession = true)
 			: this(name, value, uri.AbsolutePath, uri.Host)
 		{
-			this.MaxAge = maxAge;
-			this.IsSession = isSession;
-			this.Date = DateTime.UtcNow;
-			this.SameSite = "none";
+			MaxAge = maxAge;
+			IsSession = isSession;
+			Date = DateTime.UtcNow;
+			SameSite = "none";
 		}
 
 		#endregion
@@ -146,7 +146,9 @@ namespace BestHTTP.Cookies
 		{
 			// No Expires or Max-Age value sent from the server, we will fake the return value so we will not delete the newly came Cookie
 			if (IsSession)
+			{
 				return true;
+			}
 
 			// If a cookie has both the Max-Age and the Expires attribute, the Max-Age attribute has precedence and controls the expiration date of the cookie.
 			return MaxAge != -1 ? Math.Max(0, (long)(DateTime.UtcNow - Date).TotalSeconds) < MaxAge : Expires > DateTime.UtcNow;
@@ -158,13 +160,13 @@ namespace BestHTTP.Cookies
 		/// <returns></returns>
 		public uint GuessSize()
 		{
-			return (uint)((this.Name != null ? this.Name.Length * sizeof(char) : 0) +
-			              (this.Value != null ? this.Value.Length * sizeof(char) : 0) +
-			              (this.Domain != null ? this.Domain.Length * sizeof(char) : 0) +
-			              (this.Path != null ? this.Path.Length * sizeof(char) : 0) +
-			              (this.SameSite != null ? this.SameSite.Length * sizeof(char) : 0) +
-			              (sizeof(long) * 4) +
-			              (sizeof(bool) * 3));
+			return (uint)((Name != null ? Name.Length * sizeof(char) : 0) +
+			              (Value != null ? Value.Length * sizeof(char) : 0) +
+			              (Domain != null ? Domain.Length * sizeof(char) : 0) +
+			              (Path != null ? Path.Length * sizeof(char) : 0) +
+			              (SameSite != null ? SameSite.Length * sizeof(char) : 0) +
+			              sizeof(long) * 4 +
+			              sizeof(bool) * 3);
 		}
 
 		public static Cookie Parse(string header, Uri defaultDomain, Logger.LoggingContext context)
@@ -172,9 +174,9 @@ namespace BestHTTP.Cookies
 			Cookie cookie = new Cookie();
 			try
 			{
-				var kvps = ParseCookieHeader(header);
+				List<HeaderValue> kvps = ParseCookieHeader(header);
 
-				foreach (var kvp in kvps)
+				foreach (HeaderValue kvp in kvps)
 				{
 					switch (kvp.Key.ToLowerInvariant())
 					{
@@ -187,7 +189,9 @@ namespace BestHTTP.Cookies
 						case "domain":
 							// If the attribute-value is empty, the behavior is undefined. However, the user agent SHOULD ignore the cookie-av entirely.
 							if (string.IsNullOrEmpty(kvp.Value))
+							{
 								return null;
+							}
 
 							// If the first character of the attribute-value string is %x2E ("."):
 							//  Let cookie-domain be the attribute-value without the leading %x2E (".") character.
@@ -231,20 +235,26 @@ namespace BestHTTP.Cookies
 				// Some user agents provide users the option of preventing persistent storage of cookies across sessions.
 				// When configured thusly, user agents MUST treat all received cookies as if the persistent-flag were set to false.
 				if (HTTPManager.EnablePrivateBrowsing)
+				{
 					cookie.IsSession = true;
+				}
 
 				// http://tools.ietf.org/html/rfc6265#section-4.1.2.3
 				// WARNING: Some existing user agents treat an absent Domain attribute as if the Domain attribute were present and contained the current host name.
 				// For example, if example.com returns a Set-Cookie header without a Domain attribute, these user agents will erroneously send the cookie to www.example.com as well.
 				if (string.IsNullOrEmpty(cookie.Domain))
+				{
 					cookie.Domain = defaultDomain.Host;
+				}
 
 				// http://tools.ietf.org/html/rfc6265#section-5.3 section 7:
 				// If the cookie-attribute-list contains an attribute with an attribute-name of "Path",
 				// set the cookie's path to attribute-value of the last attribute in the cookie-attribute-list with an attribute-name of "Path".
 				// __Otherwise, set the cookie's path to the default-path of the request-uri.__
 				if (string.IsNullOrEmpty(cookie.Path))
+				{
 					cookie.Path = defaultDomain.AbsolutePath;
+				}
 
 				cookie.Date = cookie.LastAccess = DateTime.UtcNow;
 			}
@@ -278,17 +288,17 @@ namespace BestHTTP.Cookies
 		{
 			/*int version = */
 			stream.ReadInt32();
-			this.Name = stream.ReadString();
-			this.Value = stream.ReadString();
-			this.Date = DateTime.FromBinary(stream.ReadInt64());
-			this.LastAccess = DateTime.FromBinary(stream.ReadInt64());
-			this.Expires = DateTime.FromBinary(stream.ReadInt64());
-			this.MaxAge = stream.ReadInt64();
-			this.IsSession = stream.ReadBoolean();
-			this.Domain = stream.ReadString();
-			this.Path = stream.ReadString();
-			this.IsSecure = stream.ReadBoolean();
-			this.IsHttpOnly = stream.ReadBoolean();
+			Name = stream.ReadString();
+			Value = stream.ReadString();
+			Date = DateTime.FromBinary(stream.ReadInt64());
+			LastAccess = DateTime.FromBinary(stream.ReadInt64());
+			Expires = DateTime.FromBinary(stream.ReadInt64());
+			MaxAge = stream.ReadInt64();
+			IsSession = stream.ReadBoolean();
+			Domain = stream.ReadString();
+			Path = stream.ReadString();
+			IsSecure = stream.ReadBoolean();
+			IsHttpOnly = stream.ReadBoolean();
 		}
 
 		#endregion
@@ -297,54 +307,64 @@ namespace BestHTTP.Cookies
 
 		public override string ToString()
 		{
-			return string.Concat(this.Name, "=", this.Value);
+			return string.Concat(Name, "=", Value);
 		}
 
 		public override bool Equals(object obj)
 		{
 			if (obj == null)
+			{
 				return false;
+			}
 
-			return this.Equals(obj as Cookie);
+			return Equals(obj as Cookie);
 		}
 
 		public bool Equals(Cookie cookie)
 		{
 			if (cookie == null)
+			{
 				return false;
+			}
 
-			if (Object.ReferenceEquals(this, cookie))
+			if (ReferenceEquals(this, cookie))
+			{
 				return true;
+			}
 
-			return this.Name.Equals(cookie.Name, StringComparison.Ordinal) &&
-			       ((this.Domain == null && cookie.Domain == null) || this.Domain.Equals(cookie.Domain, StringComparison.Ordinal)) &&
-			       ((this.Path == null && cookie.Path == null) || this.Path.Equals(cookie.Path, StringComparison.Ordinal));
+			return Name.Equals(cookie.Name, StringComparison.Ordinal) &&
+			       ((Domain == null && cookie.Domain == null) || Domain.Equals(cookie.Domain, StringComparison.Ordinal)) &&
+			       ((Path == null && cookie.Path == null) || Path.Equals(cookie.Path, StringComparison.Ordinal));
 		}
 
 		public override int GetHashCode()
 		{
-			return this.ToString().GetHashCode();
+			return ToString().GetHashCode();
 		}
 
 		#endregion
 
 		#region Private Helper Functions
 
-		private static string ReadValue(string str, ref int pos)
+		static string ReadValue(string str, ref int pos)
 		{
 			string result = string.Empty;
 			if (str == null)
+			{
 				return result;
+			}
 
 			return str.Read(ref pos, ';');
 		}
 
-		private static List<HeaderValue> ParseCookieHeader(string str)
+		static List<HeaderValue> ParseCookieHeader(string str)
 		{
 			List<HeaderValue> result = new List<HeaderValue>();
 
 			if (str == null)
+			{
 				return result;
+			}
 
 			int idx = 0;
 
@@ -356,7 +376,9 @@ namespace BestHTTP.Cookies
 				HeaderValue qp = new HeaderValue(key);
 
 				if (idx < str.Length && str[idx - 1] == '=')
+				{
 					qp.Value = ReadValue(str, ref idx);
+				}
 
 				result.Add(qp);
 			}
@@ -370,7 +392,7 @@ namespace BestHTTP.Cookies
 
 		public int CompareTo(Cookie other)
 		{
-			return this.LastAccess.CompareTo(other.LastAccess);
+			return LastAccess.CompareTo(other.LastAccess);
 		}
 
 		#endregion

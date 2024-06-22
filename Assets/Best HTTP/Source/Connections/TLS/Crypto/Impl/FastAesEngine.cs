@@ -33,12 +33,12 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 	* This file contains the middle performance version with 2Kbytes of static tables for round precomputation.
 	* </p>
 	*/
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 	public sealed class FastAesEngine
 		: IBlockCipher
 	{
 		// The S box
-		private static readonly byte[] S =
+		static readonly byte[] S =
 		{
 			99, 124, 119, 123, 242, 107, 111, 197,
 			48, 1, 103, 43, 254, 215, 171, 118,
@@ -71,11 +71,11 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			225, 248, 152, 17, 105, 217, 142, 148,
 			155, 30, 135, 233, 206, 85, 40, 223,
 			140, 161, 137, 13, 191, 230, 66, 104,
-			65, 153, 45, 15, 176, 84, 187, 22,
+			65, 153, 45, 15, 176, 84, 187, 22
 		};
 
 		// The inverse S-box
-		private static readonly byte[] Si =
+		static readonly byte[] Si =
 		{
 			82, 9, 106, 213, 48, 54, 165, 56,
 			191, 64, 163, 158, 129, 243, 215, 251,
@@ -108,18 +108,18 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			160, 224, 59, 77, 174, 42, 245, 176,
 			200, 235, 187, 60, 131, 83, 153, 97,
 			23, 43, 4, 126, 186, 119, 214, 38,
-			225, 105, 20, 99, 85, 33, 12, 125,
+			225, 105, 20, 99, 85, 33, 12, 125
 		};
 
 		// vector used in calculating key schedule (powers of x in GF(256))
-		private static readonly byte[] rcon =
+		static readonly byte[] rcon =
 		{
 			0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
 			0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91
 		};
 
 		// precomputation tables of calculations for rounds
-		private static readonly uint[] T0 =
+		static readonly uint[] T0 =
 		{
 			0xa56363c6, 0x847c7cf8, 0x997777ee, 0x8d7b7bf6, 0x0df2f2ff,
 			0xbd6b6bd6, 0xb16f6fde, 0x54c5c591, 0x50303060, 0x03010102,
@@ -175,7 +175,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			0x3a16162c
 		};
 
-		private static readonly uint[] Tinv0 =
+		static readonly uint[] Tinv0 =
 		{
 			0x50a7f451, 0x5365417e, 0xc3a4171a, 0x965e273a, 0xcb6bab3b,
 			0xf1459d1f, 0xab58faac, 0x9303e34b, 0x55fa3020, 0xf66d76ad,
@@ -231,29 +231,29 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			0x4257b8d0
 		};
 
-		private static uint Shift(uint r, int shift)
+		static uint Shift(uint r, int shift)
 		{
 			return (r >> shift) | (r << (32 - shift));
 		}
 
 		/* multiply four bytes in GF(2^8) by 'x' {02} in parallel */
 
-		private const uint m1 = 0x80808080;
-		private const uint m2 = 0x7f7f7f7f;
-		private const uint m3 = 0x0000001b;
-		private const uint m4 = 0xC0C0C0C0;
-		private const uint m5 = 0x3f3f3f3f;
+		const uint m1 = 0x80808080;
+		const uint m2 = 0x7f7f7f7f;
+		const uint m3 = 0x0000001b;
+		const uint m4 = 0xC0C0C0C0;
+		const uint m5 = 0x3f3f3f3f;
 
-		private static uint FFmulX(uint x)
+		static uint FFmulX(uint x)
 		{
 			return ((x & m2) << 1) ^ (((x & m1) >> 7) * m3);
 		}
 
-		private static uint FFmulX2(uint x)
+		static uint FFmulX2(uint x)
 		{
 			uint t0 = (x & m5) << 2;
-			uint t1 = (x & m4);
-			t1 ^= (t1 >> 1);
+			uint t1 = x & m4;
+			t1 ^= t1 >> 1;
 			return t0 ^ (t1 >> 2) ^ (t1 >> 5);
 		}
 
@@ -267,7 +267,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 
 		*/
 
-		private static uint Inv_Mcol(uint x)
+		static uint Inv_Mcol(uint x)
 		{
 			uint t0, t1;
 			t0 = x;
@@ -278,12 +278,12 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			return t0;
 		}
 
-		private static uint SubWord(uint x)
+		static uint SubWord(uint x)
 		{
 			return (uint)S[x & 255]
-			       | (((uint)S[(x >> 8) & 255]) << 8)
-			       | (((uint)S[(x >> 16) & 255]) << 16)
-			       | (((uint)S[(x >> 24) & 255]) << 24);
+			       | ((uint)S[(x >> 8) & 255] << 8)
+			       | ((uint)S[(x >> 16) & 255] << 16)
+			       | ((uint)S[(x >> 24) & 255] << 24);
 		}
 
 		uint[][] W = null;
@@ -294,14 +294,16 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 		* AES specified a fixed block size of 128 bits and key sizes 128/192/256 bits
 		* This code is written assuming those are the only possible values
 		*/
-		private uint[][] GenerateWorkingKey(byte[] key, bool forEncryption)
+		uint[][] GenerateWorkingKey(byte[] key, bool forEncryption)
 		{
 			int keyLen = key.Length;
 			if (keyLen < 16 || keyLen > 32 || (keyLen & 7) != 0)
+			{
 				throw new ArgumentException("Key length not 128/192/256 bits.");
+			}
 
 			int KC = keyLen >> 2;
-			this.ROUNDS = KC + 6; // This is not always true for the generalized Rijndael that allows larger block sizes
+			ROUNDS = KC + 6; // This is not always true for the generalized Rijndael that allows larger block sizes
 
 			if (W == null || W.Length < ROUNDS + 1)
 			{
@@ -314,7 +316,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			else
 			{
 				for (int i = 0; i < W.Length; ++i)
+				{
 					Array.Clear(W[i], 0, W[i].Length);
+				}
 			}
 
 			switch (KC)
@@ -497,13 +501,13 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			return W;
 		}
 
-		private int ROUNDS;
-		private uint[][] WorkingKey;
-		private bool forEncryption;
+		int ROUNDS;
+		uint[][] WorkingKey;
+		bool forEncryption;
 
-		private byte[] s;
+		byte[] s;
 
-		private const int BLOCK_SIZE = 16;
+		const int BLOCK_SIZE = 16;
 
 		/**
 		* default constructor - 128 bit block size.
@@ -523,13 +527,15 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 		public void Init(bool forEncryption, ICipherParameters parameters)
 		{
 			if (!(parameters is KeyParameter keyParameter))
+			{
 				throw new ArgumentException("invalid parameter passed to AES init - "
-				                            + BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+				                            + Platform.GetTypeName(parameters));
+			}
 
 			WorkingKey = GenerateWorkingKey(keyParameter.GetKey(), forEncryption);
 
 			this.forEncryption = forEncryption;
-			this.s = /*Arrays.Clone*/(forEncryption ? S : Si);
+			s = /*Arrays.Clone*/forEncryption ? S : Si;
 		}
 
 		public string AlgorithmName
@@ -545,7 +551,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 		public int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (WorkingKey == null)
+			{
 				throw new InvalidOperationException("AES engine not initialised");
+			}
 
 			Check.DataLength(input, inOff, 16, "input buffer too short");
 			Check.OutputLength(output, outOff, 16, "output buffer too short");
@@ -893,7 +901,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
             Pack.UInt32_To_LE(C3, output[12..]);
         }
 #else
-		private void EncryptBlock(byte[] input, int inOff, byte[] output, int outOff, uint[][] KW)
+		void EncryptBlock(byte[] input, int inOff, byte[] output, int outOff, uint[][] KW)
 		{
 			FastAesEngineHelper.EncryptBlock(input, inOff, output, outOff, KW, ROUNDS, T0, S, s);
 			//uint C0 = Pack.LE_To_UInt32(input, inOff + 0);
@@ -942,7 +950,7 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			//Pack.UInt32_To_LE(C3, output, outOff + 12);
 		}
 
-		private void DecryptBlock(byte[] input, int inOff, byte[] output, int outOff, uint[][] KW)
+		void DecryptBlock(byte[] input, int inOff, byte[] output, int outOff, uint[][] KW)
 		{
 			uint C0 = Pack.LE_To_UInt32(input, inOff + 0);
 			uint C1 = Pack.LE_To_UInt32(input, inOff + 4);
@@ -979,10 +987,10 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			// the final round's table is a simple function of Si so we don't use a whole other four tables for it
 
 			kw = KW[0];
-			C0 = (uint)Si[r0 & 255] ^ (((uint)s[(r3 >> 8) & 255]) << 8) ^ (((uint)s[(r2 >> 16) & 255]) << 16) ^ (((uint)Si[(r1 >> 24) & 255]) << 24) ^ kw[0];
-			C1 = (uint)s[r1 & 255] ^ (((uint)s[(r0 >> 8) & 255]) << 8) ^ (((uint)Si[(r3 >> 16) & 255]) << 16) ^ (((uint)s[(r2 >> 24) & 255]) << 24) ^ kw[1];
-			C2 = (uint)s[r2 & 255] ^ (((uint)Si[(r1 >> 8) & 255]) << 8) ^ (((uint)Si[(r0 >> 16) & 255]) << 16) ^ (((uint)s[(r3 >> 24) & 255]) << 24) ^ kw[2];
-			C3 = (uint)Si[r3 & 255] ^ (((uint)s[(r2 >> 8) & 255]) << 8) ^ (((uint)s[(r1 >> 16) & 255]) << 16) ^ (((uint)s[(r0 >> 24) & 255]) << 24) ^ kw[3];
+			C0 = (uint)Si[r0 & 255] ^ ((uint)s[(r3 >> 8) & 255] << 8) ^ ((uint)s[(r2 >> 16) & 255] << 16) ^ ((uint)Si[(r1 >> 24) & 255] << 24) ^ kw[0];
+			C1 = (uint)s[r1 & 255] ^ ((uint)s[(r0 >> 8) & 255] << 8) ^ ((uint)Si[(r3 >> 16) & 255] << 16) ^ ((uint)s[(r2 >> 24) & 255] << 24) ^ kw[1];
+			C2 = (uint)s[r2 & 255] ^ ((uint)Si[(r1 >> 8) & 255] << 8) ^ ((uint)Si[(r0 >> 16) & 255] << 16) ^ ((uint)s[(r3 >> 24) & 255] << 24) ^ kw[2];
+			C3 = (uint)Si[r3 & 255] ^ ((uint)s[(r2 >> 8) & 255] << 8) ^ ((uint)s[(r1 >> 16) & 255] << 16) ^ ((uint)s[(r0 >> 24) & 255] << 24) ^ kw[3];
 
 			Pack.UInt32_To_LE(C0, output, outOff + 0);
 			Pack.UInt32_To_LE(C1, output, outOff + 4);

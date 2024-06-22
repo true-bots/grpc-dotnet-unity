@@ -10,46 +10,54 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 	public class EssCertIDv2
 		: Asn1Encodable
 	{
-		private readonly AlgorithmIdentifier hashAlgorithm;
-		private readonly byte[] certHash;
-		private readonly IssuerSerial issuerSerial;
+		readonly AlgorithmIdentifier hashAlgorithm;
+		readonly byte[] certHash;
+		readonly IssuerSerial issuerSerial;
 
-		private static readonly AlgorithmIdentifier DefaultAlgID = new AlgorithmIdentifier(
+		static readonly AlgorithmIdentifier DefaultAlgID = new AlgorithmIdentifier(
 			NistObjectIdentifiers.IdSha256);
 
 		public static EssCertIDv2 GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
+
 			EssCertIDv2 existing = obj as EssCertIDv2;
 			if (existing != null)
+			{
 				return existing;
+			}
+
 			return new EssCertIDv2(Asn1Sequence.GetInstance(obj));
 		}
 
-		private EssCertIDv2(
+		EssCertIDv2(
 			Asn1Sequence seq)
 		{
 			if (seq.Count > 3)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
 			int count = 0;
 
 			if (seq[0] is Asn1OctetString)
 			{
 				// Default value
-				this.hashAlgorithm = DefaultAlgID;
+				hashAlgorithm = DefaultAlgID;
 			}
 			else
 			{
-				this.hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[count++].ToAsn1Object());
+				hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[count++].ToAsn1Object());
 			}
 
-			this.certHash = Asn1OctetString.GetInstance(seq[count++].ToAsn1Object()).GetOctets();
+			certHash = Asn1OctetString.GetInstance(seq[count++].ToAsn1Object()).GetOctets();
 
 			if (seq.Count > count)
 			{
-				this.issuerSerial = IssuerSerial.GetInstance(
+				issuerSerial = IssuerSerial.GetInstance(
 					Asn1Sequence.GetInstance(seq[count].ToAsn1Object()));
 			}
 		}
@@ -81,11 +89,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 			if (algId == null)
 			{
 				// Default value
-				this.hashAlgorithm = DefaultAlgID;
+				hashAlgorithm = DefaultAlgID;
 			}
 			else
 			{
-				this.hashAlgorithm = algId;
+				hashAlgorithm = algId;
 			}
 
 			this.certHash = certHash;
@@ -94,7 +102,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Ess
 
 		public AlgorithmIdentifier HashAlgorithm
 		{
-			get { return this.hashAlgorithm; }
+			get { return hashAlgorithm; }
 		}
 
 		public byte[] GetCertHash()

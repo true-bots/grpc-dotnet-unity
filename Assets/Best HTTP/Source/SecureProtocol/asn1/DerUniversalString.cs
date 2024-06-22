@@ -18,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			internal static readonly Asn1UniversalType Instance = new Meta();
 
-			private Meta() : base(typeof(DerUniversalString), Asn1Tags.UniversalString)
+			Meta() : base(typeof(DerUniversalString), Asn1Tags.UniversalString)
 			{
 			}
 
@@ -28,7 +28,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			}
 		}
 
-		private static readonly char[] table = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+		static readonly char[] table = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 		/**
          * return a universal string from the passed in object.
@@ -38,16 +38,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		public static DerUniversalString GetInstance(object obj)
 		{
 			if (obj == null)
+			{
 				return null;
+			}
 
 			if (obj is DerUniversalString derUniversalString)
+			{
 				return derUniversalString;
+			}
 
 			if (obj is IAsn1Convertible asn1Convertible)
 			{
 				Asn1Object asn1Object = asn1Convertible.ToAsn1Object();
 				if (asn1Object is DerUniversalString converted)
+				{
 					return converted;
+				}
 			}
 			else if (obj is byte[] bytes)
 			{
@@ -61,7 +67,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 				}
 			}
 
-			throw new ArgumentException("illegal object in GetInstance: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("illegal object in GetInstance: " + Platform.GetTypeName(obj));
 		}
 
 		/**
@@ -76,7 +82,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return (DerUniversalString)Meta.Instance.GetContextInstance(taggedObject, declaredExplicit);
 		}
 
-		private readonly byte[] m_contents;
+		readonly byte[] m_contents;
 
 		public DerUniversalString(byte[] contents)
 			: this(contents, true)
@@ -86,7 +92,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		internal DerUniversalString(byte[] contents, bool clone)
 		{
 			if (null == contents)
+			{
 				throw new ArgumentNullException("contents");
+			}
 
 			m_contents = clone ? Arrays.Clone(contents) : contents;
 		}
@@ -126,7 +134,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 		{
 			DerUniversalString that = asn1Object as DerUniversalString;
 			return null != that
-			       && Arrays.AreEqual(this.m_contents, that.m_contents);
+			       && Arrays.AreEqual(m_contents, that.m_contents);
 		}
 
 		protected override int Asn1GetHashCode()
@@ -139,13 +147,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 			return new DerUniversalString(contents, false);
 		}
 
-		private static void EncodeHexByte(StringBuilder buf, int i)
+		static void EncodeHexByte(StringBuilder buf, int i)
 		{
 			buf.Append(table[(i >> 4) & 0xF]);
 			buf.Append(table[i & 0xF]);
 		}
 
-		private static void EncodeHexDL(StringBuilder buf, int dl)
+		static void EncodeHexDL(StringBuilder buf, int dl)
 		{
 			if (dl < 128)
 			{

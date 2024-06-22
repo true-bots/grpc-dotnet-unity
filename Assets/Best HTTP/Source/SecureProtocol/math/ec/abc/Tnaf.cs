@@ -11,12 +11,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 	* by Jerome A. Solinas. The paper first appeared in the Proceedings of
 	* Crypto 1997.
 	*/
-	internal class Tnaf
+	class Tnaf
 	{
-		private static readonly BigInteger MinusOne = BigInteger.One.Negate();
-		private static readonly BigInteger MinusTwo = BigInteger.Two.Negate();
-		private static readonly BigInteger MinusThree = BigInteger.Three.Negate();
-		private static readonly BigInteger Four = BigInteger.ValueOf(4);
+		static readonly BigInteger MinusOne = BigInteger.One.Negate();
+		static readonly BigInteger MinusTwo = BigInteger.Two.Negate();
+		static readonly BigInteger MinusThree = BigInteger.Three.Negate();
+		static readonly BigInteger Four = BigInteger.ValueOf(4);
 
 		/**
 		* The window width of WTNAF. The standard value of 4 is slightly less
@@ -175,10 +175,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 		{
 			int scale = lambda0.Scale;
 			if (lambda1.Scale != scale)
+			{
 				throw new ArgumentException("lambda0 and lambda1 do not have same scale");
+			}
 
-			if (!((mu == 1) || (mu == -1)))
+			if (!(mu == 1 || mu == -1))
+			{
 				throw new ArgumentException("mu must be 1 or -1");
+			}
 
 			BigInteger f0 = lambda0.Round();
 			BigInteger f1 = lambda1.Round();
@@ -315,8 +319,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 		*/
 		public static sbyte[] TauAdicNaf(sbyte mu, ZTauElement lambda)
 		{
-			if (!((mu == 1) || (mu == -1)))
+			if (!(mu == 1 || mu == -1))
+			{
 				throw new ArgumentException("mu must be 1 or -1");
+			}
 
 			BigInteger norm = Norm(mu, lambda);
 
@@ -336,12 +342,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 			BigInteger r0 = lambda.u;
 			BigInteger r1 = lambda.v;
 
-			while (!((r0.Equals(BigInteger.Zero)) && (r1.Equals(BigInteger.Zero))))
+			while (!(r0.Equals(BigInteger.Zero) && r1.Equals(BigInteger.Zero)))
 			{
 				// If r0 is odd
 				if (r0.TestBit(0))
 				{
-					u[i] = (sbyte)BigInteger.Two.Subtract((r0.Subtract(r1.ShiftLeft(1))).Mod(Four)).IntValue;
+					u[i] = (sbyte)BigInteger.Two.Subtract(r0.Subtract(r1.ShiftLeft(1)).Mod(Four)).IntValue;
 
 					// r0 = r0 - u[i]
 					if (u[i] == 1)
@@ -454,7 +460,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 		public static BigInteger[] GetLucas(sbyte mu, int k, bool doV)
 		{
 			if (!(mu == 1 || mu == -1))
+			{
 				throw new ArgumentException("mu must be 1 or -1");
+			}
 
 			BigInteger u0;
 			BigInteger u1;
@@ -543,7 +551,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 		public static BigInteger[] GetSi(AbstractF2mCurve curve)
 		{
 			if (!curve.IsKoblitz)
+			{
 				throw new ArgumentException("si is defined for Koblitz curves only");
+			}
 
 			int m = curve.FieldSize;
 			int a = curve.A.ToBigInteger().IntValue;
@@ -588,9 +598,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 			{
 				int hi = h.IntValue;
 				if (hi == 2)
+				{
 					return 1;
+				}
+
 				if (hi == 4)
+				{
 					return 2;
+				}
 			}
 
 			throw new ArgumentException("h (Cofactor) must be 2 or 4");
@@ -738,8 +753,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 		public static sbyte[] TauAdicWNaf(sbyte mu, ZTauElement lambda,
 			sbyte width, BigInteger pow2w, BigInteger tw, ZTauElement[] alpha)
 		{
-			if (!((mu == 1) || (mu == -1)))
+			if (!(mu == 1 || mu == -1))
+			{
 				throw new ArgumentException("mu must be 1 or -1");
+			}
 
 			BigInteger norm = Norm(mu, lambda);
 
@@ -761,7 +778,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 			int i = 0;
 
 			// while lambda <> (0, 0)
-			while (!((r0.Equals(BigInteger.Zero)) && (r1.Equals(BigInteger.Zero))))
+			while (!(r0.Equals(BigInteger.Zero) && r1.Equals(BigInteger.Zero)))
 			{
 				// if r0 is odd
 				if (r0.TestBit(0))
@@ -834,7 +851,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 		*/
 		public static AbstractF2mPoint[] GetPreComp(AbstractF2mPoint p, sbyte a)
 		{
-			sbyte[][] alphaTnaf = (a == 0) ? Tnaf.Alpha0Tnaf : Tnaf.Alpha1Tnaf;
+			sbyte[][] alphaTnaf = a == 0 ? Alpha0Tnaf : Alpha1Tnaf;
 
 			AbstractF2mPoint[] pu = new AbstractF2mPoint[(uint)(alphaTnaf.Length + 1) >> 1];
 			pu[0] = p;
@@ -842,7 +859,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC.Abc
 			uint precompLen = (uint)alphaTnaf.Length;
 			for (uint i = 3; i < precompLen; i += 2)
 			{
-				pu[i >> 1] = Tnaf.MultiplyFromTnaf(p, alphaTnaf[i]);
+				pu[i >> 1] = MultiplyFromTnaf(p, alphaTnaf[i]);
 			}
 
 			p.Curve.NormalizeAll(pu);

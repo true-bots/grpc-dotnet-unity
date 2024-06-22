@@ -14,27 +14,30 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 		 * Constants
 		 */
-		private static readonly int STATE_SIZE = 4;
+		static readonly int STATE_SIZE = 4;
 
 		/**
 		 * Variables to hold the state of the engine during encryption and
 		 * decryption
 		 */
-		private byte[] workingKey;
+		byte[] workingKey;
 
-		private byte[] workingIV;
-		private uint[] lfsr;
-		private uint[] nfsr;
-		private uint[] authAcc;
-		private uint[] authSr;
+		byte[] workingIV;
+		uint[] lfsr;
+		uint[] nfsr;
+		uint[] authAcc;
+		uint[] authSr;
 
-		private bool initialised = false;
-		private bool aadFinished = false;
-		private MemoryStream aadData = new MemoryStream();
+		bool initialised = false;
+		bool aadFinished = false;
+		MemoryStream aadData = new MemoryStream();
 
-		private byte[] mac;
+		byte[] mac;
 
-		public string AlgorithmName => "Grain-128AEAD";
+		public string AlgorithmName
+		{
+			get { return "Grain-128AEAD"; }
+		}
 
 		/**
 		 * Initialize a Grain-128AEAD cipher.
@@ -50,19 +53,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			 * 'forEncryption' is irrelevant.
 			 */
 			if (!(param is ParametersWithIV ivParams))
+			{
 				throw new ArgumentException("Grain-128AEAD Init parameters must include an IV");
+			}
 
 			byte[] iv = ivParams.GetIV();
 
 			if (iv == null || iv.Length != 12)
+			{
 				throw new ArgumentException("Grain-128AEAD requires exactly 12 bytes of IV");
+			}
 
 			if (!(ivParams.Parameters is KeyParameter key))
+			{
 				throw new ArgumentException("Grain-128AEAD Init parameters must include a key");
+			}
 
 			byte[] keyBytes = key.GetKey();
 			if (keyBytes.Length != 16)
+			{
 				throw new ArgumentException("Grain-128AEAD key must be 128 bits long");
+			}
 
 			/*
 			 * Initialize variables.
@@ -82,7 +93,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 		 * 320 clocks initialization phase.
 		 */
-		private void InitGrain()
+		void InitGrain()
 		{
 			for (int i = 0; i < 320; ++i)
 			{
@@ -96,8 +107,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				for (int remainder = 0; remainder < 8; ++remainder)
 				{
 					uint outputZ = GetOutput();
-					nfsr = Shift(nfsr, (GetOutputNFSR() ^ lfsr[0] ^ outputZ ^ (uint)((workingKey[quotient]) >> remainder)) & 1);
-					lfsr = Shift(lfsr, (GetOutputLFSR() ^ outputZ ^ (uint)((workingKey[quotient + 8]) >> remainder)) & 1);
+					nfsr = Shift(nfsr, (GetOutputNFSR() ^ lfsr[0] ^ outputZ ^ (uint)(workingKey[quotient] >> remainder)) & 1);
+					lfsr = Shift(lfsr, (GetOutputLFSR() ^ outputZ ^ (uint)(workingKey[quotient + 8] >> remainder)) & 1);
 				}
 			}
 
@@ -107,7 +118,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					uint outputZ = GetOutput();
 					nfsr = Shift(nfsr, (GetOutputNFSR() ^ lfsr[0]) & 1);
-					lfsr = Shift(lfsr, (GetOutputLFSR()) & 1);
+					lfsr = Shift(lfsr, GetOutputLFSR() & 1);
 					authAcc[quotient] |= outputZ << remainder;
 				}
 			}
@@ -118,7 +129,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					uint outputZ = GetOutput();
 					nfsr = Shift(nfsr, (GetOutputNFSR() ^ lfsr[0]) & 1);
-					lfsr = Shift(lfsr, (GetOutputLFSR()) & 1);
+					lfsr = Shift(lfsr, GetOutputLFSR() & 1);
 					authSr[quotient] |= outputZ << remainder;
 				}
 			}
@@ -131,7 +142,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		 *
 		 * @return Output from NFSR.
 		 */
-		private uint GetOutputNFSR()
+		uint GetOutputNFSR()
 		{
 			uint b0 = nfsr[0];
 			uint b3 = nfsr[0] >> 3;
@@ -163,8 +174,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			uint b95 = nfsr[2] >> 31;
 			uint b96 = nfsr[3];
 
-			return (b0 ^ b26 ^ b56 ^ b91 ^ b96 ^ b3 & b67 ^ b11 & b13 ^ b17 & b18
-			        ^ b27 & b59 ^ b40 & b48 ^ b61 & b65 ^ b68 & b84 ^ b22 & b24 & b25 ^ b70 & b78 & b82 ^ b88 & b92 & b93 & b95) & 1;
+			return (b0 ^ b26 ^ b56 ^ b91 ^ b96 ^ (b3 & b67) ^ (b11 & b13) ^ (b17 & b18)
+			        ^ (b27 & b59) ^ (b40 & b48) ^ (b61 & b65) ^ (b68 & b84) ^ (b22 & b24 & b25) ^ (b70 & b78 & b82) ^ (b88 & b92 & b93 & b95)) & 1;
 		}
 
 		/**
@@ -172,7 +183,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		 *
 		 * @return Output from LFSR.
 		 */
-		private uint GetOutputLFSR()
+		uint GetOutputLFSR()
 		{
 			uint s0 = lfsr[0];
 			uint s7 = lfsr[0] >> 7;
@@ -189,7 +200,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		 *
 		 * @return y_t.
 		 */
-		private uint GetOutput()
+		uint GetOutput()
 		{
 			uint b2 = nfsr[0] >> 2;
 			uint b12 = nfsr[0] >> 12;
@@ -220,7 +231,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		 * @param val   The value to shift in.
 		 * @return The shifted array with val added to index.Length - 1.
 		 */
-		private uint[] Shift(uint[] array, uint val)
+		uint[] Shift(uint[] array, uint val)
 		{
 			array[0] = (array[0] >> 1) | (array[1] << 31);
 			array[1] = (array[1] >> 1) | (array[2] << 31);
@@ -235,7 +246,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		 * @param keyBytes The key.
 		 * @param ivBytes  The IV.
 		 */
-		private void SetKey(byte[] keyBytes, byte[] ivBytes)
+		void SetKey(byte[] keyBytes, byte[] ivBytes)
 		{
 			ivBytes[12] = 0xFF;
 			ivBytes[13] = 0xFF;
@@ -260,7 +271,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             return ProcessBytes(input.AsSpan(inOff, len), output.AsSpan(outOff));
 #else
 			if (!initialised)
+			{
 				throw new ArgumentException(AlgorithmName + " not initialised");
+			}
 
 			if (!aadFinished)
 			{
@@ -297,15 +310,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			Reset(true);
 		}
 
-		private void Reset(bool clearMac)
+		void Reset(bool clearMac)
 		{
 			if (clearMac)
 			{
-				this.mac = null;
+				mac = null;
 			}
 
-			this.aadData.SetLength(0);
-			this.aadFinished = false;
+			aadData.SetLength(0);
+			aadFinished = false;
 
 			SetKey(workingKey, workingIV);
 			InitGrain();
@@ -343,7 +356,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
             }
         }
 #else
-		private void GetKeyStream(byte[] input, int inOff, int len, byte[] ciphertext, int outOff)
+		void GetKeyStream(byte[] input, int inOff, int len, byte[] ciphertext, int outOff)
 		{
 			for (int i = 0; i < len; ++i)
 			{
@@ -352,7 +365,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				{
 					uint outputZ = GetOutput();
 					nfsr = Shift(nfsr, (GetOutputNFSR() ^ lfsr[0]) & 1);
-					lfsr = Shift(lfsr, (GetOutputLFSR()) & 1);
+					lfsr = Shift(lfsr, GetOutputLFSR() & 1);
 
 					uint input_i_j = (input_i >> j) & 1U;
 					cc |= (input_i_j ^ outputZ) << j;
@@ -367,7 +380,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 					AuthShift(GetOutput());
 					nfsr = Shift(nfsr, (GetOutputNFSR() ^ lfsr[0]) & 1);
-					lfsr = Shift(lfsr, (GetOutputLFSR()) & 1);
+					lfsr = Shift(lfsr, GetOutputLFSR() & 1);
 				}
 
 				ciphertext[outOff + i] = (byte)cc;
@@ -378,7 +391,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public byte ReturnByte(byte input)
 		{
 			if (!initialised)
+			{
 				throw new ArgumentException(AlgorithmName + " not initialised");
+			}
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
             Span<byte> plaintext = stackalloc byte[1]{ input };
@@ -396,7 +411,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public void ProcessAadByte(byte input)
 		{
 			if (aadFinished)
+			{
 				throw new ArgumentException("associated data must be added before plaintext/ciphertext");
+			}
 
 			aadData.WriteByte(input);
 		}
@@ -404,7 +421,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public void ProcessAadBytes(byte[] input, int inOff, int len)
 		{
 			if (aadFinished)
+			{
 				throw new ArgumentException("associated data must be added before plaintext/ciphertext");
+			}
 
 			aadData.Write(input, inOff, len);
 		}
@@ -419,13 +438,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         }
 #endif
 
-		private void Accumulate()
+		void Accumulate()
 		{
 			authAcc[0] ^= authSr[0];
 			authAcc[1] ^= authSr[1];
 		}
 
-		private void AuthShift(uint val)
+		void AuthShift(uint val)
 		{
 			authSr[0] = (authSr[0] >> 1) | (authSr[1] << 31);
 			authSr[1] = (authSr[1] >> 1) | (val << 31);
@@ -443,7 +462,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
         }
 #endif
 
-		private void DoProcessAADBytes(byte[] input, int inOff, int len)
+		void DoProcessAADBytes(byte[] input, int inOff, int len)
 		{
 			byte[] ader;
 			int aderlen;
@@ -479,7 +498,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				for (int j = 0; j < 8; ++j)
 				{
 					nfsr = Shift(nfsr, (GetOutputNFSR() ^ lfsr[0]) & 1);
-					lfsr = Shift(lfsr, (GetOutputLFSR()) & 1);
+					lfsr = Shift(lfsr, GetOutputLFSR() & 1);
 
 					uint ader_i_j = (ader_i >> j) & 1U;
 					//if (ader_i_j != 0)
@@ -492,7 +511,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 					AuthShift(GetOutput());
 					nfsr = Shift(nfsr, (GetOutputNFSR() ^ lfsr[0]) & 1);
-					lfsr = Shift(lfsr, (GetOutputLFSR()) & 1);
+					lfsr = Shift(lfsr, GetOutputLFSR() & 1);
 				}
 			}
 		}
@@ -510,7 +529,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 			Accumulate();
 
-			this.mac = Pack.UInt32_To_LE(authAcc);
+			mac = Pack.UInt32_To_LE(authAcc);
 
 			Array.Copy(mac, 0, output, outOff, mac.Length);
 
@@ -556,16 +575,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return len + 8;
 		}
 
-		private static int LenLength(int v)
+		static int LenLength(int v)
 		{
 			if ((v & 0xff) == v)
+			{
 				return 1;
+			}
 
 			if ((v & 0xffff) == v)
+			{
 				return 2;
+			}
 
 			if ((v & 0xffffff) == v)
+			{
 				return 3;
+			}
 
 			return 4;
 		}

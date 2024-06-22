@@ -25,49 +25,49 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		: IAeadBlockCipher
 	{
 		/// <summary>The buffer length.</summary>
-		private static readonly int BUFLEN = 16;
+		static readonly int BUFLEN = 16;
 
 		/// <summary>The halfBuffer length.</summary>
-		private static readonly int HALFBUFLEN = BUFLEN >> 1;
+		static readonly int HALFBUFLEN = BUFLEN >> 1;
 
 		/// <summary>The nonce length.</summary>
-		private static readonly int NONCELEN = 12;
+		static readonly int NONCELEN = 12;
 
 		/**
 		* The maximum data length (AEAD/PlainText). Due to implementation constraints this is restricted to the maximum
 		* array length (https://programming.guide/java/array-maximum-length.html) minus the BUFLEN to allow for the MAC
 		*/
-		private static readonly int MAX_DATALEN = int.MaxValue - 8 - BUFLEN;
+		static readonly int MAX_DATALEN = int.MaxValue - 8 - BUFLEN;
 
 		/**
 		* The top bit mask.
 		*/
-		private static readonly byte MASK = 0x80;
+		static readonly byte MASK = 0x80;
 
 		/**
 		* The addition constant.
 		*/
-		private static readonly byte ADD = 0xE1;
+		static readonly byte ADD = 0xE1;
 
 		/**
 		* The initialisation flag.
 		*/
-		private static readonly int INIT = 1;
+		static readonly int INIT = 1;
 
 		/**
 		* The aeadComplete flag.
 		*/
-		private static readonly int AEAD_COMPLETE = 2;
+		static readonly int AEAD_COMPLETE = 2;
 
 		/**
 		* The cipher.
 		*/
-		private readonly IBlockCipher theCipher;
+		readonly IBlockCipher theCipher;
 
 		/**
 		* The multiplier.
 		*/
-		private readonly IGcmMultiplier theMultiplier;
+		readonly IGcmMultiplier theMultiplier;
 
 		/**
 		* The gHash buffer.
@@ -82,42 +82,42 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		/**
 		* The aeadHasher.
 		*/
-		private readonly GcmSivHasher theAEADHasher;
+		readonly GcmSivHasher theAEADHasher;
 
 		/**
 		* The dataHasher.
 		*/
-		private readonly GcmSivHasher theDataHasher;
+		readonly GcmSivHasher theDataHasher;
 
 		/**
 		* The plainDataStream.
 		*/
-		private GcmSivCache thePlain;
+		GcmSivCache thePlain;
 
 		/**
 		* The encryptedDataStream (decryption only).
 		*/
-		private GcmSivCache theEncData;
+		GcmSivCache theEncData;
 
 		/**
 		* Are we encrypting?
 		*/
-		private bool forEncryption;
+		bool forEncryption;
 
 		/**
 		* The initialAEAD.
 		*/
-		private byte[] theInitialAEAD;
+		byte[] theInitialAEAD;
 
 		/**
 		* The nonce.
 		*/
-		private byte[] theNonce;
+		byte[] theNonce;
 
 		/**
 		* The flags.
 		*/
-		private int theFlags;
+		int theFlags;
 
 		/**
 		* Constructor.
@@ -145,7 +145,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		{
 			/* Ensure that the cipher is the correct size */
 			if (pCipher.GetBlockSize() != BUFLEN)
+			{
 				throw new ArgumentException("Cipher required with a block size of " + BUFLEN + ".");
+			}
 
 			/* Store parameters */
 			theCipher = pCipher;
@@ -156,7 +158,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			theDataHasher = new GcmSivHasher(this);
 		}
 
-		public virtual IBlockCipher UnderlyingCipher => theCipher;
+		public virtual IBlockCipher UnderlyingCipher
+		{
+			get { return theCipher; }
+		}
 
 		public virtual int GetBlockSize()
 		{
@@ -203,7 +208,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 
 			byte[] k = myKey.GetKey();
 
-			if (k.Length != BUFLEN && k.Length != (BUFLEN << 1))
+			if (k.Length != BUFLEN && k.Length != BUFLEN << 1)
 			{
 				throw new ArgumentException("Invalid key");
 			}
@@ -218,13 +223,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			ResetStreams();
 		}
 
-		public virtual string AlgorithmName => theCipher.AlgorithmName + "-GCM-SIV";
+		public virtual string AlgorithmName
+		{
+			get { return theCipher.AlgorithmName + "-GCM-SIV"; }
+		}
 
 		/**
 		* check AEAD status.
 		* @param pLen the aeadLength
 		*/
-		private void CheckAeadStatus(int pLen)
+		void CheckAeadStatus(int pLen)
 		{
 			/* Check we are initialised */
 			if ((theFlags & INIT) == 0)
@@ -239,7 +247,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			}
 
 			/* Make sure that we haven't breached AEAD data limit */
-			if ((long)theAEADHasher.getBytesProcessed() + long.MinValue > (MAX_DATALEN - pLen) + long.MinValue)
+			if ((long)theAEADHasher.getBytesProcessed() + long.MinValue > MAX_DATALEN - pLen + long.MinValue)
 			{
 				throw new InvalidOperationException("AEAD byte count exceeded");
 			}
@@ -249,7 +257,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* check status.
 		* @param pLen the dataLength
 		*/
-		private void CheckStatus(int pLen)
+		void CheckStatus(int pLen)
 		{
 			/* Check we are initialised */
 			if ((theFlags & INIT) == 0)
@@ -273,7 +281,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 				currBytes = theEncData.Length;
 			}
 
-			if (currBytes + long.MinValue > (dataLimit - pLen) + long.MinValue)
+			if (currBytes + long.MinValue > dataLimit - pLen + long.MinValue)
 			{
 				throw new InvalidOperationException("byte count exceeded");
 			}
@@ -521,7 +529,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		/**
 		* Reset Streams.
 		*/
-		private void ResetStreams()
+		void ResetStreams()
 		{
 			/* Clear the plainText buffer */
 			if (thePlain != null)
@@ -553,7 +561,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* @param pBuffer the buffere
 		* @return the length
 		*/
-		private static int bufLength(byte[] pBuffer)
+		static int bufLength(byte[] pBuffer)
 		{
 			return pBuffer == null ? 0 : pBuffer.Length;
 		}
@@ -594,7 +602,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
             return thePlainLen;
         }
 #else
-		private int EncryptPlain(byte[] pCounter, byte[] pTarget, int pOffset)
+		int EncryptPlain(byte[] pCounter, byte[] pTarget, int pOffset)
 		{
 			byte[] thePlainBuf = thePlain.GetBuffer();
 			int thePlainLen = Convert.ToInt32(thePlain.Length);
@@ -630,7 +638,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		}
 #endif
 
-		private void DecryptPlain()
+		void DecryptPlain()
 		{
 			byte[] theEncDataBuf = theEncData.GetBuffer();
 			int theEncDataLen = Convert.ToInt32(theEncData.Length);
@@ -684,7 +692,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* calculate tag.
 		* @return the calculated tag
 		*/
-		private byte[] CalculateTag()
+		byte[] CalculateTag()
 		{
 			/* Complete the hash */
 			theDataHasher.completeHash();
@@ -711,7 +719,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* complete polyVAL.
 		* @return the calculated value
 		*/
-		private byte[] completePolyVal()
+		byte[] completePolyVal()
 		{
 			/* Build the polyVal result */
 			byte[] myResult = new byte[BUFLEN];
@@ -723,7 +731,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		/**
 		* process lengths.
 		*/
-		private void gHashLengths()
+		void gHashLengths()
 		{
 			/* Create reversed bigEndian buffer to keep it simple */
 			byte[] myIn = new byte[BUFLEN];
@@ -738,13 +746,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* perform the next GHASH step.
 		* @param pNext the next value
 		*/
-		private void gHASH(byte[] pNext)
+		void gHASH(byte[] pNext)
 		{
 			xorBlock(theGHash, pNext);
 			theMultiplier.MultiplyH(theGHash);
 		}
 
-		private static void fillReverse(byte[] pInput, int pOffset, int pLength, byte[] pOutput)
+		static void fillReverse(byte[] pInput, int pOffset, int pLength, byte[] pOutput)
 		{
 			/* Loop through the buffer */
 			for (int i = 0, j = BUFLEN - 1; i < pLength; i++, j--)
@@ -771,7 +779,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* @param pLeft the left operand and result
 		* @param pRight the right operand
 		*/
-		private static void xorBlock(byte[] pLeft, byte[] pRight)
+		static void xorBlock(byte[] pLeft, byte[] pRight)
 		{
 			/* Loop through the bytes */
 			for (int i = 0; i < BUFLEN; i++)
@@ -787,7 +795,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* @param pOffset the offset in the right operand
 		* @param pLength the length of data in the right operand
 		*/
-		private static void xorBlock(byte[] pLeft, byte[] pRight, int pOffset, int pLength)
+		static void xorBlock(byte[] pLeft, byte[] pRight, int pOffset, int pLength)
 		{
 			/* Loop through the bytes */
 			for (int i = 0; i < pLength; i++)
@@ -800,7 +808,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* increment the counter.
 		* @param pCounter the counter to increment
 		*/
-		private static void incrementCounter(byte[] pCounter)
+		static void incrementCounter(byte[] pCounter)
 		{
 			/* Loop through the bytes incrementing counter */
 			for (int i = 0; i < Integers.NumBytes; i++)
@@ -816,7 +824,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* multiply by X.
 		* @param pValue the value to adjust
 		*/
-		private static void mulX(byte[] pValue)
+		static void mulX(byte[] pValue)
 		{
 			/* Loop through the bytes */
 			byte myMask = (byte)0;
@@ -838,7 +846,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		* Derive Keys.
 		* @param pKey the keyGeneration key
 		*/
-		private void DeriveKeys(KeyParameter pKey)
+		void DeriveKeys(KeyParameter pKey)
 		{
 			/* Create the buffers */
 			byte[] myIn = new byte[BUFLEN];
@@ -893,7 +901,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 			theFlags |= INIT;
 		}
 
-		private class GcmSivCache
+		class GcmSivCache
 			: MemoryStream
 		{
 			internal GcmSivCache()
@@ -904,29 +912,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes
 		/**
 		* Hash Control.
 		*/
-		private class GcmSivHasher
+		class GcmSivHasher
 		{
 			/**
 			* Cache.
 			*/
-			private readonly byte[] theBuffer = new byte[BUFLEN];
+			readonly byte[] theBuffer = new byte[BUFLEN];
 
 			/**
 			* Single byte cache.
 			*/
-			private readonly byte[] theByte = new byte[1];
+			readonly byte[] theByte = new byte[1];
 
 			/**
 			* Count of active bytes in cache.
 			*/
-			private int numActive;
+			int numActive;
 
 			/**
 			* Count of hashed bytes.
 			*/
-			private ulong numHashed;
+			ulong numHashed;
 
-			private readonly GcmSivBlockCipher parent;
+			readonly GcmSivBlockCipher parent;
 
 			internal GcmSivHasher(GcmSivBlockCipher parent)
 			{

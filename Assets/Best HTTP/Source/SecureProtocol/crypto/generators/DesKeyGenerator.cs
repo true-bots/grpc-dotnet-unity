@@ -29,14 +29,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Generators
 		{
 			base.EngineInit(parameters);
 
-			if (strength == 0 || strength == (56 / 8))
+			if (strength == 0 || strength == 56 / 8)
 			{
 				strength = DesParameters.DesKeyLength;
 			}
 			else if (strength != DesParameters.DesKeyLength)
 			{
 				throw new ArgumentException(
-					"DES key must be " + (DesParameters.DesKeyLength * 8) + " bits long.");
+					"DES key must be " + DesParameters.DesKeyLength * 8 + " bits long.");
 			}
 		}
 

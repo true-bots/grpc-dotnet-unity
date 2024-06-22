@@ -31,7 +31,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 				return new DsaParameter((Asn1Sequence)obj);
 			}
 
-			throw new ArgumentException("Invalid DsaParameter: " + Org.BouncyCastle.Utilities.Platform.GetTypeName(obj));
+			throw new ArgumentException("Invalid DsaParameter: " + Platform.GetTypeName(obj));
 		}
 
 		public DsaParameter(
@@ -44,15 +44,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			this.g = new DerInteger(g);
 		}
 
-		private DsaParameter(
+		DsaParameter(
 			Asn1Sequence seq)
 		{
 			if (seq.Count != 3)
+			{
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
+			}
 
-			this.p = DerInteger.GetInstance(seq[0]);
-			this.q = DerInteger.GetInstance(seq[1]);
-			this.g = DerInteger.GetInstance(seq[2]);
+			p = DerInteger.GetInstance(seq[0]);
+			q = DerInteger.GetInstance(seq[1]);
+			g = DerInteger.GetInstance(seq[2]);
 		}
 
 		public BigInteger P

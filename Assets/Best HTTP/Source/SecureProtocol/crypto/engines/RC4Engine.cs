@@ -9,17 +9,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class RC4Engine
 		: IStreamCipher
 	{
-		private readonly static int STATE_LENGTH = 256;
+		static readonly int STATE_LENGTH = 256;
 
 		/*
 		 * variables to hold the state of the RC4 engine
 		 * during encryption and decryption
 		 */
 
-		private byte[] engineState;
-		private int x;
-		private int y;
-		private byte[] workingKey;
+		byte[] engineState;
+		int x;
+		int y;
+		byte[] workingKey;
 
 		/**
 		* initialise a RC4 cipher.
@@ -46,7 +46,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				return;
 			}
 
-			throw new ArgumentException("invalid parameter passed to RC4 init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			throw new ArgumentException("invalid parameter passed to RC4 init - " + Platform.GetTypeName(parameters));
 		}
 
 		public virtual string AlgorithmName
@@ -126,7 +126,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 
 		// Private implementation
 
-		private void SetKey(
+		void SetKey(
 			byte[] keyBytes)
 		{
 			workingKey = keyBytes;

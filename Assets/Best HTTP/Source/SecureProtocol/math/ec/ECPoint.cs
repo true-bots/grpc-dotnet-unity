@@ -59,10 +59,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		internal ECPoint(ECCurve curve, ECFieldElement x, ECFieldElement y, ECFieldElement[] zs)
 		{
-			this.m_curve = curve;
-			this.m_x = x;
-			this.m_y = y;
-			this.m_zs = zs;
+			m_curve = curve;
+			m_x = x;
+			m_y = y;
+			m_zs = zs;
 		}
 
 		protected abstract bool SatisfiesCurveEquation();
@@ -70,7 +70,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		protected virtual bool SatisfiesOrder()
 		{
 			if (BigInteger.One.Equals(Curve.Cofactor))
+			{
 				return true;
+			}
 
 			BigInteger n = Curve.Order;
 
@@ -160,7 +162,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public virtual ECFieldElement GetZCoord(int index)
 		{
-			return (index < 0 || index >= m_zs.Length) ? null : m_zs[index];
+			return index < 0 || index >= m_zs.Length ? null : m_zs[index];
 		}
 
 		public virtual ECFieldElement[] GetZCoords()
@@ -194,12 +196,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		protected virtual void CheckNormalized()
 		{
 			if (!IsNormalized())
+			{
 				throw new InvalidOperationException("point not in normal form");
+			}
 		}
 
 		public virtual bool IsNormalized()
 		{
-			int coord = this.CurveCoordinateSystem;
+			int coord = CurveCoordinateSystem;
 
 			return coord == ECCurve.COORD_AFFINE
 			       || coord == ECCurve.COORD_LAMBDA_AFFINE
@@ -215,12 +219,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		 */
 		public virtual ECPoint Normalize()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
 			{
 				return this;
 			}
 
-			switch (this.CurveCoordinateSystem)
+			switch (CurveCoordinateSystem)
 			{
 				case ECCurve.COORD_AFFINE:
 				case ECCurve.COORD_LAMBDA_AFFINE:
@@ -231,10 +235,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				{
 					ECFieldElement z = RawZCoords[0];
 					if (z.IsOne)
+					{
 						return this;
+					}
 
 					if (null == m_curve)
+					{
 						throw new InvalidOperationException("Detached points must be in affine coordinates");
+					}
 
 					/*
 					 * Use blinding to avoid the side-channel leak identified and analyzed in the paper
@@ -255,7 +263,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		internal virtual ECPoint Normalize(ECFieldElement zInv)
 		{
-			switch (this.CurveCoordinateSystem)
+			switch (CurveCoordinateSystem)
 			{
 				case ECCurve.COORD_HOMOGENEOUS:
 				case ECCurve.COORD_LAMBDA_PROJECTIVE:
@@ -299,7 +307,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		internal bool ImplIsValid(bool decompressed, bool checkOrder)
 		{
 			if (IsInfinity)
+			{
 				return true;
+			}
 
 			ValidityCallback callback = new ValidityCallback(this, decompressed, checkOrder);
 			ValidityPreCompInfo validity = (ValidityPreCompInfo)Curve.Precompute(this, ValidityPreCompInfo.PRECOMP_NAME, callback);
@@ -342,17 +352,22 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public virtual bool Equals(ECPoint other)
 		{
 			if (this == other)
+			{
 				return true;
-			if (null == other)
-				return false;
+			}
 
-			ECCurve c1 = this.Curve, c2 = other.Curve;
-			bool n1 = (null == c1), n2 = (null == c2);
+			if (null == other)
+			{
+				return false;
+			}
+
+			ECCurve c1 = Curve, c2 = other.Curve;
+			bool n1 = null == c1, n2 = null == c2;
 			bool i1 = IsInfinity, i2 = other.IsInfinity;
 
 			if (i1 || i2)
 			{
-				return (i1 && i2) && (n1 || n2 || c1.Equals(c2));
+				return i1 && i2 && (n1 || n2 || c1.Equals(c2));
 			}
 
 			ECPoint p1 = this, p2 = other;
@@ -390,10 +405,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override int GetHashCode()
 		{
-			ECCurve c = this.Curve;
-			int hc = (null == c) ? 0 : ~c.GetHashCode();
+			ECCurve c = Curve;
+			int hc = null == c ? 0 : ~c.GetHashCode();
 
-			if (!this.IsInfinity)
+			if (!IsInfinity)
 			{
 				// TODO Consider just requiring already normalized, to avoid silent performance degradation
 
@@ -408,7 +423,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override string ToString()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
 			{
 				return "INF";
 			}
@@ -452,7 +467,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public virtual ECPoint TimesPow2(int e)
 		{
 			if (e < 0)
+			{
 				throw new ArgumentException("cannot be negative", "e");
+			}
 
 			ECPoint p = this;
 			while (--e >= 0)
@@ -476,17 +493,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return TwicePlus(this);
 		}
 
-		private class ValidityCallback
+		class ValidityCallback
 			: IPreCompCallback
 		{
-			private readonly ECPoint m_outer;
-			private readonly bool m_decompressed, m_checkOrder;
+			readonly ECPoint m_outer;
+			readonly bool m_decompressed, m_checkOrder;
 
 			internal ValidityCallback(ECPoint outer, bool decompressed, bool checkOrder)
 			{
-				this.m_outer = outer;
-				this.m_decompressed = decompressed;
-				this.m_checkOrder = checkOrder;
+				m_outer = outer;
+				m_decompressed = decompressed;
+				m_checkOrder = checkOrder;
 			}
 
 			public PreCompInfo Precompute(PreCompInfo existing)
@@ -498,7 +515,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				}
 
 				if (info.HasFailed())
+				{
 					return info;
+				}
 
 				if (!info.HasCurveEquationPassed())
 				{
@@ -545,8 +564,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		 */
 		public override byte[] GetEncoded(bool compressed)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return new byte[1];
+			}
 
 			ECPoint normed = Normalize();
 
@@ -574,10 +595,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public override int GetEncodedLength(bool compressed)
 		{
 			if (IsInfinity)
+			{
 				return 1;
+			}
 
 			if (compressed)
+			{
 				return 1 + XCoord.GetEncodedLength();
+			}
 
 			return 1 + XCoord.GetEncodedLength() + YCoord.GetEncodedLength();
 		}
@@ -641,7 +666,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		 */
 		public override ECPoint Multiply(BigInteger k)
 		{
-			return this.Curve.GetMultiplier().Multiply(this, k);
+			return Curve.GetMultiplier().Multiply(this, k);
 		}
 	}
 
@@ -660,12 +685,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		protected internal override bool CompressionYTilde
 		{
-			get { return this.AffineYCoord.TestBitZero(); }
+			get { return AffineYCoord.TestBitZero(); }
 		}
 
 		protected override bool SatisfiesCurveEquation()
 		{
-			ECFieldElement X = this.RawXCoord, Y = this.RawYCoord, A = Curve.A, B = Curve.B;
+			ECFieldElement X = RawXCoord, Y = RawYCoord, A = Curve.A, B = Curve.B;
 			ECFieldElement lhs = Y.Square();
 
 			switch (CurveCoordinateSystem)
@@ -674,7 +699,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 					break;
 				case ECCurve.COORD_HOMOGENEOUS:
 				{
-					ECFieldElement Z = this.RawZCoords[0];
+					ECFieldElement Z = RawZCoords[0];
 					if (!Z.IsOne)
 					{
 						ECFieldElement Z2 = Z.Square(), Z3 = Z.Multiply(Z2);
@@ -689,7 +714,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				case ECCurve.COORD_JACOBIAN_CHUDNOVSKY:
 				case ECCurve.COORD_JACOBIAN_MODIFIED:
 				{
-					ECFieldElement Z = this.RawZCoords[0];
+					ECFieldElement Z = RawZCoords[0];
 					if (!Z.IsOne)
 					{
 						ECFieldElement Z2 = Z.Square(), Z4 = Z2.Square(), Z6 = Z2.Multiply(Z4);
@@ -710,7 +735,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public override ECPoint Subtract(ECPoint b)
 		{
 			if (b.IsInfinity)
+			{
 				return this;
+			}
 
 			// Add -b
 			return Add(b.Negate());
@@ -726,8 +753,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		internal FpPoint(ECCurve curve, ECFieldElement x, ECFieldElement y)
 			: base(curve, x, y)
 		{
-			if ((x == null) != (y == null))
+			if (x == null != (y == null))
+			{
 				throw new ArgumentException("Exactly one of the field elements is null");
+			}
 		}
 
 		internal FpPoint(ECCurve curve, ECFieldElement x, ECFieldElement y, ECFieldElement[] zs)
@@ -742,7 +771,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override ECFieldElement GetZCoord(int index)
 		{
-			if (index == 1 && ECCurve.COORD_JACOBIAN_MODIFIED == this.CurveCoordinateSystem)
+			if (index == 1 && ECCurve.COORD_JACOBIAN_MODIFIED == CurveCoordinateSystem)
 			{
 				return GetJacobianModifiedW();
 			}
@@ -753,17 +782,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		// B.3 pg 62
 		public override ECPoint Add(ECPoint b)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return b;
-			if (b.IsInfinity)
-				return this;
-			if (this == b)
-				return Twice();
+			}
 
-			ECCurve curve = this.Curve;
+			if (b.IsInfinity)
+			{
+				return this;
+			}
+
+			if (this == b)
+			{
+				return Twice();
+			}
+
+			ECCurve curve = Curve;
 			int coord = curve.CoordinateSystem;
 
-			ECFieldElement X1 = this.RawXCoord, Y1 = this.RawYCoord;
+			ECFieldElement X1 = RawXCoord, Y1 = RawYCoord;
 			ECFieldElement X2 = b.RawXCoord, Y2 = b.RawYCoord;
 
 			switch (coord)
@@ -793,7 +830,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 				case ECCurve.COORD_HOMOGENEOUS:
 				{
-					ECFieldElement Z1 = this.RawZCoords[0];
+					ECFieldElement Z1 = RawZCoords[0];
 					ECFieldElement Z2 = b.RawZCoords[0];
 
 					bool Z1IsOne = Z1.IsOne;
@@ -812,7 +849,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 						if (u.IsZero)
 						{
 							// this == b, i.e. this must be doubled
-							return this.Twice();
+							return Twice();
 						}
 
 						// this == -b, i.e. the result is the point at infinity
@@ -836,7 +873,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				case ECCurve.COORD_JACOBIAN:
 				case ECCurve.COORD_JACOBIAN_MODIFIED:
 				{
-					ECFieldElement Z1 = this.RawZCoords[0];
+					ECFieldElement Z1 = RawZCoords[0];
 					ECFieldElement Z2 = b.RawZCoords[0];
 
 					bool Z1IsOne = Z1.IsOne;
@@ -917,7 +954,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 							if (R.IsZero)
 							{
 								// this == b, i.e. this must be doubled
-								return this.Twice();
+								return Twice();
 							}
 
 							// this == -b, i.e. the result is the point at infinity
@@ -979,25 +1016,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		// B.3 pg 62
 		public override ECPoint Twice()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			ECFieldElement Y1 = this.RawYCoord;
+			ECFieldElement Y1 = RawYCoord;
 			if (Y1.IsZero)
+			{
 				return curve.Infinity;
+			}
 
 			int coord = curve.CoordinateSystem;
 
-			ECFieldElement X1 = this.RawXCoord;
+			ECFieldElement X1 = RawXCoord;
 
 			switch (coord)
 			{
 				case ECCurve.COORD_AFFINE:
 				{
 					ECFieldElement X1Squared = X1.Square();
-					ECFieldElement gamma = Three(X1Squared).Add(this.Curve.A).Divide(Two(Y1));
+					ECFieldElement gamma = Three(X1Squared).Add(Curve.A).Divide(Two(Y1));
 					ECFieldElement X3 = gamma.Square().Subtract(Two(X1));
 					ECFieldElement Y3 = gamma.Multiply(X1.Subtract(X3)).Subtract(Y1);
 
@@ -1006,7 +1047,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 				case ECCurve.COORD_HOMOGENEOUS:
 				{
-					ECFieldElement Z1 = this.RawZCoords[0];
+					ECFieldElement Z1 = RawZCoords[0];
 
 					bool Z1IsOne = Z1.IsOne;
 
@@ -1037,7 +1078,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 				case ECCurve.COORD_JACOBIAN:
 				{
-					ECFieldElement Z1 = this.RawZCoords[0];
+					ECFieldElement Z1 = RawZCoords[0];
 
 					bool Z1IsOne = Z1.IsOne;
 
@@ -1110,24 +1151,34 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public override ECPoint TwicePlus(ECPoint b)
 		{
 			if (this == b)
+			{
 				return ThreeTimes();
-			if (this.IsInfinity)
+			}
+
+			if (IsInfinity)
+			{
 				return b;
+			}
+
 			if (b.IsInfinity)
+			{
 				return Twice();
+			}
 
-			ECFieldElement Y1 = this.RawYCoord;
+			ECFieldElement Y1 = RawYCoord;
 			if (Y1.IsZero)
+			{
 				return b;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 			int coord = curve.CoordinateSystem;
 
 			switch (coord)
 			{
 				case ECCurve.COORD_AFFINE:
 				{
-					ECFieldElement X1 = this.RawXCoord;
+					ECFieldElement X1 = RawXCoord;
 					ECFieldElement X2 = b.RawXCoord, Y2 = b.RawYCoord;
 
 					ECFieldElement dx = X2.Subtract(X1), dy = Y2.Subtract(Y1);
@@ -1160,8 +1211,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 					ECFieldElement I = D.Invert();
 					ECFieldElement L1 = d.Multiply(I).Multiply(dy);
 					ECFieldElement L2 = Two(Y1).Multiply(X).Multiply(dx).Multiply(I).Subtract(L1);
-					ECFieldElement X4 = (L2.Subtract(L1)).Multiply(L1.Add(L2)).Add(X2);
-					ECFieldElement Y4 = (X1.Subtract(X4)).Multiply(L2).Subtract(Y1);
+					ECFieldElement X4 = L2.Subtract(L1).Multiply(L1.Add(L2)).Add(X2);
+					ECFieldElement Y4 = X1.Subtract(X4).Multiply(L2).Subtract(Y1);
 
 					return new FpPoint(Curve, X4, Y4);
 				}
@@ -1178,21 +1229,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override ECPoint ThreeTimes()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
-			ECFieldElement Y1 = this.RawYCoord;
+			ECFieldElement Y1 = RawYCoord;
 			if (Y1.IsZero)
+			{
 				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 			int coord = curve.CoordinateSystem;
 
 			switch (coord)
 			{
 				case ECCurve.COORD_AFFINE:
 				{
-					ECFieldElement X1 = this.RawXCoord;
+					ECFieldElement X1 = RawXCoord;
 
 					ECFieldElement _2Y1 = Two(Y1);
 					ECFieldElement X = _2Y1.Square();
@@ -1210,8 +1265,8 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 					ECFieldElement L1 = d.Multiply(I).Multiply(Z);
 					ECFieldElement L2 = X.Square().Multiply(I).Subtract(L1);
 
-					ECFieldElement X4 = (L2.Subtract(L1)).Multiply(L1.Add(L2)).Add(X1);
-					ECFieldElement Y4 = (X1.Subtract(X4)).Multiply(L2).Subtract(Y1);
+					ECFieldElement X4 = L2.Subtract(L1).Multiply(L1.Add(L2)).Add(X1);
+					ECFieldElement Y4 = X1.Subtract(X4).Multiply(L2).Subtract(Y1);
 					return new FpPoint(Curve, X4, Y4);
 				}
 				case ECCurve.COORD_JACOBIAN_MODIFIED:
@@ -1229,23 +1284,33 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public override ECPoint TimesPow2(int e)
 		{
 			if (e < 0)
+			{
 				throw new ArgumentException("cannot be negative", "e");
-			if (e == 0 || this.IsInfinity)
+			}
+
+			if (e == 0 || IsInfinity)
+			{
 				return this;
+			}
+
 			if (e == 1)
+			{
 				return Twice();
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			ECFieldElement Y1 = this.RawYCoord;
+			ECFieldElement Y1 = RawYCoord;
 			if (Y1.IsZero)
+			{
 				return curve.Infinity;
+			}
 
 			int coord = curve.CoordinateSystem;
 
 			ECFieldElement W1 = curve.A;
-			ECFieldElement X1 = this.RawXCoord;
-			ECFieldElement Z1 = this.RawZCoords.Length < 1 ? curve.FromBigInteger(BigInteger.One) : this.RawZCoords[0];
+			ECFieldElement X1 = RawXCoord;
+			ECFieldElement Z1 = RawZCoords.Length < 1 ? curve.FromBigInteger(BigInteger.One) : RawZCoords[0];
 
 			if (!Z1.IsOne)
 			{
@@ -1269,7 +1334,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			for (int i = 0; i < e; ++i)
 			{
 				if (Y1.IsZero)
+				{
 					return curve.Infinity;
+				}
 
 				ECFieldElement X1Squared = X1.Square();
 				ECFieldElement M = Three(X1Squared);
@@ -1341,7 +1408,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public override ECPoint Negate()
 		{
 			if (IsInfinity)
+			{
 				return this;
+			}
 
 			ECCurve curve = Curve;
 			int coord = curve.CoordinateSystem;
@@ -1356,9 +1425,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		protected virtual ECFieldElement CalculateJacobianModifiedW(ECFieldElement Z, ECFieldElement ZSquared)
 		{
-			ECFieldElement a4 = this.Curve.A;
+			ECFieldElement a4 = Curve.A;
 			if (a4.IsZero || Z.IsOne)
+			{
 				return a4;
+			}
 
 			if (ZSquared == null)
 			{
@@ -1381,7 +1452,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		protected virtual ECFieldElement GetJacobianModifiedW()
 		{
-			ECFieldElement[] ZZ = this.RawZCoords;
+			ECFieldElement[] ZZ = RawZCoords;
 			ECFieldElement W = ZZ[1];
 			if (W == null)
 			{
@@ -1394,7 +1465,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		protected virtual FpPoint TwiceJacobianModified(bool calculateW)
 		{
-			ECFieldElement X1 = this.RawXCoord, Y1 = this.RawYCoord, Z1 = this.RawZCoords[0], W1 = GetJacobianModifiedW();
+			ECFieldElement X1 = RawXCoord, Y1 = RawYCoord, Z1 = RawZCoords[0], W1 = GetJacobianModifiedW();
 
 			ECFieldElement X1Squared = X1.Square();
 			ECFieldElement M = Three(X1Squared).Add(W1);
@@ -1408,7 +1479,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			ECFieldElement W3 = calculateW ? Two(_8T.Multiply(W1)) : null;
 			ECFieldElement Z3 = Z1.IsOne ? _2Y1 : _2Y1.Multiply(Z1);
 
-			return new FpPoint(this.Curve, X3, Y3, new ECFieldElement[] { Z3, W3 });
+			return new FpPoint(Curve, X3, Y3, new ECFieldElement[] { Z3, W3 });
 		}
 	}
 
@@ -1428,13 +1499,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		protected override bool SatisfiesCurveEquation()
 		{
 			ECCurve curve = Curve;
-			ECFieldElement X = this.RawXCoord, Y = this.RawYCoord, A = curve.A, B = curve.B;
+			ECFieldElement X = RawXCoord, Y = RawYCoord, A = curve.A, B = curve.B;
 			ECFieldElement lhs, rhs;
 
 			int coord = curve.CoordinateSystem;
 			if (coord == ECCurve.COORD_LAMBDA_PROJECTIVE)
 			{
-				ECFieldElement Z = this.RawZCoords[0];
+				ECFieldElement Z = RawZCoords[0];
 				bool ZIsOne = Z.IsOne;
 
 				if (X.IsZero)
@@ -1477,7 +1548,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 						break;
 					case ECCurve.COORD_HOMOGENEOUS:
 					{
-						ECFieldElement Z = this.RawZCoords[0];
+						ECFieldElement Z = RawZCoords[0];
 						if (!Z.IsOne)
 						{
 							ECFieldElement Z2 = Z.Square(), Z3 = Z.Multiply(Z2);
@@ -1510,7 +1581,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				 *
 				 * Note: Tr(A) == 1 for cofactor 2 curves.
 				 */
-				ECPoint N = this.Normalize();
+				ECPoint N = Normalize();
 				ECFieldElement X = N.AffineXCoord;
 				return 0 != ((AbstractF2mFieldElement)X).Trace();
 			}
@@ -1522,11 +1593,13 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				 *
 				 * Note: Tr(A) == 0 for cofactor 4 curves.
 				 */
-				ECPoint N = this.Normalize();
+				ECPoint N = Normalize();
 				ECFieldElement X = N.AffineXCoord;
 				ECFieldElement L = ((AbstractF2mCurve)curve).SolveQuadraticEquation(X.Add(curve.A));
 				if (null == L)
+				{
 					return false;
+				}
 
 				/*
 				 * A solution exists, therefore 0 == Tr(X + A) == Tr(X).
@@ -1551,8 +1624,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override ECPoint ScaleX(ECFieldElement scale)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
 			switch (CurveCoordinateSystem)
 			{
@@ -1592,8 +1667,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override ECPoint ScaleY(ECFieldElement scale)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
 			switch (CurveCoordinateSystem)
 			{
@@ -1622,7 +1699,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		public override ECPoint Subtract(ECPoint b)
 		{
 			if (b.IsInfinity)
+			{
 				return this;
+			}
 
 			// Add -b
 			return Add(b.Negate());
@@ -1630,26 +1709,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public virtual AbstractF2mPoint Tau()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 			int coord = curve.CoordinateSystem;
 
-			ECFieldElement X1 = this.RawXCoord;
+			ECFieldElement X1 = RawXCoord;
 
 			switch (coord)
 			{
 				case ECCurve.COORD_AFFINE:
 				case ECCurve.COORD_LAMBDA_AFFINE:
 				{
-					ECFieldElement Y1 = this.RawYCoord;
+					ECFieldElement Y1 = RawYCoord;
 					return (AbstractF2mPoint)curve.CreateRawPoint(X1.Square(), Y1.Square());
 				}
 				case ECCurve.COORD_HOMOGENEOUS:
 				case ECCurve.COORD_LAMBDA_PROJECTIVE:
 				{
-					ECFieldElement Y1 = this.RawYCoord, Z1 = this.RawZCoords[0];
+					ECFieldElement Y1 = RawYCoord, Z1 = RawZCoords[0];
 					return (AbstractF2mPoint)curve.CreateRawPoint(X1.Square(), Y1.Square(),
 						new ECFieldElement[] { Z1.Square() });
 				}
@@ -1662,26 +1743,28 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public virtual AbstractF2mPoint TauPow(int pow)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 			int coord = curve.CoordinateSystem;
 
-			ECFieldElement X1 = this.RawXCoord;
+			ECFieldElement X1 = RawXCoord;
 
 			switch (coord)
 			{
 				case ECCurve.COORD_AFFINE:
 				case ECCurve.COORD_LAMBDA_AFFINE:
 				{
-					ECFieldElement Y1 = this.RawYCoord;
+					ECFieldElement Y1 = RawYCoord;
 					return (AbstractF2mPoint)curve.CreateRawPoint(X1.SquarePow(pow), Y1.SquarePow(pow));
 				}
 				case ECCurve.COORD_HOMOGENEOUS:
 				case ECCurve.COORD_LAMBDA_PROJECTIVE:
 				{
-					ECFieldElement Y1 = this.RawYCoord, Z1 = this.RawZCoords[0];
+					ECFieldElement Y1 = RawYCoord, Z1 = RawZCoords[0];
 					return (AbstractF2mPoint)curve.CreateRawPoint(X1.SquarePow(pow), Y1.SquarePow(pow),
 						new ECFieldElement[] { Z1.SquarePow(pow) });
 				}
@@ -1702,7 +1785,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		internal F2mPoint(ECCurve curve, ECFieldElement x, ECFieldElement y)
 			: base(curve, x, y)
 		{
-			if ((x == null) != (y == null))
+			if (x == null != (y == null))
 			{
 				throw new ArgumentException("Exactly one of the field elements is null");
 			}
@@ -1734,7 +1817,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			get
 			{
-				int coord = this.CurveCoordinateSystem;
+				int coord = CurveCoordinateSystem;
 
 				switch (coord)
 				{
@@ -1743,8 +1826,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 					{
 						ECFieldElement X = RawXCoord, L = RawYCoord;
 
-						if (this.IsInfinity || X.IsZero)
+						if (IsInfinity || X.IsZero)
+						{
 							return L;
+						}
 
 						// Y is actually Lambda (X + Y/X) here; convert to affine value on the fly
 						ECFieldElement Y = L.Add(X).Multiply(X);
@@ -1771,15 +1856,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		{
 			get
 			{
-				ECFieldElement X = this.RawXCoord;
+				ECFieldElement X = RawXCoord;
 				if (X.IsZero)
 				{
 					return false;
 				}
 
-				ECFieldElement Y = this.RawYCoord;
+				ECFieldElement Y = RawYCoord;
 
-				switch (this.CurveCoordinateSystem)
+				switch (CurveCoordinateSystem)
 				{
 					case ECCurve.COORD_LAMBDA_AFFINE:
 					case ECCurve.COORD_LAMBDA_PROJECTIVE:
@@ -1797,22 +1882,27 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override ECPoint Add(ECPoint b)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return b;
-			if (b.IsInfinity)
-				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			if (b.IsInfinity)
+			{
+				return this;
+			}
+
+			ECCurve curve = Curve;
 			int coord = curve.CoordinateSystem;
 
-			ECFieldElement X1 = this.RawXCoord;
+			ECFieldElement X1 = RawXCoord;
 			ECFieldElement X2 = b.RawXCoord;
 
 			switch (coord)
 			{
 				case ECCurve.COORD_AFFINE:
 				{
-					ECFieldElement Y1 = this.RawYCoord;
+					ECFieldElement Y1 = RawYCoord;
 					ECFieldElement Y2 = b.RawYCoord;
 
 					ECFieldElement dx = X1.Add(X2), dy = Y1.Add(Y2);
@@ -1835,7 +1925,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				}
 				case ECCurve.COORD_HOMOGENEOUS:
 				{
-					ECFieldElement Y1 = this.RawYCoord, Z1 = this.RawZCoords[0];
+					ECFieldElement Y1 = RawYCoord, Z1 = RawZCoords[0];
 					ECFieldElement Y2 = b.RawYCoord, Z2 = b.RawZCoords[0];
 
 					bool Z1IsOne = Z1.IsOne;
@@ -1885,12 +1975,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 					if (X1.IsZero)
 					{
 						if (X2.IsZero)
+						{
 							return curve.Infinity;
+						}
 
 						return b.Add(this);
 					}
 
-					ECFieldElement L1 = this.RawYCoord, Z1 = this.RawZCoords[0];
+					ECFieldElement L1 = RawYCoord, Z1 = RawZCoords[0];
 					ECFieldElement L2 = b.RawYCoord, Z2 = b.RawZCoords[0];
 
 					bool Z1IsOne = Z1.IsOne;
@@ -1926,7 +2018,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 					if (X2.IsZero)
 					{
 						// TODO This can probably be optimized quite a bit
-						ECPoint p = this.Normalize();
+						ECPoint p = Normalize();
 						X1 = p.RawXCoord;
 						ECFieldElement Y1 = p.YCoord;
 
@@ -1985,12 +2077,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 		 */
 		public override ECPoint Twice()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			ECFieldElement X1 = this.RawXCoord;
+			ECFieldElement X1 = RawXCoord;
 			if (X1.IsZero)
 			{
 				// A point with X == 0 is its own additive inverse
@@ -2003,7 +2097,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			{
 				case ECCurve.COORD_AFFINE:
 				{
-					ECFieldElement Y1 = this.RawYCoord;
+					ECFieldElement Y1 = RawYCoord;
 
 					ECFieldElement L1 = Y1.Divide(X1).Add(X1);
 
@@ -2014,7 +2108,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				}
 				case ECCurve.COORD_HOMOGENEOUS:
 				{
-					ECFieldElement Y1 = this.RawYCoord, Z1 = this.RawZCoords[0];
+					ECFieldElement Y1 = RawYCoord, Z1 = RawZCoords[0];
 
 					bool Z1IsOne = Z1.IsOne;
 					ECFieldElement X1Z1 = Z1IsOne ? X1 : X1.Multiply(Z1);
@@ -2035,7 +2129,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 				}
 				case ECCurve.COORD_LAMBDA_PROJECTIVE:
 				{
-					ECFieldElement L1 = this.RawYCoord, Z1 = this.RawZCoords[0];
+					ECFieldElement L1 = RawYCoord, Z1 = RawZCoords[0];
 
 					bool Z1IsOne = Z1.IsOne;
 					ECFieldElement L1Z1 = Z1IsOne ? L1 : L1.Multiply(Z1);
@@ -2053,7 +2147,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 					ECFieldElement b = curve.B;
 					ECFieldElement L3;
-					if (b.BitLength < (curve.FieldSize >> 1))
+					if (b.BitLength < curve.FieldSize >> 1)
 					{
 						ECFieldElement t1 = L1.Add(X1).Square();
 						ECFieldElement t2;
@@ -2094,14 +2188,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override ECPoint TwicePlus(ECPoint b)
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return b;
+			}
+
 			if (b.IsInfinity)
+			{
 				return Twice();
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 
-			ECFieldElement X1 = this.RawXCoord;
+			ECFieldElement X1 = RawXCoord;
 			if (X1.IsZero)
 			{
 				// A point with X == 0 is its own additive inverse
@@ -2121,7 +2220,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 						return Twice().Add(b);
 					}
 
-					ECFieldElement L1 = this.RawYCoord, Z1 = this.RawZCoords[0];
+					ECFieldElement L1 = RawYCoord, Z1 = RawZCoords[0];
 					ECFieldElement L2 = b.RawYCoord;
 
 					ECFieldElement X1Sq = X1.Square();
@@ -2165,37 +2264,41 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 
 		public override ECPoint Negate()
 		{
-			if (this.IsInfinity)
+			if (IsInfinity)
+			{
 				return this;
+			}
 
-			ECFieldElement X = this.RawXCoord;
+			ECFieldElement X = RawXCoord;
 			if (X.IsZero)
+			{
 				return this;
+			}
 
-			ECCurve curve = this.Curve;
+			ECCurve curve = Curve;
 			int coord = curve.CoordinateSystem;
 
 			switch (coord)
 			{
 				case ECCurve.COORD_AFFINE:
 				{
-					ECFieldElement Y = this.RawYCoord;
+					ECFieldElement Y = RawYCoord;
 					return new F2mPoint(curve, X, Y.Add(X));
 				}
 				case ECCurve.COORD_HOMOGENEOUS:
 				{
-					ECFieldElement Y = this.RawYCoord, Z = this.RawZCoords[0];
+					ECFieldElement Y = RawYCoord, Z = RawZCoords[0];
 					return new F2mPoint(curve, X, Y.Add(X), new ECFieldElement[] { Z });
 				}
 				case ECCurve.COORD_LAMBDA_AFFINE:
 				{
-					ECFieldElement L = this.RawYCoord;
+					ECFieldElement L = RawYCoord;
 					return new F2mPoint(curve, X, L.AddOne());
 				}
 				case ECCurve.COORD_LAMBDA_PROJECTIVE:
 				{
 					// L is actually Lambda (X + Y/X) here
-					ECFieldElement L = this.RawYCoord, Z = this.RawZCoords[0];
+					ECFieldElement L = RawYCoord, Z = RawZCoords[0];
 					return new F2mPoint(curve, X, L.Add(Z), new ECFieldElement[] { Z });
 				}
 				default:

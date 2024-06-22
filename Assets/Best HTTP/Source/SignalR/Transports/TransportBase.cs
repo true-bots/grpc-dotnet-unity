@@ -11,7 +11,7 @@ namespace BestHTTP.SignalR.Transports
 
 	public abstract class TransportBase
 	{
-		private const int MaxRetryCount = 5;
+		const int MaxRetryCount = 5;
 
 		#region Public Properties
 
@@ -47,7 +47,9 @@ namespace BestHTTP.SignalR.Transports
 				_state = value;
 
 				if (OnStateChanged != null)
+				{
 					OnStateChanged(this, old, _state);
+				}
 			}
 		}
 
@@ -62,9 +64,9 @@ namespace BestHTTP.SignalR.Transports
 
 		public TransportBase(string name, Connection connection)
 		{
-			this.Name = name;
-			this.Connection = connection;
-			this.State = TransportStates.Initial;
+			Name = name;
+			Connection = connection;
+			State = TransportStates.Initial;
 		}
 
 		#region Abstract functions
@@ -102,7 +104,7 @@ namespace BestHTTP.SignalR.Transports
 		/// </summary>
 		protected void OnConnected()
 		{
-			if (this.State != TransportStates.Reconnecting)
+			if (State != TransportStates.Reconnecting)
 			{
 				// Send the Start request
 				Start();
@@ -113,7 +115,7 @@ namespace BestHTTP.SignalR.Transports
 
 				Started();
 
-				this.State = TransportStates.Started;
+				State = TransportStates.Started;
 			}
 		}
 
@@ -124,13 +126,13 @@ namespace BestHTTP.SignalR.Transports
 		/// </summary>
 		protected void Start()
 		{
-			HTTPManager.Logger.Information("Transport - " + this.Name, "Sending Start Request");
+			HTTPManager.Logger.Information("Transport - " + Name, "Sending Start Request");
 
-			this.State = TransportStates.Starting;
+			State = TransportStates.Starting;
 
-			if (this.Connection.Protocol > ProtocolVersions.Protocol_2_0)
+			if (Connection.Protocol > ProtocolVersions.Protocol_2_0)
 			{
-				var request = new HTTPRequest(Connection.BuildUri(RequestTypes.Start, this), HTTPMethods.Get, true, true, OnStartRequestFinished);
+				HTTPRequest request = new HTTPRequest(Connection.BuildUri(RequestTypes.Start, this), HTTPMethods.Get, true, true, OnStartRequestFinished);
 
 				request.Tag = 0;
 				request.MaxRetries = 0;
@@ -144,7 +146,7 @@ namespace BestHTTP.SignalR.Transports
 			else
 			{
 				// The transport and the signalr protocol now started
-				this.State = TransportStates.Started;
+				State = TransportStates.Started;
 
 				Started();
 
@@ -152,14 +154,14 @@ namespace BestHTTP.SignalR.Transports
 			}
 		}
 
-		private void OnStartRequestFinished(HTTPRequest req, HTTPResponse resp)
+		void OnStartRequestFinished(HTTPRequest req, HTTPResponse resp)
 		{
 			switch (req.State)
 			{
 				case HTTPRequestStates.Finished:
 					if (resp.IsSuccess)
 					{
-						HTTPManager.Logger.Information("Transport - " + this.Name, "Start - Returned: " + resp.DataAsText);
+						HTTPManager.Logger.Information("Transport - " + Name, "Start - Returned: " + resp.DataAsText);
 
 						string response = Connection.ParseResponse(resp.DataAsText);
 
@@ -170,7 +172,7 @@ namespace BestHTTP.SignalR.Transports
 						}
 
 						// The transport and the signalr protocol now started
-						this.State = TransportStates.Started;
+						State = TransportStates.Started;
 
 						Started();
 
@@ -179,17 +181,19 @@ namespace BestHTTP.SignalR.Transports
 						return;
 					}
 					else
-						HTTPManager.Logger.Warning("Transport - " + this.Name, string.Format(
+					{
+						HTTPManager.Logger.Warning("Transport - " + Name, string.Format(
 							"Start - request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText,
 							req.CurrentUri));
+					}
 
 					goto default;
 
 				default:
-					HTTPManager.Logger.Information("Transport - " + this.Name, "Start request state: " + req.State.ToString());
+					HTTPManager.Logger.Information("Transport - " + Name, "Start request state: " + req.State.ToString());
 
 					// The request may not reached the server. Try it again.
 					int retryCount = (int)req.Tag;
@@ -199,7 +203,9 @@ namespace BestHTTP.SignalR.Transports
 						req.Send();
 					}
 					else
+					{
 						Connection.Error("Failed to send Start request.");
+					}
 
 					break;
 			}
@@ -214,12 +220,14 @@ namespace BestHTTP.SignalR.Transports
 		/// </summary>
 		public virtual void Abort()
 		{
-			if (this.State != TransportStates.Started)
+			if (State != TransportStates.Started)
+			{
 				return;
+			}
 
-			this.State = TransportStates.Closing;
+			State = TransportStates.Closing;
 
-			var request = new HTTPRequest(Connection.BuildUri(RequestTypes.Abort, this), HTTPMethods.Get, true, true, OnAbortRequestFinished);
+			HTTPRequest request = new HTTPRequest(Connection.BuildUri(RequestTypes.Abort, this), HTTPMethods.Get, true, true, OnAbortRequestFinished);
 
 			// Retry counter
 			request.Tag = 0;
@@ -232,28 +240,30 @@ namespace BestHTTP.SignalR.Transports
 
 		protected void AbortFinished()
 		{
-			this.State = TransportStates.Closed;
+			State = TransportStates.Closed;
 
 			Connection.TransportAborted();
 
-			this.Aborted();
+			Aborted();
 		}
 
-		private void OnAbortRequestFinished(HTTPRequest req, HTTPResponse resp)
+		void OnAbortRequestFinished(HTTPRequest req, HTTPResponse resp)
 		{
 			switch (req.State)
 			{
 				case HTTPRequestStates.Finished:
 					if (resp.IsSuccess)
 					{
-						HTTPManager.Logger.Information("Transport - " + this.Name, "Abort - Returned: " + resp.DataAsText);
+						HTTPManager.Logger.Information("Transport - " + Name, "Abort - Returned: " + resp.DataAsText);
 
-						if (this.State == TransportStates.Closing)
+						if (State == TransportStates.Closing)
+						{
 							AbortFinished();
+						}
 					}
 					else
 					{
-						HTTPManager.Logger.Warning("Transport - " + this.Name, string.Format(
+						HTTPManager.Logger.Warning("Transport - " + Name, string.Format(
 							"Abort - Handshake request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}",
 							resp.StatusCode,
 							resp.Message,
@@ -266,7 +276,7 @@ namespace BestHTTP.SignalR.Transports
 
 					break;
 				default:
-					HTTPManager.Logger.Information("Transport - " + this.Name, "Abort request state: " + req.State.ToString());
+					HTTPManager.Logger.Information("Transport - " + Name, "Abort request state: " + req.State.ToString());
 
 					// The request may not reached the server. Try it again.
 					int retryCount = (int)req.Tag;
@@ -276,7 +286,9 @@ namespace BestHTTP.SignalR.Transports
 						req.Send();
 					}
 					else
+					{
 						Connection.Error("Failed to send Abort request!");
+					}
 
 					break;
 			}
@@ -294,13 +306,13 @@ namespace BestHTTP.SignalR.Transports
 		{
 			try
 			{
-				HTTPManager.Logger.Information("Transport - " + this.Name, "Sending: " + jsonStr);
+				HTTPManager.Logger.Information("Transport - " + Name, "Sending: " + jsonStr);
 
 				SendImpl(jsonStr);
 			}
 			catch (Exception ex)
 			{
-				HTTPManager.Logger.Exception("Transport - " + this.Name, "Send", ex);
+				HTTPManager.Logger.Exception("Transport - " + Name, "Send", ex);
 			}
 		}
 
@@ -313,11 +325,11 @@ namespace BestHTTP.SignalR.Transports
 		/// </summary>
 		public void Reconnect()
 		{
-			HTTPManager.Logger.Information("Transport - " + this.Name, "Reconnecting");
+			HTTPManager.Logger.Information("Transport - " + Name, "Reconnecting");
 
 			Stop();
 
-			this.State = TransportStates.Reconnecting;
+			State = TransportStates.Reconnecting;
 
 			Connect();
 		}
@@ -336,7 +348,9 @@ namespace BestHTTP.SignalR.Transports
 
 			// We don't have to do further decoding, if it's an empty json object, then it's a KeepAlive message from the server
 			if (json.Length == 2 && json == "{}")
+			{
 				return new KeepAliveMessage();
+			}
 
 			IDictionary<string, object> msg = null;
 
@@ -363,12 +377,18 @@ namespace BestHTTP.SignalR.Transports
 			{
 				// If there are no ErrorMessage in the object, then it was a success
 				if (!msg.ContainsKey("E"))
+				{
 					result = new ResultMessage();
+				}
 				else
+				{
 					result = new FailureMessage();
+				}
 			}
 			else
+			{
 				result = new MultiMessage();
+			}
 
 			try
 			{

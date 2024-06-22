@@ -10,7 +10,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static readonly SubsequentMessage encrCert = new SubsequentMessage(0);
 		public static readonly SubsequentMessage challengeResp = new SubsequentMessage(1);
 
-		private SubsequentMessage(int value)
+		SubsequentMessage(int value)
 			: base(value)
 		{
 		}
@@ -18,10 +18,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static SubsequentMessage ValueOf(int value)
 		{
 			if (value == 0)
+			{
 				return encrCert;
+			}
 
 			if (value == 1)
+			{
 				return challengeResp;
+			}
 
 			throw new ArgumentException("unknown value: " + value, "value");
 		}

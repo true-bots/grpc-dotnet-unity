@@ -9,23 +9,29 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 	public class TimeStampReq
 		: Asn1Encodable
 	{
-		private readonly DerInteger version;
-		private readonly MessageImprint messageImprint;
-		private readonly DerObjectIdentifier tsaPolicy;
-		private readonly DerInteger nonce;
-		private readonly DerBoolean certReq;
-		private readonly X509Extensions extensions;
+		readonly DerInteger version;
+		readonly MessageImprint messageImprint;
+		readonly DerObjectIdentifier tsaPolicy;
+		readonly DerInteger nonce;
+		readonly DerBoolean certReq;
+		readonly X509Extensions extensions;
 
 		public static TimeStampReq GetInstance(object obj)
 		{
 			if (obj is TimeStampReq)
+			{
 				return (TimeStampReq)obj;
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new TimeStampReq(Asn1Sequence.GetInstance(obj));
 		}
 
-		private TimeStampReq(
+		TimeStampReq(
 			Asn1Sequence seq)
 		{
 			int nbObjects = seq.Count;
@@ -74,7 +80,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Tsp
 			X509Extensions extensions)
 		{
 			// default
-			this.version = new DerInteger(1);
+			version = new DerInteger(1);
 
 			this.messageImprint = messageImprint;
 			this.tsaPolicy = tsaPolicy;

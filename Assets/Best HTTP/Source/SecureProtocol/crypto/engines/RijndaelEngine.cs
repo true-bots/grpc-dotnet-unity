@@ -20,11 +20,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 	public class RijndaelEngine
 		: IBlockCipher
 	{
-		private static readonly int MAXROUNDS = 14;
+		static readonly int MAXROUNDS = 14;
 
-		private static readonly int MAXKC = (256 / 4);
+		static readonly int MAXKC = 256 / 4;
 
-		private static readonly byte[] Logtable =
+		static readonly byte[] Logtable =
 		{
 			0, 0, 25, 1, 50, 2, 26, 198,
 			75, 199, 27, 104, 51, 238, 223, 3,
@@ -60,7 +60,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			13, 99, 140, 128, 192, 247, 112, 7
 		};
 
-		private static readonly byte[] Alogtable =
+		static readonly byte[] Alogtable =
 		{
 			0, 3, 5, 15, 17, 51, 85, 255, 26, 46, 114, 150, 161, 248, 19, 53,
 			95, 225, 56, 72, 216, 115, 149, 164, 247, 2, 6, 10, 30, 34, 102, 170,
@@ -93,10 +93,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			252, 31, 33, 99, 165, 244, 7, 9, 27, 45, 119, 153, 176, 203, 70, 202,
 			69, 207, 74, 222, 121, 139, 134, 145, 168, 227, 62, 66, 198, 81, 243, 14,
 			18, 54, 90, 238, 41, 123, 141, 140, 143, 138, 133, 148, 167, 242, 13, 23,
-			57, 75, 221, 124, 132, 151, 162, 253, 28, 36, 108, 180, 199, 82, 246, 1,
+			57, 75, 221, 124, 132, 151, 162, 253, 28, 36, 108, 180, 199, 82, 246, 1
 		};
 
-		private static readonly byte[] S =
+		static readonly byte[] S =
 		{
 			99, 124, 119, 123, 242, 107, 111, 197, 48, 1, 103, 43, 254, 215, 171, 118,
 			202, 130, 201, 125, 250, 89, 71, 240, 173, 212, 162, 175, 156, 164, 114, 192,
@@ -113,10 +113,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			186, 120, 37, 46, 28, 166, 180, 198, 232, 221, 116, 31, 75, 189, 139, 138,
 			112, 62, 181, 102, 72, 3, 246, 14, 97, 53, 87, 185, 134, 193, 29, 158,
 			225, 248, 152, 17, 105, 217, 142, 148, 155, 30, 135, 233, 206, 85, 40, 223,
-			140, 161, 137, 13, 191, 230, 66, 104, 65, 153, 45, 15, 176, 84, 187, 22,
+			140, 161, 137, 13, 191, 230, 66, 104, 65, 153, 45, 15, 176, 84, 187, 22
 		};
 
-		private static readonly byte[] Si =
+		static readonly byte[] Si =
 		{
 			82, 9, 106, 213, 48, 54, 165, 56, 191, 64, 163, 158, 129, 243, 215, 251,
 			124, 227, 57, 130, 155, 47, 255, 135, 52, 142, 67, 68, 196, 222, 233, 203,
@@ -133,10 +133,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			31, 221, 168, 51, 136, 7, 199, 49, 177, 18, 16, 89, 39, 128, 236, 95,
 			96, 81, 127, 169, 25, 181, 74, 13, 45, 229, 122, 159, 147, 201, 156, 239,
 			160, 224, 59, 77, 174, 42, 245, 176, 200, 235, 187, 60, 131, 83, 153, 97,
-			23, 43, 4, 126, 186, 119, 214, 38, 225, 105, 20, 99, 85, 33, 12, 125,
+			23, 43, 4, 126, 186, 119, 214, 38, 225, 105, 20, 99, 85, 33, 12, 125
 		};
 
-		private static readonly byte[] rcon =
+		static readonly byte[] rcon =
 		{
 			0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
 			0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91
@@ -164,7 +164,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* multiply two elements of GF(2^m)
 		* needed for MixColumn and InvMixColumn
 		*/
-		private byte Mul0x2(
+		byte Mul0x2(
 			int b)
 		{
 			if (b != 0)
@@ -177,7 +177,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private byte Mul0x3(
+		byte Mul0x3(
 			int b)
 		{
 			if (b != 0)
@@ -190,7 +190,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private byte Mul0x9(
+		byte Mul0x9(
 			int b)
 		{
 			if (b >= 0)
@@ -203,7 +203,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private byte Mul0xb(
+		byte Mul0xb(
 			int b)
 		{
 			if (b >= 0)
@@ -216,7 +216,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private byte Mul0xd(
+		byte Mul0xd(
 			int b)
 		{
 			if (b >= 0)
@@ -229,7 +229,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private byte Mul0xe(
+		byte Mul0xe(
 			int b)
 		{
 			if (b >= 0)
@@ -245,7 +245,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 		* xor corresponding text input and round key input bytes
 		*/
-		private void KeyAddition(
+		void KeyAddition(
 			long[] rk)
 		{
 			A0 ^= rk[0];
@@ -254,7 +254,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			A3 ^= rk[3];
 		}
 
-		private long Shift(
+		long Shift(
 			long r,
 			int shift)
 		{
@@ -275,7 +275,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* Row 0 remains unchanged
 		* The other three rows are shifted a variable amount
 		*/
-		private void ShiftRow(
+		void ShiftRow(
 			byte[] shiftsSC)
 		{
 			A1 = Shift(A1, shiftsSC[1]);
@@ -283,7 +283,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			A3 = Shift(A3, shiftsSC[3]);
 		}
 
-		private long ApplyS(
+		long ApplyS(
 			long r,
 			byte[] box)
 		{
@@ -301,7 +301,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* Replace every byte of the input by the byte at that place
 		* in the nonlinear S-box
 		*/
-		private void Substitution(
+		void Substitution(
 			byte[] box)
 		{
 			A0 = ApplyS(A0, box);
@@ -313,7 +313,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		/**
 		* Mix the bytes of every column in a linear way
 		*/
-		private void MixColumn()
+		void MixColumn()
 		{
 			long r0, r1, r2, r3;
 
@@ -345,7 +345,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* Mix the bytes of every column in a linear way
 		* This is the opposite operation of Mixcolumn
 		*/
-		private void InvMixColumn()
+		void InvMixColumn()
 		{
 			long r0, r1, r2, r3;
 
@@ -360,10 +360,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				//
 				// pre-lookup the log table
 				//
-				a0 = (a0 != 0) ? (Logtable[a0 & 0xff] & 0xff) : -1;
-				a1 = (a1 != 0) ? (Logtable[a1 & 0xff] & 0xff) : -1;
-				a2 = (a2 != 0) ? (Logtable[a2 & 0xff] & 0xff) : -1;
-				a3 = (a3 != 0) ? (Logtable[a3 & 0xff] & 0xff) : -1;
+				a0 = a0 != 0 ? Logtable[a0 & 0xff] & 0xff : -1;
+				a1 = a1 != 0 ? Logtable[a1 & 0xff] & 0xff : -1;
+				a2 = a2 != 0 ? Logtable[a2 & 0xff] & 0xff : -1;
+				a3 = a3 != 0 ? Logtable[a3 & 0xff] & 0xff : -1;
 
 				r0 |= (long)((Mul0xe(a0) ^ Mul0xb(a1) ^ Mul0xd(a2) ^ Mul0x9(a3)) & 0xff) << j;
 
@@ -384,7 +384,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		* Calculate the necessary round keys
 		* The number of calculations depends on keyBits and blockBits
 		*/
-		private long[][] GenerateWorkingKey(
+		long[][] GenerateWorkingKey(
 			byte[] key)
 		{
 			int KC;
@@ -394,7 +394,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			//long[,]    W = new long[MAXROUNDS+1,4];
 			long[][] W = new long[MAXROUNDS + 1][];
 
-			for (int i = 0; i < MAXROUNDS + 1; i++) W[i] = new long[4];
+			for (int i = 0; i < MAXROUNDS + 1; i++)
+			{
+				W[i] = new long[4];
+			}
 
 			switch (keyBits)
 			{
@@ -423,7 +426,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 			else
 			{
-				ROUNDS = (BC / 8) + 6;
+				ROUNDS = BC / 8 + 6;
 			}
 
 			//
@@ -441,11 +444,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			//
 			// copy values into round key array
 			//
-			for (int j = 0; (j < KC) && (t < (ROUNDS + 1) * (BC / 8)); j++, t++)
+			for (int j = 0; j < KC && t < (ROUNDS + 1) * (BC / 8); j++, t++)
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					W[t / (BC / 8)][i] |= (long)(tk[i, j] & 0xff) << ((t * 8) % BC);
+					W[t / (BC / 8)][i] |= (long)(tk[i, j] & 0xff) << (t * 8 % BC);
 				}
 			}
 
@@ -499,11 +502,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				//
 				// copy values into round key array
 				//
-				for (int j = 0; (j < KC) && (t < (ROUNDS + 1) * (BC / 8)); j++, t++)
+				for (int j = 0; j < KC && t < (ROUNDS + 1) * (BC / 8); j++, t++)
 				{
 					for (int i = 0; i < 4; i++)
 					{
-						W[t / (BC / 8)][i] |= (long)(tk[i, j] & 0xff) << ((t * 8) % (BC));
+						W[t / (BC / 8)][i] |= (long)(tk[i, j] & 0xff) << (t * 8 % BC);
 					}
 				}
 			}
@@ -511,15 +514,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			return W;
 		}
 
-		private int BC;
-		private long BC_MASK;
-		private int ROUNDS;
-		private int blockBits;
-		private long[][] workingKey;
-		private long A0, A1, A2, A3;
-		private bool forEncryption;
-		private byte[] shifts0SC;
-		private byte[] shifts1SC;
+		int BC;
+		long BC_MASK;
+		int ROUNDS;
+		int blockBits;
+		long[][] workingKey;
+		long A0, A1, A2, A3;
+		bool forEncryption;
+		byte[] shifts0SC;
+		byte[] shifts1SC;
 
 		/**
 		* default constructor - 128 bit block size.
@@ -594,7 +597,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 				return;
 			}
 
-			throw new ArgumentException("invalid parameter passed to Rijndael init - " + Org.BouncyCastle.Utilities.Platform.GetTypeName(parameters));
+			throw new ArgumentException("invalid parameter passed to Rijndael init - " + Platform.GetTypeName(parameters));
 		}
 
 		public virtual string AlgorithmName
@@ -610,10 +613,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		public virtual int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
 		{
 			if (workingKey == null)
+			{
 				throw new InvalidOperationException("Rijndael engine not initialised");
+			}
 
-			Check.DataLength(input, inOff, (BC / 2), "input buffer too short");
-			Check.OutputLength(output, outOff, (BC / 2), "output buffer too short");
+			Check.DataLength(input, inOff, BC / 2, "input buffer too short");
+			Check.OutputLength(output, outOff, BC / 2, "output buffer too short");
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || _UNITY_2021_2_OR_NEWER_
 			UnPackBlock(input.AsSpan(inOff));
@@ -697,7 +702,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 #else
-		private void UnPackBlock(byte[] bytes, int off)
+		void UnPackBlock(byte[] bytes, int off)
 		{
 			int index = off;
 
@@ -715,7 +720,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			}
 		}
 
-		private void PackBlock(byte[] bytes, int off)
+		void PackBlock(byte[] bytes, int off)
 		{
 			int index = off;
 
@@ -729,7 +734,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 		}
 #endif
 
-		private void EncryptBlock(
+		void EncryptBlock(
 			long[][] rk)
 		{
 			int r;
@@ -758,7 +763,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Engines
 			KeyAddition(rk[ROUNDS]);
 		}
 
-		private void DecryptBlock(
+		void DecryptBlock(
 			long[][] rk)
 		{
 			int r;

@@ -34,9 +34,15 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 		public static CertificationRequestInfo GetInstance(object obj)
 		{
 			if (obj is CertificationRequestInfo)
+			{
 				return (CertificationRequestInfo)obj;
+			}
+
 			if (obj != null)
+			{
 				return new CertificationRequestInfo(Asn1Sequence.GetInstance(obj));
+			}
+
 			return null;
 		}
 
@@ -46,7 +52,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			Asn1Set attributes)
 		{
 			this.subject = subject;
-			this.subjectPKInfo = pkInfo;
+			subjectPKInfo = pkInfo;
 			this.attributes = attributes;
 
 			ValidateAttributes(attributes);
@@ -58,7 +64,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			}
 		}
 
-		private CertificationRequestInfo(
+		CertificationRequestInfo(
 			Asn1Sequence seq)
 		{
 			version = (DerInteger)seq[0];
@@ -112,10 +118,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 			return new DerSequence(v);
 		}
 
-		private static void ValidateAttributes(Asn1Set attributes)
+		static void ValidateAttributes(Asn1Set attributes)
 		{
 			if (attributes == null)
+			{
 				return;
+			}
 
 			foreach (Asn1Encodable ae in attributes)
 			{
@@ -124,7 +132,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Pkcs
 				if (attr.AttrType.Equals(PkcsObjectIdentifiers.Pkcs9AtChallengePassword))
 				{
 					if (attr.AttrValues.Count != 1)
+					{
 						throw new ArgumentException("challengePassword attribute must have one value");
+					}
 				}
 			}
 		}

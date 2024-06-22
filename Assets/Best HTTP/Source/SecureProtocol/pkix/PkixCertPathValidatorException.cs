@@ -62,7 +62,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Pkix
 			: base(message, innerException)
 		{
 			if (index < -1)
+			{
 				throw new ArgumentException("cannot be < -1", nameof(index));
+			}
 
 			m_index = index;
 		}

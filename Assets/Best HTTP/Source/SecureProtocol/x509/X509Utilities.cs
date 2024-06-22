@@ -14,15 +14,15 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.Collections;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 {
-	internal class X509Utilities
+	class X509Utilities
 	{
-		private static readonly Dictionary<string, DerObjectIdentifier> m_algorithms =
+		static readonly Dictionary<string, DerObjectIdentifier> m_algorithms =
 			new Dictionary<string, DerObjectIdentifier>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly Dictionary<string, Asn1Encodable> m_exParams =
+		static readonly Dictionary<string, Asn1Encodable> m_exParams =
 			new Dictionary<string, Asn1Encodable>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly HashSet<DerObjectIdentifier> m_noParams = new HashSet<DerObjectIdentifier>();
+		static readonly HashSet<DerObjectIdentifier> m_noParams = new HashSet<DerObjectIdentifier>();
 
 		static X509Utilities()
 		{
@@ -128,7 +128,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 			m_exParams.Add("SHA512WITHRSAANDMGF1", CreatePssParams(sha512AlgId, 64));
 		}
 
-		private static RsassaPssParameters CreatePssParams(
+		static RsassaPssParameters CreatePssParams(
 			AlgorithmIdentifier hashAlgId,
 			int saltSize)
 		{
@@ -141,8 +141,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 
 		internal static DerObjectIdentifier GetAlgorithmOid(string algorithmName)
 		{
-			if (m_algorithms.TryGetValue(algorithmName, out var oid))
+			if (m_algorithms.TryGetValue(algorithmName, out DerObjectIdentifier oid))
+			{
 				return oid;
+			}
 
 			return new DerObjectIdentifier(algorithmName);
 		}
@@ -150,10 +152,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.X509
 		internal static AlgorithmIdentifier GetSigAlgID(DerObjectIdentifier sigOid, string algorithmName)
 		{
 			if (m_noParams.Contains(sigOid))
+			{
 				return new AlgorithmIdentifier(sigOid);
+			}
 
-			if (m_exParams.TryGetValue(algorithmName, out var explicitParameters))
+			if (m_exParams.TryGetValue(algorithmName, out Asn1Encodable explicitParameters))
+			{
 				return new AlgorithmIdentifier(sigOid, explicitParameters);
+			}
 
 			return new AlgorithmIdentifier(sigOid, DerNull.Instance);
 		}

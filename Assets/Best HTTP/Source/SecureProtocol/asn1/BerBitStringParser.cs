@@ -7,12 +7,12 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Utilities.IO;
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1
 {
 	/// <summary>A parser for indefinite-length BIT STRINGs.</summary>
-	internal class BerBitStringParser
+	class BerBitStringParser
 		: Asn1BitStringParser
 	{
-		private readonly Asn1StreamParser m_parser;
+		readonly Asn1StreamParser m_parser;
 
-		private ConstructedBitStream m_bitStream;
+		ConstructedBitStream m_bitStream;
 
 		internal BerBitStringParser(Asn1StreamParser parser)
 		{

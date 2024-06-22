@@ -28,16 +28,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cms
 	 */
 	public class AuthenticatedDataParser
 	{
-		private Asn1SequenceParser seq;
-		private DerInteger version;
-		private IAsn1Convertible nextObject;
-		private bool originatorInfoCalled;
+		Asn1SequenceParser seq;
+		DerInteger version;
+		IAsn1Convertible nextObject;
+		bool originatorInfoCalled;
 
 		public AuthenticatedDataParser(
 			Asn1SequenceParser seq)
 		{
 			this.seq = seq;
-			this.version = (DerInteger)seq.ReadObject();
+			version = (DerInteger)seq.ReadObject();
 		}
 
 		public DerInteger Version

@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Modes.Gcm
 	public class BasicGcmExponentiator
 		: IGcmExponentiator
 	{
-		private GcmUtilities.FieldElement x;
+		GcmUtilities.FieldElement x;
 
 		public void Init(byte[] x)
 		{

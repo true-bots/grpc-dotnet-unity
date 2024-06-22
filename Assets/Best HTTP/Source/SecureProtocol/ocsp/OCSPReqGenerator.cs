@@ -17,11 +17,11 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 {
 	public class OcspReqGenerator
 	{
-		private List<RequestObject> list = new List<RequestObject>();
-		private GeneralName requestorName = null;
-		private X509Extensions requestExtensions = null;
+		List<RequestObject> list = new List<RequestObject>();
+		GeneralName requestorName = null;
+		X509Extensions requestExtensions = null;
 
-		private class RequestObject
+		class RequestObject
 		{
 			internal CertificateID certId;
 			internal X509Extensions extensions;
@@ -94,7 +94,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			this.requestExtensions = requestExtensions;
 		}
 
-		private OcspReq GenerateRequest(
+		OcspReq GenerateRequest(
 			DerObjectIdentifier signingAlgorithm,
 			AsymmetricKeyParameter privateKey,
 			X509Certificate[] chain,
@@ -215,7 +215,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp
 			SecureRandom random)
 		{
 			if (signingAlgorithm == null)
+			{
 				throw new ArgumentException("no signing algorithm specified");
+			}
 
 			try
 			{

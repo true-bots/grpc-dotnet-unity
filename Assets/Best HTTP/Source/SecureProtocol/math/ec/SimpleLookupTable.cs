@@ -7,7 +7,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 	public class SimpleLookupTable
 		: AbstractECLookupTable
 	{
-		private static ECPoint[] Copy(ECPoint[] points, int off, int len)
+		static ECPoint[] Copy(ECPoint[] points, int off, int len)
 		{
 			ECPoint[] result = new ECPoint[len];
 			for (int i = 0; i < len; ++i)
@@ -18,7 +18,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Math.EC
 			return result;
 		}
 
-		private readonly ECPoint[] points;
+		readonly ECPoint[] points;
 
 		public SimpleLookupTable(ECPoint[] points, int off, int len)
 		{

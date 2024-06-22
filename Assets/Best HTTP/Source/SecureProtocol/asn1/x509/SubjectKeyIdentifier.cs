@@ -24,13 +24,25 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public static SubjectKeyIdentifier GetInstance(object obj)
 		{
 			if (obj is SubjectKeyIdentifier)
+			{
 				return (SubjectKeyIdentifier)obj;
+			}
+
 			if (obj is SubjectPublicKeyInfo)
+			{
 				return new SubjectKeyIdentifier((SubjectPublicKeyInfo)obj);
+			}
+
 			if (obj is X509Extension)
+			{
 				return GetInstance(X509Extension.ConvertValueToObject((X509Extension)obj));
+			}
+
 			if (obj == null)
+			{
 				return null;
+			}
+
 			return new SubjectKeyIdentifier(Asn1OctetString.GetInstance(obj));
 		}
 
@@ -39,15 +51,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return GetInstance(X509Extensions.GetExtensionParsedValue(extensions, X509Extensions.SubjectKeyIdentifier));
 		}
 
-		private readonly byte[] keyIdentifier;
+		readonly byte[] keyIdentifier;
 
 		public SubjectKeyIdentifier(
 			byte[] keyID)
 		{
 			if (keyID == null)
+			{
 				throw new ArgumentNullException("keyID");
+			}
 
-			this.keyIdentifier = Arrays.Clone(keyID);
+			keyIdentifier = Arrays.Clone(keyID);
 		}
 
 		public SubjectKeyIdentifier(
@@ -65,7 +79,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 		public SubjectKeyIdentifier(
 			SubjectPublicKeyInfo spki)
 		{
-			this.keyIdentifier = GetDigest(spki);
+			keyIdentifier = GetDigest(spki);
 		}
 
 		public byte[] GetKeyIdentifier()
@@ -118,7 +132,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509
 			return new SubjectKeyIdentifier(id);
 		}
 
-		private static byte[] GetDigest(
+		static byte[] GetDigest(
 			SubjectPublicKeyInfo spki)
 		{
 			IDigest digest = new Sha1Digest();

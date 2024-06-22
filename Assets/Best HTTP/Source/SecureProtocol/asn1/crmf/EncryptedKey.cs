@@ -10,16 +10,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static EncryptedKey GetInstance(object obj)
 		{
 			if (obj is EncryptedKey encryptedKey)
+			{
 				return encryptedKey;
+			}
 
 			if (obj is Asn1TaggedObject taggedObject)
+			{
 				return new EncryptedKey(EnvelopedData.GetInstance(taggedObject, false));
+			}
 
 			return new EncryptedKey(EncryptedValue.GetInstance(obj));
 		}
 
-		private readonly EnvelopedData m_envelopedData;
-		private readonly EncryptedValue m_encryptedValue;
+		readonly EnvelopedData m_envelopedData;
+		readonly EncryptedValue m_encryptedValue;
 
 		public EncryptedKey(EnvelopedData envelopedData)
 		{
@@ -31,14 +35,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 			m_encryptedValue = encryptedValue;
 		}
 
-		public virtual bool IsEncryptedValue => m_encryptedValue != null;
+		public virtual bool IsEncryptedValue
+		{
+			get { return m_encryptedValue != null; }
+		}
 
 		public virtual Asn1Encodable Value
 		{
 			get
 			{
 				if (m_encryptedValue != null)
+				{
 					return m_encryptedValue;
+				}
 
 				return m_envelopedData;
 			}
@@ -56,7 +65,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public override Asn1Object ToAsn1Object()
 		{
 			if (m_encryptedValue != null)
+			{
 				return m_encryptedValue.ToAsn1Object();
+			}
 
 			return new DerTaggedObject(false, 0, m_envelopedData);
 		}

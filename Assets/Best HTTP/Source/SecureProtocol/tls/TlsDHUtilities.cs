@@ -13,7 +13,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		public static TlsDHConfig CreateNamedDHConfig(TlsContext context, int namedGroup)
 		{
 			if (namedGroup < 0 || NamedGroup.GetFiniteFieldBits(namedGroup) < 1)
+			{
 				return null;
+			}
 
 			bool padded = TlsUtilities.IsTlsV13(context);
 			return new TlsDHConfig(namedGroup, padded);
@@ -23,7 +25,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 		{
 			int namedGroup = dhConfig.NamedGroup;
 			if (namedGroup >= 0)
+			{
 				return GetNamedDHGroup(namedGroup);
+			}
 
 			return dhConfig.ExplicitGroup;
 		}
@@ -87,7 +91,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				int namedGroup = namedGroups[i];
 				DHGroup dhGroup = GetNamedDHGroup(namedGroup);
 				if (dhGroup != null && dhGroup.P.Equals(p) && dhGroup.G.Equals(g))
+				{
 					return namedGroup;
+				}
 			}
 
 			return -1;
@@ -108,7 +114,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 			{
 				DHGroup dhGroup = standardGroups[i];
 				if (dhGroup != null && dhGroup.P.Equals(p) && dhGroup.G.Equals(g))
+				{
 					return dhGroup;
+				}
 			}
 
 			return null;
@@ -131,14 +139,18 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Tls
 				}
 
 				if (!dhGroupVerifier.Accept(dhGroup))
+				{
 					throw new TlsFatalAlert(AlertDescription.insufficient_security);
+				}
 
 				return new TlsDHConfig(dhGroup);
 			}
 
 			int[] clientSupportedGroups = context.SecurityParameters.ClientSupportedGroups;
 			if (null == clientSupportedGroups || Arrays.Contains(clientSupportedGroups, namedGroup))
+			{
 				return new TlsDHConfig(namedGroup, false);
+			}
 
 			throw new TlsFatalAlert(AlertDescription.illegal_parameter);
 		}

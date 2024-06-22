@@ -6,7 +6,7 @@ using BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters;
 
 namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Cms
 {
-	internal interface CmsSecureReadable
+	interface CmsSecureReadable
 	{
 		AlgorithmIdentifier Algorithm { get; }
 		object CryptoObject { get; }

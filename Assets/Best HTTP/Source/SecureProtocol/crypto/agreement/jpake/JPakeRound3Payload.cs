@@ -24,19 +24,19 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Agreement.JPake
 		/// <summary>
 		/// The id of the {@link JPAKEParticipant} who created/sent this payload.
 		/// </summary>
-		private readonly string participantId;
+		readonly string participantId;
 
 		/// <summary>
 		/// The value of MacTag, as computed by round 3.
 		/// 
 		/// See JPAKEUtil#calculateMacTag(string, string, BigInteger, BigInteger, BigInteger, BigInteger, BigInteger, org.bouncycastle.crypto.Digest)
 		/// </summary>
-		private readonly BigInteger macTag;
+		readonly BigInteger macTag;
 
 		public JPakeRound3Payload(string participantId, BigInteger magTag)
 		{
 			this.participantId = participantId;
-			this.macTag = magTag;
+			macTag = magTag;
 		}
 
 		public virtual string ParticipantId

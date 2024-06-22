@@ -24,19 +24,23 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 		public static OobCertHash GetInstance(object obj)
 		{
 			if (obj is OobCertHash oobCertHash)
+			{
 				return oobCertHash;
+			}
 
 			if (obj != null)
+			{
 				return new OobCertHash(Asn1Sequence.GetInstance(obj));
+			}
 
 			return null;
 		}
 
-		private readonly AlgorithmIdentifier m_hashAlg;
-		private readonly CertId m_certId;
-		private readonly DerBitString m_hashVal;
+		readonly AlgorithmIdentifier m_hashAlg;
+		readonly CertId m_certId;
+		readonly DerBitString m_hashVal;
 
-		private OobCertHash(Asn1Sequence seq)
+		OobCertHash(Asn1Sequence seq)
 		{
 			int index = seq.Count - 1;
 
@@ -57,11 +61,20 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Cmp
 			}
 		}
 
-		public virtual CertId CertID => m_certId;
+		public virtual CertId CertID
+		{
+			get { return m_certId; }
+		}
 
-		public virtual AlgorithmIdentifier HashAlg => m_hashAlg;
+		public virtual AlgorithmIdentifier HashAlg
+		{
+			get { return m_hashAlg; }
+		}
 
-		public virtual DerBitString HashVal => m_hashVal;
+		public virtual DerBitString HashVal
+		{
+			get { return m_hashVal; }
+		}
 
 		/**
 		 * <pre>

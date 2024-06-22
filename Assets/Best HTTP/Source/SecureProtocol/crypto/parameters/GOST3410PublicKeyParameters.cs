@@ -9,7 +9,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 	public class Gost3410PublicKeyParameters
 		: Gost3410KeyParameters
 	{
-		private readonly BigInteger y;
+		readonly BigInteger y;
 
 		public Gost3410PublicKeyParameters(
 			BigInteger y,
@@ -17,7 +17,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(false, parameters)
 		{
 			if (y.SignValue < 1 || y.CompareTo(Parameters.P) >= 0)
+			{
 				throw new ArgumentException("Invalid y for GOST3410 public key", "y");
+			}
 
 			this.y = y;
 		}
@@ -28,7 +30,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(false, publicKeyParamSet)
 		{
 			if (y.SignValue < 1 || y.CompareTo(Parameters.P) >= 0)
+			{
 				throw new ArgumentException("Invalid y for GOST3410 public key", "y");
+			}
 
 			this.y = y;
 		}

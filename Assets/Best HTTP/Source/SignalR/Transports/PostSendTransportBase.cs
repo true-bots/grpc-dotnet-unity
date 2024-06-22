@@ -24,7 +24,7 @@ namespace BestHTTP.SignalR.Transports
 
 		protected override void SendImpl(string json)
 		{
-			var request = new HTTPRequest(Connection.BuildUri(RequestTypes.Send, this), HTTPMethods.Post, true, true, OnSendRequestFinished);
+			HTTPRequest request = new HTTPRequest(Connection.BuildUri(RequestTypes.Send, this), HTTPMethods.Post, true, true, OnSendRequestFinished);
 
 			request.FormUsage = Forms.HTTPFormUsage.UrlEncoded;
 			request.AddField("data", json);
@@ -49,28 +49,32 @@ namespace BestHTTP.SignalR.Transports
 				case HTTPRequestStates.Finished:
 					if (resp.IsSuccess)
 					{
-						HTTPManager.Logger.Information("Transport - " + this.Name, "Send - Request Finished Successfully! " + resp.DataAsText);
+						HTTPManager.Logger.Information("Transport - " + Name, "Send - Request Finished Successfully! " + resp.DataAsText);
 
 						if (!string.IsNullOrEmpty(resp.DataAsText))
 						{
-							IServerMessage msg = TransportBase.Parse(Connection.JsonEncoder, resp.DataAsText);
+							IServerMessage msg = Parse(Connection.JsonEncoder, resp.DataAsText);
 
 							if (msg != null)
+							{
 								Connection.OnMessage(msg);
+							}
 						}
 					}
 					else
+					{
 						reason = string.Format("Send - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}",
 							resp.StatusCode,
 							resp.Message,
 							resp.DataAsText);
+					}
 
 					break;
 
 				// The request finished with an unexpected error. The request's Exception property may contain more info about the error.
 				case HTTPRequestStates.Error:
 					reason = "Send - Request Finished with Error! " +
-					         (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception");
+					         (req.Exception != null ? req.Exception.Message + "\n" + req.Exception.StackTrace : "No Exception");
 					break;
 
 				// The request aborted, initiated by the user.
@@ -90,7 +94,9 @@ namespace BestHTTP.SignalR.Transports
 			}
 
 			if (!string.IsNullOrEmpty(reason))
+			{
 				Connection.Error(reason);
+			}
 		}
 
 		#endregion

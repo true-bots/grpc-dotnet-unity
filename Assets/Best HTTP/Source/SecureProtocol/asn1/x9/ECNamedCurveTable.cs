@@ -251,7 +251,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X9
 		{
 			get
 			{
-				var result = new List<string>();
+				List<string> result = new List<string>();
 				result.AddRange(X962NamedCurves.Names);
 				result.AddRange(SecNamedCurves.Names);
 				result.AddRange(NistNamedCurves.Names);

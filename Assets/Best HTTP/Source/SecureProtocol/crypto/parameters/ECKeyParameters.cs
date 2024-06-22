@@ -13,7 +13,7 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 		: AsymmetricKeyParameter
 	{
 		// NB: Use a Dictionary so we can lookup the upper case version
-		private static readonly Dictionary<string, string> Algorithms =
+		static readonly Dictionary<string, string> Algorithms =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 			{
 				{ "EC", "EC" },
@@ -21,12 +21,12 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 				{ "ECDH", "ECDH" },
 				{ "ECDHC", "ECDHC" },
 				{ "ECGOST3410", "ECGOST3410" },
-				{ "ECMQV", "ECMQV" },
+				{ "ECMQV", "ECMQV" }
 			};
 
-		private readonly string algorithm;
-		private readonly ECDomainParameters parameters;
-		private readonly DerObjectIdentifier publicKeyParamSet;
+		readonly string algorithm;
+		readonly ECDomainParameters parameters;
+		readonly DerObjectIdentifier publicKeyParamSet;
 
 		protected ECKeyParameters(
 			string algorithm,
@@ -35,9 +35,14 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(isPrivate)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException("algorithm");
+			}
+
 			if (parameters == null)
+			{
 				throw new ArgumentNullException("parameters");
+			}
 
 			this.algorithm = VerifyAlgorithmName(algorithm);
 			this.parameters = parameters;
@@ -50,12 +55,17 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			: base(isPrivate)
 		{
 			if (algorithm == null)
+			{
 				throw new ArgumentNullException("algorithm");
+			}
+
 			if (publicKeyParamSet == null)
+			{
 				throw new ArgumentNullException("publicKeyParamSet");
+			}
 
 			this.algorithm = VerifyAlgorithmName(algorithm);
-			this.parameters = LookupParameters(publicKeyParamSet);
+			parameters = LookupParameters(publicKeyParamSet);
 			this.publicKeyParamSet = publicKeyParamSet;
 		}
 
@@ -78,12 +88,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			object obj)
 		{
 			if (obj == this)
+			{
 				return true;
+			}
 
 			ECDomainParameters other = obj as ECDomainParameters;
 
 			if (other == null)
+			{
 				return false;
+			}
 
 			return Equals(other);
 		}
@@ -112,8 +126,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 
 		internal static string VerifyAlgorithmName(string algorithm)
 		{
-			if (!Algorithms.TryGetValue(algorithm, out var upper))
+			if (!Algorithms.TryGetValue(algorithm, out string upper))
+			{
 				throw new ArgumentException("unrecognised algorithm: " + algorithm, nameof(algorithm));
+			}
 
 			return upper;
 		}
@@ -122,12 +138,16 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Crypto.Parameters
 			DerObjectIdentifier publicKeyParamSet)
 		{
 			if (publicKeyParamSet == null)
+			{
 				throw new ArgumentNullException("publicKeyParamSet");
+			}
 
 			X9ECParameters x9 = ECKeyPairGenerator.FindECCurveByOid(publicKeyParamSet);
 
 			if (x9 == null)
+			{
 				throw new ArgumentException("OID is not a valid public key parameter set", "publicKeyParamSet");
+			}
 
 			return new ECDomainParameters(x9);
 		}

@@ -13,10 +13,10 @@
 
 namespace BestHTTP.JSON.LitJson
 {
-	internal enum ParserToken
+	enum ParserToken
 	{
 		// Lexer tokens (see section A.1.1. of the manual)
-		None = System.Char.MaxValue + 1,
+		None = char.MaxValue + 1,
 		Number,
 		True,
 		False,

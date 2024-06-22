@@ -13,14 +13,14 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace BestHTTP.Connections.TLS.Crypto.Impl
 {
-	[BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
+	[PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
 #if BESTHTTP_WITH_BURST
     [BurstCompile]
 #endif
 	public sealed class BurstTables8kGcmMultiplier //: IGcmMultiplier
 	{
-		private byte[] H;
-		private GcmUtilities.FieldElement[][] T;
+		byte[] H;
+		GcmUtilities.FieldElement[][] T;
 
 		public void Init(byte[] H)
 		{
@@ -34,11 +34,15 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			}
 
 			if (this.H == null)
+			{
 				this.H = Arrays.Clone(H);
+			}
 			else
 			{
 				if (this.H.Length != H.Length)
+				{
 					Array.Resize(ref this.H, H.Length);
+				}
 
 				Array.Copy(H, this.H, H.Length);
 			}
@@ -46,7 +50,9 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			for (int i = 0; i < 2; ++i)
 			{
 				if (T[i] == null)
+				{
 					T[i] = new GcmUtilities.FieldElement[256];
+				}
 
 				GcmUtilities.FieldElement[] t = T[i];
 
@@ -79,15 +85,17 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 		public unsafe void MultiplyH(byte[] x)
 		{
 			fixed (byte* px = x)
-			fixed (GcmUtilities.FieldElement* pT0 = this.T[0])
-			fixed (GcmUtilities.FieldElement* pT1 = this.T[1])
+			fixed (GcmUtilities.FieldElement* pT0 = T[0])
+			fixed (GcmUtilities.FieldElement* pT1 = T[1])
+			{
 				MultiplyHImpl(px, pT0, pT1);
+			}
 		}
 
 #if BESTHTTP_WITH_BURST
         [BurstCompile]
 #endif
-		private static unsafe void MultiplyHImpl(
+		static unsafe void MultiplyHImpl(
 #if BESTHTTP_WITH_BURST
             [NoAlias]
 #endif
@@ -123,25 +131,25 @@ namespace BestHTTP.Connections.TLS.Crypto.Impl
 			px[0] = (byte)(n >> 24);
 			px[1] = (byte)(n >> 16);
 			px[2] = (byte)(n >> 8);
-			px[3] = (byte)(n);
+			px[3] = (byte)n;
 			//UInt32_To_BE((uint)(n), bs, off + 4);
-			n = (uint)(z0);
+			n = (uint)z0;
 			px[4] = (byte)(n >> 24);
 			px[5] = (byte)(n >> 16);
 			px[6] = (byte)(n >> 8);
-			px[7] = (byte)(n);
+			px[7] = (byte)n;
 
 			n = (uint)(z1 >> 32);
 			px[8] = (byte)(n >> 24);
 			px[9] = (byte)(n >> 16);
 			px[10] = (byte)(n >> 8);
-			px[11] = (byte)(n);
+			px[11] = (byte)n;
 			//UInt32_To_BE((uint)(n), bs, off + 4);
-			n = (uint)(z1);
+			n = (uint)z1;
 			px[12] = (byte)(n >> 24);
 			px[13] = (byte)(n >> 16);
 			px[14] = (byte)(n >> 8);
-			px[15] = (byte)(n);
+			px[15] = (byte)n;
 		}
 	}
 }

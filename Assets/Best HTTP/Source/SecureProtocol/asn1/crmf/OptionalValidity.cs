@@ -8,10 +8,10 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 	public class OptionalValidity
 		: Asn1Encodable
 	{
-		private readonly Time notBefore;
-		private readonly Time notAfter;
+		readonly Time notBefore;
+		readonly Time notAfter;
 
-		private OptionalValidity(Asn1Sequence seq)
+		OptionalValidity(Asn1Sequence seq)
 		{
 			foreach (Asn1TaggedObject tObj in seq)
 			{
@@ -29,7 +29,9 @@ namespace BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.Crmf
 		public static OptionalValidity GetInstance(object obj)
 		{
 			if (obj == null || obj is OptionalValidity)
+			{
 				return (OptionalValidity)obj;
+			}
 
 			return new OptionalValidity(Asn1Sequence.GetInstance(obj));
 		}
